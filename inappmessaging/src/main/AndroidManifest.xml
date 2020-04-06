@@ -1,0 +1,29 @@
+<manifest xmlns:android="http://schemas.android.com/apk/res/android"
+  package="com.rakuten.tech.mobile.inappmessaging.runtime">
+
+  <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE"/>
+  <uses-permission android:name="android.permission.INTERNET"/>
+  <!--Wake_Lock needed for JobIntentService-->
+  <uses-permission android:name="android.permission.WAKE_LOCK"/>
+
+  <application>
+    <service
+      android:exported="false"
+      android:name="com.rakuten.tech.mobile.inappmessaging.runtime.service.DisplayMessageJobIntentService"
+      android:permission="android.permission.BIND_JOB_SERVICE"/>
+
+    <provider
+      android:name="com.rakuten.tech.mobile.inappmessaging.runtime.InAppMessagingInitProvider"
+      android:authorities="${applicationId}.InAppMessagingInitProvider"
+      android:exported="false"/>
+
+    <!-- disable default provider: Android 11 handling -->
+    <provider
+      android:name="androidx.work.impl.WorkManagerInitializer"
+      android:authorities="${applicationId}.workmanager-init"
+      android:exported="false"
+      android:enabled="false"/>
+
+  </application>
+
+</manifest>

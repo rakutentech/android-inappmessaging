@@ -1,0 +1,383 @@
+package com.rakuten.tech.mobile.inappmessaging.runtime.utils
+
+import android.os.Build
+import androidx.test.core.app.ApplicationProvider
+import androidx.work.WorkerParameters
+import androidx.work.testing.WorkManagerTestInitHelper
+import com.rakuten.tech.mobile.inappmessaging.runtime.BaseTest
+import com.rakuten.tech.mobile.inappmessaging.runtime.data.enums.EventType
+import com.rakuten.tech.mobile.inappmessaging.runtime.data.models.appevents.AppStartEvent
+import com.rakuten.tech.mobile.inappmessaging.runtime.data.models.appevents.CustomEvent
+import com.rakuten.tech.mobile.inappmessaging.runtime.data.models.appevents.Event
+import com.rakuten.tech.mobile.inappmessaging.runtime.data.models.messages.Message
+import com.rakuten.tech.mobile.inappmessaging.runtime.data.repositories.LocalEventRepository
+import com.rakuten.tech.mobile.inappmessaging.runtime.data.repositories.PingResponseMessageRepository
+import com.rakuten.tech.mobile.inappmessaging.runtime.data.responses.ping.Trigger
+import com.rakuten.tech.mobile.inappmessaging.runtime.data.responses.ping.TriggerAttribute
+import com.rakuten.tech.mobile.inappmessaging.runtime.workmanager.workers.MessageEventReconciliationWorker
+import org.amshove.kluent.*
+import org.junit.Before
+import org.junit.Test
+import org.junit.runner.RunWith
+import org.mockito.Mockito
+import org.mockito.MockitoAnnotations
+import org.robolectric.RobolectricTestRunner
+import org.robolectric.annotation.Config
+import java.util.*
+import kotlin.collections.ArrayList
+
+/**
+ * Test class for MessageEventReconciliationUtil.
+ */
+@RunWith(RobolectricTestRunner::class)
+@Config(sdk = [Build.VERSION_CODES.O_MR1])
+@Suppress("LargeClass")
+class MessageEventReconciliationUtilSpec : BaseTest() {
+
+    private val appStartEvent = AppStartEvent()
+    private val customEvent = CustomEvent("custom")
+    private val message1 = Mockito.mock(Message::class.java)
+    private val message2 = Mockito.mock(Message::class.java)
+    private val testMessage = Mockito.mock(Message::class.java)
+    private val trigger1 = Mockito.mock(Trigger::class.java)
+    private val trigger2 = Mockito.mock(Trigger::class.java)
+    private val trigger3 = Mockito.mock(Trigger::class.java)
+    private val trigger4 = Mockito.mock(Trigger::class.java)
+
+    /**
+     * Setting up data and mocks.
+     */
+    @Before
+    @Suppress("LongMethod")
+    fun setup() {
+        MockitoAnnotations.initMocks(this)
+        // Arranging message1's data.
+        val trigger1List = ArrayList<Trigger>()
+        trigger1List.add(trigger1)
+        trigger1List.add(trigger2)
+        trigger1List.add(trigger3)
+        trigger1List.add(trigger4)
+        When calling trigger1.eventType itReturns 1
+        When calling trigger2.eventType itReturns 2
+        When calling trigger3.eventType itReturns 3
+        When calling trigger4.eventType itReturns 4
+        When calling message1.getMaxImpressions() itReturns 1
+        When calling message1.getTriggers() itReturns trigger1List
+        When calling message1.getCampaignId() itReturns "message1"
+        When calling message1.isTest() itReturns false
+
+        // Arranging message2's data.
+        val trigger2List = ArrayList<Trigger>()
+        trigger2List.add(trigger1)
+        When calling message2.getMaxImpressions() itReturns 2
+        When calling message2.getTriggers() itReturns trigger2List
+        When calling message2.getCampaignId() itReturns "message2"
+        When calling message2.isTest() itReturns false
+        // Arrange test message's data.
+        When calling testMessage.getCampaignId() itReturns "test"
+        When calling testMessage.isTest() itReturns true
+    }
+
+    @Test
+    fun `should extract test messages`() {
+        val messageList = ArrayList<Message>()
+        messageList.add(message1)
+        messageList.add(message2)
+        messageList.add(testMessage)
+        val testMessageList = MessageEventReconciliationUtil.instance().extractTestMessages(messageList)
+        testMessageList[0] shouldEqual testMessage
+        testMessageList.shouldHaveSize(1)
+    }
+
+    @Test
+    fun `should reconcile message with base attributes`() {
+        // Arrange input data.
+        val inputMessageList = ArrayList<Message>()
+        inputMessageList.add(message2)
+        LocalEventRepository.instance().addEvent(appStartEvent)
+        // Act.
+        val outputMessageList = MessageEventReconciliationUtil.instance()
+                .reconcileMessagesAndEvents(inputMessageList)
+        // Re-assert the output with qualifying event.
+        outputMessageList[0] shouldEqual message2
+        outputMessageList.shouldHaveSize(1)
+    }
+
+    @Test
+    fun `should not add same message multiple times`() {
+        // Arrange input data.
+        val inputMessageList = ArrayList<Message>()
+        inputMessageList.add(message2)
+        // Act.
+        LocalEventRepository.instance().clearEvents()
+        val outputMessageList = MessageEventReconciliationUtil.instance()
+                .reconcileMessagesAndEvents(inputMessageList)
+        outputMessageList.shouldHaveSize(0)
+    }
+
+    @Test(expected = UnsupportedOperationException::class)
+    fun `should modify reconciled messages throw exception`() {
+        // Act.
+        val outputMessageList = MessageEventReconciliationUtil.instance()
+                .reconcileMessagesAndEvents(ArrayList())
+        // Re-assert the output with qualifying event.
+        outputMessageList.add(message1)
+    }
+
+    @Test
+    fun `should not reconcile test message`() {
+        // Arrange input data.
+        val inputMessageList = ArrayList<Message>()
+        inputMessageList.add(testMessage)
+        // Act.
+        val outputMessageList = MessageEventReconciliationUtil.instance()
+                .reconcileMessagesAndEvents(inputMessageList)
+        // Re-assert the output with qualifying event.
+        outputMessageList.shouldHaveSize(0)
+    }
+
+    @Test
+    fun `should check message for max impressions`() {
+        // Arrange input data.
+        val inputMessageList = ArrayList<Message>()
+        inputMessageList.add(message1)
+        // Act.
+        MessageEventReconciliationUtil.instance().reconcileMessagesAndEvents(inputMessageList)
+        // Re-assert the output with qualifying event.
+        Mockito.verify(message1).getMaxImpressions()
+    }
+
+    @Test
+    fun `should not reconcile message with invalid event`() {
+        // Arrange input data.
+        val inputMessageList = ArrayList<Message>()
+        inputMessageList.add(message2)
+        val mockEvent = Mockito.mock(Event::class.java)
+        When calling mockEvent.getEventType() itReturns EventType.INVALID.typeId
+        When calling mockEvent.getEventName() itReturns "invalid"
+        LocalEventRepository.instance().clearEvents()
+        LocalEventRepository.instance().addEvent(mockEvent)
+        // Act.
+        val outputMessageList = MessageEventReconciliationUtil.instance()
+                .reconcileMessagesAndEvents(inputMessageList)
+        // Re-assert the output with qualifying event.
+        outputMessageList.shouldHaveSize(0)
+    }
+
+    @Test
+    fun `should reconcile message with valid string trigger`() {
+        // Arrange input data.
+        val inputMessageList = ArrayList<Message>()
+        inputMessageList.add(message2)
+        val triggerAttr = TriggerAttribute("name", "value", 1, 1)
+        val attrList = ArrayList<TriggerAttribute>()
+        attrList.add(triggerAttr)
+        When calling trigger1.triggerAttributes itReturns attrList
+        When calling trigger1.eventType itReturns 4
+        When calling trigger1.eventName itReturns "custom"
+        customEvent.addAttribute("name", "value")
+        LocalEventRepository.instance().clearEvents()
+        LocalEventRepository.instance().addEvent(customEvent)
+        // Act.
+        val outputMessageList = MessageEventReconciliationUtil.instance()
+                .reconcileMessagesAndEvents(inputMessageList)
+        // Re-assert the output with qualifying event.
+        outputMessageList.shouldHaveSize(1)
+    }
+
+    @Test
+    fun `should reconcile message with valid integer trigger`() {
+        // Arrange input data.
+        val inputMessageList = ArrayList<Message>()
+        inputMessageList.add(message2)
+        val triggerAttr = TriggerAttribute("name", "1", 2, 1)
+        val attrList = ArrayList<TriggerAttribute>()
+        attrList.add(triggerAttr)
+        When calling trigger1.triggerAttributes itReturns attrList
+        When calling trigger1.eventType itReturns 4
+        When calling trigger1.eventName itReturns "custom"
+        customEvent.addAttribute("name", 1)
+        LocalEventRepository.instance().clearEvents()
+        LocalEventRepository.instance().addEvent(customEvent)
+        // Act.
+        val outputMessageList = MessageEventReconciliationUtil.instance()
+                .reconcileMessagesAndEvents(inputMessageList)
+        // Re-assert the output with qualifying event.
+        outputMessageList.shouldHaveSize(1)
+    }
+
+    @Test
+    fun `should reconcile message with valid double trigger`() {
+        // Arrange input data.
+        val inputMessageList = ArrayList<Message>()
+        inputMessageList.add(message2)
+        val triggerAttr = TriggerAttribute("name", "1.0", 3, 1)
+        val attrList = ArrayList<TriggerAttribute>()
+        attrList.add(triggerAttr)
+        When calling trigger1.triggerAttributes itReturns attrList
+        When calling trigger1.eventType itReturns 4
+        When calling trigger1.eventName itReturns "custom"
+        customEvent.addAttribute("name", 1.0)
+        LocalEventRepository.instance().clearEvents()
+        LocalEventRepository.instance().addEvent(customEvent)
+        // Act.
+        val outputMessageList = MessageEventReconciliationUtil.instance()
+                .reconcileMessagesAndEvents(inputMessageList)
+        // Re-assert the output with qualifying event.
+        outputMessageList.shouldHaveSize(1)
+    }
+
+    @Test
+    fun `should reconcile message with valid boolean trigger`() {
+        // Arrange input data.
+        val inputMessageList = ArrayList<Message>()
+        inputMessageList.add(message2)
+        val triggerAttr = TriggerAttribute("name", "true", 4, 1)
+        val attrList = ArrayList<TriggerAttribute>()
+        attrList.add(triggerAttr)
+        When calling trigger1.triggerAttributes itReturns attrList
+        When calling trigger1.eventType itReturns 4
+        When calling trigger1.eventName itReturns "custom"
+        customEvent.addAttribute("name", true)
+        LocalEventRepository.instance().clearEvents()
+        LocalEventRepository.instance().addEvent(customEvent)
+        // Act.
+        val outputMessageList = MessageEventReconciliationUtil.instance()
+                .reconcileMessagesAndEvents(inputMessageList)
+        // Re-assert the output with qualifying event.
+        outputMessageList.shouldHaveSize(1)
+    }
+
+    @Test
+    fun `should reconcile message with valid time trigger`() {
+        // Arrange input data.
+        val inputMessageList = ArrayList<Message>()
+        inputMessageList.add(message2)
+        val currDate = Date()
+        val triggerAttr = TriggerAttribute("name", currDate.time.toString(), 5, 1)
+        val attrList = ArrayList<TriggerAttribute>()
+        attrList.add(triggerAttr)
+        When calling trigger1.triggerAttributes itReturns attrList
+        When calling trigger1.eventType itReturns 4
+        When calling trigger1.eventName itReturns "custom"
+        customEvent.addAttribute("name", currDate)
+        LocalEventRepository.instance().clearEvents()
+        LocalEventRepository.instance().addEvent(customEvent)
+        // Act.
+        val outputMessageList = MessageEventReconciliationUtil.instance()
+                .reconcileMessagesAndEvents(inputMessageList)
+        // Re-assert the output with qualifying event.
+        outputMessageList.shouldHaveSize(1)
+    }
+
+    @Test
+    fun `should not reconcile message with mismatched attribute name`() {
+        // Arrange input data.
+        val inputMessageList = ArrayList<Message>()
+        inputMessageList.add(message2)
+        val currDate = Date()
+        val triggerAttr = TriggerAttribute("name1", currDate.time.toString(), 5, 1)
+        val attrList = ArrayList<TriggerAttribute>()
+        attrList.add(triggerAttr)
+        When calling trigger1.triggerAttributes itReturns attrList
+        When calling trigger1.eventType itReturns 4
+        When calling trigger1.eventName itReturns "custom"
+        customEvent.addAttribute("name2", currDate)
+        LocalEventRepository.instance().clearEvents()
+        LocalEventRepository.instance().addEvent(customEvent)
+        // Act.
+        val outputMessageList = MessageEventReconciliationUtil.instance()
+                .reconcileMessagesAndEvents(inputMessageList)
+        // Re-assert the output with qualifying event.
+        outputMessageList.shouldHaveSize(0)
+    }
+
+    @Test
+    fun `should not reconcile message with invalid value type`() {
+        // Arrange input data.
+        val inputMessageList = ArrayList<Message>()
+        inputMessageList.add(message2)
+        val currDate = Date()
+        val triggerAttr = TriggerAttribute("name", currDate.time.toString(), 0, 1)
+        val attrList = ArrayList<TriggerAttribute>()
+        attrList.add(triggerAttr)
+        When calling trigger1.triggerAttributes itReturns attrList
+        When calling trigger1.eventType itReturns 4
+        When calling trigger1.eventName itReturns "custom"
+        customEvent.addAttribute("name", currDate)
+        LocalEventRepository.instance().clearEvents()
+        LocalEventRepository.instance().addEvent(customEvent)
+        // Act.
+        val outputMessageList = MessageEventReconciliationUtil.instance()
+                .reconcileMessagesAndEvents(inputMessageList)
+        // Re-assert the output with qualifying event.
+        outputMessageList.shouldHaveSize(0)
+    }
+
+    @Test
+    fun `should not reconcile message with incorrect value type`() {
+        // Arrange input data.
+        val inputMessageList = ArrayList<Message>()
+        inputMessageList.add(message2)
+        val currDate = Date()
+        val triggerAttr = TriggerAttribute("name", currDate.time.toString(), 6, 1)
+        val attrList = ArrayList<TriggerAttribute>()
+        attrList.add(triggerAttr)
+        When calling trigger1.triggerAttributes itReturns attrList
+        When calling trigger1.eventType itReturns 4
+        When calling trigger1.eventName itReturns "custom"
+        customEvent.addAttribute("name", currDate)
+        LocalEventRepository.instance().clearEvents()
+        LocalEventRepository.instance().addEvent(customEvent)
+        // Act.
+        val outputMessageList = MessageEventReconciliationUtil.instance()
+                .reconcileMessagesAndEvents(inputMessageList)
+        // Re-assert the output with qualifying event.
+        outputMessageList.shouldHaveSize(0)
+    }
+
+    @Test
+    fun `should not reconcile message with null max impression`() {
+        // Arrange input data.
+        val inputMessageList = ArrayList<Message>()
+        inputMessageList.add(message2)
+        val currDate = Date()
+        val triggerAttr = TriggerAttribute("name", currDate.time.toString(), 6, 1)
+        val attrList = ArrayList<TriggerAttribute>()
+        attrList.add(triggerAttr)
+        When calling trigger1.triggerAttributes itReturns attrList
+        When calling trigger1.eventType itReturns 4
+        When calling trigger1.eventName itReturns "custom"
+        When calling message2.getMaxImpressions() itReturns null
+        customEvent.addAttribute("name", currDate)
+        LocalEventRepository.instance().clearEvents()
+        LocalEventRepository.instance().addEvent(customEvent)
+        // Act.
+        val outputMessageList = MessageEventReconciliationUtil.instance()
+                .reconcileMessagesAndEvents(inputMessageList)
+        // Re-assert the output with qualifying event.
+        outputMessageList.shouldHaveSize(0)
+    }
+
+    @Test
+    @Suppress("LongMethod")
+    fun `should be called once`() {
+        val mockPingRepo = Mockito.mock(PingResponseMessageRepository::class.java)
+        val mockReconUtil = Mockito.mock(MessageEventReconciliationUtil::class.java)
+        val messageList = ArrayList<Message>()
+        messageList.add(message1)
+        messageList.add(message2)
+        When calling mockPingRepo.getAllMessagesCopy() itReturns messageList
+        When calling mockReconUtil.extractTestMessages(messageList) itReturns messageList
+        When calling mockReconUtil.reconcileMessagesAndEvents(messageList) itReturns messageList
+
+        val workerParameters = Mockito.mock(WorkerParameters::class.java)
+        WorkManagerTestInitHelper.initializeTestWorkManager(ApplicationProvider.getApplicationContext())
+        val worker = MessageEventReconciliationWorker(ApplicationProvider.getApplicationContext(), workerParameters,
+                mockPingRepo, mockReconUtil)
+        worker.doWork()
+
+        Mockito.verify(mockReconUtil, Mockito.times(1)).extractTestMessages(messageList)
+        Mockito.verify(mockReconUtil, Mockito.times(1)).reconcileMessagesAndEvents(messageList)
+    }
+}

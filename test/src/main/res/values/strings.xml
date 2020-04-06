@@ -1,0 +1,8 @@
+<resources>
+  <string name="app_name">IAM Test</string>
+  <string name="empty_second_activity">Empty second activity</string>
+  <string name="launch_second_activity">Launch Second Activity</string>
+  <string name="login_successful">Login Successful</string>
+  <string name="purchase_successful">Purchase Successful</string>
+  <string name="custom_event_newuser">Custom Event: newUser</string>
+</resources>

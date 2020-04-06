@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+  <!-- Example text for local rendering -->
+  <string name="example_header_text">卵チーズとベーコンのトルコサンドイッチ</string>
+  <string name="example_body_text">タニタ食堂の日替わり弁当を20日間お届けします。丸の内タニタ食堂での計測サービス付きで、体組成の改善をしましょう
+※ご注文は10名（9,500円～）より、電話でのみ受付しておりま!</string>
+  <string name="example_left_button">カートに入れる</string>
+  <string name="example_right_button">Hello</string>
+</resources>

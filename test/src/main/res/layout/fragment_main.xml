@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout
+  xmlns:android="http://schemas.android.com/apk/res/android"
+  xmlns:tools="http://schemas.android.com/tools"
+  android:layout_width="match_parent"
+  android:layout_height="match_parent"
+  tools:context="com.rakuten.test.MainActivityFragment"
+  android:gravity="center"
+  android:orientation="vertical"
+  tools:showIn="@layout/activity_main">
+
+  <Button
+    android:id="@+id/launch_second_activity"
+    android:layout_width="wrap_content"
+    android:layout_height="wrap_content"
+    android:text="@string/launch_second_activity"/>
+
+  <Button
+    android:id="@+id/login_successful"
+    android:layout_width="wrap_content"
+    android:layout_height="wrap_content"
+    android:text="@string/login_successful"/>
+
+  <Button
+    android:id="@+id/purchase_successful"
+    android:layout_width="wrap_content"
+    android:layout_height="wrap_content"
+    android:text="@string/purchase_successful"/>
+
+  <Button
+    android:id="@+id/custom_event"
+    android:layout_width="wrap_content"
+    android:layout_height="wrap_content"
+    android:text="@string/custom_event_newuser"/>
+
+</LinearLayout>
