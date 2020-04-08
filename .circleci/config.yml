@@ -13,11 +13,11 @@ jobs:
   build:
     docker:
       - image: circleci/android:api-29
-    parallelism: 2
-    resource_class: large
+    parallelism: 4
+    resource_class: medium
     working_directory: ~/code
     environment:
-      JAVA_OPTS: "-Xmx8g"
+      JAVA_OPTS: "-Xmx16800m"
     steps:
       - checkout
       - run: git submodule update --init
@@ -33,6 +33,9 @@ jobs:
       - restore_cache:
           ## Robolectric uses maven to download sources, so we must use a different cache for maven
           key: *maven_cache_key
+      - run:
+          name: Set split
+          command: circleci tests glob "**/*.kt" | circleci tests split --split-by=timings
       - run:
           name: Run Tests
           command: ./gradlew check
