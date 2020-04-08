@@ -13,9 +13,10 @@ jobs:
   build:
     docker:
       - image: circleci/android:api-29
+    resource_class: xlarge
     working_directory: ~/code
     environment:
-      JAVA_OPTS: "-Xmx6400m"
+      JAVA_OPTS: "-Xmx8g"
     steps:
       - checkout
       - run: git submodule update --init
