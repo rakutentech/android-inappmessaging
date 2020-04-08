@@ -15,7 +15,7 @@ jobs:
       - image: circleci/android:api-29
     working_directory: ~/code
     environment:
-      JAVA_OPTS: "-Xmx3200m"
+      JAVA_OPTS: "-Xmx4g"
     steps:
       - checkout
       - run: git submodule update --init
