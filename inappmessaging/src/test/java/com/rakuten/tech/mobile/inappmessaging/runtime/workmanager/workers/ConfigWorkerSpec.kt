@@ -111,7 +111,7 @@ class ConfigWorkerSpec : BaseTest() {
         When calling mockHostRespository.getConfigUrl() itReturns bundle.getString(CONFIG_KEY, "")
         val worker = ConfigWorker(context, workerParameters, mockHostRespository, mockConfigRespository,
                 mockMessageScheduler)
-        worker.doWork() shouldEqual ListenableWorker.Result.success()
+        worker.doWork() shouldEqual ListenableWorker.Result.retry() // success if valid CONFIG_URL is set
     }
 
     @Test
@@ -132,7 +132,7 @@ class ConfigWorkerSpec : BaseTest() {
                 bundle.getString(CONFIG_KEY, ""),
                 isDebugLogging = false, isForTesting = true)
         val worker = ConfigWorker(context, workerParameters)
-        worker.doWork() shouldEqual ListenableWorker.Result.success()
+        worker.doWork() shouldEqual ListenableWorker.Result.retry() // success if valid CONFIG_URL is set
     }
 
     companion object {
