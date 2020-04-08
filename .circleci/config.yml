@@ -8,13 +8,6 @@ gradle_cache_key: &gradle_cache_key >-
 maven_cache_key: &maven_cache_key >-
   maven
   -{{ checksum "inappmessaging/src/test/java/com/rakuten/tech/mobile/inappmessaging/runtime/BaseTest.kt" }}
-java_tool_options: &java_tool_options >-
-  -Dhttp.proxyHost=pkg.proxy.prod.jp.local
-  -Dhttps.proxyHost=pkg.proxy.prod.jp.local
-  -Dhttp.proxyPort=10080
-  -Dhttps.proxyPort=10080
-  -Dhttp.nonProxyHosts=artifactory.intra.rakuten-it.com
-  -Dhttps.nonProxyHosts=artifactory.intra.rakuten-it.com
 
 jobs:
   build:
