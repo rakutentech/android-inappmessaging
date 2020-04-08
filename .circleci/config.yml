@@ -16,9 +16,6 @@ jobs:
     working_directory: ~/code
     environment:
       JAVA_OPTS: "-Xmx3200m"
-      JAVA_TOOL_OPTIONS: *java_tool_options
-      HTTP_PROXY: http://pkg.proxy.prod.jp.local:10080
-      HTTPS_PROXY: http://pkg.proxy.prod.jp.local:10080
     steps:
       - checkout
       - run: git submodule update --init
