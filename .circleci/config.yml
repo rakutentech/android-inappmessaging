@@ -13,7 +13,8 @@ jobs:
   build:
     docker:
       - image: circleci/android:api-29
-    resource_class: xlarge
+    parallelism: 2
+    resource_class: large
     working_directory: ~/code
     environment:
       JAVA_OPTS: "-Xmx8g"
