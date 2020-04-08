@@ -49,8 +49,8 @@ android {
 
     productFlavors {
         gatewayProdTesting {
-            manifestPlaceholders.in_app_messaging_sub_id = property("IAM_SUBSCRIPTION_KEY")
-            manifestPlaceholders.config_url = property("CONFIG_URL")
+            manifestPlaceholders.in_app_messaging_sub_id = property("IAM_SUBSCRIPTION_KEY") ?: ""
+            manifestPlaceholders.config_url = property("CONFIG_URL") ?: ""
         }
     }
 }
