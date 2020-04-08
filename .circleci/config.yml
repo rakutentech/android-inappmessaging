@@ -54,6 +54,9 @@ jobs:
       - run:
           name: Current Version
           command: ./gradlew currentVersion
+      - run:
+          name: Upload Code Coverage
+          command: bash <(curl -s https://codecov.io/bash)
       - store_test_results:
           path: inappmessaging/build/test-results
           destination: inappmessaging/test-results
@@ -73,6 +76,7 @@ jobs:
           root: ~/code
           paths:
             - inappmessaging/build
+            - inappmessaging/build/kdocs
 
   publish:
     docker:
