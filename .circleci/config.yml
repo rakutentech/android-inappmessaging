@@ -35,7 +35,7 @@ jobs:
           key: *maven_cache_key
       - run:
           name: Set split
-          command: circleci tests glob "**/*.kt" | circleci tests split --split-by=timings
+          command: circleci tests glob "inappmessaging/src/test/**/*.kt" | circleci tests split --split-by=timings
       - run:
           name: Run Tests
           command: ./gradlew check
