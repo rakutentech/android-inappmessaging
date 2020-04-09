@@ -17,8 +17,9 @@ jobs:
     resource_class: medium
     working_directory: ~/code
     environment:
-      _JAVA_OPTIONS: "-Xmx3200m"
-      GRADLE_OPTS: "-Dkotlin.compiler.execution.strategy=in-process -Xmx3200m"
+      JVM_OPTS: "-Xmx1024m -XX:+PrintFlagsFinal -XX:+PrintGCDetails"
+      _JAVA_OPTIONS: "-Xmx1024m"
+      GRADLE_OPTS: "-Dorg.gradle.daemon=false -Dorg.gradle.workers.max=1 -Dorg.gradle.parallel=false"
     steps:
       - checkout
       - run: git submodule update --init
