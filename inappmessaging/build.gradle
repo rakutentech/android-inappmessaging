@@ -36,11 +36,7 @@ android {
       includeAndroidResources = true
     }
     unitTests.all {
-      jvmArgs "-Xmx4g"
-      maxParallelForks 2
-      maxHeapSize = '1024m'
-      forkEvery  100   // helps when tests leak memory
-      jvmArgs '-Xmx4g', '-Xms4g', "-XX:+UnlockExperimentalVMOptions", "-XX:+UseCGroupMemoryLimitForHeap"
+      jvmArgs "-Xmx3200m"
     }
   }
 
