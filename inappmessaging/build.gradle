@@ -35,6 +35,9 @@ android {
       returnDefaultValues = true
       includeAndroidResources = true
     }
+    unitTests.all {
+      jvmArgs "-Xmx1024m"
+    }
   }
 
   dexOptions {
