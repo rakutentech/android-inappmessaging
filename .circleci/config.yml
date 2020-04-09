@@ -13,12 +13,11 @@ jobs:
   build:
     docker:
       - image: circleci/android:api-29
-    parallelism: 4
-    resource_class: medium
     working_directory: ~/code
     environment:
-      JVM_OPTS: "-Xmx3200m -XX:+PrintFlagsFinal -XX:+PrintGCDetails"
-      _JAVA_OPTIONS: "-Xmx3200m"
+      # from https://discuss.circleci.com/t/circle-ci-v2-and-android-memory-issues/11207
+      JVM_OPTS: "-Xmx1024m -XX:+PrintFlagsFinal -XX:+PrintGCDetails"
+      _JAVA_OPTIONS: "-Xmx1024m"
       GRADLE_OPTS: "-Dorg.gradle.daemon=false -Dorg.gradle.workers.max=1 -Dorg.gradle.parallel=false"
     steps:
       - checkout
@@ -35,9 +34,6 @@ jobs:
       - restore_cache:
           ## Robolectric uses maven to download sources, so we must use a different cache for maven
           key: *maven_cache_key
-      - run:
-          name: Set split
-          command: circleci tests glob "inappmessaging/src/test/**/*.kt" | circleci tests split
       - run:
           name: Run Tests
           command: ./gradlew check --no-daemon --max-workers 2
