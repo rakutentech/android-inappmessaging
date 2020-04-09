@@ -33,6 +33,8 @@ jobs:
       - restore_cache:
           ## Robolectric uses maven to download sources, so we must use a different cache for maven
           key: *maven_cache_key
+      - store_test_results:
+          path: test-results
       - run:
           name: Set split
           command: circleci tests glob "inappmessaging/src/test/**/*.kt" | circleci tests split --split-by=timings
