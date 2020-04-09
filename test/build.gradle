@@ -43,11 +43,14 @@ android {
 
     flavorDimensions 'version'
 
+    def property = { key ->
+        return System.getenv(key) ?: (project.hasProperty(key) ? project."$key" : null)
+    }
+
     productFlavors {
         gatewayProdTesting {
-            manifestPlaceholders.in_app_messaging_sub_id = System.getenv("IAM_SUBSCRIPTION_KEY") ?:
-                    property("IAM_SUBSCRIPTION_KEY")
-            manifestPlaceholders.config_url = System.getenv("CONFIG_URL") ?: property("CONFIG_URL")
+            manifestPlaceholders.in_app_messaging_sub_id = property("IAM_SUBSCRIPTION_KEY") ?: ""
+            manifestPlaceholders.config_url = property("CONFIG_URL") ?: ""
         }
     }
 }

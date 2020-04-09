@@ -8,13 +8,6 @@ gradle_cache_key: &gradle_cache_key >-
 maven_cache_key: &maven_cache_key >-
   maven
   -{{ checksum "inappmessaging/src/test/java/com/rakuten/tech/mobile/inappmessaging/runtime/BaseTest.kt" }}
-java_tool_options: &java_tool_options >-
-  -Dhttp.proxyHost=pkg.proxy.prod.jp.local
-  -Dhttps.proxyHost=pkg.proxy.prod.jp.local
-  -Dhttp.proxyPort=10080
-  -Dhttps.proxyPort=10080
-  -Dhttp.nonProxyHosts=artifactory.intra.rakuten-it.com
-  -Dhttps.nonProxyHosts=artifactory.intra.rakuten-it.com
 
 jobs:
   build:
@@ -22,10 +15,10 @@ jobs:
       - image: circleci/android:api-29
     working_directory: ~/code
     environment:
-      JAVA_OPTS: "-Xmx3200m"
-      JAVA_TOOL_OPTIONS: *java_tool_options
-      HTTP_PROXY: http://pkg.proxy.prod.jp.local:10080
-      HTTPS_PROXY: http://pkg.proxy.prod.jp.local:10080
+      # from https://discuss.circleci.com/t/circle-ci-v2-and-android-memory-issues/11207
+      JVM_OPTS: "-Xmx1024m -XX:+PrintFlagsFinal -XX:+PrintGCDetails"
+      _JAVA_OPTIONS: "-Xmx1024m"
+      GRADLE_OPTS: "-Dorg.gradle.daemon=false -Dorg.gradle.workers.max=1 -Dorg.gradle.parallel=false"
     steps:
       - checkout
       - run: git submodule update --init
@@ -43,7 +36,7 @@ jobs:
           key: *maven_cache_key
       - run:
           name: Run Tests
-          command: ./gradlew check
+          command: ./gradlew check --no-daemon --max-workers 2
       - save_cache:
           paths:
             - ~/.m2
