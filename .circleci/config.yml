@@ -17,8 +17,8 @@ jobs:
     resource_class: medium
     working_directory: ~/code
     environment:
-      JAVA_OPTS: "-Xmx1600m"
-      GRADLE_OPTS: "-Dkotlin.compiler.execution.strategy=in-process -Xmx1600m"
+      JAVA_OPTS: "-Xmx4800m"
+      GRADLE_OPTS: "-Dkotlin.compiler.execution.strategy=in-process -Xmx4800m"
     steps:
       - checkout
       - run: git submodule update --init
@@ -39,7 +39,7 @@ jobs:
           command: circleci tests glob "inappmessaging/src/test/**/*.kt" | circleci tests split
       - run:
           name: Run Tests
-          command: ./gradlew check --no-daemon --max-workers=2
+          command: ./gradlew check --no-daemon --max-workers 2
       - save_cache:
           paths:
             - ~/.m2
