@@ -1,6 +1,7 @@
 package com.rakuten.tech.mobile.inappmessaging.runtime.workmanager.schedulers
 
 import com.rakuten.tech.mobile.inappmessaging.runtime.BaseTest
+import com.rakuten.tech.mobile.inappmessaging.runtime.data.repositories.ConfigResponseRepository
 import com.rakuten.tech.mobile.inappmessaging.runtime.data.responses.config.ConfigResponseData
 import org.amshove.kluent.When
 import org.amshove.kluent.calling
@@ -16,6 +17,7 @@ class MessageMixerPingSchedulerSpec : BaseTest() {
 
     @Test
     fun `should not throw exception`() {
+        ConfigResponseRepository.instance().addConfigResponse(configResponseData)
         When calling configResponseData.enabled itReturns false
         MessageMixerPingScheduler.instance().pingMessageMixerService(10L)
     }

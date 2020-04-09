@@ -111,7 +111,9 @@ class ConfigWorkerSpec : BaseTest() {
         When calling mockHostRespository.getConfigUrl() itReturns bundle.getString(CONFIG_KEY, "")
         val worker = ConfigWorker(context, workerParameters, mockHostRespository, mockConfigRespository,
                 mockMessageScheduler)
-        worker.doWork() shouldEqual ListenableWorker.Result.retry() // success if valid CONFIG_URL is set
+        val expected = if (HostAppInfoRepository.instance().getConfigUrl().isNullOrEmpty())
+            ListenableWorker.Result.retry() else ListenableWorker.Result.success()
+        worker.doWork() shouldEqual expected
     }
 
     @Test
@@ -124,15 +126,15 @@ class ConfigWorkerSpec : BaseTest() {
         WorkManagerTestInitHelper.initializeTestWorkManager(context)
         Settings.Secure.putString(ApplicationProvider.getApplicationContext<Context>().contentResolver,
                 Settings.Secure.ANDROID_ID, "test_device_id")
-        val app = context.packageManager.getApplicationInfo(context.packageName,
-                PackageManager.GET_META_DATA)
-        val bundle = app.metaData
+        val bundle = context.packageManager.getApplicationInfo(context.packageName,
+                PackageManager.GET_META_DATA).metaData
 
         InAppMessaging.init(ApplicationProvider.getApplicationContext(), "test",
-                bundle.getString(CONFIG_KEY, ""),
-                isDebugLogging = false, isForTesting = true)
+                bundle.getString(CONFIG_KEY, ""), isDebugLogging = false, isForTesting = true)
         val worker = ConfigWorker(context, workerParameters)
-        worker.doWork() shouldEqual ListenableWorker.Result.retry() // success if valid CONFIG_URL is set
+        val expected = if (HostAppInfoRepository.instance().getConfigUrl().isNullOrEmpty())
+            ListenableWorker.Result.retry() else ListenableWorker.Result.success()
+        worker.doWork() shouldEqual expected
     }
 
     companion object {
