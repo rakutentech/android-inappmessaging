@@ -17,7 +17,8 @@ jobs:
     resource_class: medium
     working_directory: ~/code
     environment:
-      JAVA_OPTS: "-Xmx16800m"
+      JAVA_TOOL_OPTIONS: "-Xmx4g"
+      GRADLE_OPTS="-Dkotlin.compiler.execution.strategy=in-process -Xmx4g"
     steps:
       - checkout
       - run: git submodule update --init
@@ -33,14 +34,12 @@ jobs:
       - restore_cache:
           ## Robolectric uses maven to download sources, so we must use a different cache for maven
           key: *maven_cache_key
-      - store_test_results:
-          path: test-results
       - run:
           name: Set split
-          command: circleci tests glob "inappmessaging/src/test/**/*.kt" | circleci tests split --split-by=timings
+          command: circleci tests glob "inappmessaging/src/test/**/*.kt" | circleci tests split
       - run:
           name: Run Tests
-          command: ./gradlew check
+          command: ./gradlew check --no-daemon --max-workers=2
       - save_cache:
           paths:
             - ~/.m2
