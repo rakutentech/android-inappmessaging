@@ -18,7 +18,7 @@ jobs:
     working_directory: ~/code
     environment:
       JAVA_TOOL_OPTIONS: "-Xmx4g"
-      GRADLE_OPTS="-Dkotlin.compiler.execution.strategy=in-process -Xmx4g"
+      GRADLE_OPTS: "-Dkotlin.compiler.execution.strategy=in-process -Xmx4g"
     steps:
       - checkout
       - run: git submodule update --init
