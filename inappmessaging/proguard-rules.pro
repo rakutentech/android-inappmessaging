@@ -30,10 +30,9 @@
 #                 #
 ###################
 
--keep class com.rakuten.tech.mobile.inappmessaging.runtime.data.requests.ConfigRequest { *; }
--keep class com.rakuten.tech.mobile.inappmessaging.runtime.data.requests.PingRequest { *; }
--keep class com.rakuten.tech.mobile.inappmessaging.runtime.data.requests.DisplayPermissionRequest { *; }
--keep class com.rakuten.tech.mobile.inappmessaging.runtime.data.requests.ImpressionRequest { *; }
+-keep class com.rakuten.tech.mobile.inappmessaging.runtime.data.requests.** { *; }
+-keep class com.rakuten.tech.mobile.inappmessaging.runtime.data.responses.** { *; }
+-keep interface com.rakuten.tech.mobile.inappmessaging.runtime.api.** { *; }
 -keep class com.google.android.gms.dynamic.IObjectWrapper { *; }
 -keep class jp.co.rakuten.sdtd.user.challenges.internal.get.challenge.Request { *; }
 
@@ -52,16 +51,29 @@
 # Gson specific classes
 -keep class sun.misc.Unsafe { *; }
 
+# Prevent proguard from stripping interface information from TypeAdapterFactory,
+# JsonSerializer, JsonDeserializer instances (so they can be used in @JsonAdapter)
+-keep class * implements com.google.gson.TypeAdapterFactory
+-keep class * implements com.google.gson.JsonSerializer
+-keep class * implements com.google.gson.JsonDeserializer
+
+# keep enum so gson can deserialize it
+-keepclassmembers enum * { *; }
+
 ##------------------------------------------- Retrofit  -----------------------------------
 # Retrofit does reflection on generic parameters. InnerClasses is required to use Signature and
 # EnclosingMethod is required to use InnerClasses.
--keepattributes Signature, InnerClasses, EnclosingMethod
+-keepattributes Signature, InnerClasses, EnclosingMethod, Exceptions, *Annotation*
 
 # Retrofit does reflection on method and parameter annotations.
 -keepattributes RuntimeVisibleAnnotations, RuntimeVisibleParameterAnnotations
 
 # Retain service method parameters when optimizing.
 -keepclassmembers,allowshrinking,allowobfuscation interface * {
+    @retrofit2.http.* <methods>;
+}
+
+-keepclasseswithmembers class * {
     @retrofit2.http.* <methods>;
 }
 
@@ -75,8 +87,8 @@
 -dontwarn kotlin.Unit
 
 # Top-level functions that can only be used by Kotlin.
--dontwarn retrofit2.KotlinExtensions
--dontwarn retrofit2.KotlinExtensions$*
+-dontwarn retrofit2.**
+-keep class retrofit2.** { *; }
 
 # With R8 full mode, it sees no subtypes of Retrofit interfaces since they are created with a Proxy
 # and replaces all potential values with null. Explicitly keeping the interfaces prevents this.
