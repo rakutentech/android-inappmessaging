@@ -60,8 +60,8 @@ jobs:
           path: inappmessaging/build/outputs/aar
           destination: inappmessaging/aar
       - store_artifacts:
-          path: inappmessaging/build/javadocs
-          destination: inappmessaging/javadocs
+          path: inappmessaging/build/kdocs
+          destination: inappmessaging/kdocs
       - store_artifacts:
           path: inappmessaging/build/outputs/apk
           destination: inappmessaging
@@ -73,7 +73,7 @@ jobs:
 
   publish:
     docker:
-    - image: circleci/android:api-28
+    - image: circleci/android:api-29
     working_directory: ~/code
     environment:
       JVM_OPTS: "-Xmx3200m"
@@ -114,3 +114,20 @@ workflows:
               only: /^v.*/
             branches:
               only: /.*/
+      - release-verification:
+          type: approval
+          requires:
+            - build
+          filters:
+            tags:
+              only: /^v.*/
+            branches:
+              ignore: /.*/
+      - publish:
+          requires:
+            - release-verification
+          filters:
+            tags:
+              only: /^v.*/
+            branches:
+              ignore: /.*/
