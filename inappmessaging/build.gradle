@@ -131,6 +131,13 @@ publishing {
   }
 }
 
+def isSnapshot = project.version.contains('-')
+if (isSnapshot) {
+  apply from: '../config/publish/artifactory.gradle'
+} else {
+  apply from: '../config/publish/bintray.gradle'
+}
+
 dokka {
   configuration {
     sourceRoot {
