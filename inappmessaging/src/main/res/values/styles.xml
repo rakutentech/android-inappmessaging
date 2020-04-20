@@ -85,7 +85,6 @@
   </style>
 
   <style name="InAppMessaging.Text.Slide">
-    <item name="android:maxLines">@integer/slide_up_max_line</item>
     <item name="android:ellipsize">end</item>
   </style>
 

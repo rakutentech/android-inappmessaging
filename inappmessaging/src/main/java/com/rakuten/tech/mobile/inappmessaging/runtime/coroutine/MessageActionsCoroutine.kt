@@ -95,7 +95,7 @@ internal class MessageActionsCoroutine(
             R.id.message_close_button -> ImpressionType.EXIT
             R.id.message_single_button, R.id.message_button_left -> ImpressionType.ACTION_ONE
             R.id.message_button_right -> ImpressionType.ACTION_TWO
-            R.id.content -> ImpressionType.CLICK_CONTENT
+            R.id.slide_up -> ImpressionType.CLICK_CONTENT
             else -> ImpressionType.INVALID
         }
     }

@@ -47,8 +47,8 @@ internal class MessageActionsCoroutineSpec(val testName: String, val resourceId:
                     arrayOf("Right button - isOpt false", R.id.message_button_right, false),
                     arrayOf("Left button - isOpt true", R.id.message_button_left, true),
                     arrayOf("Left button - isOpt false", R.id.message_button_left, false),
-                    arrayOf("Content - isOpt true", R.id.content, true),
-                    arrayOf("Content - isOpt false", R.id.content, false)
+                    arrayOf("Content - isOpt true", R.id.slide_up, true),
+                    arrayOf("Content - isOpt false", R.id.slide_up, false)
             )
         }
 

@@ -7,10 +7,13 @@
   android:layout_height="match_parent"
   android:orientation="horizontal">
 
+  <!--ConstraintLayout will serve as an invisible button-->
   <androidx.constraintlayout.widget.ConstraintLayout
     android:id="@+id/slide_up"
     android:layout_width="match_parent"
-    android:layout_height="90dp"
+    android:layout_height="wrap_content"
+    android:clickable="true"
+    android:focusable="true"
     android:layout_gravity="bottom">
 
     <androidx.constraintlayout.widget.Guideline
@@ -42,18 +45,6 @@
       layout="@layout/close_button"
       app:layout_constraintEnd_toEndOf="parent"
       app:layout_constraintHorizontal_bias="1.0"
-      app:layout_constraintStart_toStartOf="parent"
-      app:layout_constraintTop_toTopOf="parent"/>
-
-    <!--This serves as an invisible button-->
-    <View
-      android:id="@+id/content"
-      android:layout_width="0dp"
-      android:layout_height="match_parent"
-      android:clickable="true"
-      android:focusable="true"
-      app:layout_constraintBottom_toBottomOf="parent"
-      app:layout_constraintEnd_toEndOf="@id/right_guideline"
       app:layout_constraintStart_toStartOf="parent"
       app:layout_constraintTop_toTopOf="parent"/>
 
