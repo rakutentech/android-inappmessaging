@@ -38,7 +38,7 @@ internal class InAppMessageSlideUpView(
                         context,
                         SlideFromDirectionType.getById(
                                 message.getMessagePayload()?.messageSettings?.displaySettings?.slideFrom!!)))
-        // Set listener for special handling of the invisible view(button) click.
-        content.setOnClickListener(listener)
+        // Set listener for special handling of the invisible constraints(button) click.
+        slide_up.setOnClickListener(listener)
     }
 }
