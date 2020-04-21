@@ -3,10 +3,12 @@ package com.rakuten.tech.mobile.inappmessaging.runtime.view
 import android.annotation.SuppressLint
 import android.content.Context
 import android.content.res.ColorStateList
+import android.content.res.Configuration
 import android.graphics.Color
 import android.util.AttributeSet
 import android.view.View
 import android.widget.FrameLayout
+import android.widget.LinearLayout
 import com.facebook.drawee.backends.pipeline.Fresco
 import com.google.android.material.button.MaterialButton
 import com.rakuten.tech.mobile.inappmessaging.runtime.R
@@ -68,6 +70,7 @@ internal open class InAppMessageBaseView(context: Context, attrs: AttributeSet?)
         bindText()
         bindButtons()
         bindCheckBox()
+        relayoutView()
     }
 
     /**
@@ -173,5 +176,18 @@ internal open class InAppMessageBaseView(context: Context, attrs: AttributeSet?)
                 messageBodyTextView.visibility = View.VISIBLE
             }
         }
+    }
+
+    private fun relayoutView() {
+        if (this.context.resources.configuration.orientation == Configuration.ORIENTATION_LANDSCAPE) {
+            if (!this.imageUrl.isNullOrEmpty()) {
+                message_image_view.layoutParams = LinearLayout.LayoutParams(LayoutParams.MATCH_PARENT,
+                        0, IMAGE_WEIGHT_LANDSCAPE)
+            }
+        }
+    }
+
+    companion object {
+        private const val IMAGE_WEIGHT_LANDSCAPE = 0.5f
     }
 }

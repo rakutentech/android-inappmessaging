@@ -16,6 +16,12 @@
     android:text="@string/launch_second_activity"/>
 
   <Button
+    android:id="@+id/launch_successful"
+    android:layout_width="wrap_content"
+    android:layout_height="wrap_content"
+    android:text="@string/launch_successful"/>
+
+  <Button
     android:id="@+id/login_successful"
     android:layout_width="wrap_content"
     android:layout_height="wrap_content"

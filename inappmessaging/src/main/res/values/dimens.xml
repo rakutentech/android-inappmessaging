@@ -37,7 +37,7 @@
   <dimen name="full_screen_close_button_margin_end">16dp</dimen>
   <dimen name="full_screen_text_margin_left_right">39dp</dimen>
   <dimen name="full_screen_gone_margin_top">60dp</dimen>
-  <dimen name="full_screen_bottom_spacer_margin">75dp</dimen>
+  <dimen name="full_screen_bottom_spacer_margin">50dp</dimen>
 
   <!--Message OptOut checkbox-->
   <dimen name="opt_out_text_size">12sp</dimen>
