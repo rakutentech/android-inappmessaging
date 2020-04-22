@@ -71,7 +71,6 @@ internal open class InAppMessageBaseView(context: Context, attrs: AttributeSet?)
         bindText()
         bindButtons()
         bindCheckBox()
-        relayoutView()
     }
 
     /**
@@ -176,15 +175,6 @@ internal open class InAppMessageBaseView(context: Context, attrs: AttributeSet?)
                 messageBodyTextView.setOnTouchListener(listener)
                 messageBodyTextView.visibility = View.VISIBLE
             }
-        }
-    }
-
-    private fun relayoutView() {
-        // Special handling for modal layout in landscape mode to prevent image covering the header and text.
-        if (this.context.resources.configuration.orientation == Configuration.ORIENTATION_LANDSCAPE &&
-                !this.imageUrl.isNullOrEmpty() && modal_layout != null) {
-            message_image_view.layoutParams = LinearLayout.LayoutParams(LayoutParams.MATCH_PARENT,
-                    0, IMAGE_WEIGHT_LANDSCAPE)
         }
     }
 
