@@ -5,7 +5,7 @@
   android:id="@+id/message_scrollview"
   android:layout_width="match_parent"
   android:layout_height="0dp"
-  android:layout_weight="1"
+  android:layout_weight="0.25"
   android:layout_marginBottom="@dimen/modal_text_scroll_view_margin_bottom"
   android:layout_marginStart="@dimen/modal_layout_margin_right"
   android:layout_marginEnd="@dimen/modal_layout_margin_right"
