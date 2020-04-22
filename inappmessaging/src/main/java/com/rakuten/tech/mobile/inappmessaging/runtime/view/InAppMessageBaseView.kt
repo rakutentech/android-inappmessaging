@@ -3,12 +3,10 @@ package com.rakuten.tech.mobile.inappmessaging.runtime.view
 import android.annotation.SuppressLint
 import android.content.Context
 import android.content.res.ColorStateList
-import android.content.res.Configuration
 import android.graphics.Color
 import android.util.AttributeSet
 import android.view.View
 import android.widget.FrameLayout
-import android.widget.LinearLayout
 import com.facebook.drawee.backends.pipeline.Fresco
 import com.google.android.material.button.MaterialButton
 import com.rakuten.tech.mobile.inappmessaging.runtime.R
@@ -16,7 +14,6 @@ import com.rakuten.tech.mobile.inappmessaging.runtime.data.models.messages.Messa
 import com.rakuten.tech.mobile.inappmessaging.runtime.data.responses.ping.MessageButton
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings
 import kotlinx.android.synthetic.main.close_button.view.*
-import kotlinx.android.synthetic.main.in_app_message_modal.view.*
 import kotlinx.android.synthetic.main.message_buttons.view.*
 import kotlinx.android.synthetic.main.message_image_view.view.*
 import kotlinx.android.synthetic.main.message_scrollview.view.*
@@ -176,9 +173,5 @@ internal open class InAppMessageBaseView(context: Context, attrs: AttributeSet?)
                 messageBodyTextView.visibility = View.VISIBLE
             }
         }
-    }
-
-    companion object {
-        private const val IMAGE_WEIGHT_LANDSCAPE = 0.5f
     }
 }
