@@ -16,6 +16,7 @@ import com.rakuten.tech.mobile.inappmessaging.runtime.data.models.messages.Messa
 import com.rakuten.tech.mobile.inappmessaging.runtime.data.responses.ping.MessageButton
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings
 import kotlinx.android.synthetic.main.close_button.view.*
+import kotlinx.android.synthetic.main.in_app_message_modal.view.*
 import kotlinx.android.synthetic.main.message_buttons.view.*
 import kotlinx.android.synthetic.main.message_image_view.view.*
 import kotlinx.android.synthetic.main.message_scrollview.view.*
@@ -179,11 +180,11 @@ internal open class InAppMessageBaseView(context: Context, attrs: AttributeSet?)
     }
 
     private fun relayoutView() {
-        if (this.context.resources.configuration.orientation == Configuration.ORIENTATION_LANDSCAPE) {
-            if (!this.imageUrl.isNullOrEmpty()) {
-                message_image_view.layoutParams = LinearLayout.LayoutParams(LayoutParams.MATCH_PARENT,
-                        0, IMAGE_WEIGHT_LANDSCAPE)
-            }
+        // Special handling for modal layout in landscape mode to prevent image covering the header and text.
+        if (this.context.resources.configuration.orientation == Configuration.ORIENTATION_LANDSCAPE &&
+                !this.imageUrl.isNullOrEmpty() && modal_layout != null) {
+            message_image_view.layoutParams = LinearLayout.LayoutParams(LayoutParams.MATCH_PARENT,
+                    0, IMAGE_WEIGHT_LANDSCAPE)
         }
     }
 
