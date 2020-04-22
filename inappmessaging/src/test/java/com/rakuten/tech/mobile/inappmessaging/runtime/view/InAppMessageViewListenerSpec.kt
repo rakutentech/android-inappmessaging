@@ -1,6 +1,7 @@
 package com.rakuten.tech.mobile.inappmessaging.runtime.view
 
 import android.os.Build
+import android.view.KeyEvent
 import android.view.MotionEvent
 import android.view.View
 import android.widget.CheckBox
@@ -22,8 +23,10 @@ import org.robolectric.annotation.Config
  * Test class for ModalViewOnTouchListener.
  */
 @Config(sdk = [Build.VERSION_CODES.Q])
+@Suppress("LargeClass")
 class InAppMessageViewListenerSpec : BaseTest() {
     private var motionEvent = Mockito.mock(MotionEvent::class.java)
+    private var keyEvent = Mockito.mock(KeyEvent::class.java)
 
     @Before
     fun setup() {
@@ -192,5 +195,89 @@ class InAppMessageViewListenerSpec : BaseTest() {
         val mockEvent = Mockito.mock(motionEvent::class.java)
 
         listener.onTouch(mockView, mockEvent).shouldBeFalse()
+    }
+
+    @Test
+        fun `should return true with back button click`() {
+        val mockDisplayManager = Mockito.mock(DisplayManager::class.java)
+        val mockCoroutine = Mockito.mock(MessageActionsCoroutine::class.java)
+
+        val message = ValidTestMessage("1", true)
+        val listener = InAppMessageViewListener(message, mockCoroutine, mockDisplayManager)
+        val mockView = Mockito.mock(CheckBox::class.java)
+
+        When calling keyEvent.action itReturns KeyEvent.ACTION_UP
+        When calling mockView.id itReturns R.id.message_close_button
+        When calling mockCoroutine.executeTask(message,
+                MessageActionsCoroutine.BACK_BUTTON, false) itReturns true
+
+        listener.onKey(mockView, KeyEvent.KEYCODE_BACK, keyEvent).shouldBeTrue()
+    }
+
+    @Test
+    fun `should return false with back button action down`() {
+        val mockDisplayManager = Mockito.mock(DisplayManager::class.java)
+        val mockCoroutine = Mockito.mock(MessageActionsCoroutine::class.java)
+
+        val message = ValidTestMessage("1", true)
+        val listener = InAppMessageViewListener(message, mockCoroutine, mockDisplayManager)
+        val mockView = Mockito.mock(CheckBox::class.java)
+
+        When calling keyEvent.action itReturns KeyEvent.ACTION_DOWN
+        When calling mockView.id itReturns R.id.message_close_button
+        When calling mockCoroutine.executeTask(message,
+                MessageActionsCoroutine.BACK_BUTTON, false) itReturns true
+
+        listener.onKey(mockView, KeyEvent.KEYCODE_BACK, keyEvent).shouldBeFalse()
+    }
+
+    @Test
+    fun `should return false with null event`() {
+        val mockDisplayManager = Mockito.mock(DisplayManager::class.java)
+        val mockCoroutine = Mockito.mock(MessageActionsCoroutine::class.java)
+
+        val message = ValidTestMessage("1", true)
+        val listener = InAppMessageViewListener(message, mockCoroutine, mockDisplayManager)
+        val mockView = Mockito.mock(CheckBox::class.java)
+
+        listener.onKey(mockView, KeyEvent.KEYCODE_BACK, null).shouldBeFalse()
+    }
+
+    @Test
+    fun `should return false with null event and not back button`() {
+        val mockDisplayManager = Mockito.mock(DisplayManager::class.java)
+        val mockCoroutine = Mockito.mock(MessageActionsCoroutine::class.java)
+
+        val message = ValidTestMessage("1", true)
+        val listener = InAppMessageViewListener(message, mockCoroutine, mockDisplayManager)
+        val mockView = Mockito.mock(CheckBox::class.java)
+
+        listener.onKey(mockView, KeyEvent.KEYCODE_BREAK, null).shouldBeFalse()
+    }
+
+    @Test
+    fun `should return false with not back button`() {
+        val mockDisplayManager = Mockito.mock(DisplayManager::class.java)
+        val mockCoroutine = Mockito.mock(MessageActionsCoroutine::class.java)
+
+        val message = ValidTestMessage("1", true)
+        val listener = InAppMessageViewListener(message, mockCoroutine, mockDisplayManager)
+        val mockView = Mockito.mock(CheckBox::class.java)
+        When calling keyEvent.action itReturns KeyEvent.ACTION_UP
+
+        listener.onKey(mockView, KeyEvent.KEYCODE_BREAK, keyEvent).shouldBeFalse()
+    }
+
+    @Test
+    fun `should return false with not back button and action down`() {
+        val mockDisplayManager = Mockito.mock(DisplayManager::class.java)
+        val mockCoroutine = Mockito.mock(MessageActionsCoroutine::class.java)
+
+        val message = ValidTestMessage("1", true)
+        val listener = InAppMessageViewListener(message, mockCoroutine, mockDisplayManager)
+        val mockView = Mockito.mock(CheckBox::class.java)
+        When calling keyEvent.action itReturns KeyEvent.ACTION_DOWN
+
+        listener.onKey(mockView, KeyEvent.KEYCODE_BREAK, keyEvent).shouldBeFalse()
     }
 }

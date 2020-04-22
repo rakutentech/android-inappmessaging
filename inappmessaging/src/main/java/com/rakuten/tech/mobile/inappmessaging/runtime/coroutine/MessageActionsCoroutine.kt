@@ -96,6 +96,7 @@ internal class MessageActionsCoroutine(
             R.id.message_single_button, R.id.message_button_left -> ImpressionType.ACTION_ONE
             R.id.message_button_right -> ImpressionType.ACTION_TWO
             R.id.slide_up -> ImpressionType.CLICK_CONTENT
+            BACK_BUTTON -> ImpressionType.EXIT
             else -> ImpressionType.INVALID
         }
     }
@@ -234,5 +235,9 @@ internal class MessageActionsCoroutine(
             }
         }
         return customEvent
+    }
+
+    companion object {
+        const val BACK_BUTTON = -1
     }
 }
