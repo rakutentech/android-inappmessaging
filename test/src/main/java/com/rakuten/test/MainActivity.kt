@@ -15,7 +15,6 @@ class MainActivity : AppCompatActivity() {
     override fun onResume() {
         super.onResume()
         InAppMessaging.instance().registerMessageDisplayActivity(this)
-        InAppMessaging.instance().logEvent(AppStartEvent())
     }
 
     override fun onPause() {

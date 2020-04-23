@@ -32,11 +32,6 @@ internal class InAppMessageFullScreenView(
             // If no image, add empty text spacer on top.
             view_spacer.visibility = View.VISIBLE
         }
-        // If there are buttons, add bottom spacer.
-        val buttons = message.getMessagePayload()?.messageSettings?.controlSettings?.buttons
-        if (!buttons.isNullOrEmpty()) {
-            bottom_spacer.visibility = View.VISIBLE
-        }
         setBackgroundColor(bgColor)
     }
 }
