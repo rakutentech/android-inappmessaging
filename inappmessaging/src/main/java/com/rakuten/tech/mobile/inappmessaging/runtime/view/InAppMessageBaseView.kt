@@ -68,6 +68,11 @@ internal open class InAppMessageBaseView(context: Context, attrs: AttributeSet?)
         bindText()
         bindButtons()
         bindCheckBox()
+
+        // for handling back button press
+        this.isFocusableInTouchMode = true
+        requestFocus()
+        setOnKeyListener(listener)
     }
 
     /**

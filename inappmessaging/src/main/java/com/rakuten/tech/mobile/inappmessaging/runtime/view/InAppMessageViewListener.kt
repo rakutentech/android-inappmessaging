@@ -1,6 +1,7 @@
 package com.rakuten.tech.mobile.inappmessaging.runtime.view
 
 import android.annotation.SuppressLint
+import android.view.KeyEvent
 import android.view.MotionEvent
 import android.view.View
 import android.widget.CheckBox
@@ -27,7 +28,7 @@ internal class InAppMessageViewListener(
     private val displayManager: DisplayManager = DisplayManager.instance(),
     private val buildChecker: BuildVersionChecker = BuildVersionChecker.instance()
 ) :
-    View.OnTouchListener, View.OnClickListener {
+    View.OnTouchListener, View.OnClickListener, View.OnKeyListener {
 
     // set to public to be mocked in testing.
     @VisibleForTesting
@@ -80,5 +81,20 @@ internal class InAppMessageViewListener(
                 }
             }
         }
+    }
+
+    override fun onKey(v: View?, keyCode: Int, event: KeyEvent?): Boolean {
+        if (event != null && event.action == KeyEvent.ACTION_UP && keyCode == KeyEvent.KEYCODE_BACK) {
+            // Handling back button click in coroutine.
+            CoroutineScope(Dispatchers.Main).launch {
+                displayManager.removeMessage(InAppMessaging.instance().getRegisteredActivity())
+                withContext(Dispatchers.Default) {
+                    // no need to handle result since no event should be triggered by back button
+                    messagCoroutine.executeTask(message, MessageActionsCoroutine.BACK_BUTTON, isOptOutChecked)
+                }
+            }
+            return true
+        }
+        return false
     }
 }
