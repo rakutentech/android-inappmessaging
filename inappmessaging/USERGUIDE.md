@@ -205,6 +205,14 @@ Custom event class:
 InAppMessaging.instance().logEvent(CustomEvent("search").addAttribute("keyword", "book").addAttribute("number_of_keyword", 1))
 ```
 
+### #8 Updating user information
+User information or preference is what will allow InAppMessaging to identify users for targeting and segmentation.
+Update the app's session when new user login or on logout. If app session is not updated, incorrect messages may be displayed or some messages will not be displayed.
+
+```kotlin
+InAppMessaging.instance().updateSession()
+```
+
 ## <a name="troubleshooting"></a> Trouble Shooting
 `proguard.ParseException`
 

@@ -20,7 +20,7 @@ internal abstract class PingResponseMessageRepository : MessageRepository {
     private class PingResponseMessageRepositoryImpl : PingResponseMessageRepository() {
         // LinkedHashMap can preserve the message insertion order.
         // Map - Key: Campaign ID, Value: Message object
-        private val messages: MutableMap<String, Message> = LinkedHashMap()
+        private var messages: MutableMap<String, Message> = LinkedHashMap()
 
         /**
          * Replacing all new messages to the [messageList].
@@ -29,6 +29,7 @@ internal abstract class PingResponseMessageRepository : MessageRepository {
         @Throws(IllegalArgumentException::class)
         override fun replaceAllMessages(messageList: List<Message>?) {
             requireNotNull(messageList) { InAppMessagingConstants.ARGUMENT_IS_NULL_EXCEPTION }
+            messages = LinkedHashMap()
             for (message in messageList) {
                 messages[message.getCampaignId()!!] = message
             }

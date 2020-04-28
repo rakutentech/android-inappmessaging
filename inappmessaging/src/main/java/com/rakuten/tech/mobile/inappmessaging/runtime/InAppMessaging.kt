@@ -32,7 +32,7 @@ abstract class InAppMessaging internal constructor() {
     abstract fun registerMessageDisplayActivity(@NotNull activity: Activity)
 
     /**
-     * This method unregisters the activity from InaAppMessaging
+     * This method unregisters the activity from InAppMessaging
      * This method should be called in onPause() of the registered activity in order to avoid memory leaks.
      * If there is message being displayed, it will be closed automatically.
      */
@@ -45,6 +45,12 @@ abstract class InAppMessaging internal constructor() {
      */
     @Throws(IllegalArgumentException::class, NullPointerException::class)
     abstract fun logEvent(@NotNull event: Event)
+
+    /**
+     * This methods updates the host app's session. This allows InAppMessaging to update the locally stored
+     * messages which can be dependent on user information.
+     */
+    abstract fun updateSession()
 
     /**
      * This method returns registered activity of the host app.
@@ -108,6 +114,8 @@ abstract class InAppMessaging internal constructor() {
         override fun unregisterMessageDisplayActivity() {}
 
         override fun logEvent(event: Event) {}
+
+        override fun updateSession() {}
 
         override fun getRegisteredActivity(): Activity? = null
 
