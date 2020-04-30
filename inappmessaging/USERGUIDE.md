@@ -271,6 +271,7 @@ For initial documentation:
 ### 2.x.x (TBD)
 * [SDKCF-2054](https://jira.rakuten-it.com/jira/browse/SDKCF-2054): Converted In-App Messaging to Kotlin
 * [SDKCF-1614](https://jira.rakuten-it.com/jira/browse/SDKCF-1614): Polish the Public API (removed unnecessary public APIs)
+* [SDKCF-2342](https://jira.rakuten-it.com/jira/browse/SDKCF-2342): easy_id targeting
 
 ### 1.4.0
 * Adding feature embedded event in action buttons.
