@@ -25,7 +25,7 @@ internal object EventsManager {
         localEventRepo.addEvent(event)
         // If event is a LoginSuccessfulEvent, then notify SessionManager.
         if (event.getEventType() == EventType.LOGIN_SUCCESSFUL.typeId) {
-            SessionManager.onLoginSuccessful()
+            SessionManager.onSessionUpdate()
         }
         // Broadcasting host app logged event to Analytics SDK.
         sendEvent(InAppMessagingConstants.RAT_EVENT_KEY_EVENTS, event.getRatEventMap())

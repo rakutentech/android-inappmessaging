@@ -41,6 +41,12 @@ class InAppMessagingSpec : BaseTest() {
     }
 
     @Test
+    fun `should unregister activity not crash when no activity is registered for uninitialized instance`() {
+        InAppMessaging.setUninitializedInstance()
+        InAppMessaging.instance().unregisterMessageDisplayActivity()
+    }
+
+    @Test
     fun `should not display message if config is true for uninitialized instance`() {
         InAppMessaging.setUninitializedInstance()
         When calling configResponseData.enabled itReturns true
@@ -69,6 +75,13 @@ class InAppMessagingSpec : BaseTest() {
     fun `should return null context using uninitialized instance`() {
         InAppMessaging.setUninitializedInstance()
         InAppMessaging.instance().getHostAppContext() shouldEqual null
+    }
+
+    @Test
+    fun `should not crash update session when using uninitialized instance`() {
+        InAppMessaging.setUninitializedInstance()
+        InAppMessaging.instance().registerPreference(TestUserInfoProvider())
+        InAppMessaging.instance().updateSession()
     }
 
     @Test
@@ -112,6 +125,24 @@ class InAppMessagingSpec : BaseTest() {
 
         try {
             InAppMessaging.instance().logEvent(AppStartEvent())
+        } catch (e: Exception) {
+            fail("should not throw exception")
+        }
+    }
+
+    @Test
+    @Suppress("SwallowedException")
+    fun `should not crash update session for initialized instance`() {
+        WorkManagerTestInitHelper.initializeTestWorkManager(ApplicationProvider.getApplicationContext())
+        Settings.Secure.putString(
+                ApplicationProvider.getApplicationContext<Context>().contentResolver,
+                Settings.Secure.ANDROID_ID,
+                "test_device_id")
+        InAppMessaging.init(ApplicationProvider.getApplicationContext(), "test", "",
+                isDebugLogging = true, isForTesting = true)
+
+        try {
+            InAppMessaging.instance().updateSession()
         } catch (e: Exception) {
             fail("should not throw exception")
         }

@@ -8,10 +8,10 @@ import com.rakuten.tech.mobile.inappmessaging.runtime.workmanager.schedulers.Mes
  */
 internal object SessionManager {
     /**
-     * Upon login successful, old messages will be discarded, then prepare new messages for the new
+     * Upon login successful or logout, old messages will be discarded, then prepare new messages for the new
      * user.
      */
-    fun onLoginSuccessful() {
+    fun onSessionUpdate() {
         MessageMixerPingScheduler.instance().pingMessageMixerService(0)
     }
 }
