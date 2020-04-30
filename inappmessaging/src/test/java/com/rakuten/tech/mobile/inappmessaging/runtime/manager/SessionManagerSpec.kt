@@ -11,7 +11,7 @@ import com.rakuten.tech.mobile.inappmessaging.runtime.InAppMessaging
 import com.rakuten.tech.mobile.inappmessaging.runtime.data.repositories.ConfigResponseRepository
 import com.rakuten.tech.mobile.inappmessaging.runtime.data.responses.config.ConfigResponseData
 import com.rakuten.tech.mobile.inappmessaging.runtime.data.responses.config.ConfigResponseEndpoints
-import com.rakuten.tech.mobile.inappmessaging.runtime.manager.SessionManager.onLoginSuccessful
+import com.rakuten.tech.mobile.inappmessaging.runtime.manager.SessionManager.onSessionUpdate
 import org.amshove.kluent.When
 import org.amshove.kluent.calling
 import org.amshove.kluent.itReturns
@@ -53,7 +53,7 @@ class SessionManagerSpec : BaseTest() {
         When calling configResponseData.enabled itReturns true
         When calling configResponseData.endpoints itReturns endpoints
         ConfigResponseRepository.instance().addConfigResponse(configResponseData)
-        onLoginSuccessful()
+        onSessionUpdate()
         WorkManager.getInstance(ApplicationProvider.getApplicationContext())
                 .getWorkInfosByTag(MESSAGE_MIXER_PING_WORKER).get().shouldHaveSize(1)
     }

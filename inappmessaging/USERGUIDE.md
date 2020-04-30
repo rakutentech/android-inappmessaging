@@ -205,6 +205,14 @@ Custom event class:
 InAppMessaging.instance().logEvent(CustomEvent("search").addAttribute("keyword", "book").addAttribute("number_of_keyword", 1))
 ```
 
+### #9 Updating user information
+User information or preference is what will allow InAppMessaging to identify users for targeting and segmentation.
+Update the app's session when new user login or on logout. If app session is not updated, incorrect messages may be displayed or some messages will not be displayed.
+
+```kotlin
+InAppMessaging.instance().updateSession()
+```
+
 ## <a name="troubleshooting"></a> Trouble Shooting
 `proguard.ParseException`
 
@@ -263,6 +271,7 @@ For initial documentation:
 ### 2.x.x (TBD)
 * [SDKCF-2054](https://jira.rakuten-it.com/jira/browse/SDKCF-2054): Converted In-App Messaging to Kotlin
 * [SDKCF-1614](https://jira.rakuten-it.com/jira/browse/SDKCF-1614): Polish the Public API (removed unnecessary public APIs)
+* [SDKCF-2342](https://jira.rakuten-it.com/jira/browse/SDKCF-2342): easy_id targeting
 
 ### 1.4.0
 * Adding feature embedded event in action buttons.
