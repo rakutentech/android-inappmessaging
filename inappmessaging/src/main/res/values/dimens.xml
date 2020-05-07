@@ -24,7 +24,7 @@
   <dimen name="modal_button_double_margin_bottom">12dp</dimen>
   <dimen name="modal_button_padding_left_right">5dp</dimen>
   <dimen name="modal_button_single_margin_left_right">40dp</dimen>
-  <dimen name="modal_button_text_size">12sp</dimen>
+  <dimen name="modal_button_text_size">10sp</dimen>
   <dimen name="modal_corner_radius">8dp</dimen>
 
   <!--Modal Close Button-->
