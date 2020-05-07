@@ -12,6 +12,7 @@
   android:visibility="gone"
   android:layout_gravity="bottom|center_horizontal"
   android:orientation="horizontal"
+  android:baselineAligned="false"
   tools:visibility="visible">
 
   <!--This button is only shown when there's only one button.-->
