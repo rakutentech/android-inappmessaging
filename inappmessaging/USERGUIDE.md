@@ -143,7 +143,7 @@ Create a new class in your project which implements the following file:
 `com.rakuten.tech.mobile.inappmessaging.runtime.UserInfoProvider` <br/>
 Refer to the ECO Demo [example](https://gitpub.rakuten-it.com/projects/ECO/repos/core-android-inappmessaging/browse/test/src/main/java/com/rakuten/test/AppUserInfoProvider.java?at=refs%2Fheads%2Fdev)
 
-This class serves the purpose of providing basic user information such as userId, and RAE token at runtime.
+This class serves the purpose of providing basic user information such as userId, rakutenId, and RAE token at runtime.
 It's best to utilize the [User SDK](https://documents.developers.rakuten.com/android-sdk/user-4.13/).
 Make sure RAE token can be validated by APIC using scope: `90days@Access`. This scope can be set in the User SDK.<br/>
 Note: only provide RAE token if the user is logged in.
@@ -272,6 +272,7 @@ For initial documentation:
 * [SDKCF-2054](https://jira.rakuten-it.com/jira/browse/SDKCF-2054): Converted In-App Messaging to Kotlin
 * [SDKCF-1614](https://jira.rakuten-it.com/jira/browse/SDKCF-1614): Polish the Public API (removed unnecessary public APIs)
 * [SDKCF-2342](https://jira.rakuten-it.com/jira/browse/SDKCF-2342): easy_id targeting
+* [SDKCF-2353](https://jira.rakuten-it.com/jira/browse/SDKCF-2353): Rakuten ID targeting
 
 ### 1.4.0
 * Adding feature embedded event in action buttons.
