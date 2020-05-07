@@ -26,4 +26,12 @@ class AppUserInfoProvider : UserInfoProvider {
         // }
         return ""
     }
+
+    /**
+     * Returns the logged in rakutenId utilizing any logging process.
+     */
+    override fun provideRakutenId(): String? {
+        // Any value can be set as Rakuten ID.
+        return ""
+    }
 }
