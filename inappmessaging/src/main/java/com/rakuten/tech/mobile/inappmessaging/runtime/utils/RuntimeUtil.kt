@@ -75,6 +75,11 @@ internal object RuntimeUtil {
             val user = UserIdentifier(UserIdentifierType.USER_ID, userId)
             identifierList.add(user)
         }
+        val rakutenId: String = accountRepo.getRakutenId()
+        if (rakutenId.isNotEmpty()) {
+            val user = UserIdentifier(UserIdentifierType.R_ID, rakutenId)
+            identifierList.add(user)
+        }
         return identifierList
     }
 

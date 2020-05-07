@@ -21,8 +21,27 @@ class RuntimeUtilSpec : BaseTest() {
     fun `should get user identifier with user id`() {
         val mockProvider = Mockito.mock(UserInfoProvider::class.java)
         When calling mockProvider.provideUserId() itReturns "test_user_id"
+        When calling mockProvider.provideRakutenId() itReturns ""
         AccountRepository.instance().userInfoProvider = mockProvider
         RuntimeUtil.getUserIdentifiers().shouldHaveSize(1)
+    }
+
+    @Test
+    fun `should get user identifier with rakuten id`() {
+        val mockProvider = Mockito.mock(UserInfoProvider::class.java)
+        When calling mockProvider.provideUserId() itReturns ""
+        When calling mockProvider.provideRakutenId() itReturns "test_rakuten_id"
+        AccountRepository.instance().userInfoProvider = mockProvider
+        RuntimeUtil.getUserIdentifiers().shouldHaveSize(1)
+    }
+
+    @Test
+    fun `should get user identifier with both user and rakuten id`() {
+        val mockProvider = Mockito.mock(UserInfoProvider::class.java)
+        When calling mockProvider.provideUserId() itReturns "test_user_id"
+        When calling mockProvider.provideRakutenId() itReturns "test_rakuten_id"
+        AccountRepository.instance().userInfoProvider = mockProvider
+        RuntimeUtil.getUserIdentifiers().shouldHaveSize(2)
     }
 
     @Test

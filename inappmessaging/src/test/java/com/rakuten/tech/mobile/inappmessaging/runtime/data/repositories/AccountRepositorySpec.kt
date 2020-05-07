@@ -34,6 +34,11 @@ class AccountRepositorySpec : BaseTest() {
     }
 
     @Test
+    fun `should get rakuten id`() {
+        AccountRepository.instance().getRakutenId() shouldEqual ""
+    }
+
+    @Test
     fun `should get user id with valid provider`() {
         AccountRepository.instance().userInfoProvider = TestUserInfoProvider()
         AccountRepository.instance().getUserId() shouldEqual TestUserInfoProvider().provideUserId()
@@ -43,6 +48,12 @@ class AccountRepositorySpec : BaseTest() {
     fun `should get rae token with valid provider`() {
         AccountRepository.instance().userInfoProvider = TestUserInfoProvider()
         AccountRepository.instance().getRaeToken() shouldEqual "OAuth2 " + TestUserInfoProvider().provideRaeToken()
+    }
+
+    @Test
+    fun `should get rakuten id with valid provider`() {
+        AccountRepository.instance().userInfoProvider = TestUserInfoProvider()
+        AccountRepository.instance().getRakutenId() shouldEqual TestUserInfoProvider().provideRakutenId()
     }
 
     @Test
@@ -59,6 +70,14 @@ class AccountRepositorySpec : BaseTest() {
         When calling mockProvider.provideUserId() itReturns null
         AccountRepository.instance().userInfoProvider = mockProvider
         AccountRepository.instance().getUserId() shouldEqual ""
+    }
+
+    @Test
+    fun `should get rakuten id with null values`() {
+        val mockProvider = Mockito.mock(TestUserInfoProvider::class.java)
+        When calling mockProvider.provideRakutenId() itReturns null
+        AccountRepository.instance().userInfoProvider = mockProvider
+        AccountRepository.instance().getRakutenId() shouldEqual ""
     }
 
     @Test
@@ -85,7 +104,19 @@ class AccountRepositorySpec : BaseTest() {
 
         When calling mockAcctRepo.userInfoProvider itReturns TestUserInfoProvider()
         When calling mockAcctRepo.getUserId() itReturns TestUserInfoProvider().provideUserId().toString()
+        When calling mockAcctRepo.getRakutenId() itReturns ""
         RuntimeUtil.getUserIdentifiers(mockAcctRepo).shouldHaveSize(1)
         Mockito.verify(mockAcctRepo, Mockito.times(1)).getUserId()
+    }
+
+    @Test
+    fun `should get be called once for get rakuten id`() {
+        val mockAcctRepo = Mockito.mock(AccountRepository::class.java)
+
+        When calling mockAcctRepo.userInfoProvider itReturns TestUserInfoProvider()
+        When calling mockAcctRepo.getUserId() itReturns ""
+        When calling mockAcctRepo.getRakutenId() itReturns TestUserInfoProvider().provideRakutenId().toString()
+        RuntimeUtil.getUserIdentifiers(mockAcctRepo).shouldHaveSize(1)
+        Mockito.verify(mockAcctRepo, Mockito.times(1)).getRakutenId()
     }
 }

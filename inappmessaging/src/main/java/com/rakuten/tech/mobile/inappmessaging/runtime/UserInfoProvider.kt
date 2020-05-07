@@ -19,4 +19,11 @@ interface UserInfoProvider {
      * @return String of the user ID.
      */
     fun provideUserId(): String?
+
+    /**
+     * Only return Rakuten ID used in the current session.
+     *
+     * @return String of the Rakuten ID.
+     */
+    fun provideRakutenId(): String?
 }

@@ -1,6 +1,5 @@
 package com.rakuten.tech.mobile.inappmessaging.runtime.data.repositories
 
-import androidx.annotation.WorkerThread
 import com.rakuten.tech.mobile.inappmessaging.runtime.UserInfoProvider
 
 /**
@@ -13,14 +12,17 @@ internal abstract class AccountRepository {
     /**
      * This method returns RAE token, or empty String.
      */
-    @WorkerThread
     abstract fun getRaeToken(): String
 
     /**
      * This method returns User ID, or empty String.
      */
-    @WorkerThread
     abstract fun getUserId(): String
+
+    /**
+     * This method returns Rakuten ID, or empty String.
+     */
+    abstract fun getRakutenId(): String
 
     companion object {
         private const val TOKEN_PREFIX = "OAuth2 "
@@ -32,7 +34,6 @@ internal abstract class AccountRepository {
 
     private class AccountRepositoryImpl : AccountRepository() {
 
-        @WorkerThread
         override fun getRaeToken(): String = if (this.userInfoProvider == null ||
                 this.userInfoProvider?.provideRaeToken() == null ||
                 this.userInfoProvider?.provideRaeToken()!!.isEmpty()) {
@@ -41,10 +42,14 @@ internal abstract class AccountRepository {
         } else TOKEN_PREFIX + this.userInfoProvider?.provideRaeToken()
         // According to backend specs, token has to start with "OAuth2{space}", followed by real token.
 
-        @WorkerThread
         override fun getUserId(): String =
                 if (this.userInfoProvider == null || this.userInfoProvider?.provideUserId() == null) {
                     ""
                 } else userInfoProvider!!.provideUserId().toString()
+
+        override fun getRakutenId(): String =
+                if (this.userInfoProvider == null || this.userInfoProvider?.provideRakutenId() == null) {
+                    ""
+                } else userInfoProvider!!.provideRakutenId().toString()
     }
 }
