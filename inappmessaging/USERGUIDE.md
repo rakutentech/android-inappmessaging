@@ -1,5 +1,5 @@
 # In-App Messaging
-The In-App Messaging module enables applications to receive notification, which are displayed within the app, from [Rakuten In-App Messaging Dashboard](https://developers.rakuten.com/intra/in-app-message/introduction-to-in-app-messaging-dashboard)
+The In-App Messaging module enables applications to receive notification, which are displayed within the app, from [Rakuten In-App Messaging Dashboard](https://inappmessaging.rakapi.com/)
 
 ![In-App Messaging Sample](images/what-is-inapp.png)
 
@@ -54,9 +54,9 @@ Custom events can have attributes with names and values. Attributes can be integ
 This SDK supports Android API level 21 (Lollipop) and above.
 
 ### In-App Messaging Subscription Key
-You must have a subscription key for your application from [Rakuten In-App Messaging Dashboard](https://developers.rakuten.com/intra/in-app-message/introduction-to-in-app-messaging-dashboard).<br/>
-Please refer to [App Settings](https://developers.rakuten.com/intra/in-app-message/app-settings) section for creation of app and retrieval of subscription key.<br/>
-If you have any questions, contact us via [email](https://developers.rakuten.com/intra/in-app-message/contact-us).
+You must have a subscription key for your application from [Rakuten In-App Messaging Dashboard](https://inappmessaging.rakapi.com/).<br/>
+Please go to [App Settings](https://inappmessaging.rakapi.com/app/settings) page to create/add app and for retrieving of subscription key.<br/>
+![App Settings](images/app-settings.png)
 
 ## <a name="getting-started"></a> Getting Started
 
@@ -65,17 +65,44 @@ If you have any questions, contact us via [email](https://developers.rakuten.com
 
 ### #1 In-App Messaging Dashboard
 The In-App Messaging Dashboard enables you to operate and manage your In-app messaging campaign on the Rakuten Platform.<br/>
-For more information, please refer to [dashboard user manual](https://developers.rakuten.com/intra/in-app-message/dashboard-user-manual).
+For more information, please refer to [dashboard user manual](https://inappmessaging.rakapi.com/help).
 
 ### #2 Register application and retrieve subscription keys
-Please use the [App List](https://developers.rakuten.com/intra/in-app-message/app-settings) page to create, and manage your apps.<br/>
+Please use the [App List](https://inappmessaging.rakapi.com/app/settings) page to create, and manage your apps.<br/>
 You can add/delete versions, and retrieve the subscription keys in the App List page.
 
 ### #3 Integrate the In-App Messaging SDK to your app.
 Please refer to [SDK Integration](#integration) section.
 
 ### #4 Create a campaign/message
-Please use the [Create Campaign](https://developers.rakuten.com/intra/in-app-message/create-campaign) page to create, edit, save as draft, launch, cancel edition for campaigns.
+Please use the [Create Campaign](https://inappmessaging.rakapi.com/campaign/create) page to create, edit, save as draft, launch, cancel edition for campaigns.
+* Input in-app messaging's UI Information in **Basic Information Tab**
+![Basic Info Tab](images/basic-info-tab.png)
+  * Enter the **Campaign Name**.
+  * Choose message **Type**.
+  * Choose message **Layout from Text only, Image Only, Text With Image**. (**HTML** rich content support will coming soon.)
+  * Enter the in-app message **Header** which is a required field.
+  * Enter the in-app message **Body** which is an optional field
+  * Define the **Message Background Color**. The default is white.
+  * Define the number of **Buttons**, **Button Label**, **Button Actions**.
+<br/>
+<br/>
+* Input in-app messaging's target and scheduling information in **Target & Schedule Tab**
+![Target Schedule Tab](images/target-schedule-tab.png)
+  * Define campaign message **Start Date** and **End Date**.
+  * **Choose App** and **Versions** - Choose which app in your app group you are going to apply to the campaign.
+  * Click "+" to add multiple apps.
+  * **Target Users** - You can target all your audience with select All Users, you can also target users by upload a CSV file with a list of Easy Ids or User Ids.
+  * You can select the message trigger at the **Campaign Events** field, we support: **Launch the App Event**, **Login event**, **Purchase Successful Event** as default. You can add your own custom event at [App Settings](https://inappmessaging.rakapi.com/app/settings) page.
+  * Max Lifetime Impressions - You can manage the number of messages your user will see.
+<br/>
+<br/>
+* **Launch Campaign** - Live a campaign message. This function only available for the Administrator role.
+* **Save as Draft** - Save a campaign as a draft message. This function is available for all roles.
+* **Send to Test Device** - Send your draft campaign message to the actual test device. You can use easyId or userId (Rakuten user login Id) to target which user you want to send the test message to.
+* **Cancel** - Cancel the editing of campaign
+
+Note: You can create up to 100 campaigns per app group.
 
 ### #5 Send/display message
 Message are displayed if the triggers/conditions for the campaign are satisfied in the application.
@@ -88,8 +115,7 @@ Message are displayed if the triggers/conditions for the campaign are satisfied 
 ```groovy
 allprojects {
     repositories {
-        // Note: Crimson House Intra connection is needed.
-        maven { url 'https://artifactory.rakuten-it.com/mobile-libs-mvn-release' }
+        jcenter()
     }
 }
 ```
@@ -141,11 +167,8 @@ If you want to enable debug logging in In-App Messaging SDK (tags begins with "I
 ### #5 Creating an UserInfoProvider.
 Create a new class in your project which implements the following file:
 `com.rakuten.tech.mobile.inappmessaging.runtime.UserInfoProvider` <br/>
-Refer to the ECO Demo [example](https://gitpub.rakuten-it.com/projects/ECO/repos/core-android-inappmessaging/browse/test/src/main/java/com/rakuten/test/AppUserInfoProvider.java?at=refs%2Fheads%2Fdev)
 
 This class serves the purpose of providing basic user information such as userId, rakutenId, and RAE token at runtime.
-It's best to utilize the [User SDK](https://documents.developers.rakuten.com/android-sdk/user-4.13/).
-Make sure RAE token can be validated by APIC using scope: `90days@Access`. This scope can be set in the User SDK.<br/>
 Note: only provide RAE token if the user is logged in.
 
 ### #6 Initializing In-App Messaging SDK.
@@ -239,7 +262,7 @@ buildscript {
 
 ## <a name="faq"></a> Frequently Asked Questions
 ### Q: How do I send message for in staging or testing environment?
-When creating [campaigns](https://developers.rakuten.com/intra/in-app-message/create-campaign), you can set the versions which the campaign will be applied to your app.
+When creating [campaigns](https://inappmessaging.rakapi.com/campaign/create), you can set the versions which the campaign will be applied to your app.
 You can set the versions to staging versions (ex. 0.0.1, 1.0.0-staging, 0.x.x, etc.)
 
 ### Q: How many times In-App Message should be sent to test device? Does it depends on Max Lifetime Impressions?
@@ -254,25 +277,19 @@ All the events "launch the app event, login event, purchase successful event, cu
 ## <a name="see-also"></a> Documentation and Useful Links
 Documents targeting Engineers:
 
-+ [Documentation of the latest SDK version](https://documents.developers.rakuten.com/android-sdk/inappmessaging-1.4/reference/packages.html)
-+ [SDK Source Code](https://ghe.rakuten-it.com/ssed/android-in-app-messaging)
-+ [Documentation portal of all Android SDK modules](https://documents.developers.rakuten.com/android-sdk/)
++ [SDK Source Code](https://github.com/rakutentech/android-inappmessaging)
 
 Documents targeting Product Managers:
 
-+ [In-App Messaging Dashboard Sign Up](https://developers.rakuten.com/intra/in-app-message/sign-up-for-in-app-message)
-
-For initial documentation:
-* [Overview](https://developers.rakuten.com/intra/in-app-message/overview)
-+ [Rakuten In-App Messaging Initial](https://confluence.rakuten-it.com/confluence/display/SSEDPT/Rakuten+In-App+Messaging)
++ In-App Messaging Dashboard Sign Up(page is coming soon.)
 
 ## <a name="changelog"></a> Changelog
 
 ### 2.x.x (TBD)
-* [SDKCF-2054](https://jira.rakuten-it.com/jira/browse/SDKCF-2054): Converted In-App Messaging to Kotlin
-* [SDKCF-1614](https://jira.rakuten-it.com/jira/browse/SDKCF-1614): Polish the Public API (removed unnecessary public APIs)
-* [SDKCF-2342](https://jira.rakuten-it.com/jira/browse/SDKCF-2342): easy_id targeting
-* [SDKCF-2353](https://jira.rakuten-it.com/jira/browse/SDKCF-2353): Rakuten ID targeting
+* SDKCF-2054: Converted In-App Messaging to Kotlin
+* SDKCF-1614: Polish the Public API (removed unnecessary public APIs)
+* SDKCF-2342: easy_id targeting
+* SDKCF-2353: Rakuten ID targeting
 
 ### 1.4.0
 * Adding feature embedded event in action buttons.
