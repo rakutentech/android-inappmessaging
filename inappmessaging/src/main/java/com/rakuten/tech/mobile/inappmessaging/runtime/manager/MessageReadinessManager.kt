@@ -19,6 +19,7 @@ import com.rakuten.tech.mobile.inappmessaging.runtime.workmanager.schedulers.Mes
 import retrofit2.Call
 import timber.log.Timber
 import java.io.IOException
+import java.util.Locale
 
 /**
  * The MessageReadinessManager dispatches the actual work to check if a message is ready to display.
@@ -94,7 +95,8 @@ internal interface MessageReadinessManager {
                     message.getCampaignId(),
                     HostAppInfoRepository.instance().getVersion(),
                     BuildConfig.VERSION_NAME,
-                    locale?.toString() ?: "",
+                    locale?.toString()?.replace("_", "-")
+                            ?.toLowerCase(Locale.getDefault()) ?: "",
                     PingResponseMessageRepository.instance().lastPingMillis,
                     RuntimeUtil.getUserIdentifiers())
         }
