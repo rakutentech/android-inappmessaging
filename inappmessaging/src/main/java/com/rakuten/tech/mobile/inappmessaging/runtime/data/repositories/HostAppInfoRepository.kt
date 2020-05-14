@@ -33,9 +33,9 @@ internal interface HostAppInfoRepository {
     fun getPackageName(): String?
 
     /**
-     * This method returns device's locale or null if not set.
+     * This method returns device's locale or default if not set in String and lowercase format (i.e. xx_xx).
      */
-    fun getDeviceLocale(): Locale?
+    fun getDeviceLocale(): String
 
     /**
      * This method returns IAM subscription key.
@@ -94,7 +94,10 @@ internal interface HostAppInfoRepository {
 
         override fun getPackageName(): String? = hostAppInfo?.packageName ?: ""
 
-        override fun getDeviceLocale(): Locale? = hostAppInfo?.locale ?: Locale.getDefault()
+        override fun getDeviceLocale(): String {
+            val locale = hostAppInfo?.locale ?: Locale.getDefault()
+            return locale.toString().replace("_", "-").toLowerCase(Locale.getDefault())
+        }
 
         @Suppress("FunctionMaxLength")
         override fun getInAppMessagingSubscriptionKey(): String? = hostAppInfo?.subscriptionKey ?: ""

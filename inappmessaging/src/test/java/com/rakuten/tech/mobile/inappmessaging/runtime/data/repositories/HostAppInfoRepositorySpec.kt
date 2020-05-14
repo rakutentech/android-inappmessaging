@@ -8,6 +8,7 @@ import com.rakuten.tech.mobile.inappmessaging.runtime.utils.InAppMessagingConsta
 import org.amshove.kluent.shouldEqual
 import org.junit.Assert
 import org.junit.Test
+import java.util.Locale
 
 /**
  * Test class for HostAppInfoRepository class
@@ -25,7 +26,8 @@ class HostAppInfoRepositorySpec : BaseTest() {
         HostAppInfoRepository.instance().addHostInfo(testAppInfo)
         HostAppInfoRepository.instance().getVersion() shouldEqual InAppMessagingTestConstants.APP_VERSION
         HostAppInfoRepository.instance().getPackageName() shouldEqual InAppMessagingTestConstants.APP_ID
-        HostAppInfoRepository.instance().getDeviceLocale() shouldEqual InAppMessagingTestConstants.LOCALE
+        HostAppInfoRepository.instance().getDeviceLocale() shouldEqual InAppMessagingTestConstants.LOCALE.toString()
+                .replace("_", "-").toLowerCase(Locale.getDefault())
         HostAppInfoRepository.instance()
                 .getInAppMessagingSubscriptionKey() shouldEqual InAppMessagingTestConstants.SUB_KEY
         HostAppInfoRepository.instance().getDeviceId() shouldEqual InAppMessagingTestConstants.DEVICE_ID

@@ -26,6 +26,8 @@ import org.mockito.MockitoAnnotations
 import org.robolectric.RobolectricTestRunner
 import org.robolectric.annotation.Config
 import retrofit2.Call
+import java.util.*
+import kotlin.collections.ArrayList
 
 /**
  * Test class for MessageReadinessManager.
@@ -91,6 +93,7 @@ class MessageReadinessManagerSpec : BaseTest() {
         request.sdkVersion shouldEqual BuildConfig.VERSION_NAME
         request.lastPingInMillis shouldEqual LAST_PING_MILLIS
         request.locale shouldEqual InAppMessagingTestConstants.LOCALE.toString()
+                .replace("_", "-").toLowerCase(Locale.getDefault())
     }
 
     @Test

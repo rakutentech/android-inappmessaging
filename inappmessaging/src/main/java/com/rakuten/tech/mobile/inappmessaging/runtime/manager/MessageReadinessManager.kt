@@ -89,12 +89,11 @@ internal interface MessageReadinessManager {
 
         @VisibleForTesting
         override fun getDisplayPermissionRequest(message: Message): DisplayPermissionRequest {
-            val locale = HostAppInfoRepository.instance().getDeviceLocale()
             return DisplayPermissionRequest(
                     message.getCampaignId(),
                     HostAppInfoRepository.instance().getVersion(),
                     BuildConfig.VERSION_NAME,
-                    locale?.toString() ?: "",
+                    HostAppInfoRepository.instance().getDeviceLocale(),
                     PingResponseMessageRepository.instance().lastPingMillis,
                     RuntimeUtil.getUserIdentifiers())
         }
