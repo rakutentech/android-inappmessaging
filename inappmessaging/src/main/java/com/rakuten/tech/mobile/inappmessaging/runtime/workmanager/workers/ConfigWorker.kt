@@ -16,7 +16,6 @@ import retrofit2.Response
 import timber.log.Timber
 import java.io.IOException
 import java.net.HttpURLConnection
-import java.util.Locale
 
 /**
  * This class contains the actual work to communicate with Config Service. It extends Worker class,
@@ -48,10 +47,6 @@ internal class ConfigWorker(
         Timber.tag(TAG).d(hostRepo.getConfigUrl())
         val hostAppId = hostRepo.getPackageName()
         val locale = hostRepo.getDeviceLocale()
-        var localeString = "" // Optional request parameter.
-        if (locale != null) {
-            localeString = locale.toString().replace("_", "-").toLowerCase(Locale.getDefault())
-        }
         val hostAppVersion = hostRepo.getVersion()
         // Terminate request if either appId or appVersion is empty or null.
         if (hostAppId.isNullOrEmpty() || hostAppVersion.isNullOrEmpty()) {
@@ -64,7 +59,7 @@ internal class ConfigWorker(
                 .create(ConfigRetrofitService::class.java)
                 .getConfigService(
                         configUrl,
-                        ConfigRequest(hostAppId, localeString, hostAppVersion, sdkVersion))
+                        ConfigRequest(hostAppId, locale, hostAppVersion, sdkVersion))
 
         return try {
             // Executing the API network call.

@@ -19,7 +19,6 @@ import com.rakuten.tech.mobile.inappmessaging.runtime.workmanager.schedulers.Mes
 import retrofit2.Call
 import timber.log.Timber
 import java.io.IOException
-import java.util.Locale
 
 /**
  * The MessageReadinessManager dispatches the actual work to check if a message is ready to display.
@@ -90,13 +89,11 @@ internal interface MessageReadinessManager {
 
         @VisibleForTesting
         override fun getDisplayPermissionRequest(message: Message): DisplayPermissionRequest {
-            val locale = HostAppInfoRepository.instance().getDeviceLocale()
             return DisplayPermissionRequest(
                     message.getCampaignId(),
                     HostAppInfoRepository.instance().getVersion(),
                     BuildConfig.VERSION_NAME,
-                    locale?.toString()?.replace("_", "-")
-                            ?.toLowerCase(Locale.getDefault()) ?: "",
+                    HostAppInfoRepository.instance().getDeviceLocale(),
                     PingResponseMessageRepository.instance().lastPingMillis,
                     RuntimeUtil.getUserIdentifiers())
         }
