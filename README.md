@@ -1,5 +1,14 @@
-# Raven - In App Messaging Android SDK Tutorial
+# Android In App Messaging SDK documentation
 
-https://confluence.rakuten-it.com/confluence/display/SSEDPT/Android+SDK+Usage+Tutorial
+This branch contains the documentation that is published to Github Pages for this repository.
 
-https://developers.rakuten.com/intra/in-app-message/integrate-android-sdk
+## Test locally
+
+The documentation is built on GitHub using Jekyll. You can also test locally by using:
+
+1. `bundle install`
+2. `bundle exec jekyll serve`
+
+## Other
+
+The theme is a [custom theme](https://github.com/rakutentech/android-buildconfig/tree/gh-pages-theme) based on [Cayman Jekyll Theme](https://github.com/pages-themes/cayman).

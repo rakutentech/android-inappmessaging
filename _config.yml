@@ -1,0 +1,15 @@
+markdown: kramdown
+plugins:
+  - github-pages
+remote_theme: rakutentech/android-buildconfig@gh-pages-theme
+
+title: In App Messaging SDK for Android
+description: Provides in-app messaging for Android applications.
+repository: rakutentech/android-inappmessaging
+
+docs_path: docs
+api_docs_path: api
+
+collections:
+  versions:
+  
