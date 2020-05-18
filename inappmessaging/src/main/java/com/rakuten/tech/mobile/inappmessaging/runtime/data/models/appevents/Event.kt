@@ -31,6 +31,13 @@ interface Event {
     fun getTimestamp(): Long
 
     /**
+     * This method returns event is persistent type (can be used by campaigns multiple times).
+     * If persistent type, event will not be removed in LocalEventRepository when used by a campaign.
+     */
+    @NotNull
+    fun isPersistentType(): Boolean
+
+    /**
      * This method returns RAT event map.
      */
     @RestrictTo(LIBRARY)

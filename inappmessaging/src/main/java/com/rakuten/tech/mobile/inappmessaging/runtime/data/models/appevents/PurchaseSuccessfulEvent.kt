@@ -20,7 +20,7 @@ import kotlin.collections.set
 /**
  * Purchase successful Event for host app to use.
  */
-class PurchaseSuccessfulEvent : BaseEvent(EventType.PURCHASE_SUCCESSFUL, EventType.PURCHASE_SUCCESSFUL.name) {
+class PurchaseSuccessfulEvent : BaseEvent(EventType.PURCHASE_SUCCESSFUL, EventType.PURCHASE_SUCCESSFUL.name, false) {
     var purchaseAmountMicros = -1
         private set
 

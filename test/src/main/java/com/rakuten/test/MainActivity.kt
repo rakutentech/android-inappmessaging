@@ -12,6 +12,11 @@ class MainActivity : AppCompatActivity() {
         setContentView(R.layout.activity_main)
     }
 
+    override fun onStart() {
+        super.onStart()
+        InAppMessaging.instance().logEvent(AppStartEvent())
+    }
+
     override fun onResume() {
         super.onResume()
         InAppMessaging.instance().registerMessageDisplayActivity(this)

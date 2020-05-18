@@ -6,11 +6,8 @@ import com.rakuten.tech.mobile.inappmessaging.runtime.utils.InAppMessagingConsta
 import timber.log.Timber
 import java.util.Collections
 import kotlin.collections.ArrayList
-import kotlin.collections.List
 import kotlin.collections.component1
 import kotlin.collections.component2
-import kotlin.collections.forEach
-import kotlin.collections.isNotEmpty
 
 /**
  * LocalEventRepository will store all incoming events from host app.
@@ -41,6 +38,10 @@ internal interface LocalEventRepository : EventRepository {
             require(!event.getEventName().isNullOrEmpty()) { InAppMessagingConstants.ARGUMENT_IS_EMPTY_EXCEPTION }
 
             synchronized(events) {
+                if (shouldIgnore(event)) {
+                    // If persistent type, event should only be stored once.
+                    return
+                }
                 events.add(event)
                 Timber.tag(TAG).d(event.getEventName())
                 event.getAttributeMap().forEach { (key, value) ->
@@ -70,6 +71,17 @@ internal interface LocalEventRepository : EventRepository {
                     events.clear()
                 }
             }
+        }
+
+        private fun shouldIgnore(event: Event): Boolean {
+            if (event.isPersistentType()) {
+                for (currEvent in events) {
+                    if (event.getEventType() == currEvent.getEventType() &&
+                            event.getEventName() == currEvent.getEventName()) return true
+                }
+            }
+
+            return false
         }
     }
 }
