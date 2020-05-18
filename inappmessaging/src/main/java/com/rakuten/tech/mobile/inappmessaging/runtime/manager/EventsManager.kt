@@ -22,7 +22,7 @@ internal object EventsManager {
         eventScheduler: EventMessageReconciliationScheduler = EventMessageReconciliationScheduler.instance()
     ) {
         // Caching events locally.
-        localEventRepo.addEvent(event)
+        val isAdded = localEventRepo.addEvent(event)
         // If event is a LoginSuccessfulEvent, then notify SessionManager.
         if (event.getEventType() == EventType.LOGIN_SUCCESSFUL.typeId) {
             SessionManager.onSessionUpdate()
@@ -30,7 +30,7 @@ internal object EventsManager {
         // Broadcasting host app logged event to Analytics SDK.
         sendEvent(InAppMessagingConstants.RAT_EVENT_KEY_EVENTS, event.getRatEventMap())
         // Start reconciliation process if config service is enabled.
-        if (ConfigResponseRepository.instance().isConfigEnabled() && !event.isPersistentType()) {
+        if (ConfigResponseRepository.instance().isConfigEnabled() && isAdded) {
             eventScheduler.startEventMessageReconciliationWorker()
         }
     }
