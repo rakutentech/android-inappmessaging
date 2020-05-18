@@ -29,7 +29,6 @@ internal object EventsManager {
         }
         // Broadcasting host app logged event to Analytics SDK.
         sendEvent(InAppMessagingConstants.RAT_EVENT_KEY_EVENTS, event.getRatEventMap())
-        // Start reconciliation process if config service is enabled.
         if (ConfigResponseRepository.instance().isConfigEnabled() && isAdded) {
             eventScheduler.startEventMessageReconciliationWorker()
         }

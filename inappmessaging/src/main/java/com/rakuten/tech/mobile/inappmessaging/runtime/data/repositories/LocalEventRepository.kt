@@ -40,7 +40,6 @@ internal interface LocalEventRepository : EventRepository {
             synchronized(events) {
                 // If persistent type, event should only be stored once.
                 if (shouldIgnore(event)) return false
-
                 events.add(event)
                 Timber.tag(TAG).d(event.getEventName())
                 event.getAttributeMap().forEach { (key, value) ->
