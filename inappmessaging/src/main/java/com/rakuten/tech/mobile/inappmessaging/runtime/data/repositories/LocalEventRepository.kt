@@ -34,14 +34,12 @@ internal interface LocalEventRepository : EventRepository {
          * If logEvent name is empty, an IllegalArgumentException will be thrown.
          */
         @Throws(IllegalArgumentException::class)
-        override fun addEvent(event: Event) {
+        override fun addEvent(event: Event): Boolean {
             require(!event.getEventName().isNullOrEmpty()) { InAppMessagingConstants.ARGUMENT_IS_EMPTY_EXCEPTION }
 
             synchronized(events) {
-                if (shouldIgnore(event)) {
-                    // If persistent type, event should only be stored once.
-                    return
-                }
+                // If persistent type, event should only be stored once.
+                if (shouldIgnore(event)) return false
                 events.add(event)
                 Timber.tag(TAG).d(event.getEventName())
                 event.getAttributeMap().forEach { (key, value) ->
@@ -53,6 +51,7 @@ internal interface LocalEventRepository : EventRepository {
                             value?.value)
                 }
             }
+            return true
         }
 
         /**
