@@ -25,7 +25,8 @@ import java.util.Collections
 @RestrictTo(LIBRARY)
 abstract class BaseEvent(
     @NotNull private val eventType: EventType,
-    @NotNull private var eventName: String
+    @NotNull private var eventName: String,
+    @NotNull private val isPersistent: Boolean
 ) : Event {
     private val timestamp: Long
 
@@ -57,6 +58,13 @@ abstract class BaseEvent(
      */
     @NotNull
     override fun getTimestamp(): Long = timestamp
+
+    /**
+     * This method returns event is persistent type (can be used by campaigns multiple times).
+     * If persistent type, event will not be removed in LocalEventRepository when used by a campaign.
+     */
+    @NotNull
+    override fun isPersistentType(): Boolean = isPersistent
 
     /**
      * A map will be created containing event's base attributes like event name, and timestamp.

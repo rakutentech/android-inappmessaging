@@ -42,5 +42,5 @@ class BaseEventSpec : BaseTest() {
     /**
      * Test logEvent which extends BaseEvent.
      */
-    private class TestEvent(eventType: EventType, eventName: String) : BaseEvent(eventType, eventName)
+    private class TestEvent(eventType: EventType, eventName: String) : BaseEvent(eventType, eventName, false)
 }

@@ -20,27 +20,28 @@ class EventSpec(
     val eventName: String,
     val event: BaseEvent,
     val expectedType: EventType,
-    val expectedName: String
+    val expectedName: String,
+    val expectedPersistType: Boolean
 ) : BaseTest() {
 
     companion object {
         @JvmStatic
-        @ParameterizedRobolectricTestRunner.Parameters(
-                name = "{0} event type"
-        )
+        @ParameterizedRobolectricTestRunner.Parameters(name = "{0} event type")
         fun data(): Collection<Array<Any>> {
             return listOf(
                     arrayOf("AppStart", AppStartEvent(), EventType.APP_START,
-                            EventType.APP_START.name.toLowerCase(Locale.getDefault())),
-                    arrayOf("Custom", CustomEvent("custom"), EventType.CUSTOM, "custom"),
-                    arrayOf("Custom UpperCase", CustomEvent("CuStOm"), EventType.CUSTOM, "custom"),
+                            EventType.APP_START.name.toLowerCase(Locale.getDefault()), true),
+                    arrayOf("Custom", CustomEvent("custom"), EventType.CUSTOM, "custom", false),
+                    arrayOf("Custom UpperCase", CustomEvent("CuStOm"), EventType.CUSTOM, "custom", false),
                     arrayOf("LoginSuccessful",
                             LoginSuccessfulEvent(), EventType.LOGIN_SUCCESSFUL,
-                            EventType.LOGIN_SUCCESSFUL.name.toLowerCase(Locale.getDefault())),
+                            EventType.LOGIN_SUCCESSFUL.name.toLowerCase(Locale.getDefault()),
+                            false),
                     arrayOf("PurchaseSuccessful",
                             PurchaseSuccessfulEvent(),
                             EventType.PURCHASE_SUCCESSFUL,
-                            EventType.PURCHASE_SUCCESSFUL.name.toLowerCase(Locale.getDefault()))
+                            EventType.PURCHASE_SUCCESSFUL.name.toLowerCase(Locale.getDefault()),
+                            false)
             )
         }
     }
@@ -81,5 +82,10 @@ class EventSpec(
         } else {
             event.getAttributeMap().shouldBeEmpty()
         }
+    }
+
+    @Test
+    fun `should not be persistent type`() {
+        event.isPersistentType() shouldEqual expectedPersistType
     }
 }

@@ -18,7 +18,7 @@ import java.util.Collections
  * Note: Please don't use the same attribute's name more than once
  * because the new attribute will replace the old one.
  */
-class CustomEvent(eventName: String) : BaseEvent(EventType.CUSTOM, eventName) {
+class CustomEvent(eventName: String) : BaseEvent(EventType.CUSTOM, eventName, false) {
     private val attributesMap: MutableMap<String, Attribute> = HashMap()
 
     /**
