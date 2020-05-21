@@ -6,11 +6,8 @@ import com.rakuten.tech.mobile.inappmessaging.runtime.utils.InAppMessagingConsta
 import timber.log.Timber
 import java.util.Collections
 import kotlin.collections.ArrayList
-import kotlin.collections.List
 import kotlin.collections.component1
 import kotlin.collections.component2
-import kotlin.collections.forEach
-import kotlin.collections.isNotEmpty
 
 /**
  * LocalEventRepository will store all incoming events from host app.
@@ -37,10 +34,12 @@ internal interface LocalEventRepository : EventRepository {
          * If logEvent name is empty, an IllegalArgumentException will be thrown.
          */
         @Throws(IllegalArgumentException::class)
-        override fun addEvent(event: Event) {
+        override fun addEvent(event: Event): Boolean {
             require(!event.getEventName().isNullOrEmpty()) { InAppMessagingConstants.ARGUMENT_IS_EMPTY_EXCEPTION }
 
             synchronized(events) {
+                // If persistent type, event should only be stored once.
+                if (shouldIgnore(event)) return false
                 events.add(event)
                 Timber.tag(TAG).d(event.getEventName())
                 event.getAttributeMap().forEach { (key, value) ->
@@ -52,6 +51,7 @@ internal interface LocalEventRepository : EventRepository {
                             value?.value)
                 }
             }
+            return true
         }
 
         /**
@@ -70,6 +70,17 @@ internal interface LocalEventRepository : EventRepository {
                     events.clear()
                 }
             }
+        }
+
+        private fun shouldIgnore(event: Event): Boolean {
+            if (event.isPersistentType()) {
+                for (currEvent in events) {
+                    if (event.getEventType() == currEvent.getEventType() &&
+                            event.getEventName() == currEvent.getEventName()) return true
+                }
+            }
+
+            return false
         }
     }
 }

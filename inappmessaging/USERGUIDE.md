@@ -206,7 +206,7 @@ Host app can log events to InAppMessaging anywhere in your app.
 These events will trigger messages with the same event based trigger. Upon receiving logged event, InAppMessaging SDK will start matching it with current campaigns immediately. After a campaign message's trigger events are matched by the logged events, this message will be displayed in the current registered activity. If no activity is registered, it will be displayed in the next registered activity.
 
 Pre-defined event classes:<br/>
-`AppStartEvent` - Host app can send this event after every app launch, including first launch, or resume. Recommend to log this event in host app's base activity's onResume().
+`AppStartEvent` - Host app can send this event on app launch from terminated state. Recommended to log this event in host app's base activity's onStart().
 
 `LoginSuccessfulEvent` - Host app can send this event after every time user login. Please note: this will trigger InAppMessaging SDK to update current session data to the new user.
 

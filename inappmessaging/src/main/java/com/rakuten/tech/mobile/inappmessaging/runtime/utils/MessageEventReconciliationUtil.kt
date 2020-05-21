@@ -114,7 +114,9 @@ internal interface MessageEventReconciliationUtil {
                     if (isTriggerReconciled(trigger, event)) {
                         // Add this event to eventsToBeRemoved list because it can't be used again
                         // to satisfy any more triggers.
-                        eventsToBeRemoved.add(event)
+                        if (!event.isPersistentType()) {
+                            eventsToBeRemoved.add(event)
+                        }
 
                         // Add numTriggersSatisfied by 1, and check the number against
                         // requiredSetsOfSatisfiedTriggersToDisplayMessage.

@@ -5,6 +5,7 @@ import com.rakuten.tech.mobile.inappmessaging.runtime.BaseTest
 import com.rakuten.tech.mobile.inappmessaging.runtime.data.enums.ValueType
 import com.rakuten.tech.mobile.inappmessaging.runtime.utils.InAppMessagingConstants
 import org.amshove.kluent.shouldBeEqualTo
+import org.amshove.kluent.shouldBeFalse
 import org.amshove.kluent.shouldEqual
 import org.junit.Test
 import org.junit.runner.RunWith
@@ -159,5 +160,10 @@ class CustomEventParameterizedSpec(
             else -> {
             }
         }
+    }
+
+    @Test
+    fun `should not be persistent type`() {
+        event.isPersistentType().shouldBeFalse()
     }
 }
