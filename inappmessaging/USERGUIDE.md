@@ -1,3 +1,7 @@
+---
+layout: userguide
+---
+
 # In-App Messaging
 The In-App Messaging module enables applications to receive notification, which are displayed within the app, from [Rakuten In-App Messaging Dashboard](https://inappmessaging.rakapi.com/)
 
