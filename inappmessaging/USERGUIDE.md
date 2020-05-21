@@ -18,14 +18,14 @@ The In-App Messaging module enables applications to receive notification, which 
 
 ## <a name="features"></a> Features Overview
 ### Message Type
-#1 Modal|#2 Full Screen|#3 Slide-Up
---|--|--
-<img src="images/sample-modal.png" alt="Modal UI" width="200"/>|<img src="images/sample-full.png" alt="Full UI" width="200"/>|<img src="images/sample-slide.png" alt="Slide-Up UI" width="200"/>
+| #1 Modal | #2 Full Screen | #3 Slide-Up |
+:-------------------------:|:-------------------------:|:-------------------------:
+![Modal](images/sample-modal.png)|![Full](images/sample-full.png)|![Slide](images/sample-slide.png)
 
 ### Message Layout
-#1 Text Only|#2 Image Only|#3 Text and Image|#4 HTML
---|--|--|--
-<img src="images/sample-text.png" alt="Text only" width="200"/>|<img src="images/sample-image.png" alt="Image only" width="200"/>|<img src="images/sample-image-text.png" alt="Text and image" width="200"/>|Coming soon
+| #1 Text Only | #2 Image Only | #3 Text and Image | #4 HTML |
+:-------------------------:|:-------------------------:|:-------------------------:|:-------------------------:
+![Text](images/sample-text.png)|![Image](images/sample-image.png)|![Image Text](images/sample-image-text.png)|Coming soon
 
 ### Actions (Optional Buttons)
 #### #1 Close
