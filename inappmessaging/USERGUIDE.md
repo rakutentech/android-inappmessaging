@@ -84,9 +84,7 @@ Please use the [Create Campaign](https://inappmessaging.rakapi.com/campaign/crea
   * Enter the in-app message **Header** which is a required field.
   * Enter the in-app message **Body** which is an optional field
   * Define the **Message Background Color**. The default is white.
-  * Define the number of **Buttons**, **Button Label**, **Button Actions**.
-<br/>
-<br/>
+  * Define the number of **Buttons**, **Button Label**, **Button Actions**.<br/>
 * Input in-app messaging's target and scheduling information in **Target & Schedule Tab**
 ![Target Schedule Tab](images/target-schedule-tab.png)
   * Define campaign message **Start Date** and **End Date**.
@@ -94,9 +92,7 @@ Please use the [Create Campaign](https://inappmessaging.rakapi.com/campaign/crea
   * Click "+" to add multiple apps.
   * **Target Users** - You can target all your audience with select All Users, you can also target users by upload a CSV file with a list of Easy Ids or User Ids.
   * You can select the message trigger at the **Campaign Events** field, we support: **Launch the App Event**, **Login event**, **Purchase Successful Event** as default. You can add your own custom event at [App Settings](https://inappmessaging.rakapi.com/app/settings) page.
-  * Max Lifetime Impressions - You can manage the number of messages your user will see.
-<br/>
-<br/>
+  * Max Lifetime Impressions - You can manage the number of messages your user will see.<br/>
 * **Launch Campaign** - Live a campaign message. This function only available for the Administrator role.
 * **Save as Draft** - Save a campaign as a draft message. This function is available for all roles.
 * **Send to Test Device** - Send your draft campaign message to the actual test device. You can use easyId or userId (Rakuten user login Id) to target which user you want to send the test message to.
