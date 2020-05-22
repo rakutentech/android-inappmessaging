@@ -108,13 +108,14 @@ internal interface MessageEventReconciliationUtil {
                 // Create an empty list which will contain reconciled events. They will be removed
                 // from the relevantEventsCopy iff Trigger is reconciled.
                 val eventsToBeRemoved = ArrayList<Event>() // NOPMD
-
+                var isPersistentType = false
                 // Reconcile each trigger with all relevant events.
                 for (event in relevantEventsCopy) {
+                    isPersistentType = event.isPersistentType()
                     if (isTriggerReconciled(trigger, event)) {
                         // Add this event to eventsToBeRemoved list because it can't be used again
                         // to satisfy any more triggers.
-                        if (!event.isPersistentType()) {
+                        if (!isPersistentType) {
                             eventsToBeRemoved.add(event)
                         }
 
@@ -129,6 +130,10 @@ internal interface MessageEventReconciliationUtil {
                         }
                     }
                 }
+
+                // If persistent type, only one satisfied trigger is needed
+                if (isPersistentType && numTriggersSatisfied > 0) continue
+
                 // InAppMessaging's matching logic only support `AND` logic, meaning all triggers must be
                 // satisfied by unique events. Therefore, if any trigger was not satisfied by unique events,
                 // or the number of reconciliation needed is not reached, then this whole trigger list is not
