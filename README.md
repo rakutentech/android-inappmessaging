@@ -1,3 +1,6 @@
+[![CircleCI](https://circleci.com/gh/rakutentech/android-inappmessaging.svg?style=svg)](https://circleci.com/gh/rakutentech/android-inappmessaging)
+[![codecov](https://codecov.io/gh/rakutentech/android-inappmessaging/branch/master/graph/badge.svg)](https://codecov.io/gh/rakutentech/android-inappmessaging)
+
 # In-App Messaging SDK for Android
 
 Provides in-app messaging for Android applications. See the [User Guide](./inappmessaging/USERGUIDE.md) for instructions on implementing in an android application.
