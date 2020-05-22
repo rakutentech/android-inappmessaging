@@ -141,7 +141,7 @@ if (isSnapshot) {
 dokka {
   configuration {
     sourceRoot {
-      path = "inappmessaging/src"
+      path = "inappmessaging/src/main"
     }
   }
 }
