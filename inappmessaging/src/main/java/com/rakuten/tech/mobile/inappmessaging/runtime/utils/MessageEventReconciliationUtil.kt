@@ -96,7 +96,7 @@ internal interface MessageEventReconciliationUtil {
             }
 
             val triggerList = message.getTriggers() ?: return true
-            for (trigger in triggerList) {
+            triggers@ for (trigger in triggerList) {
                 // Make a copy of only relevant events to the argument trigger.
                 val relevantEventsCopy = copyEventsForTrigger(trigger, eventMap)
                 // If there are no relevant events, this trigger can't ever be satisfied.
@@ -108,14 +108,14 @@ internal interface MessageEventReconciliationUtil {
                 // Create an empty list which will contain reconciled events. They will be removed
                 // from the relevantEventsCopy iff Trigger is reconciled.
                 val eventsToBeRemoved = ArrayList<Event>() // NOPMD
-                var isPersistentType = false
                 // Reconcile each trigger with all relevant events.
                 for (event in relevantEventsCopy) {
-                    isPersistentType = event.isPersistentType()
                     if (isTriggerReconciled(trigger, event)) {
                         // Add this event to eventsToBeRemoved list because it can't be used again
                         // to satisfy any more triggers.
-                        if (!isPersistentType) {
+                        if (event.isPersistentType()) {
+                            continue@triggers
+                        } else {
                             eventsToBeRemoved.add(event)
                         }
 
@@ -130,9 +130,6 @@ internal interface MessageEventReconciliationUtil {
                         }
                     }
                 }
-
-                // If persistent type, only one satisfied trigger is needed
-                if (isPersistentType && numTriggersSatisfied > 0) continue
 
                 // InAppMessaging's matching logic only support `AND` logic, meaning all triggers must be
                 // satisfied by unique events. Therefore, if any trigger was not satisfied by unique events,
