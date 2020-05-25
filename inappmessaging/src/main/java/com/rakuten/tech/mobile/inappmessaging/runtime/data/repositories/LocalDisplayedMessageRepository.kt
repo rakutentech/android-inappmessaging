@@ -1,5 +1,6 @@
 package com.rakuten.tech.mobile.inappmessaging.runtime.data.repositories
 
+import androidx.annotation.VisibleForTesting
 import com.rakuten.tech.mobile.inappmessaging.runtime.data.models.messages.Message
 import com.rakuten.tech.mobile.inappmessaging.runtime.utils.InAppMessagingConstants
 import java.util.Calendar
@@ -25,6 +26,12 @@ internal interface LocalDisplayedMessageRepository {
      * When message is null or message's campaignId is empty, return 0.
      */
     fun numberOfTimesDisplayed(message: Message): Int
+
+    /**
+     * This method removes all stored messages for testing.
+     */
+    @VisibleForTesting(otherwise = VisibleForTesting.PRIVATE)
+    fun clearMessages()
 
     companion object {
         private var instance: LocalDisplayedMessageRepository = LocalDisplayedMessageRepositoryImpl()
@@ -67,6 +74,12 @@ internal interface LocalDisplayedMessageRepository {
                 // Prevents race condition.
                 val messageTimeStampList = messages[message.getCampaignId()]
                 return messageTimeStampList?.size ?: 0
+            }
+        }
+
+        override fun clearMessages() {
+            if (messages.isNotEmpty()) {
+                messages.clear()
             }
         }
     }

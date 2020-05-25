@@ -14,7 +14,7 @@ import kotlin.collections.component2
  */
 internal interface LocalEventRepository : EventRepository {
     /**
-     * This method returns a copy of list which contains all events.
+     * This method removes all stored events for testing.
      */
     @VisibleForTesting(otherwise = VisibleForTesting.PRIVATE)
     fun clearEvents()

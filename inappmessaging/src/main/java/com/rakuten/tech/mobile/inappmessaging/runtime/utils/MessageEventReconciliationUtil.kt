@@ -20,7 +20,7 @@ import kotlin.collections.set
 /**
  * Utility class helping MessageEventReconciliationWorker for reconciliation.
  */
-@Suppress("LargeClass")
+@Suppress("LargeClass", "LabeledExpression")
 @SuppressWarnings("PMD.GodClass")
 internal interface MessageEventReconciliationUtil {
 
@@ -96,7 +96,7 @@ internal interface MessageEventReconciliationUtil {
             }
 
             val triggerList = message.getTriggers() ?: return true
-            for (trigger in triggerList) {
+            triggers@ for (trigger in triggerList) {
                 // Make a copy of only relevant events to the argument trigger.
                 val relevantEventsCopy = copyEventsForTrigger(trigger, eventMap)
                 // If there are no relevant events, this trigger can't ever be satisfied.
@@ -108,13 +108,14 @@ internal interface MessageEventReconciliationUtil {
                 // Create an empty list which will contain reconciled events. They will be removed
                 // from the relevantEventsCopy iff Trigger is reconciled.
                 val eventsToBeRemoved = ArrayList<Event>() // NOPMD
-
                 // Reconcile each trigger with all relevant events.
                 for (event in relevantEventsCopy) {
                     if (isTriggerReconciled(trigger, event)) {
                         // Add this event to eventsToBeRemoved list because it can't be used again
                         // to satisfy any more triggers.
-                        if (!event.isPersistentType()) {
+                        if (event.isPersistentType()) {
+                            continue@triggers
+                        } else {
                             eventsToBeRemoved.add(event)
                         }
 
@@ -129,6 +130,7 @@ internal interface MessageEventReconciliationUtil {
                         }
                     }
                 }
+
                 // InAppMessaging's matching logic only support `AND` logic, meaning all triggers must be
                 // satisfied by unique events. Therefore, if any trigger was not satisfied by unique events,
                 // or the number of reconciliation needed is not reached, then this whole trigger list is not
