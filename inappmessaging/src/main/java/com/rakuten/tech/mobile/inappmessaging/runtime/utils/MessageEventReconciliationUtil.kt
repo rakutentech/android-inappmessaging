@@ -20,7 +20,7 @@ import kotlin.collections.set
 /**
  * Utility class helping MessageEventReconciliationWorker for reconciliation.
  */
-@Suppress("LargeClass")
+@Suppress("LargeClass", "LabeledExpression")
 @SuppressWarnings("PMD.GodClass")
 internal interface MessageEventReconciliationUtil {
 
