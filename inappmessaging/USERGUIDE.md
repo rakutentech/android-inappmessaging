@@ -126,7 +126,7 @@ allprojects {
 
 ```groovy
 dependencies {
-    implementation 'com.rakuten.tech.mobile:inappmessaging:${latest_version}'
+    implementation 'com.rakuten.tech.mobile.inappmessaging:inappmessaging:${latest_version}'
 }
 ```
 Please refer to [Changelog](#changelog) section for the latest version.
@@ -287,11 +287,15 @@ Documents targeting Product Managers:
 
 ## <a name="changelog"></a> Changelog
 
-### 2.x.x (TBD)
+### 2.0.0 (in-progress)
 * SDKCF-2054: Converted In-App Messaging to Kotlin
 * SDKCF-1614: Polish the Public API (removed unnecessary public APIs)
+* SDKCF-1616: Auto Initialize the SDK
 * SDKCF-2342: easy_id targeting
 * SDKCF-2353: Rakuten ID targeting
+* SDKCF-2402: Update locale parameter format
+* SDKCF-2429: Prevent trigger of Launch App Event multiple times
+* SDKCF-1619 SDKCF-1617: Remove unnecessary dependencies (Espresso and Lombok)
 
 ### 1.4.0
 * Adding feature embedded event in action buttons.
