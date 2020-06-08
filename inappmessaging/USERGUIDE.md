@@ -112,7 +112,7 @@ Message are displayed if the triggers/conditions for the campaign are satisfied 
 ![Display message](images/what-is-inapp.png)
 
 ## <a name="integration"></a> SDK Integration
-### #1 Include Artifactory in your project, this should be added in your project root `build.gradle` file.
+### #1 Include JCenter repo in your project, this should be added in your project root `build.gradle` file.
 
 ```groovy
 allprojects {
