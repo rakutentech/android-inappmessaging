@@ -112,7 +112,7 @@ Message are displayed if the triggers/conditions for the campaign are satisfied 
 ![Display message](images/what-is-inapp.png)
 
 ## <a name="integration"></a> SDK Integration
-### #1 Include Artifactory in your project, this should be added in your project root `build.gradle` file. Note: Crimson House Intra connection is needed.
+### #1 Include JCenter repo in your project, this should be added in your project root `build.gradle` file.
 
 ```groovy
 allprojects {
@@ -122,7 +122,9 @@ allprojects {
 }
 ```
 
-### #2 Add InAppMessaging SDK in your project dependencies. Note: InAppMessaging SDK only uses AndroidX libraries, recommend host apps to migrate to AndroidX to avoid duplicate dependencies.
+### #2 Add InAppMessaging SDK in your project dependencies.
+
+Note: InAppMessaging SDK only uses AndroidX libraries, host apps should migrate to AndroidX to avoid duplicate dependencies.
 
 ```groovy
 dependencies {
