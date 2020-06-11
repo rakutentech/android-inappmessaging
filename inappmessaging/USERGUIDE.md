@@ -289,7 +289,7 @@ Documents targeting Product Managers:
 
 ## <a name="changelog"></a> Changelog
 
-### 2.0.0 (in-progress)
+### 2.0.0 (2020-06-11)
 * SDKCF-2054: Converted In-App Messaging to Kotlin
 * SDKCF-1614: Polish the Public API (removed unnecessary public APIs)
 * SDKCF-1616: Auto Initialize the SDK
