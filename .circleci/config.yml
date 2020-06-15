@@ -52,19 +52,19 @@ jobs:
           command: bash <(curl -s https://codecov.io/bash)
       - store_test_results:
           path: inappmessaging/build/test-results
-          destination: inappmessaging/test-results
+          destination: test-results/
       - store_artifacts:
           path: inappmessaging/build/reports
-          destination: inappmessaging/reports
+          destination: reports/
       - store_artifacts:
           path: inappmessaging/build/outputs/aar
-          destination: inappmessaging/aar
+          destination: aar/
       - store_artifacts:
           path: inappmessaging/build/kdocs
-          destination: inappmessaging/kdocs
+          destination: kdocs/
       - store_artifacts:
           path: inappmessaging/build/outputs/apk
-          destination: inappmessaging
+          destination: apk/
       - persist_to_workspace:
           root: ~/code
           paths:
@@ -80,6 +80,8 @@ jobs:
     steps:
     - checkout
     - run: git submodule update --init
+    - attach_workspace:
+        at: ./
     - run:
         name: Current Version
         command: ./gradlew cV
