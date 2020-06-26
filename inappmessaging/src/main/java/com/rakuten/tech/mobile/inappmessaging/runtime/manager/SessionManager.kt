@@ -1,5 +1,6 @@
 package com.rakuten.tech.mobile.inappmessaging.runtime.manager
 
+import com.rakuten.tech.mobile.inappmessaging.runtime.data.models.appevents.Event
 import com.rakuten.tech.mobile.inappmessaging.runtime.data.repositories.LocalDisplayedMessageRepository
 import com.rakuten.tech.mobile.inappmessaging.runtime.data.repositories.LocalEventRepository
 import com.rakuten.tech.mobile.inappmessaging.runtime.data.repositories.LocalOptedOutMessageRepository
@@ -16,7 +17,7 @@ internal object SessionManager {
      * Upon login successful or logout, old messages will be discarded, then prepare new messages for the new
      * user.
      */
-    fun onSessionUpdate() {
+    fun onSessionUpdate(event: Event? = null) {
         // clear locally stored campaigns from ping response
         PingResponseMessageRepository.instance().clearMessages()
 
@@ -31,6 +32,10 @@ internal object SessionManager {
 
         // clear locally stored triggered events (non-persistent)
         LocalEventRepository.instance().clearNonPersistentEvents()
+        if (event != null && !event.isPersistentType()) {
+            // manually add latest event triggered by new user since it was removed from previous clearing
+            LocalEventRepository.instance().addEvent(event)
+        }
 
         MessageMixerPingScheduler.instance().pingMessageMixerService(0)
     }

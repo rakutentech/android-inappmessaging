@@ -51,6 +51,12 @@ class EventsManagerSpec : BaseTest() {
         WorkManagerTestInitHelper.initializeTestWorkManager(context)
         When calling mockEvent.getEventName() itReturns EVENT_NAME
         When calling mockEvent.getRatEventMap() itReturns map
+        LocalDisplayedMessageRepository.instance().clearMessages()
+        LocalEventRepository.instance().clearEvents()
+        System.out.println(LocalEventRepository.instance().getEvents().size)
+        ReadyForDisplayMessageRepository.instance().clearMessages()
+        LocalOptedOutMessageRepository.instance().clearMessages()
+        PingResponseMessageRepository.instance().clearMessages()
     }
 
     @Test
@@ -104,7 +110,7 @@ class EventsManagerSpec : BaseTest() {
         InAppMessaging.instance().registerPreference(TestUserInfoProvider())
         ConfigResponseRepository.instance().addConfigResponse(configResponseData)
 
-        addTestMessages()
+        addTestData()
 
         When calling configResponseData.enabled itReturns false
         When calling mockAccount.updateUserInfo() itReturns true
@@ -112,7 +118,7 @@ class EventsManagerSpec : BaseTest() {
         EventsManager.onEventReceived(event = PurchaseSuccessfulEvent(), eventScheduler = eventRecon,
                 accountRepo = mockAccount)
 
-        verifyTestMessages(0)
+        verifyTestData(0)
     }
 
     @Test
@@ -129,15 +135,15 @@ class EventsManagerSpec : BaseTest() {
         When calling configResponseData.enabled itReturns true
         When calling mockAccount.updateUserInfo() itReturns false
 
-        addTestMessages()
+        addTestData()
 
         EventsManager.onEventReceived(event = PurchaseSuccessfulEvent(), eventScheduler = eventRecon,
                 accountRepo = mockAccount)
 
-        verifyTestMessages(1)
+        verifyTestData(1)
     }
 
-    private fun addTestMessages() {
+    private fun addTestData() {
         // Add messages
         val messageList = ArrayList<Message>()
         messageList.add(message)
@@ -147,7 +153,7 @@ class EventsManagerSpec : BaseTest() {
         LocalOptedOutMessageRepository.instance().addMessage(message)
     }
 
-    private fun verifyTestMessages(expected: Int) {
+    private fun verifyTestData(expected: Int) {
         PingResponseMessageRepository.instance().getAllMessagesCopy().shouldHaveSize(expected)
         ReadyForDisplayMessageRepository.instance().getAllMessagesCopy()shouldHaveSize(expected)
         LocalDisplayedMessageRepository.instance().numberOfTimesDisplayed(message) shouldEqual expected
@@ -156,6 +162,7 @@ class EventsManagerSpec : BaseTest() {
         } else {
             LocalOptedOutMessageRepository.instance().hasMessage(message.getCampaignId()).shouldBeFalse()
         }
+        LocalEventRepository.instance().getEvents().shouldHaveSize(1)
 
         Mockito.verify(eventRecon, Mockito.times(expected)).startEventMessageReconciliationWorker()
     }

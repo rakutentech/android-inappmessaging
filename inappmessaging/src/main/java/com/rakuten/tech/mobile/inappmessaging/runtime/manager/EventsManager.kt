@@ -29,7 +29,7 @@ internal object EventsManager {
             if (accountRepo.updateUserInfo()) {
                 // Update session when there are updates in user info
                 // event reconciliation worker is already part of session update
-                SessionManager.onSessionUpdate()
+                SessionManager.onSessionUpdate(event)
             } else if (ConfigResponseRepository.instance().isConfigEnabled()) {
                 eventScheduler.startEventMessageReconciliationWorker()
             }
