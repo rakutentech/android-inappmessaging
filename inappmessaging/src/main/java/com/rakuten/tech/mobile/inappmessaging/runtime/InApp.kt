@@ -8,7 +8,6 @@ import com.rakuten.tech.mobile.inappmessaging.runtime.data.repositories.AccountR
 import com.rakuten.tech.mobile.inappmessaging.runtime.data.repositories.ConfigResponseRepository
 import com.rakuten.tech.mobile.inappmessaging.runtime.manager.DisplayManager
 import com.rakuten.tech.mobile.inappmessaging.runtime.manager.EventsManager
-import com.rakuten.tech.mobile.inappmessaging.runtime.manager.SessionManager
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings
 import timber.log.Timber
 import java.lang.ref.WeakReference
@@ -35,6 +34,7 @@ internal class InApp(
     // ------------------------------------Public APIs-----------------------------------------------
     override fun registerPreference(userInfoProvider: UserInfoProvider) {
         AccountRepository.instance().userInfoProvider = userInfoProvider
+        AccountRepository.instance().updateUserInfo()
     }
 
     override fun registerMessageDisplayActivity(activity: Activity) {
@@ -55,10 +55,8 @@ internal class InApp(
 
     override fun logEvent(event: Event) = EventsManager.onEventReceived(event)
 
-    override fun updateSession() {
-        // Updates the current session to update all locally stored messages
-        SessionManager.onSessionUpdate()
-    }
+    @Suppress("EmptyFunctionBlock")
+    override fun updateSession() {}
 
     // ------------------------------------Library Internal APIs-------------------------------------
     @RestrictTo(RestrictTo.Scope.LIBRARY)

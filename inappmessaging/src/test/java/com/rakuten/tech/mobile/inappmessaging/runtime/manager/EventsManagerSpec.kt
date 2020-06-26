@@ -12,10 +12,13 @@ import com.rakuten.tech.mobile.inappmessaging.runtime.LegacyEventBroadcasterHelp
 import com.rakuten.tech.mobile.inappmessaging.runtime.TestUserInfoProvider
 import com.rakuten.tech.mobile.inappmessaging.runtime.data.enums.EventType
 import com.rakuten.tech.mobile.inappmessaging.runtime.data.models.appevents.Event
-import com.rakuten.tech.mobile.inappmessaging.runtime.data.repositories.ConfigResponseRepository
-import com.rakuten.tech.mobile.inappmessaging.runtime.data.repositories.LocalEventRepository
+import com.rakuten.tech.mobile.inappmessaging.runtime.data.models.appevents.PurchaseSuccessfulEvent
+import com.rakuten.tech.mobile.inappmessaging.runtime.data.models.messages.Message
+import com.rakuten.tech.mobile.inappmessaging.runtime.data.models.messages.ValidTestMessage
+import com.rakuten.tech.mobile.inappmessaging.runtime.data.repositories.*
 import com.rakuten.tech.mobile.inappmessaging.runtime.data.responses.config.ConfigResponseData
 import com.rakuten.tech.mobile.inappmessaging.runtime.utils.InAppMessagingConstants
+import com.rakuten.tech.mobile.inappmessaging.runtime.workmanager.schedulers.EventMessageReconciliationScheduler
 import org.amshove.kluent.*
 import org.junit.Before
 import org.junit.Test
@@ -34,10 +37,13 @@ import java.util.concurrent.ExecutionException
 @Config(sdk = [Build.VERSION_CODES.O_MR1])
 class EventsManagerSpec : BaseTest() {
 
-    private val mockEvent = Mockito.mock(Event::class.java)
+    private val message = ValidTestMessage()
     @Mock
+    private val mockEvent = Mockito.mock(Event::class.java)
     private val mockEventBroadcaster = Mockito.mock(LegacyEventBroadcasterHelper::class.java)
     private val configResponseData = Mockito.mock(ConfigResponseData::class.java)
+    private val mockAccount = Mockito.mock(AccountRepository::class.java)
+    private val eventRecon = Mockito.mock(EventMessageReconciliationScheduler::class.java)
 
     @Before
     fun setup() {
@@ -81,10 +87,77 @@ class EventsManagerSpec : BaseTest() {
                 isDebugLogging = false, isForTesting = true)
         InAppMessaging.instance().registerPreference(TestUserInfoProvider())
         ConfigResponseRepository.instance().addConfigResponse(configResponseData)
-        When calling configResponseData.enabled itReturns true
+        When calling configResponseData.enabled itReturns false
         When calling mockEvent.getEventType() itReturns EventType.LOGIN_SUCCESSFUL.typeId
         EventsManager.onEventReceived(mockEvent)
-        WorkManager.getInstance(context).getWorkInfosByTag(MESSAGES_EVENTS_WORKER_NAME).get().shouldHaveSize(1)
+        WorkManager.getInstance(context).getWorkInfosByTag(MESSAGES_EVENTS_WORKER_NAME).get().shouldHaveSize(0)
+    }
+
+    @Test
+    fun `should clear all messages when user info is updated`() {
+        Settings.Secure.putString(
+                ApplicationProvider.getApplicationContext<Context>().contentResolver,
+                Settings.Secure.ANDROID_ID,
+                "test_device_id")
+        InAppMessaging.init(ApplicationProvider.getApplicationContext(), "test", "",
+                isDebugLogging = false, isForTesting = true)
+        InAppMessaging.instance().registerPreference(TestUserInfoProvider())
+        ConfigResponseRepository.instance().addConfigResponse(configResponseData)
+
+        addTestMessages()
+
+        When calling configResponseData.enabled itReturns false
+        When calling mockAccount.updateUserInfo() itReturns true
+
+        EventsManager.onEventReceived(event = PurchaseSuccessfulEvent(), eventScheduler = eventRecon,
+                accountRepo = mockAccount)
+
+        verifyTestMessages(0)
+    }
+
+    @Test
+    fun `should not clear messages when user info is not updated`() {
+        Settings.Secure.putString(
+                ApplicationProvider.getApplicationContext<Context>().contentResolver,
+                Settings.Secure.ANDROID_ID,
+                "test_device_id")
+        InAppMessaging.init(ApplicationProvider.getApplicationContext(), "test", "",
+                isDebugLogging = false, isForTesting = true)
+        InAppMessaging.instance().registerPreference(TestUserInfoProvider())
+        ConfigResponseRepository.instance().addConfigResponse(configResponseData)
+
+        When calling configResponseData.enabled itReturns true
+        When calling mockAccount.updateUserInfo() itReturns false
+
+        addTestMessages()
+
+        EventsManager.onEventReceived(event = PurchaseSuccessfulEvent(), eventScheduler = eventRecon,
+                accountRepo = mockAccount)
+
+        verifyTestMessages(1)
+    }
+
+    private fun addTestMessages() {
+        // Add messages
+        val messageList = ArrayList<Message>()
+        messageList.add(message)
+        PingResponseMessageRepository.instance().replaceAllMessages(messageList)
+        ReadyForDisplayMessageRepository.instance().replaceAllMessages(messageList)
+        LocalDisplayedMessageRepository.instance().addMessage(message)
+        LocalOptedOutMessageRepository.instance().addMessage(message)
+    }
+
+    private fun verifyTestMessages(expected: Int) {
+        PingResponseMessageRepository.instance().getAllMessagesCopy().shouldHaveSize(expected)
+        ReadyForDisplayMessageRepository.instance().getAllMessagesCopy()shouldHaveSize(expected)
+        LocalDisplayedMessageRepository.instance().numberOfTimesDisplayed(message) shouldEqual expected
+        if (expected > 0) {
+            LocalOptedOutMessageRepository.instance().hasMessage(message.getCampaignId()).shouldBeTrue()
+        } else {
+            LocalOptedOutMessageRepository.instance().hasMessage(message.getCampaignId()).shouldBeFalse()
+        }
+
+        Mockito.verify(eventRecon, Mockito.times(expected)).startEventMessageReconciliationWorker()
     }
 
     companion object {

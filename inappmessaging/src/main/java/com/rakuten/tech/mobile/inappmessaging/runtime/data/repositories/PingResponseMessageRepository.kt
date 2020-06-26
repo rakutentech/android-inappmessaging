@@ -39,5 +39,9 @@ internal abstract class PingResponseMessageRepository : MessageRepository {
          * This method returns a copy of all messages are in the current repository.
          */
         override fun getAllMessagesCopy(): List<Message> = ArrayList(messages.values)
+
+        override fun clearMessages() {
+            messages.clear()
+        }
     }
 }

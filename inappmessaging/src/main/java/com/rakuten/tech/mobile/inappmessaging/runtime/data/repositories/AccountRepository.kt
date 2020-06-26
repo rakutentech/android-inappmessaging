@@ -1,6 +1,8 @@
 package com.rakuten.tech.mobile.inappmessaging.runtime.data.repositories
 
 import com.rakuten.tech.mobile.inappmessaging.runtime.UserInfoProvider
+import java.math.BigInteger
+import java.security.MessageDigest
 
 /**
  * This object contains userInfoProvider ID used when logging in, and RAE token.
@@ -8,6 +10,7 @@ import com.rakuten.tech.mobile.inappmessaging.runtime.UserInfoProvider
  */
 internal abstract class AccountRepository {
     var userInfoProvider: UserInfoProvider? = null
+    internal var encryptedUserInfo = ""
 
     /**
      * This method returns RAE token, or empty String.
@@ -23,6 +26,12 @@ internal abstract class AccountRepository {
      * This method returns Rakuten ID, or empty String.
      */
     abstract fun getRakutenId(): String
+
+    /**
+     * This method updates the encrypted value using the current user information.
+     * @return true if there are changes in user info.
+     */
+    abstract fun updateUserInfo(): Boolean
 
     companion object {
         private const val TOKEN_PREFIX = "OAuth2 "
@@ -51,5 +60,26 @@ internal abstract class AccountRepository {
                 if (this.userInfoProvider == null || this.userInfoProvider?.provideRakutenId() == null) {
                     ""
                 } else userInfoProvider!!.provideRakutenId().toString()
+
+        override fun updateUserInfo(): Boolean {
+            val curr = encrypt(getUserId() + getRaeToken() + getRakutenId())
+
+            if (encryptedUserInfo != curr) {
+                encryptedUserInfo = curr
+                return true
+            }
+
+            return false
+        }
+
+        @Suppress("MagicNumber")
+        private fun encrypt(input: String): String {
+            // MD5 hashing
+            val bytes = MessageDigest
+                    .getInstance("MD5")
+                    .digest(input.toByteArray())
+
+            return BigInteger(1, bytes).toString(16).padStart(32, '0')
+        }
     }
 }

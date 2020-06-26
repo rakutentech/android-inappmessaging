@@ -17,4 +17,27 @@ class LocalOptedOutMessageRepositorySpec : BaseTest() {
         LocalOptedOutMessageRepository.instance().hasMessage(message.getCampaignId()).shouldBeTrue()
         LocalOptedOutMessageRepository.instance().hasMessage("123").shouldBeFalse()
     }
+
+    @Test
+    fun `should return false after clearing`() {
+        val message = ValidTestMessage()
+        LocalOptedOutMessageRepository.instance().addMessage(message)
+        LocalOptedOutMessageRepository.instance().hasMessage(message.getCampaignId()).shouldBeTrue()
+
+        LocalOptedOutMessageRepository.instance().clearMessages()
+        LocalOptedOutMessageRepository.instance().hasMessage(message.getCampaignId()).shouldBeFalse()
+    }
+
+    @Test
+    fun `should return true after clearing then adding`() {
+        val message = ValidTestMessage()
+        LocalOptedOutMessageRepository.instance().addMessage(message)
+        LocalOptedOutMessageRepository.instance().hasMessage(message.getCampaignId()).shouldBeTrue()
+
+        LocalOptedOutMessageRepository.instance().clearMessages()
+        LocalOptedOutMessageRepository.instance().hasMessage(message.getCampaignId()).shouldBeFalse()
+
+        LocalOptedOutMessageRepository.instance().addMessage(message)
+        LocalOptedOutMessageRepository.instance().hasMessage(message.getCampaignId()).shouldBeTrue()
+    }
 }

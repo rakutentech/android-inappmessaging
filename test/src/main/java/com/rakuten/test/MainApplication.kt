@@ -4,8 +4,11 @@ import android.app.Application
 import com.rakuten.tech.mobile.inappmessaging.runtime.InAppMessaging
 
 class MainApplication : Application() {
+
+    val provider = AppUserInfoProvider()
+
     override fun onCreate() {
         super.onCreate()
-        InAppMessaging.instance().registerPreference(AppUserInfoProvider())
+        InAppMessaging.instance().registerPreference(provider)
     }
 }
