@@ -8,6 +8,7 @@ import androidx.work.WorkManager
 import androidx.work.testing.WorkManagerTestInitHelper
 import com.rakuten.tech.mobile.inappmessaging.runtime.BaseTest
 import com.rakuten.tech.mobile.inappmessaging.runtime.InAppMessaging
+import com.rakuten.tech.mobile.inappmessaging.runtime.data.models.appevents.PurchaseSuccessfulEvent
 import com.rakuten.tech.mobile.inappmessaging.runtime.data.models.messages.Message
 import com.rakuten.tech.mobile.inappmessaging.runtime.data.models.messages.ValidTestMessage
 import com.rakuten.tech.mobile.inappmessaging.runtime.data.repositories.*
@@ -91,7 +92,7 @@ class SessionManagerSpec : BaseTest() {
         addTestData()
         ConfigResponseRepository.instance().addConfigResponse(configResponseData)
 
-        onSessionUpdate()
+        onSessionUpdate(PurchaseSuccessfulEvent())
         verifyTestData(1)
     }
 
