@@ -53,7 +53,6 @@ class EventsManagerSpec : BaseTest() {
         When calling mockEvent.getRatEventMap() itReturns map
         LocalDisplayedMessageRepository.instance().clearMessages()
         LocalEventRepository.instance().clearEvents()
-        System.out.println(LocalEventRepository.instance().getEvents().size)
         ReadyForDisplayMessageRepository.instance().clearMessages()
         LocalOptedOutMessageRepository.instance().clearMessages()
         PingResponseMessageRepository.instance().clearMessages()
