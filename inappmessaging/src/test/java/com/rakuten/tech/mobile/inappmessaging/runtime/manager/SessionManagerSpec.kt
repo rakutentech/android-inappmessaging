@@ -38,6 +38,7 @@ class SessionManagerSpec : BaseTest() {
     @Before
     fun setup() {
         MockitoAnnotations.initMocks(this)
+        LocalEventRepository.instance().clearEvents()
     }
 
     @Test
