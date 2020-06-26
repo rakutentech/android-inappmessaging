@@ -78,6 +78,14 @@ class InAppMessagingSpec : BaseTest() {
     }
 
     @Test
+    // For code coverage. will be deleted when updateSession() is removed
+    fun `should not crash update session when using uninitialized instance`() {
+        InAppMessaging.setUninitializedInstance()
+        InAppMessaging.instance().registerPreference(TestUserInfoProvider())
+        InAppMessaging.instance().updateSession()
+    }
+
+    @Test
     fun `should display message using initialized instance`() {
         When calling configResponseData.enabled itReturns true
         ConfigResponseRepository.instance().addConfigResponse(configResponseData)
@@ -118,6 +126,25 @@ class InAppMessagingSpec : BaseTest() {
 
         try {
             InAppMessaging.instance().logEvent(AppStartEvent())
+        } catch (e: Exception) {
+            fail("should not throw exception")
+        }
+    }
+
+    @Test
+    @Suppress("SwallowedException")
+    // For code coverage. will be deleted when updateSession() is removed
+    fun `should not crash update session for initialized instance`() {
+        WorkManagerTestInitHelper.initializeTestWorkManager(ApplicationProvider.getApplicationContext())
+        Settings.Secure.putString(
+                ApplicationProvider.getApplicationContext<Context>().contentResolver,
+                Settings.Secure.ANDROID_ID,
+                "test_device_id")
+        InAppMessaging.init(ApplicationProvider.getApplicationContext(), "test", "",
+                isDebugLogging = true, isForTesting = true)
+
+        try {
+            InAppMessaging.instance().updateSession()
         } catch (e: Exception) {
             fail("should not throw exception")
         }

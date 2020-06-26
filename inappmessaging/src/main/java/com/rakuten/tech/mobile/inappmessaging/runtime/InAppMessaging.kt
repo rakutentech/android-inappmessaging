@@ -50,7 +50,7 @@ abstract class InAppMessaging internal constructor() {
      * This methods updates the host app's session. This allows InAppMessaging to update the locally stored
      * messages which can be dependent on user information.
      */
-    @Deprecated("This API is not used anymore.")
+    @Deprecated("This API is no longer used.")
     abstract fun updateSession()
 
     /**

@@ -8,6 +8,7 @@ import com.rakuten.tech.mobile.inappmessaging.runtime.data.repositories.AccountR
 import com.rakuten.tech.mobile.inappmessaging.runtime.data.repositories.ConfigResponseRepository
 import com.rakuten.tech.mobile.inappmessaging.runtime.manager.DisplayManager
 import com.rakuten.tech.mobile.inappmessaging.runtime.manager.EventsManager
+import com.rakuten.tech.mobile.inappmessaging.runtime.manager.SessionManager
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings
 import timber.log.Timber
 import java.lang.ref.WeakReference
@@ -55,8 +56,10 @@ internal class InApp(
 
     override fun logEvent(event: Event) = EventsManager.onEventReceived(event)
 
-    @Suppress("EmptyFunctionBlock")
-    override fun updateSession() {}
+    override fun updateSession() {
+        // Updates the current session to update all locally stored messages
+        SessionManager.onSessionUpdate()
+    }
 
     // ------------------------------------Library Internal APIs-------------------------------------
     @RestrictTo(RestrictTo.Scope.LIBRARY)
