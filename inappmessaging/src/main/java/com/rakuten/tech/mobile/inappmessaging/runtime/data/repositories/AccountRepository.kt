@@ -10,7 +10,7 @@ import java.security.MessageDigest
  */
 internal abstract class AccountRepository {
     var userInfoProvider: UserInfoProvider? = null
-    internal var encryptedUserInfo = ""
+    internal var userInfoHash = ""
 
     /**
      * This method returns RAE token, or empty String.
@@ -62,10 +62,10 @@ internal abstract class AccountRepository {
                 } else userInfoProvider!!.provideRakutenId().toString()
 
         override fun updateUserInfo(): Boolean {
-            val curr = encrypt(getUserId() + getRaeToken() + getRakutenId())
+            val curr = hash(getUserId() + getRaeToken() + getRakutenId())
 
-            if (encryptedUserInfo != curr) {
-                encryptedUserInfo = curr
+            if (userInfoHash != curr) {
+                userInfoHash = curr
                 return true
             }
 
@@ -73,7 +73,7 @@ internal abstract class AccountRepository {
         }
 
         @Suppress("MagicNumber")
-        private fun encrypt(input: String): String {
+        private fun hash(input: String): String {
             // MD5 hashing
             val bytes = MessageDigest
                     .getInstance("MD5")
