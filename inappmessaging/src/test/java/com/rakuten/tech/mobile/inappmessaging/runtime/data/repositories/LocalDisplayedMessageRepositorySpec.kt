@@ -15,6 +15,7 @@ import com.rakuten.tech.mobile.inappmessaging.runtime.data.models.messages.Valid
 import com.rakuten.tech.mobile.inappmessaging.runtime.utils.InAppMessagingConstants
 import org.amshove.kluent.*
 import org.junit.Assert
+import org.junit.Before
 import org.junit.Test
 import org.junit.runner.RunWith
 import org.mockito.Mockito
@@ -28,6 +29,12 @@ import kotlin.test.fail
 @RunWith(RobolectricTestRunner::class)
 @Config(sdk = [Build.VERSION_CODES.O_MR1])
 class LocalDisplayedMessageRepositorySpec : BaseTest() {
+
+    @Before
+    fun setup() {
+        LocalDisplayedMessageRepository.instance().clearMessages()
+    }
+
     @Test
     fun `should throw exception when message's campaign ID is empty`() {
         try {
@@ -81,5 +88,28 @@ class LocalDisplayedMessageRepositorySpec : BaseTest() {
         MessageActionsCoroutine(mockRepo).executeTask(message, R.id.message_close_button, true)
 
         Mockito.verify(mockRepo, Mockito.times(1)).addMessage(message)
+    }
+
+    @Test
+    fun `should return zero after clearing`() {
+        val message = ValidTestMessage()
+        LocalDisplayedMessageRepository.instance().addMessage(message)
+        LocalDisplayedMessageRepository.instance().numberOfTimesDisplayed(message) shouldEqual 1
+
+        LocalDisplayedMessageRepository.instance().clearMessages()
+        LocalDisplayedMessageRepository.instance().numberOfTimesDisplayed(message) shouldEqual 0
+    }
+
+    @Test
+    fun `should return one after clearing then adding`() {
+        val message = ValidTestMessage()
+        LocalDisplayedMessageRepository.instance().addMessage(message)
+        LocalDisplayedMessageRepository.instance().numberOfTimesDisplayed(message) shouldEqual 1
+
+        LocalDisplayedMessageRepository.instance().clearMessages()
+        LocalDisplayedMessageRepository.instance().numberOfTimesDisplayed(message) shouldEqual 0
+
+        LocalDisplayedMessageRepository.instance().addMessage(message)
+        LocalDisplayedMessageRepository.instance().numberOfTimesDisplayed(message) shouldEqual 1
     }
 }

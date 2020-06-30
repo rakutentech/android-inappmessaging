@@ -18,4 +18,10 @@ internal interface MessageRepository {
      * This method returns a copy of all messages in the repository.
      */
     fun getAllMessagesCopy(): List<Message>
+
+    /**
+     * Clears all message from the repository.
+     * This is done during session update due to user info update.
+     */
+    fun clearMessages()
 }

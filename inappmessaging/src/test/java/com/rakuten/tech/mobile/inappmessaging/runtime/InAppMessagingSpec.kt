@@ -78,6 +78,7 @@ class InAppMessagingSpec : BaseTest() {
     }
 
     @Test
+    // For code coverage. will be deleted when updateSession() is removed
     fun `should not crash update session when using uninitialized instance`() {
         InAppMessaging.setUninitializedInstance()
         InAppMessaging.instance().registerPreference(TestUserInfoProvider())
@@ -132,6 +133,7 @@ class InAppMessagingSpec : BaseTest() {
 
     @Test
     @Suppress("SwallowedException")
+    // For code coverage. will be deleted when updateSession() is removed
     fun `should not crash update session for initialized instance`() {
         WorkManagerTestInitHelper.initializeTestWorkManager(ApplicationProvider.getApplicationContext())
         Settings.Secure.putString(

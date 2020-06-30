@@ -18,10 +18,6 @@ internal abstract class ReadyForDisplayMessageRepository : ReadyMessageRepositor
         // Oldest message should be displayed first, Deque offers the flexibility to add object to head or tail.
         private val messages: MutableList<Message> = ArrayList()
 
-        /**
-         * Replacing with a new list of messages.
-         * IllegalArgumentException will be thrown if messageList is empty.
-         */
         @Throws(IllegalArgumentException::class)
         override fun replaceAllMessages(messageList: List<Message>?) {
             require(messageList != null) { InAppMessagingConstants.ARGUMENT_IS_NULL_EXCEPTION }
@@ -32,19 +28,19 @@ internal abstract class ReadyForDisplayMessageRepository : ReadyMessageRepositor
             }
         }
 
-        /**
-         * This method returns a copy of the message list.
-         */
         override fun getAllMessagesCopy(): List<Message> = ArrayList(messages)
 
-        /**
-         * This method removes a message based on argument campaignId.
-         */
         override fun removeMessage(campaignId: String) {
             synchronized(messages) {
                 messages.removeAll { message ->
                     message.getCampaignId() == campaignId
                 }
+            }
+        }
+
+        override fun clearMessages() {
+            synchronized(messages) {
+                messages.clear()
             }
         }
     }
