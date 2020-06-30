@@ -8,6 +8,7 @@ import androidx.work.WorkManager
 import androidx.work.testing.WorkManagerTestInitHelper
 import com.rakuten.tech.mobile.inappmessaging.runtime.BaseTest
 import com.rakuten.tech.mobile.inappmessaging.runtime.InAppMessaging
+import com.rakuten.tech.mobile.inappmessaging.runtime.data.models.appevents.AppStartEvent
 import com.rakuten.tech.mobile.inappmessaging.runtime.data.models.appevents.PurchaseSuccessfulEvent
 import com.rakuten.tech.mobile.inappmessaging.runtime.data.models.messages.Message
 import com.rakuten.tech.mobile.inappmessaging.runtime.data.models.messages.ValidTestMessage
@@ -94,6 +95,24 @@ class SessionManagerSpec : BaseTest() {
 
         onSessionUpdate(PurchaseSuccessfulEvent())
         verifyTestData(1)
+    }
+
+    @Test
+    fun `should clear repositories with valid persistent event`() {
+        WorkManagerTestInitHelper.initializeTestWorkManager(ApplicationProvider.getApplicationContext())
+        Settings.Secure.putString(
+                ApplicationProvider.getApplicationContext<Context>().contentResolver,
+                Settings.Secure.ANDROID_ID,
+                "test_device_id")
+        InAppMessaging.init(ApplicationProvider.getApplicationContext(), "test", "",
+                isDebugLogging = true, isForTesting = true)
+        When calling configResponseData.enabled itReturns false
+
+        addTestData()
+        ConfigResponseRepository.instance().addConfigResponse(configResponseData)
+
+        onSessionUpdate(AppStartEvent())
+        verifyTestData(0)
     }
 
     private fun addTestData() {
