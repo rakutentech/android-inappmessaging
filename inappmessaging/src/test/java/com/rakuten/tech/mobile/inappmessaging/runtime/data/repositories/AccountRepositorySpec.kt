@@ -119,4 +119,53 @@ class AccountRepositorySpec : BaseTest() {
         RuntimeUtil.getUserIdentifiers(mockAcctRepo).shouldHaveSize(1)
         Mockito.verify(mockAcctRepo, Mockito.times(1)).getRakutenId()
     }
+
+    @Test
+    fun `should return false if no update`() {
+        val infoProvider = TestUserInfoProvider()
+        AccountRepository.instance().userInfoProvider = infoProvider
+        // initial setting of hashed user info
+        AccountRepository.instance().updateUserInfo().shouldBeTrue()
+
+        AccountRepository.instance().updateUserInfo().shouldBeFalse()
+    }
+
+    @Test
+    fun `should return true for changed user id`() {
+        val infoProvider = TestUserInfoProvider()
+        AccountRepository.instance().userInfoProvider = infoProvider
+        // initial setting of hashed user info
+        AccountRepository.instance().updateUserInfo()
+
+        // updated
+        infoProvider.userId = "user-id"
+
+        AccountRepository.instance().updateUserInfo().shouldBeTrue()
+    }
+
+    @Test
+    fun `should return true for changed rakuten id`() {
+        val infoProvider = TestUserInfoProvider()
+        AccountRepository.instance().userInfoProvider = infoProvider
+        // initial setting of hashed user info
+        AccountRepository.instance().updateUserInfo()
+
+        // updated
+        infoProvider.rakutenId = "rakuten-id"
+
+        AccountRepository.instance().updateUserInfo().shouldBeTrue()
+    }
+
+    @Test
+    fun `should return true for changed rae token`() {
+        val infoProvider = TestUserInfoProvider()
+        AccountRepository.instance().userInfoProvider = infoProvider
+        // initial setting of hashed user info
+        AccountRepository.instance().updateUserInfo()
+
+        // updated
+        infoProvider.raeToken = "rae-token"
+
+        AccountRepository.instance().updateUserInfo().shouldBeTrue()
+    }
 }

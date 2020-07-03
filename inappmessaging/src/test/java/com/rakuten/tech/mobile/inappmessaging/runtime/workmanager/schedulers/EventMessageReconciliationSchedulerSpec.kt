@@ -8,7 +8,8 @@ import androidx.work.WorkManager
 import androidx.work.testing.WorkManagerTestInitHelper
 import com.rakuten.tech.mobile.inappmessaging.runtime.BaseTest
 import com.rakuten.tech.mobile.inappmessaging.runtime.InAppMessaging
-import com.rakuten.tech.mobile.inappmessaging.runtime.data.models.appevents.Event
+import com.rakuten.tech.mobile.inappmessaging.runtime.data.models.appevents.PurchaseSuccessfulEvent
+import com.rakuten.tech.mobile.inappmessaging.runtime.data.repositories.AccountRepository
 import com.rakuten.tech.mobile.inappmessaging.runtime.data.repositories.ConfigResponseRepository
 import com.rakuten.tech.mobile.inappmessaging.runtime.data.repositories.LocalEventRepository
 import com.rakuten.tech.mobile.inappmessaging.runtime.data.responses.config.ConfigResponseData
@@ -57,13 +58,15 @@ class EventMessageReconciliationSchedulerSpec : BaseTest() {
         InAppMessaging.init(context, "test", "", isDebugLogging = false, isForTesting = true)
         val mockSched = Mockito.mock(EventMessageReconciliationScheduler::class.java)
 
-        val mockEvent = Mockito.mock(Event::class.java)
         val configResponseData = Mockito.mock(ConfigResponseData::class.java)
+        val mockAccount = Mockito.mock(AccountRepository::class.java)
+
         When calling configResponseData.enabled itReturns true
-        When calling mockEvent.getEventName() itReturns "event_name"
+        When calling mockAccount.updateUserInfo() itReturns false
+
         ConfigResponseRepository.instance().addConfigResponse(configResponseData)
         LocalEventRepository.instance().clearEvents()
-        EventsManager.onEventReceived(mockEvent, eventScheduler = mockSched)
+        EventsManager.onEventReceived(PurchaseSuccessfulEvent(), eventScheduler = mockSched, accountRepo = mockAccount)
 
         Mockito.verify(mockSched, Mockito.times(1)).startEventMessageReconciliationWorker()
     }

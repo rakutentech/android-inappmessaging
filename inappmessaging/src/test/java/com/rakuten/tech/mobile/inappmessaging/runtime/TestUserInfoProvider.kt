@@ -4,9 +4,14 @@ package com.rakuten.tech.mobile.inappmessaging.runtime
  * Test class which provides user info.
  */
 class TestUserInfoProvider : UserInfoProvider {
-    override fun provideRaeToken(): String? = TEST_USER_RAE_TOKEN
-    override fun provideUserId(): String? = TEST_USER_ID
-    override fun provideRakutenId(): String? = TEST_RAKUTEN_ID
+
+    var userId = TEST_USER_ID
+    var raeToken = TEST_USER_RAE_TOKEN
+    var rakutenId = TEST_RAKUTEN_ID
+
+    override fun provideRaeToken(): String? = raeToken
+    override fun provideUserId(): String? = userId
+    override fun provideRakutenId(): String? = rakutenId
 
     companion object {
         const val TEST_USER_RAE_TOKEN = "test_rae_token"

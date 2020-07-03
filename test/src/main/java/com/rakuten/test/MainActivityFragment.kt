@@ -1,11 +1,12 @@
 package com.rakuten.test
 
+import android.app.AlertDialog
 import android.content.Intent
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.Button
+import android.widget.EditText
 import androidx.fragment.app.Fragment
 import com.rakuten.tech.mobile.inappmessaging.runtime.InAppMessaging
 import com.rakuten.tech.mobile.inappmessaging.runtime.data.models.appevents.AppStartEvent
@@ -23,16 +24,13 @@ class MainActivityFragment : Fragment(), View.OnClickListener {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        val launchSecondActivity = view.findViewById<Button>(R.id.launch_second_activity)
-        val launchSuccessfulButton = view.findViewById<Button>(R.id.launch_successful)
-        val loginSuccessfulButton = view.findViewById<Button>(R.id.login_successful)
-        val purchaseSuccessfulButton = view.findViewById<Button>(R.id.purchase_successful)
-        val customEventButton = view.findViewById<Button>(R.id.custom_event)
-        launchSecondActivity.setOnClickListener(this)
-        launchSuccessfulButton.setOnClickListener(this)
-        loginSuccessfulButton.setOnClickListener(this)
-        purchaseSuccessfulButton.setOnClickListener(this)
-        customEventButton.setOnClickListener(this)
+
+        launch_second_activity.setOnClickListener(this)
+        launch_successful.setOnClickListener(this)
+        login_successful.setOnClickListener(this)
+        purchase_successful.setOnClickListener(this)
+        custom_event.setOnClickListener(this)
+        change_user.setOnClickListener(this)
     }
 
     override fun onClick(v: View) {
@@ -43,8 +41,38 @@ class MainActivityFragment : Fragment(), View.OnClickListener {
             purchase_successful -> InAppMessaging.instance().logEvent(PurchaseSuccessfulEvent().currencyCode("JPY"))
             custom_event -> InAppMessaging.instance().logEvent(
                     CustomEvent("search_event").addAttribute("KEYWORD", "BASKETBALL").addAttribute("foo", 2))
+            change_user -> showUserInfo()
             else -> {
             }
         }
+    }
+
+    private fun showUserInfo() {
+        val contentView = LayoutInflater.from(activity).inflate(R.layout.dialog_users, null)
+        val application = activity?.application as MainApplication
+
+        val userId = contentView.findViewById<EditText>(R.id.edit_userid)
+        userId.setText(application.provider.userId)
+        val rakutenId = contentView.findViewById<EditText>(R.id.edit_rakutenid)
+        rakutenId.setText(application.provider.rakutenId)
+        val raeToken = contentView.findViewById<EditText>(R.id.edit_raetoken)
+        raeToken.setText(application.provider.raeToken)
+
+        val dialog =  AlertDialog.Builder(activity)
+                .setView(contentView)
+                .setTitle(R.string.dialog_title_user)
+                .setPositiveButton(android.R.string.ok) { dialog, _ ->
+                    application.provider.userId = userId.text.toString()
+                    application.provider.raeToken = raeToken.text.toString()
+                    application.provider.rakutenId = rakutenId.text.toString()
+
+                    dialog.dismiss()
+                }
+                .setNegativeButton(android.R.string.cancel) {dialog, _ ->
+                    dialog.dismiss()
+                }
+                .create()
+
+        dialog.show()
     }
 }

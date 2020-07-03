@@ -232,14 +232,6 @@ Custom event class:
 InAppMessaging.instance().logEvent(CustomEvent("search").addAttribute("keyword", "book").addAttribute("number_of_keyword", 1))
 ```
 
-### #9 Updating user information
-User information or preference is what will allow InAppMessaging to identify users for targeting and segmentation.
-Update the app's session when new user login or on logout. If app session is not updated, incorrect messages may be displayed or some messages will not be displayed.
-
-```kotlin
-InAppMessaging.instance().updateSession()
-```
-
 ## <a name="troubleshooting"></a> Trouble Shooting
 `proguard.ParseException`
 
@@ -288,6 +280,11 @@ Documents targeting Product Managers:
 + In-App Messaging Dashboard Sign Up(page is coming soon.)
 
 ## <a name="changelog"></a> Changelog
+
+### 2.1.0 (in-progress)
+* SDKCF-2568: Deprecate updateSession() API
+ * session update will be done internally when event is triggered and user info was changed
+ * will be removed on 3.0.0
 
 ### 2.0.0 (2020-06-11)
 * SDKCF-2054: Converted In-App Messaging to Kotlin

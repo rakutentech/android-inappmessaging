@@ -19,6 +19,12 @@ internal interface LocalEventRepository : EventRepository {
     @VisibleForTesting(otherwise = VisibleForTesting.PRIVATE)
     fun clearEvents()
 
+    /**
+     * This method removes all stored non-persistent events.
+     * This is done during session update due to user info update.
+     */
+    fun clearNonPersistentEvents()
+
     companion object {
         private const val TAG = "IAM_LocalEventRepo"
         private var instance: LocalEventRepository = LocalEventRepositoryImpl()
@@ -68,6 +74,14 @@ internal interface LocalEventRepository : EventRepository {
             synchronized(events) {
                 if (events.isNotEmpty()) {
                     events.clear()
+                }
+            }
+        }
+
+        override fun clearNonPersistentEvents() {
+            synchronized(events) {
+                if (events.isNotEmpty()) {
+                    events.removeAll { ev -> !ev.isPersistentType() }
                 }
             }
         }

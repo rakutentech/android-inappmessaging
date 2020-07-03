@@ -35,6 +35,7 @@ internal class InApp(
     // ------------------------------------Public APIs-----------------------------------------------
     override fun registerPreference(userInfoProvider: UserInfoProvider) {
         AccountRepository.instance().userInfoProvider = userInfoProvider
+        AccountRepository.instance().updateUserInfo()
     }
 
     override fun registerMessageDisplayActivity(activity: Activity) {

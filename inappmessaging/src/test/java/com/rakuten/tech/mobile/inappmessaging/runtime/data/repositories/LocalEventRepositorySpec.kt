@@ -5,10 +5,10 @@ import com.rakuten.tech.mobile.inappmessaging.runtime.data.models.appevents.*
 import com.rakuten.tech.mobile.inappmessaging.runtime.manager.EventsManager
 import com.rakuten.tech.mobile.inappmessaging.runtime.utils.InAppMessagingConstants
 import com.rakuten.tech.mobile.inappmessaging.runtime.workmanager.schedulers.EventMessageReconciliationScheduler
-import org.amshove.kluent.mock
 import org.amshove.kluent.shouldEqual
 import org.amshove.kluent.shouldHaveSize
 import org.junit.Assert
+import org.junit.Before
 import org.junit.Test
 import org.mockito.Mockito
 
@@ -17,9 +17,13 @@ import org.mockito.Mockito
  */
 class LocalEventRepositorySpec : BaseTest() {
 
+    @Before
+    fun setup() {
+        LocalEventRepository.instance().clearEvents()
+    }
+
     @Test
     fun `should throw exception when event has empty event name`() {
-        LocalEventRepository.instance().clearEvents()
         try {
             LocalEventRepository.instance().addEvent(CustomEvent(""))
             Assert.fail()
@@ -30,7 +34,6 @@ class LocalEventRepositorySpec : BaseTest() {
 
     @Test
     fun `should have correct event name`() {
-        LocalEventRepository.instance().clearEvents()
         val event = CustomEvent("TEST")
         event.addAttribute("doubleAttr", 1.0)
         event.addAttribute("stringAttr", "1.0")
@@ -52,7 +55,6 @@ class LocalEventRepositorySpec : BaseTest() {
 
     @Test
     fun `should contain correct number of event when adding all unique`() {
-        LocalEventRepository.instance().clearEvents()
         LocalEventRepository.instance().addEvent(AppStartEvent())
         LocalEventRepository.instance().addEvent(LoginSuccessfulEvent())
         LocalEventRepository.instance().addEvent(PurchaseSuccessfulEvent())
@@ -62,7 +64,6 @@ class LocalEventRepositorySpec : BaseTest() {
 
     @Test
     fun `should contain correct number of event when adding multiple non-persistent types`() {
-        LocalEventRepository.instance().clearEvents()
         LocalEventRepository.instance().addEvent(AppStartEvent())
         LocalEventRepository.instance().addEvent(LoginSuccessfulEvent())
         LocalEventRepository.instance().addEvent(LoginSuccessfulEvent())
@@ -75,12 +76,59 @@ class LocalEventRepositorySpec : BaseTest() {
 
     @Test
     fun `should contain correct number of event when adding multiple persistent types`() {
-        LocalEventRepository.instance().clearEvents()
         LocalEventRepository.instance().addEvent(AppStartEvent())
         LocalEventRepository.instance().addEvent(AppStartEvent())
         LocalEventRepository.instance().addEvent(LoginSuccessfulEvent())
         LocalEventRepository.instance().addEvent(PurchaseSuccessfulEvent())
         LocalEventRepository.instance().addEvent(CustomEvent("test"))
         LocalEventRepository.instance().getEvents().shouldHaveSize(4)
+    }
+
+    @Test
+    fun `should return zero after clearing with no persistent type`() {
+        LocalEventRepository.instance().addEvent(LoginSuccessfulEvent())
+        LocalEventRepository.instance().addEvent(PurchaseSuccessfulEvent())
+        LocalEventRepository.instance().addEvent(CustomEvent("test"))
+        LocalEventRepository.instance().getEvents().shouldHaveSize(3)
+
+        LocalEventRepository.instance().clearNonPersistentEvents()
+        LocalEventRepository.instance().getEvents().shouldHaveSize(0)
+    }
+
+    @Test
+    fun `should return zero after clearing with one persistent type`() {
+        LocalEventRepository.instance().addEvent(AppStartEvent())
+        LocalEventRepository.instance().addEvent(LoginSuccessfulEvent())
+        LocalEventRepository.instance().addEvent(PurchaseSuccessfulEvent())
+        LocalEventRepository.instance().addEvent(CustomEvent("test"))
+        LocalEventRepository.instance().getEvents().shouldHaveSize(4)
+
+        LocalEventRepository.instance().clearNonPersistentEvents()
+        LocalEventRepository.instance().getEvents().shouldHaveSize(1)
+    }
+
+    @Test
+    fun `should return valid value after clearing then adding`() {
+        LocalEventRepository.instance().addEvent(AppStartEvent())
+        LocalEventRepository.instance().addEvent(AppStartEvent())
+        LocalEventRepository.instance().addEvent(LoginSuccessfulEvent())
+        LocalEventRepository.instance().addEvent(PurchaseSuccessfulEvent())
+        LocalEventRepository.instance().addEvent(CustomEvent("test"))
+        LocalEventRepository.instance().getEvents().shouldHaveSize(4)
+
+        LocalEventRepository.instance().clearNonPersistentEvents()
+        LocalEventRepository.instance().getEvents().shouldHaveSize(1)
+
+        LocalEventRepository.instance().addEvent(AppStartEvent())
+        LocalEventRepository.instance().addEvent(LoginSuccessfulEvent())
+        LocalEventRepository.instance().addEvent(PurchaseSuccessfulEvent())
+        LocalEventRepository.instance().addEvent(CustomEvent("test"))
+        LocalEventRepository.instance().getEvents().shouldHaveSize(4)
+    }
+
+    @Test
+    fun `should not throw exception when clearing with empty events`() {
+        LocalEventRepository.instance().clearNonPersistentEvents()
+        LocalEventRepository.instance().getEvents().shouldHaveSize(0)
     }
 }

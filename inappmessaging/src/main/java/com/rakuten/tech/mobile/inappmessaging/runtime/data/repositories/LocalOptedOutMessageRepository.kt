@@ -19,6 +19,12 @@ internal interface LocalOptedOutMessageRepository {
      */
     fun hasMessage(messageCampaignId: String?): Boolean
 
+    /**
+     * Clears all message from the repository.
+     * This is done during session update due to user info update.
+     */
+    fun clearMessages()
+
     companion object {
         private var instance: LocalOptedOutMessageRepository = LocalOptedOutMessageRepositoryImpl()
 
@@ -37,6 +43,12 @@ internal interface LocalOptedOutMessageRepository {
         override fun hasMessage(messageCampaignId: String?): Boolean {
             synchronized(optedOutMessages) {
                 return optedOutMessages.contains(messageCampaignId)
+            }
+        }
+
+        override fun clearMessages() {
+            synchronized(optedOutMessages) {
+                optedOutMessages.clear()
             }
         }
     }

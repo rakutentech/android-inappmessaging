@@ -1,6 +1,5 @@
 package com.rakuten.tech.mobile.inappmessaging.runtime.data.repositories
 
-import androidx.annotation.VisibleForTesting
 import com.rakuten.tech.mobile.inappmessaging.runtime.data.models.messages.Message
 import com.rakuten.tech.mobile.inappmessaging.runtime.utils.InAppMessagingConstants
 import java.util.Calendar
@@ -28,9 +27,9 @@ internal interface LocalDisplayedMessageRepository {
     fun numberOfTimesDisplayed(message: Message): Int
 
     /**
-     * This method removes all stored messages for testing.
+     * This method removes all stored messages.
+     * This is done during session update due to user info update.
      */
-    @VisibleForTesting(otherwise = VisibleForTesting.PRIVATE)
     fun clearMessages()
 
     companion object {

@@ -10,6 +10,7 @@ import com.google.gson.Gson
 import com.rakuten.tech.mobile.inappmessaging.runtime.BaseTest
 import com.rakuten.tech.mobile.inappmessaging.runtime.InAppMessaging
 import com.rakuten.tech.mobile.inappmessaging.runtime.R
+import com.rakuten.tech.mobile.inappmessaging.runtime.TestUserInfoProvider
 import com.rakuten.tech.mobile.inappmessaging.runtime.data.models.messages.Message
 import com.rakuten.tech.mobile.inappmessaging.runtime.data.repositories.LocalDisplayedMessageRepository
 import com.rakuten.tech.mobile.inappmessaging.runtime.data.repositories.ReadyForDisplayMessageRepository
@@ -196,6 +197,7 @@ internal class MessageActionsCoroutineSpec(val testName: String, val resourceId:
         InAppMessaging.init(ApplicationProvider.getApplicationContext(), "test-key", "",
                 isForTesting = true)
         InAppMessaging.instance().registerMessageDisplayActivity(activity)
+        InAppMessaging.instance().registerPreference(TestUserInfoProvider())
     }
 
     @Test

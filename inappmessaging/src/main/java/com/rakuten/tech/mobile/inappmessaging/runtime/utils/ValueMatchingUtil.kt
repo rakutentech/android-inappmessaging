@@ -83,7 +83,7 @@ internal object ValueMatchingUtil {
                 eventValue > triggerValue
             }
             OperatorType.LESS_THAN -> if (isTime) {
-                eventValue - triggerValue < TIME_IN_MILLIS_TOLERANCE
+                eventValue - triggerValue < -TIME_IN_MILLIS_TOLERANCE
             } else {
                 eventValue < triggerValue
             }
