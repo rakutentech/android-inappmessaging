@@ -3,7 +3,7 @@ layout: userguide
 ---
 
 # In-App Messaging
-The In-App Messaging module enables applications to receive notification, which are displayed within the app, from [Rakuten In-App Messaging Dashboard](https://inappmessaging.rakapi.com/)
+The In-App Messaging module enables applications to receive notification, which are displayed within the app, from Rakuten In-App Messaging Dashboard.
 
 ![In-App Messaging Sample](images/what-is-inapp.png)
 
@@ -60,8 +60,8 @@ Custom events can have attributes with names and values. Attributes can be integ
 This SDK supports Android API level 21 (Lollipop) and above.
 
 ### In-App Messaging Subscription Key
-You must have a subscription key for your application from [Rakuten In-App Messaging Dashboard](https://inappmessaging.rakapi.com/).<br/>
-Please go to [App Settings](https://inappmessaging.rakapi.com/app/settings) page to create/add app and for retrieving of subscription key.<br/>
+You must have a subscription key for your application from Rakuten In-App Messaging Dashboard.<br/>
+Please go to App Settings page to create/add app and for retrieving of subscription key.<br/>
 ![App Settings](images/app-settings.png)
 
 ## <a name="getting-started"></a> Getting Started
@@ -71,17 +71,17 @@ Please go to [App Settings](https://inappmessaging.rakapi.com/app/settings) page
 
 ### #1 In-App Messaging Dashboard
 The In-App Messaging Dashboard enables you to operate and manage your In-app messaging campaign on the Rakuten Platform.<br/>
-For more information, please refer to [dashboard user manual](https://inappmessaging.rakapi.com/help).
+For more information, please refer to dashboard user manual.
 
 ### #2 Register application and retrieve subscription keys
-Please use the [App List](https://inappmessaging.rakapi.com/app/settings) page to create, and manage your apps.<br/>
+Please use the App List page to create, and manage your apps.<br/>
 You can add/delete versions, and retrieve the subscription keys in the App List page.
 
 ### #3 Integrate the In-App Messaging SDK to your app.
 Please refer to [SDK Integration](#integration) section.
 
 ### #4 Create a campaign/message
-Please use the [Create Campaign](https://inappmessaging.rakapi.com/campaign/create) page to create, edit, save as draft, launch, cancel edition for campaigns.
+Please use the Create Campaign page to create, edit, save as draft, launch, cancel edition for campaigns.
 * Input in-app messaging's UI Information in **Basic Information Tab**
 ![Basic Info Tab](images/basic-info-tab.png)
   * Enter the **Campaign Name**.
@@ -97,7 +97,7 @@ Please use the [Create Campaign](https://inappmessaging.rakapi.com/campaign/crea
   * **Choose App** and **Versions** - Choose which app in your app group you are going to apply to the campaign.
   * Click "+" to add multiple apps.
   * **Target Users** - You can target all your audience with select All Users, you can also target users by upload a CSV file with a list of Easy Ids or User Ids.
-  * You can select the message trigger at the **Campaign Events** field, we support: **Launch the App Event**, **Login event**, **Purchase Successful Event** as default. You can add your own custom event at [App Settings](https://inappmessaging.rakapi.com/app/settings) page.
+  * You can select the message trigger at the **Campaign Events** field, we support: **Launch the App Event**, **Login event**, **Purchase Successful Event** as default. You can add your own custom event at App Settings page.
   * Max Lifetime Impressions - You can manage the number of messages your user will see.<br/>
 * **Launch Campaign** - Live a campaign message. This function only available for the Administrator role.
 * **Save as Draft** - Save a campaign as a draft message. This function is available for all roles.
@@ -266,7 +266,7 @@ buildscript {
 
 ## <a name="faq"></a> Frequently Asked Questions
 ### Q: How do I send message for in staging or testing environment?
-When creating [campaigns](https://inappmessaging.rakapi.com/campaign/create), you can set the versions which the campaign will be applied to your app.
+When creating campaigns, you can set the versions which the campaign will be applied to your app.
 You can set the versions to staging versions (ex. 0.0.1, 1.0.0-staging, 0.x.x, etc.)
 
 ### Q: How many times In-App Message should be sent to test device? Does it depends on Max Lifetime Impressions?
