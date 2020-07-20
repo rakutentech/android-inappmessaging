@@ -12,11 +12,7 @@ android {
   defaultConfig {
     versionName version
     consumerProguardFiles 'proguard-rules.pro'
-    // This is how user enter config url during build time.
-    def property = { key ->
-      return System.getenv(key) ?: (project.hasProperty(key) ? project."$key" : null)
-    }
-    manifestPlaceholders.config_url = property("CONFIG_URL") ?: ""
+    manifestPlaceholders.config_url = CONFIG.property("CONFIG_URL") ?: ""
   }
 
   sourceSets.each {
@@ -124,10 +120,11 @@ tasks.withType(JavaCompile).configureEach {
 }
 
 apply from: '../config/publish/android.gradle'
-publishing {
-  publications {
-    // Add publish tasks to SSED Artifactory.
-    inappmessaging(MavenPublication, androidArtifact())
+afterEvaluate {
+  publishing {
+    publications {
+      inappmessaging(MavenPublication, androidArtifact())
+    }
   }
 }
 
