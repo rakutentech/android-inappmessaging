@@ -12,7 +12,7 @@ android {
   defaultConfig {
     versionName version
     consumerProguardFiles 'proguard-rules.pro'
-    manifestPlaceholders.config_url = CONFIG.property("CONFIG_URL")
+    manifestPlaceholders.config_url = CONFIG.property("CONFIG_URL") ?: ""
   }
 
   sourceSets.each {
