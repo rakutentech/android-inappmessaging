@@ -12,7 +12,7 @@ maven_cache_key: &maven_cache_key >-
 jobs:
   build:
     docker:
-      - image: circleci/android:api-29
+      - image: circleci/android@sha256:45eb47efaf498cdbf01b16e6a294ef20a4979f6acd6aaf75913707190806bb4c
     working_directory: ~/code
     environment:
       # from https://discuss.circleci.com/t/circle-ci-v2-and-android-memory-issues/11207
@@ -73,7 +73,7 @@ jobs:
 
   publish:
     docker:
-    - image: circleci/android:api-29
+      - image: circleci/android@sha256:45eb47efaf498cdbf01b16e6a294ef20a4979f6acd6aaf75913707190806bb4c
     working_directory: ~/code
     environment:
       JVM_OPTS: "-Xmx3200m"
