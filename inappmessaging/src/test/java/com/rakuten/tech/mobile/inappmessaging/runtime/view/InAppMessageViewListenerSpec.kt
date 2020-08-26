@@ -70,6 +70,7 @@ class InAppMessageViewListenerOnClickSpec : InAppMessageViewListenerSpec() {
 }
 
 @Config(sdk = [Build.VERSION_CODES.Q])
+@Suppress("LargeClass")
 class InAppMessageViewListenerOnTouchSpec : InAppMessageViewListenerSpec() {
     private val mockMotionEvent = Mockito.mock(MotionEvent::class.java)
     private val mockCheck = Mockito.mock(BuildVersionChecker::class.java)
@@ -82,13 +83,120 @@ class InAppMessageViewListenerOnTouchSpec : InAppMessageViewListenerSpec() {
     }
 
     @Test
+    fun `should return true on touch with action down and onClick listener`() {
+        val listener = InAppMessageViewListener(ValidTestMessage("1", true), buildChecker = mockCheck)
+
+        When calling mockCheck.isAndroidQAndAbove() itReturns true
+        When calling mockMotionEvent.actionMasked itReturns MotionEvent.ACTION_DOWN
+        When calling mockView.performClick() itReturns true
+
+        listener.onTouch(mockView, mockMotionEvent).shouldBeTrue()
+    }
+
+    @Test
+    fun `should return true on touch with action move and onClick listener`() {
+        val listener = InAppMessageViewListener(ValidTestMessage("1", true), buildChecker = mockCheck)
+
+        listener.magnifier = Mockito.mock(Magnifier::class.java)
+        When calling mockCheck.isAndroidQAndAbove() itReturns true
+        When calling mockMotionEvent.actionMasked itReturns MotionEvent.ACTION_MOVE
+        When calling mockView.performClick() itReturns true
+
+        listener.onTouch(mockView, mockMotionEvent).shouldBeTrue()
+    }
+
+    @Test
+    fun `should return true on touch with action cancel and onClick listener`() {
+        val listener = InAppMessageViewListener(ValidTestMessage("1", true), buildChecker = mockCheck)
+
+        listener.magnifier = Mockito.mock(Magnifier::class.java)
+        When calling mockCheck.isAndroidQAndAbove() itReturns true
+        When calling mockMotionEvent.actionMasked itReturns MotionEvent.ACTION_CANCEL
+        When calling mockView.performClick() itReturns true
+
+        listener.onTouch(mockView, mockMotionEvent).shouldBeTrue()
+    }
+
+    @Test
+    fun `should return true on touch with action up and onClick listener`() {
+        val listener = InAppMessageViewListener(ValidTestMessage("1", true), buildChecker = mockCheck)
+
+        listener.magnifier = Mockito.mock(Magnifier::class.java)
+        When calling mockCheck.isAndroidQAndAbove() itReturns true
+        When calling mockMotionEvent.actionMasked itReturns MotionEvent.ACTION_UP
+        When calling mockView.performClick() itReturns true
+
+        listener.onTouch(mockView, mockMotionEvent).shouldBeTrue()
+    }
+
+    @Test
+    fun `should return true on touch with other action and onClick listener`() {
+        val listener = InAppMessageViewListener(ValidTestMessage("1", true), buildChecker = mockCheck)
+
+        listener.magnifier = Mockito.mock(Magnifier::class.java)
+        When calling mockCheck.isAndroidQAndAbove() itReturns true
+        When calling mockMotionEvent.actionMasked itReturns MotionEvent.ACTION_OUTSIDE
+        When calling mockView.performClick() itReturns true
+
+        listener.onTouch(mockView, mockMotionEvent).shouldBeTrue()
+    }
+
+    @Test
+    fun `should return true on touch with action move, null magnifier, and onClick listener`() {
+        val listener = InAppMessageViewListener(ValidTestMessage("1", true), buildChecker = mockCheck)
+
+        When calling mockCheck.isAndroidQAndAbove() itReturns true
+        When calling mockMotionEvent.actionMasked itReturns MotionEvent.ACTION_MOVE
+        When calling mockView.performClick() itReturns true
+
+        listener.onTouch(mockView, mockMotionEvent).shouldBeTrue()
+        listener.magnifier.shouldBeNull()
+    }
+
+    @Test
+    fun `should return true on touch with action cancel, null magnifier, and onClick listener`() {
+        val listener = InAppMessageViewListener(ValidTestMessage("1", true), buildChecker = mockCheck)
+
+        When calling mockCheck.isAndroidQAndAbove() itReturns true
+        When calling mockMotionEvent.actionMasked itReturns MotionEvent.ACTION_CANCEL
+        When calling mockView.performClick() itReturns true
+
+        listener.onTouch(mockView, mockMotionEvent).shouldBeTrue()
+        listener.magnifier.shouldBeNull()
+    }
+
+    @Test
+    fun `should return true on touch with action up, null magnifier, and onClick listener`() {
+        val listener = InAppMessageViewListener(ValidTestMessage("1", true), buildChecker = mockCheck)
+
+        When calling mockCheck.isAndroidQAndAbove() itReturns true
+        When calling mockMotionEvent.actionMasked itReturns MotionEvent.ACTION_UP
+        When calling mockView.performClick() itReturns true
+
+        listener.onTouch(mockView, mockMotionEvent).shouldBeTrue()
+        listener.magnifier.shouldBeNull()
+    }
+
+    @Test
+    fun `should return true on touch with other action, null magnifier, and onClick listener`() {
+        val listener = InAppMessageViewListener(ValidTestMessage("1", true), buildChecker = mockCheck)
+
+        When calling mockCheck.isAndroidQAndAbove() itReturns true
+        When calling mockMotionEvent.actionMasked itReturns MotionEvent.ACTION_OUTSIDE
+        When calling mockView.performClick() itReturns true
+
+        listener.onTouch(mockView, mockMotionEvent).shouldBeTrue()
+        listener.magnifier.shouldBeNull()
+    }
+
+    @Test
     fun `should return true on touch with action down`() {
         val listener = InAppMessageViewListener(ValidTestMessage("1", true), buildChecker = mockCheck)
 
         When calling mockCheck.isAndroidQAndAbove() itReturns true
         When calling mockMotionEvent.actionMasked itReturns MotionEvent.ACTION_DOWN
 
-        listener.onTouch(mockView, mockMotionEvent).shouldBeTrue()
+        listener.onTouch(mockView, mockMotionEvent).shouldBeFalse()
     }
 
     @Test
@@ -98,7 +206,7 @@ class InAppMessageViewListenerOnTouchSpec : InAppMessageViewListenerSpec() {
         listener.magnifier = Mockito.mock(Magnifier::class.java)
         When calling mockCheck.isAndroidQAndAbove() itReturns true
         When calling mockMotionEvent.actionMasked itReturns MotionEvent.ACTION_MOVE
-        listener.onTouch(mockView, mockMotionEvent).shouldBeTrue()
+        listener.onTouch(mockView, mockMotionEvent).shouldBeFalse()
     }
 
     @Test
@@ -108,7 +216,7 @@ class InAppMessageViewListenerOnTouchSpec : InAppMessageViewListenerSpec() {
         listener.magnifier = Mockito.mock(Magnifier::class.java)
         When calling mockCheck.isAndroidQAndAbove() itReturns true
         When calling mockMotionEvent.actionMasked itReturns MotionEvent.ACTION_CANCEL
-        listener.onTouch(mockView, mockMotionEvent).shouldBeTrue()
+        listener.onTouch(mockView, mockMotionEvent).shouldBeFalse()
     }
 
     @Test
@@ -118,7 +226,7 @@ class InAppMessageViewListenerOnTouchSpec : InAppMessageViewListenerSpec() {
         listener.magnifier = Mockito.mock(Magnifier::class.java)
         When calling mockCheck.isAndroidQAndAbove() itReturns true
         When calling mockMotionEvent.actionMasked itReturns MotionEvent.ACTION_UP
-        listener.onTouch(mockView, mockMotionEvent).shouldBeTrue()
+        listener.onTouch(mockView, mockMotionEvent).shouldBeFalse()
     }
 
     @Test
@@ -129,7 +237,7 @@ class InAppMessageViewListenerOnTouchSpec : InAppMessageViewListenerSpec() {
         When calling mockCheck.isAndroidQAndAbove() itReturns true
         When calling mockMotionEvent.actionMasked itReturns MotionEvent.ACTION_OUTSIDE
 
-        listener.onTouch(mockView, mockMotionEvent).shouldBeTrue()
+        listener.onTouch(mockView, mockMotionEvent).shouldBeFalse()
     }
 
     @Test
@@ -138,7 +246,7 @@ class InAppMessageViewListenerOnTouchSpec : InAppMessageViewListenerSpec() {
 
         When calling mockCheck.isAndroidQAndAbove() itReturns true
         When calling mockMotionEvent.actionMasked itReturns MotionEvent.ACTION_MOVE
-        listener.onTouch(mockView, mockMotionEvent).shouldBeTrue()
+        listener.onTouch(mockView, mockMotionEvent).shouldBeFalse()
         listener.magnifier.shouldBeNull()
     }
 
@@ -148,7 +256,7 @@ class InAppMessageViewListenerOnTouchSpec : InAppMessageViewListenerSpec() {
 
         When calling mockCheck.isAndroidQAndAbove() itReturns true
         When calling mockMotionEvent.actionMasked itReturns MotionEvent.ACTION_CANCEL
-        listener.onTouch(mockView, mockMotionEvent).shouldBeTrue()
+        listener.onTouch(mockView, mockMotionEvent).shouldBeFalse()
         listener.magnifier.shouldBeNull()
     }
 
@@ -158,7 +266,7 @@ class InAppMessageViewListenerOnTouchSpec : InAppMessageViewListenerSpec() {
 
         When calling mockCheck.isAndroidQAndAbove() itReturns true
         When calling mockMotionEvent.actionMasked itReturns MotionEvent.ACTION_UP
-        listener.onTouch(mockView, mockMotionEvent).shouldBeTrue()
+        listener.onTouch(mockView, mockMotionEvent).shouldBeFalse()
         listener.magnifier.shouldBeNull()
     }
 
@@ -169,7 +277,7 @@ class InAppMessageViewListenerOnTouchSpec : InAppMessageViewListenerSpec() {
         When calling mockCheck.isAndroidQAndAbove() itReturns true
         When calling mockMotionEvent.actionMasked itReturns MotionEvent.ACTION_OUTSIDE
 
-        listener.onTouch(mockView, mockMotionEvent).shouldBeTrue()
+        listener.onTouch(mockView, mockMotionEvent).shouldBeFalse()
         listener.magnifier.shouldBeNull()
     }
 
