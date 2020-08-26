@@ -55,8 +55,7 @@ internal class InAppMessageViewListener(
                 }
                 else -> if (this.magnifier != null) this.magnifier?.dismiss()
             }
-            view.performClick()
-            return true
+            return view.performClick()
         }
         return false
     }

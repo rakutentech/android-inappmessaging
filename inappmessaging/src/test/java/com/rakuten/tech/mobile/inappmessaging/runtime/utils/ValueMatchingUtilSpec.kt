@@ -154,8 +154,7 @@ class ValueMatchingUtilSpec : BaseTest() {
                 TIME_IN_MILLIS, OperatorType.LESS_THAN, TIME_IN_MILLIS - TIME_IN_MILLIS_TOLERANCE,
                 true).shouldBeFalse()
         ValueMatchingUtil.isOperatorConditionSatisfied(
-                TIME_IN_MILLIS, OperatorType.GREATER_THAN, TIME_IN_MILLIS,
-                true).shouldBeFalse()
+                TIME_IN_MILLIS, OperatorType.GREATER_THAN, TIME_IN_MILLIS, true).shouldBeFalse()
         ValueMatchingUtil.isOperatorConditionSatisfied(
                 TIME_IN_MILLIS, OperatorType.LESS_THAN, TIME_IN_MILLIS, true).shouldBeFalse()
     }
