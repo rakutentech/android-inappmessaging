@@ -1,116 +1,21 @@
-version: 2
+version: 2.1
 
-gradle_cache_key: &gradle_cache_key >-
-  gradle-
-  {{ checksum "build.gradle" }}
-  {{ checksum "gradle/wrapper/gradle-wrapper.properties" }}
-  {{ checksum "inappmessaging/build.gradle" }}
-maven_cache_key: &maven_cache_key >-
-  maven
-  -{{ checksum "inappmessaging/src/test/java/com/rakuten/tech/mobile/inappmessaging/runtime/BaseTest.kt" }}
-
-jobs:
-  build:
-    docker:
-      - image: circleci/android@sha256:45eb47efaf498cdbf01b16e6a294ef20a4979f6acd6aaf75913707190806bb4c
-    working_directory: ~/code
-    environment:
-      # from https://discuss.circleci.com/t/circle-ci-v2-and-android-memory-issues/11207
-      JVM_OPTS: "-Xmx1024m -XX:+PrintFlagsFinal -XX:+PrintGCDetails"
-      _JAVA_OPTIONS: "-Xmx1024m"
-      GRADLE_OPTS: "-Dorg.gradle.daemon=false -Dorg.gradle.workers.max=1 -Dorg.gradle.parallel=false"
-    steps:
-      - checkout
-      - run: git submodule update --init
-      - restore_cache:
-          key: *gradle_cache_key
-      - run:
-          name: Download Dependencies
-          command: ./gradlew androidDependencies
-      - save_cache:
-          paths:
-            - ~/.gradle
-          key: *gradle_cache_key
-      - restore_cache:
-          ## Robolectric uses maven to download sources, so we must use a different cache for maven
-          key: *maven_cache_key
-      - run:
-          name: Run Tests
-          command: ./gradlew check --no-daemon --max-workers 2
-      - save_cache:
-          paths:
-            - ~/.m2
-          key: *maven_cache_key
-      - run:
-          name: Assemble AAR
-          command: ./gradlew assemble
-      - run:
-          name: Current Version
-          command: ./gradlew currentVersion
-      - run:
-          name: Upload Code Coverage
-          command: bash <(curl -s https://codecov.io/bash)
-      - store_test_results:
-          path: inappmessaging/build/test-results
-          destination: test-results/
-      - store_artifacts:
-          path: inappmessaging/build/reports
-          destination: reports/
-      - store_artifacts:
-          path: inappmessaging/build/outputs/aar
-          destination: aar/
-      - store_artifacts:
-          path: inappmessaging/build/kdocs
-          destination: kdocs/
-      - store_artifacts:
-          path: inappmessaging/build/outputs/apk
-          destination: apk/
-      - persist_to_workspace:
-          root: ~/code
-          paths:
-            - inappmessaging/build
-            - inappmessaging/build/kdocs
-
-  publish:
-    docker:
-      - image: circleci/android@sha256:45eb47efaf498cdbf01b16e6a294ef20a4979f6acd6aaf75913707190806bb4c
-    working_directory: ~/code
-    environment:
-      JVM_OPTS: "-Xmx3200m"
-    steps:
-    - checkout
-    - run: git submodule update --init
-    - attach_workspace:
-        at: ./
-    - run:
-        name: Current Version
-        command: ./gradlew cV
-    - run:
-        name: Publish Artifacts
-        command: ./gradlew publish
-    - run:
-        name: Publish Documentation
-        command: |
-          set -e
-          ./gradlew generatePublishableDocs
-          if [[ ! $CIRCLE_TAG == *"-"* ]]; then
-            git checkout gh-pages
-            cp -R inappmessaging/build/publishableDocs/docs/. ./docs
-            cp -R inappmessaging/build/publishableDocs/_versions/. ./_versions
-            git add docs _versions
-            git config user.name "CI Publisher"
-            git config user.email "dev-opensource@mail.rakuten.com"
-            git commit -m "Publish documentation for $CIRCLE_TAG"
-            git push origin gh-pages
-          else
-            echo "Documentation not published for snapshot version"
-          fi
+orbs:
+  android-sdk: rakutentech/android-sdk@0.2.0
 
 workflows:
-  version: 2
-  build:
+  version: 2.1
+  build-and-release:
     jobs:
-      - build:
+      - android-sdk/build:
+          gradle-cache-key: >-
+            gradle-
+            {{ checksum "build.gradle" }}
+            {{ checksum "gradle/wrapper/gradle-wrapper.properties" }}
+            {{ checksum "inappmessaging/build.gradle" }}
+          maven-cache-key: maven-{{ checksum "inappmessaging/src/test/AndroidManifest.xml" }}
+          sdk-path: inappmessaging
+          sample-app-path: test
           filters:
             tags:
               only: /^v.*/
@@ -119,15 +24,33 @@ workflows:
       - release-verification:
           type: approval
           requires:
-            - build
+            - android-sdk/build
           filters:
             tags:
               only: /^v.*/
             branches:
               ignore: /.*/
-      - publish:
+      - android-sdk/publish:
           requires:
             - release-verification
+          post-steps:
+            - run:
+                name: Publish Documentation
+                command: |
+                  set -e
+                  ./gradlew generatePublishableDocs
+                  if [[ ! $CIRCLE_TAG == *"-"* ]]; then
+                    git checkout gh-pages
+                    cp -R inappmessaging/build/publishableDocs/docs/. ./docs
+                    cp -R inappmessaging/build/publishableDocs/_versions/. ./_versions
+                    git add docs _versions
+                    git config user.name "CI Publisher"
+                    git config user.email "dev-opensource@mail.rakuten.com"
+                    git commit -m "Publish documentation for $CIRCLE_TAG"
+                    git push origin gh-pages
+                  else
+                    echo "Documentation not published for snapshot version"
+                  fi
           filters:
             tags:
               only: /^v.*/
