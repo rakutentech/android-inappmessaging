@@ -281,7 +281,7 @@ Documents targeting Product Managers:
 
 ## <a name="changelog"></a> Changelog
 
-### 2.1.0 (in-progress)
+### 2.1.0 (2020-09-18)
 * SDKCF-2568: Deprecate updateSession() API
  * session update will be done internally when event is triggered and user info was changed
  * will be removed on 3.0.0
