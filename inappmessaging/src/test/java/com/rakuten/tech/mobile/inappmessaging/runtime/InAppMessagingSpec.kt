@@ -6,11 +6,13 @@ import android.os.Build
 import android.provider.Settings
 import androidx.test.core.app.ApplicationProvider
 import androidx.work.testing.WorkManagerTestInitHelper
+import com.nhaarman.mockitokotlin2.mock
 import com.rakuten.tech.mobile.inappmessaging.runtime.data.models.appevents.AppStartEvent
 import com.rakuten.tech.mobile.inappmessaging.runtime.data.repositories.ConfigResponseRepository
 import com.rakuten.tech.mobile.inappmessaging.runtime.data.responses.config.ConfigResponseData
 import com.rakuten.tech.mobile.inappmessaging.runtime.manager.DisplayManager
 import org.amshove.kluent.*
+import org.junit.After
 import org.junit.Before
 import org.junit.Test
 import org.junit.runner.RunWith
@@ -33,6 +35,11 @@ class InAppMessagingSpec : BaseTest() {
     @Before
     fun setup() {
         MockitoAnnotations.initMocks(this)
+    }
+
+    @After
+    fun tearDown() {
+        Mockito.validateMockitoUsage()
     }
 
     @Test
@@ -149,4 +156,19 @@ class InAppMessagingSpec : BaseTest() {
             fail("should not throw exception")
         }
     }
+
+//    @Test
+//    fun `should call provided callback when verifying campaign's contexts`() {
+//        When calling configResponseData.enabled itReturns true
+//        ConfigResponseRepository.instance().addConfigResponse(configResponseData)
+//
+//        val callback = mock<(List<String>, String) -> Boolean>()
+//        val inApp = InApp(ApplicationProvider.getApplicationContext(), false, displayManager)
+//        inApp.registerMessageDisplayActivity(activity)
+//        inApp.onVerifyContext = callback
+//
+//        Mockito.verify(callback, Mockito.times(1)).invoke(listOf(), "")
+//
+//        ConfigResponseRepository.resetInstance()
+//    }
 }

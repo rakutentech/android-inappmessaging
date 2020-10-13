@@ -22,6 +22,8 @@ internal class ValidTestMessage(var id: String = DEFAULT_CAMPAIGN_ID, private va
 
     override fun getMaxImpressions(): Int = 1
 
+    override fun getContexts(): List<String> = listOf()
+
     @Suppress("ComplexCondition")
     override fun equals(other: Any?): Boolean {
         val otherObject = other as Message

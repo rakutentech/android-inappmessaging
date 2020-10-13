@@ -21,14 +21,23 @@ import timber.log.Timber
  * can dispatch Runnables to Android's message queue. Only one at a time.
  */
 internal class DisplayMessageJobIntentService : JobIntentService() {
-
+    @VisibleForTesting
+    var messageReadinessManager = MessageReadinessManager.instance()
     /**
      * This method starts displaying message runnable.
      */
     public override fun onHandleWork(intent: Intent) {
         Timber.tag(TAG).d("onHandleWork() started on thread: %s", Thread.currentThread().name)
+        prepareNextMessage()
+        Timber.tag(TAG).d("onHandleWork() ended")
+    }
+
+    /**
+     * This method checks if there is a message to be displayed and proceeds if found.
+     */
+    private fun prepareNextMessage() {
         // Retrieving the next ready message, and its display permission been checked.
-        val message: Message = MessageReadinessManager.instance().getNextDisplayMessage() ?: return
+        val message: Message = messageReadinessManager.getNextDisplayMessage() ?: return
         val hostActivity = InAppMessaging.instance().getRegisteredActivity()
         val imageUrl = message.getMessagePayload()?.resource?.imageUrl
         if (hostActivity != null) {
@@ -39,7 +48,6 @@ internal class DisplayMessageJobIntentService : JobIntentService() {
                 displayMessage(message, hostActivity)
             }
         }
-        Timber.tag(TAG).d("onHandleWork() ended")
     }
 
     /**
@@ -63,6 +71,8 @@ internal class DisplayMessageJobIntentService : JobIntentService() {
      * This method displays message on UI thread.
      */
     private fun displayMessage(message: Message, hostActivity: Activity) {
+        if (verifyContexts(message) == false) return
+
         UiThreadImmediateExecutorService.getInstance()
                 .execute(
                         DisplayMessageRunnable(
@@ -70,6 +80,23 @@ internal class DisplayMessageJobIntentService : JobIntentService() {
                                 hostActivity,
                                 calculateImageAspectRatio(
                                         message.getMessagePayload()?.resource?.imageUrl)))
+    }
+
+    /**
+     * This method verifies campaign's contexts before displaying the message.
+     */
+    private fun verifyContexts(message: Message): Boolean {
+        val campaignContexts = message.getContexts()
+        if (!message.isTest() &&
+                campaignContexts.isNotEmpty() &&
+                verifyCampaignContextsCallback(campaignContexts, message.getMessagePayload()?.title ?: "")) {
+            // Message display aborted by the host app
+            Timber.tag(TAG).d("message display cancelled by the host app")
+            prepareNextMessage()
+            return false
+        }
+
+        return true
     }
 
     /**
@@ -126,6 +153,8 @@ internal class DisplayMessageJobIntentService : JobIntentService() {
         private const val DISPLAY_MESSAGE_JOB_ID = 3210
         private const val DEFAULT_IMAGE_ASPECT_RATIO = 0.75f
         private const val TAG = "IAM_JobIntentService"
+
+        var verifyCampaignContextsCallback: (contexts: List<String>, campaignTitle: String) -> Boolean = { _, _ -> true}
 
         /**
          * This method enqueues work in to this service.

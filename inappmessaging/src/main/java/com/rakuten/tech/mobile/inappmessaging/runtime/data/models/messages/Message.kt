@@ -37,4 +37,6 @@ internal interface Message {
      * This method returns max impressions.
      */
     fun getMaxImpressions(): Int?
+
+    fun getContexts(): List<String>
 }

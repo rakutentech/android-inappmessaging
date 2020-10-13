@@ -11,6 +11,8 @@ import androidx.work.testing.WorkManagerTestInitHelper
 import com.facebook.datasource.DataSource
 import com.facebook.soloader.SoLoader
 import com.google.gson.Gson
+import com.nhaarman.mockitokotlin2.argumentCaptor
+import com.nhaarman.mockitokotlin2.mock
 import com.rakuten.tech.mobile.inappmessaging.runtime.BaseTest
 import com.rakuten.tech.mobile.inappmessaging.runtime.InAppMessaging
 import com.rakuten.tech.mobile.inappmessaging.runtime.data.models.messages.Message
@@ -18,14 +20,13 @@ import com.rakuten.tech.mobile.inappmessaging.runtime.data.repositories.ReadyFor
 import com.rakuten.tech.mobile.inappmessaging.runtime.data.responses.ping.CampaignData
 import com.rakuten.tech.mobile.inappmessaging.runtime.data.responses.ping.MessagePayload
 import com.rakuten.tech.mobile.inappmessaging.runtime.manager.MessageReadinessManager
-import org.amshove.kluent.When
-import org.amshove.kluent.calling
-import org.amshove.kluent.itReturns
+import org.amshove.kluent.*
 import org.junit.After
 import org.junit.Before
 import org.junit.Test
 import org.junit.runner.RunWith
 import org.mockito.Mockito
+import org.mockito.Mockito.validateMockitoUsage
 import org.mockito.MockitoAnnotations
 import org.robolectric.Robolectric
 import org.robolectric.RobolectricTestRunner
@@ -51,23 +52,23 @@ class DisplayMessageJobIntentServiceSpec : BaseTest() {
         MockitoAnnotations.initMocks(this)
         serviceController = Robolectric.buildService(DisplayMessageJobIntentService::class.java)
         displayMessageJobIntentService = serviceController?.bind()?.create()?.get()
+        WorkManagerTestInitHelper.initializeTestWorkManager(ApplicationProvider.getApplicationContext())
     }
 
     @After
     fun tearDown() {
         serviceController!!.destroy()
+        validateMockitoUsage()
     }
 
     @Test
     fun `should post message not throw exception`() {
-        WorkManagerTestInitHelper.initializeTestWorkManager(ApplicationProvider.getApplicationContext())
         InAppMessaging.instance().registerMessageDisplayActivity(activity)
         displayMessageJobIntentService!!.onHandleWork(intent!!)
     }
 
     @Test
     fun `should not throw exception with valid message`() {
-        WorkManagerTestInitHelper.initializeTestWorkManager(ApplicationProvider.getApplicationContext())
         Settings.Secure.putString(ApplicationProvider.getApplicationContext<Context>().contentResolver,
                 Settings.Secure.ANDROID_ID, "test_device_id")
         InAppMessaging.init(ApplicationProvider.getApplicationContext(), "test-key", "")
@@ -88,7 +89,6 @@ class DisplayMessageJobIntentServiceSpec : BaseTest() {
 
     @Test
     fun `should not throw exception with valid message no url`() {
-        WorkManagerTestInitHelper.initializeTestWorkManager(ApplicationProvider.getApplicationContext())
         Settings.Secure.putString(ApplicationProvider.getApplicationContext<Context>().contentResolver,
                 Settings.Secure.ANDROID_ID, "test_device_id")
         InAppMessaging.init(ApplicationProvider.getApplicationContext(), "test-key", "")
@@ -103,6 +103,123 @@ class DisplayMessageJobIntentServiceSpec : BaseTest() {
                 .layoutInflater itReturns LayoutInflater.from(ApplicationProvider.getApplicationContext())
         displayMessageJobIntentService!!.onHandleWork(intent!!)
     }
+
+// TODO: Fix tests crash when calling verifyCampaignContextsCallback
+//
+//    @Test
+//    fun `should call verifyCampaignContextsCallback for non-test campaign with contexts`() {
+//        Settings.Secure.putString(ApplicationProvider.getApplicationContext<Context>().contentResolver,
+//                Settings.Secure.ANDROID_ID, "test_device_id")
+//        InAppMessaging.init(ApplicationProvider.getApplicationContext(), "test-key", "")
+//        InAppMessaging.instance().registerMessageDisplayActivity(activity)
+//
+//        val message = Mockito.mock(Message::class.java)
+//        ReadyForDisplayMessageRepository.instance().replaceAllMessages(listOf(message))
+//        val callback = mock<(List<String>, String) -> Boolean>()
+//        DisplayMessageJobIntentService.verifyCampaignContextsCallback = callback
+//
+//        When calling message.getCampaignId() itReturns "1"
+//        When calling message.isTest() itReturns false
+//        When calling message.getMaxImpressions() itReturns 1
+//        When calling message.getMessagePayload() itReturns Gson().fromJson(MESSAGE_PAYLOAD_NO_URL.trimIndent(),
+//                MessagePayload::class.java)
+//        When calling message.getContexts() itReturns listOf("ctx")
+//        When calling mockMessageManager.getNextDisplayMessage() itReturns message
+//        When calling activity
+//                .layoutInflater itReturns LayoutInflater.from(ApplicationProvider.getApplicationContext())
+//        displayMessageJobIntentService!!.messageReadinessManager = mockMessageManager
+//        displayMessageJobIntentService!!.onHandleWork(intent!!)
+//
+//        Mockito.verify(callback, Mockito.times(1)).invoke(listOf("ctx"), "[ctx] Campaign Title")
+//    }
+//
+//    @Test
+//    fun `should not call verifyCampaignContextsCallback for non-test campaign without contexts`() {
+//        Settings.Secure.putString(ApplicationProvider.getApplicationContext<Context>().contentResolver,
+//                Settings.Secure.ANDROID_ID, "test_device_id")
+//        InAppMessaging.init(ApplicationProvider.getApplicationContext(), "test-key", "")
+//        InAppMessaging.instance().registerMessageDisplayActivity(activity)
+//
+//        val message = Mockito.mock(Message::class.java)
+//        ReadyForDisplayMessageRepository.instance().replaceAllMessages(listOf(message))
+//        val callback = mock<(List<String>, String) -> Boolean>()
+//        DisplayMessageJobIntentService.verifyCampaignContextsCallback = callback
+//
+//        When calling message.getCampaignId() itReturns "1"
+//        When calling message.isTest() itReturns false
+//        When calling message.getMaxImpressions() itReturns 1
+//        When calling message.getMessagePayload() itReturns Gson().fromJson(MESSAGE_PAYLOAD_NO_URL.trimIndent(),
+//                MessagePayload::class.java)
+//        When calling message.getContexts() itReturns listOf()
+//        When calling mockMessageManager.getNextDisplayMessage() itReturns message
+//        When calling activity
+//                .layoutInflater itReturns LayoutInflater.from(ApplicationProvider.getApplicationContext())
+//        displayMessageJobIntentService!!.messageReadinessManager = mockMessageManager
+//        displayMessageJobIntentService!!.onHandleWork(intent!!)
+//
+//        Mockito.verify(callback, Mockito.times(0)).invoke(any(), any())
+//    }
+//
+//    @Test
+//    fun `should not call verifyCampaignContextsCallback for test campaign with contexts`() {
+//        Settings.Secure.putString(ApplicationProvider.getApplicationContext<Context>().contentResolver,
+//                Settings.Secure.ANDROID_ID, "test_device_id")
+//        InAppMessaging.init(ApplicationProvider.getApplicationContext(), "test-key", "")
+//        InAppMessaging.instance().registerMessageDisplayActivity(activity)
+//
+//        val message = Mockito.mock(Message::class.java)
+//        ReadyForDisplayMessageRepository.instance().replaceAllMessages(listOf(message))
+//        val callback = mock<(List<String>, String) -> Boolean>()
+//        DisplayMessageJobIntentService.verifyCampaignContextsCallback = callback
+//
+//        When calling message.getCampaignId() itReturns "1"
+//        When calling message.isTest() itReturns true
+//        When calling message.getMaxImpressions() itReturns 1
+//        When calling message.getMessagePayload() itReturns Gson().fromJson(MESSAGE_PAYLOAD_NO_URL.trimIndent(),
+//                MessagePayload::class.java)
+//        When calling message.getContexts() itReturns listOf("ctx")
+//        When calling mockMessageManager.getNextDisplayMessage() itReturns message
+//        When calling activity
+//                .layoutInflater itReturns LayoutInflater.from(ApplicationProvider.getApplicationContext())
+//        displayMessageJobIntentService!!.messageReadinessManager = mockMessageManager
+//        displayMessageJobIntentService!!.onHandleWork(intent!!)
+//
+//        Mockito.verify(callback, Mockito.times(0)).invoke(any(), any())
+//    }
+//
+//    @Test
+//    fun `should call verifyCampaignContextsCallback with proper parameters`() {
+//        Settings.Secure.putString(ApplicationProvider.getApplicationContext<Context>().contentResolver,
+//                Settings.Secure.ANDROID_ID, "test_device_id")
+//        InAppMessaging.init(ApplicationProvider.getApplicationContext(), "test-key", "")
+//        InAppMessaging.instance().registerMessageDisplayActivity(activity)
+//
+//        val message = Mockito.mock(Message::class.java)
+//        ReadyForDisplayMessageRepository.instance().replaceAllMessages(listOf(message))
+//        val callback = mock<(List<String>, String) -> Boolean>()
+//        DisplayMessageJobIntentService.verifyCampaignContextsCallback = callback
+//
+//        When calling message.getCampaignId() itReturns "1"
+//        When calling message.isTest() itReturns false
+//        When calling message.getMaxImpressions() itReturns 1
+//        When calling message.getMessagePayload() itReturns Gson().fromJson(MESSAGE_PAYLOAD_NO_URL.trimIndent(),
+//                MessagePayload::class.java)
+//        When calling message.getContexts() itReturns listOf("ctx")
+//        When calling mockMessageManager.getNextDisplayMessage() itReturns message
+//        When calling activity
+//                .layoutInflater itReturns LayoutInflater.from(ApplicationProvider.getApplicationContext())
+//        displayMessageJobIntentService!!.messageReadinessManager = mockMessageManager
+//        displayMessageJobIntentService!!.onHandleWork(intent!!)
+//
+//        argumentCaptor<List<String>>().apply {
+//            Mockito.verify(callback).invoke(capture(), any())
+//            firstValue shouldEqual listOf("ctx")
+//        }
+//        argumentCaptor<String>().apply {
+//            Mockito.verify(callback).invoke(any(), capture())
+//            firstValue shouldBeEqualTo "[ctx] Campaign Title"
+//        }
+//    }
 
     companion object {
         private const val MESSAGE_PAYLOAD = """
@@ -129,7 +246,7 @@ class DisplayMessageJobIntentServiceSpec : BaseTest() {
                     "cropType":2,
                     "imageUrl":"https://sample.image.url/test.jpg"
                 },
-                "title":"Campaign Title",
+                "title":"[ctx] Campaign Title",
                 "titleColor":"#000000"
             }
         """
@@ -156,7 +273,7 @@ class DisplayMessageJobIntentServiceSpec : BaseTest() {
                 "resource":{
                     "cropType":2
                 },
-                "title":"Campaign Title",
+                "title":"[ctx] Campaign Title",
                 "titleColor":"#000000"
             }
         """
