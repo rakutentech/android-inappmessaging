@@ -12,8 +12,6 @@ import timber.log.Timber
  */
 internal interface DisplayManager {
 
-    var verifyCampaignContextsCallback: (contexts: List<String>, campaignTitle: String) -> Boolean
-
     /**
      * Thread safe method to display message on UI thread.
      */
@@ -34,13 +32,7 @@ internal interface DisplayManager {
 
     private class DisplayManagerImpl : DisplayManager {
 
-        override var verifyCampaignContextsCallback: (contexts: List<String>, campaignTitle: String) -> Boolean = {
-            // Allow all contexts by default
-            _, _ -> true
-        }
-
         override fun displayMessage() {
-            DisplayMessageJobIntentService.verifyCampaignContextsCallback = verifyCampaignContextsCallback
             DisplayMessageJobIntentService.enqueueWork(Intent())
         }
 

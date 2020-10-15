@@ -87,16 +87,18 @@ internal class DisplayMessageJobIntentService : JobIntentService() {
      */
     private fun verifyContexts(message: Message): Boolean {
         val campaignContexts = message.getContexts()
-        if (!message.isTest() &&
-                campaignContexts.isNotEmpty() &&
-                verifyCampaignContextsCallback(campaignContexts, message.getMessagePayload()?.title ?: "")) {
+        if (message.isTest() || campaignContexts.isEmpty()) {
+            return true
+        }
+
+        val isConfirmed = InAppMessaging.instance().onVerifyContext(campaignContexts, message.getMessagePayload()?.title ?: "")
+        if (!isConfirmed) {
             // Message display aborted by the host app
             Timber.tag(TAG).d("message display cancelled by the host app")
             prepareNextMessage()
-            return false
         }
 
-        return true
+        return isConfirmed
     }
 
     /**
@@ -153,8 +155,6 @@ internal class DisplayMessageJobIntentService : JobIntentService() {
         private const val DISPLAY_MESSAGE_JOB_ID = 3210
         private const val DEFAULT_IMAGE_ASPECT_RATIO = 0.75f
         private const val TAG = "IAM_JobIntentService"
-
-        var verifyCampaignContextsCallback: (contexts: List<String>, campaignTitle: String) -> Boolean = { _, _ -> true}
 
         /**
          * This method enqueues work in to this service.
