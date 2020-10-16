@@ -44,6 +44,7 @@ class DisplayMessageJobIntentServiceSpec : BaseTest() {
     private var serviceController: ServiceController<DisplayMessageJobIntentService>? = null
     private var displayMessageJobIntentService: DisplayMessageJobIntentService? = null
     private val mockMessageManager = Mockito.mock(MessageReadinessManager::class.java)
+    private val onVerifyContexts = Mockito.mock(InAppMessaging.instance().onVerifyContext.javaClass)
 
     @Before
     fun setup() {
@@ -52,6 +53,14 @@ class DisplayMessageJobIntentServiceSpec : BaseTest() {
         serviceController = Robolectric.buildService(DisplayMessageJobIntentService::class.java)
         displayMessageJobIntentService = serviceController?.bind()?.create()?.get()
         WorkManagerTestInitHelper.initializeTestWorkManager(ApplicationProvider.getApplicationContext())
+
+        Settings.Secure.putString(ApplicationProvider.getApplicationContext<Context>().contentResolver,
+                Settings.Secure.ANDROID_ID, "test_device_id")
+        InAppMessaging.init(ApplicationProvider.getApplicationContext(), "test-key", "")
+        InAppMessaging.instance().registerMessageDisplayActivity(activity)
+
+        When calling onVerifyContexts.invoke(any(), any()) itReturns true
+        InAppMessaging.instance().onVerifyContext = onVerifyContexts
     }
 
     @After
@@ -62,17 +71,11 @@ class DisplayMessageJobIntentServiceSpec : BaseTest() {
 
     @Test
     fun `should post message not throw exception`() {
-        InAppMessaging.instance().registerMessageDisplayActivity(activity)
         displayMessageJobIntentService!!.onHandleWork(intent!!)
     }
 
     @Test
     fun `should not throw exception with valid message`() {
-        Settings.Secure.putString(ApplicationProvider.getApplicationContext<Context>().contentResolver,
-                Settings.Secure.ANDROID_ID, "test_device_id")
-        InAppMessaging.init(ApplicationProvider.getApplicationContext(), "test-key", "")
-        InAppMessaging.instance().registerMessageDisplayActivity(activity)
-
         val message = Mockito.mock(Message::class.java)
         ReadyForDisplayMessageRepository.instance().replaceAllMessages(listOf(message))
 
@@ -88,10 +91,6 @@ class DisplayMessageJobIntentServiceSpec : BaseTest() {
 
     @Test
     fun `should not throw exception with valid message no url`() {
-        Settings.Secure.putString(ApplicationProvider.getApplicationContext<Context>().contentResolver,
-                Settings.Secure.ANDROID_ID, "test_device_id")
-        InAppMessaging.init(ApplicationProvider.getApplicationContext(), "test-key", "")
-        InAppMessaging.instance().registerMessageDisplayActivity(activity)
         val message = Mockito.mock(Message::class.java)
         ReadyForDisplayMessageRepository.instance().replaceAllMessages(listOf(message))
 
@@ -105,17 +104,7 @@ class DisplayMessageJobIntentServiceSpec : BaseTest() {
 
     @Test
     fun `should call onVerifyContext for non-test campaign with contexts`() {
-        Settings.Secure.putString(ApplicationProvider.getApplicationContext<Context>().contentResolver,
-                Settings.Secure.ANDROID_ID, "test_device_id")
-        InAppMessaging.init(ApplicationProvider.getApplicationContext(), "test-key", "")
-        InAppMessaging.instance().registerMessageDisplayActivity(activity)
-
         val message = Mockito.mock(Message::class.java)
-        ReadyForDisplayMessageRepository.instance().replaceAllMessages(listOf(message))
-
-        val callback = Mockito.mock(InAppMessaging.instance().onVerifyContext.javaClass)
-        When calling callback.invoke(any(), any()) itReturns true
-        InAppMessaging.instance().onVerifyContext = callback
 
         When calling message.getCampaignId() itReturns "1"
         When calling message.isTest() itReturns false
@@ -129,23 +118,13 @@ class DisplayMessageJobIntentServiceSpec : BaseTest() {
         displayMessageJobIntentService!!.messageReadinessManager = mockMessageManager
         displayMessageJobIntentService!!.onHandleWork(intent!!)
 
-        Mockito.verify(callback, Mockito.times(1))
+        Mockito.verify(onVerifyContexts, Mockito.times(1))
                 .invoke(listOf("ctx"), "Campaign Title")
     }
 
     @Test
     fun `should not call onVerifyContext for non-test campaign without contexts`() {
-        Settings.Secure.putString(ApplicationProvider.getApplicationContext<Context>().contentResolver,
-                Settings.Secure.ANDROID_ID, "test_device_id")
-        InAppMessaging.init(ApplicationProvider.getApplicationContext(), "test-key", "")
-        InAppMessaging.instance().registerMessageDisplayActivity(activity)
-
         val message = Mockito.mock(Message::class.java)
-        ReadyForDisplayMessageRepository.instance().replaceAllMessages(listOf(message))
-
-        val callback = Mockito.mock(InAppMessaging.instance().onVerifyContext.javaClass)
-        When calling callback.invoke(any(), any()) itReturns true
-        InAppMessaging.instance().onVerifyContext = callback
 
         When calling message.getCampaignId() itReturns "1"
         When calling message.isTest() itReturns false
@@ -159,23 +138,13 @@ class DisplayMessageJobIntentServiceSpec : BaseTest() {
         displayMessageJobIntentService!!.messageReadinessManager = mockMessageManager
         displayMessageJobIntentService!!.onHandleWork(intent!!)
 
-        Mockito.verify(callback, Mockito.times(0))
+        Mockito.verify(onVerifyContexts, Mockito.times(0))
                 .invoke(any(), any())
     }
 
     @Test
     fun `should not call onVerifyContext for test campaign with contexts`() {
-        Settings.Secure.putString(ApplicationProvider.getApplicationContext<Context>().contentResolver,
-                Settings.Secure.ANDROID_ID, "test_device_id")
-        InAppMessaging.init(ApplicationProvider.getApplicationContext(), "test-key", "")
-        InAppMessaging.instance().registerMessageDisplayActivity(activity)
-
         val message = Mockito.mock(Message::class.java)
-        ReadyForDisplayMessageRepository.instance().replaceAllMessages(listOf(message))
-
-        val callback = Mockito.mock(InAppMessaging.instance().onVerifyContext.javaClass)
-        When calling callback.invoke(any(), any()) itReturns true
-        InAppMessaging.instance().onVerifyContext = callback
 
         When calling message.getCampaignId() itReturns "1"
         When calling message.isTest() itReturns true
@@ -189,23 +158,13 @@ class DisplayMessageJobIntentServiceSpec : BaseTest() {
         displayMessageJobIntentService!!.messageReadinessManager = mockMessageManager
         displayMessageJobIntentService!!.onHandleWork(intent!!)
 
-        Mockito.verify(callback, Mockito.times(0))
+        Mockito.verify(onVerifyContexts, Mockito.times(0))
                 .invoke(any(), any())
     }
 
     @Test
     fun `should call onVerifyContext with proper parameters`() {
-        Settings.Secure.putString(ApplicationProvider.getApplicationContext<Context>().contentResolver,
-                Settings.Secure.ANDROID_ID, "test_device_id")
-        InAppMessaging.init(ApplicationProvider.getApplicationContext(), "test-key", "")
-        InAppMessaging.instance().registerMessageDisplayActivity(activity)
-
         val message = Mockito.mock(Message::class.java)
-        ReadyForDisplayMessageRepository.instance().replaceAllMessages(listOf(message))
-
-        val callback = Mockito.mock(InAppMessaging.instance().onVerifyContext.javaClass)
-        When calling callback.invoke(any(), any()) itReturns true
-        InAppMessaging.instance().onVerifyContext = callback
 
         When calling message.getCampaignId() itReturns "1"
         When calling message.isTest() itReturns false
@@ -220,11 +179,11 @@ class DisplayMessageJobIntentServiceSpec : BaseTest() {
         displayMessageJobIntentService!!.onHandleWork(intent!!)
 
         argumentCaptor<List<String>>().apply {
-            Mockito.verify(callback).invoke(capture(), any())
+            Mockito.verify(onVerifyContexts).invoke(capture(), any())
             firstValue shouldEqual listOf("ctx")
         }
         argumentCaptor<String>().apply {
-            Mockito.verify(callback).invoke(any(), capture())
+            Mockito.verify(onVerifyContexts).invoke(any(), capture())
             firstValue shouldBeEqualTo "Campaign Title"
         }
     }

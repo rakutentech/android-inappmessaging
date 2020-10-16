@@ -91,7 +91,9 @@ internal class DisplayMessageJobIntentService : JobIntentService() {
             return true
         }
 
-        val isConfirmed = InAppMessaging.instance().onVerifyContext(campaignContexts, message.getMessagePayload()?.title ?: "")
+        val isConfirmed = InAppMessaging.instance().onVerifyContext(
+                campaignContexts,
+                message.getMessagePayload()?.title ?: "")
         if (!isConfirmed) {
             // Message display aborted by the host app
             Timber.tag(TAG).d("message display cancelled by the host app")
