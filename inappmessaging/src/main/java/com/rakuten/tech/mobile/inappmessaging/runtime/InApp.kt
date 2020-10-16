@@ -33,6 +33,11 @@ internal class InApp(
     }
 
     // ------------------------------------Public APIs-----------------------------------------------
+    override var onVerifyContext: (contexts: List<String>, campaignTitle: String) -> Boolean = { _, _ -> Boolean
+        // Allow all contexts by default
+        true
+    }
+
     override fun registerPreference(userInfoProvider: UserInfoProvider) {
         AccountRepository.instance().userInfoProvider = userInfoProvider
         AccountRepository.instance().updateUserInfo()

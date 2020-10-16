@@ -216,8 +216,55 @@ class MessageMixerResponseSpec(private val testname: String, private val actual:
                 campaignTrigger.triggerAttributes[0].operator)
     }
 
+    private fun generateDummyCampaign(id: String, title: String): CampaignData {
+        val messagePayload = MessagePayload(null, null, null, null, null, null, null, null, title, null)
+        return CampaignData(messagePayload, 1, listOf(), id, false, 1)
+    }
+
     @Test
     fun `should be correct value after parsing`() {
         actual shouldEqual expected
+    }
+
+    @Test
+    fun `should return empty array if there are no contexts when calling getContexts()`() {
+        val campaign = generateDummyCampaign("id", "title")
+        campaign.getContexts() shouldEqual listOf()
+    }
+
+    @Test
+    fun `should properly read context if there's nothing beside it when calling getContexts()`() {
+        val campaign = generateDummyCampaign("id", "[ctx]")
+        campaign.getContexts() shouldEqual listOf("ctx")
+    }
+
+    @Test
+    fun `should properly read one context when calling getContexts()`() {
+        val campaign = generateDummyCampaign("id", "[ctx] title")
+        campaign.getContexts() shouldEqual listOf("ctx")
+    }
+
+    @Test
+    fun `should properly read multiple contexts when calling getContexts()`() {
+        val campaign = generateDummyCampaign("id", "[ctx1] [ctx2][ctx3] title")
+        campaign.getContexts() shouldEqual listOf("ctx1", "ctx2", "ctx3")
+    }
+
+    @Test
+    fun `should properly read multiple contexts separated with characters when calling getContexts()`() {
+        val campaign = generateDummyCampaign("id", "[ctx A]~~[ctx B]ab ab[ctx C]")
+        campaign.getContexts() shouldEqual listOf("ctx A", "ctx B", "ctx C")
+    }
+
+    @Test
+    fun `should ignore invalid contexts when calling getContexts()`() {
+        val campaign = generateDummyCampaign("id", "[ctx] [ctxbad title")
+        campaign.getContexts() shouldEqual listOf("ctx")
+    }
+
+    @Test
+    fun `should properly read context even if there are invalid ones when calling getContexts()`() {
+        val campaign = generateDummyCampaign("id", "ctxbad] title [ctx]")
+        campaign.getContexts() shouldEqual listOf("ctx")
     }
 }

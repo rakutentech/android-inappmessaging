@@ -24,7 +24,7 @@ import kotlinx.coroutines.withContext
  */
 internal class InAppMessageViewListener(
     val message: Message?,
-    private val messagCoroutine: MessageActionsCoroutine = MessageActionsCoroutine(),
+    private val messageCoroutine: MessageActionsCoroutine = MessageActionsCoroutine(),
     private val displayManager: DisplayManager = DisplayManager.instance(),
     private val buildChecker: BuildVersionChecker = BuildVersionChecker.instance()
 ) :
@@ -73,7 +73,7 @@ internal class InAppMessageViewListener(
             CoroutineScope(Dispatchers.Main).launch {
                 displayManager.removeMessage(InAppMessaging.instance().getRegisteredActivity())
                 withContext(Dispatchers.Default) {
-                    val result = messagCoroutine.executeTask(message, view.id, isOptOutChecked)
+                    val result = messageCoroutine.executeTask(message, view.id, isOptOutChecked)
                     if (result) {
                         displayManager.displayMessage()
                     }
@@ -89,7 +89,7 @@ internal class InAppMessageViewListener(
                 displayManager.removeMessage(InAppMessaging.instance().getRegisteredActivity())
                 withContext(Dispatchers.Default) {
                     // no need to handle result since no event should be triggered by back button
-                    messagCoroutine.executeTask(message, MessageActionsCoroutine.BACK_BUTTON, isOptOutChecked)
+                    messageCoroutine.executeTask(message, MessageActionsCoroutine.BACK_BUTTON, isOptOutChecked)
                 }
             }
             return true
