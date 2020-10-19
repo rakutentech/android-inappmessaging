@@ -15,4 +15,6 @@ internal class InvalidTestMessage : Message {
     override fun isTest(): Boolean = false
 
     override fun getMaxImpressions(): Int = 0
+
+    override fun getContexts(): List<String> = listOf()
 }

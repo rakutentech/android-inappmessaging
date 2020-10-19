@@ -32,4 +32,10 @@ internal data class CampaignData(
     override fun isTest(): Boolean = isTest
 
     override fun getMaxImpressions(): Int = maxImpressions
+
+    override fun getContexts(): List<String> {
+        val regex = Regex("\\[(.*?)\\]")
+        val matches = regex.findAll(messagePayload.title ?: "")
+        return matches.map { it.groupValues[1] }.toList()
+    }
 }

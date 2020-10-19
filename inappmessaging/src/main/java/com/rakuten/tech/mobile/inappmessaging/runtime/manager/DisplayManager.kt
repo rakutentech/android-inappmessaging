@@ -11,6 +11,7 @@ import timber.log.Timber
  * Display manager, which controls displaying message, or removing message from the screen.
  */
 internal interface DisplayManager {
+
     /**
      * Thread safe method to display message on UI thread.
      */

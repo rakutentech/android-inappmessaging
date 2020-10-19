@@ -18,6 +18,12 @@ import org.jetbrains.annotations.Nullable
 @Suppress("UnnecessaryAbstractClass")
 abstract class InAppMessaging internal constructor() {
     /**
+     * This callback is called just before showing a message of campaign that has registered contexts.
+     * Return `false` to prevent the message from displaying.
+     */
+    abstract var onVerifyContext: (contexts: List<String>, campaignTitle: String) -> Boolean
+
+    /**
      * This method registers provider containing user information [userInfoProvider], like RAE Token and Uer ID.
      */
     abstract fun registerPreference(@NotNull userInfoProvider: UserInfoProvider)
@@ -108,6 +114,8 @@ abstract class InAppMessaging internal constructor() {
 
     @Suppress("EmptyFunctionBlock")
     internal class NotInitializedInAppMessaging : InAppMessaging() {
+        override var onVerifyContext: (contexts: List<String>, campaignTitle: String) -> Boolean = { _, _ -> true }
+
         override fun registerPreference(userInfoProvider: UserInfoProvider) {}
 
         override fun registerMessageDisplayActivity(activity: Activity) {}
