@@ -14,6 +14,7 @@ import com.rakuten.tech.mobile.inappmessaging.runtime.coroutine.MessageActionsCo
 import com.rakuten.tech.mobile.inappmessaging.runtime.data.models.messages.Message
 import com.rakuten.tech.mobile.inappmessaging.runtime.manager.DisplayManager
 import com.rakuten.tech.mobile.inappmessaging.runtime.utils.BuildVersionChecker
+import com.rakuten.tech.mobile.inappmessaging.runtime.workmanager.schedulers.EventMessageReconciliationScheduler
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
@@ -26,7 +27,9 @@ internal class InAppMessageViewListener(
     val message: Message?,
     private val messageCoroutine: MessageActionsCoroutine = MessageActionsCoroutine(),
     private val displayManager: DisplayManager = DisplayManager.instance(),
-    private val buildChecker: BuildVersionChecker = BuildVersionChecker.instance()
+    private val buildChecker: BuildVersionChecker = BuildVersionChecker.instance(),
+    private val eventScheduler: EventMessageReconciliationScheduler = EventMessageReconciliationScheduler.instance(),
+    private val inApp: InAppMessaging = InAppMessaging.instance()
 ) :
     View.OnTouchListener, View.OnClickListener, View.OnKeyListener {
 
@@ -70,30 +73,28 @@ internal class InAppMessageViewListener(
             this.isOptOutChecked = (view as CheckBox).isChecked
         } else {
             // Handling button click in coroutine.
-            CoroutineScope(Dispatchers.Main).launch {
-                displayManager.removeMessage(InAppMessaging.instance().getRegisteredActivity())
-                withContext(Dispatchers.Default) {
-                    val result = messageCoroutine.executeTask(message, view.id, isOptOutChecked)
-                    if (result) {
-                        displayManager.displayMessage()
-                    }
-                }
-            }
+            handleClick(view.id)
         }
     }
 
     override fun onKey(v: View?, keyCode: Int, event: KeyEvent?): Boolean {
         if (event != null && event.action == KeyEvent.ACTION_UP && keyCode == KeyEvent.KEYCODE_BACK) {
             // Handling back button click in coroutine.
-            CoroutineScope(Dispatchers.Main).launch {
-                displayManager.removeMessage(InAppMessaging.instance().getRegisteredActivity())
-                withContext(Dispatchers.Default) {
-                    // no need to handle result since no event should be triggered by back button
-                    messageCoroutine.executeTask(message, MessageActionsCoroutine.BACK_BUTTON, isOptOutChecked)
-                }
-            }
+            handleClick(MessageActionsCoroutine.BACK_BUTTON)
             return true
         }
         return false
+    }
+
+    private fun handleClick(id: Int) {
+        CoroutineScope(Dispatchers.Main).launch {
+            displayManager.removeMessage(inApp.getRegisteredActivity())
+            withContext(Dispatchers.Default) {
+                val result = messageCoroutine.executeTask(message, id, isOptOutChecked)
+                if (result) {
+                    eventScheduler.startEventMessageReconciliationWorker()
+                }
+            }
+        }
     }
 }

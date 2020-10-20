@@ -162,6 +162,7 @@ class DisplayMessageJobIntentServiceSpec : BaseTest() {
                 .invoke(any(), any())
     }
 
+    @SuppressWarnings("LongMethod")
     @Test
     fun `should call onVerifyContext with proper parameters`() {
         val message = Mockito.mock(Message::class.java)
@@ -173,8 +174,7 @@ class DisplayMessageJobIntentServiceSpec : BaseTest() {
                 MessagePayload::class.java)
         When calling message.getContexts() itReturns listOf("ctx")
         When calling mockMessageManager.getNextDisplayMessage() itReturns message
-        When calling activity
-                .layoutInflater itReturns LayoutInflater.from(ApplicationProvider.getApplicationContext())
+        When calling activity.layoutInflater itReturns LayoutInflater.from(ApplicationProvider.getApplicationContext())
         displayMessageJobIntentService!!.messageReadinessManager = mockMessageManager
         displayMessageJobIntentService!!.onHandleWork(intent!!)
 
