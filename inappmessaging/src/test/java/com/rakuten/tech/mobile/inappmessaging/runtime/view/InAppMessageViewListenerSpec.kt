@@ -86,8 +86,6 @@ class InAppMessageViewListenerOnClickSpec : InAppMessageViewListenerSpec() {
         When calling mockInApp.getRegisteredActivity() itReturns mockActivity
 
         listener.onClick(mockView)
-
-        Mockito.verify(mockDisplayManager, Mockito.times(1)).removeMessage(any())
     }
 }
 
