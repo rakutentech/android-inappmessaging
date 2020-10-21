@@ -31,6 +31,9 @@ class MainActivityFragment : Fragment(), View.OnClickListener {
         purchase_successful.setOnClickListener(this)
         custom_event.setOnClickListener(this)
         change_user.setOnClickListener(this)
+        login_successful_twice.setOnClickListener(this)
+        purchase_successful_twice.setOnClickListener(this)
+        login_purchase_successful.setOnClickListener(this)
     }
 
     override fun onClick(v: View) {
@@ -42,6 +45,18 @@ class MainActivityFragment : Fragment(), View.OnClickListener {
             custom_event -> InAppMessaging.instance().logEvent(
                     CustomEvent("search_event").addAttribute("KEYWORD", "BASKETBALL").addAttribute("foo", 2))
             change_user -> showUserInfo()
+            login_successful_twice -> {
+                InAppMessaging.instance().logEvent(LoginSuccessfulEvent())
+                InAppMessaging.instance().logEvent(LoginSuccessfulEvent())
+            }
+            purchase_successful_twice -> {
+                InAppMessaging.instance().logEvent(PurchaseSuccessfulEvent().currencyCode("JPY"))
+                InAppMessaging.instance().logEvent(PurchaseSuccessfulEvent().currencyCode("JPY"))
+            }
+            login_purchase_successful -> {
+                InAppMessaging.instance().logEvent(LoginSuccessfulEvent())
+                InAppMessaging.instance().logEvent(PurchaseSuccessfulEvent().currencyCode("JPY"))
+            }
             else -> {
             }
         }

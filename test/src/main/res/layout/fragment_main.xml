@@ -34,6 +34,24 @@
     android:text="@string/purchase_successful"/>
 
   <Button
+    android:id="@+id/purchase_successful_twice"
+    android:layout_width="wrap_content"
+    android:layout_height="wrap_content"
+    android:text="@string/purchase_successful_twice"/>
+
+  <Button
+    android:id="@+id/login_successful_twice"
+    android:layout_width="wrap_content"
+    android:layout_height="wrap_content"
+    android:text="@string/login_successful_twice"/>
+
+  <Button
+    android:id="@+id/login_purchase_successful"
+    android:layout_width="wrap_content"
+    android:layout_height="wrap_content"
+    android:text="@string/login_purchase_successful"/>
+
+  <Button
     android:id="@+id/custom_event"
     android:layout_width="wrap_content"
     android:layout_height="wrap_content"
