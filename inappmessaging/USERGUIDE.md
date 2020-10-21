@@ -232,6 +232,21 @@ Custom event class:
 InAppMessaging.instance().logEvent(CustomEvent("search").addAttribute("keyword", "book").addAttribute("number_of_keyword", 1))
 ```
 
+### #9 Campaign's context (advanced feature)
+A context can be defined as the text inside "[]" within an IAM portal "Campaign Name" e.g. the campaign name is "[ctx1] title" so the context is "ctx1".
+Multiple contexts are supported.
+In order to handle defined contexts in the code an optional callback is called before a message is displayed:
+
+```kotlin
+InAppMessaging.instance().onVerifyContext = { contexts: List<String>, campaignTitle: String -> Boolean
+    if /* check your condition e.g. are you on the correct screen to display this message? */ {
+        true // campaign message will be displayed
+    } else {
+        false // campaign message won't be displayed
+    }
+}
+```
+
 ## <a name="troubleshooting"></a> Trouble Shooting
 `proguard.ParseException`
 
