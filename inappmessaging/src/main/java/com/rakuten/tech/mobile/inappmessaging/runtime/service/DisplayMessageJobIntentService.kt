@@ -23,6 +23,7 @@ import timber.log.Timber
 internal class DisplayMessageJobIntentService : JobIntentService() {
     @VisibleForTesting
     var messageReadinessManager = MessageReadinessManager.instance()
+    private var ignoredMessages: List<Message> = listOf()
     /**
      * This method starts displaying message runnable.
      */
@@ -37,7 +38,7 @@ internal class DisplayMessageJobIntentService : JobIntentService() {
      */
     private fun prepareNextMessage() {
         // Retrieving the next ready message, and its display permission been checked.
-        val message: Message = messageReadinessManager.getNextDisplayMessage() ?: return
+        val message: Message = messageReadinessManager.getNextDisplayMessage(ignoredMessages) ?: return
         val hostActivity = InAppMessaging.instance().getRegisteredActivity()
         val imageUrl = message.getMessagePayload()?.resource?.imageUrl
         if (hostActivity != null) {
@@ -97,6 +98,7 @@ internal class DisplayMessageJobIntentService : JobIntentService() {
         if (!isConfirmed) {
             // Message display aborted by the host app
             Timber.tag(TAG).d("message display cancelled by the host app")
+            ignoredMessages += message
             prepareNextMessage()
         }
 

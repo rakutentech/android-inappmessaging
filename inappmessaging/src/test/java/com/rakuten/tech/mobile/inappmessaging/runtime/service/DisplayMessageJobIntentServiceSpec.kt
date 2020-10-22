@@ -6,6 +6,7 @@ import android.content.Intent
 import android.os.Build
 import android.provider.Settings
 import android.view.LayoutInflater
+import android.view.View
 import androidx.test.core.app.ApplicationProvider
 import androidx.work.testing.WorkManagerTestInitHelper
 import com.facebook.datasource.DataSource
@@ -24,6 +25,7 @@ import org.junit.After
 import org.junit.Before
 import org.junit.Test
 import org.junit.runner.RunWith
+import org.mockito.ArgumentMatchers
 import org.mockito.Mockito
 import org.mockito.Mockito.validateMockitoUsage
 import org.mockito.MockitoAnnotations
@@ -52,15 +54,14 @@ class DisplayMessageJobIntentServiceSpec : BaseTest() {
         MockitoAnnotations.initMocks(this)
         serviceController = Robolectric.buildService(DisplayMessageJobIntentService::class.java)
         displayMessageJobIntentService = serviceController?.bind()?.create()?.get()
+        displayMessageJobIntentService!!.messageReadinessManager = mockMessageManager
         WorkManagerTestInitHelper.initializeTestWorkManager(ApplicationProvider.getApplicationContext())
+        When calling activity.layoutInflater itReturns LayoutInflater.from(ApplicationProvider.getApplicationContext())
 
         Settings.Secure.putString(ApplicationProvider.getApplicationContext<Context>().contentResolver,
                 Settings.Secure.ANDROID_ID, "test_device_id")
         InAppMessaging.init(ApplicationProvider.getApplicationContext(), "test-key", "")
         InAppMessaging.instance().registerMessageDisplayActivity(activity)
-
-        When calling onVerifyContexts.invoke(any(), any()) itReturns true
-        InAppMessaging.instance().onVerifyContext = onVerifyContexts
     }
 
     @After
@@ -84,8 +85,6 @@ class DisplayMessageJobIntentServiceSpec : BaseTest() {
         When calling message.getMaxImpressions() itReturns 10
         When calling message.getMessagePayload() itReturns Gson().fromJson(MESSAGE_PAYLOAD.trimIndent(),
                 MessagePayload::class.java)
-        When calling activity
-                .layoutInflater itReturns LayoutInflater.from(ApplicationProvider.getApplicationContext())
         displayMessageJobIntentService!!.onHandleWork(intent!!)
     }
 
@@ -97,14 +96,15 @@ class DisplayMessageJobIntentServiceSpec : BaseTest() {
         When calling message.getCampaignId() itReturns "1"
         When calling message.isTest() itReturns true
         When calling message.getMaxImpressions() itReturns 10
-        When calling activity
-                .layoutInflater itReturns LayoutInflater.from(ApplicationProvider.getApplicationContext())
         displayMessageJobIntentService!!.onHandleWork(intent!!)
     }
 
     @Test
     fun `should call onVerifyContext for non-test campaign with contexts`() {
         val message = Mockito.mock(Message::class.java)
+
+        When calling onVerifyContexts.invoke(any(), any()) itReturns true
+        InAppMessaging.instance().onVerifyContext = onVerifyContexts
 
         When calling message.getCampaignId() itReturns "1"
         When calling message.isTest() itReturns false
@@ -113,9 +113,6 @@ class DisplayMessageJobIntentServiceSpec : BaseTest() {
                 MessagePayload::class.java)
         When calling message.getContexts() itReturns listOf("ctx")
         When calling mockMessageManager.getNextDisplayMessage() itReturns message
-        When calling activity
-                .layoutInflater itReturns LayoutInflater.from(ApplicationProvider.getApplicationContext())
-        displayMessageJobIntentService!!.messageReadinessManager = mockMessageManager
         displayMessageJobIntentService!!.onHandleWork(intent!!)
 
         Mockito.verify(onVerifyContexts, Mockito.times(1))
@@ -126,6 +123,9 @@ class DisplayMessageJobIntentServiceSpec : BaseTest() {
     fun `should not call onVerifyContext for non-test campaign without contexts`() {
         val message = Mockito.mock(Message::class.java)
 
+        When calling onVerifyContexts.invoke(any(), any()) itReturns true
+        InAppMessaging.instance().onVerifyContext = onVerifyContexts
+
         When calling message.getCampaignId() itReturns "1"
         When calling message.isTest() itReturns false
         When calling message.getMaxImpressions() itReturns 1
@@ -133,9 +133,6 @@ class DisplayMessageJobIntentServiceSpec : BaseTest() {
                 MessagePayload::class.java)
         When calling message.getContexts() itReturns listOf()
         When calling mockMessageManager.getNextDisplayMessage() itReturns message
-        When calling activity
-                .layoutInflater itReturns LayoutInflater.from(ApplicationProvider.getApplicationContext())
-        displayMessageJobIntentService!!.messageReadinessManager = mockMessageManager
         displayMessageJobIntentService!!.onHandleWork(intent!!)
 
         Mockito.verify(onVerifyContexts, Mockito.times(0))
@@ -146,6 +143,9 @@ class DisplayMessageJobIntentServiceSpec : BaseTest() {
     fun `should not call onVerifyContext for test campaign with contexts`() {
         val message = Mockito.mock(Message::class.java)
 
+        When calling onVerifyContexts.invoke(any(), any()) itReturns true
+        InAppMessaging.instance().onVerifyContext = onVerifyContexts
+
         When calling message.getCampaignId() itReturns "1"
         When calling message.isTest() itReturns true
         When calling message.getMaxImpressions() itReturns 1
@@ -153,18 +153,19 @@ class DisplayMessageJobIntentServiceSpec : BaseTest() {
                 MessagePayload::class.java)
         When calling message.getContexts() itReturns listOf("ctx")
         When calling mockMessageManager.getNextDisplayMessage() itReturns message
-        When calling activity
-                .layoutInflater itReturns LayoutInflater.from(ApplicationProvider.getApplicationContext())
-        displayMessageJobIntentService!!.messageReadinessManager = mockMessageManager
         displayMessageJobIntentService!!.onHandleWork(intent!!)
 
         Mockito.verify(onVerifyContexts, Mockito.times(0))
                 .invoke(any(), any())
     }
 
+    @SuppressWarnings("LongMethod")
     @Test
     fun `should call onVerifyContext with proper parameters`() {
         val message = Mockito.mock(Message::class.java)
+
+        When calling onVerifyContexts.invoke(any(), any()) itReturns true
+        InAppMessaging.instance().onVerifyContext = onVerifyContexts
 
         When calling message.getCampaignId() itReturns "1"
         When calling message.isTest() itReturns false
@@ -173,9 +174,6 @@ class DisplayMessageJobIntentServiceSpec : BaseTest() {
                 MessagePayload::class.java)
         When calling message.getContexts() itReturns listOf("ctx")
         When calling mockMessageManager.getNextDisplayMessage() itReturns message
-        When calling activity
-                .layoutInflater itReturns LayoutInflater.from(ApplicationProvider.getApplicationContext())
-        displayMessageJobIntentService!!.messageReadinessManager = mockMessageManager
         displayMessageJobIntentService!!.onHandleWork(intent!!)
 
         argumentCaptor<List<String>>().apply {
@@ -186,6 +184,91 @@ class DisplayMessageJobIntentServiceSpec : BaseTest() {
             Mockito.verify(onVerifyContexts).invoke(any(), capture())
             firstValue shouldBeEqualTo "Campaign Title"
         }
+    }
+
+    @Test
+    fun `should call getMessagePayload again when message's context was rejected`() {
+        val message = Mockito.mock(Message::class.java)
+
+        When calling onVerifyContexts.invoke(any(), any()) itReturns false
+        InAppMessaging.instance().onVerifyContext = onVerifyContexts
+
+        When calling message.getCampaignId() itReturns "1"
+        When calling message.isTest() itReturns false
+        When calling message.getMaxImpressions() itReturns 1
+        When calling message.getMessagePayload() itReturns Gson().fromJson(MESSAGE_PAYLOAD_NO_URL.trimIndent(),
+                MessagePayload::class.java)
+        When calling message.getContexts() itReturns listOf("ctx")
+        When calling mockMessageManager.getNextDisplayMessage() itReturns message
+        displayMessageJobIntentService!!.onHandleWork(intent!!)
+
+        Mockito.verify(mockMessageManager, Mockito.times(2)).getNextDisplayMessage(any())
+    }
+
+    @Test
+    fun `should call getMessagePayload with ignored message if that message's context was rejected`() {
+        val message = Mockito.mock(Message::class.java)
+
+        When calling onVerifyContexts.invoke(any(), any()) itReturns false
+        InAppMessaging.instance().onVerifyContext = onVerifyContexts
+
+        When calling message.getCampaignId() itReturns "1"
+        When calling message.isTest() itReturns false
+        When calling message.getMaxImpressions() itReturns 1
+        When calling message.getMessagePayload() itReturns Gson().fromJson(MESSAGE_PAYLOAD_NO_URL.trimIndent(),
+                MessagePayload::class.java)
+        When calling message.getContexts() itReturns listOf("ctx")
+        When calling mockMessageManager.getNextDisplayMessage() itReturns message
+        displayMessageJobIntentService!!.onHandleWork(intent!!)
+
+        argumentCaptor<List<Message>>().apply {
+            Mockito.verify(mockMessageManager, Mockito.times(2)).getNextDisplayMessage(capture())
+            secondValue shouldEqual listOf(message)
+        }
+    }
+
+    @Test
+    fun `should display campaign if onVerifyContext was not set (default value)`() {
+        val message = Mockito.mock(Message::class.java)
+
+        When calling message.getCampaignId() itReturns "1"
+        When calling message.isTest() itReturns false
+        When calling message.getMaxImpressions() itReturns 1
+        When calling message.getMessagePayload() itReturns Gson().fromJson(MESSAGE_PAYLOAD_NO_URL.trimIndent(),
+                MessagePayload::class.java)
+        When calling message.getContexts() itReturns listOf("ctx")
+        When calling mockMessageManager.getNextDisplayMessage() itReturns message
+        displayMessageJobIntentService!!.onHandleWork(intent!!)
+
+        Mockito.verify(activity, Mockito.times(1))
+                .findViewById<View?>(ArgumentMatchers.anyInt())
+    }
+
+    @Test
+    fun `should not display campaign if activity is not registered`() {
+        InAppMessaging.instance().unregisterMessageDisplayActivity()
+        val message = Mockito.mock(Message::class.java)
+
+        When calling message.getCampaignId() itReturns "1"
+        When calling message.isTest() itReturns false
+        When calling message.getMaxImpressions() itReturns 1
+        When calling message.getMessagePayload() itReturns Gson().fromJson(MESSAGE_PAYLOAD_NO_URL.trimIndent(),
+                MessagePayload::class.java)
+        When calling message.getContexts() itReturns listOf("ctx")
+        When calling mockMessageManager.getNextDisplayMessage() itReturns message
+        displayMessageJobIntentService!!.onHandleWork(intent!!)
+
+        Mockito.verify(activity, Mockito.times(0))
+                .findViewById<View?>(ArgumentMatchers.anyInt())
+    }
+
+    @Test
+    fun `should not display campaign if payload is null`() {
+        When calling mockMessageManager.getNextDisplayMessage() itReturns null
+        displayMessageJobIntentService!!.onHandleWork(intent!!)
+
+        Mockito.verify(activity, Mockito.times(0))
+                .findViewById<View?>(ArgumentMatchers.anyInt())
     }
 
     companion object {

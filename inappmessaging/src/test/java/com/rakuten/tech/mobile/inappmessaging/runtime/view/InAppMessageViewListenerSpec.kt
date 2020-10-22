@@ -1,5 +1,6 @@
 package com.rakuten.tech.mobile.inappmessaging.runtime.view
 
+import android.app.Activity
 import android.os.Build
 import android.view.KeyEvent
 import android.view.MotionEvent
@@ -7,12 +8,19 @@ import android.view.View
 import android.widget.CheckBox
 import android.widget.Magnifier
 import com.rakuten.tech.mobile.inappmessaging.runtime.BaseTest
+import com.rakuten.tech.mobile.inappmessaging.runtime.InAppMessaging
 import com.rakuten.tech.mobile.inappmessaging.runtime.R
 import com.rakuten.tech.mobile.inappmessaging.runtime.coroutine.MessageActionsCoroutine
 import com.rakuten.tech.mobile.inappmessaging.runtime.data.models.messages.ValidTestMessage
 import com.rakuten.tech.mobile.inappmessaging.runtime.manager.DisplayManager
 import com.rakuten.tech.mobile.inappmessaging.runtime.utils.BuildVersionChecker
+import com.rakuten.tech.mobile.inappmessaging.runtime.workmanager.schedulers.EventMessageReconciliationScheduler
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.newSingleThreadContext
+import kotlinx.coroutines.test.resetMain
+import kotlinx.coroutines.test.setMain
 import org.amshove.kluent.*
+import org.junit.After
 import org.junit.Before
 import org.junit.Test
 import org.mockito.Mockito
@@ -26,22 +34,28 @@ open class InAppMessageViewListenerSpec : BaseTest() {
     internal val mockView = Mockito.mock(View::class.java)
     internal val mockDisplayManager = Mockito.mock(DisplayManager::class.java)
     internal val mockCoroutine = Mockito.mock(MessageActionsCoroutine::class.java)
+    internal val mockEventScheduler = Mockito.mock(EventMessageReconciliationScheduler::class.java)
+    internal val mockActivity = Mockito.mock(Activity::class.java)
+    internal val mockInApp = Mockito.mock(InAppMessaging::class.java)
+    private val mainThreadSurrogate = newSingleThreadContext("UI thread")
+    private val defaultThreadSurrogate = newSingleThreadContext("Default thread")
 
     @Before
     open fun setup() {
         MockitoAnnotations.initMocks(this)
+        Dispatchers.setMain(mainThreadSurrogate)
+    }
+
+    @After
+    open fun tearDown() {
+        Dispatchers.resetMain()
+        mainThreadSurrogate.close()
     }
 }
 
 @Config(sdk = [Build.VERSION_CODES.Q])
 class InAppMessageViewListenerOnClickSpec : InAppMessageViewListenerSpec() {
     private val mockCheckbox = Mockito.mock(CheckBox::class.java)
-
-    @Before
-    override fun setup() {
-        super.setup()
-        When calling mockCheckbox.isChecked itReturns true
-    }
 
     @Test
     fun `should not throw exception when argument is null`() {
@@ -52,6 +66,7 @@ class InAppMessageViewListenerOnClickSpec : InAppMessageViewListenerSpec() {
     fun `should call is checked once`() {
         val listener = InAppMessageViewListener(ValidTestMessage("1", true))
         When calling mockCheckbox.id itReturns R.id.opt_out_checkbox
+        When calling mockCheckbox.isChecked itReturns true
         listener.onClick(mockCheckbox)
 
         Mockito.verify(mockCheckbox, Mockito.times(1)).isChecked
@@ -60,10 +75,15 @@ class InAppMessageViewListenerOnClickSpec : InAppMessageViewListenerSpec() {
     @Test
     fun `should not throw exception with non-checkbox click`() {
         val message = ValidTestMessage("1", true)
-        val listener = InAppMessageViewListener(message, mockCoroutine, mockDisplayManager)
+        val listener = InAppMessageViewListener(message = message,
+                messageCoroutine = mockCoroutine,
+                displayManager = mockDisplayManager,
+                eventScheduler = mockEventScheduler,
+                inApp = mockInApp)
         val mockView = Mockito.mock(CheckBox::class.java)
         When calling mockView.id itReturns R.id.message_close_button
         When calling mockCoroutine.executeTask(message, R.id.message_close_button, false) itReturns true
+        When calling mockInApp.getRegisteredActivity() itReturns mockActivity
 
         listener.onClick(mockView)
     }
@@ -352,5 +372,25 @@ class InAppMessageViewListenerOnKeySpec : InAppMessageViewListenerSpec() {
         When calling keyEvent.action itReturns KeyEvent.ACTION_DOWN
 
         listener.onKey(mockView, KeyEvent.KEYCODE_BREAK, keyEvent).shouldBeFalse()
+    }
+
+    @Test
+    fun `should return true on false coroutine`() {
+        val message = ValidTestMessage("1", true)
+        val listener = InAppMessageViewListener(message = message,
+                messageCoroutine = mockCoroutine,
+                displayManager = mockDisplayManager,
+                eventScheduler = mockEventScheduler,
+                inApp = mockInApp)
+
+        When calling keyEvent.action itReturns KeyEvent.ACTION_UP
+        When calling mockView.id itReturns R.id.message_close_button
+        When calling mockCoroutine.executeTask(message,
+                MessageActionsCoroutine.BACK_BUTTON, false) itReturns false
+        When calling mockInApp.getRegisteredActivity() itReturns mockActivity
+
+        listener.onKey(mockView, KeyEvent.KEYCODE_BACK, keyEvent).shouldBeTrue()
+
+        Mockito.verify(mockDisplayManager, Mockito.times(1)).removeMessage(any())
     }
 }
