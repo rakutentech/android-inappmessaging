@@ -12,6 +12,7 @@ The In-App Messaging module enables applications to receive notification, which 
 * [Requirements](#requirements)
 * [Getting Started](#getting-started)
 * [SDK Integration](#integration)
+* [Advanced Features](#advanced)
 * [FAQ](#faq)
 * [Documentation and Useful Links](#see-also)
 * [Change Log](#nchangelog)
@@ -232,7 +233,10 @@ Custom event class:
 InAppMessaging.instance().logEvent(CustomEvent("search").addAttribute("keyword", "book").addAttribute("number_of_keyword", 1))
 ```
 
-### #9 Campaign's context (advanced feature)
+## <a name="advanced"></a> Advanced Features
+
+### #1 Campaign's context
+Contexts are used to add more control on when campaigns are displayed.
 A context can be defined as the text inside "[]" within an IAM portal "Campaign Name" e.g. the campaign name is "[ctx1] title" so the context is "ctx1".
 Multiple contexts are supported.
 In order to handle defined contexts in the code an optional callback is called before a message is displayed:
