@@ -3,6 +3,7 @@ package com.rakuten.tech.mobile.inappmessaging.runtime.data.responses.ping
 import android.os.Build
 import com.google.gson.Gson
 import org.amshove.kluent.shouldEqual
+import org.amshove.kluent.shouldHaveSize
 import org.junit.Test
 import org.junit.runner.RunWith
 import org.robolectric.ParameterizedRobolectricTestRunner
@@ -216,7 +217,7 @@ class MessageMixerResponseSpec(private val testname: String, private val actual:
                 campaignTrigger.triggerAttributes[0].operator)
     }
 
-    private fun generateDummyCampaign(id: String, title: String): CampaignData {
+    private fun generateDummyCampaign(id: String, title: String?): CampaignData {
         val messagePayload = MessagePayload(null, null, null, null, null, null, null, null, title, null)
         return CampaignData(messagePayload, 1, listOf(), id, false, 1)
     }
@@ -229,7 +230,7 @@ class MessageMixerResponseSpec(private val testname: String, private val actual:
     @Test
     fun `should return empty array if there are no contexts when calling getContexts()`() {
         val campaign = generateDummyCampaign("id", "title")
-        campaign.getContexts() shouldEqual listOf()
+        campaign.getContexts() shouldHaveSize 0
     }
 
     @Test
@@ -266,5 +267,17 @@ class MessageMixerResponseSpec(private val testname: String, private val actual:
     fun `should properly read context even if there are invalid ones when calling getContexts()`() {
         val campaign = generateDummyCampaign("id", "ctxbad] title [ctx]")
         campaign.getContexts() shouldEqual listOf("ctx")
+    }
+
+    @Test
+    fun `should not return any context when title is empty`() {
+        val campaign = generateDummyCampaign("id", "")
+        campaign.getContexts() shouldHaveSize 0
+    }
+
+    @Test
+    fun `should not return any context when title is null`() {
+        val campaign = generateDummyCampaign("id", null)
+        campaign.getContexts() shouldHaveSize 0
     }
 }
