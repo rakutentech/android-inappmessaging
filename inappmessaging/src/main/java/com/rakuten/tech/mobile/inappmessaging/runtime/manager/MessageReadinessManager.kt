@@ -58,8 +58,10 @@ internal interface MessageReadinessManager {
         @Suppress("LongMethod", "ReturnCount")
         override fun getNextDisplayMessage(ignored: List<Message>): Message? {
             var messageList: List<Message> = ReadyForDisplayMessageRepository.instance().getAllMessagesCopy()
-            messageList.subtract(ignored)
             for (message in messageList) {
+                if (ignored.contains(message)) {
+                    continue
+                }
                 Timber.tag(TAG).d("checking permission for message: %s", message.getCampaignId())
 
                 // First, check if this message should be displayed.
