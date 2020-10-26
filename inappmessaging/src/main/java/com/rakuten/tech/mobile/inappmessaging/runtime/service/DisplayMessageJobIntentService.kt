@@ -12,6 +12,7 @@ import com.facebook.drawee.backends.pipeline.Fresco
 import com.facebook.imagepipeline.request.ImageRequest
 import com.rakuten.tech.mobile.inappmessaging.runtime.InAppMessaging
 import com.rakuten.tech.mobile.inappmessaging.runtime.data.models.messages.Message
+import com.rakuten.tech.mobile.inappmessaging.runtime.data.repositories.LocalDisplayedMessageRepository
 import com.rakuten.tech.mobile.inappmessaging.runtime.manager.MessageReadinessManager
 import com.rakuten.tech.mobile.inappmessaging.runtime.runnable.DisplayMessageRunnable
 import timber.log.Timber
@@ -21,9 +22,9 @@ import timber.log.Timber
  * can dispatch Runnables to Android's message queue. Only one at a time.
  */
 internal class DisplayMessageJobIntentService : JobIntentService() {
-    @VisibleForTesting
+    var localDisplayRepo = LocalDisplayedMessageRepository.instance()
     var messageReadinessManager = MessageReadinessManager.instance()
-    private var ignoredMessages: List<Message> = listOf()
+
     /**
      * This method starts displaying message runnable.
      */
@@ -38,7 +39,7 @@ internal class DisplayMessageJobIntentService : JobIntentService() {
      */
     private fun prepareNextMessage() {
         // Retrieving the next ready message, and its display permission been checked.
-        val message: Message = messageReadinessManager.getNextDisplayMessage(ignoredMessages) ?: return
+        val message: Message = messageReadinessManager.getNextDisplayMessage() ?: return
         val hostActivity = InAppMessaging.instance().getRegisteredActivity()
         val imageUrl = message.getMessagePayload()?.resource?.imageUrl
         if (hostActivity != null) {
@@ -72,7 +73,13 @@ internal class DisplayMessageJobIntentService : JobIntentService() {
      * This method displays message on UI thread.
      */
     private fun displayMessage(message: Message, hostActivity: Activity) {
-        if (verifyContexts(message) == false) return
+        if (verifyContexts(message) == false) {
+            // Message display aborted by the host app
+            Timber.tag(TAG).d("message display cancelled by the host app")
+            localDisplayRepo.addMessage(message)
+            prepareNextMessage()
+            return
+        }
 
         UiThreadImmediateExecutorService.getInstance()
                 .execute(
@@ -92,17 +99,9 @@ internal class DisplayMessageJobIntentService : JobIntentService() {
             return true
         }
 
-        val isConfirmed = InAppMessaging.instance().onVerifyContext(
+        return InAppMessaging.instance().onVerifyContext(
                 campaignContexts,
                 message.getMessagePayload()?.title ?: "")
-        if (!isConfirmed) {
-            // Message display aborted by the host app
-            Timber.tag(TAG).d("message display cancelled by the host app")
-            ignoredMessages += message
-            prepareNextMessage()
-        }
-
-        return isConfirmed
     }
 
     /**
