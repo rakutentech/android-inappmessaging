@@ -48,6 +48,7 @@ class DisplayMessageJobIntentServiceSpec : BaseTest() {
     private var displayMessageJobIntentService: DisplayMessageJobIntentService? = null
     private val mockMessageManager = Mockito.mock(MessageReadinessManager::class.java)
     private var mockLocalDisplayRepo = Mockito.mock(LocalDisplayedMessageRepository::class.java)
+    private var mockReadyForDisplayRepo = Mockito.mock(ReadyForDisplayMessageRepository::class.java)
     private val onVerifyContexts = Mockito.mock(InAppMessaging.instance().onVerifyContext.javaClass)
 
     @Before
@@ -58,6 +59,7 @@ class DisplayMessageJobIntentServiceSpec : BaseTest() {
         displayMessageJobIntentService = serviceController?.bind()?.create()?.get()
         displayMessageJobIntentService!!.messageReadinessManager = mockMessageManager
         displayMessageJobIntentService!!.localDisplayRepo = mockLocalDisplayRepo
+        displayMessageJobIntentService!!.readyMessagesRepo = mockReadyForDisplayRepo
         WorkManagerTestInitHelper.initializeTestWorkManager(ApplicationProvider.getApplicationContext())
         When calling activity.layoutInflater itReturns LayoutInflater.from(ApplicationProvider.getApplicationContext())
 
@@ -223,10 +225,32 @@ class DisplayMessageJobIntentServiceSpec : BaseTest() {
         When calling message.getContexts() itReturns listOf("ctx")
         When calling mockMessageManager.getNextDisplayMessage() itReturns message itReturns null
         displayMessageJobIntentService!!.onHandleWork(intent!!)
-        
+
         argumentCaptor<Message>().apply {
             Mockito.verify(mockLocalDisplayRepo, Mockito.times(1)).addMessage(capture())
             firstValue shouldEqual message
+        }
+    }
+
+    @Test
+    fun `should remove message from ReadyForDisplayMessageRepository when its context was rejected`() {
+        val message = Mockito.mock(Message::class.java)
+
+        When calling onVerifyContexts.invoke(any(), any()) itReturns false
+        InAppMessaging.instance().onVerifyContext = onVerifyContexts
+
+        When calling message.getCampaignId() itReturns "1"
+        When calling message.isTest() itReturns false
+        When calling message.getMaxImpressions() itReturns 1
+        When calling message.getMessagePayload() itReturns Gson().fromJson(MESSAGE_PAYLOAD_NO_URL.trimIndent(),
+                MessagePayload::class.java)
+        When calling message.getContexts() itReturns listOf("ctx")
+        When calling mockMessageManager.getNextDisplayMessage() itReturns message itReturns null
+        displayMessageJobIntentService!!.onHandleWork(intent!!)
+
+        argumentCaptor<String>().apply {
+            Mockito.verify(mockReadyForDisplayRepo, Mockito.times(1)).removeMessage(capture())
+            firstValue shouldEqual message.getCampaignId()
         }
     }
 

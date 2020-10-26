@@ -13,6 +13,7 @@ import com.facebook.imagepipeline.request.ImageRequest
 import com.rakuten.tech.mobile.inappmessaging.runtime.InAppMessaging
 import com.rakuten.tech.mobile.inappmessaging.runtime.data.models.messages.Message
 import com.rakuten.tech.mobile.inappmessaging.runtime.data.repositories.LocalDisplayedMessageRepository
+import com.rakuten.tech.mobile.inappmessaging.runtime.data.repositories.ReadyForDisplayMessageRepository
 import com.rakuten.tech.mobile.inappmessaging.runtime.manager.MessageReadinessManager
 import com.rakuten.tech.mobile.inappmessaging.runtime.runnable.DisplayMessageRunnable
 import timber.log.Timber
@@ -23,6 +24,7 @@ import timber.log.Timber
  */
 internal class DisplayMessageJobIntentService : JobIntentService() {
     var localDisplayRepo = LocalDisplayedMessageRepository.instance()
+    var readyMessagesRepo = ReadyForDisplayMessageRepository.instance()
     var messageReadinessManager = MessageReadinessManager.instance()
 
     /**
@@ -76,7 +78,11 @@ internal class DisplayMessageJobIntentService : JobIntentService() {
         if (verifyContexts(message) == false) {
             // Message display aborted by the host app
             Timber.tag(TAG).d("message display cancelled by the host app")
+
+            // Mark the message as displayed
             localDisplayRepo.addMessage(message)
+            readyMessagesRepo.removeMessage(message.getCampaignId()!!)
+
             prepareNextMessage()
             return
         }
