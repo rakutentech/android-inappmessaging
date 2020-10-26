@@ -16,6 +16,7 @@ import com.nhaarman.mockitokotlin2.argumentCaptor
 import com.rakuten.tech.mobile.inappmessaging.runtime.BaseTest
 import com.rakuten.tech.mobile.inappmessaging.runtime.InAppMessaging
 import com.rakuten.tech.mobile.inappmessaging.runtime.data.models.messages.Message
+import com.rakuten.tech.mobile.inappmessaging.runtime.data.repositories.LocalDisplayedMessageRepository
 import com.rakuten.tech.mobile.inappmessaging.runtime.data.repositories.ReadyForDisplayMessageRepository
 import com.rakuten.tech.mobile.inappmessaging.runtime.data.responses.ping.CampaignData
 import com.rakuten.tech.mobile.inappmessaging.runtime.data.responses.ping.MessagePayload
@@ -46,6 +47,7 @@ class DisplayMessageJobIntentServiceSpec : BaseTest() {
     private var serviceController: ServiceController<DisplayMessageJobIntentService>? = null
     private var displayMessageJobIntentService: DisplayMessageJobIntentService? = null
     private val mockMessageManager = Mockito.mock(MessageReadinessManager::class.java)
+    private var mockLocalDisplayRepo = Mockito.mock(LocalDisplayedMessageRepository::class.java)
     private val onVerifyContexts = Mockito.mock(InAppMessaging.instance().onVerifyContext.javaClass)
 
     @Before
@@ -55,6 +57,7 @@ class DisplayMessageJobIntentServiceSpec : BaseTest() {
         serviceController = Robolectric.buildService(DisplayMessageJobIntentService::class.java)
         displayMessageJobIntentService = serviceController?.bind()?.create()?.get()
         displayMessageJobIntentService!!.messageReadinessManager = mockMessageManager
+        displayMessageJobIntentService!!.localDisplayRepo = mockLocalDisplayRepo
         WorkManagerTestInitHelper.initializeTestWorkManager(ApplicationProvider.getApplicationContext())
         When calling activity.layoutInflater itReturns LayoutInflater.from(ApplicationProvider.getApplicationContext())
 
@@ -199,14 +202,14 @@ class DisplayMessageJobIntentServiceSpec : BaseTest() {
         When calling message.getMessagePayload() itReturns Gson().fromJson(MESSAGE_PAYLOAD_NO_URL.trimIndent(),
                 MessagePayload::class.java)
         When calling message.getContexts() itReturns listOf("ctx")
-        When calling mockMessageManager.getNextDisplayMessage() itReturns message
+        When calling mockMessageManager.getNextDisplayMessage() itReturns message itReturns null
         displayMessageJobIntentService!!.onHandleWork(intent!!)
 
-        Mockito.verify(mockMessageManager, Mockito.times(2)).getNextDisplayMessage(any())
+        Mockito.verify(mockMessageManager, Mockito.times(2)).getNextDisplayMessage()
     }
 
     @Test
-    fun `should call getMessagePayload with ignored message if that message's context was rejected`() {
+    fun `should add message to LocalDisplayedMessageRepository when its context was rejected`() {
         val message = Mockito.mock(Message::class.java)
 
         When calling onVerifyContexts.invoke(any(), any()) itReturns false
@@ -218,12 +221,12 @@ class DisplayMessageJobIntentServiceSpec : BaseTest() {
         When calling message.getMessagePayload() itReturns Gson().fromJson(MESSAGE_PAYLOAD_NO_URL.trimIndent(),
                 MessagePayload::class.java)
         When calling message.getContexts() itReturns listOf("ctx")
-        When calling mockMessageManager.getNextDisplayMessage() itReturns message
+        When calling mockMessageManager.getNextDisplayMessage() itReturns message itReturns null
         displayMessageJobIntentService!!.onHandleWork(intent!!)
-
-        argumentCaptor<List<Message>>().apply {
-            Mockito.verify(mockMessageManager, Mockito.times(2)).getNextDisplayMessage(capture())
-            secondValue shouldEqual listOf(message)
+        
+        argumentCaptor<Message>().apply {
+            Mockito.verify(mockLocalDisplayRepo, Mockito.times(1)).addMessage(capture())
+            firstValue shouldEqual message
         }
     }
 

@@ -30,7 +30,7 @@ internal interface MessageReadinessManager {
      */
     @WorkerThread
     @Suppress("LongMethod", "ReturnCount")
-    fun getNextDisplayMessage(ignored: List<Message> = listOf()): Message?
+    fun getNextDisplayMessage(): Message?
 
     /**
      * This method returns a DisplayPermissionRequest object.
@@ -56,12 +56,9 @@ internal interface MessageReadinessManager {
     private class MessageReadinessManagerImpl : MessageReadinessManager {
         @WorkerThread
         @Suppress("LongMethod", "ReturnCount")
-        override fun getNextDisplayMessage(ignored: List<Message>): Message? {
+        override fun getNextDisplayMessage(): Message? {
             var messageList: List<Message> = ReadyForDisplayMessageRepository.instance().getAllMessagesCopy()
             for (message in messageList) {
-                if (ignored.contains(message)) {
-                    continue
-                }
                 Timber.tag(TAG).d("checking permission for message: %s", message.getCampaignId())
 
                 // First, check if this message should be displayed.
