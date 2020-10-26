@@ -85,15 +85,6 @@ class MessageReadinessManagerSpec : BaseTest() {
     }
 
     @Test
-    fun `should ignore test message`() {
-        val messageList = ArrayList<Message>()
-        messageList.add(ValidTestMessage("1", false))
-        messageList.add(testMessage)
-        ReadyForDisplayMessageRepository.instance().replaceAllMessages(messageList)
-        MessageReadinessManager.instance().getNextDisplayMessage(listOf(testMessage)).shouldBeNull()
-    }
-
-    @Test
     fun `should get display permission request with all attributes`() {
         val message = ValidTestMessage()
         val request = MessageReadinessManager.instance().getDisplayPermissionRequest(message)
