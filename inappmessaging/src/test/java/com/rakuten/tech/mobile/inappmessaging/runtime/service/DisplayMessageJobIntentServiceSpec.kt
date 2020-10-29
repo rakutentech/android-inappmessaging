@@ -38,6 +38,7 @@ import org.robolectric.annotation.Config
 /**
  * Test class for DisplayMessageJobIntentService.
  */
+@SuppressWarnings("LargeClass")
 @RunWith(RobolectricTestRunner::class)
 @Config(sdk = [Build.VERSION_CODES.O_MR1])
 class DisplayMessageJobIntentServiceSpec : BaseTest() {

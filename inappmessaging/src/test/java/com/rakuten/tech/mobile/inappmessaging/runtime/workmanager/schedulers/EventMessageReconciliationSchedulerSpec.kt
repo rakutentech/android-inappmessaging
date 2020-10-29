@@ -9,6 +9,7 @@ import androidx.work.testing.WorkManagerTestInitHelper
 import com.rakuten.tech.mobile.inappmessaging.runtime.BaseTest
 import com.rakuten.tech.mobile.inappmessaging.runtime.InAppMessaging
 import com.rakuten.tech.mobile.inappmessaging.runtime.data.models.appevents.PurchaseSuccessfulEvent
+import com.rakuten.tech.mobile.inappmessaging.runtime.data.models.messages.ValidTestMessage
 import com.rakuten.tech.mobile.inappmessaging.runtime.data.repositories.AccountRepository
 import com.rakuten.tech.mobile.inappmessaging.runtime.data.repositories.ConfigResponseRepository
 import com.rakuten.tech.mobile.inappmessaging.runtime.data.repositories.LocalEventRepository
@@ -46,6 +47,25 @@ class EventMessageReconciliationSchedulerSpec : BaseTest() {
                 isDebugLogging = false,
                 isForTesting = true)
         EventMessageReconciliationScheduler.instance().startEventMessageReconciliationWorker()
+        WorkManager.getInstance(ApplicationProvider.getApplicationContext())
+                .getWorkInfosByTag(MESSAGES_EVENTS_WORKER_NAME).get()[0].shouldNotBeNull()
+    }
+
+    @Test
+    @Throws(ExecutionException::class, InterruptedException::class)
+    fun `should start reconciliation worker with message`() {
+        WorkManagerTestInitHelper.initializeTestWorkManager(ApplicationProvider.getApplicationContext())
+        Settings.Secure.putString(
+                ApplicationProvider.getApplicationContext<Context>().contentResolver,
+                Settings.Secure.ANDROID_ID,
+                "test_device_id")
+        InAppMessaging.init(
+                ApplicationProvider.getApplicationContext(),
+                "test",
+                "",
+                isDebugLogging = false,
+                isForTesting = true)
+        EventMessageReconciliationScheduler.instance().startEventMessageReconciliationWorker(ValidTestMessage())
         WorkManager.getInstance(ApplicationProvider.getApplicationContext())
                 .getWorkInfosByTag(MESSAGES_EVENTS_WORKER_NAME).get()[0].shouldNotBeNull()
     }
