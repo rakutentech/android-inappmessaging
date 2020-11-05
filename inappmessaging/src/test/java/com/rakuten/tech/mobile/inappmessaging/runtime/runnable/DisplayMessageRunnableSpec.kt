@@ -6,6 +6,7 @@ import android.os.Build
 import android.provider.Settings
 import android.view.LayoutInflater
 import android.view.View
+import android.view.Window
 import androidx.test.core.app.ApplicationProvider
 import androidx.work.testing.WorkManagerTestInitHelper
 import com.facebook.soloader.SoLoader
@@ -34,15 +35,17 @@ import java.lang.IllegalStateException
 @Config(sdk = [Build.VERSION_CODES.O_MR1])
 @Suppress("LargeClass")
 class DisplayMessageRunnableSpec : BaseTest() {
-    private var message = Mockito.mock(CampaignData::class.java)
-    private var hostAppActivity = Mockito.mock(Activity::class.java)
-    private var view = Mockito.mock(View::class.java)
+    private val message = Mockito.mock(CampaignData::class.java)
+    private val hostAppActivity = Mockito.mock(Activity::class.java)
+    private val view = Mockito.mock(View::class.java)
+    private val window = Mockito.mock(Window::class.java)
 
     @Before
     fun setup() {
         SoLoader.setInTestMode()
         MockitoAnnotations.initMocks(this)
         When calling view!!.id itReturns 12343254
+        When calling hostAppActivity.window itReturns window
     }
 
     @Test
@@ -69,7 +72,7 @@ class DisplayMessageRunnableSpec : BaseTest() {
         DisplayMessageRunnable(message, hostAppActivity, IMAGE_ASPECT_RATIO).run()
     }
 
-    @Test(expected = IllegalStateException::class)
+    @Test
     fun `should throw exception with mock activity for full`() {
         WorkManagerTestInitHelper.initializeTestWorkManager(ApplicationProvider.getApplicationContext())
         Settings.Secure.putString(
@@ -85,8 +88,8 @@ class DisplayMessageRunnableSpec : BaseTest() {
         DisplayMessageRunnable(message, hostAppActivity, IMAGE_ASPECT_RATIO).run()
     }
 
-    @Test(expected = IllegalStateException::class)
-    fun `should throw exception with mock activity for modal`() {
+    @Test
+    fun `should not throw exception with mock activity for modal`() {
         WorkManagerTestInitHelper.initializeTestWorkManager(ApplicationProvider.getApplicationContext())
         Settings.Secure.putString(
                 ApplicationProvider.getApplicationContext<Context>().contentResolver,
@@ -101,8 +104,8 @@ class DisplayMessageRunnableSpec : BaseTest() {
         DisplayMessageRunnable(message, hostAppActivity, IMAGE_ASPECT_RATIO).run()
     }
 
-    @Test(expected = IllegalStateException::class)
-    fun `should throw exception with mock activity for slide`() {
+    @Test
+    fun `should not throw exception with mock activity for slide`() {
         WorkManagerTestInitHelper.initializeTestWorkManager(ApplicationProvider.getApplicationContext())
         Settings.Secure.putString(
                 ApplicationProvider.getApplicationContext<Context>().contentResolver,
@@ -117,8 +120,8 @@ class DisplayMessageRunnableSpec : BaseTest() {
         DisplayMessageRunnable(message, hostAppActivity, IMAGE_ASPECT_RATIO).run()
     }
 
-    @Test(expected = IllegalStateException::class)
-    fun `should throw exception with mock activity for modal and buttons`() {
+    @Test
+    fun `should not throw exception with mock activity for modal and buttons`() {
         WorkManagerTestInitHelper.initializeTestWorkManager(ApplicationProvider.getApplicationContext())
         Settings.Secure.putString(
                 ApplicationProvider.getApplicationContext<Context>().contentResolver,
