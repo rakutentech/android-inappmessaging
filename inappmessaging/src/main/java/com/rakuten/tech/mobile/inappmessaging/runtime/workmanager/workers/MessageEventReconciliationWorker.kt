@@ -56,8 +56,7 @@ internal class MessageEventReconciliationWorker(
         val readyMessageList = ArrayList(messageUtil.extractTestMessages(messageListCopy))
 
         // Add a list of ready messages reconciled messages' triggers with existing local events.
-        readyMessageList.addAll(messageUtil.reconcileMessagesAndEvents(messageListCopy,
-                inputData.getString(EVENT_RECONCILIATION_DATA)))
+        readyMessageList.addAll(messageUtil.reconcileMessagesAndEvents(messageListCopy))
 
         // Finally, add all ready messages into ReadyForDisplayMessageRepository.
         ReadyForDisplayMessageRepository.instance().replaceAllMessages(readyMessageList)
@@ -77,6 +76,5 @@ internal class MessageEventReconciliationWorker(
 
     companion object {
         private const val TAG = "IAM_MsgEventReconWorker"
-        const val EVENT_RECONCILIATION_DATA = "iam_event_reconciliation_data"
     }
 }

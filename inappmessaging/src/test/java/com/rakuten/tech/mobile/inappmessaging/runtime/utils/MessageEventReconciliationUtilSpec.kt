@@ -2,7 +2,6 @@ package com.rakuten.tech.mobile.inappmessaging.runtime.utils
 
 import android.os.Build
 import androidx.test.core.app.ApplicationProvider
-import androidx.work.Data
 import androidx.work.WorkerParameters
 import androidx.work.testing.WorkManagerTestInitHelper
 import com.rakuten.tech.mobile.inappmessaging.runtime.BaseTest
@@ -15,7 +14,6 @@ import com.rakuten.tech.mobile.inappmessaging.runtime.data.repositories.PingResp
 import com.rakuten.tech.mobile.inappmessaging.runtime.data.responses.ping.Trigger
 import com.rakuten.tech.mobile.inappmessaging.runtime.data.responses.ping.TriggerAttribute
 import com.rakuten.tech.mobile.inappmessaging.runtime.workmanager.workers.MessageEventReconciliationWorker
-import com.rakuten.tech.mobile.inappmessaging.runtime.workmanager.workers.MessageEventReconciliationWorker.Companion.EVENT_RECONCILIATION_DATA
 import org.amshove.kluent.*
 import org.junit.Before
 import org.junit.Ignore
@@ -44,7 +42,7 @@ open class MessageEventReconciliationUtilSpec : BaseTest() {
     internal val trigger1 = Mockito.mock(Trigger::class.java)
     private val trigger2 = Mockito.mock(Trigger::class.java)
     private val trigger3 = Mockito.mock(Trigger::class.java)
-    internal val trigger4 = Mockito.mock(Trigger::class.java)
+    private val trigger4 = Mockito.mock(Trigger::class.java)
 
     /**
      * Setting up data and mocks.
@@ -262,8 +260,6 @@ class MessageEventReconciliationUtilReconcileSpec : MessageEventReconciliationUt
         When calling mockReconUtil.reconcileMessagesAndEvents(messageList) itReturns messageList
 
         val workerParameters = Mockito.mock(WorkerParameters::class.java)
-        When calling workerParameters.inputData itReturns Data.Builder()
-                .putString(EVENT_RECONCILIATION_DATA, null).build()
         WorkManagerTestInitHelper.initializeTestWorkManager(ApplicationProvider.getApplicationContext())
         val worker = MessageEventReconciliationWorker(ApplicationProvider.getApplicationContext(), workerParameters,
                 mockPingRepo, mockReconUtil)
@@ -274,7 +270,7 @@ class MessageEventReconciliationUtilReconcileSpec : MessageEventReconciliationUt
     }
 
     @Test
-    fun `should ignore required set of satisfied triggers for persistent type (app start)`() {
+    fun `should check required set of satisfied triggers for persistent type (app start)`() {
         val inputMessageList = ArrayList<Message>()
         inputMessageList.add(message2)
         val attrList = ArrayList<TriggerAttribute>()
@@ -299,8 +295,7 @@ class MessageEventReconciliationUtilReconcileSpec : MessageEventReconciliationUt
         outputMessageList = MessageEventReconciliationUtil.instance()
                 .reconcileMessagesAndEvents(inputMessageList)
         // Re-assert the output with qualifying event.
-        outputMessageList.shouldHaveSize(1)
-        outputMessageList[0].getCampaignId() shouldEqual "message2"
+        outputMessageList.shouldBeEmpty()
     }
 
     @Test
@@ -501,62 +496,5 @@ class MessageEventReconciliationUtilReconcileInvalidSpec : MessageEventReconcili
                 .reconcileMessagesAndEvents(inputMessageList)
         // Re-assert the output with qualifying event.
         outputMessageList.shouldHaveSize(0)
-    }
-}
-
-class MessageEventReconciliationUtilReconcileWithMessageSpec : MessageEventReconciliationUtilSpec() {
-
-    @Test
-    fun `should ignore just displayed message with persistent type only`() {
-        // Arrange input data.
-        val inputMessageList = ArrayList<Message>()
-        inputMessageList.add(message2)
-        LocalEventRepository.instance().addEvent(appStartEvent)
-        // Act.
-        val outputMessageList = MessageEventReconciliationUtil.instance()
-                .reconcileMessagesAndEvents(inputMessageList, message2.getCampaignId())
-        // Re-assert the output with qualifying event.
-        outputMessageList.shouldBeEmpty()
-    }
-
-    @Test
-    fun `should not ignore just displayed message with non-persistent type`() {
-        // Arrange input data.
-        val inputMessageList = ArrayList<Message>()
-        inputMessageList.add(message2)
-        LocalEventRepository.instance().addEvent(customEvent)
-
-        When calling trigger1.eventType itReturns 4
-        When calling trigger1.eventName itReturns "custom"
-
-        // Act.
-        val outputMessageList = MessageEventReconciliationUtil.instance()
-                .reconcileMessagesAndEvents(inputMessageList, message2.getCampaignId())
-        // Re-assert the output with qualifying event.
-        outputMessageList[0] shouldEqual message2
-        outputMessageList.shouldHaveSize(1)
-    }
-
-    @Test
-    fun `should ignore just displayed message with multiple events`() {
-        // Arrange input data.
-        val inputMessageList = ArrayList<Message>()
-        inputMessageList.add(message2)
-        LocalEventRepository.instance().addEvent(appStartEvent)
-        LocalEventRepository.instance().addEvent(customEvent)
-
-        val list = ArrayList<Trigger>()
-        list.add(trigger1)
-        list.add(trigger4)
-
-        When calling message2.getTriggers() itReturns list
-        When calling trigger4.eventName itReturns "custom"
-
-        // Act.
-        val outputMessageList = MessageEventReconciliationUtil.instance()
-                .reconcileMessagesAndEvents(inputMessageList, message2.getCampaignId())
-        // Re-assert the output with qualifying event.
-        outputMessageList[0] shouldEqual message2
-        outputMessageList.shouldHaveSize(1)
     }
 }
