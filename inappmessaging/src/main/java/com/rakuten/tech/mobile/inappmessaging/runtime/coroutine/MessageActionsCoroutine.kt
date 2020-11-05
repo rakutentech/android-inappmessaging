@@ -1,7 +1,7 @@
 package com.rakuten.tech.mobile.inappmessaging.runtime.coroutine
 
+import android.content.ActivityNotFoundException
 import android.content.Intent
-import android.content.pm.PackageManager
 import android.net.Uri
 import androidx.annotation.WorkerThread
 import com.rakuten.tech.mobile.inappmessaging.runtime.InAppMessaging
@@ -20,6 +20,7 @@ import com.rakuten.tech.mobile.inappmessaging.runtime.data.responses.ping.OnClic
 import com.rakuten.tech.mobile.inappmessaging.runtime.data.responses.ping.Trigger
 import com.rakuten.tech.mobile.inappmessaging.runtime.manager.EventsManager
 import com.rakuten.tech.mobile.inappmessaging.runtime.manager.ImpressionManager
+import timber.log.Timber
 import java.util.Date
 import kotlin.collections.ArrayList
 
@@ -155,14 +156,10 @@ internal class MessageActionsCoroutine(
                 // Build an implicit intent.
                 val intent = Intent(Intent.ACTION_DEFAULT, Uri.parse(uri))
 
-                // Verify if there are installed apps on the phone can handle the intent.
-                val packageManager = activityContext.packageManager
-                val activities =
-                        packageManager.queryIntentActivities(intent, PackageManager.MATCH_DEFAULT_ONLY)
-
-                if (activities.isNotEmpty()) {
-                    // Launch activity.
+                try {
                     activityContext.startActivity(intent)
+                } catch (e: ActivityNotFoundException) {
+                    Timber.tag(TAG).d(e)
                 }
             }
         }
@@ -239,5 +236,6 @@ internal class MessageActionsCoroutine(
 
     companion object {
         const val BACK_BUTTON = -1
+        private const val TAG = "IAM_MessageActions"
     }
 }
