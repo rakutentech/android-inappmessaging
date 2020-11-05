@@ -92,7 +92,7 @@ internal class InAppMessageViewListener(
             withContext(Dispatchers.Default) {
                 val result = messageCoroutine.executeTask(message, id, isOptOutChecked)
                 if (result) {
-                    eventScheduler.startEventMessageReconciliationWorker(message)
+                    eventScheduler.startEventMessageReconciliationWorker()
                 }
             }
         }
