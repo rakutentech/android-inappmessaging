@@ -34,7 +34,7 @@ internal interface MessageEventReconciliationUtil {
      * This method reconciles a list of messages with local events, return a list of reconciled ready messages.
      * Test messages will not be added to the returned list. No repeating messages will be added.
      */
-    fun reconcileMessagesAndEvents(messages: List<Message>, ignoredCampaignId: String? = null): MutableList<Message>
+    fun reconcileMessagesAndEvents(messages: List<Message>): MutableList<Message>
 
     companion object {
         private const val TAG = "MsgEventReconcileUtil"
@@ -56,10 +56,7 @@ internal interface MessageEventReconciliationUtil {
             return testMessages
         }
 
-        override fun reconcileMessagesAndEvents(
-            messages: List<Message>,
-            ignoredCampaignId: String?
-        ): MutableList<Message> {
+        override fun reconcileMessagesAndEvents(messages: List<Message>): MutableList<Message> {
             // Make an empty list of message, later add reconciled messages to it.
             val reconciledMessages = ArrayList<Message>()
             // Make a map of events for easy matching.
@@ -68,7 +65,7 @@ internal interface MessageEventReconciliationUtil {
                 if (message.isTest()) {
                     // Skip test messages.
                     continue
-                } else if (isMessageReconciled(message, localEvents, ignoredCampaignId)) {
+                } else if (isMessageReconciled(message, localEvents)) {
                     // Check if message is reconciled.
                     // Add this message only once regardless of its max impressions.
                     reconciledMessages.add(message)
@@ -88,11 +85,7 @@ internal interface MessageEventReconciliationUtil {
          * argument eventMap. Because each event can only be used once against a message.
          */
         @Suppress("LongMethod", "ComplexMethod", "NestedBlockDepth", "ReturnCount")
-        private fun isMessageReconciled(
-            message: Message,
-            eventMap: Map<String, MutableList<Event>>,
-            ignoredCampaignId: String?
-        ): Boolean {
+        private fun isMessageReconciled(message: Message, eventMap: Map<String, MutableList<Event>>): Boolean {
             // Getting the number of reconciliations are needed in order to reconcile this message.
             val requiredSetsOfSatisfiedTriggersToDisplayMessage = getNumTimesToSatisfyTriggersForDisplay(message)
 
@@ -121,12 +114,11 @@ internal interface MessageEventReconciliationUtil {
                         // Add this event to eventsToBeRemoved list because it can't be used again
                         // to satisfy any more triggers.
                         if (event.isPersistentType()) {
-                            if (triggerList.size == 1 && message.getCampaignId().equals(ignoredCampaignId)) {
-                                // If campaign only depends on persistent type (i.e. App Launch),
-                                // prevent from displaying again since it is the campaign that was just closed.
-                                return false
+                            if (triggerList.size > 1) {
+                                // If campaign depends on other events other than a persistent type (i.e. App Launch),
+                                // no need to check the required number for satisfied triggers
+                                continue@triggers
                             }
-                            continue@triggers
                         } else {
                             eventsToBeRemoved.add(event)
                         }
