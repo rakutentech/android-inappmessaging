@@ -235,7 +235,7 @@ InAppMessaging.instance().logEvent(CustomEvent("search").addAttribute("keyword",
 
 ## <a name="advanced"></a> Advanced Features
 
-### #1 Campaign's context
+### <a name="context"></a> #1 Campaign's context
 Contexts are used to add more control on when campaigns are displayed.
 A context can be defined as the text inside "[]" within an IAM portal "Campaign Name" e.g. the campaign name is "[ctx1] title" so the context is "ctx1".
 Multiple contexts are supported.
@@ -299,6 +299,12 @@ Documents targeting Product Managers:
 + In-App Messaging Dashboard Sign Up(page is coming soon.)
 
 ## <a name="changelog"></a> Changelog
+
+### 2.2.0 (2020-11-10)
+* SDKCF-2870: Allow host app to control if a campaign should be displayed in the current screen (using [contexts](#context))
+* SDKCF-2980: Fix Android 11 issue where user are not redirected after tapping a campaign's redirect/deeplink button
+* SDKCF-2967: Fix issue for campaigns getting displayed multiple times for campaign triggered by the AppLaunch event
+* SDKCF-2872: Fix issue for Slide Up campaign was getting shown again after being closed and when user moved to another tab
 
 ### 2.1.0 (2020-09-18)
 * SDKCF-2568: Deprecate updateSession() API
