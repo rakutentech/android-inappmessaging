@@ -14,7 +14,7 @@ The In-App Messaging module enables applications to receive notification, which 
 * [SDK Integration](#integration)
 * [FAQ](#faq)
 * [Documentation and Useful Links](#see-also)
-* [Change Log](#nchangelog)
+* [Change Log](#changelog)
 
 ## <a name="features"></a> Features Overview
 ### Message Type
