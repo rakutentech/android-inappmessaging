@@ -3,14 +3,12 @@ layout: userguide
 ---
 
 # In-App Messaging
-The In-App Messaging module enables applications to receive notification, that are displayed within the app, from Rakuten In-App Messaging Dashboard.
+In-App Messaging (IAM) module allows app developers to easily configure and display notifications within their app.
 
 ![In-App Messaging Sample](images/what-is-inapp.png)
 
 ### This page covers:
-* [Features Overview](#features)
 * [Requirements](#requirements)
-* [Getting Started](#getting-started)
 * [SDK Integration](#integration)
 * [Advanced Features](#advanced)
 * [Troubleshooting](#troubleshooting)
@@ -18,102 +16,12 @@ The In-App Messaging module enables applications to receive notification, that a
 * [Documentation and Useful Links](#see-also)
 * [Change Log](#changelog)
 
-## <a name="features"></a> Features Overview
-### Message Type
-
-| #1 Modal | #2 Full Screen | #3 Slide-Up |
-|-------------------|-------------------|-------------------|
-| ![Modal](images/sample-modal.png) | ![Full](images/sample-full.png) | ![Slide](images/sample-slide.png) |
-
-### Message Layout
-
-| #1 Text Only | #2 Image Only | #3 Text and Image | #4 HTML |
-|-------------------|-------------------|-------------------|-------------------|
-| ![Text](images/sample-text.png) | ![Image](images/sample-image.png) | ![Image Text](images/sample-image-text.png) | Coming soon |
-
-### Actions (Optional Buttons)
-#### #1 Close
-Closes the In-App message on tap.
-
-#### #2 Redirect
-Launches the URI in an external  browser on tap.
-
-#### #3 Deeplink
-Launches the URI in an external  browser on tap.
-
-### Triggers
-These are events sent from the host app that are used as conditions to determine if a specific campaign/message should be displayed.
-
-#### #1 `AppStartEvent` (pre-defined)
-Event that the host app can log after app launch from terminated stated (e.g. Main Activity's `Activity#onStart()`).
-
-App Start Event is persistent, meaning, once it's logged it will always satisfy corresponding trigger in a campaign. All subsequent logs of this event are ignored. Campaigns that require only AppStartEvent are shown once per app session.
-
-#### #2 `LoginSuccessfulEvent` (pre-defined)
-Event that the host app can log every time user logs in successfully.
-
-#### #3 `PurchaseSuccessfulEvent` (pre-defined)
-Event that the host app can log after every successful purchase.
-
-#### #4 `CustomEvent` (customizable)
-Event that host app can log after app-defined states are reached or conditions are met.
-Custom events can have attributes with names and values. Attributes can be `integer`, `double`, `String`, `boolean`, or `java.util.Date` type.
-
 ## <a name="requirements"></a> Requirements
 ### Supported Android Versions
 This SDK supports Android API level 21 (Lollipop) and above.
 
 ### In-App Messaging Subscription Key
-You must have a subscription key for your application from Rakuten In-App Messaging Dashboard.<br/>
-Please go to App Settings page to create/add app and for retrieving of subscription key.<br/>
-![App Settings](images/app-settings.png)
-
-## <a name="getting-started"></a> Getting Started
-
-### How does In-App Messaging work?
-![How In-App Messaging Works](images/how-it-works.png)
-
-### #1 In-App Messaging Dashboard
-The In-App Messaging Dashboard enables you to operate and manage your In-app messaging campaign on the Rakuten Platform.<br/>
-For more information, please refer to dashboard user manual.
-
-### #2 Register application and retrieve subscription keys
-Please use the App List page to create, and manage your apps.<br/>
-You can add/delete versions, and retrieve the subscription keys in the App List page.
-
-### #3 Integrate the In-App Messaging SDK to your app.
-Please refer to [SDK Integration](#integration) section.
-
-### #4 Create a campaign/message
-Please use the Create Campaign page to create, edit, save as draft, launch, cancel edition for campaigns.
-* Input in-app messaging's UI Information in **Basic Information Tab**
-![Basic Info Tab](images/basic-info-tab.png)
-  * Enter the **Campaign Name**.
-  * Choose message **Type**.
-  * Choose message **Layout from Text only, Image Only, Text With Image**. (**HTML** rich content support will coming soon.)
-  * Enter the in-app message **Header** which is a required field.
-  * Enter the in-app message **Body** which is an optional field
-  * Define the **Message Background Color**. The default is white.
-  * Define the number of **Buttons**, **Button Label**, **Button Actions**.<br/>
-* Input in-app messaging's target and scheduling information in **Target & Schedule Tab**
-![Target Schedule Tab](images/target-schedule-tab.png)
-  * Define campaign message **Start Date** and **End Date**.
-  * **Choose App** and **Versions** - Choose which app in your app group you are going to apply to the campaign.
-  * Click "+" to add multiple apps.
-  * **Target Users** - You can target all your audience with select All Users, you can also target users by uploading a CSV file with a list of Easy IDs or User IDs.
-  * You can select the message trigger at the **Campaign Events** field, we support: **Launch the App Event**, **Login event**, **Purchase Successful Event** as default. You can add your own custom event at App Settings page.
-  * Max Lifetime Impressions - You can manage the number of messages your user will see.<br/>
-* **Launch Campaign** - Live a campaign message. This function only available for the Administrator role.
-* **Save as Draft** - Save a campaign as a draft message. This function is available for all roles.
-* **Send to Test Device** - Send your draft campaign message to the actual test device. You can use easyId or userId (Rakuten user login ID) to target which user you want to send the test message to.
-* **Cancel** - Cancel the editing of campaign
-
-Note: You can create up to 100 campaigns per app group.
-
-### #5 Send/display message
-Message are displayed if the triggers/conditions for the campaign are satisfied in the application.
-
-![Display message](images/what-is-inapp.png)
+You must have a subscription key for your application from IAM Dashboard.
 
 ## <a name="integration"></a> SDK Integration
 ### #1 Include JCenter repo in your project, this should be added in your project root `build.gradle` file.
@@ -242,23 +150,45 @@ Host app can log events to InAppMessaging anywhere in your app.
 
 These events will trigger messages with the same event based trigger. Upon receiving logged event, InAppMessaging SDK will start matching it with current campaigns immediately. After a campaign message's trigger events are matched by the logged events, this message will be displayed in the current registered activity. If no activity is registered, it will be displayed in the next registered activity.
 
-Pre-defined event classes:<br/>
-`AppStartEvent` - Host app should send this event on app launch from terminated state. Recommended to log this event in host app's main activity's `Activity#onStart()`.
+### Pre-defined event classes:<br/>
+### `AppStartEvent`
+Host app should log this event on app launch from terminated state. Recommended to log this event in host app's main activity's `Activity#onStart()`.
 
-`LoginSuccessfulEvent` - Host app should send this event after user logs in successfully.
-
-`PurchaseSuccessfulEvent` - Host app should send this event after every successful purchase.
+App Start Event is persistent, meaning, once it's logged it will always satisfy corresponding trigger in a campaign. All subsequent logs of this event are ignored. Campaigns that require only AppStartEvent are shown once per app session.
 
 ```kotlin
-InAppMessaging.instance().logEvent(AppStartEvent())
+class MainActivity : AppCompatActivity() {
+
+    override fun onStart() {
+        super.onStart()
+        InAppMessaging.instance().logEvent(AppStartEvent())
+    }
+}
 ```
 
-Custom event class:
+### `LoginSuccessfulEvent`
+Host app should log this every time the user logs in successfully.
 
-`CustomEvent` - Host app can send custom events to InAppMessaging SDK.
+```kotlin
+InAppMessaging.instance().logEvent(LoginSuccessfulEvent())
+```
+
+### `PurchaseSuccessfulEvent`
+Host app should log this event after every successful purchase.
+
+```kotlin
+InAppMessaging.instance().logEvent(PurchaseSuccessfulEvent()
+```
+
+### Custom event class:
+
+### `CustomEvent`
+Host app should log this after app-defined states are reached or conditions are met.
+
+Custom events can have attributes with names and values. Attributes can be `integer`, `double`, `String`, `boolean`, or `java.util.Date` type.
 
 * Every custom event requires a name(case insensitive), but doesn't require to add any attributes with the custom event.
-* Each custom event attribute also requires a name(case insensitive), and a value. Supported custom event attribute value type are: integer, double, String, boolean, and java.util.Date.
+* Each custom event attribute also requires a name(case insensitive), and a value.
 * Recommended to use English characters only.
 * Because the custom event's name will be used when matching campaigns with triggers; therefore, please make sure the actual campaign event's name and attribute's name must match with the logged events to InAppMessaging SDK.
 
@@ -286,7 +216,7 @@ InAppMessaging.instance().onVerifyContext = { contexts: List<String>, campaignTi
 }
 ```
 
-## <a name="troubleshooting"></a> Trouble Shooting
+## <a name="troubleshooting"></a> Troubleshooting
 <details>
 <summary>proguard.ParseException (click to expand)</summary>
 
@@ -314,13 +244,8 @@ buildscript {
 ```
 </details>
 
-<details>
-<summary>Getting error 401 (click to expand)</summary>
-
-### Getting error 401
-Rakuten developers experiencing problems should refer to the Troubleshooting Guide on the internal developer documentation portal.
-
-</details>
+### Other Issues
+Rakuten developers experiencing any other problems should refer to the Troubleshooting Guide on the internal developer documentation portal.
 
 ## <a name="faq"></a> Frequently Asked Questions
 ### Q: How do I send message for in staging or testing environment?
