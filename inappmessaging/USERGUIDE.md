@@ -13,7 +13,7 @@ The In-App Messaging module enables applications to receive notification, that a
 * [Getting Started](#getting-started)
 * [SDK Integration](#integration)
 * [Advanced Features](#advanced)
-* [Trouble Shooting](#troubleshooting)
+* [Troubleshooting](#troubleshooting)
 * [FAQ](#faq)
 * [Documentation and Useful Links](#see-also)
 * [Change Log](#changelog)
@@ -42,7 +42,7 @@ Launches the URI in an external  browser on tap.
 Launches the URI in an external  browser on tap.
 
 ### Triggers
-These are events sent from the host app that are used as conditions if a specific campaign/message should be displayed.
+These are events sent from the host app that are used as conditions to determine if a specific campaign/message should be displayed.
 
 #### #1 `AppStartEvent` (pre-defined)
 Event that the host app can log after app launch from terminated stated (e.g. Main Activity's `Activity#onStart()`).
@@ -56,7 +56,7 @@ Event that the host app can log every time user logs in successfully.
 Event that the host app can log after every successful purchase.
 
 #### #4 `CustomEvent` (customizable)
-Event that host app can send after app-defined states or conditions.
+Event that host app can log after app-defined states are reached or conditions are met.
 Custom events can have attributes with names and values. Attributes can be `integer`, `double`, `String`, `boolean`, or `java.util.Date` type.
 
 ## <a name="requirements"></a> Requirements
@@ -318,7 +318,7 @@ buildscript {
 <summary>Getting error 401 (click to expand)</summary>
 
 ### Getting error 401
-(For our internal users) If you are encountering error 401 when calling ping/impression endpoint - check your app's scopes list if it contains all required entries OR stop putting RAE Token in `UserInfoProvider` (this breaks user targeting)
+Rakuten developers experiencing problems should refer to the Troubleshooting Guide on the internal developer documentation portal.
 
 </details>
 
