@@ -39,6 +39,14 @@
   <dimen name="full_screen_gone_margin_top">60dp</dimen>
   <dimen name="full_screen_bottom_spacer_margin">50dp</dimen>
 
+  <!--Slide Up Close Button -->
+  <dimen name="slide_up_close_button_margin_top">12dp</dimen>
+  <dimen name="slide_up_close_button_margin_end">16dp</dimen>
+
+  <!--Slide Up Text -->
+  <dimen name="slide_up_text_min_height">50dp</dimen>
+  <dimen name="slide_up_text_margin_top">0dp</dimen>
+
   <!--Message OptOut checkbox-->
   <dimen name="opt_out_text_size">12sp</dimen>
   <dimen name="opt_out_checkbox_margin_top">3dp</dimen>
