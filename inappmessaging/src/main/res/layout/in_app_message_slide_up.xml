@@ -35,6 +35,8 @@
       style="@style/InAppMessaging.Text.Slide"
       android:layout_width="0dp"
       android:layout_height="match_parent"
+      android:minHeight="@dimen/slide_up_text_min_height"
+      android:layout_marginTop="@dimen/slide_up_text_margin_top"
       app:layout_constraintLeft_toLeftOf="@id/left_guideline"
       app:layout_constraintRight_toRightOf="@id/right_guideline"
       tools:text="@string/example_body_text"
