@@ -129,6 +129,8 @@ afterEvaluate {
 
 def isSnapshot = project.version.contains('-')
 if (isSnapshot) {
+  project.ext.ARTIFACTORY_URL=CONFIG.property("ARTIFACTORY_URL_SNAPSHOT")
+  project.ext.ARTIFACTORY_REPO=CONFIG.property("ARTIFACTORY_REPO_SNAPSHOT")
   apply from: '../config/publish/artifactory.gradle'
 } else {
   apply from: '../config/publish/bintray.gradle'
