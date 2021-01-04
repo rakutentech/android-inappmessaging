@@ -23,6 +23,7 @@ import org.mockito.Mockito
 import org.mockito.MockitoAnnotations
 import org.robolectric.RobolectricTestRunner
 import org.robolectric.annotation.Config
+import java.security.KeyStoreException
 
 /**
  * Test class for InitializationWorker.
@@ -79,5 +80,21 @@ class InitializerSpec : BaseTest() {
         When calling context.resources itReturns ApplicationProvider.getApplicationContext<Context>()
                 .resources
         Initializer.initializeSdk(context, "test", "", true)
+    }
+
+    @Test(expected = KeyStoreException::class)
+    fun `should throw keystore exception with null android ID`() {
+        val appCtx = ApplicationProvider.getApplicationContext<Context>()
+        val context = Mockito.mock(Context::class.java)
+        Settings.Secure.putString(appCtx.contentResolver, Settings.Secure.ANDROID_ID, null)
+        When calling context.packageName itReturns appCtx.packageName
+        When calling context.contentResolver itReturns appCtx.contentResolver
+        When calling context.packageManager itReturns appCtx.packageManager
+        When calling context.resources itReturns appCtx.resources
+        When calling context.resources itReturns appCtx.resources
+
+        // AndroidKeyStore is not supported by robolectric
+        Initializer.initializeSdk(
+                ApplicationProvider.getApplicationContext(), "test", "", true)
     }
 }
