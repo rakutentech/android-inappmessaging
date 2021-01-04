@@ -91,7 +91,6 @@ class InitializerSpec : BaseTest() {
         When calling context.contentResolver itReturns appCtx.contentResolver
         When calling context.packageManager itReturns appCtx.packageManager
         When calling context.resources itReturns appCtx.resources
-        When calling context.resources itReturns appCtx.resources
 
         // AndroidKeyStore is not supported by robolectric
         Initializer.initializeSdk(
