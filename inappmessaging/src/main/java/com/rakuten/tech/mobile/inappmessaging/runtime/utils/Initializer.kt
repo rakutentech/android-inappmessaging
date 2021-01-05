@@ -7,7 +7,11 @@ import android.content.pm.PackageInfo
 import android.content.pm.PackageManager.NameNotFoundException
 import android.os.Build
 import android.provider.Settings
+import android.security.keystore.KeyGenParameterSpec
+import android.security.keystore.KeyProperties
 import androidx.core.content.pm.PackageInfoCompat
+import androidx.security.crypto.EncryptedSharedPreferences
+import androidx.security.crypto.MasterKey
 import com.facebook.drawee.backends.pipeline.Fresco
 import com.google.gson.Gson
 import com.rakuten.tech.mobile.inappmessaging.runtime.data.models.HostAppInfo
@@ -15,6 +19,7 @@ import com.rakuten.tech.mobile.inappmessaging.runtime.data.repositories.HostAppI
 import com.rakuten.tech.mobile.inappmessaging.runtime.exception.InAppMessagingInitializationException
 import timber.log.Timber
 import java.util.Locale
+import java.util.UUID
 
 /**
  * IAM SDK initialization class.
@@ -22,6 +27,7 @@ import java.util.Locale
 internal object Initializer {
 
     private const val TAG = "IAM_InitWorker"
+    private const val ID_KEY = "uuid_key"
 
     /**
      * This method returns a string of Android Device ID. Note: In order to get device ID without Context,
@@ -29,7 +35,7 @@ internal object Initializer {
      */
     @SuppressLint("HardwareIds") // Suppress lint check of using device id.
     private fun getDeviceId(context: Context): String =
-            Settings.Secure.getString(context.contentResolver, Settings.Secure.ANDROID_ID)
+            Settings.Secure.getString(context.contentResolver, Settings.Secure.ANDROID_ID) ?: getUuid(context)
 
     /**
      * This method gets device's locale based on API level.
@@ -75,7 +81,6 @@ internal object Initializer {
     @Suppress("LongMethod")
     @Throws(InAppMessagingInitializationException::class)
     fun initializeSdk(context: Context, subscriptionKey: String?, configUrl: String?, isForTesting: Boolean = false) {
-
         val hostAppInfo = HostAppInfo(
                 getHostAppPackageName(context),
                 getDeviceId(context),
@@ -92,5 +97,40 @@ internal object Initializer {
             Fresco.initialize(context)
         }
         Timber.tag(TAG).d(Gson().toJson(hostAppInfo))
+    }
+
+    /**
+     * This method retrieves the stored UUID or generates a random ID if not available.
+     * This value is only used if Settings.Secure.ANDROID_ID returns a null value.
+     */
+    @SuppressWarnings("LongMethod")
+    private fun getUuid(context: Context): String {
+        val master = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+            val spec = KeyGenParameterSpec.Builder(
+                    MasterKey.DEFAULT_MASTER_KEY_ALIAS,
+                    KeyProperties.PURPOSE_ENCRYPT or KeyProperties.PURPOSE_DECRYPT)
+                    .setBlockModes(KeyProperties.BLOCK_MODE_GCM)
+                    .setEncryptionPaddings(KeyProperties.ENCRYPTION_PADDING_NONE)
+                    .setKeySize(MasterKey.DEFAULT_AES_GCM_MASTER_KEY_SIZE)
+                    .build()
+            MasterKey.Builder(context).setKeyGenParameterSpec(spec).build()
+        } else {
+            MasterKey.Builder(context).build()
+        }
+        val sharedPref = EncryptedSharedPreferences.create(
+                context,
+                "shared_preferences",
+                master,
+                EncryptedSharedPreferences.PrefKeyEncryptionScheme.AES256_SIV,
+                EncryptedSharedPreferences.PrefValueEncryptionScheme.AES256_GCM
+        )
+
+        return if (sharedPref.contains(ID_KEY)) {
+            sharedPref.getString(ID_KEY, "").toString()
+        } else {
+            val id = UUID.randomUUID().toString()
+            sharedPref.edit().putString(ID_KEY, id).apply()
+            id
+        }
     }
 }
