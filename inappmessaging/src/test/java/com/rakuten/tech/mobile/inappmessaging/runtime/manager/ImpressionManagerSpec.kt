@@ -13,14 +13,13 @@ import com.rakuten.tech.mobile.inappmessaging.runtime.TestUserInfoProvider
 import com.rakuten.tech.mobile.inappmessaging.runtime.data.enums.ImpressionType
 import com.rakuten.tech.mobile.inappmessaging.runtime.data.models.Impression
 import org.amshove.kluent.shouldBeGreaterThan
-import org.amshove.kluent.shouldEqual
+import org.amshove.kluent.shouldBeEqualTo
 import org.amshove.kluent.shouldHaveSize
 import org.junit.Before
 import org.junit.Test
 import org.junit.runner.RunWith
 import org.mockito.ArgumentMatchers
 import org.mockito.Mockito
-import org.mockito.MockitoAnnotations
 import org.robolectric.RobolectricTestRunner
 import org.robolectric.annotation.Config
 import java.util.concurrent.ExecutionException
@@ -36,14 +35,13 @@ class ImpressionManagerSpec : BaseTest() {
 
     @Before
     fun setup() {
-        MockitoAnnotations.initMocks(this)
         impressionList = ImpressionManager().createImpressionList(VALID_IMPRESSION_TYPES)
     }
 
     @Test
     fun `should create impression list with correct attributes`() {
         impressionList!![0].timestamp shouldBeGreaterThan 0L
-        impressionList!![1].type shouldEqual ImpressionType.ACTION_ONE.typeId
+        impressionList!![1].type shouldBeEqualTo ImpressionType.ACTION_ONE.typeId
     }
 
     @Test(expected = IllegalArgumentException::class)

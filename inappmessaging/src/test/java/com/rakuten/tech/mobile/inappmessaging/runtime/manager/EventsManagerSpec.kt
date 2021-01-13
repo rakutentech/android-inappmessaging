@@ -23,9 +23,7 @@ import org.amshove.kluent.*
 import org.junit.Before
 import org.junit.Test
 import org.junit.runner.RunWith
-import org.mockito.Mock
 import org.mockito.Mockito
-import org.mockito.MockitoAnnotations
 import org.robolectric.RobolectricTestRunner
 import org.robolectric.annotation.Config
 import java.util.concurrent.ExecutionException
@@ -38,7 +36,6 @@ import java.util.concurrent.ExecutionException
 class EventsManagerSpec : BaseTest() {
 
     private val message = ValidTestMessage()
-    @Mock
     private val mockEvent = Mockito.mock(Event::class.java)
     private val mockEventBroadcaster = Mockito.mock(LegacyEventBroadcasterHelper::class.java)
     private val configResponseData = Mockito.mock(ConfigResponseData::class.java)
@@ -47,7 +44,6 @@ class EventsManagerSpec : BaseTest() {
 
     @Before
     fun setup() {
-        MockitoAnnotations.initMocks(this)
         WorkManagerTestInitHelper.initializeTestWorkManager(context)
         When calling mockEvent.getEventName() itReturns EVENT_NAME
         When calling mockEvent.getRatEventMap() itReturns map
@@ -62,7 +58,7 @@ class EventsManagerSpec : BaseTest() {
     fun `should receive event`() {
         LocalEventRepository.instance().clearEvents()
         EventsManager.onEventReceived(mockEvent)
-        LocalEventRepository.instance().getEvents()[0].getEventName() shouldEqual EVENT_NAME
+        LocalEventRepository.instance().getEvents()[0].getEventName() shouldBeEqualTo EVENT_NAME
     }
 
     @Test
@@ -155,7 +151,7 @@ class EventsManagerSpec : BaseTest() {
     private fun verifyTestData(expected: Int) {
         PingResponseMessageRepository.instance().getAllMessagesCopy().shouldHaveSize(expected)
         ReadyForDisplayMessageRepository.instance().getAllMessagesCopy()shouldHaveSize(expected)
-        LocalDisplayedMessageRepository.instance().numberOfTimesDisplayed(message) shouldEqual expected
+        LocalDisplayedMessageRepository.instance().numberOfTimesDisplayed(message) shouldBeEqualTo expected
         if (expected > 0) {
             LocalOptedOutMessageRepository.instance().hasMessage(message.getCampaignId()).shouldBeTrue()
         } else {

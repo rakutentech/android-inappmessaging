@@ -1,7 +1,7 @@
 package com.rakuten.tech.mobile.inappmessaging.runtime.data.enums
 
 import android.os.Build
-import org.amshove.kluent.shouldEqual
+import org.amshove.kluent.shouldBeEqualTo
 import org.junit.Test
 import org.junit.runner.RunWith
 import org.robolectric.ParameterizedRobolectricTestRunner
@@ -29,6 +29,6 @@ class SlideFromDirectionTypeSpec(private val id: Int, private val expected: Any?
 
     @Test
     fun `should return correct type from id`() {
-        SlideFromDirectionType.getById(id) shouldEqual expected
+        SlideFromDirectionType.getById(id) shouldBeEqualTo expected
     }
 }

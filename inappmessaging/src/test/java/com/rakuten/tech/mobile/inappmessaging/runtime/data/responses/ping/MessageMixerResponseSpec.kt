@@ -2,7 +2,7 @@ package com.rakuten.tech.mobile.inappmessaging.runtime.data.responses.ping
 
 import android.os.Build
 import com.google.gson.Gson
-import org.amshove.kluent.shouldEqual
+import org.amshove.kluent.shouldBeEqualTo
 import org.amshove.kluent.shouldHaveSize
 import org.junit.Test
 import org.junit.runner.RunWith
@@ -224,7 +224,7 @@ class MessageMixerResponseSpec(private val testname: String, private val actual:
 
     @Test
     fun `should be correct value after parsing`() {
-        actual shouldEqual expected
+        actual shouldBeEqualTo expected
     }
 
     @Test
@@ -236,37 +236,37 @@ class MessageMixerResponseSpec(private val testname: String, private val actual:
     @Test
     fun `should properly read context if there's nothing beside it when calling getContexts()`() {
         val campaign = generateDummyCampaign("id", "[ctx]")
-        campaign.getContexts() shouldEqual listOf("ctx")
+        campaign.getContexts() shouldBeEqualTo listOf("ctx")
     }
 
     @Test
     fun `should properly read one context when calling getContexts()`() {
         val campaign = generateDummyCampaign("id", "[ctx] title")
-        campaign.getContexts() shouldEqual listOf("ctx")
+        campaign.getContexts() shouldBeEqualTo listOf("ctx")
     }
 
     @Test
     fun `should properly read multiple contexts when calling getContexts()`() {
         val campaign = generateDummyCampaign("id", "[ctx1] [ctx2][ctx3] title")
-        campaign.getContexts() shouldEqual listOf("ctx1", "ctx2", "ctx3")
+        campaign.getContexts() shouldBeEqualTo listOf("ctx1", "ctx2", "ctx3")
     }
 
     @Test
     fun `should properly read multiple contexts separated with characters when calling getContexts()`() {
         val campaign = generateDummyCampaign("id", "[ctx A]~~[ctx B]ab ab[ctx C]")
-        campaign.getContexts() shouldEqual listOf("ctx A", "ctx B", "ctx C")
+        campaign.getContexts() shouldBeEqualTo listOf("ctx A", "ctx B", "ctx C")
     }
 
     @Test
     fun `should ignore invalid contexts when calling getContexts()`() {
         val campaign = generateDummyCampaign("id", "[ctx] [ctxbad title")
-        campaign.getContexts() shouldEqual listOf("ctx")
+        campaign.getContexts() shouldBeEqualTo listOf("ctx")
     }
 
     @Test
     fun `should properly read context even if there are invalid ones when calling getContexts()`() {
         val campaign = generateDummyCampaign("id", "ctxbad] title [ctx]")
-        campaign.getContexts() shouldEqual listOf("ctx")
+        campaign.getContexts() shouldBeEqualTo listOf("ctx")
     }
 
     @Test

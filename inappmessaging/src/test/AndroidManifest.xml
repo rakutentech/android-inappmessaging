@@ -1,8 +1,8 @@
 <!--This is a test mock Android Manifest file used by Robolectric tests-->
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
   package="com.rakuten.tech.mobile.inappmessaging.runtime"
-  android:versionCode="101"
-  android:versionName="version.name">
+  android:versionCode="2"
+  android:versionName="1.0">
 
   <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE"/>
   <uses-permission android:name="android.permission.INTERNET"/>
@@ -10,7 +10,7 @@
   <application>
     <meta-data
       android:name="com.rakuten.tech.mobile.inappmessaging.subscriptionkey"
-      android:value="test_sub_key"/>
+      android:value="${test_sub_key}"/>
 
     <meta-data
       android:name="com.rakuten.tech.mobile.inappmessaging.debugging"

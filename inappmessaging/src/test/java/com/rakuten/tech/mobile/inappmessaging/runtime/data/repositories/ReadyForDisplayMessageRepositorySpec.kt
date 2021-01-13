@@ -4,7 +4,7 @@ import com.rakuten.tech.mobile.inappmessaging.runtime.BaseTest
 import com.rakuten.tech.mobile.inappmessaging.runtime.data.models.messages.Message
 import com.rakuten.tech.mobile.inappmessaging.runtime.data.models.messages.ValidTestMessage
 import com.rakuten.tech.mobile.inappmessaging.runtime.utils.InAppMessagingConstants
-import org.amshove.kluent.shouldEqual
+import org.amshove.kluent.shouldBeEqualTo
 import org.amshove.kluent.shouldHaveSize
 import org.junit.Assert
 import org.junit.Test
@@ -19,7 +19,7 @@ class ReadyForDisplayMessageRepositorySpec : BaseTest() {
             ReadyForDisplayMessageRepository.instance().replaceAllMessages(null)
             Assert.fail()
         } catch (e: IllegalArgumentException) {
-            e.localizedMessage shouldEqual InAppMessagingConstants.ARGUMENT_IS_NULL_EXCEPTION
+            e.localizedMessage shouldBeEqualTo InAppMessagingConstants.ARGUMENT_IS_NULL_EXCEPTION
         }
     }
 

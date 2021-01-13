@@ -3,6 +3,26 @@ version: 2.1
 orbs:
   android-sdk: rakutentech/android-sdk@0.2.0
 
+jobs:
+  integration-test:
+    docker:
+      - image: circleci/android@sha256:45eb47efaf498cdbf01b16e6a294ef20a4979f6acd6aaf75913707190806bb4c
+    working_directory: ~/code
+    environment:
+      # from https://discuss.circleci.com/t/circle-ci-v2-and-android-memory-issues/11207
+      JVM_OPTS: "-Xmx1024m -XX:+PrintFlagsFinal -XX:+PrintGCDetails"
+      _JAVA_OPTIONS: "-Xmx1024m"
+      GRADLE_OPTS: "-Dorg.gradle.daemon=false -Dorg.gradle.workers.max=1 -Dorg.gradle.parallel=false"
+    steps:
+      - checkout
+      - run: git submodule update --init
+      - run:
+          name: Download Dependencies
+          command: ./gradlew androidDependencies
+      - run:
+          name: Run Tests
+          command: ./gradlew clean testRelease --tests com.rakuten.tech.mobile.inappmessaging.runtime.integration.IntegrationSpec
+
 workflows:
   version: 2.1
   build-and-release:
@@ -56,3 +76,13 @@ workflows:
               only: /^v.*/
             branches:
               ignore: /.*/
+  integration-test:
+    triggers:
+      - schedule:
+          cron: "0 11,9 * * *"
+          filters:
+            branches:
+              only:
+                - master
+    jobs:
+      - integration-test

@@ -22,7 +22,6 @@ import org.junit.Before
 import org.junit.Test
 import org.junit.runner.RunWith
 import org.mockito.Mockito
-import org.mockito.MockitoAnnotations
 import org.robolectric.RobolectricTestRunner
 import org.robolectric.annotation.Config
 import retrofit2.Call
@@ -43,7 +42,6 @@ class MessageReadinessManagerSpec : BaseTest() {
 
     @Before
     fun setup() {
-        MockitoAnnotations.initMocks(this)
         AccountRepository.instance().userInfoProvider = TestUserInfoProvider()
         HostAppInfoRepository.instance().addHostInfo(HostAppInfo(
                 InAppMessagingTestConstants.APP_ID,
@@ -81,18 +79,18 @@ class MessageReadinessManagerSpec : BaseTest() {
         messageList.add(ValidTestMessage("1", false))
         messageList.add(testMessage)
         ReadyForDisplayMessageRepository.instance().replaceAllMessages(messageList)
-        MessageReadinessManager.instance().getNextDisplayMessage() shouldEqual testMessage
+        MessageReadinessManager.instance().getNextDisplayMessage() shouldBeEqualTo testMessage
     }
 
     @Test
     fun `should get display permission request with all attributes`() {
         val message = ValidTestMessage()
         val request = MessageReadinessManager.instance().getDisplayPermissionRequest(message)
-        request.campaignId shouldEqual message.getCampaignId()
-        request.appVersion shouldEqual InAppMessagingTestConstants.APP_VERSION
-        request.sdkVersion shouldEqual BuildConfig.VERSION_NAME
-        request.lastPingInMillis shouldEqual LAST_PING_MILLIS
-        request.locale shouldEqual InAppMessagingTestConstants.LOCALE.toString()
+        request.campaignId shouldBeEqualTo message.getCampaignId()
+        request.appVersion shouldBeEqualTo InAppMessagingTestConstants.APP_VERSION
+        request.sdkVersion shouldBeEqualTo BuildConfig.VERSION_NAME
+        request.lastPingInMillis shouldBeEqualTo LAST_PING_MILLIS
+        request.locale shouldBeEqualTo InAppMessagingTestConstants.LOCALE.toString()
                 .replace("_", "-").toLowerCase(Locale.getDefault())
     }
 
@@ -100,14 +98,14 @@ class MessageReadinessManagerSpec : BaseTest() {
     fun `should response call contain two headers`() {
         val responseCall: Call<DisplayPermissionResponse> =
                 MessageReadinessManager.instance().getDisplayPermissionResponseCall(DISPLAY_PERMISSION_URL, mockRequest)
-        responseCall.request().headers().size() shouldEqual 2
+        responseCall.request().headers().size() shouldBeEqualTo 2
     }
 
     @Test
     fun `should add token to header`() {
         val responseCall: Call<DisplayPermissionResponse> =
                 MessageReadinessManager.instance().getDisplayPermissionResponseCall(DISPLAY_PERMISSION_URL, mockRequest)
-        responseCall.request().header(MessageMixerRetrofitService.RAE_TOKEN_HEADER) shouldEqual
+        responseCall.request().header(MessageMixerRetrofitService.RAE_TOKEN_HEADER) shouldBeEqualTo
                 "OAuth2 " + TestUserInfoProvider.TEST_USER_RAE_TOKEN
     }
 
@@ -115,7 +113,7 @@ class MessageReadinessManagerSpec : BaseTest() {
     fun `should add sub id header`() {
         val responseCall: Call<DisplayPermissionResponse> =
                 MessageReadinessManager.instance().getDisplayPermissionResponseCall(DISPLAY_PERMISSION_URL, mockRequest)
-        responseCall.request().header(MessageMixerRetrofitService.SUBSCRIPTION_ID_HEADER) shouldEqual
+        responseCall.request().header(MessageMixerRetrofitService.SUBSCRIPTION_ID_HEADER) shouldBeEqualTo
                 InAppMessagingTestConstants.SUB_KEY
     }
 
