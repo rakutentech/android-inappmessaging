@@ -11,11 +11,9 @@ import com.rakuten.tech.mobile.inappmessaging.runtime.data.repositories.ConfigRe
 import com.rakuten.tech.mobile.inappmessaging.runtime.data.responses.config.ConfigResponseData
 import com.rakuten.tech.mobile.inappmessaging.runtime.manager.DisplayManager
 import org.amshove.kluent.*
-import org.junit.Before
 import org.junit.Test
 import org.junit.runner.RunWith
 import org.mockito.Mockito
-import org.mockito.MockitoAnnotations
 import org.robolectric.RobolectricTestRunner
 import org.robolectric.annotation.Config
 import kotlin.test.fail
@@ -29,12 +27,6 @@ class InAppMessagingSpec : BaseTest() {
     private var activity = Mockito.mock(Activity::class.java)
     private var configResponseData = Mockito.mock(ConfigResponseData::class.java)
     private var displayManager = Mockito.mock(DisplayManager::class.java)
-
-    @Before
-    fun setup() {
-        MockitoAnnotations.initMocks(this)
-    }
-
     @Test
     fun `should unregister activity not crash when no activity is registered`() {
         InAppMessaging.instance().unregisterMessageDisplayActivity()
@@ -74,7 +66,7 @@ class InAppMessagingSpec : BaseTest() {
     @Test
     fun `should return null context using uninitialized instance`() {
         InAppMessaging.setUninitializedInstance()
-        InAppMessaging.instance().getHostAppContext() shouldEqual null
+        InAppMessaging.instance().getHostAppContext() shouldBeEqualTo null
     }
 
     @Test
@@ -108,7 +100,7 @@ class InAppMessagingSpec : BaseTest() {
                 isDebugLogging = true, isForTesting = true)
 
         InAppMessaging.instance().registerMessageDisplayActivity(activity)
-        InAppMessaging.instance().getRegisteredActivity() shouldEqual activity
+        InAppMessaging.instance().getRegisteredActivity() shouldBeEqualTo activity
         InAppMessaging.instance().unregisterMessageDisplayActivity()
         InAppMessaging.instance().getRegisteredActivity().shouldBeNull()
     }

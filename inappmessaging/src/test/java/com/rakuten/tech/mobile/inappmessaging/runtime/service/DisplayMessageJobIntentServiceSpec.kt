@@ -29,7 +29,6 @@ import org.junit.runner.RunWith
 import org.mockito.ArgumentMatchers
 import org.mockito.Mockito
 import org.mockito.Mockito.validateMockitoUsage
-import org.mockito.MockitoAnnotations
 import org.robolectric.Robolectric
 import org.robolectric.RobolectricTestRunner
 import org.robolectric.android.controller.ServiceController
@@ -55,7 +54,6 @@ class DisplayMessageJobIntentServiceSpec : BaseTest() {
     @Before
     fun setup() {
         SoLoader.setInTestMode()
-        MockitoAnnotations.initMocks(this)
         serviceController = Robolectric.buildService(DisplayMessageJobIntentService::class.java)
         displayMessageJobIntentService = serviceController?.bind()?.create()?.get()
         displayMessageJobIntentService!!.messageReadinessManager = mockMessageManager
@@ -184,7 +182,7 @@ class DisplayMessageJobIntentServiceSpec : BaseTest() {
 
         argumentCaptor<List<String>>().apply {
             Mockito.verify(onVerifyContexts).invoke(capture(), any())
-            firstValue shouldEqual listOf("ctx")
+            firstValue shouldBeEqualTo listOf("ctx")
         }
         argumentCaptor<String>().apply {
             Mockito.verify(onVerifyContexts).invoke(any(), capture())
@@ -229,7 +227,7 @@ class DisplayMessageJobIntentServiceSpec : BaseTest() {
 
         argumentCaptor<Message>().apply {
             Mockito.verify(mockLocalDisplayRepo, Mockito.times(1)).addMessage(capture())
-            firstValue shouldEqual message
+            firstValue shouldBeEqualTo message
         }
     }
 
@@ -251,7 +249,7 @@ class DisplayMessageJobIntentServiceSpec : BaseTest() {
 
         argumentCaptor<String>().apply {
             Mockito.verify(mockReadyForDisplayRepo, Mockito.times(1)).removeMessage(capture())
-            firstValue shouldEqual message.getCampaignId()
+            firstValue shouldBeEqualTo message.getCampaignId()
         }
     }
 
@@ -367,7 +365,6 @@ class ImagePrefetchSubscriberSpec {
     @Before
     fun setup() {
         SoLoader.setInTestMode()
-        MockitoAnnotations.initMocks(this)
         serviceController = Robolectric.buildService(DisplayMessageJobIntentService::class.java)
         displayMessageJobIntentService = serviceController?.bind()?.create()?.get()
     }

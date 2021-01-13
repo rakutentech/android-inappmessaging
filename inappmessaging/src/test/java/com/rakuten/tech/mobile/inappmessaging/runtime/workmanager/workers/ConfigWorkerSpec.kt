@@ -19,7 +19,7 @@ import com.rakuten.tech.mobile.inappmessaging.runtime.workmanager.schedulers.Mes
 import org.amshove.kluent.When
 import org.amshove.kluent.calling
 import org.amshove.kluent.itReturns
-import org.amshove.kluent.shouldEqual
+import org.amshove.kluent.shouldBeEqualTo
 import org.junit.Before
 import org.junit.Test
 import org.junit.runner.RunWith
@@ -55,7 +55,7 @@ class ConfigWorkerSpec : BaseTest() {
         When calling mockResponse?.isSuccessful itReturns false
         When calling mockResponse?.code() itReturns 500
         When calling mockResponse?.body() itReturns null
-        ConfigWorker(context, workerParameters).onResponse(mockResponse!!) shouldEqual ListenableWorker.Result.retry()
+        ConfigWorker(context, workerParameters).onResponse(mockResponse!!) shouldBeEqualTo ListenableWorker.Result.retry()
     }
 
     @Test
@@ -63,7 +63,7 @@ class ConfigWorkerSpec : BaseTest() {
         When calling mockResponse?.isSuccessful itReturns false
         When calling mockResponse?.code() itReturns 400
         val worker = ConfigWorker(context, workerParameters)
-        worker.onResponse(mockResponse!!) shouldEqual ListenableWorker.Result.failure()
+        worker.onResponse(mockResponse!!) shouldBeEqualTo ListenableWorker.Result.failure()
     }
 
     @Test
@@ -71,7 +71,7 @@ class ConfigWorkerSpec : BaseTest() {
         When calling mockHostRespository.getPackageName() itReturns null
         val worker = ConfigWorker(context, workerParameters, mockHostRespository, ConfigResponseRepository.instance(),
                 MessageMixerPingScheduler.instance())
-        worker.doWork() shouldEqual ListenableWorker.Result.failure()
+        worker.doWork() shouldBeEqualTo ListenableWorker.Result.failure()
     }
 
     @Test
@@ -79,7 +79,7 @@ class ConfigWorkerSpec : BaseTest() {
         When calling mockHostRespository.getPackageName() itReturns ""
         val worker = ConfigWorker(context, workerParameters, mockHostRespository, ConfigResponseRepository.instance(),
                 MessageMixerPingScheduler.instance())
-        worker.doWork() shouldEqual ListenableWorker.Result.failure()
+        worker.doWork() shouldBeEqualTo ListenableWorker.Result.failure()
     }
 
     @Test
@@ -87,7 +87,7 @@ class ConfigWorkerSpec : BaseTest() {
         When calling mockHostRespository.getPackageName() itReturns "valid.package.name"
         val worker = ConfigWorker(context, workerParameters, mockHostRespository, ConfigResponseRepository.instance(),
                 MessageMixerPingScheduler.instance())
-        worker.doWork() shouldEqual ListenableWorker.Result.failure()
+        worker.doWork() shouldBeEqualTo ListenableWorker.Result.failure()
     }
 
     @Test
@@ -96,7 +96,7 @@ class ConfigWorkerSpec : BaseTest() {
         When calling mockHostRespository.getVersion() itReturns ""
         val worker = ConfigWorker(context, workerParameters, mockHostRespository, ConfigResponseRepository.instance(),
                 MessageMixerPingScheduler.instance())
-        worker.doWork() shouldEqual ListenableWorker.Result.failure()
+        worker.doWork() shouldBeEqualTo ListenableWorker.Result.failure()
     }
 
     @Test
@@ -113,7 +113,7 @@ class ConfigWorkerSpec : BaseTest() {
                 mockMessageScheduler)
         val expected = if (HostAppInfoRepository.instance().getConfigUrl().isNullOrEmpty())
             ListenableWorker.Result.retry() else ListenableWorker.Result.success()
-        worker.doWork() shouldEqual expected
+        worker.doWork() shouldBeEqualTo expected
     }
 
     @Test
@@ -134,7 +134,7 @@ class ConfigWorkerSpec : BaseTest() {
         val worker = ConfigWorker(context, workerParameters)
         val expected = if (HostAppInfoRepository.instance().getConfigUrl().isNullOrEmpty())
             ListenableWorker.Result.retry() else ListenableWorker.Result.success()
-        worker.doWork() shouldEqual expected
+        worker.doWork() shouldBeEqualTo expected
     }
 
     companion object {

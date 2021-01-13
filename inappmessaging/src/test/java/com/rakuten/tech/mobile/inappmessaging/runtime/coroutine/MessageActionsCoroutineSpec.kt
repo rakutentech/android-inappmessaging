@@ -214,7 +214,7 @@ internal class MessageActionsCoroutineSpec(val testName: String, val resourceId:
         val result = MessageActionsCoroutine().executeTask(message, resourceId, isOpt)
         result.shouldBeTrue()
         LocalDisplayedMessageRepository.instance()
-                .numberOfTimesDisplayed(message) shouldEqual numberOfTimesDisplayed + 1
+                .numberOfTimesDisplayed(message) shouldBeEqualTo numberOfTimesDisplayed + 1
     }
 
     @Test

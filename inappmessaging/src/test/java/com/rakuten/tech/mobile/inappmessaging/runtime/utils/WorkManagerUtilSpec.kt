@@ -2,7 +2,7 @@ package com.rakuten.tech.mobile.inappmessaging.runtime.utils
 
 import androidx.work.NetworkType
 import com.rakuten.tech.mobile.inappmessaging.runtime.BaseTest
-import org.amshove.kluent.shouldEqual
+import org.amshove.kluent.shouldBeEqualTo
 import org.junit.Test
 
 /**
@@ -13,6 +13,6 @@ class WorkManagerUtilSpec : BaseTest() {
     @Test
     fun `should get correct network connected constraint`() {
         val constraints = WorkManagerUtil.getNetworkConnectedConstraint()
-        constraints.requiredNetworkType shouldEqual NetworkType.CONNECTED
+        constraints.requiredNetworkType shouldBeEqualTo NetworkType.CONNECTED
     }
 }

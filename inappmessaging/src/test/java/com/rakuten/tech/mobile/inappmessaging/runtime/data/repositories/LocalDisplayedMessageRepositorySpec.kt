@@ -41,7 +41,7 @@ class LocalDisplayedMessageRepositorySpec : BaseTest() {
             LocalDisplayedMessageRepository.instance().addMessage(InvalidTestMessage())
             Assert.fail()
         } catch (e: IllegalArgumentException) {
-            e.localizedMessage shouldEqual InAppMessagingConstants.ARGUMENT_IS_EMPTY_EXCEPTION
+            e.localizedMessage shouldBeEqualTo InAppMessagingConstants.ARGUMENT_IS_EMPTY_EXCEPTION
         }
     }
 
@@ -49,7 +49,7 @@ class LocalDisplayedMessageRepositorySpec : BaseTest() {
     fun `should return valid timestamp list`() {
         val message = ValidTestMessage()
         LocalDisplayedMessageRepository.instance().addMessage(message)
-        LocalDisplayedMessageRepository.instance().numberOfTimesDisplayed(message) shouldEqual 1
+        LocalDisplayedMessageRepository.instance().numberOfTimesDisplayed(message) shouldBeEqualTo 1
     }
 
     @Test
@@ -58,7 +58,7 @@ class LocalDisplayedMessageRepositorySpec : BaseTest() {
             LocalDisplayedMessageRepository.instance().addMessage(null)
             fail("should throw exception")
         } catch (e: IllegalArgumentException) {
-            e.localizedMessage shouldEqual InAppMessagingConstants.ARGUMENT_IS_NULL_EXCEPTION
+            e.localizedMessage shouldBeEqualTo InAppMessagingConstants.ARGUMENT_IS_NULL_EXCEPTION
         }
     }
 
@@ -68,7 +68,7 @@ class LocalDisplayedMessageRepositorySpec : BaseTest() {
             LocalDisplayedMessageRepository.instance().addMessage(ValidTestMessage(""))
             fail("should throw exception")
         } catch (e: IllegalArgumentException) {
-            e.localizedMessage shouldEqual InAppMessagingConstants.ARGUMENT_IS_EMPTY_EXCEPTION
+            e.localizedMessage shouldBeEqualTo InAppMessagingConstants.ARGUMENT_IS_EMPTY_EXCEPTION
         }
     }
 
@@ -94,22 +94,22 @@ class LocalDisplayedMessageRepositorySpec : BaseTest() {
     fun `should return zero after clearing`() {
         val message = ValidTestMessage()
         LocalDisplayedMessageRepository.instance().addMessage(message)
-        LocalDisplayedMessageRepository.instance().numberOfTimesDisplayed(message) shouldEqual 1
+        LocalDisplayedMessageRepository.instance().numberOfTimesDisplayed(message) shouldBeEqualTo 1
 
         LocalDisplayedMessageRepository.instance().clearMessages()
-        LocalDisplayedMessageRepository.instance().numberOfTimesDisplayed(message) shouldEqual 0
+        LocalDisplayedMessageRepository.instance().numberOfTimesDisplayed(message) shouldBeEqualTo 0
     }
 
     @Test
     fun `should return one after clearing then adding`() {
         val message = ValidTestMessage()
         LocalDisplayedMessageRepository.instance().addMessage(message)
-        LocalDisplayedMessageRepository.instance().numberOfTimesDisplayed(message) shouldEqual 1
+        LocalDisplayedMessageRepository.instance().numberOfTimesDisplayed(message) shouldBeEqualTo 1
 
         LocalDisplayedMessageRepository.instance().clearMessages()
-        LocalDisplayedMessageRepository.instance().numberOfTimesDisplayed(message) shouldEqual 0
+        LocalDisplayedMessageRepository.instance().numberOfTimesDisplayed(message) shouldBeEqualTo 0
 
         LocalDisplayedMessageRepository.instance().addMessage(message)
-        LocalDisplayedMessageRepository.instance().numberOfTimesDisplayed(message) shouldEqual 1
+        LocalDisplayedMessageRepository.instance().numberOfTimesDisplayed(message) shouldBeEqualTo 1
     }
 }

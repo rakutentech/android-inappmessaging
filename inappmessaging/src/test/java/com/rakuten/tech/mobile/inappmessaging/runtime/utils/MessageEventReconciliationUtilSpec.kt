@@ -20,7 +20,6 @@ import org.junit.Ignore
 import org.junit.Test
 import org.junit.runner.RunWith
 import org.mockito.Mockito
-import org.mockito.MockitoAnnotations
 import org.robolectric.RobolectricTestRunner
 import org.robolectric.annotation.Config
 import java.util.*
@@ -50,7 +49,6 @@ open class MessageEventReconciliationUtilSpec : BaseTest() {
     @Before
     @Suppress("LongMethod")
     fun setup() {
-        MockitoAnnotations.initMocks(this)
         // Arranging message1's data.
         val trigger1List = ArrayList<Trigger>()
         trigger1List.add(trigger1)
@@ -91,7 +89,7 @@ class MessageEventReconciliationUtilExtractSpec : MessageEventReconciliationUtil
         messageList.add(message2)
         messageList.add(testMessage)
         val testMessageList = MessageEventReconciliationUtil.instance().extractTestMessages(messageList)
-        testMessageList[0] shouldEqual testMessage
+        testMessageList[0] shouldBeEqualTo testMessage
         testMessageList.shouldHaveSize(1)
     }
 }
@@ -109,7 +107,7 @@ class MessageEventReconciliationUtilReconcileSpec : MessageEventReconciliationUt
         val outputMessageList = MessageEventReconciliationUtil.instance()
                 .reconcileMessagesAndEvents(inputMessageList)
         // Re-assert the output with qualifying event.
-        outputMessageList[0] shouldEqual message2
+        outputMessageList[0] shouldBeEqualTo message2
         outputMessageList.shouldHaveSize(1)
     }
 
@@ -287,7 +285,7 @@ class MessageEventReconciliationUtilReconcileSpec : MessageEventReconciliationUt
                 .reconcileMessagesAndEvents(inputMessageList)
         // Re-assert the output with qualifying event.
         outputMessageList.shouldHaveSize(1)
-        outputMessageList[0].getCampaignId() shouldEqual "message2"
+        outputMessageList[0].getCampaignId() shouldBeEqualTo "message2"
 
         LocalDisplayedMessageRepository.instance().addMessage(message2) // increment "displayed" times
 
@@ -316,7 +314,7 @@ class MessageEventReconciliationUtilReconcileSpec : MessageEventReconciliationUt
                 .reconcileMessagesAndEvents(inputMessageList)
         // Re-assert the output with qualifying event.
         outputMessageList.shouldHaveSize(1)
-        outputMessageList[0].getCampaignId() shouldEqual "message2"
+        outputMessageList[0].getCampaignId() shouldBeEqualTo "message2"
 
         LocalDisplayedMessageRepository.instance().addMessage(message2) // increment "displayed" times
 
@@ -345,7 +343,7 @@ class MessageEventReconciliationUtilReconcileSpec : MessageEventReconciliationUt
                 .reconcileMessagesAndEvents(inputMessageList)
         // Re-assert the output with qualifying event.
         outputMessageList.shouldHaveSize(1)
-        outputMessageList[0].getCampaignId() shouldEqual "message2"
+        outputMessageList[0].getCampaignId() shouldBeEqualTo "message2"
 
         LocalDisplayedMessageRepository.instance().addMessage(message2) // increment "displayed" times
 
@@ -375,7 +373,7 @@ class MessageEventReconciliationUtilReconcileSpec : MessageEventReconciliationUt
         var outputMessageList = MessageEventReconciliationUtil.instance().reconcileMessagesAndEvents(inputMessageList)
         // Re-assert the output with qualifying event.
         outputMessageList.shouldHaveSize(1)
-        outputMessageList[0].getCampaignId() shouldEqual "message2"
+        outputMessageList[0].getCampaignId() shouldBeEqualTo "message2"
 
         LocalDisplayedMessageRepository.instance().addMessage(message2) // increment "displayed" times
 

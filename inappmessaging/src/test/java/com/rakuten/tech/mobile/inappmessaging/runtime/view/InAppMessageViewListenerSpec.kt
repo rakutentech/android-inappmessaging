@@ -16,6 +16,8 @@ import com.rakuten.tech.mobile.inappmessaging.runtime.manager.DisplayManager
 import com.rakuten.tech.mobile.inappmessaging.runtime.utils.BuildVersionChecker
 import com.rakuten.tech.mobile.inappmessaging.runtime.workmanager.schedulers.EventMessageReconciliationScheduler
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.ObsoleteCoroutinesApi
 import kotlinx.coroutines.newSingleThreadContext
 import kotlinx.coroutines.test.resetMain
 import kotlinx.coroutines.test.setMain
@@ -24,7 +26,6 @@ import org.junit.After
 import org.junit.Before
 import org.junit.Test
 import org.mockito.Mockito
-import org.mockito.MockitoAnnotations
 import org.robolectric.annotation.Config
 
 /**
@@ -37,15 +38,18 @@ open class InAppMessageViewListenerSpec : BaseTest() {
     internal val mockEventScheduler = Mockito.mock(EventMessageReconciliationScheduler::class.java)
     internal val mockActivity = Mockito.mock(Activity::class.java)
     internal val mockInApp = Mockito.mock(InAppMessaging::class.java)
+    @ObsoleteCoroutinesApi
     private val mainThreadSurrogate = newSingleThreadContext("UI thread")
-    private val defaultThreadSurrogate = newSingleThreadContext("Default thread")
 
+    @ExperimentalCoroutinesApi
+    @ObsoleteCoroutinesApi
     @Before
     open fun setup() {
-        MockitoAnnotations.initMocks(this)
         Dispatchers.setMain(mainThreadSurrogate)
     }
 
+    @ExperimentalCoroutinesApi
+    @ObsoleteCoroutinesApi
     @After
     open fun tearDown() {
         Dispatchers.resetMain()
@@ -95,6 +99,8 @@ class InAppMessageViewListenerOnTouchSpec : InAppMessageViewListenerSpec() {
     private val mockMotionEvent = Mockito.mock(MotionEvent::class.java)
     private val mockCheck = Mockito.mock(BuildVersionChecker::class.java)
 
+    @ObsoleteCoroutinesApi
+    @ExperimentalCoroutinesApi
     @Before
     override fun setup() {
         super.setup()

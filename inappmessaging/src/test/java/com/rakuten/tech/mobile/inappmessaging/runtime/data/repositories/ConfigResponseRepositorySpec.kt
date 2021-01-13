@@ -3,7 +3,7 @@ package com.rakuten.tech.mobile.inappmessaging.runtime.data.repositories
 import com.google.gson.Gson
 import com.rakuten.tech.mobile.inappmessaging.runtime.BaseTest
 import com.rakuten.tech.mobile.inappmessaging.runtime.data.responses.config.ConfigResponse
-import org.amshove.kluent.shouldEqual
+import org.amshove.kluent.shouldBeEqualTo
 import org.junit.Test
 
 /**
@@ -19,26 +19,26 @@ class ConfigResponseRepositorySpec : BaseTest() {
     @Test
     fun `should be empty string for impression endpoints with initial values`() {
         ConfigResponseRepository.resetInstance()
-        ConfigResponseRepository.instance().getImpressionEndpoint() shouldEqual ""
+        ConfigResponseRepository.instance().getImpressionEndpoint() shouldBeEqualTo ""
     }
 
     @Test
     fun `should be empty string for display endpoints with initial values`() {
         ConfigResponseRepository.resetInstance()
-        ConfigResponseRepository.instance().getDisplayPermissionEndpoint() shouldEqual ""
+        ConfigResponseRepository.instance().getDisplayPermissionEndpoint() shouldBeEqualTo ""
     }
 
     @Test
     fun `should be empty string for ping endpoints with initial values`() {
         ConfigResponseRepository.resetInstance()
-        ConfigResponseRepository.instance().getPingEndpoint() shouldEqual ""
+        ConfigResponseRepository.instance().getPingEndpoint() shouldBeEqualTo ""
     }
 
     @Test
     fun `should be valid value for impression endpoints with initial values`() {
         val response = Gson().fromJson(CONFIG_RESPONSE.trimIndent(), ConfigResponse::class.java)
         ConfigResponseRepository.instance().addConfigResponse(response.data)
-        ConfigResponseRepository.instance().getImpressionEndpoint() shouldEqual response.data?.endpoints?.impression
+        ConfigResponseRepository.instance().getImpressionEndpoint() shouldBeEqualTo response.data?.endpoints?.impression
     }
 
     @Test
@@ -46,14 +46,14 @@ class ConfigResponseRepositorySpec : BaseTest() {
         val response = Gson().fromJson(CONFIG_RESPONSE.trimIndent(), ConfigResponse::class.java)
         ConfigResponseRepository.instance().addConfigResponse(response.data)
         ConfigResponseRepository.instance()
-                .getDisplayPermissionEndpoint() shouldEqual response.data?.endpoints?.displayPermission
+                .getDisplayPermissionEndpoint() shouldBeEqualTo response.data?.endpoints?.displayPermission
     }
 
     @Test
     fun `should be valid value for ping endpoints with initial values`() {
         val response = Gson().fromJson(CONFIG_RESPONSE.trimIndent(), ConfigResponse::class.java)
         ConfigResponseRepository.instance().addConfigResponse(response.data)
-        ConfigResponseRepository.instance().getPingEndpoint() shouldEqual response.data?.endpoints?.ping
+        ConfigResponseRepository.instance().getPingEndpoint() shouldBeEqualTo response.data?.endpoints?.ping
     }
 
     companion object {
