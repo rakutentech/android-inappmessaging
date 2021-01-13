@@ -44,7 +44,9 @@ class IntegrationSpec {
     fun `should return valid config`() {
         val worker = ConfigWorker(context, workerParameters, HostAppInfoRepository.instance(),
                 ConfigResponseRepository.instance(), mockMessageScheduler)
-        worker.doWork() shouldBeEqualTo ListenableWorker.Result.success()
+        val expected = if (HostAppInfoRepository.instance().getConfigUrl().isNullOrEmpty())
+            ListenableWorker.Result.retry() else ListenableWorker.Result.success()
+        worker.doWork() shouldBeEqualTo expected
 
         // confirm valid config
         ConfigResponseRepository.instance().isConfigEnabled().shouldBeTrue()
@@ -57,11 +59,14 @@ class IntegrationSpec {
     fun `should return valid ping response`() {
         val worker = ConfigWorker(context, workerParameters, HostAppInfoRepository.instance(),
                 ConfigResponseRepository.instance(), mockMessageScheduler)
-        if (worker.doWork() == ListenableWorker.Result.success()) {
+        val result = worker.doWork()
+        if (result == ListenableWorker.Result.success()) {
             val pingWorker = MessageMixerWorker(context, workerParameters, mockEventScheduler, mockMessageScheduler)
             pingWorker.doWork() shouldBeEqualTo ListenableWorker.Result.success()
             PingResponseMessageRepository.instance().lastPingMillis shouldBeGreaterThan 0
             PingResponseMessageRepository.instance().getAllMessagesCopy().shouldBeEmpty()
+        } else {
+            result shouldBeEqualTo ListenableWorker.Result.retry()
         }
     }
 }

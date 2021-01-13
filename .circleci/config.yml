@@ -3,14 +3,6 @@ version: 2.1
 orbs:
   android-sdk: rakutentech/android-sdk@0.2.0
 
-java_tool_options: &java_tool_options >-
-  -Dhttp.proxyHost=pkg.proxy.prod.jp.local
-  -Dhttps.proxyHost=pkg.proxy.prod.jp.local
-  -Dhttp.proxyPort=10080
-  -Dhttps.proxyPort=10080
-  -Dhttp.nonProxyHosts=artifactory.intra.rakuten-it.com
-  -Dhttps.nonProxyHosts=artifactory.intra.rakuten-it.com
-
 jobs:
   integration-test:
     docker:
@@ -21,9 +13,6 @@ jobs:
       JVM_OPTS: "-Xmx1024m -XX:+PrintFlagsFinal -XX:+PrintGCDetails"
       _JAVA_OPTIONS: "-Xmx1024m"
       GRADLE_OPTS: "-Dorg.gradle.daemon=false -Dorg.gradle.workers.max=1 -Dorg.gradle.parallel=false"
-      JAVA_TOOL_OPTIONS: *java_tool_options
-      HTTP_PROXY: http://pkg.proxy.prod.jp.local:10080
-      HTTPS_PROXY: http://pkg.proxy.prod.jp.local:10080
     steps:
       - checkout
       - run: git submodule update --init
@@ -90,10 +79,10 @@ workflows:
   integration-test:
     triggers:
       - schedule:
-          cron: "10 10 * * *"
+          cron: "0 11,9 * * *"
           filters:
             branches:
               only:
-                - feature/SDKCF-3110
+                - master
     jobs:
       - integration-test

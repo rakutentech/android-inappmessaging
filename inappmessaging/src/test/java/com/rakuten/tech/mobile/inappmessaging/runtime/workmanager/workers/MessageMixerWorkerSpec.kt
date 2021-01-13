@@ -22,8 +22,11 @@ import org.junit.Test
 import org.junit.runner.RunWith
 import org.mockito.Mock
 import org.mockito.Mockito
+import org.mockito.MockitoAnnotations
 import org.robolectric.RobolectricTestRunner
+import org.robolectric.Shadows
 import org.robolectric.annotation.Config
+import org.robolectric.annotation.LooperMode
 import retrofit2.Response
 import java.net.HttpURLConnection
 
@@ -40,6 +43,7 @@ class MessageMixerWorkerSpec : BaseTest() {
 
     @Before
     fun setup() {
+        MockitoAnnotations.initMocks(this)
         WorkManagerTestInitHelper.initializeTestWorkManager(ApplicationProvider.getApplicationContext())
         Settings.Secure.putString(
                 ApplicationProvider.getApplicationContext<Context>().contentResolver,
