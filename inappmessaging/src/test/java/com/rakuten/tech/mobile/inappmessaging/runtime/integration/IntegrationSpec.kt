@@ -48,11 +48,14 @@ class IntegrationSpec {
             ListenableWorker.Result.retry() else ListenableWorker.Result.success()
         worker.doWork() shouldBeEqualTo expected
 
-        // confirm valid config
-        ConfigResponseRepository.instance().isConfigEnabled().shouldBeTrue()
-        ConfigResponseRepository.instance().getPingEndpoint().shouldNotBeNullOrEmpty()
-        ConfigResponseRepository.instance().getDisplayPermissionEndpoint().shouldNotBeNullOrEmpty()
-        ConfigResponseRepository.instance().getImpressionEndpoint().shouldNotBeNullOrEmpty()
+        // will not work on forked repo (PR) since environment variables are not shared
+        if (expected == ListenableWorker.Result.success()) {
+            // confirm valid config
+            ConfigResponseRepository.instance().isConfigEnabled().shouldBeTrue()
+            ConfigResponseRepository.instance().getPingEndpoint().shouldNotBeNullOrEmpty()
+            ConfigResponseRepository.instance().getDisplayPermissionEndpoint().shouldNotBeNullOrEmpty()
+            ConfigResponseRepository.instance().getImpressionEndpoint().shouldNotBeNullOrEmpty()
+        }
     }
 
     @Test
