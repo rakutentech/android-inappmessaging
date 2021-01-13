@@ -3,6 +3,14 @@ version: 2.1
 orbs:
   android-sdk: rakutentech/android-sdk@0.2.0
 
+java_tool_options: &java_tool_options >-
+  -Dhttp.proxyHost=pkg.proxy.prod.jp.local
+  -Dhttps.proxyHost=pkg.proxy.prod.jp.local
+  -Dhttp.proxyPort=10080
+  -Dhttps.proxyPort=10080
+  -Dhttp.nonProxyHosts=artifactory.intra.rakuten-it.com
+  -Dhttps.nonProxyHosts=artifactory.intra.rakuten-it.com
+
 jobs:
   integration-test:
     docker:
@@ -89,7 +97,7 @@ workflows:
   integration-test:
     triggers:
       - schedule:
-          cron: "05 10 * * *"
+          cron: "10 10 * * *"
           filters:
             branches:
               only:
