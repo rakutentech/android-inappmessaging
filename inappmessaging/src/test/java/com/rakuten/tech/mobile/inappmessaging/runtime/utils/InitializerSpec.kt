@@ -15,12 +15,11 @@ import com.rakuten.tech.mobile.inappmessaging.runtime.exception.InAppMessagingIn
 import org.amshove.kluent.When
 import org.amshove.kluent.calling
 import org.amshove.kluent.itReturns
-import org.amshove.kluent.shouldEqual
+import org.amshove.kluent.shouldBeEqualTo
 import org.junit.Before
 import org.junit.Test
 import org.junit.runner.RunWith
 import org.mockito.Mockito
-import org.mockito.MockitoAnnotations
 import org.robolectric.RobolectricTestRunner
 import org.robolectric.annotation.Config
 import java.security.KeyStoreException
@@ -36,7 +35,6 @@ class InitializerSpec : BaseTest() {
 
     @Before
     fun setup() {
-        MockitoAnnotations.initMocks(this)
         When calling workerParameters.inputData itReturns Data.EMPTY
         context = ApplicationProvider.getApplicationContext()
         Settings.Secure.putString(context?.contentResolver, Settings.Secure.ANDROID_ID, "testid")
@@ -52,10 +50,10 @@ class InitializerSpec : BaseTest() {
                 isDebugLogging = false,
                 isForTesting = true)
         InAppMessaging.instance().registerPreference(TestUserInfoProvider())
-        HostAppInfoRepository.instance().getInAppMessagingSubscriptionKey() shouldEqual "test_sub_key"
+        HostAppInfoRepository.instance().getInAppMessagingSubscriptionKey() shouldBeEqualTo "test_sub_key"
         HostAppInfoRepository.instance()
-                .getPackageName() shouldEqual "com.rakuten.tech.mobile.inappmessaging.runtime.test"
-        HostAppInfoRepository.instance().getVersion() shouldEqual "version.name.101"
+                .getPackageName() shouldBeEqualTo "com.rakuten.tech.mobile.inappmessaging.runtime.test"
+        HostAppInfoRepository.instance().getVersion() shouldBeEqualTo "1.0.2"
     }
 
     @Test

@@ -21,7 +21,6 @@ import org.junit.Before
 import org.junit.Test
 import org.junit.runner.RunWith
 import org.mockito.Mockito
-import org.mockito.MockitoAnnotations
 import org.robolectric.RobolectricTestRunner
 import org.robolectric.annotation.Config
 import java.util.concurrent.ExecutionException
@@ -39,7 +38,6 @@ class SessionManagerSpec : BaseTest() {
 
     @Before
     fun setup() {
-        MockitoAnnotations.initMocks(this)
         LocalEventRepository.instance().clearEvents()
     }
 
@@ -128,7 +126,7 @@ class SessionManagerSpec : BaseTest() {
     private fun verifyTestData(expected: Int) {
         PingResponseMessageRepository.instance().getAllMessagesCopy().shouldHaveSize(0)
         ReadyForDisplayMessageRepository.instance().getAllMessagesCopy()shouldHaveSize(0)
-        LocalDisplayedMessageRepository.instance().numberOfTimesDisplayed(message) shouldEqual 0
+        LocalDisplayedMessageRepository.instance().numberOfTimesDisplayed(message) shouldBeEqualTo 0
         LocalOptedOutMessageRepository.instance().hasMessage(message.getCampaignId()).shouldBeFalse()
         LocalEventRepository.instance().getEvents().shouldHaveSize(expected)
     }

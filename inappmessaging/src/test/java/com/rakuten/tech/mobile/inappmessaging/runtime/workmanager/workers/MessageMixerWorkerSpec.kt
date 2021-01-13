@@ -22,7 +22,6 @@ import org.junit.Test
 import org.junit.runner.RunWith
 import org.mockito.Mock
 import org.mockito.Mockito
-import org.mockito.MockitoAnnotations
 import org.robolectric.RobolectricTestRunner
 import org.robolectric.annotation.Config
 import retrofit2.Response
@@ -41,7 +40,6 @@ class MessageMixerWorkerSpec : BaseTest() {
 
     @Before
     fun setup() {
-        MockitoAnnotations.initMocks(this)
         WorkManagerTestInitHelper.initializeTestWorkManager(ApplicationProvider.getApplicationContext())
         Settings.Secure.putString(
                 ApplicationProvider.getApplicationContext<Context>().contentResolver,
@@ -55,7 +53,7 @@ class MessageMixerWorkerSpec : BaseTest() {
     fun `should fail if request fail`() {
         When calling mockResponse?.isSuccessful itReturns false
         MessageMixerWorker(context, workerParameters!!)
-                .onResponse(mockResponse!!) shouldEqual ListenableWorker.Result.failure()
+                .onResponse(mockResponse!!) shouldBeEqualTo ListenableWorker.Result.failure()
     }
 
     @Test
@@ -63,7 +61,7 @@ class MessageMixerWorkerSpec : BaseTest() {
         When calling mockResponse?.isSuccessful itReturns true
         When calling mockResponse?.body() as Any? itReturns null
         MessageMixerWorker(context!!, workerParameters!!)
-                .onResponse(mockResponse!!) shouldEqual ListenableWorker.Result.success()
+                .onResponse(mockResponse!!) shouldBeEqualTo ListenableWorker.Result.success()
     }
 
     @Test
@@ -71,7 +69,7 @@ class MessageMixerWorkerSpec : BaseTest() {
         When calling mockResponse?.isSuccessful itReturns true
         When calling mockResponse?.body() as Any? itReturns null
         MessageMixerWorker(context!!, workerParameters!!)
-                .onResponse(mockResponse!!) shouldEqual ListenableWorker.Result.success()
+                .onResponse(mockResponse!!) shouldBeEqualTo ListenableWorker.Result.success()
     }
 
     @Test
@@ -80,7 +78,7 @@ class MessageMixerWorkerSpec : BaseTest() {
         When calling mockResponse?.body() itReturns Gson().fromJson(MIXER_RESPONSE.trimIndent(),
                 MessageMixerResponse::class.java)
         MessageMixerWorker(context!!, workerParameters!!)
-                .onResponse(mockResponse!!) shouldEqual ListenableWorker.Result.success()
+                .onResponse(mockResponse!!) shouldBeEqualTo ListenableWorker.Result.success()
     }
 
     @Test
@@ -88,7 +86,7 @@ class MessageMixerWorkerSpec : BaseTest() {
         When calling mockResponse?.isSuccessful itReturns false
         When calling mockResponse?.code() itReturns HttpURLConnection.HTTP_INTERNAL_ERROR
         MessageMixerWorker(context!!, workerParameters!!)
-                .onResponse(mockResponse!!) shouldEqual ListenableWorker.Result.retry()
+                .onResponse(mockResponse!!) shouldBeEqualTo ListenableWorker.Result.retry()
     }
 
     @Test

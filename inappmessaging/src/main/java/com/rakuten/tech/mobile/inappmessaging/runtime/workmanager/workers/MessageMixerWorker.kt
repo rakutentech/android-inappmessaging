@@ -28,9 +28,18 @@ import java.net.HttpURLConnection
 @SuppressWarnings("PMD.ExcessiveImports")
 internal class MessageMixerWorker(
     context: Context,
-    workerParams: WorkerParameters
+    workerParams: WorkerParameters,
+    private val eventMessageScheduler: EventMessageReconciliationScheduler,
+    private val messageMixerScheduler: MessageMixerPingScheduler
 ) :
     Worker(context, workerParams) {
+
+    /**
+     * Overload constructor to handle OneTimeWorkRequest.Builder().
+     */
+    constructor(context: Context, workerParams: WorkerParameters) :
+            this(context, workerParams, EventMessageReconciliationScheduler.instance(),
+                    MessageMixerPingScheduler.instance())
 
     /**
      * This is the main method to do the work. Making Message Mixer network call is the main work.
@@ -90,7 +99,7 @@ internal class MessageMixerWorker(
                 // Start a new MessageEventReconciliationWorker, there was a new Ping Response to parse.
                 // This worker will attempt to cancel message scheduled but hasn't been displayed yet
                 // because there could be an edge case where the message is obsolete.
-                EventMessageReconciliationScheduler.instance().startEventMessageReconciliationWorker()
+                eventMessageScheduler.startEventMessageReconciliationWorker()
 
                 // Schedule next ping.
                 scheduleNextPing(messageMixerResponse.nextPingMillis)
@@ -111,7 +120,7 @@ internal class MessageMixerWorker(
      */
     @Throws(IllegalArgumentException::class)
     private fun scheduleNextPing(nextPingMillis: Long) {
-        MessageMixerPingScheduler.instance().pingMessageMixerService(nextPingMillis)
+        messageMixerScheduler.pingMessageMixerService(nextPingMillis)
         Timber.tag(TAG).d("Next ping scheduled in: %d", nextPingMillis)
     }
 

@@ -48,12 +48,12 @@ class EventSpec(
 
     @Test
     fun `should have correct event type`() {
-        event.getEventType() shouldEqual expectedType.typeId
+        event.getEventType() shouldBeEqualTo expectedType.typeId
     }
 
     @Test
     fun `should have correct event name`() {
-        event.getEventName() shouldEqual expectedName
+        event.getEventName() shouldBeEqualTo expectedName
     }
 
     @Test
@@ -71,7 +71,7 @@ class EventSpec(
     @Test
     fun `RAT event map should correct values`() {
         val map = event.getRatEventMap()
-        map[InAppMessagingConstants.RAT_EVENT_KEY_EVENT_NAME] shouldEqual expectedName
+        map[InAppMessagingConstants.RAT_EVENT_KEY_EVENT_NAME] shouldBeEqualTo expectedName
         map[InAppMessagingConstants.RAT_EVENT_KEY_EVENT_TIMESTAMP] as Long shouldBeGreaterThan 0L
     }
 
@@ -86,6 +86,6 @@ class EventSpec(
 
     @Test
     fun `should not be persistent type`() {
-        event.isPersistentType() shouldEqual expectedPersistType
+        event.isPersistentType() shouldBeEqualTo expectedPersistType
     }
 }

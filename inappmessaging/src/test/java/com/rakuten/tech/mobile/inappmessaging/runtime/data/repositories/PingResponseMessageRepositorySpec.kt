@@ -4,7 +4,7 @@ import com.rakuten.tech.mobile.inappmessaging.runtime.BaseTest
 import com.rakuten.tech.mobile.inappmessaging.runtime.data.models.messages.Message
 import com.rakuten.tech.mobile.inappmessaging.runtime.data.models.messages.ValidTestMessage
 import com.rakuten.tech.mobile.inappmessaging.runtime.utils.InAppMessagingConstants
-import org.amshove.kluent.shouldEqual
+import org.amshove.kluent.shouldBeEqualTo
 import org.amshove.kluent.shouldHaveSize
 import org.junit.Assert
 import org.junit.Before
@@ -29,8 +29,8 @@ class PingResponseMessageRepositorySpec : BaseTest() {
         messageList.add(message1)
         PingResponseMessageRepository.instance().replaceAllMessages(messageList)
         PingResponseMessageRepository.instance().getAllMessagesCopy().shouldHaveSize(2)
-        PingResponseMessageRepository.instance().getAllMessagesCopy()[0] shouldEqual message0
-        PingResponseMessageRepository.instance().getAllMessagesCopy()[1] shouldEqual message1
+        PingResponseMessageRepository.instance().getAllMessagesCopy()[0] shouldBeEqualTo message0
+        PingResponseMessageRepository.instance().getAllMessagesCopy()[1] shouldBeEqualTo message1
     }
 
     @Test
@@ -39,7 +39,7 @@ class PingResponseMessageRepositorySpec : BaseTest() {
             PingResponseMessageRepository.instance().replaceAllMessages(null)
             Assert.fail()
         } catch (e: IllegalArgumentException) {
-            e.localizedMessage shouldEqual InAppMessagingConstants.ARGUMENT_IS_NULL_EXCEPTION
+            e.localizedMessage shouldBeEqualTo InAppMessagingConstants.ARGUMENT_IS_NULL_EXCEPTION
         }
     }
 

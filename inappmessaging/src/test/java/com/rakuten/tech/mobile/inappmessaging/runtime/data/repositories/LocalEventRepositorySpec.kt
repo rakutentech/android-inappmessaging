@@ -5,7 +5,7 @@ import com.rakuten.tech.mobile.inappmessaging.runtime.data.models.appevents.*
 import com.rakuten.tech.mobile.inappmessaging.runtime.manager.EventsManager
 import com.rakuten.tech.mobile.inappmessaging.runtime.utils.InAppMessagingConstants
 import com.rakuten.tech.mobile.inappmessaging.runtime.workmanager.schedulers.EventMessageReconciliationScheduler
-import org.amshove.kluent.shouldEqual
+import org.amshove.kluent.shouldBeEqualTo
 import org.amshove.kluent.shouldHaveSize
 import org.junit.Assert
 import org.junit.Before
@@ -28,7 +28,7 @@ class LocalEventRepositorySpec : BaseTest() {
             LocalEventRepository.instance().addEvent(CustomEvent(""))
             Assert.fail()
         } catch (e: IllegalArgumentException) {
-            e.localizedMessage shouldEqual InAppMessagingConstants.EVENT_NAME_EMPTY_EXCEPTION
+            e.localizedMessage shouldBeEqualTo InAppMessagingConstants.EVENT_NAME_EMPTY_EXCEPTION
         }
     }
 
@@ -38,7 +38,7 @@ class LocalEventRepositorySpec : BaseTest() {
         event.addAttribute("doubleAttr", 1.0)
         event.addAttribute("stringAttr", "1.0")
         LocalEventRepository.instance().addEvent(event)
-        LocalEventRepository.instance().getEvents()[0].getEventName() shouldEqual "test"
+        LocalEventRepository.instance().getEvents()[0].getEventName() shouldBeEqualTo "test"
     }
 
     @Test

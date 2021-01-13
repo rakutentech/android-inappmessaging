@@ -5,7 +5,7 @@ import com.rakuten.tech.mobile.inappmessaging.runtime.InAppMessagingTestConstant
 import com.rakuten.tech.mobile.inappmessaging.runtime.data.models.HostAppInfo
 import com.rakuten.tech.mobile.inappmessaging.runtime.exception.InAppMessagingInitializationException
 import com.rakuten.tech.mobile.inappmessaging.runtime.utils.InAppMessagingConstants
-import org.amshove.kluent.shouldEqual
+import org.amshove.kluent.shouldBeEqualTo
 import org.junit.Assert
 import org.junit.Test
 import java.util.Locale
@@ -24,13 +24,13 @@ class HostAppInfoRepositorySpec : BaseTest() {
                 InAppMessagingTestConstants.SUB_KEY,
                 InAppMessagingTestConstants.LOCALE)
         HostAppInfoRepository.instance().addHostInfo(testAppInfo)
-        HostAppInfoRepository.instance().getVersion() shouldEqual InAppMessagingTestConstants.APP_VERSION
-        HostAppInfoRepository.instance().getPackageName() shouldEqual InAppMessagingTestConstants.APP_ID
-        HostAppInfoRepository.instance().getDeviceLocale() shouldEqual InAppMessagingTestConstants.LOCALE.toString()
+        HostAppInfoRepository.instance().getVersion() shouldBeEqualTo InAppMessagingTestConstants.APP_VERSION
+        HostAppInfoRepository.instance().getPackageName() shouldBeEqualTo InAppMessagingTestConstants.APP_ID
+        HostAppInfoRepository.instance().getDeviceLocale() shouldBeEqualTo InAppMessagingTestConstants.LOCALE.toString()
                 .replace("_", "-").toLowerCase(Locale.getDefault())
         HostAppInfoRepository.instance()
-                .getInAppMessagingSubscriptionKey() shouldEqual InAppMessagingTestConstants.SUB_KEY
-        HostAppInfoRepository.instance().getDeviceId() shouldEqual InAppMessagingTestConstants.DEVICE_ID
+                .getInAppMessagingSubscriptionKey() shouldBeEqualTo InAppMessagingTestConstants.SUB_KEY
+        HostAppInfoRepository.instance().getDeviceId() shouldBeEqualTo InAppMessagingTestConstants.DEVICE_ID
     }
 
     @Test
@@ -39,7 +39,7 @@ class HostAppInfoRepositorySpec : BaseTest() {
             HostAppInfoRepository.instance().addHostInfo(null)
             Assert.fail()
         } catch (e: InAppMessagingInitializationException) {
-            e.localizedMessage shouldEqual InAppMessagingConstants.ARGUMENT_IS_NULL_EXCEPTION
+            e.localizedMessage shouldBeEqualTo InAppMessagingConstants.ARGUMENT_IS_NULL_EXCEPTION
         }
     }
 
@@ -50,7 +50,7 @@ class HostAppInfoRepositorySpec : BaseTest() {
             HostAppInfoRepository.instance().addHostInfo(hostAppInfo)
             Assert.fail()
         } catch (e: InAppMessagingInitializationException) {
-            e.localizedMessage shouldEqual InAppMessagingConstants.VERSION_IS_EMPTY_EXCEPTION
+            e.localizedMessage shouldBeEqualTo InAppMessagingConstants.VERSION_IS_EMPTY_EXCEPTION
         }
     }
 
@@ -61,7 +61,7 @@ class HostAppInfoRepositorySpec : BaseTest() {
             HostAppInfoRepository.instance().addHostInfo(hostAppInfo)
             Assert.fail()
         } catch (e: InAppMessagingInitializationException) {
-            e.localizedMessage shouldEqual InAppMessagingConstants.PACKAGE_NAME_IS_EMPTY_EXCEPTION
+            e.localizedMessage shouldBeEqualTo InAppMessagingConstants.PACKAGE_NAME_IS_EMPTY_EXCEPTION
         }
     }
 
@@ -74,7 +74,7 @@ class HostAppInfoRepositorySpec : BaseTest() {
             HostAppInfoRepository.instance().addHostInfo(hostAppInfo)
             Assert.fail()
         } catch (e: InAppMessagingInitializationException) {
-            e.localizedMessage shouldEqual InAppMessagingConstants.SUBSCRIPTION_KEY_IS_EMPTY_EXCEPTION
+            e.localizedMessage shouldBeEqualTo InAppMessagingConstants.SUBSCRIPTION_KEY_IS_EMPTY_EXCEPTION
         }
     }
 

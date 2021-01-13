@@ -25,35 +25,35 @@ class AccountRepositorySpec : BaseTest() {
 
     @Test
     fun `should get rae token`() {
-        AccountRepository.instance().getRaeToken() shouldEqual ""
+        AccountRepository.instance().getRaeToken() shouldBeEqualTo ""
     }
 
     @Test
     fun `should get user id`() {
-        AccountRepository.instance().getUserId() shouldEqual ""
+        AccountRepository.instance().getUserId() shouldBeEqualTo ""
     }
 
     @Test
     fun `should get rakuten id`() {
-        AccountRepository.instance().getRakutenId() shouldEqual ""
+        AccountRepository.instance().getRakutenId() shouldBeEqualTo ""
     }
 
     @Test
     fun `should get user id with valid provider`() {
         AccountRepository.instance().userInfoProvider = TestUserInfoProvider()
-        AccountRepository.instance().getUserId() shouldEqual TestUserInfoProvider().provideUserId()
+        AccountRepository.instance().getUserId() shouldBeEqualTo TestUserInfoProvider().provideUserId()
     }
 
     @Test
     fun `should get rae token with valid provider`() {
         AccountRepository.instance().userInfoProvider = TestUserInfoProvider()
-        AccountRepository.instance().getRaeToken() shouldEqual "OAuth2 " + TestUserInfoProvider().provideRaeToken()
+        AccountRepository.instance().getRaeToken() shouldBeEqualTo "OAuth2 " + TestUserInfoProvider().provideRaeToken()
     }
 
     @Test
     fun `should get rakuten id with valid provider`() {
         AccountRepository.instance().userInfoProvider = TestUserInfoProvider()
-        AccountRepository.instance().getRakutenId() shouldEqual TestUserInfoProvider().provideRakutenId()
+        AccountRepository.instance().getRakutenId() shouldBeEqualTo TestUserInfoProvider().provideRakutenId()
     }
 
     @Test
@@ -61,7 +61,7 @@ class AccountRepositorySpec : BaseTest() {
         val mockProvider = Mockito.mock(TestUserInfoProvider::class.java)
         When calling mockProvider.provideRaeToken() itReturns null
         AccountRepository.instance().userInfoProvider = mockProvider
-        AccountRepository.instance().getRaeToken() shouldEqual ""
+        AccountRepository.instance().getRaeToken() shouldBeEqualTo ""
     }
 
     @Test
@@ -69,7 +69,7 @@ class AccountRepositorySpec : BaseTest() {
         val mockProvider = Mockito.mock(TestUserInfoProvider::class.java)
         When calling mockProvider.provideUserId() itReturns null
         AccountRepository.instance().userInfoProvider = mockProvider
-        AccountRepository.instance().getUserId() shouldEqual ""
+        AccountRepository.instance().getUserId() shouldBeEqualTo ""
     }
 
     @Test
@@ -77,7 +77,7 @@ class AccountRepositorySpec : BaseTest() {
         val mockProvider = Mockito.mock(TestUserInfoProvider::class.java)
         When calling mockProvider.provideRakutenId() itReturns null
         AccountRepository.instance().userInfoProvider = mockProvider
-        AccountRepository.instance().getRakutenId() shouldEqual ""
+        AccountRepository.instance().getRakutenId() shouldBeEqualTo ""
     }
 
     @Test

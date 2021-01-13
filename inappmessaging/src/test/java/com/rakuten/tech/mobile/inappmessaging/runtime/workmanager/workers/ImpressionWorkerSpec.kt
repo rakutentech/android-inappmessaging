@@ -25,12 +25,11 @@ import okhttp3.ResponseBody
 import org.amshove.kluent.When
 import org.amshove.kluent.calling
 import org.amshove.kluent.itReturns
-import org.amshove.kluent.shouldEqual
+import org.amshove.kluent.shouldBeEqualTo
 import org.junit.Before
 import org.junit.Test
 import org.junit.runner.RunWith
 import org.mockito.Mockito
-import org.mockito.MockitoAnnotations
 import org.robolectric.RobolectricTestRunner
 import org.robolectric.annotation.Config
 import retrofit2.Call
@@ -53,7 +52,6 @@ class ImpressionWorkerSpec : BaseTest() {
 
     @Before
     fun setup() {
-        MockitoAnnotations.initMocks(this)
         AccountRepository.instance().userInfoProvider = TestUserInfoProvider()
         HostAppInfoRepository.instance().addHostInfo(HostAppInfo(InAppMessagingTestConstants.APP_ID,
                 InAppMessagingTestConstants.DEVICE_ID, InAppMessagingTestConstants.APP_VERSION,
@@ -78,24 +76,24 @@ class ImpressionWorkerSpec : BaseTest() {
 
     @Test
     fun `should response body call contains two headers`() {
-        responseBodyCall!!.request().headers().size() shouldEqual 3
+        responseBodyCall!!.request().headers().size() shouldBeEqualTo 3
     }
 
     @Test
     fun `should response body call contains token header`() {
-        responseBodyCall!!.request().header(MessageMixerRetrofitService.RAE_TOKEN_HEADER) shouldEqual
+        responseBodyCall!!.request().header(MessageMixerRetrofitService.RAE_TOKEN_HEADER) shouldBeEqualTo
                 "OAuth2 " + TestUserInfoProvider.TEST_USER_RAE_TOKEN
     }
 
     @Test
     fun `should response body call contains sub id header`() {
-        responseBodyCall!!.request().header(MessageMixerRetrofitService.SUBSCRIPTION_ID_HEADER) shouldEqual
+        responseBodyCall!!.request().header(MessageMixerRetrofitService.SUBSCRIPTION_ID_HEADER) shouldBeEqualTo
                 InAppMessagingTestConstants.SUB_KEY
     }
 
     @Test
     fun `should response body call contains device id header`() {
-        responseBodyCall!!.request().header(MessageMixerRetrofitService.DEVICE_ID_HEADER) shouldEqual
+        responseBodyCall!!.request().header(MessageMixerRetrofitService.DEVICE_ID_HEADER) shouldBeEqualTo
                 InAppMessagingTestConstants.DEVICE_ID
     }
 
@@ -115,7 +113,7 @@ class ImpressionWorkerSpec : BaseTest() {
         ConfigResponseRepository.instance().addConfigResponse(response.data)
         workManager.enqueue(request).result.get()
         val workInfo = workManager.getWorkInfoById(request.id).get()
-        workInfo.state shouldEqual WorkInfo.State.FAILED
+        workInfo.state shouldBeEqualTo WorkInfo.State.FAILED
     }
 
     @Test
@@ -135,7 +133,7 @@ class ImpressionWorkerSpec : BaseTest() {
 
         workManager.enqueue(request).result.get()
         val workInfo = workManager.getWorkInfoById(request.id).get()
-        workInfo.state shouldEqual WorkInfo.State.FAILED
+        workInfo.state shouldBeEqualTo WorkInfo.State.FAILED
     }
 
     @Test
@@ -153,7 +151,7 @@ class ImpressionWorkerSpec : BaseTest() {
         retrieveValidConfig()
         workManager.enqueue(request).result.get()
         val workInfo = workManager.getWorkInfoById(request.id).get()
-        workInfo.state shouldEqual WorkInfo.State.FAILED
+        workInfo.state shouldBeEqualTo WorkInfo.State.FAILED
     }
 
     @Test
@@ -172,7 +170,7 @@ class ImpressionWorkerSpec : BaseTest() {
         retrieveValidConfig()
         workManager.enqueue(request).result.get()
         val workInfo = workManager.getWorkInfoById(request.id).get()
-        workInfo.state shouldEqual WorkInfo.State.FAILED
+        workInfo.state shouldBeEqualTo WorkInfo.State.FAILED
     }
 
     @Test
@@ -192,7 +190,7 @@ class ImpressionWorkerSpec : BaseTest() {
         ConfigResponseRepository.instance().addConfigResponse(response.data)
         workManager.enqueue(request).result.get()
         val workInfo = workManager.getWorkInfoById(request.id).get()
-        workInfo.state shouldEqual WorkInfo.State.ENQUEUED
+        workInfo.state shouldBeEqualTo WorkInfo.State.ENQUEUED
     }
 
     @Test
@@ -212,7 +210,7 @@ class ImpressionWorkerSpec : BaseTest() {
         retrieveValidConfig()
         workManager.enqueue(request).result.get()
         val workInfo = workManager.getWorkInfoById(request.id).get()
-        workInfo.state shouldEqual WorkInfo.State.FAILED
+        workInfo.state shouldBeEqualTo WorkInfo.State.FAILED
     }
 
     private fun retrieveValidConfig() {

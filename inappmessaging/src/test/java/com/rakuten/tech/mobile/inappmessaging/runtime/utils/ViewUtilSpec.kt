@@ -4,7 +4,7 @@ import android.os.Build
 import androidx.test.core.app.ApplicationProvider
 import com.rakuten.tech.mobile.inappmessaging.runtime.BaseTest
 import com.rakuten.tech.mobile.inappmessaging.runtime.data.enums.SlideFromDirectionType
-import org.amshove.kluent.shouldEqual
+import org.amshove.kluent.shouldBeEqualTo
 import org.junit.Test
 import org.junit.runner.RunWith
 import org.robolectric.RobolectricTestRunner
@@ -22,6 +22,6 @@ class ViewUtilSpec : BaseTest() {
         val animation = ViewUtil.getSlidingAnimation(
                 ApplicationProvider.getApplicationContext(),
                 SlideFromDirectionType.BOTTOM)
-        animation.duration shouldEqual 400L
+        animation.duration shouldBeEqualTo 400L
     }
 }

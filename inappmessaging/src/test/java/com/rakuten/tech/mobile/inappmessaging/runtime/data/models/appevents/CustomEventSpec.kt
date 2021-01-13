@@ -6,7 +6,6 @@ import com.rakuten.tech.mobile.inappmessaging.runtime.data.enums.ValueType
 import com.rakuten.tech.mobile.inappmessaging.runtime.utils.InAppMessagingConstants
 import org.amshove.kluent.shouldBeEqualTo
 import org.amshove.kluent.shouldBeFalse
-import org.amshove.kluent.shouldEqual
 import org.junit.Test
 import org.junit.runner.RunWith
 import org.robolectric.ParameterizedRobolectricTestRunner
@@ -90,33 +89,33 @@ class CustomEventParameterizedSpec(
         when (attrType) {
             ValueType.STRING -> {
                 event.addAttribute(STRING_ATTRIBUTE, attrValue)
-                event.getAttributeMap()[STRING_ATTRIBUTE]?.name shouldEqual STRING_ATTRIBUTE
-                event.getAttributeMap()[STRING_ATTRIBUTE]?.value shouldEqual attrValue
-                event.getAttributeMap()[STRING_ATTRIBUTE]?.valueType shouldEqual ValueType.STRING.typeId
+                event.getAttributeMap()[STRING_ATTRIBUTE]?.name shouldBeEqualTo STRING_ATTRIBUTE
+                event.getAttributeMap()[STRING_ATTRIBUTE]?.value shouldBeEqualTo attrValue
+                event.getAttributeMap()[STRING_ATTRIBUTE]?.valueType shouldBeEqualTo ValueType.STRING.typeId
             }
             ValueType.INTEGER -> {
                 event.addAttribute(INTEGER_ATTRIBUTE, attrValue.toInt())
-                event.getAttributeMap()[INTEGER_ATTRIBUTE]?.name shouldEqual INTEGER_ATTRIBUTE
-                event.getAttributeMap()[INTEGER_ATTRIBUTE]?.value shouldEqual attrValue
-                event.getAttributeMap()[INTEGER_ATTRIBUTE]?.valueType shouldEqual ValueType.INTEGER.typeId
+                event.getAttributeMap()[INTEGER_ATTRIBUTE]?.name shouldBeEqualTo INTEGER_ATTRIBUTE
+                event.getAttributeMap()[INTEGER_ATTRIBUTE]?.value shouldBeEqualTo attrValue
+                event.getAttributeMap()[INTEGER_ATTRIBUTE]?.valueType shouldBeEqualTo ValueType.INTEGER.typeId
             }
             ValueType.DOUBLE -> {
                 event.addAttribute(DOUBLE_ATTRIBUTE, attrValue.toDouble())
-                event.getAttributeMap()[DOUBLE_ATTRIBUTE]?.name shouldEqual DOUBLE_ATTRIBUTE
-                event.getAttributeMap()[DOUBLE_ATTRIBUTE]?.value shouldEqual attrValue
-                event.getAttributeMap()[DOUBLE_ATTRIBUTE]?.valueType shouldEqual ValueType.DOUBLE.typeId
+                event.getAttributeMap()[DOUBLE_ATTRIBUTE]?.name shouldBeEqualTo DOUBLE_ATTRIBUTE
+                event.getAttributeMap()[DOUBLE_ATTRIBUTE]?.value shouldBeEqualTo attrValue
+                event.getAttributeMap()[DOUBLE_ATTRIBUTE]?.valueType shouldBeEqualTo ValueType.DOUBLE.typeId
             }
             ValueType.BOOLEAN -> {
                 event.addAttribute(BOOLEAN_ATTRIBUTE, attrValue.toBoolean())
-                event.getAttributeMap()[BOOLEAN_ATTRIBUTE]?.name shouldEqual BOOLEAN_ATTRIBUTE
-                event.getAttributeMap()[BOOLEAN_ATTRIBUTE]?.value shouldEqual attrValue
-                event.getAttributeMap()[BOOLEAN_ATTRIBUTE]?.valueType shouldEqual ValueType.BOOLEAN.typeId
+                event.getAttributeMap()[BOOLEAN_ATTRIBUTE]?.name shouldBeEqualTo BOOLEAN_ATTRIBUTE
+                event.getAttributeMap()[BOOLEAN_ATTRIBUTE]?.value shouldBeEqualTo attrValue
+                event.getAttributeMap()[BOOLEAN_ATTRIBUTE]?.valueType shouldBeEqualTo ValueType.BOOLEAN.typeId
             }
             ValueType.TIME_IN_MILLI -> {
                 event.addAttribute(DATE_ATTRIBUTE, Date(attrValue.toLong()))
-                event.getAttributeMap()[DATE_ATTRIBUTE]?.name shouldEqual DATE_ATTRIBUTE
-                event.getAttributeMap()[DATE_ATTRIBUTE]?.value shouldEqual attrValue
-                event.getAttributeMap()[DATE_ATTRIBUTE]?.valueType shouldEqual ValueType.TIME_IN_MILLI.typeId
+                event.getAttributeMap()[DATE_ATTRIBUTE]?.name shouldBeEqualTo DATE_ATTRIBUTE
+                event.getAttributeMap()[DATE_ATTRIBUTE]?.value shouldBeEqualTo attrValue
+                event.getAttributeMap()[DATE_ATTRIBUTE]?.valueType shouldBeEqualTo ValueType.TIME_IN_MILLI.typeId
             }
             else -> {
             }
@@ -129,33 +128,33 @@ class CustomEventParameterizedSpec(
         when (attrType) {
             ValueType.STRING -> {
                 event.addAttribute(STRING_ATTRIBUTE_UPPER, attrValue)
-                event.getAttributeMap()[STRING_ATTRIBUTE_UPPER]?.name shouldEqual STRING_ATTRIBUTE
-                event.getAttributeMap()[STRING_ATTRIBUTE_UPPER]?.value shouldEqual attrValue
-                event.getAttributeMap()[STRING_ATTRIBUTE_UPPER]?.valueType shouldEqual ValueType.STRING.typeId
+                event.getAttributeMap()[STRING_ATTRIBUTE_UPPER]?.name shouldBeEqualTo STRING_ATTRIBUTE
+                event.getAttributeMap()[STRING_ATTRIBUTE_UPPER]?.value shouldBeEqualTo attrValue
+                event.getAttributeMap()[STRING_ATTRIBUTE_UPPER]?.valueType shouldBeEqualTo ValueType.STRING.typeId
             }
             ValueType.INTEGER -> {
                 event.addAttribute(INTEGER_ATTRIBUTE_UPPER, attrValue.toInt())
-                event.getAttributeMap()[INTEGER_ATTRIBUTE_UPPER]?.name shouldEqual INTEGER_ATTRIBUTE
-                event.getAttributeMap()[INTEGER_ATTRIBUTE_UPPER]?.value shouldEqual attrValue
-                event.getAttributeMap()[INTEGER_ATTRIBUTE_UPPER]?.valueType shouldEqual ValueType.INTEGER.typeId
+                event.getAttributeMap()[INTEGER_ATTRIBUTE_UPPER]?.name shouldBeEqualTo INTEGER_ATTRIBUTE
+                event.getAttributeMap()[INTEGER_ATTRIBUTE_UPPER]?.value shouldBeEqualTo attrValue
+                event.getAttributeMap()[INTEGER_ATTRIBUTE_UPPER]?.valueType shouldBeEqualTo ValueType.INTEGER.typeId
             }
             ValueType.DOUBLE -> {
                 event.addAttribute(DOUBLE_ATTRIBUTE_UPPER, attrValue.toDouble())
-                event.getAttributeMap()[DOUBLE_ATTRIBUTE_UPPER]?.name shouldEqual DOUBLE_ATTRIBUTE
-                event.getAttributeMap()[DOUBLE_ATTRIBUTE_UPPER]?.value shouldEqual attrValue
-                event.getAttributeMap()[DOUBLE_ATTRIBUTE_UPPER]?.valueType shouldEqual ValueType.DOUBLE.typeId
+                event.getAttributeMap()[DOUBLE_ATTRIBUTE_UPPER]?.name shouldBeEqualTo DOUBLE_ATTRIBUTE
+                event.getAttributeMap()[DOUBLE_ATTRIBUTE_UPPER]?.value shouldBeEqualTo attrValue
+                event.getAttributeMap()[DOUBLE_ATTRIBUTE_UPPER]?.valueType shouldBeEqualTo ValueType.DOUBLE.typeId
             }
             ValueType.BOOLEAN -> {
                 event.addAttribute(BOOLEAN_ATTRIBUTE_UPPER, attrValue.toBoolean())
-                event.getAttributeMap()[BOOLEAN_ATTRIBUTE_UPPER]?.name shouldEqual BOOLEAN_ATTRIBUTE
-                event.getAttributeMap()[BOOLEAN_ATTRIBUTE_UPPER]?.value shouldEqual attrValue
-                event.getAttributeMap()[BOOLEAN_ATTRIBUTE_UPPER]?.valueType shouldEqual ValueType.BOOLEAN.typeId
+                event.getAttributeMap()[BOOLEAN_ATTRIBUTE_UPPER]?.name shouldBeEqualTo BOOLEAN_ATTRIBUTE
+                event.getAttributeMap()[BOOLEAN_ATTRIBUTE_UPPER]?.value shouldBeEqualTo attrValue
+                event.getAttributeMap()[BOOLEAN_ATTRIBUTE_UPPER]?.valueType shouldBeEqualTo ValueType.BOOLEAN.typeId
             }
             ValueType.TIME_IN_MILLI -> {
                 event.addAttribute(DATE_ATTRIBUTE_UPPER, Date(attrValue.toLong()))
-                event.getAttributeMap()[DATE_ATTRIBUTE_UPPER]?.name shouldEqual DATE_ATTRIBUTE
-                event.getAttributeMap()[DATE_ATTRIBUTE_UPPER]?.value shouldEqual attrValue
-                event.getAttributeMap()[DATE_ATTRIBUTE_UPPER]?.valueType shouldEqual ValueType.TIME_IN_MILLI.typeId
+                event.getAttributeMap()[DATE_ATTRIBUTE_UPPER]?.name shouldBeEqualTo DATE_ATTRIBUTE
+                event.getAttributeMap()[DATE_ATTRIBUTE_UPPER]?.value shouldBeEqualTo attrValue
+                event.getAttributeMap()[DATE_ATTRIBUTE_UPPER]?.valueType shouldBeEqualTo ValueType.TIME_IN_MILLI.typeId
             }
             else -> {
             }

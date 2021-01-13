@@ -23,7 +23,6 @@ import org.junit.Before
 import org.junit.Test
 import org.junit.runner.RunWith
 import org.mockito.Mockito
-import org.mockito.MockitoAnnotations
 import org.robolectric.RobolectricTestRunner
 import org.robolectric.annotation.Config
 
@@ -42,7 +41,6 @@ class DisplayMessageRunnableSpec : BaseTest() {
     @Before
     fun setup() {
         SoLoader.setInTestMode()
-        MockitoAnnotations.initMocks(this)
         When calling view!!.id itReturns 12343254
         When calling hostAppActivity.window itReturns window
     }
