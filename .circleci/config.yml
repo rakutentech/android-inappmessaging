@@ -2,6 +2,7 @@ version: 2.1
 
 orbs:
   android-sdk: rakutentech/android-sdk@0.2.0
+  slack: circleci/slack@4.2.0
 
 jobs:
   integration-test:
@@ -22,6 +23,12 @@ jobs:
       - run:
           name: Run Tests
           command: ./gradlew clean testRelease --tests com.rakuten.tech.mobile.inappmessaging.runtime.integration.IntegrationSpec
+      - slack/notify:
+          event: fail
+          template: basic_fail_1
+      - slack/notify:
+          event: pass
+          template: success_tagged_deploy_1
 
 workflows:
   version: 2.1
