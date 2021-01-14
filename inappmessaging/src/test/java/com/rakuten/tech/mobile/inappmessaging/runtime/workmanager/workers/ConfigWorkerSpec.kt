@@ -55,7 +55,8 @@ class ConfigWorkerSpec : BaseTest() {
         When calling mockResponse?.isSuccessful itReturns false
         When calling mockResponse?.code() itReturns 500
         When calling mockResponse?.body() itReturns null
-        ConfigWorker(context, workerParameters).onResponse(mockResponse!!) shouldBeEqualTo ListenableWorker.Result.retry()
+        ConfigWorker(context,
+                workerParameters).onResponse(mockResponse!!) shouldBeEqualTo ListenableWorker.Result.retry()
     }
 
     @Test
