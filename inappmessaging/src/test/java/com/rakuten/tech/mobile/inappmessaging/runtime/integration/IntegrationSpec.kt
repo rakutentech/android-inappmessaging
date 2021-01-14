@@ -7,6 +7,8 @@ import androidx.test.core.app.ApplicationProvider
 import androidx.work.ListenableWorker
 import androidx.work.WorkerParameters
 import com.rakuten.tech.mobile.inappmessaging.runtime.AppManifestConfig
+import com.rakuten.tech.mobile.inappmessaging.runtime.InAppMessaging
+import com.rakuten.tech.mobile.inappmessaging.runtime.UserInfoProvider
 import com.rakuten.tech.mobile.inappmessaging.runtime.data.repositories.ConfigResponseRepository
 import com.rakuten.tech.mobile.inappmessaging.runtime.data.repositories.HostAppInfoRepository
 import com.rakuten.tech.mobile.inappmessaging.runtime.data.repositories.PingResponseMessageRepository
@@ -36,6 +38,11 @@ class IntegrationSpec {
         val manifest = AppManifestConfig(context)
         Settings.Secure.putString(context.contentResolver, Settings.Secure.ANDROID_ID, "testid")
         ConfigResponseRepository.resetInstance()
+        InAppMessaging.instance().registerPreference(object : UserInfoProvider {
+            override fun provideRaeToken() = ""
+            override fun provideUserId() = ""
+            override fun provideRakutenId() = ""
+        })
         // to initialize host app info
         Initializer.initializeSdk(context, manifest.subscriptionKey(), manifest.configUrl(), true)
     }

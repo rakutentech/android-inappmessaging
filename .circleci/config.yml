@@ -79,7 +79,7 @@ workflows:
   integration-test:
     triggers:
       - schedule:
-          cron: "0 11,9 * * *"
+          cron: "0 9,23 * * *"
           filters:
             branches:
               only:
