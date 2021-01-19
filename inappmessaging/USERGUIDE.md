@@ -112,9 +112,11 @@ class AppUserInfoProvider : UserInfoProvider {
 
 * Rakuten ID - Any value that is considered by the app as user identifier.
 * User ID - The ID when registering a Rakuten account (e.g. email address or username).
-* RAE Token - This is the token provided by the internal UserSDK as the RAE authentication token value.
+* RAE Token - This is the token provided by the internal User SDK as the "authentication token" value.
 
-**<font color="red">Note:</font> only provide RAE token if the user is logged in.**
+**<font color="red">Notes for Rakuten Developers:</font>**
+* **Only provide RAE token if the user is logged in.**
+* **The internal IAM backend only supports production RAE token.**
 
 ### #6 Initializing In-App Messaging SDK.
 In-App Messaging is automatically initialized at startup and handled on a background thread.
