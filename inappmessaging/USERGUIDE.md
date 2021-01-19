@@ -218,6 +218,17 @@ InAppMessaging.instance().onVerifyContext = { contexts: List<String>, campaignTi
 }
 ```
 
+### <a name="close-campaign"></a> #2 Close campaign API
+There are cases that apps need to manually close the campaigns without user interaction.
+
+An example is when a different user logs-in and the currently displayed campaign does not target the new user.
+
+It is possible that the new user did not close the campaign (tapping the 'X' button) when logging in. The app can force-close the campaign by calling the `closeMessage()` API.
+
+```kotlin
+InAppMessaging.instance().closeMessage()
+```
+
 ## <a name="troubleshooting"></a> Troubleshooting
 <details>
 <summary>proguard.ParseException (click to expand)</summary>
@@ -273,6 +284,9 @@ Documents targeting Product Managers:
 + In-App Messaging Dashboard Sign Up(page is coming soon.)
 
 ## <a name="changelog"></a> Changelog
+
+### 2.3.0 (in-progress)
+* SDKCF-3199: Add `closeMessage` API for programmatically closing campaigns without user action.
 
 ### 2.2.0 (2020-11-10)
 * SDKCF-2870: Allow host app to control if a campaign should be displayed in the current screen (using [contexts](#context))

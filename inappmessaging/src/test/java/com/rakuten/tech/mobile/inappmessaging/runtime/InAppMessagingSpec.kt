@@ -4,6 +4,7 @@ import android.app.Activity
 import android.content.Context
 import android.os.Build
 import android.provider.Settings
+import android.view.ViewGroup
 import androidx.test.core.app.ApplicationProvider
 import androidx.work.testing.WorkManagerTestInitHelper
 import com.rakuten.tech.mobile.inappmessaging.runtime.data.models.appevents.AppStartEvent
@@ -24,9 +25,12 @@ import kotlin.test.fail
 @RunWith(RobolectricTestRunner::class)
 @Config(sdk = [Build.VERSION_CODES.O_MR1])
 class InAppMessagingSpec : BaseTest() {
-    private var activity = Mockito.mock(Activity::class.java)
-    private var configResponseData = Mockito.mock(ConfigResponseData::class.java)
-    private var displayManager = Mockito.mock(DisplayManager::class.java)
+    private val activity = Mockito.mock(Activity::class.java)
+    private val configResponseData = Mockito.mock(ConfigResponseData::class.java)
+    private val displayManager = Mockito.mock(DisplayManager::class.java)
+    private val viewGroup = Mockito.mock(ViewGroup::class.java)
+    private val parentViewGroup = Mockito.mock(ViewGroup::class.java)
+
     @Test
     fun `should unregister activity not crash when no activity is registered`() {
         InAppMessaging.instance().unregisterMessageDisplayActivity()
@@ -55,6 +59,7 @@ class InAppMessagingSpec : BaseTest() {
         InAppMessaging.setUninitializedInstance()
         InAppMessaging.instance().registerPreference(TestUserInfoProvider())
         InAppMessaging.instance().logEvent(AppStartEvent())
+        InAppMessaging.instance().closeMessage()
     }
 
     @Test
@@ -91,13 +96,7 @@ class InAppMessagingSpec : BaseTest() {
 
     @Test
     fun `should clear registered activity for initialized instance`() {
-        WorkManagerTestInitHelper.initializeTestWorkManager(ApplicationProvider.getApplicationContext())
-        Settings.Secure.putString(
-                ApplicationProvider.getApplicationContext<Context>().contentResolver,
-                Settings.Secure.ANDROID_ID,
-                "test_device_id")
-        InAppMessaging.init(ApplicationProvider.getApplicationContext(), "test", "",
-                isDebugLogging = true, isForTesting = true)
+        initializeInstance()
 
         InAppMessaging.instance().registerMessageDisplayActivity(activity)
         InAppMessaging.instance().getRegisteredActivity() shouldBeEqualTo activity
@@ -108,13 +107,7 @@ class InAppMessagingSpec : BaseTest() {
     @Test
     @Suppress("SwallowedException")
     fun `should not crash logging event for initialized instance`() {
-        WorkManagerTestInitHelper.initializeTestWorkManager(ApplicationProvider.getApplicationContext())
-        Settings.Secure.putString(
-                ApplicationProvider.getApplicationContext<Context>().contentResolver,
-                Settings.Secure.ANDROID_ID,
-                "test_device_id")
-        InAppMessaging.init(ApplicationProvider.getApplicationContext(), "test", "",
-                isDebugLogging = true, isForTesting = true)
+        initializeInstance()
 
         try {
             InAppMessaging.instance().logEvent(AppStartEvent())
@@ -127,6 +120,28 @@ class InAppMessagingSpec : BaseTest() {
     @Suppress("SwallowedException")
     // For code coverage. will be deleted when updateSession() is removed
     fun `should not crash update session for initialized instance`() {
+        initializeInstance()
+
+        try {
+            InAppMessaging.instance().updateSession()
+        } catch (e: Exception) {
+            fail("should not throw exception")
+        }
+    }
+
+    @Test
+    fun `should remove message from host activity`() {
+        When calling activity.findViewById<ViewGroup>(R.id.in_app_message_base_view) itReturns viewGroup
+        When calling viewGroup.parent itReturns parentViewGroup
+
+        initializeInstance()
+
+        InAppMessaging.instance().registerMessageDisplayActivity(activity)
+        InAppMessaging.instance().closeMessage()
+        Mockito.verify(parentViewGroup).removeView(viewGroup)
+    }
+
+    private fun initializeInstance() {
         WorkManagerTestInitHelper.initializeTestWorkManager(ApplicationProvider.getApplicationContext())
         Settings.Secure.putString(
                 ApplicationProvider.getApplicationContext<Context>().contentResolver,
@@ -134,11 +149,5 @@ class InAppMessagingSpec : BaseTest() {
                 "test_device_id")
         InAppMessaging.init(ApplicationProvider.getApplicationContext(), "test", "",
                 isDebugLogging = true, isForTesting = true)
-
-        try {
-            InAppMessaging.instance().updateSession()
-        } catch (e: Exception) {
-            fail("should not throw exception")
-        }
     }
 }

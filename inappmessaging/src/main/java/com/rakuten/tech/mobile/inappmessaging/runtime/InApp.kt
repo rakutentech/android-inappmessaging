@@ -68,11 +68,14 @@ internal class InApp(
 
     // ------------------------------------Library Internal APIs-------------------------------------
     @RestrictTo(RestrictTo.Scope.LIBRARY)
-    override fun getRegisteredActivity(): Activity? =
-            if (activityWeakReference != null) activityWeakReference!!.get() else null
+    override fun getRegisteredActivity() = if (activityWeakReference != null) activityWeakReference!!.get() else null
 
     @RestrictTo(RestrictTo.Scope.LIBRARY)
-    override fun getHostAppContext(): Context? = context
+    override fun getHostAppContext() = context
+
+    override fun closeMessage() {
+        displayManager.removeMessage(getRegisteredActivity())
+    }
 
     companion object {
         private const val TAG = "IAM_InAppMessaging"
