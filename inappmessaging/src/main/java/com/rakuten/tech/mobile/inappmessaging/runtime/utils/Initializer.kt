@@ -7,11 +7,7 @@ import android.content.pm.PackageInfo
 import android.content.pm.PackageManager.NameNotFoundException
 import android.os.Build
 import android.provider.Settings
-import android.security.keystore.KeyGenParameterSpec
-import android.security.keystore.KeyProperties
 import androidx.core.content.pm.PackageInfoCompat
-import androidx.security.crypto.EncryptedSharedPreferences
-import androidx.security.crypto.MasterKey
 import com.facebook.drawee.backends.pipeline.Fresco
 import com.google.gson.Gson
 import com.rakuten.tech.mobile.inappmessaging.runtime.data.models.HostAppInfo
@@ -27,15 +23,16 @@ import java.util.UUID
 internal object Initializer {
 
     private const val TAG = "IAM_InitWorker"
-    private const val ID_KEY = "uuid_key"
+    internal const val ID_KEY = "uuid_key"
 
     /**
      * This method returns a string of Android Device ID. Note: In order to get device ID without Context,
      * use HostAppInfoRepo.
      */
     @SuppressLint("HardwareIds") // Suppress lint check of using device id.
-    private fun getDeviceId(context: Context): String =
-            Settings.Secure.getString(context.contentResolver, Settings.Secure.ANDROID_ID) ?: getUuid(context)
+    private fun getDeviceId(context: Context, sharedUtil: SharePreferencesUtil) =
+            Settings.Secure.getString(context.contentResolver, Settings.Secure.ANDROID_ID)
+                    ?: getUuid(context, sharedUtil)
 
     /**
      * This method gets device's locale based on API level.
@@ -80,10 +77,16 @@ internal object Initializer {
      */
     @Suppress("LongMethod")
     @Throws(InAppMessagingInitializationException::class)
-    fun initializeSdk(context: Context, subscriptionKey: String?, configUrl: String?, isForTesting: Boolean = false) {
+    fun initializeSdk(
+        context: Context,
+        subscriptionKey: String?,
+        configUrl: String?,
+        isForTesting: Boolean = false,
+        sharedUtil: SharePreferencesUtil = SharePreferencesUtil
+    ) {
         val hostAppInfo = HostAppInfo(
                 getHostAppPackageName(context),
-                getDeviceId(context),
+                getDeviceId(context, sharedUtil),
                 getHostAppVersion(context),
                 subscriptionKey,
                 getLocale(context),
@@ -104,26 +107,8 @@ internal object Initializer {
      * This value is only used if Settings.Secure.ANDROID_ID returns a null value.
      */
     @SuppressWarnings("LongMethod")
-    private fun getUuid(context: Context): String {
-        val master = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
-            val spec = KeyGenParameterSpec.Builder(
-                    MasterKey.DEFAULT_MASTER_KEY_ALIAS,
-                    KeyProperties.PURPOSE_ENCRYPT or KeyProperties.PURPOSE_DECRYPT)
-                    .setBlockModes(KeyProperties.BLOCK_MODE_GCM)
-                    .setEncryptionPaddings(KeyProperties.ENCRYPTION_PADDING_NONE)
-                    .setKeySize(MasterKey.DEFAULT_AES_GCM_MASTER_KEY_SIZE)
-                    .build()
-            MasterKey.Builder(context).setKeyGenParameterSpec(spec).build()
-        } else {
-            MasterKey.Builder(context).build()
-        }
-        val sharedPref = EncryptedSharedPreferences.create(
-                context,
-                "shared_preferences",
-                master,
-                EncryptedSharedPreferences.PrefKeyEncryptionScheme.AES256_SIV,
-                EncryptedSharedPreferences.PrefValueEncryptionScheme.AES256_GCM
-        )
+    private fun getUuid(context: Context, sharedUtil: SharePreferencesUtil): String {
+        val sharedPref = sharedUtil.createSharedPreference(context, sharedUtil.generateKey(context))
 
         return if (sharedPref.contains(ID_KEY)) {
             sharedPref.getString(ID_KEY, "").toString()
