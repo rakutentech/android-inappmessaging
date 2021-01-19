@@ -116,7 +116,7 @@ class AppUserInfoProvider : UserInfoProvider {
 
 **<font color="red">Notes for Rakuten Developers:</font>**
 * **Only provide RAE token if the user is logged in.**
-* **The internal IAM backend only supports PROD RAE token.**
+* **The internal IAM backend only supports production RAE token.**
 
 ### #6 Initializing In-App Messaging SDK.
 In-App Messaging is automatically initialized at startup and handled on a background thread.
