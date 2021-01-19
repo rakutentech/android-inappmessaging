@@ -229,6 +229,8 @@ It is possible that the new user did not close the campaign (tapping the 'X' but
 InAppMessaging.instance().closeMessage()
 ```
 
+**<font color="red">Note:</font> Calling this API will not increment the campaign's impression (i.e not counted as displayed).**
+
 ## <a name="troubleshooting"></a> Troubleshooting
 <details>
 <summary>proguard.ParseException (click to expand)</summary>
