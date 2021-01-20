@@ -219,7 +219,7 @@ InAppMessaging.instance().onVerifyContext = { contexts: List<String>, campaignTi
 ```
 
 ### <a name="close-campaign"></a> #2 Close campaign API
-There are cases that apps need to manually close the campaigns without user interaction.
+There may be cases where apps need to manually close the campaigns without user interaction.
 
 An example is when a different user logs-in and the currently displayed campaign does not target the new user.
 

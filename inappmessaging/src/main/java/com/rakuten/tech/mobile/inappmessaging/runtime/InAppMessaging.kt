@@ -75,8 +75,8 @@ abstract class InAppMessaging internal constructor() {
     internal abstract fun getHostAppContext(): Context?
 
     /**
-     * This methods manually closes the currently displayed message.
-     * This method should be called when app needs to force-close the displayed message without user action.
+     * Close the currently displayed message.
+     * This should be called when app needs to force-close the displayed message without user action.
      * Calling this method will not increment the campaign impression.
      */
     abstract fun closeMessage()
