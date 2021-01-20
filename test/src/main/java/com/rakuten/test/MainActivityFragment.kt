@@ -77,6 +77,9 @@ class MainActivityFragment : Fragment(), View.OnClickListener {
                 .setView(contentView)
                 .setTitle(R.string.dialog_title_user)
                 .setPositiveButton(android.R.string.ok) { dialog, _ ->
+                    if (application.provider.userId != userId.text.toString()) {
+                        InAppMessaging.instance().closeMessage()
+                    }
                     application.provider.userId = userId.text.toString()
                     application.provider.raeToken = raeToken.text.toString()
                     application.provider.rakutenId = rakutenId.text.toString()

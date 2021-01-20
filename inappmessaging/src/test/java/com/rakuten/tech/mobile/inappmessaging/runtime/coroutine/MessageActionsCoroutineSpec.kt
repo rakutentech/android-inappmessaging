@@ -21,7 +21,6 @@ import org.junit.Before
 import org.junit.Test
 import org.junit.runner.RunWith
 import org.mockito.Mockito
-import org.mockito.MockitoAnnotations
 import org.robolectric.ParameterizedRobolectricTestRunner
 import org.robolectric.annotation.Config
 
@@ -181,12 +180,11 @@ internal class MessageActionsCoroutineSpec(val testName: String, val resourceId:
                 }"""
     }
 
-    private var message = Gson().fromJson(CAMPAIGN_DATA.trimIndent(), CampaignData::class.java)
-    private var activity = Mockito.mock(Activity::class.java)
+    private val message = Gson().fromJson(CAMPAIGN_DATA.trimIndent(), CampaignData::class.java)
+    private val activity = Mockito.mock(Activity::class.java)
 
     @Before
     fun setup() {
-        MockitoAnnotations.initMocks(this)
         When calling activity.packageManager itReturns ApplicationProvider
                 .getApplicationContext<Context>().packageManager
 

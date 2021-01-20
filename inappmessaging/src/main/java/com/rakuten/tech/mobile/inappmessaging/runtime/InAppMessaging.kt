@@ -74,6 +74,13 @@ abstract class InAppMessaging internal constructor() {
     @RestrictTo(RestrictTo.Scope.LIBRARY)
     internal abstract fun getHostAppContext(): Context?
 
+    /**
+     * Close the currently displayed message.
+     * This should be called when app needs to force-close the displayed message without user action.
+     * Calling this method will not increment the campaign impression.
+     */
+    abstract fun closeMessage()
+
     companion object {
         private var instance: InAppMessaging = NotInitializedInAppMessaging()
 
@@ -130,5 +137,7 @@ abstract class InAppMessaging internal constructor() {
         override fun getRegisteredActivity(): Activity? = null
 
         override fun getHostAppContext(): Context? = null
+
+        override fun closeMessage() {}
     }
 }

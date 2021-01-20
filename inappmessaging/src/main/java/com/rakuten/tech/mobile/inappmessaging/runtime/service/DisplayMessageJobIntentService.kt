@@ -75,7 +75,7 @@ internal class DisplayMessageJobIntentService : JobIntentService() {
      * This method displays message on UI thread.
      */
     private fun displayMessage(message: Message, hostActivity: Activity) {
-        if (verifyContexts(message) == false) {
+        if (!verifyContexts(message)) {
             // Message display aborted by the host app
             Timber.tag(TAG).d("message display cancelled by the host app")
 
