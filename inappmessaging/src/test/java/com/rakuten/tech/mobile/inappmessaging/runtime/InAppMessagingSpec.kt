@@ -8,7 +8,10 @@ import android.view.ViewGroup
 import androidx.test.core.app.ApplicationProvider
 import androidx.work.testing.WorkManagerTestInitHelper
 import com.rakuten.tech.mobile.inappmessaging.runtime.data.models.appevents.AppStartEvent
+import com.rakuten.tech.mobile.inappmessaging.runtime.data.models.messages.ValidTestMessage
 import com.rakuten.tech.mobile.inappmessaging.runtime.data.repositories.ConfigResponseRepository
+import com.rakuten.tech.mobile.inappmessaging.runtime.data.repositories.LocalDisplayedMessageRepository
+import com.rakuten.tech.mobile.inappmessaging.runtime.data.repositories.ReadyForDisplayMessageRepository
 import com.rakuten.tech.mobile.inappmessaging.runtime.data.responses.config.ConfigResponseData
 import com.rakuten.tech.mobile.inappmessaging.runtime.manager.DisplayManager
 import org.amshove.kluent.*
@@ -131,14 +134,20 @@ class InAppMessagingSpec : BaseTest() {
 
     @Test
     fun `should remove message from host activity`() {
+        val message = ValidTestMessage("1")
+        ReadyForDisplayMessageRepository.instance().replaceAllMessages(listOf(message))
+        LocalDisplayedMessageRepository.instance().clearMessages()
         When calling activity.findViewById<ViewGroup>(R.id.in_app_message_base_view) itReturns viewGroup
         When calling viewGroup.parent itReturns parentViewGroup
+        When calling viewGroup.tag itReturns "1"
 
         initializeInstance()
 
         InAppMessaging.instance().registerMessageDisplayActivity(activity)
         InAppMessaging.instance().closeMessage()
         Mockito.verify(parentViewGroup).removeView(viewGroup)
+        ReadyForDisplayMessageRepository.instance().getAllMessagesCopy().shouldBeEmpty()
+        LocalDisplayedMessageRepository.instance().numberOfTimesDisplayed(message) shouldBeEqualTo 1
     }
 
     private fun initializeInstance() {

@@ -30,11 +30,15 @@ internal abstract class ReadyForDisplayMessageRepository : ReadyMessageRepositor
 
         override fun getAllMessagesCopy(): List<Message> = ArrayList(messages)
 
-        override fun removeMessage(campaignId: String) {
+        override fun removeMessage(campaignId: String): Message {
             synchronized(messages) {
+                val message = messages.first { msg ->
+                    msg.getCampaignId() == campaignId
+                }
                 messages.removeAll { message ->
                     message.getCampaignId() == campaignId
                 }
+                return message
             }
         }
 
