@@ -49,7 +49,7 @@ internal interface DisplayManager {
                 parent.removeView(inAppMessageBaseView)
                 Timber.tag(TAG).d("View removed")
             }
-            return inAppMessageBaseView.tag
+            return inAppMessageBaseView?.tag
         }
     }
 }
