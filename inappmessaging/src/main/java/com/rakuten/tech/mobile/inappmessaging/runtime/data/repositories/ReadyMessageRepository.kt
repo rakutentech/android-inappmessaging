@@ -21,7 +21,7 @@ internal interface ReadyMessageRepository {
     /**
      * Removing a message from the repository.
      */
-    fun removeMessage(campaignId: String): Message
+    fun removeMessage(campaignId: String)
 
     /**
      * Clears all message from the repository.

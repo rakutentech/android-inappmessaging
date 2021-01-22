@@ -147,7 +147,7 @@ class InAppMessagingSpec : BaseTest() {
         InAppMessaging.instance().closeMessage()
         Mockito.verify(parentViewGroup).removeView(viewGroup)
         ReadyForDisplayMessageRepository.instance().getAllMessagesCopy().shouldBeEmpty()
-        LocalDisplayedMessageRepository.instance().numberOfTimesDisplayed(message) shouldBeEqualTo 1
+        LocalDisplayedMessageRepository.instance().numberOfTimesDisplayed(message) shouldBeEqualTo 0
     }
 
     private fun initializeInstance() {

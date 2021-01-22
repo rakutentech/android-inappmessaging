@@ -81,9 +81,6 @@ internal class InApp(
         if (id != null) {
             // Remove message from ReadyForDisplayMessageRepository.
             val message = ReadyForDisplayMessageRepository.instance().removeMessage(id)
-
-            // Adding message to LocalDisplayedMessageRepository.
-            LocalDisplayedMessageRepository.instance().addMessage(message)
         }
     }
 
