@@ -20,7 +20,7 @@ internal interface DisplayManager {
     /**
      * Removing the InApp message view from the screen, and makes the parent view interactive again.
      */
-    fun removeMessage(activity: Activity?): String?
+    fun removeMessage(activity: Activity?): Any?
 
     companion object {
         private const val TAG = "IAM_DisplayManager"
@@ -36,22 +36,20 @@ internal interface DisplayManager {
             DisplayMessageJobIntentService.enqueueWork(Intent())
         }
 
-        override fun removeMessage(activity: Activity?): String? {
+        override fun removeMessage(activity: Activity?): Any? {
             if (activity == null) return null
 
             // Find any displaying InApp Message view from the activity.
             val inAppMessageBaseView = activity.findViewById<ViewGroup>(R.id.in_app_message_base_view)
-            return if (inAppMessageBaseView != null) {
+            if (inAppMessageBaseView != null) {
                 // Removing just the InApp Message from the view hierarchy.
                 val parent = inAppMessageBaseView.parent as ViewGroup
                 parent.isFocusableInTouchMode = true
                 parent.requestFocus()
                 parent.removeView(inAppMessageBaseView)
                 Timber.tag(TAG).d("View removed")
-                inAppMessageBaseView.tag as String
-            } else {
-                null
             }
+            return inAppMessageBaseView.tag
         }
     }
 }
