@@ -21,11 +21,11 @@ internal interface ReadyMessageRepository {
     /**
      * Removing a message from the repository.
      */
-    fun removeMessage(campaignId: String)
+    fun removeMessage(campaignId: String, shouldIncrementTimesClosed: Boolean = false)
 
     /**
      * Clears all message from the repository.
      * This is done during session update due to user info update.
      */
-    fun clearMessages()
+    fun clearMessages(isClearQueued: Boolean = false)
 }

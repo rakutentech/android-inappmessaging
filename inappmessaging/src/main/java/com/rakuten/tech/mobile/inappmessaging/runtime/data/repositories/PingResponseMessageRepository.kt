@@ -43,5 +43,10 @@ internal abstract class PingResponseMessageRepository : MessageRepository {
         override fun clearMessages() {
             messages.clear()
         }
+
+        override fun incrementTimesClosed(messageList: List<Message>) {
+            messages.filter { m -> messageList.any { it.getCampaignId() == m.key } }
+                    .forEach { it.value.incrementTimesClosed() }
+        }
     }
 }

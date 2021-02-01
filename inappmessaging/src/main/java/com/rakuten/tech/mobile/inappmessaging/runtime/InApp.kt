@@ -6,7 +6,6 @@ import androidx.annotation.RestrictTo
 import com.rakuten.tech.mobile.inappmessaging.runtime.data.models.appevents.Event
 import com.rakuten.tech.mobile.inappmessaging.runtime.data.repositories.AccountRepository
 import com.rakuten.tech.mobile.inappmessaging.runtime.data.repositories.ConfigResponseRepository
-import com.rakuten.tech.mobile.inappmessaging.runtime.data.repositories.LocalDisplayedMessageRepository
 import com.rakuten.tech.mobile.inappmessaging.runtime.data.repositories.ReadyForDisplayMessageRepository
 import com.rakuten.tech.mobile.inappmessaging.runtime.manager.DisplayManager
 import com.rakuten.tech.mobile.inappmessaging.runtime.manager.EventsManager
@@ -75,12 +74,13 @@ internal class InApp(
     @RestrictTo(RestrictTo.Scope.LIBRARY)
     override fun getHostAppContext() = context
 
-    override fun closeMessage() {
+    override fun closeMessage(clearQueuedCampaigns: Boolean) {
         val id = displayManager.removeMessage(getRegisteredActivity())
 
-        if (id != null) {
-            // Remove message from ReadyForDisplayMessageRepository.
-            val message = ReadyForDisplayMessageRepository.instance().removeMessage(id as String)
+        if (clearQueuedCampaigns) {
+            ReadyForDisplayMessageRepository.instance().clearMessages(clearQueuedCampaigns)
+        } else if (id != null) {
+            ReadyForDisplayMessageRepository.instance().removeMessage(id as String, true)
         }
     }
 

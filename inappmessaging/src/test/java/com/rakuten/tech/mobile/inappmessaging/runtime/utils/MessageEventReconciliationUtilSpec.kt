@@ -150,13 +150,7 @@ class MessageEventReconciliationUtilReconcileSpec : MessageEventReconciliationUt
         // Arrange input data.
         val inputMessageList = ArrayList<Message>()
         inputMessageList.add(message2)
-        val triggerAttr = TriggerAttribute("name", "value", 1, 1)
-        val attrList = ArrayList<TriggerAttribute>()
-        attrList.add(triggerAttr)
-        When calling trigger1.triggerAttributes itReturns attrList
-        When calling trigger1.eventType itReturns 4
-        When calling trigger1.eventName itReturns "custom"
-        customEvent.addAttribute("name", "value")
+        setupCustomEventStringAttribute()
         LocalEventRepository.instance().addEvent(customEvent)
         // Act.
         val outputMessageList = MessageEventReconciliationUtil.instance()
@@ -222,6 +216,35 @@ class MessageEventReconciliationUtilReconcileSpec : MessageEventReconciliationUt
         val outputMessageList = MessageEventReconciliationUtil.instance()
                 .reconcileMessagesAndEvents(inputMessageList)
         // Re-assert the output with qualifying event.
+        outputMessageList.shouldHaveSize(1)
+    }
+
+    @Test
+    fun `should not reconcile message when events are not enough due to times closed`() {
+        val inputMessageList = ArrayList<Message>()
+        inputMessageList.add(message2)
+        When calling message2.getNumberOfTimesClosed() itReturns 1
+        setupCustomEventStringAttribute()
+        LocalEventRepository.instance().addEvent(customEvent)
+
+        val outputMessageList = MessageEventReconciliationUtil.instance()
+                .reconcileMessagesAndEvents(inputMessageList)
+
+        outputMessageList.shouldBeEmpty()
+    }
+
+    @Test
+    fun `should reconcile message when events are enough with to times closes`() {
+        val inputMessageList = ArrayList<Message>()
+        inputMessageList.add(message2)
+        When calling message2.getNumberOfTimesClosed() itReturns 1
+        setupCustomEventStringAttribute()
+        LocalEventRepository.instance().addEvent(customEvent)
+        LocalEventRepository.instance().addEvent(customEvent)
+
+        val outputMessageList = MessageEventReconciliationUtil.instance()
+                .reconcileMessagesAndEvents(inputMessageList)
+
         outputMessageList.shouldHaveSize(1)
     }
 
@@ -381,6 +404,16 @@ class MessageEventReconciliationUtilReconcileSpec : MessageEventReconciliationUt
         outputMessageList = MessageEventReconciliationUtil.instance().reconcileMessagesAndEvents(inputMessageList)
         // Re-assert the output with qualifying event.
         outputMessageList.shouldHaveSize(0)
+    }
+
+    private fun setupCustomEventStringAttribute() {
+        val triggerAttr = TriggerAttribute("name", "value", 1, 1)
+        val attrList = ArrayList<TriggerAttribute>()
+        attrList.add(triggerAttr)
+        When calling trigger1.triggerAttributes itReturns attrList
+        When calling trigger1.eventType itReturns 4
+        When calling trigger1.eventName itReturns "custom"
+        customEvent.addAttribute("name", "value")
     }
 }
 

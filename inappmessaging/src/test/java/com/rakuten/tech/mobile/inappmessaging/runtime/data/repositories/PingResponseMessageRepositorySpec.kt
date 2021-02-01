@@ -14,19 +14,20 @@ import org.junit.Test
  * Test class for PingResponseMessageRepository.
  */
 class PingResponseMessageRepositorySpec : BaseTest() {
+    private val message0 = ValidTestMessage()
+    private val message1 = ValidTestMessage("1234")
+    private val messageList = ArrayList<Message>()
 
     @Before
     fun setup() {
         PingResponseMessageRepository.instance().clearMessages()
+        messageList.clear()
+        messageList.add(message0)
+        messageList.add(message1)
     }
 
     @Test
     fun `should add message list with valid list`() {
-        val messageList = ArrayList<Message>()
-        val message0 = ValidTestMessage()
-        val message1 = ValidTestMessage("1234")
-        messageList.add(message0)
-        messageList.add(message1)
         PingResponseMessageRepository.instance().replaceAllMessages(messageList)
         PingResponseMessageRepository.instance().getAllMessagesCopy().shouldHaveSize(2)
         PingResponseMessageRepository.instance().getAllMessagesCopy()[0] shouldBeEqualTo message0
@@ -50,11 +51,6 @@ class PingResponseMessageRepositorySpec : BaseTest() {
 
     @Test
     fun `should be empty after clearing`() {
-        val messageList = ArrayList<Message>()
-        val message0 = ValidTestMessage()
-        val message1 = ValidTestMessage("1234")
-        messageList.add(message0)
-        messageList.add(message1)
         PingResponseMessageRepository.instance().replaceAllMessages(messageList)
         PingResponseMessageRepository.instance().getAllMessagesCopy().shouldHaveSize(2)
 
@@ -64,11 +60,6 @@ class PingResponseMessageRepositorySpec : BaseTest() {
 
     @Test
     fun `should contain correct messages after clearing then adding`() {
-        val messageList = ArrayList<Message>()
-        val message0 = ValidTestMessage()
-        val message1 = ValidTestMessage("1234")
-        messageList.add(message0)
-        messageList.add(message1)
         PingResponseMessageRepository.instance().replaceAllMessages(messageList)
         PingResponseMessageRepository.instance().getAllMessagesCopy().shouldHaveSize(2)
 
@@ -77,5 +68,36 @@ class PingResponseMessageRepositorySpec : BaseTest() {
 
         PingResponseMessageRepository.instance().replaceAllMessages(messageList)
         PingResponseMessageRepository.instance().getAllMessagesCopy().shouldHaveSize(2)
+    }
+
+    @Test
+    fun `should increment all matching from single item`() {
+        PingResponseMessageRepository.instance().replaceAllMessages(messageList)
+        PingResponseMessageRepository.instance().incrementTimesClosed(listOf(message0))
+        for (msg in PingResponseMessageRepository.instance().getAllMessagesCopy()) {
+            if (msg.getCampaignId() != "1234") {
+                msg.getNumberOfTimesClosed() shouldBeEqualTo 1
+            } else {
+                msg.getNumberOfTimesClosed() shouldBeEqualTo 0
+            }
+        }
+    }
+
+    @Test
+    fun `should increment all matching from multiple items`() {
+        PingResponseMessageRepository.instance().replaceAllMessages(messageList)
+        PingResponseMessageRepository.instance().incrementTimesClosed(messageList)
+        for (msg in PingResponseMessageRepository.instance().getAllMessagesCopy()) {
+            msg.getNumberOfTimesClosed() shouldBeEqualTo 1
+        }
+    }
+
+    @Test
+    fun `should not increment if no matching`() {
+        PingResponseMessageRepository.instance().replaceAllMessages(messageList)
+        PingResponseMessageRepository.instance().incrementTimesClosed(listOf(ValidTestMessage("4321")))
+        for (msg in PingResponseMessageRepository.instance().getAllMessagesCopy()) {
+            msg.getNumberOfTimesClosed() shouldBeEqualTo 0
+        }
     }
 }

@@ -39,4 +39,12 @@ internal interface Message {
     fun getMaxImpressions(): Int?
 
     fun getContexts(): List<String>
+
+    /**
+     * This method returns the number of times this message has been queued (ready for display)
+     * but was removed when closeMessage API was called.
+     */
+    fun getNumberOfTimesClosed(): Int
+
+    fun incrementTimesClosed()
 }

@@ -260,8 +260,10 @@ internal interface MessageEventReconciliationUtil {
             val displayedImpression: Int = LocalDisplayedMessageRepository.instance().numberOfTimesDisplayed(message)
 
             // Only check for message has been displayed less than its max impressions.
+            // The number of times the message was removed from ready for display repository is considered since local
+            // event list was not cleared and the triggers should  all be satisfied again.
             return if (maxImpression != null && displayedImpression < maxImpression) {
-                displayedImpression + 1
+                displayedImpression + 1 + message.getNumberOfTimesClosed()
             } else 0
         }
 
@@ -291,7 +293,7 @@ internal interface MessageEventReconciliationUtil {
                 entry.setValue(Collections.unmodifiableList(entry.value))
             }
             // Return an unmodifiable map.
-            return Collections.unmodifiableMap<String, MutableList<Event>>(eventMap)
+            return Collections.unmodifiableMap(eventMap)
         }
 
         /**
