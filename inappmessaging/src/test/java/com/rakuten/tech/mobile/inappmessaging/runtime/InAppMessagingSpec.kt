@@ -7,6 +7,7 @@ import android.provider.Settings
 import android.view.ViewGroup
 import androidx.test.core.app.ApplicationProvider
 import androidx.work.testing.WorkManagerTestInitHelper
+import com.nhaarman.mockitokotlin2.never
 import com.rakuten.tech.mobile.inappmessaging.runtime.data.models.appevents.AppStartEvent
 import com.rakuten.tech.mobile.inappmessaging.runtime.data.models.messages.Message
 import com.rakuten.tech.mobile.inappmessaging.runtime.data.models.messages.ValidTestMessage
@@ -138,7 +139,6 @@ class InAppMessagingSpec : BaseTest() {
     fun `should remove message from host activity and not clear queue`() {
         val message = ValidTestMessage("1")
         setupDisplayedView(message)
-
         initializeInstance()
 
         InAppMessaging.instance().registerMessageDisplayActivity(activity)
@@ -202,7 +202,35 @@ class InAppMessagingSpec : BaseTest() {
         }
         LocalDisplayedMessageRepository.instance().numberOfTimesDisplayed(message) shouldBeEqualTo 0
     }
+  
+    @Test
+    fun `should remove message but not clear repo when activity is unregistered`() {
+        val message = ValidTestMessage("1")
+        setupDisplayedView(message)
+        initializeInstance()
 
+        InAppMessaging.instance().registerMessageDisplayActivity(activity)
+        InAppMessaging.instance().unregisterMessageDisplayActivity()
+        Mockito.verify(parentViewGroup).removeView(viewGroup)
+        ReadyForDisplayMessageRepository.instance().getAllMessagesCopy().shouldHaveSize(2)
+        LocalDisplayedMessageRepository.instance().numberOfTimesDisplayed(message) shouldBeEqualTo 0
+    }
+
+    @Test
+    fun `should not crash when unregister activity without displayed message`() {
+        val message = ValidTestMessage("1")
+        setupDisplayedView(message)
+        initializeInstance()
+
+        When calling activity.findViewById<ViewGroup>(R.id.in_app_message_base_view) itReturns null
+
+        InAppMessaging.instance().registerMessageDisplayActivity(activity)
+        InAppMessaging.instance().unregisterMessageDisplayActivity()
+        Mockito.verify(parentViewGroup, never()).removeView(viewGroup)
+        ReadyForDisplayMessageRepository.instance().getAllMessagesCopy().shouldHaveSize(2)
+        LocalDisplayedMessageRepository.instance().numberOfTimesDisplayed(message) shouldBeEqualTo 0
+    }
+  
     private fun setupDisplayedView(message: Message) {
         val message2 = ValidTestMessage()
         ReadyForDisplayMessageRepository.instance().replaceAllMessages(listOf(message, message2))

@@ -54,6 +54,7 @@ internal class InApp(
 
     @Suppress("FunctionMaxLength")
     override fun unregisterMessageDisplayActivity() {
+        displayManager.removeMessage(getRegisteredActivity())
         activityWeakReference?.clear()
 
         Timber.tag(TAG)
