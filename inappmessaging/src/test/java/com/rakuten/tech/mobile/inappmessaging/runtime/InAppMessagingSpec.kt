@@ -30,6 +30,7 @@ import kotlin.test.fail
  */
 @RunWith(RobolectricTestRunner::class)
 @Config(sdk = [Build.VERSION_CODES.O_MR1])
+@SuppressWarnings("LargeClass")
 class InAppMessagingSpec : BaseTest() {
     private val activity = Mockito.mock(Activity::class.java)
     private val configResponseData = Mockito.mock(ConfigResponseData::class.java)
@@ -202,7 +203,7 @@ class InAppMessagingSpec : BaseTest() {
         }
         LocalDisplayedMessageRepository.instance().numberOfTimesDisplayed(message) shouldBeEqualTo 0
     }
-  
+
     @Test
     fun `should remove message but not clear repo when activity is unregistered`() {
         val message = ValidTestMessage("1")
@@ -230,7 +231,7 @@ class InAppMessagingSpec : BaseTest() {
         ReadyForDisplayMessageRepository.instance().getAllMessagesCopy().shouldHaveSize(2)
         LocalDisplayedMessageRepository.instance().numberOfTimesDisplayed(message) shouldBeEqualTo 0
     }
-  
+
     private fun setupDisplayedView(message: Message) {
         val message2 = ValidTestMessage()
         ReadyForDisplayMessageRepository.instance().replaceAllMessages(listOf(message, message2))
