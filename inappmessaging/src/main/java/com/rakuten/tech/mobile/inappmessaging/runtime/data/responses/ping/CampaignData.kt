@@ -21,6 +21,8 @@ internal data class CampaignData(
     private val maxImpressions: Int
 ) : Message {
 
+    private var timesQueued = 0
+
     override fun getType(): Int = type
 
     override fun getCampaignId(): String = campaignId
@@ -37,5 +39,14 @@ internal data class CampaignData(
         val regex = Regex("\\[(.*?)\\]")
         val matches = regex.findAll(messagePayload.title ?: "")
         return matches.map { it.groupValues[1] }.toList()
+    }
+
+    override fun getNumberOfTimesClosed() = synchronized(timesQueued) {
+        timesQueued
+    }
+    override fun incrementTimesClosed() {
+        synchronized(timesQueued) {
+            timesQueued++
+        }
     }
 }

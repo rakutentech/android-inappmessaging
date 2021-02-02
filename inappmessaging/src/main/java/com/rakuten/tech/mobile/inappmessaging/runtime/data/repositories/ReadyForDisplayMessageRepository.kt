@@ -30,16 +30,27 @@ internal abstract class ReadyForDisplayMessageRepository : ReadyMessageRepositor
 
         override fun getAllMessagesCopy(): List<Message> = ArrayList(messages)
 
-        override fun removeMessage(campaignId: String) {
+        override fun removeMessage(campaignId: String, shouldIncrementTimesClosed: Boolean) {
             synchronized(messages) {
                 messages.removeAll { message ->
-                    message.getCampaignId() == campaignId
+                    if (message.getCampaignId() == campaignId) {
+                        // messages contain unique message (no two message have the same campaign id)
+                        if (shouldIncrementTimesClosed) {
+                            PingResponseMessageRepository.instance().incrementTimesClosed(listOf(message))
+                        }
+                        true
+                    } else {
+                        false
+                    }
                 }
             }
         }
 
-        override fun clearMessages() {
+        override fun clearMessages(shouldIncrementTimesClosed: Boolean) {
             synchronized(messages) {
+                if (shouldIncrementTimesClosed) {
+                    PingResponseMessageRepository.instance().incrementTimesClosed(messages)
+                }
                 messages.clear()
             }
         }

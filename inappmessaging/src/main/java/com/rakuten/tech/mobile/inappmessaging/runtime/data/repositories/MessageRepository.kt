@@ -24,4 +24,10 @@ internal interface MessageRepository {
      * This is done during session update due to user info update.
      */
     fun clearMessages()
+
+    /**
+     * Increments the number of times closed while in queue (ready for display)
+     * for all the messages in the [messageList].
+     */
+    fun incrementTimesClosed(messageList: List<Message>)
 }

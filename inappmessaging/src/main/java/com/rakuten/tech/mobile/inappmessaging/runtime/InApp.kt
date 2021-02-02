@@ -3,15 +3,18 @@ package com.rakuten.tech.mobile.inappmessaging.runtime
 import android.app.Activity
 import android.content.Context
 import androidx.annotation.RestrictTo
+import androidx.annotation.VisibleForTesting
 import com.rakuten.tech.mobile.inappmessaging.runtime.data.models.appevents.Event
 import com.rakuten.tech.mobile.inappmessaging.runtime.data.repositories.AccountRepository
 import com.rakuten.tech.mobile.inappmessaging.runtime.data.repositories.ConfigResponseRepository
-import com.rakuten.tech.mobile.inappmessaging.runtime.data.repositories.LocalDisplayedMessageRepository
 import com.rakuten.tech.mobile.inappmessaging.runtime.data.repositories.ReadyForDisplayMessageRepository
 import com.rakuten.tech.mobile.inappmessaging.runtime.manager.DisplayManager
 import com.rakuten.tech.mobile.inappmessaging.runtime.manager.EventsManager
 import com.rakuten.tech.mobile.inappmessaging.runtime.manager.SessionManager
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
 import timber.log.Timber
 import java.lang.ref.WeakReference
 
@@ -76,12 +79,21 @@ internal class InApp(
     @RestrictTo(RestrictTo.Scope.LIBRARY)
     override fun getHostAppContext() = context
 
-    override fun closeMessage() {
+    override fun closeMessage(clearQueuedCampaigns: Boolean) {
+        CoroutineScope(Dispatchers.Main).launch {
+            // called inside main dispatcher to make sure that it is always called in UI thread
+            removeMessage(clearQueuedCampaigns)
+        }
+    }
+
+    @VisibleForTesting
+    internal fun removeMessage(clearQueuedCampaigns: Boolean) {
         val id = displayManager.removeMessage(getRegisteredActivity())
 
-        if (id != null) {
-            // Remove message from ReadyForDisplayMessageRepository.
-            val message = ReadyForDisplayMessageRepository.instance().removeMessage(id as String)
+        if (clearQueuedCampaigns) {
+            ReadyForDisplayMessageRepository.instance().clearMessages(true)
+        } else if (id != null) {
+            ReadyForDisplayMessageRepository.instance().removeMessage(id as String, true)
         }
     }
 

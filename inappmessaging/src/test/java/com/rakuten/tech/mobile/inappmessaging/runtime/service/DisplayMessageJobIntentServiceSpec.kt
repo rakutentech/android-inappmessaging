@@ -13,6 +13,7 @@ import com.facebook.datasource.DataSource
 import com.facebook.soloader.SoLoader
 import com.google.gson.Gson
 import com.nhaarman.mockitokotlin2.argumentCaptor
+import com.nhaarman.mockitokotlin2.eq
 import com.rakuten.tech.mobile.inappmessaging.runtime.BaseTest
 import com.rakuten.tech.mobile.inappmessaging.runtime.InAppMessaging
 import com.rakuten.tech.mobile.inappmessaging.runtime.data.models.messages.Message
@@ -248,7 +249,7 @@ class DisplayMessageJobIntentServiceSpec : BaseTest() {
         displayMessageJobIntentService!!.onHandleWork(intent!!)
 
         argumentCaptor<String>().apply {
-            Mockito.verify(mockReadyForDisplayRepo, Mockito.times(1)).removeMessage(capture())
+            Mockito.verify(mockReadyForDisplayRepo, Mockito.times(1)).removeMessage(capture(), eq(false))
             firstValue shouldBeEqualTo message.getCampaignId()
         }
     }

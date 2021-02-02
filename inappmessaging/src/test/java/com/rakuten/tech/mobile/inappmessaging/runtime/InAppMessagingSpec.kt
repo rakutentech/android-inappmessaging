@@ -13,6 +13,7 @@ import com.rakuten.tech.mobile.inappmessaging.runtime.data.models.messages.Messa
 import com.rakuten.tech.mobile.inappmessaging.runtime.data.models.messages.ValidTestMessage
 import com.rakuten.tech.mobile.inappmessaging.runtime.data.repositories.ConfigResponseRepository
 import com.rakuten.tech.mobile.inappmessaging.runtime.data.repositories.LocalDisplayedMessageRepository
+import com.rakuten.tech.mobile.inappmessaging.runtime.data.repositories.PingResponseMessageRepository
 import com.rakuten.tech.mobile.inappmessaging.runtime.data.repositories.ReadyForDisplayMessageRepository
 import com.rakuten.tech.mobile.inappmessaging.runtime.data.responses.config.ConfigResponseData
 import com.rakuten.tech.mobile.inappmessaging.runtime.manager.DisplayManager
@@ -29,6 +30,7 @@ import kotlin.test.fail
  */
 @RunWith(RobolectricTestRunner::class)
 @Config(sdk = [Build.VERSION_CODES.O_MR1])
+@SuppressWarnings("LargeClass")
 class InAppMessagingSpec : BaseTest() {
     private val activity = Mockito.mock(Activity::class.java)
     private val configResponseData = Mockito.mock(ConfigResponseData::class.java)
@@ -135,35 +137,103 @@ class InAppMessagingSpec : BaseTest() {
     }
 
     @Test
-    fun `should remove message from host activity`() {
+    @Suppress("SwallowedException")
+    fun `should not crash close message for initialized instance`() {
+        initializeInstance()
+
+        try {
+            InAppMessaging.instance().closeMessage()
+            InAppMessaging.instance().closeMessage(true)
+        } catch (e: Exception) {
+            fail("should not throw exception")
+        }
+    }
+
+    @Test
+    fun `should remove message from host activity and not clear queue`() {
         val message = ValidTestMessage("1")
-        setupDisplay(message)
+        setupDisplayedView(message)
         initializeInstance()
 
         InAppMessaging.instance().registerMessageDisplayActivity(activity)
-        InAppMessaging.instance().closeMessage()
+        (InAppMessaging.instance() as InApp).removeMessage(false)
+        Mockito.verify(parentViewGroup).removeView(viewGroup)
+        ReadyForDisplayMessageRepository.instance().getAllMessagesCopy().shouldHaveSize(1)
+        for (msg in PingResponseMessageRepository.instance().getAllMessagesCopy()) {
+            if (msg.getCampaignId() == "1") {
+                msg.getNumberOfTimesClosed() shouldBeEqualTo 1
+            } else {
+                msg.getNumberOfTimesClosed() shouldBeEqualTo 0
+            }
+        }
+        LocalDisplayedMessageRepository.instance().numberOfTimesDisplayed(message) shouldBeEqualTo 0
+    }
+
+    @Test
+    fun `should remove message from host activity and clear queue`() {
+        val message = ValidTestMessage("1")
+        setupDisplayedView(message)
+        initializeInstance()
+
+        InAppMessaging.instance().registerMessageDisplayActivity(activity)
+        (InAppMessaging.instance() as InApp).removeMessage(true)
         Mockito.verify(parentViewGroup).removeView(viewGroup)
         ReadyForDisplayMessageRepository.instance().getAllMessagesCopy().shouldBeEmpty()
+        for (msg in PingResponseMessageRepository.instance().getAllMessagesCopy()) {
+            msg.getNumberOfTimesClosed() shouldBeEqualTo 1
+        }
+        LocalDisplayedMessageRepository.instance().numberOfTimesDisplayed(message) shouldBeEqualTo 0
+    }
+
+    @Test
+    fun `should not increment when no message is displayed`() {
+        val message = ValidTestMessage("1")
+        ReadyForDisplayMessageRepository.instance().replaceAllMessages(listOf(message))
+        PingResponseMessageRepository.instance().replaceAllMessages(listOf(message))
+        initializeInstance()
+
+        InAppMessaging.instance().registerMessageDisplayActivity(activity)
+        (InAppMessaging.instance() as InApp).removeMessage(false)
+        ReadyForDisplayMessageRepository.instance().getAllMessagesCopy().shouldHaveSize(1)
+        for (msg in PingResponseMessageRepository.instance().getAllMessagesCopy()) {
+            msg.getNumberOfTimesClosed() shouldBeEqualTo 0
+        }
+        LocalDisplayedMessageRepository.instance().numberOfTimesDisplayed(message) shouldBeEqualTo 0
+    }
+
+    @Test
+    fun `should clear and increment when no message is displayed but flag true`() {
+        val message = ValidTestMessage("1")
+        ReadyForDisplayMessageRepository.instance().replaceAllMessages(listOf(message))
+        PingResponseMessageRepository.instance().replaceAllMessages(listOf(message))
+        initializeInstance()
+
+        InAppMessaging.instance().registerMessageDisplayActivity(activity)
+        (InAppMessaging.instance() as InApp).removeMessage(true)
+        ReadyForDisplayMessageRepository.instance().getAllMessagesCopy().shouldBeEmpty()
+        for (msg in PingResponseMessageRepository.instance().getAllMessagesCopy()) {
+            msg.getNumberOfTimesClosed() shouldBeEqualTo 1
+        }
         LocalDisplayedMessageRepository.instance().numberOfTimesDisplayed(message) shouldBeEqualTo 0
     }
 
     @Test
     fun `should remove message but not clear repo when activity is unregistered`() {
         val message = ValidTestMessage("1")
-        setupDisplay(message)
+        setupDisplayedView(message)
         initializeInstance()
 
         InAppMessaging.instance().registerMessageDisplayActivity(activity)
         InAppMessaging.instance().unregisterMessageDisplayActivity()
         Mockito.verify(parentViewGroup).removeView(viewGroup)
-        ReadyForDisplayMessageRepository.instance().getAllMessagesCopy().shouldHaveSize(1)
+        ReadyForDisplayMessageRepository.instance().getAllMessagesCopy().shouldHaveSize(2)
         LocalDisplayedMessageRepository.instance().numberOfTimesDisplayed(message) shouldBeEqualTo 0
     }
 
     @Test
     fun `should not crash when unregister activity without displayed message`() {
         val message = ValidTestMessage("1")
-        setupDisplay(message)
+        setupDisplayedView(message)
         initializeInstance()
 
         When calling activity.findViewById<ViewGroup>(R.id.in_app_message_base_view) itReturns null
@@ -171,12 +241,14 @@ class InAppMessagingSpec : BaseTest() {
         InAppMessaging.instance().registerMessageDisplayActivity(activity)
         InAppMessaging.instance().unregisterMessageDisplayActivity()
         Mockito.verify(parentViewGroup, never()).removeView(viewGroup)
-        ReadyForDisplayMessageRepository.instance().getAllMessagesCopy().shouldHaveSize(1)
+        ReadyForDisplayMessageRepository.instance().getAllMessagesCopy().shouldHaveSize(2)
         LocalDisplayedMessageRepository.instance().numberOfTimesDisplayed(message) shouldBeEqualTo 0
     }
 
-    private fun setupDisplay(message: Message) {
-        ReadyForDisplayMessageRepository.instance().replaceAllMessages(listOf(message))
+    private fun setupDisplayedView(message: Message) {
+        val message2 = ValidTestMessage()
+        ReadyForDisplayMessageRepository.instance().replaceAllMessages(listOf(message, message2))
+        PingResponseMessageRepository.instance().replaceAllMessages(listOf(message, message2))
         LocalDisplayedMessageRepository.instance().clearMessages()
         When calling activity.findViewById<ViewGroup>(R.id.in_app_message_base_view) itReturns viewGroup
         When calling viewGroup.parent itReturns parentViewGroup

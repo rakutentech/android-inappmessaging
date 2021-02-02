@@ -229,6 +229,13 @@ It is possible that the new user did not close the campaign (tapping the 'X' but
 InAppMessaging.instance().closeMessage()
 ```
 
+An optional parameter, `clearQueuedCampaigns`, can be set to `true` (`false` by default) which will additionally remove all campaigns that were queued to be displayed.
+
+```kotlin
+InAppMessaging.instance().closeMessage(true)
+```
+
+
 **<font color="red">Note:</font> Calling this API will not increment the campaign's impression (i.e not counted as displayed).**
 
 ## <a name="troubleshooting"></a> Troubleshooting
@@ -288,7 +295,7 @@ Documents targeting Product Managers:
 ## <a name="changelog"></a> Changelog
 
 ### 2.3.0 (in-progress)
-* SDKCF-3199: Add `closeMessage` API for programmatically closing campaigns without user action.
+* SDKCF-3199: Add [`closeMessage` API](#close-campaign) for programmatically closing campaigns without user action.
 
 ### 2.2.0 (2020-11-10)
 * SDKCF-2870: Allow host app to control if a campaign should be displayed in the current screen (using [contexts](#context))

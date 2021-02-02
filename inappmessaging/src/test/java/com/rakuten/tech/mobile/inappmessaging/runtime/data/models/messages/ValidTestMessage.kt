@@ -5,10 +5,11 @@ import com.rakuten.tech.mobile.inappmessaging.runtime.data.responses.ping.Messag
 import com.rakuten.tech.mobile.inappmessaging.runtime.data.responses.ping.Trigger
 
 internal class ValidTestMessage(var id: String = DEFAULT_CAMPAIGN_ID, private val isTest: Boolean = IS_TEST) : Message {
+    internal var timesClosed = 0
 
     override fun getType(): Int = InAppMessageType.MODAL.typeId
 
-    override fun getCampaignId(): String? = id
+    override fun getCampaignId() = id
 
     override fun getTriggers(): List<Trigger>? {
         val triggerList = ArrayList<Trigger>()
@@ -23,6 +24,12 @@ internal class ValidTestMessage(var id: String = DEFAULT_CAMPAIGN_ID, private va
     override fun getMaxImpressions(): Int = 1
 
     override fun getContexts(): List<String> = listOf()
+
+    override fun getNumberOfTimesClosed() = timesClosed
+
+    override fun incrementTimesClosed() {
+        timesClosed++
+    }
 
     @Suppress("ComplexCondition")
     override fun equals(other: Any?): Boolean {

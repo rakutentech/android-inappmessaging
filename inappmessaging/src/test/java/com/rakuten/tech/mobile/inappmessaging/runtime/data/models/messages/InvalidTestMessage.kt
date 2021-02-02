@@ -17,4 +17,9 @@ internal class InvalidTestMessage : Message {
     override fun getMaxImpressions(): Int = 0
 
     override fun getContexts(): List<String> = listOf()
+
+    override fun getNumberOfTimesClosed() = 0
+
+    @SuppressWarnings("EmptyFunctionBlock")
+    override fun incrementTimesClosed() {}
 }

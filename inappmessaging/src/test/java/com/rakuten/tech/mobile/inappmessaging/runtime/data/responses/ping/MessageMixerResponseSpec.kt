@@ -280,4 +280,17 @@ class MessageMixerResponseSpec(private val testname: String, private val actual:
         val campaign = generateDummyCampaign("id", null)
         campaign.getContexts() shouldHaveSize 0
     }
+
+    @Test
+    fun `should not always start times closed to zero`() {
+        val campaign = generateDummyCampaign("id", "")
+        campaign.getNumberOfTimesClosed() shouldBeEqualTo 0
+    }
+
+    @Test
+    fun `should have correct incremented value`() {
+        val campaign = generateDummyCampaign("id", "")
+        campaign.incrementTimesClosed()
+        campaign.getNumberOfTimesClosed() shouldBeEqualTo 1
+    }
 }

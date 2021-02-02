@@ -78,8 +78,10 @@ abstract class InAppMessaging internal constructor() {
      * Close the currently displayed message.
      * This should be called when app needs to force-close the displayed message without user action.
      * Calling this method will not increment the campaign impression.
+     * @param clearQueuedCampaigns An optional parameter, when set to true (false by default), will additionally
+     * remove all campaigns that were queued to be displayed.
      */
-    abstract fun closeMessage()
+    abstract fun closeMessage(clearQueuedCampaigns: Boolean = false)
 
     companion object {
         private var instance: InAppMessaging = NotInitializedInAppMessaging()
@@ -138,6 +140,6 @@ abstract class InAppMessaging internal constructor() {
 
         override fun getHostAppContext(): Context? = null
 
-        override fun closeMessage() {}
+        override fun closeMessage(clearQueuedCampaigns: Boolean) {}
     }
 }
