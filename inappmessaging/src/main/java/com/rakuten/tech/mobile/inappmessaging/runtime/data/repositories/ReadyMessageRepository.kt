@@ -20,12 +20,15 @@ internal interface ReadyMessageRepository {
 
     /**
      * Removing a message from the repository.
+     * @param campaignId id of the message to be removed.
+     * @param shouldIncrementTimesClosed if true, the number of times closed while in queue is incremented.
      */
     fun removeMessage(campaignId: String, shouldIncrementTimesClosed: Boolean = false)
 
     /**
-     * Clears all message from the repository.
-     * This is done during session update due to user info update.
+     * Clears all message from the repository. This is called during session update due to user info update,
+     * or when clearing of queued (ready for display) messages.
+     * @param shouldIncrementTimesClosed if true, the number of times closed while in queue is incremented.
      */
-    fun clearMessages(isClearQueued: Boolean = false)
+    fun clearMessages(shouldIncrementTimesClosed: Boolean = false)
 }

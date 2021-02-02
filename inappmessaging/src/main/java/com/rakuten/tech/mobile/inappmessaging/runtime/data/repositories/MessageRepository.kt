@@ -26,7 +26,8 @@ internal interface MessageRepository {
     fun clearMessages()
 
     /**
-     * Increments the number of times closed for all the messages in the [messageList].
+     * Increments the number of times closed while in queue (ready for display)
+     * for all the messages in the [messageList].
      */
     fun incrementTimesClosed(messageList: List<Message>)
 }

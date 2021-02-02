@@ -46,9 +46,9 @@ internal abstract class ReadyForDisplayMessageRepository : ReadyMessageRepositor
             }
         }
 
-        override fun clearMessages(isClearQueued: Boolean) {
+        override fun clearMessages(shouldIncrementTimesClosed: Boolean) {
             synchronized(messages) {
-                if (isClearQueued) {
+                if (shouldIncrementTimesClosed) {
                     PingResponseMessageRepository.instance().incrementTimesClosed(messages)
                 }
                 messages.clear()
