@@ -273,6 +273,7 @@ class DisplayMessageJobIntentServiceSpec : BaseTest() {
     @Test
     fun `should not display campaign if activity is not registered`() {
         InAppMessaging.instance().unregisterMessageDisplayActivity()
+        Mockito.verify(activity).findViewById<View?>(ArgumentMatchers.anyInt())
         val message = Mockito.mock(Message::class.java)
 
         When calling message.getCampaignId() itReturns "1"
@@ -284,8 +285,8 @@ class DisplayMessageJobIntentServiceSpec : BaseTest() {
         When calling mockMessageManager.getNextDisplayMessage() itReturns message
         displayMessageJobIntentService!!.onHandleWork(intent!!)
 
-        Mockito.verify(activity, Mockito.times(0))
-                .findViewById<View?>(ArgumentMatchers.anyInt())
+        // will be called only once when activity was unregistered
+        Mockito.verify(activity).findViewById<View?>(ArgumentMatchers.anyInt())
     }
 
     @Test
