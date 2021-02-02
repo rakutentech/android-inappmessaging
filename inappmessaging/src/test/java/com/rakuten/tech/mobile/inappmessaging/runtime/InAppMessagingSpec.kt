@@ -137,13 +137,26 @@ class InAppMessagingSpec : BaseTest() {
     }
 
     @Test
+    @Suppress("SwallowedException")
+    fun `should not crash close message for initialized instance`() {
+        initializeInstance()
+
+        try {
+            InAppMessaging.instance().closeMessage()
+            InAppMessaging.instance().closeMessage(true)
+        } catch (e: Exception) {
+            fail("should not throw exception")
+        }
+    }
+
+    @Test
     fun `should remove message from host activity and not clear queue`() {
         val message = ValidTestMessage("1")
         setupDisplayedView(message)
         initializeInstance()
 
         InAppMessaging.instance().registerMessageDisplayActivity(activity)
-        InAppMessaging.instance().closeMessage()
+        (InAppMessaging.instance() as InApp).removeMessage(false)
         Mockito.verify(parentViewGroup).removeView(viewGroup)
         ReadyForDisplayMessageRepository.instance().getAllMessagesCopy().shouldHaveSize(1)
         for (msg in PingResponseMessageRepository.instance().getAllMessagesCopy()) {
@@ -163,7 +176,7 @@ class InAppMessagingSpec : BaseTest() {
         initializeInstance()
 
         InAppMessaging.instance().registerMessageDisplayActivity(activity)
-        InAppMessaging.instance().closeMessage(true)
+        (InAppMessaging.instance() as InApp).removeMessage(true)
         Mockito.verify(parentViewGroup).removeView(viewGroup)
         ReadyForDisplayMessageRepository.instance().getAllMessagesCopy().shouldBeEmpty()
         for (msg in PingResponseMessageRepository.instance().getAllMessagesCopy()) {
@@ -173,14 +186,14 @@ class InAppMessagingSpec : BaseTest() {
     }
 
     @Test
-    fun `should not crash and not increment when no message is displayed`() {
+    fun `should not increment when no message is displayed`() {
         val message = ValidTestMessage("1")
         ReadyForDisplayMessageRepository.instance().replaceAllMessages(listOf(message))
         PingResponseMessageRepository.instance().replaceAllMessages(listOf(message))
         initializeInstance()
 
         InAppMessaging.instance().registerMessageDisplayActivity(activity)
-        InAppMessaging.instance().closeMessage()
+        (InAppMessaging.instance() as InApp).removeMessage(false)
         ReadyForDisplayMessageRepository.instance().getAllMessagesCopy().shouldHaveSize(1)
         for (msg in PingResponseMessageRepository.instance().getAllMessagesCopy()) {
             msg.getNumberOfTimesClosed() shouldBeEqualTo 0
@@ -189,14 +202,14 @@ class InAppMessagingSpec : BaseTest() {
     }
 
     @Test
-    fun `should should clear and increment when no message is displayed but flag true`() {
+    fun `should clear and increment when no message is displayed but flag true`() {
         val message = ValidTestMessage("1")
         ReadyForDisplayMessageRepository.instance().replaceAllMessages(listOf(message))
         PingResponseMessageRepository.instance().replaceAllMessages(listOf(message))
         initializeInstance()
 
         InAppMessaging.instance().registerMessageDisplayActivity(activity)
-        InAppMessaging.instance().closeMessage(true)
+        (InAppMessaging.instance() as InApp).removeMessage(true)
         ReadyForDisplayMessageRepository.instance().getAllMessagesCopy().shouldBeEmpty()
         for (msg in PingResponseMessageRepository.instance().getAllMessagesCopy()) {
             msg.getNumberOfTimesClosed() shouldBeEqualTo 1
