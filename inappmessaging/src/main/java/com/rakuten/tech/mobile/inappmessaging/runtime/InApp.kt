@@ -91,7 +91,7 @@ internal class InApp(
         val id = displayManager.removeMessage(getRegisteredActivity())
 
         if (clearQueuedCampaigns) {
-            ReadyForDisplayMessageRepository.instance().clearMessages(clearQueuedCampaigns)
+            ReadyForDisplayMessageRepository.instance().clearMessages(true)
         } else if (id != null) {
             ReadyForDisplayMessageRepository.instance().removeMessage(id as String, true)
         }
