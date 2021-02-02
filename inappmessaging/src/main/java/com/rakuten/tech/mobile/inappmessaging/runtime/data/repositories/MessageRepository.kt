@@ -26,8 +26,7 @@ internal interface MessageRepository {
     fun clearMessages()
 
     /**
-     * Clears all message from the repository.
-     * This is done during session update due to user info update.
+     * Increments the number of times closed for all the messages in the [messageList].
      */
     fun incrementTimesClosed(messageList: List<Message>)
 }
