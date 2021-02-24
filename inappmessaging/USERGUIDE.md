@@ -294,8 +294,11 @@ Documents targeting Product Managers:
 
 ## <a name="changelog"></a> Changelog
 
-### 2.3.0 (in-progress)
+### 2.3.0 (2021-02-24)
 * SDKCF-3199: Add [`closeMessage` API](#close-campaign) for programmatically closing campaigns without user action.
+* SDKCF-3129: Fix close button layout issue in slide-up campaign
+* SDKCF-3117: Fix ANDROID_ID crash on AQUOS devices
+* SDKCF-3219: Add closing of campaign when activity is unregistered
 
 ### 2.2.0 (2020-11-10)
 * SDKCF-2870: Allow host app to control if a campaign should be displayed in the current screen (using [contexts](#context))
