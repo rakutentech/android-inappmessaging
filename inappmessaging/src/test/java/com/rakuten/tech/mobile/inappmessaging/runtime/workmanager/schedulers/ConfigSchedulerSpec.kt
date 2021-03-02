@@ -27,7 +27,7 @@ class ConfigSchedulerSpec : BaseTest() {
                 Settings.Secure.ANDROID_ID,
                 "test_device_id")
         InAppMessaging.init(ApplicationProvider.getApplicationContext(), "test", "",
-                isDebugLogging = false, isForTesting = true)
+                isDebugLogging = false)
         ConfigScheduler.instance().startConfig()
     }
 
@@ -41,7 +41,7 @@ class ConfigSchedulerSpec : BaseTest() {
         val mockConfigScheduler = Mockito.mock(ConfigScheduler::class.java)
 
         InAppMessaging.init(ApplicationProvider.getApplicationContext(), "test", "",
-                isDebugLogging = false, isForTesting = true, configScheduler = mockConfigScheduler)
+                isDebugLogging = false, configScheduler = mockConfigScheduler)
 
         Mockito.verify(mockConfigScheduler, Mockito.times(1)).startConfig()
     }

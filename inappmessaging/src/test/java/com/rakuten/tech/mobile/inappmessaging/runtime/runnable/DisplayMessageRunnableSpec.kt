@@ -9,7 +9,6 @@ import android.view.View
 import android.view.Window
 import androidx.test.core.app.ApplicationProvider
 import androidx.work.testing.WorkManagerTestInitHelper
-import com.facebook.soloader.SoLoader
 import com.google.gson.Gson
 import com.rakuten.tech.mobile.inappmessaging.runtime.BaseTest
 import com.rakuten.tech.mobile.inappmessaging.runtime.InAppMessaging
@@ -40,7 +39,6 @@ class DisplayMessageRunnableSpec : BaseTest() {
 
     @Before
     fun setup() {
-        SoLoader.setInTestMode()
         When calling view!!.id itReturns 12343254
         When calling hostAppActivity.window itReturns window
     }
@@ -48,29 +46,29 @@ class DisplayMessageRunnableSpec : BaseTest() {
     @Test
     fun `should not throw exception fo invalid message type`() {
         When calling message.getType() itReturns 0
-        DisplayMessageRunnable(message, hostAppActivity, IMAGE_ASPECT_RATIO).run()
+        DisplayMessageRunnable(message, hostAppActivity).run()
     }
 
     @Test
     fun `should not throw exception fo invalid does not exist`() {
         When calling message.getType() itReturns 100
-        DisplayMessageRunnable(message, hostAppActivity, IMAGE_ASPECT_RATIO).run()
+        DisplayMessageRunnable(message, hostAppActivity).run()
     }
 
     @Test(expected = NullPointerException::class)
     fun `should throw null pointer exception when modal`() {
         When calling message.getType() itReturns InAppMessageType.MODAL.typeId
-        DisplayMessageRunnable(message, hostAppActivity, IMAGE_ASPECT_RATIO).run()
+        DisplayMessageRunnable(message, hostAppActivity).run()
     }
 
     @Test(expected = NullPointerException::class)
     fun `should throw null pointer exception when fullscreen`() {
         When calling message.getType() itReturns InAppMessageType.FULL.typeId
-        DisplayMessageRunnable(message, hostAppActivity, IMAGE_ASPECT_RATIO).run()
+        DisplayMessageRunnable(message, hostAppActivity).run()
     }
 
     @Test
-    fun `should throw exception with mock activity for full`() {
+    fun `should not throw exception with mock activity for full`() {
         WorkManagerTestInitHelper.initializeTestWorkManager(ApplicationProvider.getApplicationContext())
         Settings.Secure.putString(
                 ApplicationProvider.getApplicationContext<Context>().contentResolver,
@@ -82,7 +80,7 @@ class DisplayMessageRunnableSpec : BaseTest() {
                 MessagePayload::class.java)
         When calling hostAppActivity
                 .layoutInflater itReturns LayoutInflater.from(ApplicationProvider.getApplicationContext())
-        DisplayMessageRunnable(message, hostAppActivity, IMAGE_ASPECT_RATIO).run()
+        DisplayMessageRunnable(message, hostAppActivity).run()
     }
 
     @Test
@@ -98,7 +96,7 @@ class DisplayMessageRunnableSpec : BaseTest() {
                 MessagePayload::class.java)
         When calling hostAppActivity
                 .layoutInflater itReturns LayoutInflater.from(ApplicationProvider.getApplicationContext())
-        DisplayMessageRunnable(message, hostAppActivity, IMAGE_ASPECT_RATIO).run()
+        DisplayMessageRunnable(message, hostAppActivity).run()
     }
 
     @Test
@@ -114,7 +112,7 @@ class DisplayMessageRunnableSpec : BaseTest() {
                 MessagePayload::class.java)
         When calling hostAppActivity
                 .layoutInflater itReturns LayoutInflater.from(ApplicationProvider.getApplicationContext())
-        DisplayMessageRunnable(message, hostAppActivity, IMAGE_ASPECT_RATIO).run()
+        DisplayMessageRunnable(message, hostAppActivity).run()
     }
 
     @Test
@@ -130,11 +128,10 @@ class DisplayMessageRunnableSpec : BaseTest() {
                 MessagePayload::class.java)
         When calling hostAppActivity
                 .layoutInflater itReturns LayoutInflater.from(ApplicationProvider.getApplicationContext())
-        DisplayMessageRunnable(message, hostAppActivity, IMAGE_ASPECT_RATIO).run()
+        DisplayMessageRunnable(message, hostAppActivity).run()
     }
 
     companion object {
-        private const val IMAGE_ASPECT_RATIO = 0.75f
         private const val MESSAGE_PAYLOAD = """
             {
                 "backgroundColor":"#000000",

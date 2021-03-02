@@ -23,8 +23,8 @@ internal class InAppMessageFullScreenView(
      * Populating view data.
      */
     @SuppressFBWarnings("BC_UNCONFIRMED_CAST_OF_RETURN_VALUE")
-    override fun populateViewData(message: Message, imageAspectRatio: Float) {
-        super.populateViewData(message, imageAspectRatio)
+    override fun populateViewData(message: Message) {
+        super.populateViewData(message)
         if (imageUrl.isNullOrEmpty()) {
             // If no image, use @drawable/close_button_black_background.
             (message_close_button as ImageButton).setImageResource(R.drawable.close_button_black_background)

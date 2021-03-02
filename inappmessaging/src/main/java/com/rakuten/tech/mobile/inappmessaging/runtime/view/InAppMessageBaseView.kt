@@ -7,7 +7,6 @@ import android.graphics.Color
 import android.util.AttributeSet
 import android.view.View
 import android.widget.FrameLayout
-import com.facebook.drawee.backends.pipeline.Fresco
 import com.google.android.material.button.MaterialButton
 import com.rakuten.tech.mobile.inappmessaging.runtime.R
 import com.rakuten.tech.mobile.inappmessaging.runtime.data.models.messages.Message
@@ -38,13 +37,12 @@ internal open class InAppMessageBaseView(context: Context, attrs: AttributeSet?)
     private var header: String? = null
     private var messageBody: String? = null
     private var buttons: List<MessageButton>? = null
-    private var imageAspectRatio = 0f
     private var displayOptOut = false
 
     /**
      * Sets campaign message data onto the view.
      */
-    override fun populateViewData(message: Message, imageAspectRatio: Float) {
+    override fun populateViewData(message: Message) {
         this.headerColor = Color.parseColor(message.getMessagePayload()?.headerColor)
         this.messageBodyColor = Color.parseColor(message.getMessagePayload()?.messageBodyColor)
         this.bgColor = Color.parseColor(message.getMessagePayload()?.backgroundColor)
@@ -53,10 +51,9 @@ internal open class InAppMessageBaseView(context: Context, attrs: AttributeSet?)
         this.buttons = message.getMessagePayload()?.messageSettings?.controlSettings?.buttons
         this.imageUrl = message.getMessagePayload()?.resource?.imageUrl
         this.listener = InAppMessageViewListener(message)
-        this.imageAspectRatio = imageAspectRatio
         this.displayOptOut = message.getMessagePayload()?.messageSettings?.displaySettings?.optOut!!
-        bindViewData()
         this.tag = message.getCampaignId()
+        bindViewData()
     }
 
     /**
@@ -118,18 +115,9 @@ internal open class InAppMessageBaseView(context: Context, attrs: AttributeSet?)
     @SuppressLint("ClickableViewAccessibility")
     private fun bindImage() { // Display image.
         if (!this.imageUrl.isNullOrEmpty()) {
-            val draweeView = message_image_view
-            if (draweeView != null) {
-                draweeView.setOnTouchListener(this.listener)
-                // Building a DraweeController to handle animations.
-                // Image should be already downloaded and cached in memory. Fresco library will look for the
-                // cached image by URI.
-                draweeView.controller = Fresco.newDraweeControllerBuilder()
-                        .setUri(this.imageUrl)
-                        .setAutoPlayAnimations(true)
-                        .build()
-                draweeView.aspectRatio = this.imageAspectRatio
-                draweeView.visibility = View.VISIBLE
+            if (message_image_view != null) {
+                message_image_view.setOnTouchListener(this.listener)
+                message_image_view.visibility = View.VISIBLE
             }
         }
     }

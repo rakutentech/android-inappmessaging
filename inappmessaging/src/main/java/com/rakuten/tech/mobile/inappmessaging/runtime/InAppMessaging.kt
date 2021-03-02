@@ -106,12 +106,11 @@ abstract class InAppMessaging internal constructor() {
             subscriptionKey: String?,
             configUrl: String?,
             isDebugLogging: Boolean = false,
-            isForTesting: Boolean = false,
             configScheduler: ConfigScheduler = ConfigScheduler.instance()
         ) {
             instance = InApp(context, isDebugLogging)
             // Initializing SDK using background worker thread.
-            Initializer.initializeSdk(context, subscriptionKey, configUrl, isForTesting)
+            Initializer.initializeSdk(context, subscriptionKey, configUrl)
             configScheduler.startConfig()
         }
 

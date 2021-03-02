@@ -50,7 +50,7 @@ class SessionManagerSpec : BaseTest() {
                 Settings.Secure.ANDROID_ID,
                 "test_device_id")
         InAppMessaging.init(ApplicationProvider.getApplicationContext(), "test", "",
-                isDebugLogging = true, isForTesting = true)
+                isDebugLogging = true)
         When calling configResponseData.enabled itReturns true
         When calling configResponseData.endpoints itReturns endpoints
         ConfigResponseRepository.instance().addConfigResponse(configResponseData)
@@ -67,7 +67,7 @@ class SessionManagerSpec : BaseTest() {
                 Settings.Secure.ANDROID_ID,
                 "test_device_id")
         InAppMessaging.init(ApplicationProvider.getApplicationContext(), "test", "",
-                isDebugLogging = true, isForTesting = true)
+                isDebugLogging = true)
         When calling configResponseData.enabled itReturns false
 
         addTestData()
@@ -85,7 +85,7 @@ class SessionManagerSpec : BaseTest() {
                 Settings.Secure.ANDROID_ID,
                 "test_device_id")
         InAppMessaging.init(ApplicationProvider.getApplicationContext(), "test", "",
-                isDebugLogging = true, isForTesting = true)
+                isDebugLogging = true)
         When calling configResponseData.enabled itReturns false
 
         addTestData()
@@ -103,7 +103,7 @@ class SessionManagerSpec : BaseTest() {
                 Settings.Secure.ANDROID_ID,
                 "test_device_id")
         InAppMessaging.init(ApplicationProvider.getApplicationContext(), "test", "",
-                isDebugLogging = true, isForTesting = true)
+                isDebugLogging = true)
         When calling configResponseData.enabled itReturns false
 
         addTestData()
