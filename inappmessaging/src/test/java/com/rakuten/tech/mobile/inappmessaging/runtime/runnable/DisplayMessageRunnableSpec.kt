@@ -69,12 +69,7 @@ class DisplayMessageRunnableSpec : BaseTest() {
 
     @Test
     fun `should not throw exception with mock activity for full`() {
-        WorkManagerTestInitHelper.initializeTestWorkManager(ApplicationProvider.getApplicationContext())
-        Settings.Secure.putString(
-                ApplicationProvider.getApplicationContext<Context>().contentResolver,
-                Settings.Secure.ANDROID_ID,
-                "test_device_id")
-        InAppMessaging.init(ApplicationProvider.getApplicationContext(), "test-key", "")
+        initializeInApp()
         When calling message.getType() itReturns InAppMessageType.FULL.typeId
         When calling message.getMessagePayload() itReturns Gson().fromJson(MESSAGE_PAYLOAD.trimIndent(),
                 MessagePayload::class.java)
@@ -85,12 +80,7 @@ class DisplayMessageRunnableSpec : BaseTest() {
 
     @Test
     fun `should not throw exception with mock activity for modal`() {
-        WorkManagerTestInitHelper.initializeTestWorkManager(ApplicationProvider.getApplicationContext())
-        Settings.Secure.putString(
-                ApplicationProvider.getApplicationContext<Context>().contentResolver,
-                Settings.Secure.ANDROID_ID,
-                "test_device_id")
-        InAppMessaging.init(ApplicationProvider.getApplicationContext(), "test-key", "")
+        initializeInApp()
         When calling message.getType() itReturns InAppMessageType.MODAL.typeId
         When calling message.getMessagePayload() itReturns Gson().fromJson(MESSAGE_PAYLOAD.trimIndent(),
                 MessagePayload::class.java)
@@ -101,12 +91,7 @@ class DisplayMessageRunnableSpec : BaseTest() {
 
     @Test
     fun `should not throw exception with mock activity for slide`() {
-        WorkManagerTestInitHelper.initializeTestWorkManager(ApplicationProvider.getApplicationContext())
-        Settings.Secure.putString(
-                ApplicationProvider.getApplicationContext<Context>().contentResolver,
-                Settings.Secure.ANDROID_ID,
-                "test_device_id")
-        InAppMessaging.init(ApplicationProvider.getApplicationContext(), "test-key", "")
+        initializeInApp()
         When calling message.getType() itReturns InAppMessageType.SLIDE.typeId
         When calling message.getMessagePayload() itReturns Gson().fromJson(MESSAGE_PAYLOAD_SLIDE.trimIndent(),
                 MessagePayload::class.java)
@@ -117,18 +102,22 @@ class DisplayMessageRunnableSpec : BaseTest() {
 
     @Test
     fun `should not throw exception with mock activity for modal and buttons`() {
-        WorkManagerTestInitHelper.initializeTestWorkManager(ApplicationProvider.getApplicationContext())
-        Settings.Secure.putString(
-                ApplicationProvider.getApplicationContext<Context>().contentResolver,
-                Settings.Secure.ANDROID_ID,
-                "test_device_id")
-        InAppMessaging.init(ApplicationProvider.getApplicationContext(), "test-key", "")
+        initializeInApp()
         When calling message.getType() itReturns InAppMessageType.MODAL.typeId
         When calling message.getMessagePayload() itReturns Gson().fromJson(MESSAGE_PAYLOAD_TWO_BUTTONS.trimIndent(),
                 MessagePayload::class.java)
         When calling hostAppActivity
                 .layoutInflater itReturns LayoutInflater.from(ApplicationProvider.getApplicationContext())
         DisplayMessageRunnable(message, hostAppActivity).run()
+    }
+
+    private fun initializeInApp() {
+        WorkManagerTestInitHelper.initializeTestWorkManager(ApplicationProvider.getApplicationContext())
+        Settings.Secure.putString(
+                ApplicationProvider.getApplicationContext<Context>().contentResolver,
+                Settings.Secure.ANDROID_ID,
+                "test_device_id")
+        InAppMessaging.init(ApplicationProvider.getApplicationContext(), "test-key", "")
     }
 
     companion object {
