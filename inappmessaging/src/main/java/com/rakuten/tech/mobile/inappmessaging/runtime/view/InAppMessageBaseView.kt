@@ -114,11 +114,9 @@ internal open class InAppMessageBaseView(context: Context, attrs: AttributeSet?)
      */
     @SuppressLint("ClickableViewAccessibility")
     private fun bindImage() { // Display image.
-        if (!this.imageUrl.isNullOrEmpty()) {
-            if (message_image_view != null) {
+        if (!this.imageUrl.isNullOrEmpty() && message_image_view != null) {
                 message_image_view.setOnTouchListener(this.listener)
                 message_image_view.visibility = View.VISIBLE
-            }
         }
     }
 

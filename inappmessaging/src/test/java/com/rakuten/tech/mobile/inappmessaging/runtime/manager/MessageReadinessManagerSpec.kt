@@ -131,12 +131,7 @@ class MessageReadinessManagerSpec : BaseTest() {
 
     @Test
     fun `should next ready message be null with ping required`() {
-        WorkManagerTestInitHelper.initializeTestWorkManager(ApplicationProvider.getApplicationContext())
-        Settings.Secure.putString(ApplicationProvider.getApplicationContext<Context>().contentResolver,
-                Settings.Secure.ANDROID_ID, "test_device_id")
-        InAppMessaging.init(ApplicationProvider.getApplicationContext(), "test", "",
-                isDebugLogging = true)
-
+        initializeInApp()
         val messageList = ArrayList<Message>()
         // will not be displayed when campaign expires)
         messageList.add(ValidTestMessage("1", false))
@@ -153,12 +148,7 @@ class MessageReadinessManagerSpec : BaseTest() {
 
     @Test
     fun `should next ready message be null with empty display impression`() {
-        WorkManagerTestInitHelper.initializeTestWorkManager(ApplicationProvider.getApplicationContext())
-        Settings.Secure.putString(ApplicationProvider.getApplicationContext<Context>().contentResolver,
-                Settings.Secure.ANDROID_ID, "test_device_id")
-        InAppMessaging.init(ApplicationProvider.getApplicationContext(), "test", "",
-                isDebugLogging = true)
-
+        initializeInApp()
         val messageList = ArrayList<Message>()
         // will not be displayed when campaign expires)
         messageList.add(ValidTestMessage("1", false))
@@ -171,6 +161,14 @@ class MessageReadinessManagerSpec : BaseTest() {
                 InAppMessagingTestConstants.DEVICE_ID, InAppMessagingTestConstants.APP_VERSION,
                 "2", InAppMessagingTestConstants.LOCALE))
         MessageReadinessManager.instance().getNextDisplayMessage().shouldBeNull()
+    }
+
+    private fun initializeInApp() {
+        WorkManagerTestInitHelper.initializeTestWorkManager(ApplicationProvider.getApplicationContext())
+        Settings.Secure.putString(ApplicationProvider.getApplicationContext<Context>().contentResolver,
+                Settings.Secure.ANDROID_ID, "test_device_id")
+        InAppMessaging.init(ApplicationProvider.getApplicationContext(), "test", "",
+                isDebugLogging = true)
     }
 
     companion object {
