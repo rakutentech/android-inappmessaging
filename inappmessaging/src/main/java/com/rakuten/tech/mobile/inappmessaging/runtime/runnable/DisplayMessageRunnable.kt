@@ -84,8 +84,8 @@ internal class DisplayMessageRunnable(
         val url = message.getMessagePayload()?.resource?.imageUrl
         // hide campaign view (cannot use visibility since Glide callback will not work.)
         // https://github.com/bumptech/glide/issues/618
-        view.alpha = 0f
         if (url != null) {
+            view.alpha = 0f
             Glide.with(view).load(url).addListener(object : RequestListener<Drawable> {
                 override fun onLoadFailed(
                     e: GlideException?,
@@ -110,11 +110,12 @@ internal class DisplayMessageRunnable(
                     view.alpha = 1f
                     return false
                 }
-            }).into(view.findViewById(R.id.message_image_view))
+            }).timeout(IMG_DOWNLOAD_TIMEOUT).into(view.findViewById(R.id.message_image_view))
         }
     }
 
     companion object {
         private const val TAG = "IAM_MessageRunnable"
+        private const val IMG_DOWNLOAD_TIMEOUT = 2000 // in ms
     }
 }
