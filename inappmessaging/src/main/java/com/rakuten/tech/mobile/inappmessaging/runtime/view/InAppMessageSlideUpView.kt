@@ -22,8 +22,8 @@ internal class InAppMessageSlideUpView(
     /**
      * Populating view data according to Slide Up view.
      */
-    override fun populateViewData(message: Message, imageAspectRatio: Float) {
-        super.populateViewData(message, imageAspectRatio)
+    override fun populateViewData(message: Message) {
+        super.populateViewData(message)
 
         // Override image from white background to black background.
         (message_close_button as ImageButton).setImageResource(R.drawable.close_button_black_background)

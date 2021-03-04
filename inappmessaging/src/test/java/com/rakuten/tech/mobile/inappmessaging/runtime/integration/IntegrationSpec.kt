@@ -44,7 +44,7 @@ class IntegrationSpec {
             override fun provideRakutenId() = ""
         })
         // to initialize host app info
-        Initializer.initializeSdk(context, manifest.subscriptionKey(), manifest.configUrl(), true)
+        Initializer.initializeSdk(context, manifest.subscriptionKey(), manifest.configUrl())
     }
 
     @Test

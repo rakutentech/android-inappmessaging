@@ -85,7 +85,7 @@ class EventsManagerSpec : BaseTest() {
                 Settings.Secure.ANDROID_ID,
                 "test_device_id")
         InAppMessaging.init(ApplicationProvider.getApplicationContext(), "test", "",
-                isDebugLogging = false, isForTesting = true)
+                isDebugLogging = false)
         InAppMessaging.instance().registerPreference(TestUserInfoProvider())
         ConfigResponseRepository.instance().addConfigResponse(configResponseData)
         When calling configResponseData.enabled itReturns false
@@ -101,7 +101,7 @@ class EventsManagerSpec : BaseTest() {
                 Settings.Secure.ANDROID_ID,
                 "test_device_id")
         InAppMessaging.init(ApplicationProvider.getApplicationContext(), "test", "",
-                isDebugLogging = false, isForTesting = true)
+                isDebugLogging = false)
         InAppMessaging.instance().registerPreference(TestUserInfoProvider())
         ConfigResponseRepository.instance().addConfigResponse(configResponseData)
 
@@ -123,7 +123,7 @@ class EventsManagerSpec : BaseTest() {
                 Settings.Secure.ANDROID_ID,
                 "test_device_id")
         InAppMessaging.init(ApplicationProvider.getApplicationContext(), "test", "",
-                isDebugLogging = false, isForTesting = true)
+                isDebugLogging = false)
         InAppMessaging.instance().registerPreference(TestUserInfoProvider())
         ConfigResponseRepository.instance().addConfigResponse(configResponseData)
 
