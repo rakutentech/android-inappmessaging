@@ -85,9 +85,8 @@ internal class DisplayMessageRunnable(
     private fun downloadImage(view: InAppMessageBaseView, message: Message) {
         val url = message.getMessagePayload()?.resource?.imageUrl
         if (url != null) {
-            val imageView = view.findViewById<ImageView>(R.id.message_image_view)
             Glide.with(hostActivity).load(url).timeout(IMG_DOWNLOAD_TIMEOUT).into(
-                    object : ImageViewTarget<Drawable>(imageView) {
+                    object : ImageViewTarget<Drawable>(view.findViewById(R.id.message_image_view)) {
                         override fun onLoadStarted(placeholder: Drawable?) {
                             super.onLoadStarted(placeholder)
                             // hide campaign view (cannot use visibility since Glide callback will not work.)
