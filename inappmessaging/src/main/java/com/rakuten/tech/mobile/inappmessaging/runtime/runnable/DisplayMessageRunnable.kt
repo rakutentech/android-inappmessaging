@@ -3,7 +3,6 @@ package com.rakuten.tech.mobile.inappmessaging.runtime.runnable
 import android.app.Activity
 import android.graphics.drawable.Drawable
 import android.view.View
-import android.widget.ImageView
 import androidx.annotation.UiThread
 import com.bumptech.glide.Glide
 import com.bumptech.glide.request.target.ImageViewTarget
@@ -85,13 +84,15 @@ internal class DisplayMessageRunnable(
     private fun downloadImage(view: InAppMessageBaseView, message: Message) {
         val url = message.getMessagePayload()?.resource?.imageUrl
         if (url != null) {
+            // hide campaign view (cannot use visibility since Glide callback will not work.)
+            // https://github.com/bumptech/glide/issues/618
+            view.alpha = 0f
             Glide.with(view).load(url).timeout(IMG_DOWNLOAD_TIMEOUT).into(
                     object : ImageViewTarget<Drawable>(view.findViewById(R.id.message_image_view)) {
                         override fun onLoadStarted(placeholder: Drawable?) {
                             super.onLoadStarted(placeholder)
-                            // hide campaign view (cannot use visibility since Glide callback will not work.)
-                            // https://github.com/bumptech/glide/issues/618
-                            view.alpha = 0f
+                            // manual timer is used to prevent blocking the UI too long because Glide's "onLoadFailed"
+                            // is not called immediately after download image timeout.
                             timer = Timer()
                             timer?.schedule(timerTask { handleDownload(view, false) }, TIMER_SCHEDULE)
                         }
