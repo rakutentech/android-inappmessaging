@@ -85,7 +85,7 @@ internal class DisplayMessageRunnable(
     private fun downloadImage(view: InAppMessageBaseView, message: Message) {
         val url = message.getMessagePayload()?.resource?.imageUrl
         if (url != null) {
-            Glide.with(hostActivity).load(url).timeout(IMG_DOWNLOAD_TIMEOUT).into(
+            Glide.with(view).load(url).timeout(IMG_DOWNLOAD_TIMEOUT).into(
                     object : ImageViewTarget<Drawable>(view.findViewById(R.id.message_image_view)) {
                         override fun onLoadStarted(placeholder: Drawable?) {
                             super.onLoadStarted(placeholder)
@@ -114,7 +114,7 @@ internal class DisplayMessageRunnable(
     }
 
     private fun handleDownload(view: InAppMessageBaseView, isSuccess: Boolean) {
-        Glide.with(hostActivity).pauseAllRequests()
+        Glide.with(view).pauseAllRequests()
         if (timer != null) {
             timer?.cancel()
             timer?.purge()
