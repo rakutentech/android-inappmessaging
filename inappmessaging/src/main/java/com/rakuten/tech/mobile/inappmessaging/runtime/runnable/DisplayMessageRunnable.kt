@@ -5,21 +5,21 @@ import android.graphics.drawable.Drawable
 import android.view.View
 import androidx.annotation.UiThread
 import com.bumptech.glide.Glide
-import com.bumptech.glide.request.target.ImageViewTarget
-import com.bumptech.glide.request.transition.Transition
+import com.bumptech.glide.load.DataSource
+import com.bumptech.glide.load.engine.GlideException
+import com.bumptech.glide.request.RequestListener
+import com.bumptech.glide.request.target.Target
 import com.rakuten.tech.mobile.inappmessaging.runtime.R
 import com.rakuten.tech.mobile.inappmessaging.runtime.data.enums.InAppMessageType
 import com.rakuten.tech.mobile.inappmessaging.runtime.data.models.messages.Message
-import com.rakuten.tech.mobile.inappmessaging.runtime.data.repositories.ReadyForDisplayMessageRepository
 import com.rakuten.tech.mobile.inappmessaging.runtime.manager.DisplayManager
 import com.rakuten.tech.mobile.inappmessaging.runtime.view.InAppMessageBaseView
 import com.rakuten.tech.mobile.inappmessaging.runtime.view.InAppMessageFullScreenView
 import com.rakuten.tech.mobile.inappmessaging.runtime.view.InAppMessageModalView
 import com.rakuten.tech.mobile.inappmessaging.runtime.view.InAppMessageSlideUpView
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings
+import kotlinx.coroutines.Runnable
 import timber.log.Timber
-import java.util.Timer
-import java.util.TimerTask
 
 /**
  * Displaying message runnable which presents the message on the UI thread. Message close, and other
@@ -80,70 +80,42 @@ internal class DisplayMessageRunnable(
         }
     }
 
-    private var timer: Timer? = null
     private fun downloadImage(view: InAppMessageBaseView, message: Message) {
         val url = message.getMessagePayload()?.resource?.imageUrl
+        // hide campaign view (cannot use visibility since Glide callback will not work.)
+        // https://github.com/bumptech/glide/issues/618
         if (url != null) {
-            // hide campaign view (cannot use visibility since Glide callback will not work.)
-            // https://github.com/bumptech/glide/issues/618
             view.alpha = 0f
-            Glide.with(view).load(url).timeout(IMG_DOWNLOAD_TIMEOUT).into(
-                    object : ImageViewTarget<Drawable>(view.findViewById(R.id.message_image_view)) {
-                        override fun onLoadStarted(placeholder: Drawable?) {
-                            super.onLoadStarted(placeholder)
-                            // manual timer is used to prevent blocking the UI too long because Glide's "onLoadFailed"
-                            // is not called immediately after download image timeout.
-                            timer = Timer()
-                            timer?.schedule(timerTask { handleDownload(view, false) }, TIMER_SCHEDULE)
-                        }
-
-                        override fun onLoadFailed(errorDrawable: Drawable?) {
-                            handleDownload(view, false)
-                            super.onLoadFailed(errorDrawable)
-                        }
-
-                        override fun onResourceReady(resource: Drawable, transition: Transition<in Drawable>?) {
-                            handleDownload(view, true)
-                            super.onResourceReady(resource, transition)
-                        }
-
-                        override fun setResource(resource: Drawable?) {
-                            getView().setImageDrawable(resource)
-                        }
-                    })
-        }
-    }
-
-    private fun handleDownload(view: InAppMessageBaseView, isSuccess: Boolean) {
-        Glide.with(view).pauseAllRequests()
-        if (timer != null) {
-            timer?.cancel()
-            timer?.purge()
-            timer = null
-            hostActivity.runOnUiThread {
-                if (isSuccess) {
-                    view.alpha = 1f
-                } else {
+            Glide.with(view).load(url).addListener(object : RequestListener<Drawable> {
+                override fun onLoadFailed(
+                    e: GlideException?,
+                    model: Any?,
+                    target: Target<Drawable>?,
+                    isFirstResource: Boolean
+                ): Boolean {
                     Timber.tag(TAG).d("Downloading image failed")
-                    val id = DisplayManager.instance().removeMessage(hostActivity)
-                    if (id != null) {
-                        // drop event when download fail
-                        ReadyForDisplayMessageRepository.instance().removeMessage(id as String, true)
-                    }
+                    // When image can't be downloaded, remove campaign.
+                    DisplayManager.instance().removeMessage(hostActivity)
+                    return false
                 }
-            }
-        }
-    }
 
-    private fun timerTask(wrapped: Runnable) = object : TimerTask() {
-        override fun run() {
-            wrapped.run()
+                override fun onResourceReady(
+                    resource: Drawable?,
+                    model: Any?,
+                    target: Target<Drawable>?,
+                    dataSource: DataSource?,
+                    isFirstResource: Boolean
+                ): Boolean {
+                    // show campaign
+                    view.alpha = 1f
+                    return false
+                }
+            }).timeout(IMG_DOWNLOAD_TIMEOUT).into(view.findViewById(R.id.message_image_view))
         }
     }
 
     companion object {
         private const val TAG = "IAM_MessageRunnable"
-        private const val IMG_DOWNLOAD_TIMEOUT = 1000 // in ms (1s for connection timeout and 1s for read timeout)
-        private const val TIMER_SCHEDULE = 2100L // in ms (100ms more than total time out to give chance to Glide)
+        private const val IMG_DOWNLOAD_TIMEOUT = 2000 // in ms
     }
 }

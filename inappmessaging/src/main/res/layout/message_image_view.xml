@@ -7,5 +7,4 @@
   android:contentDescription="@string/in_app_message_image"
   android:scaleType="fitCenter"
   android:visibility="gone"
-  android:adjustViewBounds="true"
   tools:visibility="visible"/>

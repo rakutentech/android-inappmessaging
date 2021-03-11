@@ -122,7 +122,7 @@ class AppUserInfoProvider : UserInfoProvider {
 In-App Messaging is automatically initialized at startup and handled on a background thread.
 Host app just needs to register the provider containing the user information.
 
-In your Application class' `onCreate()` method, add:
+In your Application's `onCreate()` method, add:
 
 ```kotlin
 InAppMessaging.instance().registerPreference(YourUserInfoProvider())
@@ -179,7 +179,7 @@ InAppMessaging.instance().logEvent(LoginSuccessfulEvent())
 Host app should log this event after every successful purchase.
 
 ```kotlin
-InAppMessaging.instance().logEvent(PurchaseSuccessfulEvent())
+InAppMessaging.instance().logEvent(PurchaseSuccessfulEvent()
 ```
 
 ### Custom event class:
@@ -293,9 +293,6 @@ Documents targeting Product Managers:
 + In-App Messaging Dashboard Sign Up(page is coming soon.)
 
 ## <a name="changelog"></a> Changelog
-
-### 2.3.1 (in-progress)
-* SDKCF-3450: Replace Fresco image loading and display library with Glide.
 
 ### 2.3.0 (2021-02-24)
 * SDKCF-3199: Add [`closeMessage` API](#close-campaign) for programmatically closing campaigns without user action.
