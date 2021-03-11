@@ -115,6 +115,7 @@ internal class DisplayMessageRunnable(
     }
 
     private fun handleDownload(view: InAppMessageBaseView, isSuccess: Boolean) {
+        Glide.with(view).pauseAllRequests()
         if (timer != null) {
             timer?.cancel()
             timer?.purge()
