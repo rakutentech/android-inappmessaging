@@ -70,7 +70,8 @@ class ImpressionWorkerSpec : BaseTest() {
         WorkManagerTestInitHelper.initializeTestWorkManager(ApplicationProvider.getApplicationContext(), config)
         Settings.Secure.putString(ApplicationProvider.getApplicationContext<Context>().contentResolver,
                 Settings.Secure.ANDROID_ID, "test_device_id")
-        InAppMessaging.init(ApplicationProvider.getApplicationContext(), "test-key", "")
+        InAppMessaging.init(ApplicationProvider.getApplicationContext(), "test-key", "",
+                isForTesting = true)
     }
 
     @Test

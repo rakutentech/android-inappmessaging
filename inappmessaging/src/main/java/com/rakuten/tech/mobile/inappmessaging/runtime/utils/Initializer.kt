@@ -8,6 +8,7 @@ import android.content.pm.PackageManager.NameNotFoundException
 import android.os.Build
 import android.provider.Settings
 import androidx.core.content.pm.PackageInfoCompat
+import com.facebook.drawee.backends.pipeline.Fresco
 import com.google.gson.Gson
 import com.rakuten.tech.mobile.inappmessaging.runtime.data.models.HostAppInfo
 import com.rakuten.tech.mobile.inappmessaging.runtime.data.repositories.HostAppInfoRepository
@@ -80,6 +81,7 @@ internal object Initializer {
         context: Context,
         subscriptionKey: String?,
         configUrl: String?,
+        isForTesting: Boolean = false,
         sharedUtil: SharePreferencesUtil = SharePreferencesUtil
     ) {
         val hostAppInfo = HostAppInfo(
@@ -93,6 +95,10 @@ internal object Initializer {
         // Store hostAppInfo in repository.
         HostAppInfoRepository.instance().addHostInfo(hostAppInfo)
 
+        // Initialize Fresco library if it's not initialized already.
+        if (!Fresco.hasBeenInitialized() && !isForTesting) {
+            Fresco.initialize(context)
+        }
         Timber.tag(TAG).d(Gson().toJson(hostAppInfo))
     }
 

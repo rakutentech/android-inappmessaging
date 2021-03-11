@@ -131,7 +131,7 @@ class ConfigWorkerSpec : BaseTest() {
                 PackageManager.GET_META_DATA).metaData
 
         InAppMessaging.init(ApplicationProvider.getApplicationContext(), "test",
-                bundle.getString(CONFIG_KEY, ""), isDebugLogging = false)
+                bundle.getString(CONFIG_KEY, ""), isDebugLogging = false, isForTesting = true)
         val worker = ConfigWorker(context, workerParameters)
         val expected = if (HostAppInfoRepository.instance().getConfigUrl().isNullOrEmpty())
             ListenableWorker.Result.retry() else ListenableWorker.Result.success()

@@ -262,6 +262,6 @@ class InAppMessagingSpec : BaseTest() {
                 Settings.Secure.ANDROID_ID,
                 "test_device_id")
         InAppMessaging.init(ApplicationProvider.getApplicationContext(), "test", "",
-                isDebugLogging = true)
+                isDebugLogging = true, isForTesting = true)
     }
 }
