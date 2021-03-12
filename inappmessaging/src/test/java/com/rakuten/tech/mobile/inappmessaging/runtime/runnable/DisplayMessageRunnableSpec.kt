@@ -76,7 +76,7 @@ class DisplayMessageRunnableSpec : BaseTest() {
                 ApplicationProvider.getApplicationContext<Context>().contentResolver,
                 Settings.Secure.ANDROID_ID,
                 "test_device_id")
-        InAppMessaging.init(ApplicationProvider.getApplicationContext(), "test-key", "")
+        InAppMessaging.init(ApplicationProvider.getApplicationContext(), TEST_KEY, "")
         When calling message.getType() itReturns InAppMessageType.FULL.typeId
         When calling message.getMessagePayload() itReturns Gson().fromJson(MESSAGE_PAYLOAD.trimIndent(),
                 MessagePayload::class.java)
@@ -92,7 +92,7 @@ class DisplayMessageRunnableSpec : BaseTest() {
                 ApplicationProvider.getApplicationContext<Context>().contentResolver,
                 Settings.Secure.ANDROID_ID,
                 "test_device_id")
-        InAppMessaging.init(ApplicationProvider.getApplicationContext(), "test-key", "")
+        InAppMessaging.init(ApplicationProvider.getApplicationContext(), TEST_KEY, "")
         When calling message.getType() itReturns InAppMessageType.MODAL.typeId
         When calling message.getMessagePayload() itReturns Gson().fromJson(MESSAGE_PAYLOAD.trimIndent(),
                 MessagePayload::class.java)
@@ -108,7 +108,7 @@ class DisplayMessageRunnableSpec : BaseTest() {
                 ApplicationProvider.getApplicationContext<Context>().contentResolver,
                 Settings.Secure.ANDROID_ID,
                 "test_device_id")
-        InAppMessaging.init(ApplicationProvider.getApplicationContext(), "test-key", "")
+        InAppMessaging.init(ApplicationProvider.getApplicationContext(), TEST_KEY, "")
         When calling message.getType() itReturns InAppMessageType.SLIDE.typeId
         When calling message.getMessagePayload() itReturns Gson().fromJson(MESSAGE_PAYLOAD_SLIDE.trimIndent(),
                 MessagePayload::class.java)
@@ -124,7 +124,7 @@ class DisplayMessageRunnableSpec : BaseTest() {
                 ApplicationProvider.getApplicationContext<Context>().contentResolver,
                 Settings.Secure.ANDROID_ID,
                 "test_device_id")
-        InAppMessaging.init(ApplicationProvider.getApplicationContext(), "test-key", "")
+        InAppMessaging.init(ApplicationProvider.getApplicationContext(), TEST_KEY, "")
         When calling message.getType() itReturns InAppMessageType.MODAL.typeId
         When calling message.getMessagePayload() itReturns Gson().fromJson(MESSAGE_PAYLOAD_TWO_BUTTONS.trimIndent(),
                 MessagePayload::class.java)
@@ -134,6 +134,7 @@ class DisplayMessageRunnableSpec : BaseTest() {
     }
 
     companion object {
+        private const val TEST_KEY = "test-key"
         private const val IMAGE_ASPECT_RATIO = 0.75f
         private const val MESSAGE_PAYLOAD = """
             {

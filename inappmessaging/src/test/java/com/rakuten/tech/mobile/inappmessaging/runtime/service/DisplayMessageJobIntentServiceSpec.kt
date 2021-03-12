@@ -378,7 +378,7 @@ class ImagePrefetchSubscriberSpec {
         val dataSource = Mockito.mock(DataSource::class.java)
         When calling dataSource.progress itReturns 1f
         displayMessageJobIntentService?.ImagePrefetchSubscriber(message, activity)
-                ?.onNewResult(dataSource as DataSource<Void>?)
+                ?.onNewResult(dataSource as DataSource<Void>)
     }
 
     @Test
@@ -388,6 +388,6 @@ class ImagePrefetchSubscriberSpec {
         val dataSource = Mockito.mock(DataSource::class.java)
         When calling dataSource.progress itReturns 1f
         displayMessageJobIntentService?.ImagePrefetchSubscriber(message, activity)
-                ?.onFailure(dataSource as DataSource<Void>?)
+                ?.onFailure(dataSource as DataSource<Void>)
     }
 }
