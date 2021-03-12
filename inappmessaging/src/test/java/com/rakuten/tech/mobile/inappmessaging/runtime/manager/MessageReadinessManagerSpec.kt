@@ -132,6 +132,7 @@ class MessageReadinessManagerSpec : BaseTest() {
     @Test
     fun `should next ready message be null with ping required`() {
         initializeInApp()
+
         val messageList = ArrayList<Message>()
         // will not be displayed when campaign expires)
         messageList.add(ValidTestMessage("1", false))
@@ -149,6 +150,7 @@ class MessageReadinessManagerSpec : BaseTest() {
     @Test
     fun `should next ready message be null with empty display impression`() {
         initializeInApp()
+
         val messageList = ArrayList<Message>()
         // will not be displayed when campaign expires)
         messageList.add(ValidTestMessage("1", false))
@@ -168,7 +170,7 @@ class MessageReadinessManagerSpec : BaseTest() {
         Settings.Secure.putString(ApplicationProvider.getApplicationContext<Context>().contentResolver,
                 Settings.Secure.ANDROID_ID, "test_device_id")
         InAppMessaging.init(ApplicationProvider.getApplicationContext(), "test", "",
-                isDebugLogging = true)
+                isDebugLogging = true, isForTesting = true)
     }
 
     companion object {

@@ -54,7 +54,8 @@ class InitializerSpec : BaseTest() {
                 context,
                 "test_sub_key",
                 "",
-                isDebugLogging = false)
+                isDebugLogging = false,
+                isForTesting = true)
         InAppMessaging.instance().registerPreference(TestUserInfoProvider())
         HostAppInfoRepository.instance().getInAppMessagingSubscriptionKey() shouldBeEqualTo "test_sub_key"
         HostAppInfoRepository.instance()
@@ -65,7 +66,7 @@ class InitializerSpec : BaseTest() {
     @Test
     fun `should not throw exception`() {
         WorkManagerTestInitHelper.initializeTestWorkManager(context)
-        Initializer.initializeSdk(context, "test", "")
+        Initializer.initializeSdk(context, "test", "", true)
     }
 
     @Test(expected = InAppMessagingInitializationException::class)
@@ -81,7 +82,7 @@ class InitializerSpec : BaseTest() {
                 .packageManager
         When calling context.resources itReturns ApplicationProvider.getApplicationContext<Context>()
                 .resources
-        Initializer.initializeSdk(context, "test", "")
+        Initializer.initializeSdk(context, "test", "", true)
     }
 
     @Test(expected = KeyStoreException::class)
@@ -89,7 +90,7 @@ class InitializerSpec : BaseTest() {
         Settings.Secure.putString(context.contentResolver, Settings.Secure.ANDROID_ID, null)
 
         // AndroidKeyStore is not supported by robolectric
-        Initializer.initializeSdk(context, "test", "")
+        Initializer.initializeSdk(context, "test", "", true)
     }
 
     @Test
@@ -103,7 +104,7 @@ class InitializerSpec : BaseTest() {
         sharedPref.edit().clear().apply()
 
         // AndroidKeyStore is not supported by robolectric
-        Initializer.initializeSdk(appCtx, "test", "")
+        Initializer.initializeSdk(appCtx, "test", "", true)
 
         HostAppInfoRepository.instance().getDeviceId().shouldNotBeNullOrEmpty()
     }
@@ -118,7 +119,7 @@ class InitializerSpec : BaseTest() {
         sharedPref.edit().putString(Initializer.ID_KEY, "test_uuid").apply()
 
         // AndroidKeyStore is not supported by robolectric
-        Initializer.initializeSdk(context, "test", "")
+        Initializer.initializeSdk(context, "test", "", true)
 
         HostAppInfoRepository.instance().getDeviceId() shouldBeEqualTo "test_uuid"
     }
@@ -133,7 +134,7 @@ class InitializerSpec : BaseTest() {
         When calling mockEditor.putString(any(), any()) itReturns mockEditor
 
         // AndroidKeyStore is not supported by robolectric
-        Initializer.initializeSdk(context, "test", "", mockUtil)
+        Initializer.initializeSdk(context, "test", "", true, mockUtil)
 
         Mockito.verify(mockUtil).generateKey(context)
         Mockito.verify(mockUtil).createSharedPreference(context, mockMaster)
@@ -151,7 +152,7 @@ class InitializerSpec : BaseTest() {
         When calling mockPref.getString(Initializer.ID_KEY, "") itReturns "random_uuid"
 
         // AndroidKeyStore is not supported by robolectric
-        Initializer.initializeSdk(context, "test", "", mockUtil)
+        Initializer.initializeSdk(context, "test", "", true, mockUtil)
 
         Mockito.verify(mockUtil).generateKey(context)
         Mockito.verify(mockUtil).createSharedPreference(context, mockMaster)

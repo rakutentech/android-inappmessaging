@@ -295,7 +295,7 @@ Documents targeting Product Managers:
 ## <a name="changelog"></a> Changelog
 
 ### 2.3.1 (in-progress)
-* SDKCF-3450: Replace Fresco image loading and display library with Glide.
+* SDKCF-3450: Update Fresco dependency to v2.4.0 to fix SoLoader issue.
 
 ### 2.3.0 (2021-02-24)
 * SDKCF-3199: Add [`closeMessage` API](#close-campaign) for programmatically closing campaigns without user action.

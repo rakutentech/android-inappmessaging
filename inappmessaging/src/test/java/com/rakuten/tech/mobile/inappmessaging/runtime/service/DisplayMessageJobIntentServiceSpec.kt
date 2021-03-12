@@ -4,12 +4,13 @@ import android.app.Activity
 import android.content.Context
 import android.content.Intent
 import android.os.Build
-import android.os.Handler
 import android.provider.Settings
 import android.view.LayoutInflater
 import android.view.View
 import androidx.test.core.app.ApplicationProvider
 import androidx.work.testing.WorkManagerTestInitHelper
+import com.facebook.datasource.DataSource
+import com.facebook.soloader.SoLoader
 import com.google.gson.Gson
 import com.nhaarman.mockitokotlin2.argumentCaptor
 import com.nhaarman.mockitokotlin2.eq
@@ -18,9 +19,9 @@ import com.rakuten.tech.mobile.inappmessaging.runtime.InAppMessaging
 import com.rakuten.tech.mobile.inappmessaging.runtime.data.models.messages.Message
 import com.rakuten.tech.mobile.inappmessaging.runtime.data.repositories.LocalDisplayedMessageRepository
 import com.rakuten.tech.mobile.inappmessaging.runtime.data.repositories.ReadyForDisplayMessageRepository
+import com.rakuten.tech.mobile.inappmessaging.runtime.data.responses.ping.CampaignData
 import com.rakuten.tech.mobile.inappmessaging.runtime.data.responses.ping.MessagePayload
 import com.rakuten.tech.mobile.inappmessaging.runtime.manager.MessageReadinessManager
-import com.rakuten.tech.mobile.inappmessaging.runtime.runnable.DisplayMessageRunnable
 import org.amshove.kluent.*
 import org.junit.After
 import org.junit.Before
@@ -53,6 +54,7 @@ class DisplayMessageJobIntentServiceSpec : BaseTest() {
 
     @Before
     fun setup() {
+        SoLoader.setInTestMode()
         serviceController = Robolectric.buildService(DisplayMessageJobIntentService::class.java)
         displayMessageJobIntentService = serviceController?.bind()?.create()?.get()
         displayMessageJobIntentService!!.messageReadinessManager = mockMessageManager
@@ -255,7 +257,6 @@ class DisplayMessageJobIntentServiceSpec : BaseTest() {
     @Test
     fun `should display campaign if onVerifyContext was not set (default value)`() {
         val message = Mockito.mock(Message::class.java)
-        val mockHandler = Mockito.mock(Handler::class.java)
 
         When calling message.getCampaignId() itReturns "1"
         When calling message.isTest() itReturns false
@@ -264,11 +265,10 @@ class DisplayMessageJobIntentServiceSpec : BaseTest() {
                 MessagePayload::class.java)
         When calling message.getContexts() itReturns listOf("ctx")
         When calling mockMessageManager.getNextDisplayMessage() itReturns message
-        displayMessageJobIntentService!!.handler = mockHandler
         displayMessageJobIntentService!!.onHandleWork(intent!!)
 
-        Mockito.verify(mockHandler, Mockito.times(1))
-                .post(any(DisplayMessageRunnable::class))
+        Mockito.verify(activity, Mockito.times(1))
+                .findViewById<View?>(ArgumentMatchers.anyInt())
     }
 
     @Test
@@ -355,5 +355,39 @@ class DisplayMessageJobIntentServiceSpec : BaseTest() {
                 "titleColor":"#000000"
             }
         """
+    }
+}
+
+@RunWith(RobolectricTestRunner::class)
+@Config(sdk = [Build.VERSION_CODES.O_MR1])
+class ImagePrefetchSubscriberSpec {
+    private var serviceController: ServiceController<DisplayMessageJobIntentService>? = null
+    private var displayMessageJobIntentService: DisplayMessageJobIntentService? = null
+
+    @Before
+    fun setup() {
+        SoLoader.setInTestMode()
+        serviceController = Robolectric.buildService(DisplayMessageJobIntentService::class.java)
+        displayMessageJobIntentService = serviceController?.bind()?.create()?.get()
+    }
+
+    @Test
+    fun `should not throw exception on new result`() {
+        val message = Mockito.mock(CampaignData::class.java)
+        val activity = Mockito.mock(Activity::class.java)
+        val dataSource = Mockito.mock(DataSource::class.java)
+        When calling dataSource.progress itReturns 1f
+        displayMessageJobIntentService?.ImagePrefetchSubscriber(message, activity)
+                ?.onNewResult(dataSource as DataSource<Void>)
+    }
+
+    @Test
+    fun `should not throw exception on failed result`() {
+        val message = Mockito.mock(CampaignData::class.java)
+        val activity = Mockito.mock(Activity::class.java)
+        val dataSource = Mockito.mock(DataSource::class.java)
+        When calling dataSource.progress itReturns 1f
+        displayMessageJobIntentService?.ImagePrefetchSubscriber(message, activity)
+                ?.onFailure(dataSource as DataSource<Void>)
     }
 }
