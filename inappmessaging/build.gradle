@@ -1,5 +1,6 @@
 apply from: '../config/android/library.gradle'
-apply from: '../config/quality/android.gradle'
+//apply from: '../config/quality/android.gradle'
+apply from: "../config/quality/checkstyle/android.gradle"
 apply from: "../config/quality/detekt/android.gradle"
 apply from: '../config/quality/errorprone/android.gradle'
 apply from: '../config/documentation/dokka/android.gradle'
