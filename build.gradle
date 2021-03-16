@@ -12,6 +12,7 @@ buildscript {
     repositories {
         google()
         gradle()
+        mavenCentral()
         jcenter()
         jitpack()
     }
@@ -32,6 +33,7 @@ plugins {
 allprojects { proj ->
     repositories {
         google()
+        mavenCentral()
         jcenter()
         jitpack()
     }
