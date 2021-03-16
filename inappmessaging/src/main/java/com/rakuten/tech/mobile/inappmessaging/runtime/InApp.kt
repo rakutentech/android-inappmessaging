@@ -11,7 +11,6 @@ import com.rakuten.tech.mobile.inappmessaging.runtime.data.repositories.ReadyFor
 import com.rakuten.tech.mobile.inappmessaging.runtime.manager.DisplayManager
 import com.rakuten.tech.mobile.inappmessaging.runtime.manager.EventsManager
 import com.rakuten.tech.mobile.inappmessaging.runtime.manager.SessionManager
-import edu.umd.cs.findbugs.annotations.SuppressFBWarnings
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
@@ -24,7 +23,6 @@ internal class InApp(
     private val displayManager: DisplayManager = DisplayManager.instance()
 ) : InAppMessaging() {
 
-    @SuppressFBWarnings("UWF_FIELD_NOT_INITIALIZED_IN_CONSTRUCTOR") // No need to initialize.
     // Used for displaying or removing messages from screen.
     private var activityWeakReference: WeakReference<Activity>? = null
 

@@ -266,6 +266,24 @@ buildscript {
 ```
 </details>
 
+<details>
+<summary>Build Error: `java.lang.RuntimeException: Duplicate class com.rakuten.tech.mobile.manifestconfig.annotations.ManifestConfig`</summary>
+
+This build error could occur if you are using older versions of other libraries from `com.rakuten.tech.mobile`.
+Some of the dependencies in this SDK have changed to a new Group ID of `io.github.rakutentech` (due to the [JCenter shutdown](https://jfrog.com/blog/into-the-sunset-bintray-jcenter-gocenter-and-chartcenter/)).
+This means that if you have another library in your project which depends on the older dependencies using the Gropu ID `com.rakuten.tech.mobile`, then you will have duplicate classes.
+
+To avoid this, please add the following to your `build.gradle` in order to exclude the old `com.rakuten.tech.mobile` dependencies from your project.
+
+```groovy
+configurations.all {
+    exclude group: 'com.rakuten.tech.mobile', module: 'manifest-config-processor'
+    exclude group: 'com.rakuten.tech.mobile', module: 'manifest-config-annotations'
+}
+```
+
+</details>
+
 ### Other Issues
 Rakuten developers experiencing any other problems should refer to the Troubleshooting Guide on the internal developer documentation portal.
 

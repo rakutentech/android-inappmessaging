@@ -6,7 +6,6 @@ import android.view.View
 import android.widget.ImageButton
 import com.rakuten.tech.mobile.inappmessaging.runtime.R
 import com.rakuten.tech.mobile.inappmessaging.runtime.data.models.messages.Message
-import edu.umd.cs.findbugs.annotations.SuppressFBWarnings
 import kotlinx.android.synthetic.main.close_button.view.*
 import kotlinx.android.synthetic.main.in_app_message_full_screen.view.*
 
@@ -22,7 +21,6 @@ internal class InAppMessageFullScreenView(
     /**
      * Populating view data.
      */
-    @SuppressFBWarnings("BC_UNCONFIRMED_CAST_OF_RETURN_VALUE")
     override fun populateViewData(message: Message, imageAspectRatio: Float) {
         super.populateViewData(message, imageAspectRatio)
         if (imageUrl.isNullOrEmpty()) {

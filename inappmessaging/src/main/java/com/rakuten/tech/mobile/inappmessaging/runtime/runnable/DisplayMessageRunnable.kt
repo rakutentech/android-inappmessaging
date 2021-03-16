@@ -9,7 +9,6 @@ import com.rakuten.tech.mobile.inappmessaging.runtime.data.models.messages.Messa
 import com.rakuten.tech.mobile.inappmessaging.runtime.view.InAppMessageFullScreenView
 import com.rakuten.tech.mobile.inappmessaging.runtime.view.InAppMessageModalView
 import com.rakuten.tech.mobile.inappmessaging.runtime.view.InAppMessageSlideUpView
-import edu.umd.cs.findbugs.annotations.SuppressFBWarnings
 import kotlinx.coroutines.Runnable
 
 /**
@@ -27,7 +26,6 @@ internal class DisplayMessageRunnable(
      * Interface method which will be invoked by the Virtual Machine. This is also the actual method
      * which will display message with correct data.
      */
-    @SuppressFBWarnings("BC_UNCONFIRMED_CAST_OF_RETURN_VALUE") // No need to check casting.
     @UiThread
     @Suppress("LongMethod")
     override fun run() {
