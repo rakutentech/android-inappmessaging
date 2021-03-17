@@ -1,5 +1,5 @@
 apply from: '../config/android/library.gradle'
-apply from: '../config/quality/android.gradle'
+apply from: "../config/quality/checkstyle/android.gradle"
 apply from: "../config/quality/detekt/android.gradle"
 apply from: '../config/quality/errorprone/android.gradle'
 apply from: '../config/documentation/dokka/android.gradle'
@@ -64,8 +64,8 @@ dependencies {
   implementation 'com.squareup.retrofit2:converter-gson:2.5.0'
   implementation 'com.squareup.retrofit2:retrofit:2.8.1'
   implementation 'androidx.localbroadcastmanager:localbroadcastmanager:1.0.0'
-  implementation 'com.rakuten.tech.mobile:manifest-config-annotations:0.1.0'
-  kapt 'com.rakuten.tech.mobile:manifest-config-processor:0.1.0'
+  kapt "io.github.rakutentech.manifestconfig:manifest-config-processor:0.2.0"
+  implementation "io.github.rakutentech.manifestconfig:manifest-config-annotations:0.2.0"
 
   // Doclava needs an annotation class from this package (used by Retrofit)
   compileOnly 'org.codehaus.mojo:animal-sniffer-annotations:1.18'
@@ -83,11 +83,6 @@ dependencies {
   testImplementation "com.facebook.soloader:soloader:0.9.0"
 
   detektPlugins "io.gitlab.arturbosch.detekt:detekt-formatting:1.1.1"
-  if(!JavaVersion.current().java9Compatible) {
-    // see https://github.com/tbroyer/gradle-errorprone-plugin#jdk-8-support
-    errorproneJavac 'com.google.errorprone:javac:9+181-r4173-1'
-  }
-  errorprone 'com.google.errorprone:error_prone_core:2.3.2'
 }
 
 task checkUrlPrefixes {
@@ -133,7 +128,7 @@ if (isSnapshot) {
   project.ext.ARTIFACTORY_REPO=CONFIG.property("ARTIFACTORY_REPO_SNAPSHOT")
   apply from: '../config/publish/artifactory.gradle'
 } else {
-  apply from: '../config/publish/bintray.gradle'
+  apply from: '../config/publish/maven-central.gradle'
 }
 
 dokka {

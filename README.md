@@ -1,3 +1,4 @@
+[![Maven Central](https://img.shields.io/maven-central/v/io.github.rakutentech.inappmessaging/inappmessaging)](https://search.maven.org/artifact/io.github.rakutentech.inappmessaging/inappmessaging)
 [![CircleCI](https://circleci.com/gh/rakutentech/android-inappmessaging.svg?style=svg)](https://circleci.com/gh/rakutentech/android-inappmessaging)
 [![codecov](https://codecov.io/gh/rakutentech/android-inappmessaging/branch/master/graph/badge.svg)](https://codecov.io/gh/rakutentech/android-inappmessaging)
 
@@ -13,14 +14,6 @@ This repository uses submodules for some configuration, so they must be initiali
 $ git submodule init
 $ git submodule update
 $ ./gradlew assemble
-```
-
-If you wish to publish an artifact to JCenter, you must set the Bintray credentials as environment variables.
-
-```bash
-$ export BINTRAY_USER=user_name
-$ export BINTRAY_KEY=key
-$ export BINTRY_REPO=repo_name
 ```
 
 ## How to test the Sample app

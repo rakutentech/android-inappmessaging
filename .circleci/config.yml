@@ -1,7 +1,7 @@
 version: 2.1
 
 orbs:
-  android-sdk: rakutentech/android-sdk@0.2.0
+  android-sdk: rakutentech/android-sdk@0.2.1
   slack: circleci/slack@4.2.0
 
 jobs:
@@ -57,6 +57,12 @@ workflows:
       - android-sdk/publish:
           requires:
             - release-verification
+          after-prepare-steps:
+            # Retrieve Base64 PGP Key and save to file
+            - run: |
+                if [[ "$RELEASE_PGP_KEY_BASE64" != "" ]]; then
+                  base64 -d \<<< "$RELEASE_PGP_KEY_BASE64" > ./maven-central-key.gpg
+                fi
           post-steps:
             - run:
                 name: Publish Documentation

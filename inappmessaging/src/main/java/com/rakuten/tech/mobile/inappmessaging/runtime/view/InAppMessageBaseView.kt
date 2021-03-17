@@ -12,7 +12,6 @@ import com.google.android.material.button.MaterialButton
 import com.rakuten.tech.mobile.inappmessaging.runtime.R
 import com.rakuten.tech.mobile.inappmessaging.runtime.data.models.messages.Message
 import com.rakuten.tech.mobile.inappmessaging.runtime.data.responses.ping.MessageButton
-import edu.umd.cs.findbugs.annotations.SuppressFBWarnings
 import kotlinx.android.synthetic.main.close_button.view.*
 import kotlinx.android.synthetic.main.message_buttons.view.*
 import kotlinx.android.synthetic.main.message_image_view.view.*
@@ -62,7 +61,6 @@ internal open class InAppMessageBaseView(context: Context, attrs: AttributeSet?)
     /**
      * This method binds data to view.
      */
-    @SuppressFBWarnings("BC_UNCONFIRMED_CAST_OF_RETURN_VALUE") // No need to check for casting type.
     // Warning: NPath complexity > 200. Explanation: Empty checks are OK.
     private fun bindViewData() {
         bindImage()
@@ -79,7 +77,6 @@ internal open class InAppMessageBaseView(context: Context, attrs: AttributeSet?)
     /**
      * This method binds data to buttons.
      */
-    @SuppressFBWarnings("BC_UNCONFIRMED_CAST_OF_RETURN_VALUE")
     private fun bindButtons() {
         // Set onClick listener to close button.
         val closeButton = message_close_button
@@ -152,7 +149,6 @@ internal open class InAppMessageBaseView(context: Context, attrs: AttributeSet?)
      * This method binds data to message header.
      */
     @SuppressLint("ClickableViewAccessibility")
-    @SuppressFBWarnings("BC_UNCONFIRMED_CAST_OF_RETURN_VALUE")
     @Suppress("LongMethod")
     private fun bindText() {
         if (!header.isNullOrEmpty() || !messageBody.isNullOrEmpty()) {

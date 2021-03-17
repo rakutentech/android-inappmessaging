@@ -3,12 +3,10 @@ package com.rakuten.tech.mobile.inappmessaging.runtime.data.requests
 import com.google.gson.annotations.SerializedName
 import com.rakuten.tech.mobile.inappmessaging.runtime.data.models.UserIdentifier
 import com.rakuten.tech.mobile.inappmessaging.runtime.utils.InAppMessagingConstants
-import edu.umd.cs.findbugs.annotations.SuppressFBWarnings
 
 /**
  * This class represents the request body for message display permission request.
  */
-@SuppressFBWarnings("URF_UNREAD_FIELD") // No getter needed.
 @SuppressWarnings("ObjectToString") // toString() method is not needed for this class.
 internal data class DisplayPermissionRequest(
     @SerializedName("campaignId")

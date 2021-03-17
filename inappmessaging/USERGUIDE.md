@@ -29,7 +29,7 @@ You must have a subscription key for your application from IAM Dashboard.
 ```groovy
 allprojects {
     repositories {
-        jcenter()
+        mavenCentral()
     }
 }
 ```
@@ -40,7 +40,7 @@ Note: InAppMessaging SDK only uses AndroidX libraries. Host apps should migrate 
 
 ```groovy
 dependencies {
-    implementation 'com.rakuten.tech.mobile.inappmessaging:inappmessaging:${latest_version}'
+    implementation 'io.github.rakutentech.inappmessaging:inappmessaging:${latest_version}'
 }
 ```
 Please refer to [Changelog](#changelog) section for the latest version.
@@ -266,6 +266,24 @@ buildscript {
 ```
 </details>
 
+<details>
+<summary>Build Error: `java.lang.RuntimeException: Duplicate class com.rakuten.tech.mobile.manifestconfig.annotations.ManifestConfig`</summary>
+
+This build error could occur if you are using older versions of other libraries from `com.rakuten.tech.mobile`.
+Some of the dependencies in this SDK have changed to a new Group ID of `io.github.rakutentech` (due to the [JCenter shutdown](https://jfrog.com/blog/into-the-sunset-bintray-jcenter-gocenter-and-chartcenter/)).
+This means that if you have another library in your project which depends on the older dependencies using the Gropu ID `com.rakuten.tech.mobile`, then you will have duplicate classes.
+
+To avoid this, please add the following to your `build.gradle` in order to exclude the old `com.rakuten.tech.mobile` dependencies from your project.
+
+```groovy
+configurations.all {
+    exclude group: 'com.rakuten.tech.mobile', module: 'manifest-config-processor'
+    exclude group: 'com.rakuten.tech.mobile', module: 'manifest-config-annotations'
+}
+```
+
+</details>
+
 ### Other Issues
 Rakuten developers experiencing any other problems should refer to the Troubleshooting Guide on the internal developer documentation portal.
 
@@ -294,8 +312,11 @@ Documents targeting Product Managers:
 
 ## <a name="changelog"></a> Changelog
 
-### 2.3.1 (in-progress)
+### 3.0.0 (in-progress)
 * SDKCF-3450: Update Fresco dependency to v2.4.0 to fix SoLoader issue.
+* SDKCF-3454: Changed Maven Group ID to `io.github.rakutentech.inappmessaging`. You must update your dependency declarations to the following:
+  - `io.github.rakutentech.inappmessaging:inappmessaging:3.0.0`
+* Migrated publishing to Maven Central due to Bintray/JCenter being [shutdown](https://jfrog.com/blog/into-the-sunset-bintray-jcenter-gocenter-and-chartcenter/). You must add `mavenCentral()` to your `repositories`.
 
 ### 2.3.0 (2021-02-24)
 * SDKCF-3199: Add [`closeMessage` API](#close-campaign) for programmatically closing campaigns without user action.
@@ -311,8 +332,8 @@ Documents targeting Product Managers:
 
 ### 2.1.0 (2020-09-18)
 * SDKCF-2568: Deprecate updateSession() API
- * session update will be done internally when event is triggered and user info was changed
- * will be removed on 3.0.0
+  - session update will be done internally when event is triggered and user info was changed
+  - will be removed on next major version
 
 ### 2.0.0 (2020-06-11)
 * SDKCF-2054: Converted In-App Messaging to Kotlin
