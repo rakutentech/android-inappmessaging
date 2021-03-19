@@ -26,6 +26,9 @@ jobs:
       - slack/notify:
           event: fail
           template: basic_fail_1
+      - store_test_results:
+          path: inappmessaging/build/test-results
+          destination: test-results
 
 workflows:
   version: 2.1
