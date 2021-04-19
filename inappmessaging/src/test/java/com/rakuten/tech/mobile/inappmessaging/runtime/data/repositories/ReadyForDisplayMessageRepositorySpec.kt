@@ -1,19 +1,27 @@
 package com.rakuten.tech.mobile.inappmessaging.runtime.data.repositories
 
+import android.content.Context
+import android.provider.Settings
+import androidx.test.core.app.ApplicationProvider
+import androidx.work.testing.WorkManagerTestInitHelper
 import com.rakuten.tech.mobile.inappmessaging.runtime.BaseTest
+import com.rakuten.tech.mobile.inappmessaging.runtime.InAppMessaging
+import com.rakuten.tech.mobile.inappmessaging.runtime.TestUserInfoProvider
+import com.rakuten.tech.mobile.inappmessaging.runtime.UserInfoProvider
 import com.rakuten.tech.mobile.inappmessaging.runtime.data.models.messages.Message
 import com.rakuten.tech.mobile.inappmessaging.runtime.data.models.messages.ValidTestMessage
 import com.rakuten.tech.mobile.inappmessaging.runtime.utils.InAppMessagingConstants
-import org.amshove.kluent.shouldBeEmpty
-import org.amshove.kluent.shouldBeEqualTo
-import org.amshove.kluent.shouldHaveSize
+import org.amshove.kluent.*
 import org.junit.Assert
 import org.junit.Before
 import org.junit.Test
+import org.junit.runner.RunWith
+import org.robolectric.RobolectricTestRunner
 
 /**
  * Test class for ReadyForDisplayMessageRepository.
  */
+@RunWith(RobolectricTestRunner::class)
 class ReadyForDisplayMessageRepositorySpec : BaseTest() {
     private val messageList = ArrayList<Message>()
     private val message0 = ValidTestMessage()
@@ -123,5 +131,34 @@ class ReadyForDisplayMessageRepositorySpec : BaseTest() {
         for (msg in PingResponseMessageRepository.instance().getAllMessagesCopy()) {
             msg.getNumberOfTimesClosed() shouldBeEqualTo 0
         }
+    }
+
+    @Test
+    fun `should save and restore values for different users`() {
+        val infoProvider = TestUserInfoProvider()
+        initializeInstance(infoProvider)
+
+        ReadyForDisplayMessageRepository.instance().replaceAllMessages(messageList)
+        ReadyForDisplayMessageRepository.instance().getAllMessagesCopy().shouldHaveSize(2)
+
+        infoProvider.rakutenId = "user2"
+        AccountRepository.instance().updateUserInfo()
+        ReadyForDisplayMessageRepository.instance().getAllMessagesCopy().shouldBeEmpty()
+
+        // revert to initial user info
+        infoProvider.rakutenId = TestUserInfoProvider.TEST_RAKUTEN_ID
+        AccountRepository.instance().updateUserInfo()
+        ReadyForDisplayMessageRepository.instance().getAllMessagesCopy().shouldHaveSize(2)
+    }
+
+    private fun initializeInstance(infoProvider: UserInfoProvider) {
+        WorkManagerTestInitHelper.initializeTestWorkManager(ApplicationProvider.getApplicationContext())
+        Settings.Secure.putString(
+                ApplicationProvider.getApplicationContext<Context>().contentResolver,
+                Settings.Secure.ANDROID_ID,
+                "test_device_id")
+        InAppMessaging.init(ApplicationProvider.getApplicationContext(), "test", "",
+                isDebugLogging = true, isForTesting = true, isCacheHandling = true)
+        InAppMessaging.instance().registerPreference(infoProvider)
     }
 }

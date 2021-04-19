@@ -4,12 +4,16 @@ import com.rakuten.tech.mobile.inappmessaging.runtime.data.enums.InAppMessageTyp
 import com.rakuten.tech.mobile.inappmessaging.runtime.data.responses.ping.MessagePayload
 import com.rakuten.tech.mobile.inappmessaging.runtime.data.responses.ping.Trigger
 
-internal class ValidTestMessage(var id: String = DEFAULT_CAMPAIGN_ID, private val isTest: Boolean = IS_TEST) : Message {
+internal class ValidTestMessage(
+    private val campaignId: String = DEFAULT_CAMPAIGN_ID,
+    private val isTest: Boolean = IS_TEST
+) : Message {
     internal var timesClosed = 0
+    private var max = 1
 
     override fun getType(): Int = InAppMessageType.MODAL.typeId
 
-    override fun getCampaignId() = id
+    override fun getCampaignId() = campaignId
 
     override fun getTriggers(): List<Trigger>? {
         val triggerList = ArrayList<Trigger>()
@@ -21,7 +25,11 @@ internal class ValidTestMessage(var id: String = DEFAULT_CAMPAIGN_ID, private va
 
     override fun isTest(): Boolean = isTest
 
-    override fun getMaxImpressions(): Int = 1
+    override fun getMaxImpressions() = max
+
+    override fun setMaxImpression(maxImpression: Int) {
+        this.max = maxImpression
+    }
 
     override fun getContexts(): List<String> = listOf()
 
@@ -42,7 +50,7 @@ internal class ValidTestMessage(var id: String = DEFAULT_CAMPAIGN_ID, private va
     }
 
     override fun hashCode(): Int {
-        var result = id.hashCode()
+        var result = campaignId.hashCode()
         result = 31 * result + isTest.hashCode()
         return result
     }

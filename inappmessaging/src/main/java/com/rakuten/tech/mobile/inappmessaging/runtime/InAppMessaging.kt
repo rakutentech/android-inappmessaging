@@ -2,6 +2,7 @@ package com.rakuten.tech.mobile.inappmessaging.runtime
 
 import android.app.Activity
 import android.content.Context
+import android.content.SharedPreferences
 import androidx.annotation.RestrictTo
 import androidx.annotation.VisibleForTesting
 import com.rakuten.tech.mobile.inappmessaging.runtime.data.models.appevents.Event
@@ -75,6 +76,18 @@ abstract class InAppMessaging internal constructor() {
     internal abstract fun getHostAppContext(): Context?
 
     /**
+     * This method returns flag if local caching feature is enabled.
+     */
+    @RestrictTo(RestrictTo.Scope.LIBRARY)
+    internal abstract fun isLocalCachingEnabled(): Boolean
+
+    /**
+     * This method returns the encrypted shared preference.
+     */
+    @RestrictTo(RestrictTo.Scope.LIBRARY)
+    internal abstract fun getEncryptedSharedPref(): SharedPreferences?
+
+    /**
      * Close the currently displayed message.
      * This should be called when app needs to force-close the displayed message without user action.
      * Calling this method will not increment the campaign impression.
@@ -107,9 +120,10 @@ abstract class InAppMessaging internal constructor() {
             configUrl: String?,
             isDebugLogging: Boolean = false,
             isForTesting: Boolean = false,
+            isCacheHandling: Boolean = false,
             configScheduler: ConfigScheduler = ConfigScheduler.instance()
         ) {
-            instance = InApp(context, isDebugLogging)
+            instance = InApp(context, isDebugLogging, isCacheHandling = isCacheHandling)
             // Initializing SDK using background worker thread.
             Initializer.initializeSdk(context, subscriptionKey, configUrl, isForTesting)
             configScheduler.startConfig()
@@ -139,6 +153,10 @@ abstract class InAppMessaging internal constructor() {
         override fun getRegisteredActivity(): Activity? = null
 
         override fun getHostAppContext(): Context? = null
+
+        override fun isLocalCachingEnabled() = false
+
+        override fun getEncryptedSharedPref(): SharedPreferences? = null
 
         override fun closeMessage(clearQueuedCampaigns: Boolean) {}
     }

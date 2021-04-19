@@ -108,7 +108,7 @@ internal object Initializer {
      */
     @SuppressWarnings("LongMethod")
     private fun getUuid(context: Context, sharedUtil: SharePreferencesUtil): String {
-        val sharedPref = sharedUtil.createSharedPreference(context, sharedUtil.generateKey(context))
+        val sharedPref = sharedUtil.createSharedPreference(context, sharedUtil.generateKey(context), "uuid")
 
         return if (sharedPref.contains(ID_KEY)) {
             sharedPref.getString(ID_KEY, "").toString()

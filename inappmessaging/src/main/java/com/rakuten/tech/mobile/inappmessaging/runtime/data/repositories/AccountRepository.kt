@@ -62,7 +62,7 @@ internal abstract class AccountRepository {
                 } else userInfoProvider!!.provideRakutenId().toString()
 
         override fun updateUserInfo(): Boolean {
-            val curr = hash(getUserId() + getRaeToken() + getRakutenId())
+            val curr = hash(getUserId() + getRakutenId())
 
             if (userInfoHash != curr) {
                 userInfoHash = curr
