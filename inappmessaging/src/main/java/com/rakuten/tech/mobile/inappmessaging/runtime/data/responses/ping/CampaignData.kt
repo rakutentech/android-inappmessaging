@@ -18,10 +18,11 @@ internal data class CampaignData(
     @SerializedName("isTest")
     private val isTest: Boolean,
     @SerializedName("maxImpressions")
-    private val maxImpressions: Int
+    private var maxImpressions: Int
 ) : Message {
 
-    private var timesQueued = 0
+    @SerializedName("timesClosed")
+    internal var timesClosed = 0
 
     override fun getType(): Int = type
 
@@ -35,18 +36,22 @@ internal data class CampaignData(
 
     override fun getMaxImpressions(): Int = maxImpressions
 
+    override fun setMaxImpression(maxImpression: Int) {
+        this.maxImpressions = maxImpression
+    }
+
     override fun getContexts(): List<String> {
         val regex = Regex("\\[(.*?)\\]")
         val matches = regex.findAll(messagePayload.title ?: "")
         return matches.map { it.groupValues[1] }.toList()
     }
 
-    override fun getNumberOfTimesClosed() = synchronized(timesQueued) {
-        timesQueued
+    override fun getNumberOfTimesClosed() = synchronized(timesClosed) {
+        timesClosed
     }
     override fun incrementTimesClosed() {
-        synchronized(timesQueued) {
-            timesQueued++
+        synchronized(timesClosed) {
+            timesClosed++
         }
     }
 }

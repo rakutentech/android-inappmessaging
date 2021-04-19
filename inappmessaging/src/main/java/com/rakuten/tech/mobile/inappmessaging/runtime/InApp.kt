@@ -11,16 +11,19 @@ import com.rakuten.tech.mobile.inappmessaging.runtime.data.repositories.ReadyFor
 import com.rakuten.tech.mobile.inappmessaging.runtime.manager.DisplayManager
 import com.rakuten.tech.mobile.inappmessaging.runtime.manager.EventsManager
 import com.rakuten.tech.mobile.inappmessaging.runtime.manager.SessionManager
+import com.rakuten.tech.mobile.inappmessaging.runtime.utils.SharePreferencesUtil
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import timber.log.Timber
 import java.lang.ref.WeakReference
 
+@SuppressWarnings("TooManyFunctions")
 internal class InApp(
     private val context: Context,
     isDebugLogging: Boolean,
-    private val displayManager: DisplayManager = DisplayManager.instance()
+    private val displayManager: DisplayManager = DisplayManager.instance(),
+    private var isCacheHandling: Boolean = BuildConfig.IS_CACHE_HANDLING
 ) : InAppMessaging() {
 
     // Used for displaying or removing messages from screen.
@@ -76,6 +79,11 @@ internal class InApp(
 
     @RestrictTo(RestrictTo.Scope.LIBRARY)
     override fun getHostAppContext() = context
+
+    override fun isLocalCachingEnabled() = isCacheHandling
+
+    override fun getEncryptedSharedPref() = SharePreferencesUtil.createSharedPreference(context,
+            SharePreferencesUtil.generateKey(context), AccountRepository.instance().userInfoHash)
 
     override fun closeMessage(clearQueuedCampaigns: Boolean) {
         CoroutineScope(Dispatchers.Main).launch {

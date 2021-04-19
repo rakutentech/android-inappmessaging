@@ -2,7 +2,6 @@ package com.rakuten.tech.mobile.inappmessaging.runtime
 
 import android.app.Activity
 import android.content.Context
-import android.os.Build
 import android.provider.Settings
 import android.view.ViewGroup
 import androidx.test.core.app.ApplicationProvider
@@ -22,14 +21,12 @@ import org.junit.Test
 import org.junit.runner.RunWith
 import org.mockito.Mockito
 import org.robolectric.RobolectricTestRunner
-import org.robolectric.annotation.Config
 import kotlin.test.fail
 
 /**
  * Test class for InAppMessaging.
  */
 @RunWith(RobolectricTestRunner::class)
-@Config(sdk = [Build.VERSION_CODES.O_MR1])
 @SuppressWarnings("LargeClass")
 class InAppMessagingSpec : BaseTest() {
     private val activity = Mockito.mock(Activity::class.java)
@@ -67,6 +64,8 @@ class InAppMessagingSpec : BaseTest() {
         InAppMessaging.instance().registerPreference(TestUserInfoProvider())
         InAppMessaging.instance().logEvent(AppStartEvent())
         InAppMessaging.instance().closeMessage()
+        InAppMessaging.instance().isLocalCachingEnabled().shouldBeFalse()
+        InAppMessaging.instance().getEncryptedSharedPref().shouldBeNull()
     }
 
     @Test
@@ -245,6 +244,13 @@ class InAppMessagingSpec : BaseTest() {
         LocalDisplayedMessageRepository.instance().numberOfTimesDisplayed(message) shouldBeEqualTo 0
     }
 
+    @Test
+    fun `should enable caching`() {
+        initializeInstance(true)
+
+        InAppMessaging.instance().isLocalCachingEnabled().shouldBeTrue()
+    }
+
     private fun setupDisplayedView(message: Message) {
         val message2 = ValidTestMessage()
         ReadyForDisplayMessageRepository.instance().replaceAllMessages(listOf(message, message2))
@@ -255,13 +261,13 @@ class InAppMessagingSpec : BaseTest() {
         When calling viewGroup.tag itReturns "1"
     }
 
-    private fun initializeInstance() {
+    private fun initializeInstance(shouldDisableCaching: Boolean = false) {
         WorkManagerTestInitHelper.initializeTestWorkManager(ApplicationProvider.getApplicationContext())
         Settings.Secure.putString(
                 ApplicationProvider.getApplicationContext<Context>().contentResolver,
                 Settings.Secure.ANDROID_ID,
                 "test_device_id")
         InAppMessaging.init(ApplicationProvider.getApplicationContext(), "test", "",
-                isDebugLogging = true, isForTesting = true)
+                isDebugLogging = true, isForTesting = !shouldDisableCaching)
     }
 }

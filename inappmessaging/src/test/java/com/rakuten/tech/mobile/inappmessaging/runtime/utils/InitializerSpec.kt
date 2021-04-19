@@ -24,13 +24,11 @@ import org.junit.runner.RunWith
 import org.mockito.Mockito
 import org.robolectric.RobolectricTestRunner
 import org.robolectric.annotation.Config
-import java.security.KeyStoreException
 
 /**
  * Test class for InitializationWorker.
  */
 @RunWith(RobolectricTestRunner::class)
-@Config(sdk = [Build.VERSION_CODES.O_MR1])
 class InitializerSpec : BaseTest() {
     private val workerParameters = Mockito.mock(WorkerParameters::class.java)
     private val context = ApplicationProvider.getApplicationContext<Context>()
@@ -44,7 +42,7 @@ class InitializerSpec : BaseTest() {
         Settings.Secure.putString(context.contentResolver, Settings.Secure.ANDROID_ID, "testid")
 
         When calling mockUtil.generateKey(context) itReturns mockMaster
-        When calling mockUtil.createSharedPreference(context, mockMaster) itReturns mockPref
+        When calling mockUtil.createSharedPreference(context, mockMaster, "uuid") itReturns mockPref
     }
 
     @Test
@@ -85,14 +83,6 @@ class InitializerSpec : BaseTest() {
         Initializer.initializeSdk(context, "test", "", true)
     }
 
-    @Test(expected = KeyStoreException::class)
-    fun `should throw keystore exception with null android ID and device is android m or above`() {
-        Settings.Secure.putString(context.contentResolver, Settings.Secure.ANDROID_ID, null)
-
-        // AndroidKeyStore is not supported by robolectric
-        Initializer.initializeSdk(context, "test", "", true)
-    }
-
     @Test
     @Config(sdk = [Build.VERSION_CODES.LOLLIPOP])
     fun `should generate uuid when null android ID and device below android m with empty pref`() {
@@ -100,10 +90,10 @@ class InitializerSpec : BaseTest() {
         Settings.Secure.putString(appCtx.contentResolver, Settings.Secure.ANDROID_ID, null)
 
         // clear preferences
-        val sharedPref = SharePreferencesUtil.createSharedPreference(context, SharePreferencesUtil.generateKey(context))
+        val sharedPref = SharePreferencesUtil.createSharedPreference(context,
+                SharePreferencesUtil.generateKey(context), "uuid")
         sharedPref.edit().clear().apply()
 
-        // AndroidKeyStore is not supported by robolectric
         Initializer.initializeSdk(appCtx, "test", "", true)
 
         HostAppInfoRepository.instance().getDeviceId().shouldNotBeNullOrEmpty()
@@ -112,14 +102,16 @@ class InitializerSpec : BaseTest() {
     @Test
     @Config(sdk = [Build.VERSION_CODES.LOLLIPOP])
     fun `should generate uuid when null android ID and device below android m with non-empty pref`() {
-        Settings.Secure.putString(context.contentResolver, Settings.Secure.ANDROID_ID, null)
+        val appCtx = ApplicationProvider.getApplicationContext<Context>()
+        Settings.Secure.putString(appCtx.contentResolver, Settings.Secure.ANDROID_ID, null)
 
         // add test value
-        val sharedPref = SharePreferencesUtil.createSharedPreference(context, SharePreferencesUtil.generateKey(context))
+        val sharedPref = SharePreferencesUtil.createSharedPreference(context,
+                SharePreferencesUtil.generateKey(context), "uuid")
+        sharedPref.edit().clear().apply()
         sharedPref.edit().putString(Initializer.ID_KEY, "test_uuid").apply()
 
-        // AndroidKeyStore is not supported by robolectric
-        Initializer.initializeSdk(context, "test", "", true)
+        Initializer.initializeSdk(appCtx, "test", "", true)
 
         HostAppInfoRepository.instance().getDeviceId() shouldBeEqualTo "test_uuid"
     }
@@ -133,11 +125,10 @@ class InitializerSpec : BaseTest() {
         When calling mockPref.edit() itReturns mockEditor
         When calling mockEditor.putString(any(), any()) itReturns mockEditor
 
-        // AndroidKeyStore is not supported by robolectric
         Initializer.initializeSdk(context, "test", "", true, mockUtil)
 
         Mockito.verify(mockUtil).generateKey(context)
-        Mockito.verify(mockUtil).createSharedPreference(context, mockMaster)
+        Mockito.verify(mockUtil).createSharedPreference(context, mockMaster, "uuid")
         Mockito.verify(mockPref).contains(Initializer.ID_KEY)
         Mockito.verify(mockPref).edit()
         Mockito.verify(mockEditor).putString(eq(Initializer.ID_KEY), any())
@@ -151,11 +142,10 @@ class InitializerSpec : BaseTest() {
         When calling mockPref.contains(Initializer.ID_KEY) itReturns true
         When calling mockPref.getString(Initializer.ID_KEY, "") itReturns "random_uuid"
 
-        // AndroidKeyStore is not supported by robolectric
         Initializer.initializeSdk(context, "test", "", true, mockUtil)
 
         Mockito.verify(mockUtil).generateKey(context)
-        Mockito.verify(mockUtil).createSharedPreference(context, mockMaster)
+        Mockito.verify(mockUtil).createSharedPreference(context, mockMaster, "uuid")
         Mockito.verify(mockPref).contains(Initializer.ID_KEY)
         Mockito.verify(mockPref, never()).edit()
         Mockito.verify(mockPref).getString(Initializer.ID_KEY, "")

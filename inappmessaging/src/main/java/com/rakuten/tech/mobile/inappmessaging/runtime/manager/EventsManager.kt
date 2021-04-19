@@ -23,10 +23,11 @@ internal object EventsManager {
         eventScheduler: EventMessageReconciliationScheduler = EventMessageReconciliationScheduler.instance(),
         accountRepo: AccountRepository = AccountRepository.instance()
     ) {
+        val isUserUpdated = accountRepo.updateUserInfo()
         // Caching events locally.
         val isAdded = localEventRepo.addEvent(event)
         if (isAdded) {
-            if (accountRepo.updateUserInfo()) {
+            if (isUserUpdated) {
                 // Update session when there are updates in user info
                 // event reconciliation worker is already part of session update
                 SessionManager.onSessionUpdate(event)
