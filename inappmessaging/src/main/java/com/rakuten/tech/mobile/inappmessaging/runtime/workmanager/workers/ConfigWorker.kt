@@ -8,8 +8,8 @@ import com.rakuten.tech.mobile.inappmessaging.runtime.BuildConfig
 import com.rakuten.tech.mobile.inappmessaging.runtime.api.ConfigRetrofitService
 import com.rakuten.tech.mobile.inappmessaging.runtime.data.repositories.ConfigResponseRepository
 import com.rakuten.tech.mobile.inappmessaging.runtime.data.repositories.HostAppInfoRepository
+import com.rakuten.tech.mobile.inappmessaging.runtime.data.requests.ConfigQueryParamsBuilder
 import com.rakuten.tech.mobile.inappmessaging.runtime.data.responses.config.ConfigResponse
-import com.rakuten.tech.mobile.inappmessaging.runtime.utils.InAppMessagingConstants
 import com.rakuten.tech.mobile.inappmessaging.runtime.utils.RuntimeUtil
 import com.rakuten.tech.mobile.inappmessaging.runtime.workmanager.schedulers.MessageMixerPingScheduler
 import retrofit2.Response
@@ -49,17 +49,16 @@ internal class ConfigWorker(
         val locale = hostRepo.getDeviceLocale()
         val hostAppVersion = hostRepo.getVersion()
         // Terminate request if either appId or appVersion is empty or null.
-        // appId Max length= 200 and appVersion Max length= 100.
-        if (hostAppId.isNullOrEmpty() || hostAppId.length > QUERY_MAX_LENGTH_200 || hostAppVersion.isNullOrEmpty() || hostAppVersion.length > QUERY_MAX_LENGTH_100) {
+        if (hostAppId.isNullOrEmpty() || hostAppVersion.isNullOrEmpty()) {
             return Result.failure()
         }
 
         val configUrl = hostRepo.getConfigUrl() ?: ""
         val sdkVersion = BuildConfig.VERSION_NAME
-        val platform = InAppMessagingConstants.ANDROID_PLATFORM_ENUM
+        val params = ConfigQueryParamsBuilder(hostAppId, locale, hostAppVersion, sdkVersion).queryParams
         val configServiceCall = RuntimeUtil.getRetrofit()
                 .create(ConfigRetrofitService::class.java)
-                .getConfigService(configUrl, platform, hostAppId, sdkVersion, hostAppVersion, locale)
+                .getConfigService(configUrl, params)
 
         return try {
             // Executing the API network call.
@@ -95,7 +94,5 @@ internal class ConfigWorker(
 
     companion object {
         private const val TAG = "IAM_ConfigWorker"
-        private const val QUERY_MAX_LENGTH_200 = 200
-        private const val QUERY_MAX_LENGTH_100 = 100
     }
 }

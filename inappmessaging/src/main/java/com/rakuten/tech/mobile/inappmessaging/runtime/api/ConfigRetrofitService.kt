@@ -3,7 +3,7 @@ package com.rakuten.tech.mobile.inappmessaging.runtime.api
 import com.rakuten.tech.mobile.inappmessaging.runtime.data.responses.config.ConfigResponse
 import retrofit2.Call
 import retrofit2.http.GET
-import retrofit2.http.Query
+import retrofit2.http.QueryMap
 import retrofit2.http.Url
 
 /**
@@ -17,11 +17,7 @@ internal interface ConfigRetrofitService {
      */
     @GET
     fun getConfigService(
-            @Url url: String,
-            @Query("platform", encoded = false) platform: Int,
-            @Query("appId", encoded = false) appId: String,
-            @Query("sdkVersion", encoded = false) sdkVersion: String,
-            @Query("appVersion", encoded = false) appVersion: String,
-            @Query("locale", encoded = false) locale: String
+        @Url url: String,
+        @QueryMap parameters: Map<String, @JvmSuppressWildcards Any?>
     ): Call<ConfigResponse>
 }

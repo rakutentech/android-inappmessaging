@@ -26,8 +26,6 @@ import org.mockito.Mockito
 import org.robolectric.RobolectricTestRunner
 import org.robolectric.annotation.Config
 
-//Todo: The integration test check the state of "enabled" value, this one is no more returned by the server,
-// To be enabled in 3664 (Support rolloutPercentage and remove enable) after updating the tests related to this change
 @Ignore
 @RunWith(RobolectricTestRunner::class)
 @Config(sdk = [Build.VERSION_CODES.O_MR1])
