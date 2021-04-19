@@ -1,11 +1,8 @@
 package com.rakuten.tech.mobile.inappmessaging.runtime.api
 
-import com.rakuten.tech.mobile.inappmessaging.runtime.data.requests.ConfigRequest
 import com.rakuten.tech.mobile.inappmessaging.runtime.data.responses.config.ConfigResponse
 import retrofit2.Call
-import retrofit2.http.Body
-import retrofit2.http.POST
-import retrofit2.http.Url
+import retrofit2.http.*
 
 /**
  * Retrofit API interface in order for Retrofit to make request to Config Service.
@@ -16,6 +13,6 @@ internal interface ConfigRetrofitService {
     /**
      * This method retrieves config.
      */
-    @POST
-    fun getConfigService(@Url url: String, @Body requestBody: ConfigRequest): Call<ConfigResponse>
+    @GET
+    fun getConfigService(@Url url: String, @QueryMap(encoded = false) requestParameters: Map<String, Any?>): Call<ConfigResponse>
 }

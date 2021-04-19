@@ -49,7 +49,8 @@ internal class ConfigWorker(
         val locale = hostRepo.getDeviceLocale()
         val hostAppVersion = hostRepo.getVersion()
         // Terminate request if either appId or appVersion is empty or null.
-        if (hostAppId.isNullOrEmpty() || hostAppVersion.isNullOrEmpty()) {
+        // appId Max length= 200 and appVersion Max length= 100.
+        if (hostAppId.isNullOrEmpty() || hostAppId.length > QUERY_MAX_LENGTH_200 || hostAppVersion.isNullOrEmpty() || hostAppVersion.length > QUERY_MAX_LENGTH_100) {
             return Result.failure()
         }
 
@@ -59,7 +60,7 @@ internal class ConfigWorker(
                 .create(ConfigRetrofitService::class.java)
                 .getConfigService(
                         configUrl,
-                        ConfigRequest(hostAppId, locale, hostAppVersion, sdkVersion))
+                        ConfigRequest(hostAppId, locale, hostAppVersion, sdkVersion).queryParam)
 
         return try {
             // Executing the API network call.
@@ -95,5 +96,7 @@ internal class ConfigWorker(
 
     companion object {
         private const val TAG = "IAM_ConfigWorker"
+        private const val QUERY_MAX_LENGTH_200 = 200
+        private const val QUERY_MAX_LENGTH_100 = 100
     }
 }
