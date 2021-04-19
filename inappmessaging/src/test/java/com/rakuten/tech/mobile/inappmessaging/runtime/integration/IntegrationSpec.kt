@@ -19,12 +19,16 @@ import com.rakuten.tech.mobile.inappmessaging.runtime.workmanager.workers.Config
 import com.rakuten.tech.mobile.inappmessaging.runtime.workmanager.workers.MessageMixerWorker
 import org.amshove.kluent.*
 import org.junit.Before
+import org.junit.Ignore
 import org.junit.Test
 import org.junit.runner.RunWith
 import org.mockito.Mockito
 import org.robolectric.RobolectricTestRunner
 import org.robolectric.annotation.Config
 
+//Todo: The integration test check the state of "enabled" value, this one is no more returned by the server,
+// To be enabled in 3664 (Support rolloutPercentage and remove enable) after updating the tests related to this change
+@Ignore
 @RunWith(RobolectricTestRunner::class)
 @Config(sdk = [Build.VERSION_CODES.O_MR1])
 class IntegrationSpec {

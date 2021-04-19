@@ -2,7 +2,9 @@ package com.rakuten.tech.mobile.inappmessaging.runtime.api
 
 import com.rakuten.tech.mobile.inappmessaging.runtime.data.responses.config.ConfigResponse
 import retrofit2.Call
-import retrofit2.http.*
+import retrofit2.http.GET
+import retrofit2.http.Query
+import retrofit2.http.Url
 
 /**
  * Retrofit API interface in order for Retrofit to make request to Config Service.
@@ -22,5 +24,4 @@ internal interface ConfigRetrofitService {
             @Query("appVersion", encoded = false) appVersion: String,
             @Query("locale", encoded = false) locale: String
     ): Call<ConfigResponse>
-
 }
