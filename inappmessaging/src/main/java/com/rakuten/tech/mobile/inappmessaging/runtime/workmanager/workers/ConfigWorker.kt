@@ -8,8 +8,8 @@ import com.rakuten.tech.mobile.inappmessaging.runtime.BuildConfig
 import com.rakuten.tech.mobile.inappmessaging.runtime.api.ConfigRetrofitService
 import com.rakuten.tech.mobile.inappmessaging.runtime.data.repositories.ConfigResponseRepository
 import com.rakuten.tech.mobile.inappmessaging.runtime.data.repositories.HostAppInfoRepository
-import com.rakuten.tech.mobile.inappmessaging.runtime.data.requests.ConfigRequest
 import com.rakuten.tech.mobile.inappmessaging.runtime.data.responses.config.ConfigResponse
+import com.rakuten.tech.mobile.inappmessaging.runtime.utils.InAppMessagingConstants
 import com.rakuten.tech.mobile.inappmessaging.runtime.utils.RuntimeUtil
 import com.rakuten.tech.mobile.inappmessaging.runtime.workmanager.schedulers.MessageMixerPingScheduler
 import retrofit2.Response
@@ -56,11 +56,10 @@ internal class ConfigWorker(
 
         val configUrl = hostRepo.getConfigUrl() ?: ""
         val sdkVersion = BuildConfig.VERSION_NAME
+        val platform = InAppMessagingConstants.ANDROID_PLATFORM_ENUM
         val configServiceCall = RuntimeUtil.getRetrofit()
                 .create(ConfigRetrofitService::class.java)
-                .getConfigService(
-                        configUrl,
-                        ConfigRequest(hostAppId, locale, hostAppVersion, sdkVersion).queryParam)
+                .getConfigService(configUrl, platform, hostAppId, sdkVersion, hostAppVersion, locale)
 
         return try {
             // Executing the API network call.

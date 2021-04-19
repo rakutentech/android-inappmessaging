@@ -11,6 +11,6 @@ import com.google.gson.annotations.SerializedName
  */
 internal data class ConfigResponseData(
     @SerializedName("endpoints") val endpoints: ConfigResponseEndpoints? = null,
-    @SerializedName("rolloutPercentage") val rollOutPercentage: Int? = null,
+    @SerializedName("rolloutPercentage") val rollOutPercentage: Int,
     @SerializedName("enabled") val enabled: Boolean = false
 )

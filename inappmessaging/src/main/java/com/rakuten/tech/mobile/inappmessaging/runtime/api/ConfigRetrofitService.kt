@@ -14,5 +14,13 @@ internal interface ConfigRetrofitService {
      * This method retrieves config.
      */
     @GET
-    fun getConfigService(@Url url: String, @QueryMap(encoded = false) requestParameters: Map<String, Any?>): Call<ConfigResponse>
+    fun getConfigService(
+            @Url url: String,
+            @Query("platform", encoded = false) platform: Int,
+            @Query("appId", encoded = false) appId: String,
+            @Query("sdkVersion", encoded = false) sdkVersion: String,
+            @Query("appVersion", encoded = false) appVersion: String,
+            @Query("locale", encoded = false) locale: String
+    ): Call<ConfigResponse>
+
 }
