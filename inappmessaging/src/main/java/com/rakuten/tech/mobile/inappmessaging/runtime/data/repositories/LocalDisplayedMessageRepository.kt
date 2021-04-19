@@ -5,6 +5,7 @@ import com.google.gson.reflect.TypeToken
 import com.rakuten.tech.mobile.inappmessaging.runtime.InAppMessaging
 import com.rakuten.tech.mobile.inappmessaging.runtime.data.models.messages.Message
 import com.rakuten.tech.mobile.inappmessaging.runtime.utils.InAppMessagingConstants
+import timber.log.Timber
 import java.util.Calendar
 import kotlin.collections.ArrayList
 import kotlin.collections.HashMap
@@ -38,6 +39,7 @@ internal interface LocalDisplayedMessageRepository {
     companion object {
         private var instance: LocalDisplayedMessageRepository = LocalDisplayedMessageRepositoryImpl()
         private const val LOCAL_DISPLAYED_KEY = "local_displayed_list"
+        private const val TAG = "IAM_LocalEventRepo"
 
         fun instance() = instance
     }
@@ -115,7 +117,7 @@ internal interface LocalDisplayedMessageRepository {
             if (InAppMessaging.instance().isLocalCachingEnabled()) {
                 // reset message list from cached using updated user info
                 InAppMessaging.instance().getEncryptedSharedPref()?.edit()?.putString(LOCAL_DISPLAYED_KEY,
-                        Gson().toJson(messages))?.apply()
+                        Gson().toJson(messages))?.apply() ?: Timber.tag(TAG).d("failed saving map")
             }
         }
     }
