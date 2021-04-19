@@ -158,7 +158,7 @@ class PingResponseMessageRepositorySpec : BaseTest() {
                 Settings.Secure.ANDROID_ID,
                 "test_device_id")
         InAppMessaging.init(ApplicationProvider.getApplicationContext(), "test", "",
-                isDebugLogging = true, isForTesting = false)
+                isDebugLogging = true, isForTesting = true, isCacheHandling = true)
         InAppMessaging.instance().registerPreference(infoProvider)
     }
 }

@@ -157,7 +157,7 @@ class AccountRepositorySpec : BaseTest() {
     }
 
     @Test
-    fun `should return true for changed rae token`() {
+    fun `should return false for changed rae token`() {
         val infoProvider = TestUserInfoProvider()
         AccountRepository.instance().userInfoProvider = infoProvider
         // initial setting of hashed user info
@@ -166,6 +166,6 @@ class AccountRepositorySpec : BaseTest() {
         // updated
         infoProvider.raeToken = "rae-token"
 
-        AccountRepository.instance().updateUserInfo().shouldBeTrue()
+        AccountRepository.instance().updateUserInfo().shouldBeFalse()
     }
 }

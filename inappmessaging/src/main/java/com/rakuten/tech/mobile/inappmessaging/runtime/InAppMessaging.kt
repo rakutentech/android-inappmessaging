@@ -120,7 +120,7 @@ abstract class InAppMessaging internal constructor() {
             configUrl: String?,
             isDebugLogging: Boolean = false,
             isForTesting: Boolean = false,
-            isCacheHandling: Boolean = true,
+            isCacheHandling: Boolean = false,
             configScheduler: ConfigScheduler = ConfigScheduler.instance()
         ) {
             instance = InApp(context, isDebugLogging, isCacheHandling = isCacheHandling)

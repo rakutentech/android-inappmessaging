@@ -246,7 +246,7 @@ class InAppMessagingSpec : BaseTest() {
 
     @Test
     fun `should enable caching`() {
-        initializeInstance(false)
+        initializeInstance(true)
 
         InAppMessaging.instance().isLocalCachingEnabled().shouldBeTrue()
     }
@@ -261,13 +261,13 @@ class InAppMessagingSpec : BaseTest() {
         When calling viewGroup.tag itReturns "1"
     }
 
-    private fun initializeInstance(shouldDisableCaching: Boolean = false) {
+    private fun initializeInstance(shouldEnableCaching: Boolean = false) {
         WorkManagerTestInitHelper.initializeTestWorkManager(ApplicationProvider.getApplicationContext())
         Settings.Secure.putString(
                 ApplicationProvider.getApplicationContext<Context>().contentResolver,
                 Settings.Secure.ANDROID_ID,
                 "test_device_id")
         InAppMessaging.init(ApplicationProvider.getApplicationContext(), "test", "",
-                isDebugLogging = true, isForTesting = true, isCacheHandling = !shouldDisableCaching)
+                isDebugLogging = true, isForTesting = true, isCacheHandling = shouldEnableCaching)
     }
 }
