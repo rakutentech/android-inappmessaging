@@ -246,7 +246,7 @@ class InAppMessagingSpec : BaseTest() {
 
     @Test
     fun `should enable caching`() {
-        initializeInstance(true)
+        initializeInstance(false)
 
         InAppMessaging.instance().isLocalCachingEnabled().shouldBeTrue()
     }
@@ -268,6 +268,6 @@ class InAppMessagingSpec : BaseTest() {
                 Settings.Secure.ANDROID_ID,
                 "test_device_id")
         InAppMessaging.init(ApplicationProvider.getApplicationContext(), "test", "",
-                isDebugLogging = true, isForTesting = !shouldDisableCaching)
+                isDebugLogging = true, isForTesting = true, isCacheHandling = !shouldDisableCaching)
     }
 }
