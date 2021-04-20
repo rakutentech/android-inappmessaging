@@ -12,7 +12,7 @@ import com.rakuten.tech.mobile.inappmessaging.runtime.data.repositories.HostAppI
 import com.rakuten.tech.mobile.inappmessaging.runtime.data.repositories.PingResponseMessageRepository
 import com.rakuten.tech.mobile.inappmessaging.runtime.data.requests.PingRequest
 import com.rakuten.tech.mobile.inappmessaging.runtime.data.responses.ping.MessageMixerResponse
-import com.rakuten.tech.mobile.inappmessaging.runtime.utils.InAppMessagingConstants
+import com.rakuten.tech.mobile.inappmessaging.runtime.utils.RetryDelayUtil
 import com.rakuten.tech.mobile.inappmessaging.runtime.utils.RuntimeUtil
 import com.rakuten.tech.mobile.inappmessaging.runtime.workmanager.schedulers.EventMessageReconciliationScheduler
 import com.rakuten.tech.mobile.inappmessaging.runtime.workmanager.schedulers.MessageMixerPingScheduler
@@ -31,7 +31,8 @@ internal class MessageMixerWorker(
     context: Context,
     workerParams: WorkerParameters,
     private val eventMessageScheduler: EventMessageReconciliationScheduler,
-    private val messageMixerScheduler: MessageMixerPingScheduler
+    private val messageMixerScheduler: MessageMixerPingScheduler,
+    private val retryUtil: RetryDelayUtil = RetryDelayUtil
 ) :
     Worker(context, workerParams) {
 
@@ -107,12 +108,15 @@ internal class MessageMixerWorker(
                 scheduleNextPing(messageMixerResponse.nextPingMillis)
                 Timber.tag(TAG).d("campaign size: %d", messageMixerResponse.data.size)
             }
-        } else return if (response.code() == InAppMessagingConstants.RETRY_ERROR_CODE ||
-                response.code() >= HttpURLConnection.HTTP_INTERNAL_ERROR) {
-            // Retry with exponential backoff if server has error.
-            Result.retry()
-        } else {
-            Result.failure()
+        } else return when {
+            response.code() == RetryDelayUtil.RETRY_ERROR_CODE -> {
+                messageMixerScheduler.pingMessageMixerService(MessageMixerPingScheduler.currDelay)
+                MessageMixerPingScheduler.currDelay = retryUtil.getNextDelay(MessageMixerPingScheduler.currDelay)
+                // set previous worker as success to avoid logging
+                Result.success()
+            }
+            response.code() >= HttpURLConnection.HTTP_INTERNAL_ERROR -> Result.retry() // Retry if server has error.
+            else -> Result.failure()
         }
         return Result.success()
     }
@@ -123,6 +127,8 @@ internal class MessageMixerWorker(
      */
     @Throws(IllegalArgumentException::class)
     private fun scheduleNextPing(nextPingMillis: Long) {
+        // reset current delay to initial
+        MessageMixerPingScheduler.currDelay = RetryDelayUtil.INITIAL_BACKOFF_DELAY
         messageMixerScheduler.pingMessageMixerService(nextPingMillis)
         Timber.tag(TAG).d("Next ping scheduled in: %d", nextPingMillis)
     }

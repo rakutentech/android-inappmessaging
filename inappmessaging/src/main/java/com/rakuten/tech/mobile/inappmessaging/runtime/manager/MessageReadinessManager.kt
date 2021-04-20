@@ -14,6 +14,7 @@ import com.rakuten.tech.mobile.inappmessaging.runtime.data.repositories.PingResp
 import com.rakuten.tech.mobile.inappmessaging.runtime.data.repositories.ReadyForDisplayMessageRepository
 import com.rakuten.tech.mobile.inappmessaging.runtime.data.requests.DisplayPermissionRequest
 import com.rakuten.tech.mobile.inappmessaging.runtime.data.responses.displaypermission.DisplayPermissionResponse
+import com.rakuten.tech.mobile.inappmessaging.runtime.utils.RetryDelayUtil
 import com.rakuten.tech.mobile.inappmessaging.runtime.utils.RuntimeUtil
 import com.rakuten.tech.mobile.inappmessaging.runtime.workmanager.schedulers.MessageMixerPingScheduler
 import retrofit2.Call
@@ -78,6 +79,8 @@ internal interface MessageReadinessManager {
                 val displayPermissionResponse = getMessagePermission(message)
                 // If server wants SDK to ping for updated messages, do a new ping request and break this loop.
                 if (isPingServerNeeded(displayPermissionResponse)) {
+                    // reset current delay to initial
+                    MessageMixerPingScheduler.currDelay = RetryDelayUtil.INITIAL_BACKOFF_DELAY
                     MessageMixerPingScheduler.instance().pingMessageMixerService(0)
                     break
                 } else if (isMessagePermissibleToDisplay(displayPermissionResponse)) {
