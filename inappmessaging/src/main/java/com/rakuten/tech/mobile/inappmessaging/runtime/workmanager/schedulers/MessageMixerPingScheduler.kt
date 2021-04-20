@@ -5,6 +5,7 @@ import androidx.work.OneTimeWorkRequest
 import androidx.work.WorkManager
 import com.rakuten.tech.mobile.inappmessaging.runtime.InAppMessaging
 import com.rakuten.tech.mobile.inappmessaging.runtime.data.repositories.ConfigResponseRepository
+import com.rakuten.tech.mobile.inappmessaging.runtime.utils.RetryDelayUtil
 import com.rakuten.tech.mobile.inappmessaging.runtime.utils.WorkManagerUtil
 import com.rakuten.tech.mobile.inappmessaging.runtime.workmanager.workers.MessageMixerWorker
 import java.util.concurrent.TimeUnit
@@ -25,6 +26,7 @@ internal interface MessageMixerPingScheduler {
     companion object {
         private const val MESSAGE_MIXER_PING_WORKER = "iam_message_mixer_worker"
         private var instance: MessageMixerPingScheduler = MessageMixerPingSchedulerImpl()
+        internal var currDelay = RetryDelayUtil.INITIAL_BACKOFF_DELAY
 
         fun instance(): MessageMixerPingScheduler = instance
     }

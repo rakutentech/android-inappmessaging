@@ -7,6 +7,7 @@ import com.rakuten.tech.mobile.inappmessaging.runtime.data.repositories.LocalEve
 import com.rakuten.tech.mobile.inappmessaging.runtime.data.repositories.LocalOptedOutMessageRepository
 import com.rakuten.tech.mobile.inappmessaging.runtime.data.repositories.PingResponseMessageRepository
 import com.rakuten.tech.mobile.inappmessaging.runtime.data.repositories.ReadyForDisplayMessageRepository
+import com.rakuten.tech.mobile.inappmessaging.runtime.utils.RetryDelayUtil
 import com.rakuten.tech.mobile.inappmessaging.runtime.workmanager.schedulers.MessageMixerPingScheduler
 
 /**
@@ -41,6 +42,8 @@ internal object SessionManager {
         }
 
         // TODO: possibly add checking if the last ping is within a certain threshold before executing the request
+        // reset current delay to initial
+        MessageMixerPingScheduler.currDelay = RetryDelayUtil.INITIAL_BACKOFF_DELAY
         MessageMixerPingScheduler.instance().pingMessageMixerService(0)
     }
 }
