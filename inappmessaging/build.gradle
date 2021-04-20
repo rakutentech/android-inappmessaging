@@ -12,7 +12,7 @@ android {
   defaultConfig {
     versionName version
     consumerProguardFiles 'proguard-rules.pro'
-    manifestPlaceholders.config_url = CONFIG.property("CONFIG_URL") ?: ""
+    manifestPlaceholders.config_url = CONFIG.property("CONFIG_URL_DEV") ?: ""
     manifestPlaceholders.test_sub_key = CONFIG.property("IAM_TEST_SUBSCRIPTION_KEY") ?: "test_sub_key"
     buildConfigField("boolean", "IS_CACHE_HANDLING", "true")
   }
