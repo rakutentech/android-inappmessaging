@@ -1,10 +1,9 @@
 package com.rakuten.tech.mobile.inappmessaging.runtime.api
 
-import com.rakuten.tech.mobile.inappmessaging.runtime.data.requests.ConfigRequest
 import com.rakuten.tech.mobile.inappmessaging.runtime.data.responses.config.ConfigResponse
 import retrofit2.Call
-import retrofit2.http.Body
-import retrofit2.http.POST
+import retrofit2.http.GET
+import retrofit2.http.QueryMap
 import retrofit2.http.Url
 
 /**
@@ -16,6 +15,9 @@ internal interface ConfigRetrofitService {
     /**
      * This method retrieves config.
      */
-    @POST
-    fun getConfigService(@Url url: String, @Body requestBody: ConfigRequest): Call<ConfigResponse>
+    @GET
+    fun getConfigService(
+        @Url url: String,
+        @QueryMap parameters: Map<String, @JvmSuppressWildcards Any?>
+    ): Call<ConfigResponse>
 }

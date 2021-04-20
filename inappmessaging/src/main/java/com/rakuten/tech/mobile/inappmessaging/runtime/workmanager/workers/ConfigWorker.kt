@@ -8,7 +8,7 @@ import com.rakuten.tech.mobile.inappmessaging.runtime.BuildConfig
 import com.rakuten.tech.mobile.inappmessaging.runtime.api.ConfigRetrofitService
 import com.rakuten.tech.mobile.inappmessaging.runtime.data.repositories.ConfigResponseRepository
 import com.rakuten.tech.mobile.inappmessaging.runtime.data.repositories.HostAppInfoRepository
-import com.rakuten.tech.mobile.inappmessaging.runtime.data.requests.ConfigRequest
+import com.rakuten.tech.mobile.inappmessaging.runtime.data.requests.ConfigQueryParamsBuilder
 import com.rakuten.tech.mobile.inappmessaging.runtime.data.responses.config.ConfigResponse
 import com.rakuten.tech.mobile.inappmessaging.runtime.utils.RuntimeUtil
 import com.rakuten.tech.mobile.inappmessaging.runtime.workmanager.schedulers.MessageMixerPingScheduler
@@ -55,11 +55,10 @@ internal class ConfigWorker(
 
         val configUrl = hostRepo.getConfigUrl() ?: ""
         val sdkVersion = BuildConfig.VERSION_NAME
+        val params = ConfigQueryParamsBuilder(hostAppId, locale, hostAppVersion, sdkVersion).queryParams
         val configServiceCall = RuntimeUtil.getRetrofit()
                 .create(ConfigRetrofitService::class.java)
-                .getConfigService(
-                        configUrl,
-                        ConfigRequest(hostAppId, locale, hostAppVersion, sdkVersion))
+                .getConfigService(configUrl, params)
 
         return try {
             // Executing the API network call.
