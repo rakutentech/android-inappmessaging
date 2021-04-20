@@ -41,16 +41,10 @@ internal abstract class PingResponseMessageRepository : MessageRepository {
             requireNotNull(messageList) { InAppMessagingConstants.ARGUMENT_IS_NULL_EXCEPTION }
             checkAndResetMap()
 
-            val localMap = LinkedHashMap<String, Message>()
+            messages = LinkedHashMap()
             for (message in messageList) {
-                // max impression should not be updated
-                if (messages.containsKey(message.getCampaignId()!!)) {
-                    message.setMaxImpression(messages[message.getCampaignId()]?.getMaxImpressions()!!)
-                }
-                localMap[message.getCampaignId()!!] = message
+                messages[message.getCampaignId()!!] = message
             }
-            messages.clear()
-            messages.putAll(localMap)
             saveUpdatedMap()
         }
 
