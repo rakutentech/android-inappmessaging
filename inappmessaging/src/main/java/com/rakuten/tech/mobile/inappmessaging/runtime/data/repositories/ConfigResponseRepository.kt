@@ -37,6 +37,8 @@ internal interface ConfigResponseRepository {
 
     companion object {
         private var instance: ConfigResponseRepository = ConfigResponseRepositoryImpl()
+        @VisibleForTesting
+        internal var randomizer: Random = Random
 
         fun instance(): ConfigResponseRepository = instance
 
@@ -45,6 +47,7 @@ internal interface ConfigResponseRepository {
          */
         @VisibleForTesting
         fun resetInstance() {
+            randomizer = Random
             this.instance = ConfigResponseRepositoryImpl()
         }
     }
@@ -60,7 +63,7 @@ internal interface ConfigResponseRepository {
             configResponseData = data
             val rollOut = configResponseData?.rollOutPercentage ?: 0
             isEnabled = if (rollOut > 0) {
-                Random.nextInt(1, 101) < rollOut
+                randomizer.nextInt(1, 101) <= rollOut
             } else {
                 false
             }

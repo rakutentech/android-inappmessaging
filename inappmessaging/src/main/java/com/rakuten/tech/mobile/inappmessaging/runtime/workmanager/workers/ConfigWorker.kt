@@ -79,6 +79,7 @@ internal class ConfigWorker(
      * because server could be busy for the moment. Returns FAILURE if response code is 400.
      */
     @VisibleForTesting
+    @SuppressWarnings("LongMethod")
     @Throws(IllegalArgumentException::class)
     fun onResponse(response: Response<ConfigResponse?>): Result {
         if (response.isSuccessful && response.body() != null) {
