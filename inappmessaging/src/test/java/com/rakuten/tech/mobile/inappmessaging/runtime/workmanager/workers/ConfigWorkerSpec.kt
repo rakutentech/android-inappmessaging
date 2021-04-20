@@ -8,6 +8,7 @@ import androidx.test.core.app.ApplicationProvider
 import androidx.work.ListenableWorker
 import androidx.work.WorkerParameters
 import androidx.work.testing.WorkManagerTestInitHelper
+import com.nhaarman.mockitokotlin2.eq
 import com.rakuten.tech.mobile.inappmessaging.runtime.BaseTest
 import com.rakuten.tech.mobile.inappmessaging.runtime.InAppMessaging
 import com.rakuten.tech.mobile.inappmessaging.runtime.InAppMessagingTestConstants
@@ -15,17 +16,14 @@ import com.rakuten.tech.mobile.inappmessaging.runtime.data.models.HostAppInfo
 import com.rakuten.tech.mobile.inappmessaging.runtime.data.repositories.ConfigResponseRepository
 import com.rakuten.tech.mobile.inappmessaging.runtime.data.repositories.HostAppInfoRepository
 import com.rakuten.tech.mobile.inappmessaging.runtime.data.responses.config.ConfigResponse
+import com.rakuten.tech.mobile.inappmessaging.runtime.utils.RetryDelayUtil
+import com.rakuten.tech.mobile.inappmessaging.runtime.workmanager.schedulers.ConfigScheduler
 import com.rakuten.tech.mobile.inappmessaging.runtime.workmanager.schedulers.MessageMixerPingScheduler
-import org.amshove.kluent.When
-import org.amshove.kluent.calling
-import org.amshove.kluent.itReturns
-import org.amshove.kluent.shouldBeEqualTo
+import org.amshove.kluent.*
 import org.junit.Before
 import org.junit.Test
 import org.junit.runner.RunWith
-import org.mockito.Mock
-import org.mockito.Mockito
-import org.mockito.MockitoAnnotations
+import org.mockito.*
 import org.robolectric.RobolectricTestRunner
 import org.robolectric.annotation.Config
 import retrofit2.Response
@@ -44,10 +42,13 @@ class ConfigWorkerSpec : BaseTest() {
     private val mockHostRespository = Mockito.mock(HostAppInfoRepository::class.java)
     private val mockConfigRespository = Mockito.mock(ConfigResponseRepository::class.java)
     private val mockMessageScheduler = Mockito.mock(MessageMixerPingScheduler::class.java)
+    private val mockRetry = Mockito.mock(RetryDelayUtil::class.java)
+    private val mockConfigScheduler = Mockito.mock(ConfigScheduler::class.java)
 
     @Before
     fun setup() {
         MockitoAnnotations.initMocks(this)
+        ConfigScheduler.currDelay = RetryDelayUtil.INITIAL_BACKOFF_DELAY
     }
 
     @Test
@@ -136,6 +137,49 @@ class ConfigWorkerSpec : BaseTest() {
         val expected = if (HostAppInfoRepository.instance().getConfigUrl().isNullOrEmpty())
             ListenableWorker.Result.retry() else ListenableWorker.Result.success()
         worker.doWork() shouldBeEqualTo expected
+    }
+
+    @Test
+    fun `should return success but will trigger next config when too many request error`() {
+        When calling mockResponse?.isSuccessful itReturns false
+        When calling mockResponse?.code() itReturns RetryDelayUtil.RETRY_ERROR_CODE
+        ConfigWorker(context, workerParameters, HostAppInfoRepository.instance(), ConfigResponseRepository.instance(),
+                MessageMixerPingScheduler.instance(), mockConfigScheduler, mockRetry)
+                .onResponse(mockResponse!!) shouldBeEqualTo ListenableWorker.Result.Success()
+
+        Mockito.verify(mockConfigScheduler).startConfig(eq(RetryDelayUtil.INITIAL_BACKOFF_DELAY))
+        Mockito.verify(mockRetry).getNextDelay(eq(RetryDelayUtil.INITIAL_BACKOFF_DELAY))
+    }
+
+    @Test
+    fun `should use correct backoff delay`() {
+        When calling mockResponse?.isSuccessful itReturns false
+        When calling mockResponse?.code() itReturns RetryDelayUtil.RETRY_ERROR_CODE
+        val worker = ConfigWorker(context, workerParameters, HostAppInfoRepository.instance(),
+                ConfigResponseRepository.instance(), MessageMixerPingScheduler.instance(), mockConfigScheduler)
+        worker.onResponse(mockResponse!!) shouldBeEqualTo ListenableWorker.Result.Success()
+        Mockito.verify(mockConfigScheduler).startConfig(eq(RetryDelayUtil.INITIAL_BACKOFF_DELAY))
+        ConfigScheduler.currDelay shouldBeGreaterThan (RetryDelayUtil.INITIAL_BACKOFF_DELAY * 2)
+
+        worker.onResponse(mockResponse) shouldBeEqualTo ListenableWorker.Result.Success()
+        Mockito.verify(mockConfigScheduler).startConfig(AdditionalMatchers.gt(RetryDelayUtil.INITIAL_BACKOFF_DELAY * 2))
+        ConfigScheduler.currDelay shouldBeGreaterThan (RetryDelayUtil.INITIAL_BACKOFF_DELAY * 4)
+    }
+
+    @Test
+    fun `should reset initial delay`() {
+        When calling mockResponse?.isSuccessful itReturns false
+        When calling mockResponse?.code() itReturns RetryDelayUtil.RETRY_ERROR_CODE
+        val worker = ConfigWorker(context, workerParameters, mockHostRespository,
+                mockConfigRespository, mockMessageScheduler, mockConfigScheduler)
+        worker.onResponse(mockResponse!!) shouldBeEqualTo ListenableWorker.Result.Success()
+        Mockito.verify(mockConfigScheduler).startConfig(eq(RetryDelayUtil.INITIAL_BACKOFF_DELAY))
+
+        When calling mockResponse.isSuccessful itReturns true
+        When calling mockResponse.code() itReturns 200
+        When calling mockResponse.body() itReturns Mockito.mock(ConfigResponse::class.java)
+        worker.onResponse(mockResponse) shouldBeEqualTo ListenableWorker.Result.Success()
+        ConfigScheduler.currDelay shouldBeEqualTo RetryDelayUtil.INITIAL_BACKOFF_DELAY
     }
 
     companion object {

@@ -10,7 +10,9 @@ import com.rakuten.tech.mobile.inappmessaging.runtime.data.repositories.ConfigRe
 import com.rakuten.tech.mobile.inappmessaging.runtime.data.repositories.HostAppInfoRepository
 import com.rakuten.tech.mobile.inappmessaging.runtime.data.requests.ConfigQueryParamsBuilder
 import com.rakuten.tech.mobile.inappmessaging.runtime.data.responses.config.ConfigResponse
+import com.rakuten.tech.mobile.inappmessaging.runtime.utils.RetryDelayUtil
 import com.rakuten.tech.mobile.inappmessaging.runtime.utils.RuntimeUtil
+import com.rakuten.tech.mobile.inappmessaging.runtime.workmanager.schedulers.ConfigScheduler
 import com.rakuten.tech.mobile.inappmessaging.runtime.workmanager.schedulers.MessageMixerPingScheduler
 import retrofit2.Response
 import timber.log.Timber
@@ -26,7 +28,9 @@ internal class ConfigWorker(
     workerParams: WorkerParameters,
     private val hostRepo: HostAppInfoRepository,
     private val configRepo: ConfigResponseRepository,
-    private val messagePingScheduler: MessageMixerPingScheduler
+    private val messagePingScheduler: MessageMixerPingScheduler,
+    private val configScheduler: ConfigScheduler = ConfigScheduler.instance(),
+    private val retryUtil: RetryDelayUtil = RetryDelayUtil
 ) :
     Worker(context, workerParams) {
 
@@ -81,13 +85,19 @@ internal class ConfigWorker(
             // Adding config data to its repo.
             configRepo.addConfigResponse(response.body()?.data)
             // Schedule a ping request to message mixer. Initial delay is 0
+            // reset current delay to initial
+            ConfigScheduler.currDelay = RetryDelayUtil.INITIAL_BACKOFF_DELAY
             messagePingScheduler.pingMessageMixerService(0)
             Timber.tag(TAG).d("Config Response: %b", response.body()?.data?.enabled)
-        } else return if (response.code() >= HttpURLConnection.HTTP_INTERNAL_ERROR) {
-            // Retry with exponential backoff if server has error.
-            Result.retry()
-        } else {
-            Result.failure()
+        } else return when {
+            response.code() == RetryDelayUtil.RETRY_ERROR_CODE -> {
+                configScheduler.startConfig(ConfigScheduler.currDelay)
+                ConfigScheduler.currDelay = retryUtil.getNextDelay(ConfigScheduler.currDelay)
+                // set previous worker as success to avoid logging
+                Result.success()
+            }
+            response.code() >= HttpURLConnection.HTTP_INTERNAL_ERROR -> Result.retry() // Retry if server has error.
+            else -> Result.failure()
         }
         return Result.success()
     }
