@@ -12,6 +12,7 @@ import com.rakuten.tech.mobile.inappmessaging.runtime.data.repositories.HostAppI
 import com.rakuten.tech.mobile.inappmessaging.runtime.data.repositories.PingResponseMessageRepository
 import com.rakuten.tech.mobile.inappmessaging.runtime.data.requests.PingRequest
 import com.rakuten.tech.mobile.inappmessaging.runtime.data.responses.ping.MessageMixerResponse
+import com.rakuten.tech.mobile.inappmessaging.runtime.utils.InAppMessagingConstants
 import com.rakuten.tech.mobile.inappmessaging.runtime.utils.RuntimeUtil
 import com.rakuten.tech.mobile.inappmessaging.runtime.workmanager.schedulers.EventMessageReconciliationScheduler
 import com.rakuten.tech.mobile.inappmessaging.runtime.workmanager.schedulers.MessageMixerPingScheduler
@@ -83,6 +84,7 @@ internal class MessageMixerWorker(
      * is 400, return FAILURE.
      */
     @VisibleForTesting
+    @SuppressWarnings("LongMethod")
     fun onResponse(response: Response<MessageMixerResponse>): Result {
         if (response.isSuccessful) {
             val messageMixerResponse = response.body()
@@ -105,7 +107,8 @@ internal class MessageMixerWorker(
                 scheduleNextPing(messageMixerResponse.nextPingMillis)
                 Timber.tag(TAG).d("campaign size: %d", messageMixerResponse.data.size)
             }
-        } else return if (response.code() >= HttpURLConnection.HTTP_INTERNAL_ERROR) {
+        } else return if (response.code() == InAppMessagingConstants.RETRY_ERROR_CODE ||
+                response.code() >= HttpURLConnection.HTTP_INTERNAL_ERROR) {
             // Retry with exponential backoff if server has error.
             Result.retry()
         } else {

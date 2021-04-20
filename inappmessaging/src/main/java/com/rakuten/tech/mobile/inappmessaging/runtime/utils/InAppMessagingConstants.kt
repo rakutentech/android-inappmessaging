@@ -39,5 +39,9 @@ internal class InAppMessagingConstants {
         const val RAT_EVENT_KEY_EVENT_NAME = "eventName"
         const val RAT_EVENT_KEY_EVENT_TIMESTAMP = "timestamp"
         const val RAT_EVENT_KEY_EVENT_CUSTOM_ATTRIBUTE = "customAttributes"
+
+        // ------------------------------ 429 Error Handling ---------------------------------------------
+        const val RETRY_ERROR_CODE = 429
+        const val INITIAL_BACKOFF_DELAY = 60L // in secs
     }
 }

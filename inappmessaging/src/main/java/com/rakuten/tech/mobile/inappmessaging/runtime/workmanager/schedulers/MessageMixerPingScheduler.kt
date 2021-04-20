@@ -1,10 +1,12 @@
 package com.rakuten.tech.mobile.inappmessaging.runtime.workmanager.schedulers
 
+import androidx.work.BackoffPolicy
 import androidx.work.ExistingWorkPolicy
 import androidx.work.OneTimeWorkRequest
 import androidx.work.WorkManager
 import com.rakuten.tech.mobile.inappmessaging.runtime.InAppMessaging
 import com.rakuten.tech.mobile.inappmessaging.runtime.data.repositories.ConfigResponseRepository
+import com.rakuten.tech.mobile.inappmessaging.runtime.utils.InAppMessagingConstants
 import com.rakuten.tech.mobile.inappmessaging.runtime.utils.WorkManagerUtil
 import com.rakuten.tech.mobile.inappmessaging.runtime.workmanager.workers.MessageMixerWorker
 import java.util.concurrent.TimeUnit
@@ -42,6 +44,8 @@ internal interface MessageMixerPingScheduler {
                     .setInitialDelay(initialDelay, TimeUnit.MILLISECONDS)
                     .setConstraints(WorkManagerUtil.getNetworkConnectedConstraint())
                     .addTag(MESSAGE_MIXER_PING_WORKER)
+                    .setBackoffCriteria(BackoffPolicy.EXPONENTIAL,
+                            InAppMessagingConstants.INITIAL_BACKOFF_DELAY, TimeUnit.SECONDS)
                     .build()
 
             // Enqueue work request in the background.

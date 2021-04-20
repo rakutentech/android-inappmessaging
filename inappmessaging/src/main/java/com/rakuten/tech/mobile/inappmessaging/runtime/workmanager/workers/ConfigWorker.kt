@@ -10,6 +10,7 @@ import com.rakuten.tech.mobile.inappmessaging.runtime.data.repositories.ConfigRe
 import com.rakuten.tech.mobile.inappmessaging.runtime.data.repositories.HostAppInfoRepository
 import com.rakuten.tech.mobile.inappmessaging.runtime.data.requests.ConfigRequest
 import com.rakuten.tech.mobile.inappmessaging.runtime.data.responses.config.ConfigResponse
+import com.rakuten.tech.mobile.inappmessaging.runtime.utils.InAppMessagingConstants
 import com.rakuten.tech.mobile.inappmessaging.runtime.utils.RuntimeUtil
 import com.rakuten.tech.mobile.inappmessaging.runtime.workmanager.schedulers.MessageMixerPingScheduler
 import retrofit2.Response
@@ -84,7 +85,8 @@ internal class ConfigWorker(
             // Schedule a ping request to message mixer. Initial delay is 0
             messagePingScheduler.pingMessageMixerService(0)
             Timber.tag(TAG).d("Config Response: %b", response.body()?.data?.enabled)
-        } else return if (response.code() >= HttpURLConnection.HTTP_INTERNAL_ERROR) {
+        } else return if (response.code() == InAppMessagingConstants.RETRY_ERROR_CODE ||
+                response.code() >= HttpURLConnection.HTTP_INTERNAL_ERROR) {
             // Retry with exponential backoff if server has error.
             Result.retry()
         } else {
