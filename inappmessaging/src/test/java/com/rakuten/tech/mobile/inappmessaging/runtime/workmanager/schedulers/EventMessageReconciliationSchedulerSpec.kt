@@ -61,7 +61,7 @@ class EventMessageReconciliationSchedulerSpec : BaseTest() {
         val configResponseData = Mockito.mock(ConfigResponseData::class.java)
         val mockAccount = Mockito.mock(AccountRepository::class.java)
 
-        When calling configResponseData.enabled itReturns true
+        When calling configResponseData.rollOutPercentage itReturns 100
         When calling mockAccount.updateUserInfo() itReturns false
 
         ConfigResponseRepository.instance().addConfigResponse(configResponseData)

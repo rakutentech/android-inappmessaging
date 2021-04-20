@@ -82,7 +82,8 @@ internal class ConfigWorker(
             configRepo.addConfigResponse(response.body()?.data)
             // Schedule a ping request to message mixer. Initial delay is 0
             messagePingScheduler.pingMessageMixerService(0)
-            Timber.tag(TAG).d("Config Response: %b", response.body()?.data?.enabled)
+            Timber.tag(TAG).d("Config Response: %d (%b)",
+                    response.body()?.data?.rollOutPercentage, configRepo.isConfigEnabled())
         } else return if (response.code() >= HttpURLConnection.HTTP_INTERNAL_ERROR) {
             // Retry with exponential backoff if server has error.
             Result.retry()

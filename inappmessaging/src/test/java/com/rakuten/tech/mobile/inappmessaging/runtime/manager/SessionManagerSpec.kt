@@ -48,7 +48,7 @@ class SessionManagerSpec : BaseTest() {
                 "test_device_id")
         InAppMessaging.init(ApplicationProvider.getApplicationContext(), "test", "",
                 isDebugLogging = true, isForTesting = true)
-        When calling configResponseData.enabled itReturns true
+        When calling configResponseData.rollOutPercentage itReturns 100
         When calling configResponseData.endpoints itReturns endpoints
         ConfigResponseRepository.instance().addConfigResponse(configResponseData)
         onSessionUpdate()
@@ -65,7 +65,7 @@ class SessionManagerSpec : BaseTest() {
                 "test_device_id")
         InAppMessaging.init(ApplicationProvider.getApplicationContext(), "test", "",
                 isDebugLogging = true, isForTesting = true)
-        When calling configResponseData.enabled itReturns false
+        When calling configResponseData.rollOutPercentage itReturns 0
 
         addTestData()
         ConfigResponseRepository.instance().addConfigResponse(configResponseData)
@@ -83,7 +83,7 @@ class SessionManagerSpec : BaseTest() {
                 "test_device_id")
         InAppMessaging.init(ApplicationProvider.getApplicationContext(), "test", "",
                 isDebugLogging = true, isForTesting = true)
-        When calling configResponseData.enabled itReturns false
+        When calling configResponseData.rollOutPercentage itReturns 0
 
         addTestData()
         ConfigResponseRepository.instance().addConfigResponse(configResponseData)
@@ -101,7 +101,7 @@ class SessionManagerSpec : BaseTest() {
                 "test_device_id")
         InAppMessaging.init(ApplicationProvider.getApplicationContext(), "test", "",
                 isDebugLogging = true, isForTesting = true)
-        When calling configResponseData.enabled itReturns false
+        When calling configResponseData.rollOutPercentage itReturns 0
 
         addTestData()
         ConfigResponseRepository.instance().addConfigResponse(configResponseData)

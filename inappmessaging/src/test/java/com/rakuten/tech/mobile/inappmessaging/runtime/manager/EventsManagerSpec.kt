@@ -69,9 +69,9 @@ class EventsManagerSpec : BaseTest() {
     @Test
     fun `should check config is enabled`() {
         ConfigResponseRepository.instance().addConfigResponse(configResponseData)
-        When calling configResponseData.enabled itReturns false
+        When calling configResponseData.rollOutPercentage itReturns 0
         EventsManager.onEventReceived(mockEvent)
-        Mockito.verify(configResponseData).enabled
+        Mockito.verify(configResponseData).rollOutPercentage
     }
 
     @Test
@@ -85,7 +85,7 @@ class EventsManagerSpec : BaseTest() {
                 isDebugLogging = false, isForTesting = true)
         InAppMessaging.instance().registerPreference(TestUserInfoProvider())
         ConfigResponseRepository.instance().addConfigResponse(configResponseData)
-        When calling configResponseData.enabled itReturns false
+        When calling configResponseData.rollOutPercentage itReturns 0
         When calling mockEvent.getEventType() itReturns EventType.LOGIN_SUCCESSFUL.typeId
         EventsManager.onEventReceived(mockEvent)
         WorkManager.getInstance(context).getWorkInfosByTag(MESSAGES_EVENTS_WORKER_NAME).get().shouldHaveSize(0)
@@ -104,7 +104,7 @@ class EventsManagerSpec : BaseTest() {
 
         addTestData()
 
-        When calling configResponseData.enabled itReturns false
+        When calling configResponseData.rollOutPercentage itReturns 0
         When calling mockAccount.updateUserInfo() itReturns true
 
         EventsManager.onEventReceived(event = PurchaseSuccessfulEvent(), eventScheduler = eventRecon,
@@ -122,9 +122,8 @@ class EventsManagerSpec : BaseTest() {
         InAppMessaging.init(ApplicationProvider.getApplicationContext(), "test", "",
                 isDebugLogging = false, isForTesting = true)
         InAppMessaging.instance().registerPreference(TestUserInfoProvider())
+        When calling configResponseData.rollOutPercentage itReturns 100
         ConfigResponseRepository.instance().addConfigResponse(configResponseData)
-
-        When calling configResponseData.enabled itReturns true
         When calling mockAccount.updateUserInfo() itReturns false
 
         addTestData()
