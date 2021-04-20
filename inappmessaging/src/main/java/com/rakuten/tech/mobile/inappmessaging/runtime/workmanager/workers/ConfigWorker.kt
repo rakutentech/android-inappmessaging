@@ -79,6 +79,7 @@ internal class ConfigWorker(
      * because server could be busy for the moment. Returns FAILURE if response code is 400.
      */
     @VisibleForTesting
+    @SuppressWarnings("LongMethod")
     @Throws(IllegalArgumentException::class)
     fun onResponse(response: Response<ConfigResponse?>): Result {
         if (response.isSuccessful && response.body() != null) {
@@ -88,7 +89,8 @@ internal class ConfigWorker(
             // reset current delay to initial
             ConfigScheduler.currDelay = RetryDelayUtil.INITIAL_BACKOFF_DELAY
             messagePingScheduler.pingMessageMixerService(0)
-            Timber.tag(TAG).d("Config Response: %b", response.body()?.data?.enabled)
+            Timber.tag(TAG).d("Config Response: %d (%b)",
+                    response.body()?.data?.rollOutPercentage, configRepo.isConfigEnabled())
         } else return when {
             response.code() == RetryDelayUtil.RETRY_ERROR_CODE -> {
                 configScheduler.startConfig(ConfigScheduler.currDelay)

@@ -49,7 +49,7 @@ class InAppMessagingSpec : BaseTest() {
     @Test
     fun `should not display message if config is true for uninitialized instance`() {
         InAppMessaging.setUninitializedInstance()
-        When calling configResponseData.enabled itReturns true
+        When calling configResponseData.rollOutPercentage itReturns 100
         ConfigResponseRepository.instance().addConfigResponse(configResponseData)
 
         InAppMessaging.instance().registerMessageDisplayActivity(activity)
@@ -90,7 +90,7 @@ class InAppMessagingSpec : BaseTest() {
 
     @Test
     fun `should display message using initialized instance`() {
-        When calling configResponseData.enabled itReturns true
+        When calling configResponseData.rollOutPercentage itReturns 100
         ConfigResponseRepository.instance().addConfigResponse(configResponseData)
 
         val inApp = InApp(ApplicationProvider.getApplicationContext(), false, displayManager)
