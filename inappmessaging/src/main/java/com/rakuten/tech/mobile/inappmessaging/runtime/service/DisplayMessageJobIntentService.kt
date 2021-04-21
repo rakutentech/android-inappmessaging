@@ -79,9 +79,8 @@ internal class DisplayMessageJobIntentService : JobIntentService() {
             // Message display aborted by the host app
             Timber.tag(TAG).d("message display cancelled by the host app")
 
-            // Mark the message as displayed
-            localDisplayRepo.addMessage(message)
-            readyMessagesRepo.removeMessage(message.getCampaignId()!!)
+            // increment time closed to handle required number of events to be triggered
+            readyMessagesRepo.removeMessage(message.getCampaignId()!!, true)
 
             prepareNextMessage()
             return
