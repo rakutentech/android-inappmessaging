@@ -6,7 +6,7 @@ import android.content.SharedPreferences
 import androidx.annotation.RestrictTo
 import androidx.annotation.VisibleForTesting
 import com.rakuten.tech.mobile.inappmessaging.runtime.data.models.appevents.Event
-import com.rakuten.tech.mobile.inappmessaging.runtime.data.repositories.LocalEventRepository
+import com.rakuten.tech.mobile.inappmessaging.runtime.data.repositories.PingResponseMessageRepository
 import com.rakuten.tech.mobile.inappmessaging.runtime.exception.InAppMessagingInitializationException
 import com.rakuten.tech.mobile.inappmessaging.runtime.utils.Initializer
 import com.rakuten.tech.mobile.inappmessaging.runtime.workmanager.schedulers.ConfigScheduler
@@ -128,8 +128,8 @@ abstract class InAppMessaging internal constructor() {
             // Initializing SDK using background worker thread.
             Initializer.initializeSdk(context, subscriptionKey, configUrl, isForTesting)
 
-            // inform event repository that it is initial launch to remove previously stored persistent event
-            LocalEventRepository.isInitialLaunch = true
+            // inform ping response repository that it is initial launch to display app launch campaign at least once
+            PingResponseMessageRepository.isInitialLaunch = true
 
             configScheduler.startConfig()
         }

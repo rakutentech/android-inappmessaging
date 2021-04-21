@@ -19,6 +19,8 @@ internal abstract class PingResponseMessageRepository : MessageRepository {
         private var instance: PingResponseMessageRepository = PingResponseMessageRepositoryImpl()
         private const val PING_RESPONSE_KEY = "ping_response_list"
 
+        internal var isInitialLaunch = false
+
         fun instance(): PingResponseMessageRepository = instance
     }
 
@@ -26,6 +28,7 @@ internal abstract class PingResponseMessageRepository : MessageRepository {
         // LinkedHashMap can preserve the message insertion order.
         // Map - Key: Campaign ID, Value: Message object
         private var messages: MutableMap<String, Message> = LinkedHashMap()
+        private var appLaunchList: MutableMap<String, Boolean> = LinkedHashMap()
         private var user = ""
 
         init {
@@ -42,9 +45,14 @@ internal abstract class PingResponseMessageRepository : MessageRepository {
             checkAndResetMap()
 
             messages = LinkedHashMap()
+            appLaunchList = LinkedHashMap()
             for (message in messageList) {
                 messages[message.getCampaignId()!!] = message
+                if (message.getTriggers()?.size == 1) {
+                    appLaunchList[message.getCampaignId()!!] = isInitialLaunch
+                }
             }
+            isInitialLaunch = false
             saveUpdatedMap()
         }
 
@@ -66,6 +74,12 @@ internal abstract class PingResponseMessageRepository : MessageRepository {
             messages.filter { m -> messageList.any { it.getCampaignId() == m.key } }
                     .forEach { it.value.incrementTimesClosed() }
             saveUpdatedMap()
+        }
+
+        override fun shouldDisplayAppLaunchCampaign(id: String): Boolean {
+            val result = appLaunchList[id]
+            appLaunchList[id] = false // it should not be displayed again in current session
+            return result ?: false
         }
 
         private fun checkAndResetMap(onLaunch: Boolean = false) {
