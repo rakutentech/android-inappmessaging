@@ -38,7 +38,7 @@ internal interface LocalEventRepository : EventRepository {
         private var instance: LocalEventRepository = LocalEventRepositoryImpl()
         private const val LOCAL_EVENT_KEY = "local_event_list"
 
-        internal var isLaunch = false
+        internal var isInitialLaunch = false
 
         fun instance() = instance
     }
@@ -108,8 +108,8 @@ internal interface LocalEventRepository : EventRepository {
 
         private fun shouldIgnore(event: Event): Boolean {
             if (event.isPersistentType()) {
-                if (isLaunch) {
-                    isLaunch = false
+                if (isInitialLaunch) {
+                    isInitialLaunch = false
                     clearPersistentEvents()
                 }
                 for (currEvent in events) {

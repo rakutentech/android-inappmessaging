@@ -129,7 +129,7 @@ abstract class InAppMessaging internal constructor() {
             Initializer.initializeSdk(context, subscriptionKey, configUrl, isForTesting)
 
             // inform event repository that it is initial launch to remove previously stored persistent event
-            LocalEventRepository.isLaunch = true
+            LocalEventRepository.isInitialLaunch = true
 
             configScheduler.startConfig()
         }
