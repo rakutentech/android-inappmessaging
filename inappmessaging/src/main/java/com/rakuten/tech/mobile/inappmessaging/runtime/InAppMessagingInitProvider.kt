@@ -47,7 +47,7 @@ internal class InAppMessagingInitProvider : ContentProvider() {
         WorkManager.initialize(context, config)
 
         InAppMessaging.init(context, manifestConfig.subscriptionKey(), manifestConfig.configUrl(),
-                isDebugLogging = manifestConfig.isDebugging())
+                isDebugLogging = manifestConfig.isDebugging(), isCacheHandling = BuildConfig.IS_CACHE_HANDLING)
         return true
     }
 
