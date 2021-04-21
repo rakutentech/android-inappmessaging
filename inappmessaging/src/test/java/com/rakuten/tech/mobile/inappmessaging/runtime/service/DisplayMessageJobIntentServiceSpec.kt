@@ -14,6 +14,7 @@ import com.facebook.soloader.SoLoader
 import com.google.gson.Gson
 import com.nhaarman.mockitokotlin2.argumentCaptor
 import com.nhaarman.mockitokotlin2.eq
+import com.nhaarman.mockitokotlin2.never
 import com.rakuten.tech.mobile.inappmessaging.runtime.BaseTest
 import com.rakuten.tech.mobile.inappmessaging.runtime.InAppMessaging
 import com.rakuten.tech.mobile.inappmessaging.runtime.data.models.messages.Message
@@ -212,7 +213,7 @@ class DisplayMessageJobIntentServiceSpec : BaseTest() {
     }
 
     @Test
-    fun `should add message to LocalDisplayedMessageRepository when its context was rejected`() {
+    fun `should not add message to LocalDisplayedMessageRepository when its context was rejected`() {
         val message = Mockito.mock(Message::class.java)
 
         When calling onVerifyContexts.invoke(any(), any()) itReturns false
@@ -227,10 +228,7 @@ class DisplayMessageJobIntentServiceSpec : BaseTest() {
         When calling mockMessageManager.getNextDisplayMessage() itReturns message itReturns null
         displayMessageJobIntentService!!.onHandleWork(intent!!)
 
-        argumentCaptor<Message>().apply {
-            Mockito.verify(mockLocalDisplayRepo, Mockito.times(1)).addMessage(capture())
-            firstValue shouldBeEqualTo message
-        }
+        Mockito.verify(mockLocalDisplayRepo, never()).addMessage(any())
     }
 
     @Test
@@ -250,7 +248,7 @@ class DisplayMessageJobIntentServiceSpec : BaseTest() {
         displayMessageJobIntentService!!.onHandleWork(intent!!)
 
         argumentCaptor<String>().apply {
-            Mockito.verify(mockReadyForDisplayRepo, Mockito.times(1)).removeMessage(capture(), eq(false))
+            Mockito.verify(mockReadyForDisplayRepo, Mockito.times(1)).removeMessage(capture(), eq(true))
             firstValue shouldBeEqualTo message.getCampaignId()
         }
     }

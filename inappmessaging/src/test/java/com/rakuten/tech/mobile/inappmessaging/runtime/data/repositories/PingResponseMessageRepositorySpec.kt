@@ -24,6 +24,7 @@ import org.robolectric.RobolectricTestRunner
  * Test class for PingResponseMessageRepository.
  */
 @RunWith(RobolectricTestRunner::class)
+@SuppressWarnings("LargeClass")
 class PingResponseMessageRepositorySpec : BaseTest() {
     private val message0 = ValidTestMessage()
     private val message1 = ValidTestMessage("1234")
@@ -133,6 +134,8 @@ class PingResponseMessageRepositorySpec : BaseTest() {
 
     @Test
     fun `should return false when not first launch`() {
+        initializeInstance(TestUserInfoProvider(), false)
+        PingResponseMessageRepository.isInitialLaunch = false
         PingResponseMessageRepository.instance().replaceAllMessages(messageList)
         for (msg in PingResponseMessageRepository.instance().getAllMessagesCopy()) {
             PingResponseMessageRepository.instance()
@@ -142,6 +145,7 @@ class PingResponseMessageRepositorySpec : BaseTest() {
 
     @Test
     fun `should return true when first launch`() {
+        initializeInstance(TestUserInfoProvider(), false)
         PingResponseMessageRepository.isInitialLaunch = true
         PingResponseMessageRepository.instance().replaceAllMessages(messageList)
         for (msg in PingResponseMessageRepository.instance().getAllMessagesCopy()) {
@@ -152,6 +156,7 @@ class PingResponseMessageRepositorySpec : BaseTest() {
 
     @Test
     fun `should return true to app launch only and false to multiple triggers`() {
+        initializeInstance(TestUserInfoProvider(), false)
         PingResponseMessageRepository.isInitialLaunch = true
         val mockMessage = Mockito.mock(Message::class.java)
         When calling mockMessage.getCampaignId() itReturns "54321"
@@ -187,12 +192,12 @@ class PingResponseMessageRepositorySpec : BaseTest() {
         }
     }
 
-    private fun initializeInstance(infoProvider: UserInfoProvider) {
+    private fun initializeInstance(infoProvider: UserInfoProvider, isCache: Boolean = true) {
         WorkManagerTestInitHelper.initializeTestWorkManager(ApplicationProvider.getApplicationContext())
         Settings.Secure.putString(ApplicationProvider.getApplicationContext<Context>().contentResolver,
                 Settings.Secure.ANDROID_ID, "test_device_id")
         InAppMessaging.init(ApplicationProvider.getApplicationContext(), "test", "",
-                isDebugLogging = true, isForTesting = true, isCacheHandling = true)
+                isDebugLogging = true, isForTesting = true, isCacheHandling = isCache)
         InAppMessaging.instance().registerPreference(infoProvider)
     }
 }
