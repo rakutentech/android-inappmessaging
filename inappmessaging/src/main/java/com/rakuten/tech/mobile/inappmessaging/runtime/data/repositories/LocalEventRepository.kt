@@ -60,10 +60,10 @@ internal interface LocalEventRepository : EventRepository {
             require(!event.getEventName().isNullOrEmpty()) { InAppMessagingConstants.ARGUMENT_IS_EMPTY_EXCEPTION }
 
             synchronized(events) {
+                checkAndResetList()
                 // If persistent type, event should only be stored once.
                 if (shouldIgnore(event)) return false
 
-                checkAndResetList()
                 events.add(event)
                 Timber.tag(TAG).d(event.getEventName())
                 event.getAttributeMap().forEach { (key, value) ->
