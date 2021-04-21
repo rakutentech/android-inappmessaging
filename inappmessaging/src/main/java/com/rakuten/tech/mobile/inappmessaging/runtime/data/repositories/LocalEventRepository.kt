@@ -38,6 +38,8 @@ internal interface LocalEventRepository : EventRepository {
         private var instance: LocalEventRepository = LocalEventRepositoryImpl()
         private const val LOCAL_EVENT_KEY = "local_event_list"
 
+        internal var isInitialLaunch = false
+
         fun instance() = instance
     }
 
@@ -108,6 +110,10 @@ internal interface LocalEventRepository : EventRepository {
 
         private fun shouldIgnore(event: Event): Boolean {
             if (event.isPersistentType()) {
+                if (isInitialLaunch) {
+                    isInitialLaunch = false
+                    clearPersistentEvents()
+                }
                 for (currEvent in events) {
                     if (event.getEventType() == currEvent.getEventType() &&
                             event.getEventName() == currEvent.getEventName()) return true
@@ -115,6 +121,14 @@ internal interface LocalEventRepository : EventRepository {
             }
 
             return false
+        }
+
+        private fun clearPersistentEvents() {
+            synchronized(events) {
+                if (events.isNotEmpty()) {
+                    events.removeAll { ev -> ev.isPersistentType() }
+                }
+            }
         }
 
         private fun checkAndResetList(onLaunch: Boolean = false) {
