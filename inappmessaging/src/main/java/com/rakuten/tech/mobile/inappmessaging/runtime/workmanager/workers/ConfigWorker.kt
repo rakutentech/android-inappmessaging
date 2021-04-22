@@ -24,7 +24,7 @@ import java.net.HttpURLConnection
  * and uses synchronized network call to make request to Config Service.
  */
 internal class ConfigWorker(
-    val context: Context,
+    context: Context,
     workerParams: WorkerParameters,
     private val hostRepo: HostAppInfoRepository,
     private val configRepo: ConfigResponseRepository,
