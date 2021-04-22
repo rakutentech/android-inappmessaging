@@ -52,7 +52,7 @@ internal class ConfigWorker(
         val hostAppId = hostRepo.getPackageName()
         val locale = hostRepo.getDeviceLocale()
         val hostAppVersion = hostRepo.getVersion()
-        // Terminate request if either appId or appVersion or subscription key is empty or null.
+        // Terminate request if any of the following values is empty or null: appId, appVersion or subscription key.
         if (hostAppId.isNullOrEmpty() || hostAppVersion.isNullOrEmpty() ||
                 hostRepo.getInAppMessagingSubscriptionKey().isNullOrEmpty()) {
             return Result.failure()
