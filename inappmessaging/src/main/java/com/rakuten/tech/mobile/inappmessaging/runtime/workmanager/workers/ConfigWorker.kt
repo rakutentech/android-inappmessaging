@@ -24,7 +24,7 @@ import java.net.HttpURLConnection
  * and uses synchronized network call to make request to Config Service.
  */
 internal class ConfigWorker(
-    context: Context,
+    val context: Context,
     workerParams: WorkerParameters,
     private val hostRepo: HostAppInfoRepository,
     private val configRepo: ConfigResponseRepository,
@@ -52,17 +52,19 @@ internal class ConfigWorker(
         val hostAppId = hostRepo.getPackageName()
         val locale = hostRepo.getDeviceLocale()
         val hostAppVersion = hostRepo.getVersion()
-        // Terminate request if either appId or appVersion is empty or null.
-        if (hostAppId.isNullOrEmpty() || hostAppVersion.isNullOrEmpty()) {
+        // Terminate request if either appId or appVersion or subscription key is empty or null.
+        if (hostAppId.isNullOrEmpty() || hostAppVersion.isNullOrEmpty() ||
+                hostRepo.getInAppMessagingSubscriptionKey().isNullOrEmpty()) {
             return Result.failure()
         }
 
         val configUrl = hostRepo.getConfigUrl() ?: ""
         val sdkVersion = BuildConfig.VERSION_NAME
         val params = ConfigQueryParamsBuilder(hostAppId, locale, hostAppVersion, sdkVersion).queryParams
+        val subscriptionId = hostRepo.getInAppMessagingSubscriptionKey()!!
         val configServiceCall = RuntimeUtil.getRetrofit()
                 .create(ConfigRetrofitService::class.java)
-                .getConfigService(configUrl, params)
+                .getConfigService(configUrl, subscriptionId, params)
 
         return try {
             // Executing the API network call.
