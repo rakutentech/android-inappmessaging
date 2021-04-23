@@ -19,14 +19,12 @@ import com.rakuten.tech.mobile.inappmessaging.runtime.workmanager.workers.Config
 import com.rakuten.tech.mobile.inappmessaging.runtime.workmanager.workers.MessageMixerWorker
 import org.amshove.kluent.*
 import org.junit.Before
-import org.junit.Ignore
 import org.junit.Test
 import org.junit.runner.RunWith
 import org.mockito.Mockito
 import org.robolectric.RobolectricTestRunner
 import org.robolectric.annotation.Config
 
-@Ignore
 @RunWith(RobolectricTestRunner::class)
 @Config(sdk = [Build.VERSION_CODES.O_MR1])
 class IntegrationSpec {
