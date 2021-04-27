@@ -312,6 +312,13 @@ Documents targeting Product Managers:
 
 ## <a name="changelog"></a> Changelog
 
+### 4.0.0 (in-progress)
+* SDKCF-3651: Change config request to POST
+* SDKCF-3653: Add exponential retry handling for config and ping request for "429 too many requests" response.
+* SDKCF-3655: Handle opt-out and max impression tracking logic solely on SDK.
+* SDKCF-3664: Support roll-out percentage for computing if In-App Messaging is enabled.
+* SDKCF-3715: Include subscription key in config request.
+
 ### 3.0.0 (2021-03-24)
 * SDKCF-3450: Update Fresco dependency to v2.4.0 to fix SoLoader issue.
 * SDKCF-3454: Changed Maven Group ID to `io.github.rakutentech.inappmessaging`. You must update your dependency declarations to the following:
