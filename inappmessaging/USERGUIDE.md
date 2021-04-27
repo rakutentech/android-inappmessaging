@@ -312,6 +312,13 @@ Documents targeting Product Managers:
 
 ## <a name="changelog"></a> Changelog
 
+### 4.0.0-pp (in-progress)
+* SDKCF-3651: Changed Config API call to /GET with query params. This allows the backend to filter requests if required.
+* SDKCF-3653: Added handling for Config and Ping API calls for "429 too many requests" response. The SDK will start exponential backoff (plus a random factor) retries to space out the requests to the backend when code 429 is received.
+* SDKCF-3655: Handled opt-out and max impression tracking logic solely on SDK. This change reduces the backend's load per request.
+* SDKCF-3664: Added support on roll-out percentage for computing if In-App Messaging is enabled. This allows the backend to gradually increase campaign distribution.
+* SDKCF-3715: Included subscription key in Config API request header to enable better filtering of requests.
+
 ### 3.0.0 (2021-03-24)
 * SDKCF-3450: Update Fresco dependency to v2.4.0 to fix SoLoader issue.
 * SDKCF-3454: Changed Maven Group ID to `io.github.rakutentech.inappmessaging`. You must update your dependency declarations to the following:
