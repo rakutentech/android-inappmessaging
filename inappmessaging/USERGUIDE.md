@@ -312,7 +312,7 @@ Documents targeting Product Managers:
 
 ## <a name="changelog"></a> Changelog
 
-### 4.0.0-pp-v1 (in-progress)
+### 4.0.0-pp (in-progress)
 * SDKCF-3651: Change config request to GET
 * SDKCF-3653: Add exponential retry handling for config and ping request for "429 too many requests" response.
 * SDKCF-3655: Handle opt-out and max impression tracking logic solely on SDK.
