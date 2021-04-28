@@ -111,7 +111,8 @@ class ConfigWorkerSpec : BaseTest() {
         val version = ctx.packageManager.getPackageInfo(ctx.packageName, 0).versionName
         When calling mockHostRespository.getVersion() itReturns version
         When calling mockHostRespository.getConfigUrl() itReturns bundle.getString(CONFIG_KEY, "")
-        When calling mockHostRespository.getInAppMessagingSubscriptionKey() itReturns bundle.getString(SUBSCRIPTION_KEY, "")
+        When calling mockHostRespository
+                .getInAppMessagingSubscriptionKey() itReturns bundle.getString(SUBSCRIPTION_KEY, "")
         val worker = ConfigWorker(context, workerParameters, mockHostRespository, mockConfigRespository,
                 mockMessageScheduler)
         val expected = if (HostAppInfoRepository.instance().getConfigUrl().isNullOrEmpty())

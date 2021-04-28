@@ -7,6 +7,7 @@ import androidx.annotation.VisibleForTesting
 import com.rakuten.tech.mobile.inappmessaging.runtime.data.models.appevents.Event
 import com.rakuten.tech.mobile.inappmessaging.runtime.data.repositories.AccountRepository
 import com.rakuten.tech.mobile.inappmessaging.runtime.data.repositories.ConfigResponseRepository
+import com.rakuten.tech.mobile.inappmessaging.runtime.data.repositories.LocalDisplayedMessageRepository
 import com.rakuten.tech.mobile.inappmessaging.runtime.data.repositories.ReadyForDisplayMessageRepository
 import com.rakuten.tech.mobile.inappmessaging.runtime.manager.DisplayManager
 import com.rakuten.tech.mobile.inappmessaging.runtime.manager.EventsManager
@@ -59,7 +60,8 @@ internal class InApp(
 
     @Suppress("FunctionMaxLength")
     override fun unregisterMessageDisplayActivity() {
-        displayManager.removeMessage(getRegisteredActivity())
+        val id = displayManager.removeMessage(getRegisteredActivity())
+        LocalDisplayedMessageRepository.instance().setRemovedMessage(id as String?)
         activityWeakReference?.clear()
 
         Timber.tag(TAG)

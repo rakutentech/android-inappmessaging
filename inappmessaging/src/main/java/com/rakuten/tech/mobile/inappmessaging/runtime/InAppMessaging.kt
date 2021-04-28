@@ -6,6 +6,7 @@ import android.content.SharedPreferences
 import androidx.annotation.RestrictTo
 import androidx.annotation.VisibleForTesting
 import com.rakuten.tech.mobile.inappmessaging.runtime.data.models.appevents.Event
+import com.rakuten.tech.mobile.inappmessaging.runtime.data.repositories.LocalDisplayedMessageRepository
 import com.rakuten.tech.mobile.inappmessaging.runtime.data.repositories.PingResponseMessageRepository
 import com.rakuten.tech.mobile.inappmessaging.runtime.exception.InAppMessagingInitializationException
 import com.rakuten.tech.mobile.inappmessaging.runtime.utils.Initializer
@@ -130,6 +131,7 @@ abstract class InAppMessaging internal constructor() {
 
             // inform ping response repository that it is initial launch to display app launch campaign at least once
             PingResponseMessageRepository.isInitialLaunch = true
+            LocalDisplayedMessageRepository.isInitialLaunch = true
 
             configScheduler.startConfig()
         }

@@ -93,7 +93,7 @@ internal abstract class ReadyForDisplayMessageRepository : ReadyMessageRepositor
         private fun saveUpdatedList() {
             // check if caching is enabled to update persistent data
             if (InAppMessaging.instance().isLocalCachingEnabled()) {
-                // reset message list from cached using updated user info
+                // reset updated message list
                 InAppMessaging.instance().getEncryptedSharedPref()?.edit()?.putString(READY_DISPLAY_KEY,
                         Gson().toJson(messages))?.apply()
             }

@@ -107,7 +107,7 @@ internal abstract class PingResponseMessageRepository : MessageRepository {
         private fun saveUpdatedMap() {
             // check if caching is enabled to update persistent data
             if (InAppMessaging.instance().isLocalCachingEnabled()) {
-                // reset message list from cached using updated user info
+                // save updated message list
                 InAppMessaging.instance().getEncryptedSharedPref()?.edit()?.putString(PING_RESPONSE_KEY,
                         Gson().toJson(messages))?.apply()
             }

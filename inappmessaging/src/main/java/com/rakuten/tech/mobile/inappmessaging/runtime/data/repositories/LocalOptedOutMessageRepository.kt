@@ -70,7 +70,7 @@ internal interface LocalOptedOutMessageRepository {
                     (onLaunch || user != AccountRepository.instance().userInfoHash)) {
                 user = AccountRepository.instance().userInfoHash
                 optedOutMessages.clear()
-                // reset message list from cached using updated user info
+                // reset id list from cached using updated user info
                 InAppMessaging.instance().getEncryptedSharedPref()?.getStringSet(
                         LOCAL_OPTED_OUT_KEY, HashSet<String?>())?.let {
                     optedOutMessages.addAll(it)
@@ -81,7 +81,7 @@ internal interface LocalOptedOutMessageRepository {
         private fun saveUpdatedSet() {
             // check if caching is enabled to update persistent data
             if (InAppMessaging.instance().isLocalCachingEnabled()) {
-                // reset message list from cached using updated user info
+                // save updated id list
                 InAppMessaging.instance().getEncryptedSharedPref()?.edit()?.putStringSet(LOCAL_OPTED_OUT_KEY,
                         optedOutMessages)?.apply()
             }
