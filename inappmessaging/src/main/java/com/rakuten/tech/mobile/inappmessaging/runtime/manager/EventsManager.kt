@@ -1,5 +1,6 @@
 package com.rakuten.tech.mobile.inappmessaging.runtime.manager
 
+import com.rakuten.tech.mobile.inappmessaging.runtime.InAppMessaging
 import com.rakuten.tech.mobile.inappmessaging.runtime.LegacyEventBroadcasterHelper
 import com.rakuten.tech.mobile.inappmessaging.runtime.data.models.appevents.Event
 import com.rakuten.tech.mobile.inappmessaging.runtime.data.repositories.AccountRepository
@@ -12,6 +13,9 @@ import com.rakuten.tech.mobile.inappmessaging.runtime.workmanager.schedulers.Eve
  * EventsManager accepts local events.
  */
 internal object EventsManager {
+
+    private var isUpdated = false
+
     /**
      * This method adds logEvent on the events list.
      * Then starts session update and event worker to process that logEvent.
@@ -27,13 +31,17 @@ internal object EventsManager {
         // Caching events locally.
         val isAdded = localEventRepo.addEvent(event)
         if (isAdded) {
-            if (isUserUpdated) {
+            if (isUserUpdated || isUpdated) {
+                isUpdated = false
                 // Update session when there are updates in user info
                 // event reconciliation worker is already part of session update
                 SessionManager.onSessionUpdate(event)
             } else if (ConfigResponseRepository.instance().isConfigEnabled()) {
                 eventScheduler.startEventMessageReconciliationWorker()
             }
+        } else if (InAppMessaging.instance().isLocalCachingEnabled()) {
+            // retain "user updated status" for next non-persistent to trigger ping request
+            isUpdated = isUserUpdated
         }
 
         // Broadcasting host app logged event to Analytics SDK.
