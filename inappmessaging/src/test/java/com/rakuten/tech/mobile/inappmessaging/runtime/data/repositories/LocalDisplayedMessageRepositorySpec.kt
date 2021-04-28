@@ -127,14 +127,60 @@ class LocalDisplayedMessageRepositorySpec : BaseTest() {
         LocalDisplayedMessageRepository.instance().numberOfTimesDisplayed(message) shouldBeEqualTo 1
     }
 
-    private fun initializeInstance(infoProvider: UserInfoProvider) {
+    @Test
+    fun `should return zero for times closed when not first launch`() {
+        initializeInstance(TestUserInfoProvider())
+        LocalDisplayedMessageRepository.isInitialLaunch = false
+        LocalDisplayedMessageRepository.instance().setRemovedMessage("1234")
+
+        LocalDisplayedMessageRepository.instance().numberOfTimesClosed("1234") shouldBeEqualTo 0
+    }
+
+    @Test
+    fun `should return correct number of times closed for removed when first launch`() {
+        initializeInstance(TestUserInfoProvider(), false)
+        LocalDisplayedMessageRepository.isInitialLaunch = true
+        LocalDisplayedMessageRepository.instance().setRemovedMessage("1234")
+
+        LocalDisplayedMessageRepository.instance().numberOfTimesClosed("1234") shouldBeEqualTo 1
+        // should not increment since no longer initial launch
+        LocalDisplayedMessageRepository.instance().numberOfTimesClosed("1234") shouldBeEqualTo 1
+
+        // should increment since initial launch
+        LocalDisplayedMessageRepository.isInitialLaunch = true
+        LocalDisplayedMessageRepository.instance().numberOfTimesClosed("1234") shouldBeEqualTo 2
+    }
+
+    @Test
+    fun `should return false for removed when first launch and no removed messages`() {
+        initializeInstance(TestUserInfoProvider(), false)
+        LocalDisplayedMessageRepository.isInitialLaunch = true
+        LocalDisplayedMessageRepository.instance().setRemovedMessage("")
+
+        LocalDisplayedMessageRepository.instance().numberOfTimesClosed("1234") shouldBeEqualTo 0
+
+        LocalDisplayedMessageRepository.instance().setRemovedMessage(null)
+
+        LocalDisplayedMessageRepository.instance().numberOfTimesClosed("1234") shouldBeEqualTo 0
+    }
+
+    @Test
+    fun `should return false not the same campaign id`() {
+        initializeInstance(TestUserInfoProvider(), false)
+        LocalDisplayedMessageRepository.isInitialLaunch = true
+        LocalDisplayedMessageRepository.instance().setRemovedMessage("1234")
+
+        LocalDisplayedMessageRepository.instance().numberOfTimesClosed("4321") shouldBeEqualTo 0
+    }
+
+    private fun initializeInstance(infoProvider: UserInfoProvider, isCache: Boolean = true) {
         WorkManagerTestInitHelper.initializeTestWorkManager(ApplicationProvider.getApplicationContext())
         Settings.Secure.putString(
                 ApplicationProvider.getApplicationContext<Context>().contentResolver,
                 Settings.Secure.ANDROID_ID,
                 "test_device_id")
         InAppMessaging.init(ApplicationProvider.getApplicationContext(), "test", "",
-                isDebugLogging = true, isForTesting = true, isCacheHandling = true)
+                isDebugLogging = true, isForTesting = true, isCacheHandling = isCache)
         InAppMessaging.instance().registerPreference(infoProvider)
     }
 }
