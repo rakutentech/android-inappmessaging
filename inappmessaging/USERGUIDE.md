@@ -29,7 +29,7 @@ You must have a subscription key for your application from IAM Dashboard.
 ```groovy
 allprojects {
     repositories {
-        mavenCentral()
+        maven { url 'will be provided directly' }
     }
 }
 ```
@@ -40,7 +40,7 @@ Note: InAppMessaging SDK only uses AndroidX libraries. Host apps should migrate 
 
 ```groovy
 dependencies {
-    implementation 'io.github.rakutentech.inappmessaging:inappmessaging:${latest_version}'
+    implementation 'io.github.rakutentech.inappmessaging:inappmessaging:4.0.0-PP'
 }
 ```
 Please refer to [Changelog](#changelog) section for the latest version.
@@ -312,12 +312,13 @@ Documents targeting Product Managers:
 
 ## <a name="changelog"></a> Changelog
 
-### 4.0.0-pp (in-progress)
+### 4.0.0-PP (2021-05-07)
 * SDKCF-3651: Changed Config API call to /GET with query params. This allows the backend to filter requests if required.
 * SDKCF-3653: Added handling for Config and Ping API calls for "429 too many requests" response. The SDK will start exponential backoff (plus a random factor) retries to space out the requests to the backend when code 429 is received.
 * SDKCF-3655: Handled opt-out and max impression tracking logic solely on SDK. This change reduces the backend's load per request.
 * SDKCF-3664: Added support on roll-out percentage for computing if In-App Messaging is enabled. This allows the backend to gradually increase campaign distribution.
 * SDKCF-3715: Included subscription key in Config API request header to enable better filtering of requests.
+* SDKCF-3742: Fixed opt-out wording in JP and EN for consistency with iOS.
 
 ### 3.0.0 (2021-03-24)
 * SDKCF-3450: Update Fresco dependency to v2.4.0 to fix SoLoader issue.
