@@ -30,7 +30,7 @@ You must have a subscription key for your application from IAM Dashboard.
 ```groovy
 allprojects {
     repositories {
-        mavenCentral()
+        maven { url 'will be provided directly' }
     }
 }
 ```
@@ -41,7 +41,7 @@ Note: InAppMessaging SDK only uses AndroidX libraries. Host apps should migrate 
 
 ```groovy
 dependencies {
-    implementation 'io.github.rakutentech.inappmessaging:inappmessaging:${latest_version}'
+    implementation 'io.github.rakutentech.inappmessaging:inappmessaging:4.0.0-PP'
 }
 ```
 Please refer to [Changelog](#changelog) section for the latest version.
