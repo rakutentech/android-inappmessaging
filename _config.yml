@@ -1,4 +1,9 @@
-markdown: kramdown
+markdown: CommonMarkGhPages
+
+commonmark:
+  options: ["SMART", "FOOTNOTES"]
+  extensions: ["strikethrough", "autolink", "table", "tagfilter"]
+
 plugins:
   - github-pages
 remote_theme: rakutentech/android-buildconfig@gh-pages-theme
