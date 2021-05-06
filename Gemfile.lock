@@ -244,6 +244,7 @@ PLATFORMS
 
 DEPENDENCIES
   github-pages (= 197)
+  jekyll-commonmark-ghpages
 
 BUNDLED WITH
    1.17.2
