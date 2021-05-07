@@ -45,18 +45,18 @@ dependencies {
 ```
 Please refer to [Changelog](#changelog) section for the latest version.
 
-### #3 Target and compile SDK version to 28 or above.
-Note: It is required to target and compile to SDK version 28 or above.
+### #3 Target and compile SDK version to 30 or above.
+Note: It is required to target and compile to SDK version 30 or above.
 
 ```groovy
 android {
-    compileSdkVersion 28
+    compileSdkVersion 30
 
     defaultConfig {
     // Defines the minimum API level required to run the app.
     minSdkVersion 21
     // Specifies the API level used to test the app.
-    targetSdkVersion 28
+    targetSdkVersion 30
     }
 }
 ```
