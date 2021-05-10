@@ -10,6 +10,7 @@ In-App Messaging (IAM) module allows app developers to easily configure and disp
 ### This page covers:
 * [Requirements](#requirements)
 * [SDK Integration](#integration)
+* [SDK Logic](#logic)
 * [Advanced Features](#advanced)
 * [Troubleshooting](#troubleshooting)
 * [FAQ](#faq)
@@ -199,6 +200,16 @@ InAppMessaging.instance().logEvent(CustomEvent("search").addAttribute("keyword",
 ```
 
 **<font color="red">Please note:</font> Logging events may trigger InAppMessaging SDK to update current session data if there were changes in the app's user information (see [UserInfoProvider](#info-provider) section for details).**
+
+## <a name="logic"></a> SDK Logic
+
+### Client-side opt-out handling
+
+If user (with valid identifiers in [`UserInfoProvider`](#info-provider) class) opts out from a campaign, that information is saved in user cache locally on the device and the campaign won't be shown again for that user on the same device. The opt-out status is not shared between devices. The same applies for anonymous user.
+
+### Client-side max impressions handling
+
+Campaign impressions (displays) are counted locally for each user. Meaning that a campaign with maxImpression value of 3 will be displayed to each user (different identifiers in [`UserInfoProvider`](#info-provider) class) max 3 times. Campaign's max impression number can be modified in the dashboard/backend. Then the SDK, after next ping call, will compare new value with old max impression number and add the difference to the current impression counter. The max impression data is not shared between devices. The same applies for anonymous user.
 
 ## <a name="advanced"></a> Advanced Features
 
