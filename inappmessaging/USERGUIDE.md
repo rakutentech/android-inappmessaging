@@ -46,18 +46,18 @@ dependencies {
 ```
 Please refer to [Changelog](#changelog) section for the latest version.
 
-### #3 Target and compile SDK version to 28 or above.
-Note: It is required to target and compile to SDK version 28 or above.
+### #3 Target and compile SDK version to 30 or above.
+Note: It is required to target and compile to SDK version 30 or above.
 
 ```groovy
 android {
-    compileSdkVersion 28
+    compileSdkVersion 30
 
     defaultConfig {
     // Defines the minimum API level required to run the app.
     minSdkVersion 21
     // Specifies the API level used to test the app.
-    targetSdkVersion 28
+    targetSdkVersion 30
     }
 }
 ```
@@ -250,16 +250,13 @@ InAppMessaging.instance().closeMessage(true)
 **<font color="red">Note:</font> Calling this API will not increment the campaign's impression (i.e not counted as displayed).**
 
 ## <a name="troubleshooting"></a> Troubleshooting
-<details>
-<summary>proguard.ParseException (click to expand)</summary>
-
-### `proguard.ParseException`
-
+### Proguard ParseException
 ```kotlin
 Caused by: java.io.IOException: proguard.ParseException: Unknown option '-if' in line 84 of file
 This error will be thrown during compilation if `minifyEnabled = true`, and your Proguard version is below 6.0.
 ```
-
+<details>
+<summary style="cursor: pointer;";>(click to expand)</summary>
 Recommendation: Update your project's Android Gradle Plugin to the latest version, it includes the latest version of Proguard.
 
 Less optimal solution: Force Gradle to use the latest version of Proguard(https://sourceforge.net/p/proguard/discussion/182455/thread/89a4d63d/):
@@ -277,8 +274,10 @@ buildscript {
 ```
 </details>
 
+### Duplicate class ManifestConfig
+Build Error: `java.lang.RuntimeException: Duplicate class com.rakuten.tech.mobile.manifestconfig.annotations.ManifestConfig`
 <details>
-<summary>Build Error: `java.lang.RuntimeException: Duplicate class com.rakuten.tech.mobile.manifestconfig.annotations.ManifestConfig`</summary>
+<summary style="cursor: pointer;";>(click to expand)</summary>
 
 This build error could occur if you are using older versions of other libraries from `com.rakuten.tech.mobile`.
 Some of the dependencies in this SDK have changed to a new Group ID of `io.github.rakutentech` (due to the [JCenter shutdown](https://jfrog.com/blog/into-the-sunset-bintray-jcenter-gocenter-and-chartcenter/)).
