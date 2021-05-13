@@ -90,6 +90,7 @@ internal class ConfigWorker(
             // Schedule a ping request to message mixer. Initial delay is 0
             // reset current delay to initial
             ConfigScheduler.currDelay = RetryDelayUtil.INITIAL_BACKOFF_DELAY
+            MessageMixerPingScheduler.currDelay = RetryDelayUtil.INITIAL_BACKOFF_DELAY
             messagePingScheduler.pingMessageMixerService(0)
             Timber.tag(TAG).d("Config Response: %d (%b)",
                     response.body()?.data?.rollOutPercentage, configRepo.isConfigEnabled())

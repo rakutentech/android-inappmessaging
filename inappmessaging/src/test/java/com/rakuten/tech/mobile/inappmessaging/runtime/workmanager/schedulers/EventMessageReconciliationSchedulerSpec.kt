@@ -68,7 +68,7 @@ class EventMessageReconciliationSchedulerSpec : BaseTest() {
         LocalEventRepository.instance().clearEvents()
         EventsManager.onEventReceived(PurchaseSuccessfulEvent(), eventScheduler = mockSched, accountRepo = mockAccount)
 
-        Mockito.verify(mockSched, Mockito.times(1)).startEventMessageReconciliationWorker()
+        Mockito.verify(mockSched).startEventMessageReconciliationWorker()
     }
 
     companion object {

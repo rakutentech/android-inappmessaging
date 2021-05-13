@@ -43,6 +43,6 @@ class ConfigSchedulerSpec : BaseTest() {
         InAppMessaging.init(ApplicationProvider.getApplicationContext(), "test", "",
                 isDebugLogging = false, isForTesting = true, configScheduler = mockConfigScheduler)
 
-        Mockito.verify(mockConfigScheduler, Mockito.times(1)).startConfig()
+        Mockito.verify(mockConfigScheduler).startConfig()
     }
 }

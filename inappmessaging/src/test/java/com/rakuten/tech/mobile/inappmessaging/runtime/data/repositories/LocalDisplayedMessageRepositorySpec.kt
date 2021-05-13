@@ -82,7 +82,7 @@ class LocalDisplayedMessageRepositorySpec : BaseTest() {
         When calling message.getCampaignId() itReturns "id"
         MessageActionsCoroutine(mockRepo).executeTask(message, R.id.message_close_button, true)
 
-        Mockito.verify(mockRepo, Mockito.times(1)).addMessage(message)
+        Mockito.verify(mockRepo).addMessage(message)
     }
 
     @Test

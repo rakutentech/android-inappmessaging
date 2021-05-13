@@ -286,8 +286,8 @@ class MessageEventReconciliationUtilReconcileSpec : MessageEventReconciliationUt
                 mockPingRepo, mockReconUtil)
         worker.doWork()
 
-        Mockito.verify(mockReconUtil, Mockito.times(1)).extractTestMessages(messageList)
-        Mockito.verify(mockReconUtil, Mockito.times(1)).reconcileMessagesAndEvents(messageList)
+        Mockito.verify(mockReconUtil).extractTestMessages(messageList)
+        Mockito.verify(mockReconUtil).reconcileMessagesAndEvents(messageList)
     }
 
     @Test

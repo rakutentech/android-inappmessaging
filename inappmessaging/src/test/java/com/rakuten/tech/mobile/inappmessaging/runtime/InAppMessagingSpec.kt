@@ -16,7 +16,9 @@ import com.rakuten.tech.mobile.inappmessaging.runtime.data.repositories.PingResp
 import com.rakuten.tech.mobile.inappmessaging.runtime.data.repositories.ReadyForDisplayMessageRepository
 import com.rakuten.tech.mobile.inappmessaging.runtime.data.responses.config.ConfigResponseData
 import com.rakuten.tech.mobile.inappmessaging.runtime.manager.DisplayManager
+import com.rakuten.tech.mobile.inappmessaging.runtime.manager.EventsManager
 import org.amshove.kluent.*
+import org.junit.After
 import org.junit.Test
 import org.junit.runner.RunWith
 import org.mockito.Mockito
@@ -32,8 +34,14 @@ class InAppMessagingSpec : BaseTest() {
     private val activity = Mockito.mock(Activity::class.java)
     private val configResponseData = Mockito.mock(ConfigResponseData::class.java)
     private val displayManager = Mockito.mock(DisplayManager::class.java)
+    private val eventsManager = Mockito.mock(EventsManager::class.java)
     private val viewGroup = Mockito.mock(ViewGroup::class.java)
     private val parentViewGroup = Mockito.mock(ViewGroup::class.java)
+
+    @After
+    fun tearDown() {
+        ConfigResponseRepository.resetInstance()
+    }
 
     @Test
     fun `should unregister activity not crash when no activity is registered`() {
@@ -53,9 +61,7 @@ class InAppMessagingSpec : BaseTest() {
         ConfigResponseRepository.instance().addConfigResponse(configResponseData)
 
         InAppMessaging.instance().registerMessageDisplayActivity(activity)
-        Mockito.verify(displayManager, Mockito.times(0)).displayMessage()
-
-        ConfigResponseRepository.resetInstance()
+        Mockito.verify(displayManager, never()).displayMessage()
     }
 
     @Test
@@ -90,14 +96,9 @@ class InAppMessagingSpec : BaseTest() {
 
     @Test
     fun `should display message using initialized instance`() {
-        When calling configResponseData.rollOutPercentage itReturns 100
-        ConfigResponseRepository.instance().addConfigResponse(configResponseData)
-
-        val inApp = InApp(ApplicationProvider.getApplicationContext(), false, displayManager)
+        val inApp = initializeMockInstance(100)
         inApp.registerMessageDisplayActivity(activity)
-        Mockito.verify(displayManager, Mockito.times(1)).displayMessage()
-
-        ConfigResponseRepository.resetInstance()
+        Mockito.verify(displayManager).displayMessage()
     }
 
     @Test
@@ -245,6 +246,38 @@ class InAppMessagingSpec : BaseTest() {
     }
 
     @Test
+    fun `should not call display message if config is false`() {
+        val instance = initializeMockInstance(0)
+
+        instance.registerMessageDisplayActivity(activity)
+        Mockito.verify(displayManager, never()).displayMessage()
+    }
+
+    @Test
+    fun `should not call remove message if config is false`() {
+        val instance = initializeMockInstance(0)
+
+        instance.unregisterMessageDisplayActivity()
+        Mockito.verify(displayManager, never()).removeMessage(any())
+    }
+
+    @Test
+    fun `should not log event if config is false`() {
+        val instance = initializeMockInstance(0)
+
+        instance.logEvent(AppStartEvent())
+        Mockito.verify(eventsManager, never()).onEventReceived(any(), any(), any(), any(), any())
+    }
+
+    @Test
+    fun `should log event if config is true`() {
+        val instance = initializeMockInstance(100)
+
+        instance.logEvent(AppStartEvent())
+        Mockito.verify(eventsManager).onEventReceived(any(), any(), any(), any(), any())
+    }
+
+    @Test
     fun `should enable caching`() {
         initializeInstance(true)
 
@@ -267,7 +300,17 @@ class InAppMessagingSpec : BaseTest() {
                 ApplicationProvider.getApplicationContext<Context>().contentResolver,
                 Settings.Secure.ANDROID_ID,
                 "test_device_id")
+        When calling configResponseData.rollOutPercentage itReturns 100
+        ConfigResponseRepository.instance().addConfigResponse(configResponseData)
         InAppMessaging.init(ApplicationProvider.getApplicationContext(), "test", "",
                 isDebugLogging = true, isForTesting = true, isCacheHandling = shouldEnableCaching)
+    }
+
+    private fun initializeMockInstance(rollout: Int): InAppMessaging {
+        When calling configResponseData.rollOutPercentage itReturns rollout
+        ConfigResponseRepository.instance().addConfigResponse(configResponseData)
+
+        return InApp(ApplicationProvider.getApplicationContext(), false, displayManager,
+                eventsManager = eventsManager)
     }
 }

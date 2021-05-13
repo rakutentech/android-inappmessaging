@@ -122,8 +122,7 @@ class DisplayMessageJobIntentServiceSpec : BaseTest() {
         When calling mockMessageManager.getNextDisplayMessage() itReturns message
         displayMessageJobIntentService!!.onHandleWork(intent!!)
 
-        Mockito.verify(onVerifyContexts, Mockito.times(1))
-                .invoke(listOf("ctx"), "Campaign Title")
+        Mockito.verify(onVerifyContexts).invoke(listOf("ctx"), "Campaign Title")
     }
 
     @Test
@@ -142,8 +141,7 @@ class DisplayMessageJobIntentServiceSpec : BaseTest() {
         When calling mockMessageManager.getNextDisplayMessage() itReturns message
         displayMessageJobIntentService!!.onHandleWork(intent!!)
 
-        Mockito.verify(onVerifyContexts, Mockito.times(0))
-                .invoke(any(), any())
+        Mockito.verify(onVerifyContexts, never()).invoke(any(), any())
     }
 
     @Test
@@ -162,8 +160,7 @@ class DisplayMessageJobIntentServiceSpec : BaseTest() {
         When calling mockMessageManager.getNextDisplayMessage() itReturns message
         displayMessageJobIntentService!!.onHandleWork(intent!!)
 
-        Mockito.verify(onVerifyContexts, Mockito.times(0))
-                .invoke(any(), any())
+        Mockito.verify(onVerifyContexts, never()).invoke(any(), any())
     }
 
     @SuppressWarnings("LongMethod")
@@ -248,7 +245,7 @@ class DisplayMessageJobIntentServiceSpec : BaseTest() {
         displayMessageJobIntentService!!.onHandleWork(intent!!)
 
         argumentCaptor<String>().apply {
-            Mockito.verify(mockReadyForDisplayRepo, Mockito.times(1)).removeMessage(capture(), eq(true))
+            Mockito.verify(mockReadyForDisplayRepo).removeMessage(capture(), eq(true))
             firstValue shouldBeEqualTo message.getCampaignId()
         }
     }
@@ -266,8 +263,7 @@ class DisplayMessageJobIntentServiceSpec : BaseTest() {
         When calling mockMessageManager.getNextDisplayMessage() itReturns message
         displayMessageJobIntentService!!.onHandleWork(intent!!)
 
-        Mockito.verify(activity, Mockito.times(1))
-                .findViewById<View?>(ArgumentMatchers.anyInt())
+        Mockito.verify(activity).findViewById<View?>(ArgumentMatchers.anyInt())
     }
 
     @Test
@@ -294,8 +290,7 @@ class DisplayMessageJobIntentServiceSpec : BaseTest() {
         When calling mockMessageManager.getNextDisplayMessage() itReturns null
         displayMessageJobIntentService!!.onHandleWork(intent!!)
 
-        Mockito.verify(activity, Mockito.times(0))
-                .findViewById<View?>(ArgumentMatchers.anyInt())
+        Mockito.verify(activity, never()).findViewById<View?>(ArgumentMatchers.anyInt())
     }
 
     companion object {

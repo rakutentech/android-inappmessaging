@@ -73,7 +73,7 @@ class InAppMessageViewListenerOnClickSpec : InAppMessageViewListenerSpec() {
         When calling mockCheckbox.isChecked itReturns true
         listener.onClick(mockCheckbox)
 
-        Mockito.verify(mockCheckbox, Mockito.times(1)).isChecked
+        Mockito.verify(mockCheckbox).isChecked
     }
 
     @Test
@@ -397,6 +397,6 @@ class InAppMessageViewListenerOnKeySpec : InAppMessageViewListenerSpec() {
 
         listener.onKey(mockView, KeyEvent.KEYCODE_BACK, keyEvent).shouldBeTrue()
 
-        Mockito.verify(mockDisplayManager, Mockito.times(1)).removeMessage(any())
+        Mockito.verify(mockDisplayManager).removeMessage(any())
     }
 }

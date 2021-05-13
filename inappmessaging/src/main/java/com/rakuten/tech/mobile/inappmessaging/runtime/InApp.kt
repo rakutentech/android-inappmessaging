@@ -24,7 +24,8 @@ internal class InApp(
     private val context: Context,
     isDebugLogging: Boolean,
     private val displayManager: DisplayManager = DisplayManager.instance(),
-    private var isCacheHandling: Boolean = BuildConfig.IS_CACHE_HANDLING
+    private var isCacheHandling: Boolean = BuildConfig.IS_CACHE_HANDLING,
+    private val eventsManager: EventsManager = EventsManager
 ) : InAppMessaging() {
 
     // Used for displaying or removing messages from screen.
@@ -60,19 +61,27 @@ internal class InApp(
 
     @Suppress("FunctionMaxLength")
     override fun unregisterMessageDisplayActivity() {
-        val id = displayManager.removeMessage(getRegisteredActivity())
-        LocalDisplayedMessageRepository.instance().setRemovedMessage(id as String?)
+        if (ConfigResponseRepository.instance().isConfigEnabled()) {
+            val id = displayManager.removeMessage(getRegisteredActivity())
+            LocalDisplayedMessageRepository.instance().setRemovedMessage(id as String?)
+        }
         activityWeakReference?.clear()
 
         Timber.tag(TAG)
         Timber.d("unregisterMessageDisplayActivity()")
     }
 
-    override fun logEvent(event: Event) = EventsManager.onEventReceived(event)
+    override fun logEvent(event: Event) {
+        if (ConfigResponseRepository.instance().isConfigEnabled()) {
+            eventsManager.onEventReceived(event)
+        }
+    }
 
     override fun updateSession() {
-        // Updates the current session to update all locally stored messages
-        SessionManager.onSessionUpdate()
+        if (ConfigResponseRepository.instance().isConfigEnabled()) {
+            // Updates the current session to update all locally stored messages
+            SessionManager.onSessionUpdate()
+        }
     }
 
     // ------------------------------------Library Internal APIs-------------------------------------
