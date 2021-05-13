@@ -20,6 +20,7 @@ internal object EventsManager {
      * This method adds logEvent on the events list.
      * Then starts session update and event worker to process that logEvent.
      */
+    @SuppressWarnings("onEventReceived")
     fun onEventReceived(
         event: Event,
         sendEvent: (String, Map<String, *>?) -> Unit = LegacyEventBroadcasterHelper::sendEvent,

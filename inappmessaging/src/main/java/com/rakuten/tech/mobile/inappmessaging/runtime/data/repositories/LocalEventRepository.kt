@@ -46,7 +46,9 @@ internal interface LocalEventRepository : EventRepository {
         private var user = ""
 
         init {
-            checkAndResetList(true)
+            synchronized(events) {
+                checkAndResetList(true)
+            }
         }
 
         /**

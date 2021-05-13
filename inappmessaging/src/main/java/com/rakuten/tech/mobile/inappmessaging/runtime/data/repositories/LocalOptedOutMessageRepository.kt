@@ -38,7 +38,9 @@ internal interface LocalOptedOutMessageRepository {
         private var user = ""
 
         init {
-            checkAndResetSet(true)
+            synchronized(optedOutMessages) {
+                checkAndResetSet(true)
+            }
         }
 
         override fun addMessage(message: Message) {

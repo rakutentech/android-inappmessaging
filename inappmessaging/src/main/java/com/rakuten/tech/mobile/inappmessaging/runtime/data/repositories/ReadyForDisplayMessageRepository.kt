@@ -25,7 +25,9 @@ internal abstract class ReadyForDisplayMessageRepository : ReadyMessageRepositor
         private var user = ""
 
         init {
-            checkAndResetList(true)
+            synchronized(messages) {
+                checkAndResetList(true)
+            }
         }
 
         @Throws(IllegalArgumentException::class)
@@ -40,8 +42,10 @@ internal abstract class ReadyForDisplayMessageRepository : ReadyMessageRepositor
         }
 
         override fun getAllMessagesCopy(): List<Message> {
-            checkAndResetList()
-            return ArrayList(messages)
+            synchronized(messages) {
+                checkAndResetList()
+                return ArrayList(messages)
+            }
         }
 
         override fun removeMessage(campaignId: String, shouldIncrementTimesClosed: Boolean) {
