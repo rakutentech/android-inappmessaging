@@ -7,6 +7,7 @@ import com.rakuten.tech.mobile.inappmessaging.runtime.data.models.messages.Messa
 import com.rakuten.tech.mobile.inappmessaging.runtime.utils.InAppMessagingConstants
 import timber.log.Timber
 import java.util.Calendar
+import java.util.concurrent.ConcurrentHashMap
 import kotlin.collections.ArrayList
 import kotlin.collections.HashMap
 import kotlin.collections.set
@@ -62,8 +63,8 @@ internal interface LocalDisplayedMessageRepository {
         // Displayed message campaign ID and a list of the epoch time in UTC this message was displayed.
         // Such as:
         // {5bf41c52-e4c0-4cb2-9183-df429e84d681, [1537309879557,1537309879557,1537309879557]}
-        private val messages = HashMap<String, List<Long>>()
-        private val removedMessages = HashMap<String, Int>()
+        private val messages = ConcurrentHashMap<String, List<Long>>()
+        private val removedMessages = ConcurrentHashMap<String, Int>()
         private var removedMessage = ""
         private var user = ""
 

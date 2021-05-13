@@ -10,6 +10,8 @@ import java.security.MessageDigest
  */
 internal abstract class AccountRepository {
     var userInfoProvider: UserInfoProvider? = null
+
+    @get:Synchronized @set:Synchronized
     internal var userInfoHash = ""
 
     /**

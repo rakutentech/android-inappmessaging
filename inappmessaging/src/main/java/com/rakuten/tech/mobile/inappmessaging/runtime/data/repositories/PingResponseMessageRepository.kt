@@ -6,6 +6,7 @@ import com.rakuten.tech.mobile.inappmessaging.runtime.data.models.messages.Messa
 import com.rakuten.tech.mobile.inappmessaging.runtime.data.responses.ping.CampaignData
 import com.rakuten.tech.mobile.inappmessaging.runtime.utils.InAppMessagingConstants
 import org.json.JSONObject
+import java.util.concurrent.ConcurrentHashMap
 
 /**
  * Contains all downloaded messages from Ping Message Mixer. Also exposed internal api which can get
@@ -27,8 +28,8 @@ internal abstract class PingResponseMessageRepository : MessageRepository {
     private class PingResponseMessageRepositoryImpl : PingResponseMessageRepository() {
         // LinkedHashMap can preserve the message insertion order.
         // Map - Key: Campaign ID, Value: Message object
-        private var messages: MutableMap<String, Message> = LinkedHashMap()
-        private var appLaunchList: MutableMap<String, Boolean> = LinkedHashMap()
+        private var messages: MutableMap<String, Message> = ConcurrentHashMap()
+        private var appLaunchList: MutableMap<String, Boolean> = ConcurrentHashMap()
         private var user = ""
 
         init {
