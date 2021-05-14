@@ -30,7 +30,7 @@ import kotlin.collections.ArrayList
  */
 @RunWith(RobolectricTestRunner::class)
 @Config(sdk = [Build.VERSION_CODES.O_MR1])
-@Ignore
+@Ignore("base class")
 open class MessageEventReconciliationUtilSpec : BaseTest() {
 
     val appStartEvent = AppStartEvent()
@@ -286,8 +286,8 @@ class MessageEventReconciliationUtilReconcileSpec : MessageEventReconciliationUt
                 mockPingRepo, mockReconUtil)
         worker.doWork()
 
-        Mockito.verify(mockReconUtil, Mockito.times(1)).extractTestMessages(messageList)
-        Mockito.verify(mockReconUtil, Mockito.times(1)).reconcileMessagesAndEvents(messageList)
+        Mockito.verify(mockReconUtil).extractTestMessages(messageList)
+        Mockito.verify(mockReconUtil).reconcileMessagesAndEvents(messageList)
     }
 
     @Test

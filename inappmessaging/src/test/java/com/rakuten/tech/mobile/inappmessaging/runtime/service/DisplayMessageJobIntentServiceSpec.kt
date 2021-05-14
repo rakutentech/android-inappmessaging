@@ -18,8 +18,10 @@ import com.nhaarman.mockitokotlin2.never
 import com.rakuten.tech.mobile.inappmessaging.runtime.BaseTest
 import com.rakuten.tech.mobile.inappmessaging.runtime.InAppMessaging
 import com.rakuten.tech.mobile.inappmessaging.runtime.data.models.messages.Message
+import com.rakuten.tech.mobile.inappmessaging.runtime.data.repositories.ConfigResponseRepository
 import com.rakuten.tech.mobile.inappmessaging.runtime.data.repositories.LocalDisplayedMessageRepository
 import com.rakuten.tech.mobile.inappmessaging.runtime.data.repositories.ReadyForDisplayMessageRepository
+import com.rakuten.tech.mobile.inappmessaging.runtime.data.responses.config.ConfigResponseData
 import com.rakuten.tech.mobile.inappmessaging.runtime.data.responses.ping.CampaignData
 import com.rakuten.tech.mobile.inappmessaging.runtime.data.responses.ping.MessagePayload
 import com.rakuten.tech.mobile.inappmessaging.runtime.manager.MessageReadinessManager
@@ -52,6 +54,7 @@ class DisplayMessageJobIntentServiceSpec : BaseTest() {
     private var mockLocalDisplayRepo = Mockito.mock(LocalDisplayedMessageRepository::class.java)
     private var mockReadyForDisplayRepo = Mockito.mock(ReadyForDisplayMessageRepository::class.java)
     private val onVerifyContexts = Mockito.mock(InAppMessaging.instance().onVerifyContext.javaClass)
+    private val configResponseData = Mockito.mock(ConfigResponseData::class.java)
 
     @Before
     fun setup() {
@@ -64,6 +67,9 @@ class DisplayMessageJobIntentServiceSpec : BaseTest() {
         WorkManagerTestInitHelper.initializeTestWorkManager(ApplicationProvider.getApplicationContext())
         When calling activity.layoutInflater itReturns LayoutInflater.from(ApplicationProvider.getApplicationContext())
 
+        When calling configResponseData.rollOutPercentage itReturns 100
+        ConfigResponseRepository.instance().addConfigResponse(configResponseData)
+
         Settings.Secure.putString(ApplicationProvider.getApplicationContext<Context>().contentResolver,
                 Settings.Secure.ANDROID_ID, "test_device_id")
         InAppMessaging.init(ApplicationProvider.getApplicationContext(), "test-key", "",
@@ -73,6 +79,7 @@ class DisplayMessageJobIntentServiceSpec : BaseTest() {
 
     @After
     fun tearDown() {
+        ConfigResponseRepository.resetInstance()
         serviceController!!.destroy()
         validateMockitoUsage()
     }
@@ -122,8 +129,7 @@ class DisplayMessageJobIntentServiceSpec : BaseTest() {
         When calling mockMessageManager.getNextDisplayMessage() itReturns message
         displayMessageJobIntentService!!.onHandleWork(intent!!)
 
-        Mockito.verify(onVerifyContexts, Mockito.times(1))
-                .invoke(listOf("ctx"), "Campaign Title")
+        Mockito.verify(onVerifyContexts).invoke(listOf("ctx"), "Campaign Title")
     }
 
     @Test
@@ -142,8 +148,7 @@ class DisplayMessageJobIntentServiceSpec : BaseTest() {
         When calling mockMessageManager.getNextDisplayMessage() itReturns message
         displayMessageJobIntentService!!.onHandleWork(intent!!)
 
-        Mockito.verify(onVerifyContexts, Mockito.times(0))
-                .invoke(any(), any())
+        Mockito.verify(onVerifyContexts, never()).invoke(any(), any())
     }
 
     @Test
@@ -162,8 +167,7 @@ class DisplayMessageJobIntentServiceSpec : BaseTest() {
         When calling mockMessageManager.getNextDisplayMessage() itReturns message
         displayMessageJobIntentService!!.onHandleWork(intent!!)
 
-        Mockito.verify(onVerifyContexts, Mockito.times(0))
-                .invoke(any(), any())
+        Mockito.verify(onVerifyContexts, never()).invoke(any(), any())
     }
 
     @SuppressWarnings("LongMethod")
@@ -248,7 +252,7 @@ class DisplayMessageJobIntentServiceSpec : BaseTest() {
         displayMessageJobIntentService!!.onHandleWork(intent!!)
 
         argumentCaptor<String>().apply {
-            Mockito.verify(mockReadyForDisplayRepo, Mockito.times(1)).removeMessage(capture(), eq(true))
+            Mockito.verify(mockReadyForDisplayRepo).removeMessage(capture(), eq(true))
             firstValue shouldBeEqualTo message.getCampaignId()
         }
     }
@@ -266,8 +270,7 @@ class DisplayMessageJobIntentServiceSpec : BaseTest() {
         When calling mockMessageManager.getNextDisplayMessage() itReturns message
         displayMessageJobIntentService!!.onHandleWork(intent!!)
 
-        Mockito.verify(activity, Mockito.times(1))
-                .findViewById<View?>(ArgumentMatchers.anyInt())
+        Mockito.verify(activity).findViewById<View?>(ArgumentMatchers.anyInt())
     }
 
     @Test
@@ -294,8 +297,7 @@ class DisplayMessageJobIntentServiceSpec : BaseTest() {
         When calling mockMessageManager.getNextDisplayMessage() itReturns null
         displayMessageJobIntentService!!.onHandleWork(intent!!)
 
-        Mockito.verify(activity, Mockito.times(0))
-                .findViewById<View?>(ArgumentMatchers.anyInt())
+        Mockito.verify(activity, never()).findViewById<View?>(ArgumentMatchers.anyInt())
     }
 
     companion object {

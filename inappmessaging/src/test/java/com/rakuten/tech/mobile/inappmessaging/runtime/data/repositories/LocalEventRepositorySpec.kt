@@ -60,7 +60,7 @@ class LocalEventRepositorySpec : BaseTest() {
 
         EventsManager.onEventReceived(mockEvent, localEventRepo = mockRepo, eventScheduler = mockSched)
 
-        Mockito.verify(mockRepo, Mockito.times(1)).addEvent(mockEvent)
+        Mockito.verify(mockRepo).addEvent(mockEvent)
     }
 
     @Test

@@ -95,7 +95,7 @@ class AccountRepositorySpec : BaseTest() {
         val worker = ImpressionWorker(context, workerParameters)
         worker.createReportImpressionCall("https://host/impression/", impressionRequest,
                 accountRepo = mockAcctRepo)
-        Mockito.verify(mockAcctRepo, Mockito.times(1)).getRaeToken()
+        Mockito.verify(mockAcctRepo).getRaeToken()
     }
 
     @Test
@@ -106,7 +106,7 @@ class AccountRepositorySpec : BaseTest() {
         When calling mockAcctRepo.getUserId() itReturns TestUserInfoProvider().provideUserId().toString()
         When calling mockAcctRepo.getRakutenId() itReturns ""
         RuntimeUtil.getUserIdentifiers(mockAcctRepo).shouldHaveSize(1)
-        Mockito.verify(mockAcctRepo, Mockito.times(1)).getUserId()
+        Mockito.verify(mockAcctRepo).getUserId()
     }
 
     @Test
@@ -117,7 +117,7 @@ class AccountRepositorySpec : BaseTest() {
         When calling mockAcctRepo.getUserId() itReturns ""
         When calling mockAcctRepo.getRakutenId() itReturns TestUserInfoProvider().provideRakutenId().toString()
         RuntimeUtil.getUserIdentifiers(mockAcctRepo).shouldHaveSize(1)
-        Mockito.verify(mockAcctRepo, Mockito.times(1)).getRakutenId()
+        Mockito.verify(mockAcctRepo).getRakutenId()
     }
 
     @Test
