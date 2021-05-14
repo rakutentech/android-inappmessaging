@@ -5,6 +5,7 @@ import androidx.annotation.VisibleForTesting
 import androidx.work.Worker
 import androidx.work.WorkerParameters
 import com.rakuten.tech.mobile.inappmessaging.runtime.BuildConfig
+import com.rakuten.tech.mobile.inappmessaging.runtime.InAppMessaging
 import com.rakuten.tech.mobile.inappmessaging.runtime.api.ConfigRetrofitService
 import com.rakuten.tech.mobile.inappmessaging.runtime.data.repositories.ConfigResponseRepository
 import com.rakuten.tech.mobile.inappmessaging.runtime.data.repositories.HostAppInfoRepository
@@ -90,10 +91,17 @@ internal class ConfigWorker(
             // Schedule a ping request to message mixer. Initial delay is 0
             // reset current delay to initial
             ConfigScheduler.currDelay = RetryDelayUtil.INITIAL_BACKOFF_DELAY
-            MessageMixerPingScheduler.currDelay = RetryDelayUtil.INITIAL_BACKOFF_DELAY
-            messagePingScheduler.pingMessageMixerService(0)
             Timber.tag(TAG).d("Config Response: %d (%b)",
                     response.body()?.data?.rollOutPercentage, configRepo.isConfigEnabled())
+            if (configRepo.isConfigEnabled()) {
+                // move temp data to persistent cache
+                InAppMessaging.instance().saveTempData()
+                MessageMixerPingScheduler.currDelay = RetryDelayUtil.INITIAL_BACKOFF_DELAY
+                messagePingScheduler.pingMessageMixerService(0)
+            } else {
+                // reset IAM instance which will clear temp data
+                InAppMessaging.setUninitializedInstance()
+            }
         } else return when {
             response.code() == RetryDelayUtil.RETRY_ERROR_CODE -> {
                 configScheduler.startConfig(ConfigScheduler.currDelay)
@@ -102,7 +110,11 @@ internal class ConfigWorker(
                 Result.success()
             }
             response.code() >= HttpURLConnection.HTTP_INTERNAL_ERROR -> Result.retry() // Retry if server has error.
-            else -> Result.failure()
+            else -> {
+                // clear temp data (ignore all temp data stored during config request)
+                InAppMessaging.setUninitializedInstance()
+                Result.failure()
+            }
         }
         return Result.success()
     }

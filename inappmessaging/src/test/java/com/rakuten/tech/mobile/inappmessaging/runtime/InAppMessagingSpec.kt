@@ -8,17 +8,17 @@ import androidx.test.core.app.ApplicationProvider
 import androidx.work.testing.WorkManagerTestInitHelper
 import com.nhaarman.mockitokotlin2.never
 import com.rakuten.tech.mobile.inappmessaging.runtime.data.models.appevents.AppStartEvent
+import com.rakuten.tech.mobile.inappmessaging.runtime.data.models.appevents.LoginSuccessfulEvent
+import com.rakuten.tech.mobile.inappmessaging.runtime.data.models.appevents.PurchaseSuccessfulEvent
 import com.rakuten.tech.mobile.inappmessaging.runtime.data.models.messages.Message
 import com.rakuten.tech.mobile.inappmessaging.runtime.data.models.messages.ValidTestMessage
-import com.rakuten.tech.mobile.inappmessaging.runtime.data.repositories.ConfigResponseRepository
-import com.rakuten.tech.mobile.inappmessaging.runtime.data.repositories.LocalDisplayedMessageRepository
-import com.rakuten.tech.mobile.inappmessaging.runtime.data.repositories.PingResponseMessageRepository
-import com.rakuten.tech.mobile.inappmessaging.runtime.data.repositories.ReadyForDisplayMessageRepository
+import com.rakuten.tech.mobile.inappmessaging.runtime.data.repositories.*
 import com.rakuten.tech.mobile.inappmessaging.runtime.data.responses.config.ConfigResponseData
 import com.rakuten.tech.mobile.inappmessaging.runtime.manager.DisplayManager
 import com.rakuten.tech.mobile.inappmessaging.runtime.manager.EventsManager
 import org.amshove.kluent.*
 import org.junit.After
+import org.junit.Before
 import org.junit.Test
 import org.junit.runner.RunWith
 import org.mockito.Mockito
@@ -37,6 +37,11 @@ class InAppMessagingSpec : BaseTest() {
     private val eventsManager = Mockito.mock(EventsManager::class.java)
     private val viewGroup = Mockito.mock(ViewGroup::class.java)
     private val parentViewGroup = Mockito.mock(ViewGroup::class.java)
+
+    @Before
+    fun setup() {
+        LocalEventRepository.instance().clearEvents()
+    }
 
     @After
     fun tearDown() {
@@ -72,6 +77,7 @@ class InAppMessagingSpec : BaseTest() {
         InAppMessaging.instance().closeMessage()
         InAppMessaging.instance().isLocalCachingEnabled().shouldBeFalse()
         InAppMessaging.instance().getEncryptedSharedPref().shouldBeNull()
+        InAppMessaging.instance().saveTempData()
     }
 
     @Test
@@ -266,7 +272,29 @@ class InAppMessagingSpec : BaseTest() {
         val instance = initializeMockInstance(0)
 
         instance.logEvent(AppStartEvent())
+        instance.logEvent(AppStartEvent())
+        instance.logEvent(PurchaseSuccessfulEvent())
+        instance.logEvent(LoginSuccessfulEvent())
         Mockito.verify(eventsManager, never()).onEventReceived(any(), any(), any(), any(), any())
+        LocalEventRepository.instance().getEvents().shouldHaveSize(0)
+        (instance as InApp).tempEventList.shouldHaveSize(4)
+    }
+
+    @Test
+    fun `should move temp data to repo`() {
+        val instance = initializeMockInstance(0)
+
+        instance.logEvent(AppStartEvent())
+        instance.logEvent(AppStartEvent())
+        instance.logEvent(PurchaseSuccessfulEvent())
+        instance.logEvent(LoginSuccessfulEvent())
+        Mockito.verify(eventsManager, never()).onEventReceived(any(), any(), any(), any(), any())
+        LocalEventRepository.instance().getEvents().shouldHaveSize(0)
+        (instance as InApp).tempEventList.shouldHaveSize(4)
+
+        instance.saveTempData()
+        LocalEventRepository.instance().getEvents().shouldHaveSize(3) // app start is only logged once
+        instance.tempEventList.shouldBeEmpty()
     }
 
     @Test

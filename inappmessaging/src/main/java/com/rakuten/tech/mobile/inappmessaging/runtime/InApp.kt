@@ -8,6 +8,7 @@ import com.rakuten.tech.mobile.inappmessaging.runtime.data.models.appevents.Even
 import com.rakuten.tech.mobile.inappmessaging.runtime.data.repositories.AccountRepository
 import com.rakuten.tech.mobile.inappmessaging.runtime.data.repositories.ConfigResponseRepository
 import com.rakuten.tech.mobile.inappmessaging.runtime.data.repositories.LocalDisplayedMessageRepository
+import com.rakuten.tech.mobile.inappmessaging.runtime.data.repositories.LocalEventRepository
 import com.rakuten.tech.mobile.inappmessaging.runtime.data.repositories.ReadyForDisplayMessageRepository
 import com.rakuten.tech.mobile.inappmessaging.runtime.manager.DisplayManager
 import com.rakuten.tech.mobile.inappmessaging.runtime.manager.EventsManager
@@ -30,6 +31,9 @@ internal class InApp(
 
     // Used for displaying or removing messages from screen.
     private var activityWeakReference: WeakReference<Activity>? = null
+
+    @VisibleForTesting
+    internal var tempEventList = ArrayList<Event>()
 
     init {
         if (isDebugLogging) {
@@ -74,6 +78,10 @@ internal class InApp(
     override fun logEvent(event: Event) {
         if (ConfigResponseRepository.instance().isConfigEnabled()) {
             eventsManager.onEventReceived(event)
+        } else {
+            synchronized(tempEventList) {
+                tempEventList.add(event)
+            }
         }
     }
 
@@ -81,6 +89,15 @@ internal class InApp(
         if (ConfigResponseRepository.instance().isConfigEnabled()) {
             // Updates the current session to update all locally stored messages
             SessionManager.onSessionUpdate()
+        }
+    }
+
+    override fun closeMessage(clearQueuedCampaigns: Boolean) {
+        if (ConfigResponseRepository.instance().isConfigEnabled()) {
+            CoroutineScope(Dispatchers.Main).launch {
+                // called inside main dispatcher to make sure that it is always called in UI thread
+                removeMessage(clearQueuedCampaigns)
+            }
         }
     }
 
@@ -96,10 +113,10 @@ internal class InApp(
     override fun getEncryptedSharedPref() = SharePreferencesUtil.createSharedPreference(context,
             SharePreferencesUtil.generateKey(context), AccountRepository.instance().userInfoHash)
 
-    override fun closeMessage(clearQueuedCampaigns: Boolean) {
-        CoroutineScope(Dispatchers.Main).launch {
-            // called inside main dispatcher to make sure that it is always called in UI thread
-            removeMessage(clearQueuedCampaigns)
+    override fun saveTempData() {
+        synchronized(tempEventList) {
+            tempEventList.forEach { LocalEventRepository.instance().addEvent(it) }
+            tempEventList.clear()
         }
     }
 

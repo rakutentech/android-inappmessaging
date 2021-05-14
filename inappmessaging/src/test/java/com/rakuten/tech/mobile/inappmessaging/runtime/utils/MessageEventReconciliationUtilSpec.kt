@@ -30,7 +30,7 @@ import kotlin.collections.ArrayList
  */
 @RunWith(RobolectricTestRunner::class)
 @Config(sdk = [Build.VERSION_CODES.O_MR1])
-@Ignore
+@Ignore("base class")
 open class MessageEventReconciliationUtilSpec : BaseTest() {
 
     val appStartEvent = AppStartEvent()
