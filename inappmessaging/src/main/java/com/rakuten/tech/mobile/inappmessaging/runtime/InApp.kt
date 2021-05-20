@@ -114,6 +114,7 @@ internal class InApp(
             SharePreferencesUtil.generateKey(context), AccountRepository.instance().userInfoHash)
 
     override fun saveTempData() {
+        AccountRepository.instance().updateUserInfo()
         synchronized(tempEventList) {
             tempEventList.forEach { LocalEventRepository.instance().addEvent(it) }
             tempEventList.clear()
