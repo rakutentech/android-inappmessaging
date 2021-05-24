@@ -323,7 +323,7 @@ Documents targeting Product Managers:
 
 ## <a name="changelog"></a> Changelog
 
-### 4.1.0-PP (in-progress)
+### 4.1.0-PP (2021-05-25)
 * SDKCF-3793: Added handling for concurrent access to persistent cache by having data synchronization.
 * SDKCF-3794: Fixed crash issue due to missing proguard configuration for events.
 * SDKCF-3820: Added disabling of SDK features when response received from backend is disabled config.
