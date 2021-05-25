@@ -323,12 +323,10 @@ Documents targeting Product Managers:
 
 ## <a name="changelog"></a> Changelog
 
-### 4.1.0-PP (2021-05-25)
+### 4.0.0 (in-progress)
 * SDKCF-3793: Added handling for concurrent access to persistent cache by having data synchronization.
 * SDKCF-3794: Fixed crash issue due to missing proguard configuration for events.
 * SDKCF-3820: Added disabling of SDK features when response received from backend is disabled config.
-
-### 4.0.0-PP (2021-05-07)
 * SDKCF-3651: Changed Config API call to /GET with query params. This allows the backend to filter requests if required.
 * SDKCF-3653: Added handling for Config and Ping API calls for "429 too many requests" response. The SDK will start exponential backoff (plus a random factor) retries to space out the requests to the backend when code 429 is received.
 * SDKCF-3655: Handled opt-out and max impression tracking logic solely on SDK. This change reduces the backend's load per request.
