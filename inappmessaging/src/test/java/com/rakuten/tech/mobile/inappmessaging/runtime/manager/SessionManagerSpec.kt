@@ -1,7 +1,6 @@
 package com.rakuten.tech.mobile.inappmessaging.runtime.manager
 
 import android.content.Context
-import android.os.Build
 import android.provider.Settings
 import androidx.test.core.app.ApplicationProvider
 import androidx.work.WorkManager
@@ -22,14 +21,12 @@ import org.junit.Test
 import org.junit.runner.RunWith
 import org.mockito.Mockito
 import org.robolectric.RobolectricTestRunner
-import org.robolectric.annotation.Config
 import java.util.concurrent.ExecutionException
 
 /**
  * Test class for SessionManager.
  */
 @RunWith(RobolectricTestRunner::class)
-@Config(sdk = [Build.VERSION_CODES.O_MR1])
 class SessionManagerSpec : BaseTest() {
 
     private var configResponseData = Mockito.mock(ConfigResponseData::class.java)
@@ -51,7 +48,7 @@ class SessionManagerSpec : BaseTest() {
                 "test_device_id")
         InAppMessaging.init(ApplicationProvider.getApplicationContext(), "test", "",
                 isDebugLogging = true, isForTesting = true)
-        When calling configResponseData.enabled itReturns true
+        When calling configResponseData.rollOutPercentage itReturns 100
         When calling configResponseData.endpoints itReturns endpoints
         ConfigResponseRepository.instance().addConfigResponse(configResponseData)
         onSessionUpdate()
@@ -68,7 +65,7 @@ class SessionManagerSpec : BaseTest() {
                 "test_device_id")
         InAppMessaging.init(ApplicationProvider.getApplicationContext(), "test", "",
                 isDebugLogging = true, isForTesting = true)
-        When calling configResponseData.enabled itReturns false
+        When calling configResponseData.rollOutPercentage itReturns 0
 
         addTestData()
         ConfigResponseRepository.instance().addConfigResponse(configResponseData)
@@ -86,7 +83,7 @@ class SessionManagerSpec : BaseTest() {
                 "test_device_id")
         InAppMessaging.init(ApplicationProvider.getApplicationContext(), "test", "",
                 isDebugLogging = true, isForTesting = true)
-        When calling configResponseData.enabled itReturns false
+        When calling configResponseData.rollOutPercentage itReturns 0
 
         addTestData()
         ConfigResponseRepository.instance().addConfigResponse(configResponseData)
@@ -104,7 +101,7 @@ class SessionManagerSpec : BaseTest() {
                 "test_device_id")
         InAppMessaging.init(ApplicationProvider.getApplicationContext(), "test", "",
                 isDebugLogging = true, isForTesting = true)
-        When calling configResponseData.enabled itReturns false
+        When calling configResponseData.rollOutPercentage itReturns 0
 
         addTestData()
         ConfigResponseRepository.instance().addConfigResponse(configResponseData)

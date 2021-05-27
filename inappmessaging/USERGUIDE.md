@@ -10,6 +10,7 @@ In-App Messaging (IAM) module allows app developers to easily configure and disp
 ### This page covers:
 * [Requirements](#requirements)
 * [SDK Integration](#integration)
+* [SDK Logic](#logic)
 * [Advanced Features](#advanced)
 * [Troubleshooting](#troubleshooting)
 * [FAQ](#faq)
@@ -200,6 +201,16 @@ InAppMessaging.instance().logEvent(CustomEvent("search").addAttribute("keyword",
 
 **<font color="red">Please note:</font> Logging events may trigger InAppMessaging SDK to update current session data if there were changes in the app's user information (see [UserInfoProvider](#info-provider) section for details).**
 
+## <a name="logic"></a> SDK Logic
+
+### Client-side opt-out handling
+
+If user (with valid identifiers in [`UserInfoProvider`](#info-provider) class) opts out from a campaign, that information is saved in user cache locally on the device and the campaign won't be shown again for that user on the same device. The opt-out status is not shared between devices. The same applies for anonymous user.
+
+### Client-side max impressions handling
+
+Campaign impressions (displays) are counted locally for each user. Meaning that a campaign with maxImpression value of 3 will be displayed to each user (different identifiers in [`UserInfoProvider`](#info-provider) class) max 3 times. Campaign's max impression number can be modified in the dashboard/backend. Then the SDK, after next ping call, will compare new value with old max impression number and add the difference to the current impression counter. The max impression data is not shared between devices. The same applies for anonymous user.
+
 ## <a name="advanced"></a> Advanced Features
 
 ### <a name="context"></a> #1 Campaign's context
@@ -310,6 +321,17 @@ Documents targeting Product Managers:
 + In-App Messaging Dashboard Sign Up(page is coming soon.)
 
 ## <a name="changelog"></a> Changelog
+
+### 4.0.0 (in-progress)
+* SDKCF-3793: Added handling for concurrent access to persistent cache by having data synchronization.
+* SDKCF-3794: Fixed crash issue due to missing proguard configuration for events.
+* SDKCF-3820: Added disabling of SDK features when response received from backend is disabled config.
+* SDKCF-3651: Changed Config API call to /GET with query params. This allows the backend to filter requests if required.
+* SDKCF-3653: Added handling for Config and Ping API calls for "429 too many requests" response. The SDK will start exponential backoff (plus a random factor) retries to space out the requests to the backend when code 429 is received.
+* SDKCF-3655: Handled opt-out and max impression tracking logic solely on SDK. This change reduces the backend's load per request.
+* SDKCF-3664: Added support on roll-out percentage for computing if In-App Messaging is enabled. This allows the backend to gradually increase campaign distribution.
+* SDKCF-3715: Included subscription key in Config API request header to enable better filtering of requests.
+* SDKCF-3742: Fixed opt-out wording in JP and EN for consistency with iOS.
 
 ### 3.0.0 (2021-03-24)
 * SDKCF-3450: Update Fresco dependency to v2.4.0 to fix SoLoader issue.

@@ -2,9 +2,11 @@ package com.rakuten.tech.mobile.inappmessaging.runtime
 
 import android.app.Activity
 import android.content.Context
+import android.content.SharedPreferences
 import androidx.annotation.RestrictTo
-import androidx.annotation.VisibleForTesting
 import com.rakuten.tech.mobile.inappmessaging.runtime.data.models.appevents.Event
+import com.rakuten.tech.mobile.inappmessaging.runtime.data.repositories.LocalDisplayedMessageRepository
+import com.rakuten.tech.mobile.inappmessaging.runtime.data.repositories.PingResponseMessageRepository
 import com.rakuten.tech.mobile.inappmessaging.runtime.exception.InAppMessagingInitializationException
 import com.rakuten.tech.mobile.inappmessaging.runtime.utils.Initializer
 import com.rakuten.tech.mobile.inappmessaging.runtime.workmanager.schedulers.ConfigScheduler
@@ -15,7 +17,7 @@ import org.jetbrains.annotations.Nullable
  * Main entry point for the IAM SDK.
  * Should be accessed via [InAppMessaging.instance].
  */
-@Suppress("UnnecessaryAbstractClass")
+@Suppress("UnnecessaryAbstractClass", "TooManyFunctions")
 abstract class InAppMessaging internal constructor() {
     /**
      * This callback is called just before showing a message of campaign that has registered contexts.
@@ -75,6 +77,24 @@ abstract class InAppMessaging internal constructor() {
     internal abstract fun getHostAppContext(): Context?
 
     /**
+     * This method returns flag if local caching feature is enabled.
+     */
+    @RestrictTo(RestrictTo.Scope.LIBRARY)
+    internal abstract fun isLocalCachingEnabled(): Boolean
+
+    /**
+     * This method returns the encrypted shared preference.
+     */
+    @RestrictTo(RestrictTo.Scope.LIBRARY)
+    internal abstract fun getEncryptedSharedPref(): SharedPreferences?
+
+    /**
+     * This method moves temp data to persistent cache.
+     */
+    @RestrictTo(RestrictTo.Scope.LIBRARY)
+    internal abstract fun saveTempData()
+
+    /**
      * Close the currently displayed message.
      * This should be called when app needs to force-close the displayed message without user action.
      * Calling this method will not increment the campaign impression.
@@ -107,21 +127,26 @@ abstract class InAppMessaging internal constructor() {
             configUrl: String?,
             isDebugLogging: Boolean = false,
             isForTesting: Boolean = false,
+            isCacheHandling: Boolean = false,
             configScheduler: ConfigScheduler = ConfigScheduler.instance()
         ) {
-            instance = InApp(context, isDebugLogging)
+            instance = InApp(context, isDebugLogging, isCacheHandling = isCacheHandling)
             // Initializing SDK using background worker thread.
             Initializer.initializeSdk(context, subscriptionKey, configUrl, isForTesting)
+
+            // inform ping response repository that it is initial launch to display app launch campaign at least once
+            PingResponseMessageRepository.isInitialLaunch = true
+            LocalDisplayedMessageRepository.isInitialLaunch = true
+
             configScheduler.startConfig()
         }
 
-        @VisibleForTesting
         internal fun setUninitializedInstance() {
             instance = NotInitializedInAppMessaging()
         }
     }
 
-    @Suppress("EmptyFunctionBlock")
+    @Suppress("EmptyFunctionBlock", "TooManyFunctions")
     internal class NotInitializedInAppMessaging : InAppMessaging() {
         override var onVerifyContext: (contexts: List<String>, campaignTitle: String) -> Boolean = { _, _ -> true }
 
@@ -140,6 +165,12 @@ abstract class InAppMessaging internal constructor() {
 
         override fun getHostAppContext(): Context? = null
 
+        override fun isLocalCachingEnabled() = false
+
+        override fun getEncryptedSharedPref(): SharedPreferences? = null
+
         override fun closeMessage(clearQueuedCampaigns: Boolean) {}
+
+        override fun saveTempData() {}
     }
 }

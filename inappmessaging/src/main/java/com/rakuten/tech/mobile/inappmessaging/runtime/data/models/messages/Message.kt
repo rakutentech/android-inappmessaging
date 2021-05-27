@@ -7,6 +7,7 @@ import com.rakuten.tech.mobile.inappmessaging.runtime.data.responses.ping.Trigge
  * Interface for an InApp campaign message.
  * All in-app messages must implement this interface.
  */
+@SuppressWarnings("ComplexInterface")
 internal interface Message {
     /**
      * This method returns the message type.
@@ -37,6 +38,11 @@ internal interface Message {
      * This method returns max impressions.
      */
     fun getMaxImpressions(): Int?
+
+    /**
+     * This method sets max impressions.
+     */
+    fun setMaxImpression(maxImpression: Int)
 
     fun getContexts(): List<String>
 

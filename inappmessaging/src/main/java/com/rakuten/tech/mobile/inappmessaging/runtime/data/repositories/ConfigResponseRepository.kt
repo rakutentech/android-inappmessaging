@@ -2,6 +2,7 @@ package com.rakuten.tech.mobile.inappmessaging.runtime.data.repositories
 
 import androidx.annotation.VisibleForTesting
 import com.rakuten.tech.mobile.inappmessaging.runtime.data.responses.config.ConfigResponseData
+import kotlin.random.Random
 
 /**
  * Container for the response data from config service.
@@ -36,6 +37,8 @@ internal interface ConfigResponseRepository {
 
     companion object {
         private var instance: ConfigResponseRepository = ConfigResponseRepositoryImpl()
+        @VisibleForTesting
+        internal var randomizer: Random = Random
 
         fun instance(): ConfigResponseRepository = instance
 
@@ -44,20 +47,29 @@ internal interface ConfigResponseRepository {
          */
         @VisibleForTesting
         fun resetInstance() {
+            randomizer = Random
             this.instance = ConfigResponseRepositoryImpl()
         }
     }
 
     private class ConfigResponseRepositoryImpl : ConfigResponseRepository {
         private var configResponseData: ConfigResponseData? = null
+        private var isEnabled = false
 
         @Throws(IllegalArgumentException::class)
+        @SuppressWarnings("MagicNumber")
         override fun addConfigResponse(data: ConfigResponseData?) {
             requireNotNull(data)
             configResponseData = data
+            val rollOut = configResponseData?.rollOutPercentage ?: 0
+            isEnabled = if (rollOut > 0) {
+                randomizer.nextInt(1, 101) <= rollOut
+            } else {
+                false
+            }
         }
 
-        override fun isConfigEnabled(): Boolean = configResponseData != null && configResponseData!!.enabled
+        override fun isConfigEnabled(): Boolean = isEnabled
 
         override fun getPingEndpoint(): String =
                 if (configResponseData != null) {

@@ -10,6 +10,8 @@ import java.security.MessageDigest
  */
 internal abstract class AccountRepository {
     var userInfoProvider: UserInfoProvider? = null
+
+    @get:Synchronized @set:Synchronized
     internal var userInfoHash = ""
 
     /**
@@ -62,7 +64,7 @@ internal abstract class AccountRepository {
                 } else userInfoProvider!!.provideRakutenId().toString()
 
         override fun updateUserInfo(): Boolean {
-            val curr = hash(getUserId() + getRaeToken() + getRakutenId())
+            val curr = hash(getUserId() + getRakutenId())
 
             if (userInfoHash != curr) {
                 userInfoHash = curr

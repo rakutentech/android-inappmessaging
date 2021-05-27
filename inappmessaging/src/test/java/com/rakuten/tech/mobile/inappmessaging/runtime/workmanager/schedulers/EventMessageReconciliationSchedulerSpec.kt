@@ -61,14 +61,14 @@ class EventMessageReconciliationSchedulerSpec : BaseTest() {
         val configResponseData = Mockito.mock(ConfigResponseData::class.java)
         val mockAccount = Mockito.mock(AccountRepository::class.java)
 
-        When calling configResponseData.enabled itReturns true
+        When calling configResponseData.rollOutPercentage itReturns 100
         When calling mockAccount.updateUserInfo() itReturns false
 
         ConfigResponseRepository.instance().addConfigResponse(configResponseData)
         LocalEventRepository.instance().clearEvents()
         EventsManager.onEventReceived(PurchaseSuccessfulEvent(), eventScheduler = mockSched, accountRepo = mockAccount)
 
-        Mockito.verify(mockSched, Mockito.times(1)).startEventMessageReconciliationWorker()
+        Mockito.verify(mockSched).startEventMessageReconciliationWorker()
     }
 
     companion object {

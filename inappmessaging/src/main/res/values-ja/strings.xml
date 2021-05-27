@@ -2,5 +2,5 @@
 <resources>
   <string name="in_app_message_image">クローズボタン</string>
   <string name="close_button">アプリ内メッセージングのイメージ</string>
-  <string name="message_opt_out_text">次回からこのメッセージを表示しない。</string>
+  <string name="message_opt_out_text">次回から表示しない</string>
 </resources>

@@ -18,7 +18,7 @@ class MessageMixerPingSchedulerSpec : BaseTest() {
     @Test
     fun `should not throw exception`() {
         ConfigResponseRepository.instance().addConfigResponse(configResponseData)
-        When calling configResponseData.enabled itReturns false
+        When calling configResponseData.rollOutPercentage itReturns 0
         MessageMixerPingScheduler.instance().pingMessageMixerService(10L)
     }
 }

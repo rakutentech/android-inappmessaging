@@ -8,6 +8,7 @@ import com.rakuten.tech.mobile.inappmessaging.runtime.data.models.appevents.Even
 import com.rakuten.tech.mobile.inappmessaging.runtime.data.models.messages.Message
 import com.rakuten.tech.mobile.inappmessaging.runtime.data.repositories.LocalDisplayedMessageRepository
 import com.rakuten.tech.mobile.inappmessaging.runtime.data.repositories.LocalEventRepository
+import com.rakuten.tech.mobile.inappmessaging.runtime.data.repositories.PingResponseMessageRepository
 import com.rakuten.tech.mobile.inappmessaging.runtime.data.responses.ping.Trigger
 import com.rakuten.tech.mobile.inappmessaging.runtime.data.responses.ping.TriggerAttribute
 import timber.log.Timber
@@ -114,8 +115,10 @@ internal interface MessageEventReconciliationUtil {
                         // Add this event to eventsToBeRemoved list because it can't be used again
                         // to satisfy any more triggers.
                         if (event.isPersistentType()) {
-                            if (triggerList.size > 1) {
-                                // If campaign depends on other events other than a persistent type (i.e. App Launch),
+                            if (triggerList.size > 1 || PingResponseMessageRepository.instance()
+                                            .shouldDisplayAppLaunchCampaign(message.getCampaignId()!!)) {
+                                // If campaign depends on other events other than a persistent type (i.e. App Launch)
+                                // or should at least be displayed once,
                                 // no need to check the required number for satisfied triggers
                                 continue@triggers
                             }
@@ -258,12 +261,14 @@ internal interface MessageEventReconciliationUtil {
         private fun getNumTimesToSatisfyTriggersForDisplay(message: Message): Int {
             val maxImpression = message.getMaxImpressions()
             val displayedImpression: Int = LocalDisplayedMessageRepository.instance().numberOfTimesDisplayed(message)
+            val incrementRemoved = LocalDisplayedMessageRepository.instance()
+                    .numberOfTimesClosed(message.getCampaignId()!!)
 
             // Only check for message has been displayed less than its max impressions.
             // The number of times the message was removed from ready for display repository is considered since local
             // event list was not cleared and the triggers should  all be satisfied again.
             return if (maxImpression != null && displayedImpression < maxImpression) {
-                displayedImpression + 1 + message.getNumberOfTimesClosed()
+                displayedImpression + 1 + message.getNumberOfTimesClosed() + incrementRemoved
             } else 0
         }
 

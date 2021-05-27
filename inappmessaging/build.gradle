@@ -12,8 +12,9 @@ android {
   defaultConfig {
     versionName version
     consumerProguardFiles 'proguard-rules.pro'
-    manifestPlaceholders.config_url = CONFIG.property("CONFIG_URL") ?: ""
-    manifestPlaceholders.test_sub_key = CONFIG.property("IAM_TEST_SUBSCRIPTION_KEY") ?: "test_sub_key"
+    manifestPlaceholders.config_url = CONFIG.property("CONFIG_URL_DEV") ?: ""
+    manifestPlaceholders.test_sub_key = CONFIG.property("IAM_DEV_SUBSCRIPTION_KEY") ?: "test_sub_key"
+    buildConfigField("boolean", "IS_CACHE_HANDLING", "true")
   }
 
   sourceSets.each {
@@ -64,6 +65,7 @@ dependencies {
   implementation 'com.squareup.retrofit2:converter-gson:2.5.0'
   implementation 'com.squareup.retrofit2:retrofit:2.8.1'
   implementation 'androidx.localbroadcastmanager:localbroadcastmanager:1.0.0'
+  implementation 'com.google.code.gson:gson:2.8.6'
   kapt "io.github.rakutentech.manifestconfig:manifest-config-processor:0.2.0"
   implementation "io.github.rakutentech.manifestconfig:manifest-config-annotations:0.2.0"
 
@@ -137,4 +139,9 @@ dokka {
       path = "inappmessaging/src/main"
     }
   }
+}
+
+apply from: "../config/quality/jacoco/android.gradle"
+jacoco {
+  toolVersion = "0.8.3"
 }

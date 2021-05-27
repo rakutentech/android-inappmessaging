@@ -30,4 +30,9 @@ internal interface MessageRepository {
      * for all the messages in the [messageList].
      */
     fun incrementTimesClosed(messageList: List<Message>)
+
+    /**
+     * Checks if campaign with only App Launch event should still be displayed.
+     */
+    fun shouldDisplayAppLaunchCampaign(id: String): Boolean
 }
