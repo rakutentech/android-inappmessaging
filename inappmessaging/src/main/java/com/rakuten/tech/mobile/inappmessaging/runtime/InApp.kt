@@ -110,8 +110,8 @@ internal class InApp(
 
     override fun isLocalCachingEnabled() = isCacheHandling
 
-    override fun getEncryptedSharedPref() = SharePreferencesUtil.createSharedPreference(context,
-            SharePreferencesUtil.generateKey(context), AccountRepository.instance().userInfoHash)
+    override fun getSharedPref() = SharePreferencesUtil.createSharedPreference(context,
+            AccountRepository.instance().userInfoHash)
 
     override fun saveTempData() {
         AccountRepository.instance().updateUserInfo()
