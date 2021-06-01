@@ -322,6 +322,9 @@ Documents targeting Product Managers:
 
 ## <a name="changelog"></a> Changelog
 
+### 4.1.1-PP (in-progress)
+* SDKCF-3781: Fixed crash due to failing master key generation by trying to creating 1 more time, and using normal shared preferences as fallback if creation failed again.
+
 ### 4.1.0-PP (2021-05-25)
 * SDKCF-3793: Added handling for concurrent access to persistent cache by having data synchronization.
 * SDKCF-3794: Fixed crash issue due to missing proguard configuration for events.
