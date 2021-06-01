@@ -79,12 +79,12 @@ internal object Initializer {
     @Suppress("LongParameterList")
     @Throws(InAppMessagingInitializationException::class)
     fun initializeSdk(
-            context: Context,
-            subscriptionKey: String?,
-            configUrl: String?,
-            isForTesting: Boolean = false,
-            sharedUtil: SharedPreferencesUtil = SharedPreferencesUtil,
-            masterKey: MasterKey? = null
+        context: Context,
+        subscriptionKey: String?,
+        configUrl: String?,
+        isForTesting: Boolean = false,
+        sharedUtil: SharedPreferencesUtil = SharedPreferencesUtil,
+        masterKey: MasterKey? = null
     ) {
         val hostAppInfo = HostAppInfo(getHostAppPackageName(context), getDeviceId(context, sharedUtil, masterKey),
                 getHostAppVersion(context), subscriptionKey, getLocale(context), configUrl)
