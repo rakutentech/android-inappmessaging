@@ -323,7 +323,7 @@ Documents targeting Product Managers:
 ## <a name="changelog"></a> Changelog
 
 ### 4.1.1-PP (in-progress)
-* SDKCF-3781: Fixed crash due to failing master key generation for encrypted shared preferences.
+* SDKCF-3781: Fixed crash due to failing master key generation for encrypted shared preferences. The root cause of the crash is suspected to be these Android platform issues [#147480931](https://issuetracker.google.com/issues/147480931) and [#176215143](https://issuetracker.google.com/issues/176215143). To prevent the crash the following workaround is implemented:
   - The SDK will try to create a master key again after the first failed attempt, and will fallback to normal shared preferences if the key generation still fails.
 
 ### 4.1.0-PP (2021-05-25)
