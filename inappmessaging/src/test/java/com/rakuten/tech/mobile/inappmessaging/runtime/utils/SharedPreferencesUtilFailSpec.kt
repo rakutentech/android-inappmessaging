@@ -16,13 +16,8 @@ import java.io.File
 import java.lang.NullPointerException
 
 @RunWith(RobolectricTestRunner::class)
-class SharedPreferencesUtilSpec : BaseTest() {
-    companion object {
-        private const val ACCOUNT = "test"
-        private const val PREFS = "internal_shared_prefs"
-        private const val ACCOUNT_PREFS = "internal_shared_prefs_$ACCOUNT"
-        private const val IS_ENCRYPTED_KEY = "prefs_key_encrypted"
-    }
+class SharedPreferencesUtilFailSpec : BaseTest() {
+
     private val mockMasterKey = Mockito.mock(MasterKey::class.java)
     private val context = ApplicationProvider.getApplicationContext<Context>()
     private val mockContext = Mockito.mock(Context::class.java)
@@ -38,7 +33,7 @@ class SharedPreferencesUtilSpec : BaseTest() {
     }
 
     @Test
-    fun `should set encrypted flag in pref to false`() {
+    fun `should set encrypted flag in pref to false when master key creation failed`() {
         val file = Mockito.mock(File::class.java)
         When calling mockContext.filesDir itReturns file
         When calling file.parent itReturns "samplePath"
@@ -48,7 +43,7 @@ class SharedPreferencesUtilSpec : BaseTest() {
     }
 
     @Test
-    fun `should set encrypted flag in pref to false with failed removing of master`() {
+    fun `should set encrypted flag in pref to false when removing of master key failed`() {
         val mockTimber = Mockito.mock(Timber.Tree::class.java)
         SharedPreferencesUtil.createSharedPreference(mockContext, ACCOUNT, mockMasterKey, timber = mockTimber)
         prefs.contains(IS_ENCRYPTED_KEY).shouldBeTrue()
@@ -57,12 +52,19 @@ class SharedPreferencesUtilSpec : BaseTest() {
     }
 
     @Test
-    fun `should use normal shared pref is encrypted flag is false`() {
+    fun `should use normal shared pref if encrypted flag is false`() {
         prefs.edit().putBoolean(IS_ENCRYPTED_KEY, false).apply()
         accountPrefs.edit().putString("KEY_TEST", "normal_pref").apply()
 
         val createdPref = SharedPreferencesUtil.createSharedPreference(context, ACCOUNT, mockMasterKey)
         createdPref.contains("KEY_TEST").shouldBeTrue()
         createdPref.getString("KEY_TEST", "") shouldBeEqualTo "normal_pref"
+    }
+
+    companion object {
+        private const val ACCOUNT = "test"
+        private const val PREFS = "internal_shared_prefs"
+        private const val ACCOUNT_PREFS = "internal_shared_prefs_$ACCOUNT"
+        private const val IS_ENCRYPTED_KEY = "prefs_key_encrypted"
     }
 }
