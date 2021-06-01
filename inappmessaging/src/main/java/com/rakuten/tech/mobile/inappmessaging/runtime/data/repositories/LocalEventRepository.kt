@@ -123,7 +123,7 @@ internal interface LocalEventRepository : EventRepository {
                     (onLaunch || user != AccountRepository.instance().userInfoHash)) {
                 user = AccountRepository.instance().userInfoHash
                 // reset event list from cached using updated user info
-                val listString = InAppMessaging.instance().getEncryptedSharedPref()?.getString(LOCAL_EVENT_KEY, "")
+                val listString = InAppMessaging.instance().getSharedPref()?.getString(LOCAL_EVENT_KEY, "")
                         ?: ""
                 if (listString.isNotEmpty()) {
                     events.clear()
@@ -158,7 +158,7 @@ internal interface LocalEventRepository : EventRepository {
             // check if caching is enabled to update persistent data
             if (InAppMessaging.instance().isLocalCachingEnabled()) {
                 // save updated event list
-                InAppMessaging.instance().getEncryptedSharedPref()?.edit()?.putString(LOCAL_EVENT_KEY,
+                InAppMessaging.instance().getSharedPref()?.edit()?.putString(LOCAL_EVENT_KEY,
                         Gson().toJson(events))?.apply()
             }
         }

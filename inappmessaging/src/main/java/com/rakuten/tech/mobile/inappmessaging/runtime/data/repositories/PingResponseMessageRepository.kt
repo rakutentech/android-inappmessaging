@@ -89,7 +89,7 @@ internal abstract class PingResponseMessageRepository : MessageRepository {
                     (onLaunch || user != AccountRepository.instance().userInfoHash)) {
                 user = AccountRepository.instance().userInfoHash
                 // reset message list from cached using updated user info
-                val listString = InAppMessaging.instance().getEncryptedSharedPref()?.getString(PING_RESPONSE_KEY, "")
+                val listString = InAppMessaging.instance().getSharedPref()?.getString(PING_RESPONSE_KEY, "")
                         ?: ""
                 messages.clear()
                 if (listString.isNotEmpty()) {
@@ -109,7 +109,7 @@ internal abstract class PingResponseMessageRepository : MessageRepository {
             // check if caching is enabled to update persistent data
             if (InAppMessaging.instance().isLocalCachingEnabled()) {
                 // save updated message list
-                InAppMessaging.instance().getEncryptedSharedPref()?.edit()?.putString(PING_RESPONSE_KEY,
+                InAppMessaging.instance().getSharedPref()?.edit()?.putString(PING_RESPONSE_KEY,
                         Gson().toJson(messages))?.apply()
             }
         }
