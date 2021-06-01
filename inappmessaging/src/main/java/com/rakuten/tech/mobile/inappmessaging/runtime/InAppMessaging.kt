@@ -86,7 +86,7 @@ abstract class InAppMessaging internal constructor() {
      * This method returns the encrypted shared preference.
      */
     @RestrictTo(RestrictTo.Scope.LIBRARY)
-    internal abstract fun getEncryptedSharedPref(): SharedPreferences?
+    internal abstract fun getSharedPref(): SharedPreferences?
 
     /**
      * This method moves temp data to persistent cache.
@@ -167,7 +167,7 @@ abstract class InAppMessaging internal constructor() {
 
         override fun isLocalCachingEnabled() = false
 
-        override fun getEncryptedSharedPref(): SharedPreferences? = null
+        override fun getSharedPref(): SharedPreferences? = null
 
         override fun closeMessage(clearQueuedCampaigns: Boolean) {}
 
