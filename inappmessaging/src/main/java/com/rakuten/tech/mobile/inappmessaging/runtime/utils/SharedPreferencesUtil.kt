@@ -8,7 +8,7 @@ import timber.log.Timber
 import java.io.File
 import java.security.KeyStore
 
-internal object SharePreferencesUtil {
+internal object SharedPreferencesUtil {
 
     @SuppressWarnings("TooGenericExceptionCaught", "ReturnCount", "LongMethod", "NestedBlockDepth")
     fun createSharedPreference(

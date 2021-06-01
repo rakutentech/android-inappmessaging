@@ -13,7 +13,7 @@ import com.rakuten.tech.mobile.inappmessaging.runtime.data.repositories.ReadyFor
 import com.rakuten.tech.mobile.inappmessaging.runtime.manager.DisplayManager
 import com.rakuten.tech.mobile.inappmessaging.runtime.manager.EventsManager
 import com.rakuten.tech.mobile.inappmessaging.runtime.manager.SessionManager
-import com.rakuten.tech.mobile.inappmessaging.runtime.utils.SharePreferencesUtil
+import com.rakuten.tech.mobile.inappmessaging.runtime.utils.SharedPreferencesUtil
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
@@ -110,7 +110,7 @@ internal class InApp(
 
     override fun isLocalCachingEnabled() = isCacheHandling
 
-    override fun getSharedPref() = SharePreferencesUtil.createSharedPreference(context,
+    override fun getSharedPref() = SharedPreferencesUtil.createSharedPreference(context,
             AccountRepository.instance().userInfoHash)
 
     override fun saveTempData() {

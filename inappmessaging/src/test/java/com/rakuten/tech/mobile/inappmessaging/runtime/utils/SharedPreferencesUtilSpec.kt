@@ -16,7 +16,7 @@ import java.io.File
 import java.lang.NullPointerException
 
 @RunWith(RobolectricTestRunner::class)
-class SharePreferencesUtilSpec : BaseTest() {
+class SharedPreferencesUtilSpec : BaseTest() {
     companion object {
         private const val ACCOUNT = "test"
         private const val PREFS = "internal_shared_prefs"
@@ -42,7 +42,7 @@ class SharePreferencesUtilSpec : BaseTest() {
         val file = Mockito.mock(File::class.java)
         When calling mockContext.filesDir itReturns file
         When calling file.parent itReturns "samplePath"
-        SharePreferencesUtil.createSharedPreference(mockContext, ACCOUNT, mockMasterKey)
+        SharedPreferencesUtil.createSharedPreference(mockContext, ACCOUNT, mockMasterKey)
         prefs.contains(IS_ENCRYPTED_KEY).shouldBeTrue()
         prefs.getBoolean(IS_ENCRYPTED_KEY, true).shouldBeFalse()
     }
@@ -50,7 +50,7 @@ class SharePreferencesUtilSpec : BaseTest() {
     @Test
     fun `should set encrypted flag in pref to false with failed removing of master`() {
         val mockTimber = Mockito.mock(Timber.Tree::class.java)
-        SharePreferencesUtil.createSharedPreference(mockContext, ACCOUNT, mockMasterKey, timber = mockTimber)
+        SharedPreferencesUtil.createSharedPreference(mockContext, ACCOUNT, mockMasterKey, timber = mockTimber)
         prefs.contains(IS_ENCRYPTED_KEY).shouldBeTrue()
         prefs.getBoolean(IS_ENCRYPTED_KEY, true).shouldBeFalse()
         Mockito.verify(mockTimber, times(2)).e(any(Throwable::class))
@@ -61,7 +61,7 @@ class SharePreferencesUtilSpec : BaseTest() {
         prefs.edit().putBoolean(IS_ENCRYPTED_KEY, false).apply()
         accountPrefs.edit().putString("KEY_TEST", "normal_pref").apply()
 
-        val createdPref = SharePreferencesUtil.createSharedPreference(context, ACCOUNT, mockMasterKey)
+        val createdPref = SharedPreferencesUtil.createSharedPreference(context, ACCOUNT, mockMasterKey)
         createdPref.contains("KEY_TEST").shouldBeTrue()
         createdPref.getString("KEY_TEST", "") shouldBeEqualTo "normal_pref"
     }

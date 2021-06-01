@@ -32,7 +32,7 @@ import org.robolectric.annotation.Config
 class InitializerSpec : BaseTest() {
     private val workerParameters = Mockito.mock(WorkerParameters::class.java)
     private val context = ApplicationProvider.getApplicationContext<Context>()
-    private val mockUtil = Mockito.mock(SharePreferencesUtil::class.java)
+    private val mockUtil = Mockito.mock(SharedPreferencesUtil::class.java)
     private val mockMaster = Mockito.mock(MasterKey::class.java)
     private val mockPref = Mockito.mock(EncryptedSharedPreferences::class.java)
 
@@ -89,7 +89,7 @@ class InitializerSpec : BaseTest() {
         Settings.Secure.putString(appCtx.contentResolver, Settings.Secure.ANDROID_ID, null)
 
         // clear preferences
-        val sharedPref = SharePreferencesUtil.createSharedPreference(context, "uuid")
+        val sharedPref = SharedPreferencesUtil.createSharedPreference(context, "uuid")
         sharedPref.edit().clear().apply()
 
         Initializer.initializeSdk(appCtx, "test", "", true)
@@ -104,7 +104,7 @@ class InitializerSpec : BaseTest() {
         Settings.Secure.putString(appCtx.contentResolver, Settings.Secure.ANDROID_ID, null)
 
         // add test value
-        val sharedPref = SharePreferencesUtil.createSharedPreference(context, "uuid")
+        val sharedPref = SharedPreferencesUtil.createSharedPreference(context, "uuid")
         sharedPref.edit().clear().apply()
         sharedPref.edit().putString(Initializer.ID_KEY, "test_uuid").apply()
 

@@ -31,7 +31,7 @@ internal object Initializer {
      * use HostAppInfoRepo.
      */
     @SuppressLint("HardwareIds") // Suppress lint check of using device id.
-    private fun getDeviceId(context: Context, sharedUtil: SharePreferencesUtil, masterKey: MasterKey?) =
+    private fun getDeviceId(context: Context, sharedUtil: SharedPreferencesUtil, masterKey: MasterKey?) =
             Settings.Secure.getString(context.contentResolver, Settings.Secure.ANDROID_ID)
                     ?: getUuid(context, sharedUtil, masterKey)
 
@@ -79,12 +79,12 @@ internal object Initializer {
     @Suppress("LongParameterList")
     @Throws(InAppMessagingInitializationException::class)
     fun initializeSdk(
-        context: Context,
-        subscriptionKey: String?,
-        configUrl: String?,
-        isForTesting: Boolean = false,
-        sharedUtil: SharePreferencesUtil = SharePreferencesUtil,
-        masterKey: MasterKey? = null
+            context: Context,
+            subscriptionKey: String?,
+            configUrl: String?,
+            isForTesting: Boolean = false,
+            sharedUtil: SharedPreferencesUtil = SharedPreferencesUtil,
+            masterKey: MasterKey? = null
     ) {
         val hostAppInfo = HostAppInfo(getHostAppPackageName(context), getDeviceId(context, sharedUtil, masterKey),
                 getHostAppVersion(context), subscriptionKey, getLocale(context), configUrl)
@@ -103,7 +103,7 @@ internal object Initializer {
      * This method retrieves the stored UUID or generates a random ID if not available.
      * This value is only used if Settings.Secure.ANDROID_ID returns a null value.
      */
-    private fun getUuid(context: Context, sharedUtil: SharePreferencesUtil, masterKey: MasterKey?): String {
+    private fun getUuid(context: Context, sharedUtil: SharedPreferencesUtil, masterKey: MasterKey?): String {
         val sharedPref = sharedUtil.createSharedPreference(context, "uuid", masterKey)
 
         return if (sharedPref.contains(ID_KEY)) {

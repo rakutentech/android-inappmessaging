@@ -324,7 +324,7 @@ Documents targeting Product Managers:
 
 ### 4.1.1-PP (in-progress)
 * SDKCF-3781: Fixed crash due to failing master key generation for encrypted shared preferences.
-  - The SDK will try to create a master key again after the first failed attempt, and will fallback to normal shared preferences if the key generation still failed.
+  - The SDK will try to create a master key again after the first failed attempt, and will fallback to normal shared preferences if the key generation still fails.
 
 ### 4.1.0-PP (2021-05-25)
 * SDKCF-3793: Added handling for concurrent access to persistent cache by having data synchronization.
