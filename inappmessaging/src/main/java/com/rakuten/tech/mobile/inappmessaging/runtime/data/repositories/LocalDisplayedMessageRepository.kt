@@ -140,7 +140,7 @@ internal interface LocalDisplayedMessageRepository {
                     (onLaunch || user != AccountRepository.instance().userInfoHash)) {
                 user = AccountRepository.instance().userInfoHash
                 // reset message list from cached using updated user info
-                val sharedPref = InAppMessaging.instance().getEncryptedSharedPref()
+                val sharedPref = InAppMessaging.instance().getSharedPref()
                 val listString = sharedPref?.getString(LOCAL_DISPLAYED_KEY, "") ?: ""
                 messages.clear()
                 if (listString.isNotEmpty()) {
@@ -163,7 +163,7 @@ internal interface LocalDisplayedMessageRepository {
             // check if caching is enabled to update persistent data
             if (InAppMessaging.instance().isLocalCachingEnabled()) {
                 // reset message list from cached using updated user info
-                val editor = InAppMessaging.instance().getEncryptedSharedPref()?.edit()
+                val editor = InAppMessaging.instance().getSharedPref()?.edit()
                 editor?.putString(LOCAL_DISPLAYED_KEY, Gson().toJson(messages))
                         ?.putString(LOCAL_DISPLAYED_CLOSED_KEY, removedMessage)
                         ?.putString(LOCAL_DISPLAYED_CLOSED_LIST_KEY, Gson().toJson(removedMessages))

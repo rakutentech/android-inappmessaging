@@ -82,7 +82,7 @@ internal abstract class ReadyForDisplayMessageRepository : ReadyMessageRepositor
                     (onLaunch || user != AccountRepository.instance().userInfoHash)) {
                 user = AccountRepository.instance().userInfoHash
                 // reset message list from cached using updated user info
-                val listString = InAppMessaging.instance().getEncryptedSharedPref()?.getString(READY_DISPLAY_KEY, "")
+                val listString = InAppMessaging.instance().getSharedPref()?.getString(READY_DISPLAY_KEY, "")
                         ?: ""
                 messages.clear()
                 if (listString.isNotEmpty()) {
@@ -98,7 +98,7 @@ internal abstract class ReadyForDisplayMessageRepository : ReadyMessageRepositor
             // check if caching is enabled to update persistent data
             if (InAppMessaging.instance().isLocalCachingEnabled()) {
                 // reset updated message list
-                InAppMessaging.instance().getEncryptedSharedPref()?.edit()?.putString(READY_DISPLAY_KEY,
+                InAppMessaging.instance().getSharedPref()?.edit()?.putString(READY_DISPLAY_KEY,
                         Gson().toJson(messages))?.apply()
             }
         }

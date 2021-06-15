@@ -323,15 +323,17 @@ Documents targeting Product Managers:
 ## <a name="changelog"></a> Changelog
 
 ### 4.0.0 (in-progress)
-* SDKCF-3793: Added handling for concurrent access to persistent cache by having data synchronization.
-* SDKCF-3794: Fixed crash issue due to missing proguard configuration for events.
-* SDKCF-3820: Added disabling of SDK features when response received from backend is disabled config.
 * SDKCF-3651: Changed Config API call to /GET with query params. This allows the backend to filter requests if required.
 * SDKCF-3653: Added handling for Config and Ping API calls for "429 too many requests" response. The SDK will start exponential backoff (plus a random factor) retries to space out the requests to the backend when code 429 is received.
 * SDKCF-3655: Handled opt-out and max impression tracking logic solely on SDK. This change reduces the backend's load per request.
 * SDKCF-3664: Added support on roll-out percentage for computing if In-App Messaging is enabled. This allows the backend to gradually increase campaign distribution.
 * SDKCF-3715: Included subscription key in Config API request header to enable better filtering of requests.
 * SDKCF-3742: Fixed opt-out wording in JP and EN for consistency with iOS.
+* SDKCF-3793: Added handling for concurrent access to persistent cache by having data synchronization.
+* SDKCF-3794: Fixed crash issue due to missing proguard configuration for events.
+* SDKCF-3820: Added disabling of SDK features when response received from backend is disabled config.
+* SDKCF-3781: Fixed crash due to failing master key generation for encrypted shared preferences. The root cause of the crash is suspected to be these Android platform issues [#147480931](https://issuetracker.google.com/issues/147480931) and [#176215143](https://issuetracker.google.com/issues/176215143). To prevent the crash the following workaround is implemented:
+  - The SDK will try to create a master key again after the first failed attempt, and will fallback to normal shared preferences if the key generation still fails.
 
 ### 3.0.0 (2021-03-24)
 * SDKCF-3450: Update Fresco dependency to v2.4.0 to fix SoLoader issue.

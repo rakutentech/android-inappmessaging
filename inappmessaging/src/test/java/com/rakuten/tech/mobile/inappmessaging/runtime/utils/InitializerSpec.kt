@@ -32,7 +32,7 @@ import org.robolectric.annotation.Config
 class InitializerSpec : BaseTest() {
     private val workerParameters = Mockito.mock(WorkerParameters::class.java)
     private val context = ApplicationProvider.getApplicationContext<Context>()
-    private val mockUtil = Mockito.mock(SharePreferencesUtil::class.java)
+    private val mockUtil = Mockito.mock(SharedPreferencesUtil::class.java)
     private val mockMaster = Mockito.mock(MasterKey::class.java)
     private val mockPref = Mockito.mock(EncryptedSharedPreferences::class.java)
 
@@ -41,8 +41,7 @@ class InitializerSpec : BaseTest() {
         When calling workerParameters.inputData itReturns Data.EMPTY
         Settings.Secure.putString(context.contentResolver, Settings.Secure.ANDROID_ID, "testid")
 
-        When calling mockUtil.generateKey(context) itReturns mockMaster
-        When calling mockUtil.createSharedPreference(context, mockMaster, "uuid") itReturns mockPref
+        When calling mockUtil.createSharedPreference(context, "uuid", mockMaster) itReturns mockPref
     }
 
     @Test
@@ -90,8 +89,7 @@ class InitializerSpec : BaseTest() {
         Settings.Secure.putString(appCtx.contentResolver, Settings.Secure.ANDROID_ID, null)
 
         // clear preferences
-        val sharedPref = SharePreferencesUtil.createSharedPreference(context,
-                SharePreferencesUtil.generateKey(context), "uuid")
+        val sharedPref = SharedPreferencesUtil.createSharedPreference(context, "uuid")
         sharedPref.edit().clear().apply()
 
         Initializer.initializeSdk(appCtx, "test", "", true)
@@ -106,8 +104,7 @@ class InitializerSpec : BaseTest() {
         Settings.Secure.putString(appCtx.contentResolver, Settings.Secure.ANDROID_ID, null)
 
         // add test value
-        val sharedPref = SharePreferencesUtil.createSharedPreference(context,
-                SharePreferencesUtil.generateKey(context), "uuid")
+        val sharedPref = SharedPreferencesUtil.createSharedPreference(context, "uuid")
         sharedPref.edit().clear().apply()
         sharedPref.edit().putString(Initializer.ID_KEY, "test_uuid").apply()
 
@@ -125,10 +122,9 @@ class InitializerSpec : BaseTest() {
         When calling mockPref.edit() itReturns mockEditor
         When calling mockEditor.putString(any(), any()) itReturns mockEditor
 
-        Initializer.initializeSdk(context, "test", "", true, mockUtil)
+        Initializer.initializeSdk(context, "test", "", true, mockUtil, mockMaster)
 
-        Mockito.verify(mockUtil).generateKey(context)
-        Mockito.verify(mockUtil).createSharedPreference(context, mockMaster, "uuid")
+        Mockito.verify(mockUtil).createSharedPreference(context, "uuid", mockMaster)
         Mockito.verify(mockPref).contains(Initializer.ID_KEY)
         Mockito.verify(mockPref).edit()
         Mockito.verify(mockEditor).putString(eq(Initializer.ID_KEY), any())
@@ -142,10 +138,9 @@ class InitializerSpec : BaseTest() {
         When calling mockPref.contains(Initializer.ID_KEY) itReturns true
         When calling mockPref.getString(Initializer.ID_KEY, "") itReturns "random_uuid"
 
-        Initializer.initializeSdk(context, "test", "", true, mockUtil)
+        Initializer.initializeSdk(context, "test", "", true, mockUtil, mockMaster)
 
-        Mockito.verify(mockUtil).generateKey(context)
-        Mockito.verify(mockUtil).createSharedPreference(context, mockMaster, "uuid")
+        Mockito.verify(mockUtil).createSharedPreference(context, "uuid", mockMaster)
         Mockito.verify(mockPref).contains(Initializer.ID_KEY)
         Mockito.verify(mockPref, never()).edit()
         Mockito.verify(mockPref).getString(Initializer.ID_KEY, "")
