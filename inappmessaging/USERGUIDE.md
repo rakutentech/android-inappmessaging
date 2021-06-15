@@ -30,7 +30,7 @@ You must have a subscription key for your application from IAM Dashboard.
 ```groovy
 allprojects {
     repositories {
-        maven { url 'will be provided directly' }
+        mavenCentral()
     }
 }
 ```
@@ -41,7 +41,7 @@ Note: InAppMessaging SDK only uses AndroidX libraries. Host apps should migrate 
 
 ```groovy
 dependencies {
-    implementation 'io.github.rakutentech.inappmessaging:inappmessaging:4.0.0-PP'
+    implementation 'io.github.rakutentech.inappmessaging:inappmessaging:${latest_version}'
 }
 ```
 Please refer to [Changelog](#changelog) section for the latest version.
@@ -332,6 +332,11 @@ Documents targeting Product Managers:
 * SDKCF-3664: Added support on roll-out percentage for computing if In-App Messaging is enabled. This allows the backend to gradually increase campaign distribution.
 * SDKCF-3715: Included subscription key in Config API request header to enable better filtering of requests.
 * SDKCF-3742: Fixed opt-out wording in JP and EN for consistency with iOS.
+* SDKCF-3793: Added handling for concurrent access to persistent cache by having data synchronization.
+* SDKCF-3794: Fixed crash issue due to missing proguard configuration for events.
+* SDKCF-3820: Added disabling of SDK features when response received from backend is disabled config.
+* SDKCF-3781: Fixed crash due to failing master key generation for encrypted shared preferences. The root cause of the crash is suspected to be these Android platform issues [#147480931](https://issuetracker.google.com/issues/147480931) and [#176215143](https://issuetracker.google.com/issues/176215143). To prevent the crash the following workaround is implemented:
+  - The SDK will try to create a master key again after the first failed attempt, and will fallback to normal shared preferences if the key generation still fails.
 
 ### 3.0.0 (2021-03-24)
 * SDKCF-3450: Update Fresco dependency to v2.4.0 to fix SoLoader issue.
