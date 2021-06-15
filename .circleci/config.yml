@@ -26,6 +26,9 @@ jobs:
       - slack/notify:
           event: fail
           template: basic_fail_1
+      - slack/notify:
+          event: pass
+          template: basic_success_1
       - store_test_results:
           path: inappmessaging/build/test-results
           destination: test-results
