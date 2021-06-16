@@ -2,7 +2,7 @@ version: 2.1
 
 orbs:
   android-sdk: rakutentech/android-sdk@0.2.1
-  slack: circleci/slack@4.2.0
+  slack: circleci/slack@4.4.2
 
 jobs:
   integration-test:
