@@ -8,7 +8,6 @@ import android.content.pm.PackageManager.NameNotFoundException
 import android.os.Build
 import android.provider.Settings
 import androidx.core.content.pm.PackageInfoCompat
-import androidx.security.crypto.MasterKey
 import com.facebook.drawee.backends.pipeline.Fresco
 import com.google.gson.Gson
 import com.rakuten.tech.mobile.inappmessaging.runtime.data.models.HostAppInfo
@@ -31,9 +30,9 @@ internal object Initializer {
      * use HostAppInfoRepo.
      */
     @SuppressLint("HardwareIds") // Suppress lint check of using device id.
-    private fun getDeviceId(context: Context, sharedUtil: SharedPreferencesUtil, masterKey: MasterKey?) =
+    private fun getDeviceId(context: Context, sharedUtil: SharedPreferencesUtil) =
             Settings.Secure.getString(context.contentResolver, Settings.Secure.ANDROID_ID)
-                    ?: getUuid(context, sharedUtil, masterKey)
+                    ?: getUuid(context, sharedUtil)
 
     /**
      * This method gets device's locale based on API level.
@@ -83,10 +82,9 @@ internal object Initializer {
         subscriptionKey: String?,
         configUrl: String?,
         isForTesting: Boolean = false,
-        sharedUtil: SharedPreferencesUtil = SharedPreferencesUtil,
-        masterKey: MasterKey? = null
+        sharedUtil: SharedPreferencesUtil = SharedPreferencesUtil
     ) {
-        val hostAppInfo = HostAppInfo(getHostAppPackageName(context), getDeviceId(context, sharedUtil, masterKey),
+        val hostAppInfo = HostAppInfo(getHostAppPackageName(context), getDeviceId(context, sharedUtil),
                 getHostAppVersion(context), subscriptionKey, getLocale(context), configUrl)
 
         // Store hostAppInfo in repository.
@@ -103,8 +101,8 @@ internal object Initializer {
      * This method retrieves the stored UUID or generates a random ID if not available.
      * This value is only used if Settings.Secure.ANDROID_ID returns a null value.
      */
-    private fun getUuid(context: Context, sharedUtil: SharedPreferencesUtil, masterKey: MasterKey?): String {
-        val sharedPref = sharedUtil.createSharedPreference(context, "uuid", masterKey)
+    private fun getUuid(context: Context, sharedUtil: SharedPreferencesUtil): String {
+        val sharedPref = sharedUtil.createSharedPreference(context, "uuid")
 
         return if (sharedPref.contains(ID_KEY)) {
             sharedPref.getString(ID_KEY, "").toString()
