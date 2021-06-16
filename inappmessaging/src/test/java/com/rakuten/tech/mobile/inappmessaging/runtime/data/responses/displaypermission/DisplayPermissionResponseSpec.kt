@@ -10,7 +10,11 @@ import org.robolectric.annotation.Config
 
 @RunWith(ParameterizedRobolectricTestRunner::class)
 @Config(sdk = [Build.VERSION_CODES.O_MR1])
-class DisplayPermissionResponseSpec(private val testname: String, private val actual: Boolean, private val expected: Boolean) {
+class DisplayPermissionResponseSpec(
+    private val testname: String,
+    private val actual: Boolean,
+    private val expected: Boolean
+) {
 
     companion object {
         @JvmStatic
@@ -38,7 +42,6 @@ class DisplayPermissionResponseSpec(private val testname: String, private val ac
                 "display":false,
                 "performPing":true
             }"""
-
 
         private val response =
                 Gson().fromJson(DISPLAY_RESPONSE.trimIndent(), DisplayPermissionResponse::class.java)
