@@ -4,8 +4,6 @@ import android.content.Context
 import android.content.SharedPreferences
 import android.os.Build
 import android.provider.Settings
-import androidx.security.crypto.EncryptedSharedPreferences
-import androidx.security.crypto.MasterKey
 import androidx.test.core.app.ApplicationProvider
 import androidx.work.Data
 import androidx.work.WorkerParameters
@@ -33,15 +31,14 @@ class InitializerSpec : BaseTest() {
     private val workerParameters = Mockito.mock(WorkerParameters::class.java)
     private val context = ApplicationProvider.getApplicationContext<Context>()
     private val mockUtil = Mockito.mock(SharedPreferencesUtil::class.java)
-    private val mockMaster = Mockito.mock(MasterKey::class.java)
-    private val mockPref = Mockito.mock(EncryptedSharedPreferences::class.java)
+    private val mockPref = Mockito.mock(SharedPreferences::class.java)
 
     @Before
     fun setup() {
         When calling workerParameters.inputData itReturns Data.EMPTY
         Settings.Secure.putString(context.contentResolver, Settings.Secure.ANDROID_ID, "testid")
 
-        When calling mockUtil.createSharedPreference(context, "uuid", mockMaster) itReturns mockPref
+        When calling mockUtil.createSharedPreference(context, "uuid") itReturns mockPref
     }
 
     @Test
@@ -122,9 +119,9 @@ class InitializerSpec : BaseTest() {
         When calling mockPref.edit() itReturns mockEditor
         When calling mockEditor.putString(any(), any()) itReturns mockEditor
 
-        Initializer.initializeSdk(context, "test", "", true, mockUtil, mockMaster)
+        Initializer.initializeSdk(context, "test", "", true, mockUtil)
 
-        Mockito.verify(mockUtil).createSharedPreference(context, "uuid", mockMaster)
+        Mockito.verify(mockUtil).createSharedPreference(context, "uuid")
         Mockito.verify(mockPref).contains(Initializer.ID_KEY)
         Mockito.verify(mockPref).edit()
         Mockito.verify(mockEditor).putString(eq(Initializer.ID_KEY), any())
@@ -138,9 +135,9 @@ class InitializerSpec : BaseTest() {
         When calling mockPref.contains(Initializer.ID_KEY) itReturns true
         When calling mockPref.getString(Initializer.ID_KEY, "") itReturns "random_uuid"
 
-        Initializer.initializeSdk(context, "test", "", true, mockUtil, mockMaster)
+        Initializer.initializeSdk(context, "test", "", true, mockUtil)
 
-        Mockito.verify(mockUtil).createSharedPreference(context, "uuid", mockMaster)
+        Mockito.verify(mockUtil).createSharedPreference(context, "uuid")
         Mockito.verify(mockPref).contains(Initializer.ID_KEY)
         Mockito.verify(mockPref, never()).edit()
         Mockito.verify(mockPref).getString(Initializer.ID_KEY, "")
