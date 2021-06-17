@@ -65,8 +65,7 @@ class ImpressionManagerSpec : BaseTest() {
                 ApplicationProvider.getApplicationContext<Context>().contentResolver,
                 Settings.Secure.ANDROID_ID,
                 "test_device_id")
-        InAppMessaging.init(ApplicationProvider.getApplicationContext(), "test", "",
-                isDebugLogging = false, isForTesting = true)
+        InAppMessaging.initialize(ApplicationProvider.getApplicationContext(), true)
         InAppMessaging.instance().registerPreference(TestUserInfoProvider())
         ImpressionManager().scheduleReportImpression(impressionList!!, "1234", false,
                 eventBroadcaster::sendEvent)
@@ -82,8 +81,7 @@ class ImpressionManagerSpec : BaseTest() {
         Settings.Secure.putString(ApplicationProvider.getApplicationContext<Context>().contentResolver,
                 Settings.Secure.ANDROID_ID,
                 "test_device_id")
-        InAppMessaging.init(ApplicationProvider.getApplicationContext(), "test", "",
-                isDebugLogging = false, isForTesting = true)
+        InAppMessaging.initialize(ApplicationProvider.getApplicationContext(), true)
         InAppMessaging.instance().registerPreference(TestUserInfoProvider())
         ImpressionManager().scheduleReportImpression(
                 impressionList!!,

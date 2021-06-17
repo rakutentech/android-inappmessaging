@@ -330,8 +330,7 @@ class InAppMessagingSpec : BaseTest() {
                 "test_device_id")
         When calling configResponseData.rollOutPercentage itReturns 100
         ConfigResponseRepository.instance().addConfigResponse(configResponseData)
-        InAppMessaging.init(ApplicationProvider.getApplicationContext(), "test", "",
-                isDebugLogging = true, isForTesting = true, isCacheHandling = shouldEnableCaching)
+        InAppMessaging.initialize(ApplicationProvider.getApplicationContext(), true, shouldEnableCaching)
     }
 
     private fun initializeMockInstance(rollout: Int): InAppMessaging {

@@ -70,11 +70,8 @@ open class ConfigWorkerSpec : BaseTest() {
         WorkManagerTestInitHelper.initializeTestWorkManager(context)
         Settings.Secure.putString(ApplicationProvider.getApplicationContext<Context>().contentResolver,
                 Settings.Secure.ANDROID_ID, "test_device_id")
-        val bundle = context.packageManager.getApplicationInfo(context.packageName,
-                PackageManager.GET_META_DATA).metaData
 
-        InAppMessaging.init(ApplicationProvider.getApplicationContext(), "test",
-                bundle.getString(CONFIG_KEY, ""), isDebugLogging = false, isForTesting = true)
+        InAppMessaging.initialize(ApplicationProvider.getApplicationContext(), true)
     }
 
     internal fun setupMock(rollout: Int) {

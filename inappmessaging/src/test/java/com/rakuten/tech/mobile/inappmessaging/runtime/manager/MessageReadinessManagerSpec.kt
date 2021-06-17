@@ -169,8 +169,7 @@ class MessageReadinessManagerSpec : BaseTest() {
         WorkManagerTestInitHelper.initializeTestWorkManager(ApplicationProvider.getApplicationContext())
         Settings.Secure.putString(ApplicationProvider.getApplicationContext<Context>().contentResolver,
                 Settings.Secure.ANDROID_ID, "test_device_id")
-        InAppMessaging.init(ApplicationProvider.getApplicationContext(), "test", "",
-                isDebugLogging = true, isForTesting = true)
+        InAppMessaging.initialize(ApplicationProvider.getApplicationContext(), true)
     }
 
     companion object {

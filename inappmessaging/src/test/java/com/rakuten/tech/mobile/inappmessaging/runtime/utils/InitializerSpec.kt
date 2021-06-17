@@ -12,6 +12,7 @@ import androidx.work.WorkerParameters
 import androidx.work.testing.WorkManagerTestInitHelper
 import com.nhaarman.mockitokotlin2.eq
 import com.nhaarman.mockitokotlin2.never
+import com.rakuten.tech.mobile.inappmessaging.runtime.AppManifestConfig
 import com.rakuten.tech.mobile.inappmessaging.runtime.BaseTest
 import com.rakuten.tech.mobile.inappmessaging.runtime.InAppMessaging
 import com.rakuten.tech.mobile.inappmessaging.runtime.TestUserInfoProvider
@@ -47,14 +48,10 @@ class InitializerSpec : BaseTest() {
     @Test
     fun `should add host app info with basic attributes`() {
         WorkManagerTestInitHelper.initializeTestWorkManager(context!!)
-        InAppMessaging.init(
-                context,
-                "test_sub_key",
-                "",
-                isDebugLogging = false,
-                isForTesting = true)
+        InAppMessaging.initialize(context, true)
         InAppMessaging.instance().registerPreference(TestUserInfoProvider())
-        HostAppInfoRepository.instance().getInAppMessagingSubscriptionKey() shouldBeEqualTo "test_sub_key"
+        HostAppInfoRepository.instance()
+                .getInAppMessagingSubscriptionKey() shouldBeEqualTo AppManifestConfig(context).subscriptionKey()
         HostAppInfoRepository.instance()
                 .getPackageName() shouldBeEqualTo "com.rakuten.tech.mobile.inappmessaging.runtime.test"
         HostAppInfoRepository.instance().getVersion() shouldBeEqualTo "1.0.2"

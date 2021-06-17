@@ -73,8 +73,7 @@ class LocalDisplayedMessageRepositorySpec : BaseTest() {
         Settings.Secure.putString(ApplicationProvider.getApplicationContext<Context>().contentResolver,
                 Settings.Secure.ANDROID_ID,
                 "test_device_id")
-        InAppMessaging.init(ApplicationProvider.getApplicationContext(), "test-key", "",
-                isForTesting = true)
+        InAppMessaging.initialize(ApplicationProvider.getApplicationContext(), true)
 
         val mockRepo = Mockito.mock(LocalDisplayedMessageRepository::class.java)
 
@@ -179,8 +178,7 @@ class LocalDisplayedMessageRepositorySpec : BaseTest() {
                 ApplicationProvider.getApplicationContext<Context>().contentResolver,
                 Settings.Secure.ANDROID_ID,
                 "test_device_id")
-        InAppMessaging.init(ApplicationProvider.getApplicationContext(), "test", "",
-                isDebugLogging = true, isForTesting = true, isCacheHandling = isCache)
+        InAppMessaging.initialize(ApplicationProvider.getApplicationContext(), true, isCache)
         InAppMessaging.instance().registerPreference(infoProvider)
     }
 }

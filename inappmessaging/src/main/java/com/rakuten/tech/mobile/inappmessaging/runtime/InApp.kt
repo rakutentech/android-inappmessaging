@@ -14,6 +14,8 @@ import com.rakuten.tech.mobile.inappmessaging.runtime.manager.DisplayManager
 import com.rakuten.tech.mobile.inappmessaging.runtime.manager.EventsManager
 import com.rakuten.tech.mobile.inappmessaging.runtime.manager.SessionManager
 import com.rakuten.tech.mobile.inappmessaging.runtime.utils.SharedPreferencesUtil
+import com.rakuten.tech.mobile.manifestconfig.annotations.ManifestConfig
+import com.rakuten.tech.mobile.manifestconfig.annotations.MetaData
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
@@ -132,7 +134,30 @@ internal class InApp(
         }
     }
 
+    @ManifestConfig
+    internal interface App {
+
+        /**
+         * Subscription Key from the InAppMessaging Dashboard.
+         **/
+        @MetaData(key = "com.rakuten.tech.mobile.inappmessaging.subscriptionkey")
+        fun subscriptionKey(): String?
+
+        /**
+         * Config URL for the IAM API.
+         **/
+        @MetaData(key = "com.rakuten.tech.mobile.inappmessaging.configurl")
+        fun configUrl(): String?
+
+        /**
+         * Flag to enable/disable debug logging.
+         **/
+        @MetaData(key = "com.rakuten.tech.mobile.inappmessaging.debugging", value = "false")
+        fun isDebugging(): Boolean
+    }
+
     companion object {
+        internal var errorCallback: ((ex: Exception) -> Unit)? = null
         private const val TAG = "IAM_InAppMessaging"
     }
 }

@@ -76,8 +76,8 @@ class LocalOptedOutMessageRepositorySpec : BaseTest() {
                 ApplicationProvider.getApplicationContext<Context>().contentResolver,
                 Settings.Secure.ANDROID_ID,
                 "test_device_id")
-        InAppMessaging.init(ApplicationProvider.getApplicationContext(), "test", "",
-                isDebugLogging = true, isForTesting = true, isCacheHandling = true)
+        InAppMessaging.initialize(ApplicationProvider.getApplicationContext(), isForTesting = true,
+                isCacheHandling = true)
         InAppMessaging.instance().registerPreference(infoProvider)
     }
 }

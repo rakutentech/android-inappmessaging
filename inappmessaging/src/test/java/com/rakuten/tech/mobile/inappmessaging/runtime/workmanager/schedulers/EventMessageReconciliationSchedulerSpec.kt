@@ -39,12 +39,7 @@ class EventMessageReconciliationSchedulerSpec : BaseTest() {
                 ApplicationProvider.getApplicationContext<Context>().contentResolver,
                 Settings.Secure.ANDROID_ID,
                 "test_device_id")
-        InAppMessaging.init(
-                ApplicationProvider.getApplicationContext(),
-                "test",
-                "",
-                isDebugLogging = false,
-                isForTesting = true)
+        InAppMessaging.initialize(ApplicationProvider.getApplicationContext(), true)
         EventMessageReconciliationScheduler.instance().startEventMessageReconciliationWorker()
         WorkManager.getInstance(ApplicationProvider.getApplicationContext())
                 .getWorkInfosByTag(MESSAGES_EVENTS_WORKER_NAME).get()[0].shouldNotBeNull()
@@ -55,7 +50,7 @@ class EventMessageReconciliationSchedulerSpec : BaseTest() {
         WorkManagerTestInitHelper.initializeTestWorkManager(ApplicationProvider.getApplicationContext())
         val context = ApplicationProvider.getApplicationContext<Context>()
         Settings.Secure.putString(context.contentResolver, Settings.Secure.ANDROID_ID, "test_device_id")
-        InAppMessaging.init(context, "test", "", isDebugLogging = false, isForTesting = true)
+        InAppMessaging.initialize(context, true)
         val mockSched = Mockito.mock(EventMessageReconciliationScheduler::class.java)
 
         val configResponseData = Mockito.mock(ConfigResponseData::class.java)
