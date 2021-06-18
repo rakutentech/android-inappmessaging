@@ -105,17 +105,15 @@ internal object Initializer {
     private fun getUuid(context: Context, sharedUtil: SharedPreferencesUtil): String {
         val sharedPref = sharedUtil.createSharedPreference(context, "uuid")
 
-        return if (sharedPref.contains(ID_KEY)) {
+        if (sharedPref.contains(ID_KEY)) {
             try {
-                sharedPref.getString(ID_KEY, "").toString()
+                return sharedPref.getString(ID_KEY, "").toString()
             } catch (ex: ClassCastException) {
                 Timber.tag(TAG).d(ex.cause, "Incorrect type for $ID_KEY data")
-                ""
             }
-        } else {
-            val id = UUID.randomUUID().toString()
-            sharedPref.edit().putString(ID_KEY, id).apply()
-            id
         }
+        val id = UUID.randomUUID().toString()
+        sharedPref.edit().putString(ID_KEY, id).apply()
+        return id
     }
 }

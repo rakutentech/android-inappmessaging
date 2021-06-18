@@ -120,16 +120,25 @@ class AppUserInfoProvider : UserInfoProvider {
 * **The internal IAM backend only supports production RAE token.**
 
 ### #6 Initializing In-App Messaging SDK.
-In-App Messaging is automatically initialized at startup and handled on a background thread.
-Host app just needs to register the provider containing the user information.
+Host app should initialize the SDK, then register the provider containing the user information.
 
 In your Application class' `onCreate()` method, add:
 
 ```kotlin
-InAppMessaging.instance().registerPreference(YourUserInfoProvider())
+// API: init(context: Context, errorCallback: ((ex: Exception) -> Unit)? = null): Boolean
+// `errorCallback` lambda function is optional,
+// and can be used for analytics and logging of encountered initialization issues.
+val iamFlag = InAppMessaging.init(this) {
+    Log.e(TAG, it.localizedMessage, it.cause)
+}
+
+// use flag to enable/disable IAM feature in your app.
+if (iamFlag) {
+    InAppMessaging.instance().registerPreference(provider)
+}
 ```
 
-**<font color="red">Note:</font> There could be exceptions thrown during initialization, if Subscription Key or other critical information was not found.**
+**<font color="red">Notes:</font> Missing Subscription Key or other critical information are some of the possible issues that can be encountered during initialization.**
 
 ### #7 Registering and unregistering activities.
 Only register activities that are allowed to display In-App messages. Your activities will be kept in a `WeakReference` object, so it will not cause any memory leaks. Don't forget to unregister your activities in `onPause()` method.
@@ -332,8 +341,9 @@ Documents targeting Product Managers:
 * SDKCF-3793: Added handling for concurrent access to persistent cache by having data synchronization.
 * SDKCF-3794: Fixed crash issue due to missing proguard configuration for events.
 * SDKCF-3820: Added disabling of SDK features when response received from backend is disabled config.
-* SDKCF-3781: Fixed crash due to failing master key generation for encrypted shared preferences. The root cause of the crash is suspected to be these Android platform issues [#147480931](https://issuetracker.google.com/issues/147480931) and [#176215143](https://issuetracker.google.com/issues/176215143). To prevent the crash the following workaround is implemented:
-  - The SDK will try to create a master key again after the first failed attempt, and will fallback to normal shared preferences if the key generation still fails.
+* SDKCF-3781/SDKCF-3915: Fixed crash due to failing master key generation for encrypted shared preferences. The root cause of the crash is suspected to be these Android platform issues [#147480931](https://issuetracker.google.com/issues/147480931) and [#176215143](https://issuetracker.google.com/issues/176215143).
+  - To prevent the crash, SDK use normal shared preferences.
+* SDKCF-3908: Changed auto-initialization to explicit init for better control and handling for any initialization issue. Please refer to [SDK Integration](#integration) for details.
 
 ### 3.0.0 (2021-03-24)
 * SDKCF-3450: Update Fresco dependency to v2.4.0 to fix SoLoader issue.

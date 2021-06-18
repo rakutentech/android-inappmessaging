@@ -18,6 +18,7 @@ import com.rakuten.tech.mobile.inappmessaging.runtime.manager.DisplayManager
 import com.rakuten.tech.mobile.inappmessaging.runtime.manager.EventsManager
 import org.amshove.kluent.*
 import org.junit.After
+import org.junit.Assert
 import org.junit.Before
 import org.junit.Test
 import org.junit.runner.RunWith
@@ -37,10 +38,12 @@ class InAppMessagingSpec : BaseTest() {
     private val eventsManager = Mockito.mock(EventsManager::class.java)
     private val viewGroup = Mockito.mock(ViewGroup::class.java)
     private val parentViewGroup = Mockito.mock(ViewGroup::class.java)
+    private val mockContext = Mockito.mock(Context::class.java)
 
     @Before
     fun setup() {
         LocalEventRepository.instance().clearEvents()
+        When calling mockContext.applicationContext itReturns null
     }
 
     @After
@@ -310,6 +313,32 @@ class InAppMessagingSpec : BaseTest() {
         initializeInstance(true)
 
         InAppMessaging.instance().isLocalCachingEnabled().shouldBeTrue()
+    }
+
+    @Test
+    fun `should return true when initialization have no issues`() {
+        InAppMessaging.init(ApplicationProvider.getApplicationContext()).shouldBeTrue()
+    }
+
+    @Test
+    fun `should return true when initialization have no issues with callback`() {
+        InAppMessaging.init(ApplicationProvider.getApplicationContext()) {
+            Assert.fail()
+        }.shouldBeTrue()
+    }
+
+    @Test
+    fun `should return false when initialization have no fails`() {
+        InAppMessaging.init(mockContext).shouldBeFalse()
+    }
+
+    @Test
+    fun `should return false when initialization have no fails with callback`() {
+        val function: (ex: Exception) -> Unit = {}
+        val mockCallback = Mockito.mock(function.javaClass)
+        InAppMessaging.init(mockContext, mockCallback).shouldBeFalse()
+
+        Mockito.verify(mockCallback).invoke(any())
     }
 
     private fun setupDisplayedView(message: Message) {
