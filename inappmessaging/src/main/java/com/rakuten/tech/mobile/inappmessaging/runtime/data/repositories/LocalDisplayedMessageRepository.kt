@@ -1,5 +1,6 @@
 package com.rakuten.tech.mobile.inappmessaging.runtime.data.repositories
 
+import androidx.annotation.VisibleForTesting
 import com.google.gson.Gson
 import com.google.gson.reflect.TypeToken
 import com.rakuten.tech.mobile.inappmessaging.runtime.InAppMessaging
@@ -50,9 +51,12 @@ internal interface LocalDisplayedMessageRepository {
 
     companion object {
         private var instance: LocalDisplayedMessageRepository = LocalDisplayedMessageRepositoryImpl()
-        private const val LOCAL_DISPLAYED_KEY = "local_displayed_list"
-        private const val LOCAL_DISPLAYED_CLOSED_KEY = "local_displayed_closed"
-        private const val LOCAL_DISPLAYED_CLOSED_LIST_KEY = "local_displayed_closed_list"
+        @VisibleForTesting
+        internal const val LOCAL_DISPLAYED_KEY = "local_displayed_list"
+        @VisibleForTesting
+        internal const val LOCAL_DISPLAYED_CLOSED_KEY = "local_displayed_closed"
+        @VisibleForTesting
+        internal const val LOCAL_DISPLAYED_CLOSED_LIST_KEY = "local_displayed_closed_list"
         private const val TAG = "IAM_LocalEventRepo"
 
         internal var isInitialLaunch = false

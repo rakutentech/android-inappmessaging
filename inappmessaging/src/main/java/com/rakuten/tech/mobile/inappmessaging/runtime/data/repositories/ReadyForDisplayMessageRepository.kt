@@ -1,5 +1,6 @@
 package com.rakuten.tech.mobile.inappmessaging.runtime.data.repositories
 
+import androidx.annotation.VisibleForTesting
 import com.google.gson.Gson
 import com.rakuten.tech.mobile.inappmessaging.runtime.InAppMessaging
 import com.rakuten.tech.mobile.inappmessaging.runtime.data.models.messages.Message
@@ -16,7 +17,8 @@ internal abstract class ReadyForDisplayMessageRepository : ReadyMessageRepositor
 
     companion object {
         private var instance: ReadyForDisplayMessageRepository = ReadyForDisplayMessageRepositoryImpl()
-        private const val READY_DISPLAY_KEY = "ready_display_list"
+        @VisibleForTesting
+        internal const val READY_DISPLAY_KEY = "ready_display_list"
         private const val TAG = "IAM_ReadyDisplayRepo"
 
         fun instance(): ReadyForDisplayMessageRepository = instance

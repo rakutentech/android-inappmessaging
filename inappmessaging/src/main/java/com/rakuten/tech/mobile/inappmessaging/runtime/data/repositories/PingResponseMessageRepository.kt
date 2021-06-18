@@ -1,5 +1,6 @@
 package com.rakuten.tech.mobile.inappmessaging.runtime.data.repositories
 
+import androidx.annotation.VisibleForTesting
 import com.google.gson.Gson
 import com.rakuten.tech.mobile.inappmessaging.runtime.InAppMessaging
 import com.rakuten.tech.mobile.inappmessaging.runtime.data.models.messages.Message
@@ -20,7 +21,8 @@ internal abstract class PingResponseMessageRepository : MessageRepository {
 
     companion object {
         private var instance: PingResponseMessageRepository = PingResponseMessageRepositoryImpl()
-        private const val PING_RESPONSE_KEY = "ping_response_list"
+        @VisibleForTesting
+        internal const val PING_RESPONSE_KEY = "ping_response_list"
         private const val TAG = "IAM_PingResponseRepo"
 
         internal var isInitialLaunch = false

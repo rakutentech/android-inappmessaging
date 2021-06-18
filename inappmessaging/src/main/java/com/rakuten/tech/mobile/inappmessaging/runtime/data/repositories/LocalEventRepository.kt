@@ -37,7 +37,9 @@ internal interface LocalEventRepository : EventRepository {
     companion object {
         private const val TAG = "IAM_LocalEventRepo"
         private var instance: LocalEventRepository = LocalEventRepositoryImpl()
-        private const val LOCAL_EVENT_KEY = "local_event_list"
+
+        @VisibleForTesting
+        internal const val LOCAL_EVENT_KEY = "local_event_list"
 
         fun instance() = instance
     }

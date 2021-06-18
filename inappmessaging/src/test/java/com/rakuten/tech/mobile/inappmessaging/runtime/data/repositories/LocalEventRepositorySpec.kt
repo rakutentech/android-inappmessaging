@@ -4,10 +4,7 @@ import android.content.Context
 import android.provider.Settings
 import androidx.test.core.app.ApplicationProvider
 import androidx.work.testing.WorkManagerTestInitHelper
-import com.rakuten.tech.mobile.inappmessaging.runtime.BaseTest
-import com.rakuten.tech.mobile.inappmessaging.runtime.InAppMessaging
-import com.rakuten.tech.mobile.inappmessaging.runtime.TestUserInfoProvider
-import com.rakuten.tech.mobile.inappmessaging.runtime.UserInfoProvider
+import com.rakuten.tech.mobile.inappmessaging.runtime.*
 import com.rakuten.tech.mobile.inappmessaging.runtime.data.models.appevents.*
 import com.rakuten.tech.mobile.inappmessaging.runtime.manager.EventsManager
 import com.rakuten.tech.mobile.inappmessaging.runtime.utils.InAppMessagingConstants
@@ -136,6 +133,31 @@ class LocalEventRepositorySpec : BaseTest() {
 
     @Test
     fun `should save and restore values for different users`() {
+        setupAndTestMultipleUser()
+        LocalEventRepository.instance().getEvents().shouldHaveSize(4)
+    }
+
+    @Test
+    fun `should not crash and clear previous when forced cast exception`() {
+        setupAndTestMultipleUser()
+        val editor = InAppMessaging.instance().getSharedPref()?.edit()
+        editor?.putInt(LocalEventRepository.LOCAL_EVENT_KEY, 1)?.apply()
+
+        LocalEventRepository.instance().addEvent(LoginSuccessfulEvent())
+        LocalEventRepository.instance().getEvents().shouldHaveSize(2) // including persistent type
+    }
+
+    @Test
+    fun `should not crash and clear previous when parsing invalid json`() {
+        setupAndTestMultipleUser()
+        val editor = InAppMessaging.instance().getSharedPref()?.edit()
+        editor?.putString(LocalEventRepository.LOCAL_EVENT_KEY, "[{eventType:\"invalid\"}]")?.apply()
+
+        LocalEventRepository.instance().addEvent(LoginSuccessfulEvent())
+        LocalEventRepository.instance().getEvents().shouldHaveSize(1) // clear all due to invalid data
+    }
+
+    private fun setupAndTestMultipleUser() {
         val infoProvider = TestUserInfoProvider()
         initializeInstance(infoProvider)
 
@@ -149,7 +171,6 @@ class LocalEventRepositorySpec : BaseTest() {
         // revert to initial user info
         infoProvider.rakutenId = TestUserInfoProvider.TEST_RAKUTEN_ID
         AccountRepository.instance().updateUserInfo()
-        LocalEventRepository.instance().getEvents().shouldHaveSize(4)
     }
 
     private fun initializeInstance(infoProvider: UserInfoProvider) {

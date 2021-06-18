@@ -53,6 +53,19 @@ class LocalOptedOutMessageRepositorySpec : BaseTest() {
 
     @Test
     fun `should save and restore values for different users`() {
+        val message = setupAndTestMultipleUser()
+        LocalOptedOutMessageRepository.instance().hasMessage(message.getCampaignId()).shouldBeTrue()
+    }
+
+    @Test
+    fun `should not crash and clear previous when forced cast exception`() {
+        val message = setupAndTestMultipleUser()
+        val editor = InAppMessaging.instance().getSharedPref()?.edit()
+        editor?.putInt(LocalOptedOutMessageRepository.LOCAL_OPTED_OUT_KEY, 1)?.apply()
+        LocalOptedOutMessageRepository.instance().hasMessage(message.getCampaignId()).shouldBeFalse()
+    }
+
+    private fun setupAndTestMultipleUser(): ValidTestMessage {
         val infoProvider = TestUserInfoProvider()
         initializeInstance(infoProvider)
 
@@ -67,7 +80,7 @@ class LocalOptedOutMessageRepositorySpec : BaseTest() {
         // revert to initial user info
         infoProvider.rakutenId = TestUserInfoProvider.TEST_RAKUTEN_ID
         AccountRepository.instance().updateUserInfo()
-        LocalOptedOutMessageRepository.instance().hasMessage(message.getCampaignId()).shouldBeTrue()
+        return message
     }
 
     private fun initializeInstance(infoProvider: UserInfoProvider) {

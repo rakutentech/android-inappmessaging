@@ -109,20 +109,7 @@ class LocalDisplayedMessageRepositorySpec : BaseTest() {
 
     @Test
     fun `should save and restore values for different users`() {
-        val infoProvider = TestUserInfoProvider()
-        initializeInstance(infoProvider)
-
-        val message = ValidTestMessage()
-        LocalDisplayedMessageRepository.instance().addMessage(message)
-        LocalDisplayedMessageRepository.instance().numberOfTimesDisplayed(message) shouldBeEqualTo 1
-
-        infoProvider.rakutenId = "user2"
-        AccountRepository.instance().updateUserInfo()
-        LocalDisplayedMessageRepository.instance().numberOfTimesDisplayed(message) shouldBeEqualTo 0
-
-        // revert to initial user info
-        infoProvider.rakutenId = TestUserInfoProvider.TEST_RAKUTEN_ID
-        AccountRepository.instance().updateUserInfo()
+        val message = setupAndTestMultipleUser()
         LocalDisplayedMessageRepository.instance().numberOfTimesDisplayed(message) shouldBeEqualTo 1
     }
 
@@ -170,6 +157,35 @@ class LocalDisplayedMessageRepositorySpec : BaseTest() {
         LocalDisplayedMessageRepository.instance().setRemovedMessage("1234")
 
         LocalDisplayedMessageRepository.instance().numberOfTimesClosed("4321") shouldBeEqualTo 0
+    }
+
+    @Test
+    fun `should not crash and clear previous when forced cast exception`() {
+        val message = setupAndTestMultipleUser()
+        val editor = InAppMessaging.instance().getSharedPref()?.edit()
+        editor?.putInt(LocalDisplayedMessageRepository.LOCAL_DISPLAYED_CLOSED_LIST_KEY, 1)
+                ?.putInt(LocalDisplayedMessageRepository.LOCAL_DISPLAYED_CLOSED_KEY, 1)
+                ?.putInt(LocalDisplayedMessageRepository.LOCAL_DISPLAYED_KEY, 1)?.apply()
+
+        LocalDisplayedMessageRepository.instance().numberOfTimesDisplayed(message) shouldBeEqualTo 0
+    }
+
+    private fun setupAndTestMultipleUser(): ValidTestMessage {
+        val infoProvider = TestUserInfoProvider()
+        initializeInstance(infoProvider)
+
+        val message = ValidTestMessage()
+        LocalDisplayedMessageRepository.instance().addMessage(message)
+        LocalDisplayedMessageRepository.instance().numberOfTimesDisplayed(message) shouldBeEqualTo 1
+
+        infoProvider.rakutenId = "user2"
+        AccountRepository.instance().updateUserInfo()
+        LocalDisplayedMessageRepository.instance().numberOfTimesDisplayed(message) shouldBeEqualTo 0
+
+        // revert to initial user info
+        infoProvider.rakutenId = TestUserInfoProvider.TEST_RAKUTEN_ID
+        AccountRepository.instance().updateUserInfo()
+        return message
     }
 
     private fun initializeInstance(infoProvider: UserInfoProvider, isCache: Boolean = true) {

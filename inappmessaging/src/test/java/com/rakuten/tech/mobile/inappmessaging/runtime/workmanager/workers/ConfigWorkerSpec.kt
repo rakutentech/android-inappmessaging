@@ -104,7 +104,7 @@ class ConfigWorkerSuccessSpec : ConfigWorkerSpec() {
                 .getInAppMessagingSubscriptionKey() itReturns bundle.getString(SUBSCRIPTION_KEY, "")
         val worker = ConfigWorker(context, workerParameters, mockHostRepository, mockConfigRepository,
                 mockMessageScheduler)
-        val expected = if (HostAppInfoRepository.instance().getConfigUrl().isNullOrEmpty())
+        val expected = if (bundle.getString(CONFIG_KEY, "").isNullOrEmpty())
             ListenableWorker.Result.retry() else ListenableWorker.Result.success()
         worker.doWork() shouldBeEqualTo expected
     }

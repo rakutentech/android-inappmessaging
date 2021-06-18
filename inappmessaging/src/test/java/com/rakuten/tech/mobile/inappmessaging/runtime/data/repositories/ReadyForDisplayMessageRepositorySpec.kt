@@ -135,6 +135,19 @@ class ReadyForDisplayMessageRepositorySpec : BaseTest() {
 
     @Test
     fun `should save and restore values for different users`() {
+        setupAndTestMultipleUser()
+        ReadyForDisplayMessageRepository.instance().getAllMessagesCopy().shouldHaveSize(2)
+    }
+
+    @Test
+    fun `should not crash and clear previous when forced cast exception`() {
+        setupAndTestMultipleUser()
+        val editor = InAppMessaging.instance().getSharedPref()?.edit()
+        editor?.putInt(ReadyForDisplayMessageRepository.READY_DISPLAY_KEY, 1)?.apply()
+        ReadyForDisplayMessageRepository.instance().getAllMessagesCopy().shouldBeEmpty()
+    }
+
+    private fun setupAndTestMultipleUser() {
         val infoProvider = TestUserInfoProvider()
         initializeInstance(infoProvider)
 
@@ -148,7 +161,6 @@ class ReadyForDisplayMessageRepositorySpec : BaseTest() {
         // revert to initial user info
         infoProvider.rakutenId = TestUserInfoProvider.TEST_RAKUTEN_ID
         AccountRepository.instance().updateUserInfo()
-        ReadyForDisplayMessageRepository.instance().getAllMessagesCopy().shouldHaveSize(2)
     }
 
     private fun initializeInstance(infoProvider: UserInfoProvider) {

@@ -1,5 +1,6 @@
 package com.rakuten.tech.mobile.inappmessaging.runtime.data.repositories
 
+import androidx.annotation.VisibleForTesting
 import androidx.annotation.WorkerThread
 import com.rakuten.tech.mobile.inappmessaging.runtime.InAppMessaging
 import com.rakuten.tech.mobile.inappmessaging.runtime.data.models.messages.Message
@@ -30,7 +31,8 @@ internal interface LocalOptedOutMessageRepository {
 
     companion object {
         private var instance: LocalOptedOutMessageRepository = LocalOptedOutMessageRepositoryImpl()
-        private const val LOCAL_OPTED_OUT_KEY = "local_opted_out_list"
+        @VisibleForTesting
+        internal const val LOCAL_OPTED_OUT_KEY = "local_opted_out_list"
         private const val TAG = "IAM_LocalOptedOutRepo"
 
         fun instance() = instance
