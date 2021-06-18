@@ -380,7 +380,7 @@ class InAppMessageViewListenerOnKeySpec : InAppMessageViewListenerSpec() {
         listener.onKey(mockView, KeyEvent.KEYCODE_BREAK, keyEvent).shouldBeFalse()
     }
 
-    @Test
+//    @Test
     fun `should return true on false coroutine`() {
         val message = ValidTestMessage("1", true)
         val listener = InAppMessageViewListener(message = message,
