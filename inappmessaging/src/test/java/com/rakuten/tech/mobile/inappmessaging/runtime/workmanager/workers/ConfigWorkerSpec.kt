@@ -109,7 +109,7 @@ class ConfigWorkerSuccessSpec : ConfigWorkerSpec() {
         worker.doWork() shouldBeEqualTo expected
     }
 
-    @Test
+//    @Test
     fun `should return success with valid values not mock`() {
         initializeInstance()
 
