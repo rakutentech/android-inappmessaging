@@ -117,16 +117,22 @@ abstract class InAppMessaging internal constructor() {
         fun instance(): InAppMessaging = instance
 
         /**
-         * Initializes the InAppMesssaging SDK.
+         * Initializes the In-App Messaging SDK. [errorCallback] is an optional callback function for
+         * app to receive the exception that caused failed init.
+         *
+         * @return `true` if initialization is successful, and `false` otherwise.
          */
-        fun init(context: Context, errorCallback: ((ex: Exception) -> Unit)? = null) {
+        @SuppressWarnings("TooGenericExceptionCaught")
+        fun init(context: Context, errorCallback: ((ex: Exception) -> Unit)? = null): Boolean {
             InApp.errorCallback = errorCallback
-            try {
+            return try {
                 initialize(context, isCacheHandling = BuildConfig.IS_CACHE_HANDLING)
+                true
             } catch (ex: Exception) {
                 errorCallback?.let {
                     it(InAppMessagingInitializationException("In-App Messaging initialization failed", ex.cause))
                 }
+                false
             }
         }
 

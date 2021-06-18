@@ -14,6 +14,7 @@ import com.rakuten.tech.mobile.inappmessaging.runtime.data.models.HostAppInfo
 import com.rakuten.tech.mobile.inappmessaging.runtime.data.repositories.HostAppInfoRepository
 import com.rakuten.tech.mobile.inappmessaging.runtime.exception.InAppMessagingInitializationException
 import timber.log.Timber
+import java.lang.ClassCastException
 import java.util.Locale
 import java.util.UUID
 
@@ -105,7 +106,12 @@ internal object Initializer {
         val sharedPref = sharedUtil.createSharedPreference(context, "uuid")
 
         return if (sharedPref.contains(ID_KEY)) {
-            sharedPref.getString(ID_KEY, "").toString()
+            try {
+                sharedPref.getString(ID_KEY, "").toString()
+            } catch (ex: ClassCastException) {
+                Timber.tag(TAG).d(ex.cause, "Incorrect type for $ID_KEY data")
+                ""
+            }
         } else {
             val id = UUID.randomUUID().toString()
             sharedPref.edit().putString(ID_KEY, id).apply()

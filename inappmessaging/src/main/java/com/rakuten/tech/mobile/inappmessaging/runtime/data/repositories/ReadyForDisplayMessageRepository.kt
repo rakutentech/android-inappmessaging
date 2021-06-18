@@ -6,6 +6,8 @@ import com.rakuten.tech.mobile.inappmessaging.runtime.data.models.messages.Messa
 import com.rakuten.tech.mobile.inappmessaging.runtime.data.responses.ping.CampaignData
 import com.rakuten.tech.mobile.inappmessaging.runtime.utils.InAppMessagingConstants
 import org.json.JSONArray
+import timber.log.Timber
+import java.lang.ClassCastException
 
 /**
  * Contains all messages are ready for display, but not yet displayed.
@@ -15,6 +17,7 @@ internal abstract class ReadyForDisplayMessageRepository : ReadyMessageRepositor
     companion object {
         private var instance: ReadyForDisplayMessageRepository = ReadyForDisplayMessageRepositoryImpl()
         private const val READY_DISPLAY_KEY = "ready_display_list"
+        private const val TAG = "IAM_ReadyDisplayRepo"
 
         fun instance(): ReadyForDisplayMessageRepository = instance
     }
@@ -82,8 +85,13 @@ internal abstract class ReadyForDisplayMessageRepository : ReadyMessageRepositor
                     (onLaunch || user != AccountRepository.instance().userInfoHash)) {
                 user = AccountRepository.instance().userInfoHash
                 // reset message list from cached using updated user info
-                val listString = InAppMessaging.instance().getSharedPref()?.getString(READY_DISPLAY_KEY, "")
-                        ?: ""
+                val listString = try {
+                    InAppMessaging.instance().getSharedPref()?.getString(READY_DISPLAY_KEY, "") ?: ""
+                } catch (ex: ClassCastException) {
+                    Timber.tag(TAG).d(ex.cause, "Incorrect type for $READY_DISPLAY_KEY data")
+                    ""
+                }
+
                 messages.clear()
                 if (listString.isNotEmpty()) {
                     val jsonArray = JSONArray(listString)
@@ -99,7 +107,7 @@ internal abstract class ReadyForDisplayMessageRepository : ReadyMessageRepositor
             if (InAppMessaging.instance().isLocalCachingEnabled()) {
                 // reset updated message list
                 InAppMessaging.instance().getSharedPref()?.edit()?.putString(READY_DISPLAY_KEY,
-                        Gson().toJson(messages))?.apply()
+                        Gson().toJson(messages))?.apply() ?: Timber.tag(TAG).d("failed saving ready data")
             }
         }
     }
