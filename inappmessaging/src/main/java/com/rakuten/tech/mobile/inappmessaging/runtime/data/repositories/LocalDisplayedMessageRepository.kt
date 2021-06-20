@@ -57,7 +57,7 @@ internal interface LocalDisplayedMessageRepository {
         internal const val LOCAL_DISPLAYED_CLOSED_KEY = "local_displayed_closed"
         @VisibleForTesting
         internal const val LOCAL_DISPLAYED_CLOSED_LIST_KEY = "local_displayed_closed_list"
-        private const val TAG = "IAM_LocalEventRepo"
+        private const val TAG = "IAM_LocalDisplayRepo"
 
         internal var isInitialLaunch = false
 
