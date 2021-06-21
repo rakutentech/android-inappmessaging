@@ -22,7 +22,6 @@ import java.util.concurrent.TimeUnit
  * more. Methods are not static because dependency injection makes this util object available to
  * everyone and easy to use. Plus static functions are difficult to test.
  */
-@SuppressWarnings("PMD.ExcessiveImports")
 internal object RuntimeUtil {
     private const val DEFAULT_TIMEOUT_IN_SECONDS = 5
     private val OK_HTTP_CLIENT = OkHttpClient.Builder()

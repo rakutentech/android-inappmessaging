@@ -21,7 +21,6 @@ import kotlinx.android.synthetic.main.opt_out_checkbox.view.*
 /**
  * Base class of all custom views.
  */
-@SuppressWarnings("PMD.ExcessiveImports")
 internal open class InAppMessageBaseView(context: Context, attrs: AttributeSet?) :
         FrameLayout(context, attrs), InAppMessageView {
 
@@ -149,7 +148,7 @@ internal open class InAppMessageBaseView(context: Context, attrs: AttributeSet?)
      * This method binds data to message header.
      */
     @SuppressLint("ClickableViewAccessibility")
-    @Suppress("LongMethod")
+    @SuppressWarnings("LongMethod")
     private fun bindText() {
         if (!header.isNullOrEmpty() || !messageBody.isNullOrEmpty()) {
             val scrollView = message_scrollview

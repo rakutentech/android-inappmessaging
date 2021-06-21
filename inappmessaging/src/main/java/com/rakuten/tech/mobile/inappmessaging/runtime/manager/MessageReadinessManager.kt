@@ -30,7 +30,7 @@ internal interface MessageReadinessManager {
      * This method returns the next ready to display message.
      */
     @WorkerThread
-    @Suppress("LongMethod", "ReturnCount")
+    @SuppressWarnings("LongMethod", "ReturnCount")
     fun getNextDisplayMessage(): Message?
 
     /**
@@ -43,7 +43,7 @@ internal interface MessageReadinessManager {
      * This method returns a DisplayPermissionResponse object.
      */
     @VisibleForTesting
-    @Suppress("FunctionMaxLength")
+    @SuppressWarnings("FunctionMaxLength")
     fun getDisplayPermissionResponseCall(displayPermissionUrl: String, request: DisplayPermissionRequest):
             Call<DisplayPermissionResponse>
 
@@ -56,7 +56,7 @@ internal interface MessageReadinessManager {
 
     private class MessageReadinessManagerImpl : MessageReadinessManager {
         @WorkerThread
-        @Suppress("LongMethod", "ReturnCount")
+        @SuppressWarnings("LongMethod", "ReturnCount")
         override fun getNextDisplayMessage(): Message? {
             var messageList: List<Message> = ReadyForDisplayMessageRepository.instance().getAllMessagesCopy()
             for (message in messageList) {
@@ -102,7 +102,7 @@ internal interface MessageReadinessManager {
         }
 
         @VisibleForTesting
-        @Suppress("FunctionMaxLength")
+        @SuppressWarnings("FunctionMaxLength")
         override fun getDisplayPermissionResponseCall(
             displayPermissionUrl: String,
             request: DisplayPermissionRequest
@@ -143,7 +143,7 @@ internal interface MessageReadinessManager {
         /**
          * This method returns display message permission (from server).
          */
-        @Suppress("ReturnCount")
+        @SuppressWarnings("ReturnCount")
         private fun getMessagePermission(message: Message): DisplayPermissionResponse? {
             // Prepare request data.
             val displayPermissionUrl: String = ConfigResponseRepository.instance().getDisplayPermissionEndpoint()

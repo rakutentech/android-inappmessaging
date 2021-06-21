@@ -116,8 +116,8 @@ internal class MessageActionsCoroutine(
         return when {
             impressionType == ImpressionType.ACTION_ONE && !controlSettings.buttons.isNullOrEmpty() ->
                 controlSettings.buttons[0].buttonBehavior
-            impressionType == ImpressionType.ACTION_TWO && controlSettings.buttons?.size!! >= 2 ->
-                controlSettings.buttons[1].buttonBehavior
+            impressionType == ImpressionType.ACTION_TWO && (controlSettings.buttons?.size ?: 0 >= 2) ->
+                controlSettings.buttons?.get(1)?.buttonBehavior
             impressionType == ImpressionType.CLICK_CONTENT -> controlSettings.content.onClick
             else -> null
         }
@@ -182,27 +182,32 @@ internal class MessageActionsCoroutine(
     /**
      * This method retrieves embedded event object from message based on impressionType.
      */
-    @Suppress("LongMethod", "ComplexCondition", "ReturnCount", "MaxLineLength", "MaximumLineLength")
+    @SuppressWarnings("LongMethod", "ComplexCondition", "ReturnCount", "MaxLineLength", "MaximumLineLength")
     private fun getEmbeddedEvent(impressionType: ImpressionType, message: Message?): Trigger? {
-        if (ImpressionType.ACTION_ONE == impressionType || ImpressionType.ACTION_TWO == impressionType) {
-            val index = if (impressionType == ImpressionType.ACTION_ONE) 0 else 1
-            if (message?.getMessagePayload() != null &&
+        try {
+            if (ImpressionType.ACTION_ONE == impressionType || ImpressionType.ACTION_TWO == impressionType) {
+                val index = if (impressionType == ImpressionType.ACTION_ONE) 0 else 1
+                if (message?.getMessagePayload() != null &&
+                        message.getMessagePayload()!!.messageSettings != null &&
+                        message.getMessagePayload()!!.messageSettings?.controlSettings != null &&
+                        message.getMessagePayload()!!.messageSettings?.controlSettings?.buttons != null &&
+                        message.getMessagePayload()!!.messageSettings?.controlSettings?.buttons?.get(index) != null) {
+
+                    return message.getMessagePayload()!!.messageSettings
+                            ?.controlSettings?.buttons?.get(index)?.embeddedEvent
+                }
+            } else if (ImpressionType.CLICK_CONTENT == impressionType &&
+                    message != null &&
+                    message.getMessagePayload() != null &&
                     message.getMessagePayload()!!.messageSettings != null &&
                     message.getMessagePayload()!!.messageSettings?.controlSettings != null &&
-                    message.getMessagePayload()!!.messageSettings?.controlSettings?.buttons != null &&
-                    message.getMessagePayload()!!.messageSettings?.controlSettings?.buttons?.get(index) != null) {
+                    message.getMessagePayload()!!.messageSettings?.controlSettings?.content != null) {
 
-                return message.getMessagePayload()!!.messageSettings
-                        ?.controlSettings?.buttons?.get(index)?.embeddedEvent
+                return message.getMessagePayload()!!.messageSettings?.controlSettings?.content?.embeddedEvent
             }
-        } else if (ImpressionType.CLICK_CONTENT == impressionType &&
-                message != null &&
-                message.getMessagePayload() != null &&
-                message.getMessagePayload()!!.messageSettings != null &&
-                message.getMessagePayload()!!.messageSettings?.controlSettings != null &&
-                message.getMessagePayload()!!.messageSettings?.controlSettings?.content != null) {
-
-            return message.getMessagePayload()!!.messageSettings?.controlSettings?.content?.embeddedEvent
+        } catch (ex: Exception) {
+            // no need to call error callback since this is an internal issue
+            Timber.tag(TAG).d(ex)
         }
         return null
     }
@@ -210,9 +215,10 @@ internal class MessageActionsCoroutine(
     /**
      * This method creates a local custom event based on argument.
      */
-    @Suppress("LongMethod", "ReturnCount")
+    @SuppressWarnings("LongMethod", "ReturnCount")
     private fun createLocalCustomEvent(embeddedEvent: Trigger): Event? {
-        if (EventType.CUSTOM != EventType.getById(embeddedEvent.eventType!!)) {
+        val type = embeddedEvent.eventType ?: return null
+        if (EventType.CUSTOM != EventType.getById(type)) {
             return null
         }
 

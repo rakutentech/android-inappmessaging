@@ -3,7 +3,7 @@ package com.rakuten.tech.mobile.inappmessaging.runtime.data.enums
 /**
  * Representing all In-App message's animation directions.
  */
-@Suppress("MagicNumber")
+@SuppressWarnings("MagicNumber")
 internal enum class SlideFromDirectionType(val typeId: Int) {
     INVALID(0),
     BOTTOM(1),

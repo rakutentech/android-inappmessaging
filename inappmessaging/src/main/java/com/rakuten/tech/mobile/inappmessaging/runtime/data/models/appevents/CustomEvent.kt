@@ -1,5 +1,6 @@
 package com.rakuten.tech.mobile.inappmessaging.runtime.data.models.appevents
 
+import androidx.annotation.NonNull
 import androidx.annotation.RestrictTo
 import androidx.annotation.RestrictTo.Scope.LIBRARY
 import com.rakuten.tech.mobile.inappmessaging.runtime.data.enums.EventType
@@ -17,8 +18,10 @@ import java.util.Collections
  * Logging custom event for client to use.
  * Note: Please don't use the same attribute's name more than once
  * because the new attribute will replace the old one.
+ *
+ * @throws IllegalArgumentException if [eventName] is an empty string or is more than 255 characters.
  */
-class CustomEvent(eventName: String) : BaseEvent(EventType.CUSTOM, eventName, false) {
+class CustomEvent(@NonNull eventName: String) : BaseEvent(EventType.CUSTOM, eventName, false) {
     private val attributesMap: MutableMap<String, Attribute> = HashMap()
 
     /**

@@ -12,7 +12,6 @@ import java.util.concurrent.TimeUnit
 /**
  * Scheduling workers to do their work in the background to communicate with IAM config service.
  */
-@SuppressWarnings("PMD.UseUtilityClass")
 internal interface ConfigScheduler {
 
     fun startConfig(delay: Long = 0)

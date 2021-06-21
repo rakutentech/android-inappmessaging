@@ -29,7 +29,7 @@ import org.robolectric.annotation.Config
  */
 @RunWith(ParameterizedRobolectricTestRunner::class)
 @Config(sdk = [Build.VERSION_CODES.O_MR1])
-@Suppress("LongMethod")
+@SuppressWarnings("LongMethod")
 internal class MessageActionsCoroutineSpec(
     val testName: String,
     private val resourceId: Int,

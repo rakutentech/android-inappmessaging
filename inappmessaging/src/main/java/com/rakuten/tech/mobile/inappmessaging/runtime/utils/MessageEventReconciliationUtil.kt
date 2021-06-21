@@ -21,8 +21,7 @@ import kotlin.collections.set
 /**
  * Utility class helping MessageEventReconciliationWorker for reconciliation.
  */
-@Suppress("LargeClass", "LabeledExpression")
-@SuppressWarnings("PMD.GodClass")
+@SuppressWarnings("LargeClass", "LabeledExpression")
 internal interface MessageEventReconciliationUtil {
 
     /**
@@ -85,7 +84,7 @@ internal interface MessageEventReconciliationUtil {
          * Note: once the event has been reconciled with the message, it will be removed from the
          * argument eventMap. Because each event can only be used once against a message.
          */
-        @Suppress("LongMethod", "ComplexMethod", "NestedBlockDepth", "ReturnCount")
+        @SuppressWarnings("LongMethod", "ComplexMethod", "NestedBlockDepth", "ReturnCount")
         private fun isMessageReconciled(message: Message, eventMap: Map<String, MutableList<Event>>): Boolean {
             // Getting the number of reconciliations are needed in order to reconcile this message.
             val requiredSetsOfSatisfiedTriggersToDisplayMessage = getNumTimesToSatisfyTriggersForDisplay(message)
@@ -162,7 +161,7 @@ internal interface MessageEventReconciliationUtil {
          * can have attributes that are not part of trigger's attributes. Also, all trigger's attributes
          * just need to be satisfied once by event's attributes.
          */
-        @Suppress("ReturnCount")
+        @SuppressWarnings("ReturnCount")
         private fun isTriggerReconciled(trigger: Trigger, event: Event): Boolean {
             // Validate argument event is for the argument trigger and
             // if different custom events share the same eventType.
@@ -213,7 +212,7 @@ internal interface MessageEventReconciliationUtil {
          * The method checks if the value from event attribute can satisfy trigger's attribute values according to
          * trigger attribute's operator type.
          */
-        @Suppress("ReturnCount", "ComplexCondition", "LongMethod")
+        @SuppressWarnings("ReturnCount", "ComplexCondition", "LongMethod")
         private fun isValueReconciled(
             valueTypeId: Int,
             eventValue: String?,
@@ -257,7 +256,7 @@ internal interface MessageEventReconciliationUtil {
          * qualified local events are needed to satisfy this message's triggers, and so on. In summary,
          * getNumTimesToSatisfyTriggersForDisplay = displayedImpression + 1.
          */
-        @Suppress("FunctionMaxLength")
+        @SuppressWarnings("FunctionMaxLength")
         private fun getNumTimesToSatisfyTriggersForDisplay(message: Message): Int {
             val maxImpression = message.getMaxImpressions()
             val displayedImpression: Int = LocalDisplayedMessageRepository.instance().numberOfTimesDisplayed(message)
@@ -306,7 +305,7 @@ internal interface MessageEventReconciliationUtil {
          * The purpose of only extracting relevant events is to increase performance
          * by only reconcile these relevant events.
          */
-        @Suppress("ReturnCount", "LongMethod")
+        @SuppressWarnings("ReturnCount", "LongMethod")
         private fun copyEventsForTrigger(trigger: Trigger, eventMap: Map<String, MutableList<Event>>):
                 MutableList<Event>? {
             // Reconcile by trigger's type.

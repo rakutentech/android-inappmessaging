@@ -3,7 +3,7 @@ package com.rakuten.tech.mobile.inappmessaging.runtime.data.enums
 /**
  * All types of impressions.
  */
-@Suppress("MagicNumber")
+@SuppressWarnings("MagicNumber")
 internal enum class ImpressionType(val typeId: Int) {
     INVALID(0),
     // View impression.

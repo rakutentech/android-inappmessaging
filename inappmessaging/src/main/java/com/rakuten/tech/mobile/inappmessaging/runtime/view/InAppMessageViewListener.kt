@@ -42,7 +42,7 @@ internal class InAppMessageViewListener(
      * Callback When touch event occurred. Which will trigger to magnify message view content.
      */
     @SuppressLint("NewApi")
-    @Suppress("LongMethod")
+    @SuppressWarnings("LongMethod")
     override fun onTouch(view: View, event: MotionEvent): Boolean {
         if (buildChecker.isAndroidQAndAbove()) {
             when (event.actionMasked) {

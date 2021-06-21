@@ -9,7 +9,7 @@ import org.junit.Test
 /**
  * Test class for ValueMatchingUtil.
  */
-@Suppress("LargeClass")
+@SuppressWarnings("LargeClass")
 class ValueMatchingUtilSpec : BaseTest() {
     /* ---------------------------------- Testing for null arguments --------------------------*/
     @Test

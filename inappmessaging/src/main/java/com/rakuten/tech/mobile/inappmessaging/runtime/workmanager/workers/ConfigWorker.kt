@@ -47,7 +47,7 @@ internal class ConfigWorker(
      * the response(200/400) returned from Config Service, `WorkerResult.Success` should always be
      * returned. Because this work(network call to config service) was scheduled and executed.
      */
-    @Suppress("LongMethod")
+    @SuppressWarnings("LongMethod")
     override fun doWork(): Result {
         Timber.tag(TAG).d(hostRepo.getConfigUrl())
         val hostAppId = hostRepo.getPackageName()

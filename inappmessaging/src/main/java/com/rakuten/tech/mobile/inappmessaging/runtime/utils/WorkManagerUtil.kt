@@ -6,7 +6,6 @@ import androidx.work.NetworkType
 /**
  * Utility class for WorkManager related classes.
  */
-@SuppressWarnings("PMD.UseUtilityClass")
 internal object WorkManagerUtil {
     /**
      * This method returns work constraints for impression worker.

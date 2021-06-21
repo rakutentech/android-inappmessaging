@@ -26,7 +26,6 @@ import java.net.HttpURLConnection
  * class, and uses synchronized network call to make request to Message Mixer Service. Note: If
  * return RETRY, WorkerManager will make exponential backoff retries by itself.
  */
-@SuppressWarnings("PMD.ExcessiveImports")
 internal class MessageMixerWorker(
     context: Context,
     workerParams: WorkerParameters,
@@ -136,7 +135,7 @@ internal class MessageMixerWorker(
     /**
      * This method parses response data, and returns a list of parsed messages.
      */
-    @Suppress("FunctionMaxLength")
+    @SuppressWarnings("FunctionMaxLength")
     private fun parsePingResponseWithTestMessage(response: MessageMixerResponse): List<Message> {
         val parsedMessages = ArrayList<Message>()
         for (data in response.data) {

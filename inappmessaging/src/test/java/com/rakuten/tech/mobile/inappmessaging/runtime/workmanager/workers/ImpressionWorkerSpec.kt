@@ -40,7 +40,7 @@ import java.util.*
  */
 @RunWith(RobolectricTestRunner::class)
 @Config(sdk = [Build.VERSION_CODES.O_MR1])
-@Suppress("LargeClass")
+@SuppressWarnings("LargeClass")
 class ImpressionWorkerSpec : BaseTest() {
 
     private val context = Mockito.mock(Context::class.java)

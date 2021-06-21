@@ -20,7 +20,6 @@ import java.net.HttpURLConnection
 /**
  * A background Worker class which handles reporting impressions.
  */
-@SuppressWarnings("PMD.ExcessiveImports")
 internal class ImpressionWorker(
     context: Context,
     workerParams: WorkerParameters
@@ -31,7 +30,7 @@ internal class ImpressionWorker(
      * This method makes a thread blocking network call to post impression.
      * If server responding a non-successful response, work will be retried again with exponential backoff.
      */
-    @Suppress("LongMethod", "ReturnCount")
+    @SuppressWarnings("LongMethod", "ReturnCount")
     override fun doWork(): Result {
         // Retrieve input data.
         val impressionEndpoint = ConfigResponseRepository.instance().getImpressionEndpoint()

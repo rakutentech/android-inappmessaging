@@ -13,7 +13,6 @@ import java.util.concurrent.TimeUnit
 /**
  * Utility class used for scheduling WorkManager's workers to communicate with IAM /ping endpoint.
  */
-@SuppressWarnings("PMD.UseUtilityClass") // Private constructor made package private for testing.
 internal interface MessageMixerPingScheduler {
 
     /**

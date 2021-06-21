@@ -3,7 +3,7 @@ package com.rakuten.tech.mobile.inappmessaging.runtime.data.enums
 /**
  * OperatorType contains all the possible enum types for trigger attribute comparison.
  */
-@Suppress("MagicNumber")
+@SuppressWarnings("MagicNumber")
 internal enum class OperatorType(val typeId: Int) {
     INVALID(0),
     EQUALS(1),

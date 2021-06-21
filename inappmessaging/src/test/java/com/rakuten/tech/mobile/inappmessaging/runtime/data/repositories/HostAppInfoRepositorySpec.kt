@@ -3,7 +3,7 @@ package com.rakuten.tech.mobile.inappmessaging.runtime.data.repositories
 import com.rakuten.tech.mobile.inappmessaging.runtime.BaseTest
 import com.rakuten.tech.mobile.inappmessaging.runtime.InAppMessagingTestConstants
 import com.rakuten.tech.mobile.inappmessaging.runtime.data.models.HostAppInfo
-import com.rakuten.tech.mobile.inappmessaging.runtime.exception.InAppMessagingInitializationException
+import com.rakuten.tech.mobile.inappmessaging.runtime.exception.InAppMessagingException
 import com.rakuten.tech.mobile.inappmessaging.runtime.utils.InAppMessagingConstants
 import org.amshove.kluent.shouldBeEqualTo
 import org.junit.Assert
@@ -38,7 +38,7 @@ class HostAppInfoRepositorySpec : BaseTest() {
         try {
             HostAppInfoRepository.instance().addHostInfo(null)
             Assert.fail()
-        } catch (e: InAppMessagingInitializationException) {
+        } catch (e: InAppMessagingException) {
             e.localizedMessage shouldBeEqualTo InAppMessagingConstants.ARGUMENT_IS_NULL_EXCEPTION
         }
     }
@@ -49,7 +49,7 @@ class HostAppInfoRepositorySpec : BaseTest() {
         try {
             HostAppInfoRepository.instance().addHostInfo(hostAppInfo)
             Assert.fail()
-        } catch (e: InAppMessagingInitializationException) {
+        } catch (e: InAppMessagingException) {
             e.localizedMessage shouldBeEqualTo InAppMessagingConstants.VERSION_IS_EMPTY_EXCEPTION
         }
     }
@@ -60,7 +60,7 @@ class HostAppInfoRepositorySpec : BaseTest() {
         try {
             HostAppInfoRepository.instance().addHostInfo(hostAppInfo)
             Assert.fail()
-        } catch (e: InAppMessagingInitializationException) {
+        } catch (e: InAppMessagingException) {
             e.localizedMessage shouldBeEqualTo InAppMessagingConstants.PACKAGE_NAME_IS_EMPTY_EXCEPTION
         }
     }
@@ -73,7 +73,7 @@ class HostAppInfoRepositorySpec : BaseTest() {
         try {
             HostAppInfoRepository.instance().addHostInfo(hostAppInfo)
             Assert.fail()
-        } catch (e: InAppMessagingInitializationException) {
+        } catch (e: InAppMessagingException) {
             e.localizedMessage shouldBeEqualTo InAppMessagingConstants.SUBSCRIPTION_KEY_IS_EMPTY_EXCEPTION
         }
     }

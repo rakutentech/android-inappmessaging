@@ -121,7 +121,7 @@ class InAppMessagingSpec : BaseTest() {
     }
 
     @Test
-    @Suppress("SwallowedException")
+    @SuppressWarnings("SwallowedException")
     fun `should not crash logging event for initialized instance`() {
         initializeInstance()
 
@@ -133,7 +133,7 @@ class InAppMessagingSpec : BaseTest() {
     }
 
     @Test
-    @Suppress("SwallowedException")
+    @SuppressWarnings("SwallowedException")
     // For code coverage. will be deleted when updateSession() is removed
     fun `should not crash update session for initialized instance`() {
         initializeInstance()
@@ -146,7 +146,7 @@ class InAppMessagingSpec : BaseTest() {
     }
 
     @Test
-    @Suppress("SwallowedException")
+    @SuppressWarnings("SwallowedException")
     fun `should not crash close message for initialized instance`() {
         initializeInstance()
 
