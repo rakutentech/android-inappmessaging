@@ -94,7 +94,7 @@ class InAppMessageViewListenerOnClickSpec : InAppMessageViewListenerSpec() {
 }
 
 @Config(sdk = [Build.VERSION_CODES.Q])
-@Suppress("LargeClass")
+@SuppressWarnings("LargeClass")
 class InAppMessageViewListenerOnTouchSpec : InAppMessageViewListenerSpec() {
     private val mockMotionEvent = Mockito.mock(MotionEvent::class.java)
     private val mockCheck = Mockito.mock(BuildVersionChecker::class.java)

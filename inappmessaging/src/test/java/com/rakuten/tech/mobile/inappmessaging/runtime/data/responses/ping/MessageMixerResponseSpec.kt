@@ -11,7 +11,7 @@ import org.robolectric.annotation.Config
 
 @RunWith(ParameterizedRobolectricTestRunner::class)
 @Config(sdk = [Build.VERSION_CODES.O_MR1])
-@Suppress("LargeClass")
+@SuppressWarnings("LargeClass")
 class MessageMixerResponseSpec(private val testname: String, private val actual: Any?, private val expected: Any?) {
 
     companion object {
@@ -19,7 +19,7 @@ class MessageMixerResponseSpec(private val testname: String, private val actual:
         @ParameterizedRobolectricTestRunner.Parameters(
                 name = "{0} type test"
         )
-        @Suppress("LongMethod")
+        @SuppressWarnings("LongMethod")
         fun data(): List<Array<out Any?>> {
             return listOf(
                     arrayOf("currentPingMills", response.currentPingMillis, 1583890595467),

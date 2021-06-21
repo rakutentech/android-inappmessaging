@@ -31,7 +31,7 @@ import org.robolectric.annotation.Config
  */
 @RunWith(RobolectricTestRunner::class)
 @Config(sdk = [Build.VERSION_CODES.O_MR1])
-@Suppress("LargeClass")
+@SuppressWarnings("LargeClass")
 class DisplayMessageRunnableSpec : BaseTest() {
     private val message = Mockito.mock(CampaignData::class.java)
     private val hostAppActivity = Mockito.mock(Activity::class.java)

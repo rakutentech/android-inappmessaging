@@ -3,7 +3,7 @@ package com.rakuten.tech.mobile.inappmessaging.runtime.data.enums
 /**
  * All types of In-App messages based on Protocol V1.
  */
-@Suppress("MagicNumber")
+@SuppressWarnings("MagicNumber")
 internal enum class InAppMessageType(val typeId: Int) {
     INVALID(0),
     MODAL(1),

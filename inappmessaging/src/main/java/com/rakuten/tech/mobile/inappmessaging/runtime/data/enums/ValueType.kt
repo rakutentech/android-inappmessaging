@@ -9,7 +9,7 @@ import org.jetbrains.annotations.Nullable
  * Data value's type supported by InAppMessaging's custom events.
  */
 @RestrictTo(LIBRARY)
-@Suppress("MagicNumber")
+@SuppressWarnings("MagicNumber")
 enum class ValueType(@NotNull val typeId: Int) {
     INVALID(0),
     STRING(1),

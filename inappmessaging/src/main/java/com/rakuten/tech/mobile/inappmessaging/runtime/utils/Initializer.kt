@@ -12,7 +12,7 @@ import com.facebook.drawee.backends.pipeline.Fresco
 import com.google.gson.Gson
 import com.rakuten.tech.mobile.inappmessaging.runtime.data.models.HostAppInfo
 import com.rakuten.tech.mobile.inappmessaging.runtime.data.repositories.HostAppInfoRepository
-import com.rakuten.tech.mobile.inappmessaging.runtime.exception.InAppMessagingInitializationException
+import com.rakuten.tech.mobile.inappmessaging.runtime.exception.InAppMessagingException
 import timber.log.Timber
 import java.lang.ClassCastException
 import java.util.Locale
@@ -38,7 +38,7 @@ internal object Initializer {
     /**
      * This method gets device's locale based on API level.
      */
-    @Suppress("DEPRECATION")
+    @SuppressWarnings("DEPRECATION")
     @TargetApi(Build.VERSION_CODES.N)
     private fun getLocale(context: Context): Locale? =
             if (BuildVersionChecker.instance().isNougatAndAbove()) {
@@ -76,8 +76,8 @@ internal object Initializer {
      * This method returns the result of the background work. Work is consist of retrieve and
      * store host app information, then schedule a request to sync with config service.
      */
-    @Suppress("LongParameterList")
-    @Throws(InAppMessagingInitializationException::class)
+    @SuppressWarnings("LongParameterList")
+    @Throws(InAppMessagingException::class)
     fun initializeSdk(
         context: Context,
         subscriptionKey: String?,

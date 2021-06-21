@@ -36,7 +36,7 @@ internal class MessageEventReconciliationWorker(
      * Reconcile ping response messages with existing local trigger events.
      * Then add ready to display messages to repository.
      */
-    @Suppress("LongMethod")
+    @SuppressWarnings("LongMethod")
     override fun doWork(): Result {
         Timber.tag(TAG).d("doWork()")
         var startTime: Long = 0

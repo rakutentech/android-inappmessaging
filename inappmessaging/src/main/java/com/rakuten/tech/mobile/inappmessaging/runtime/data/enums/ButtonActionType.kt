@@ -3,7 +3,7 @@ package com.rakuten.tech.mobile.inappmessaging.runtime.data.enums
 /**
  * Representing all In-App message's button actions.
  */
-@Suppress("MagicNumber")
+@SuppressWarnings("MagicNumber")
 internal enum class ButtonActionType(val typeId: Int) {
     INVALID(0),
     REDIRECT(1),

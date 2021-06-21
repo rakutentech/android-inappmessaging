@@ -1,7 +1,7 @@
 package com.rakuten.tech.mobile.inappmessaging.runtime.data.repositories
 
 import com.rakuten.tech.mobile.inappmessaging.runtime.data.models.HostAppInfo
-import com.rakuten.tech.mobile.inappmessaging.runtime.exception.InAppMessagingInitializationException
+import com.rakuten.tech.mobile.inappmessaging.runtime.exception.InAppMessagingException
 import com.rakuten.tech.mobile.inappmessaging.runtime.utils.InAppMessagingConstants.Companion.ARGUMENT_IS_NULL_EXCEPTION
 import com.rakuten.tech.mobile.inappmessaging.runtime.utils.InAppMessagingConstants.Companion.DEVICE_ID_IS_EMPTY_EXCEPTION
 import com.rakuten.tech.mobile.inappmessaging.runtime.utils.InAppMessagingConstants.Companion.LOCALE_IS_EMPTY_EXCEPTION
@@ -19,7 +19,7 @@ internal interface HostAppInfoRepository {
     /**
      * This method adds host information.
      */
-    @Throws(InAppMessagingInitializationException::class)
+    @Throws(InAppMessagingException::class)
     fun addHostInfo(hostAppInfo: HostAppInfo?)
 
     /**
@@ -40,7 +40,7 @@ internal interface HostAppInfoRepository {
     /**
      * This method returns IAM subscription key.
      */
-    @Suppress("FunctionMaxLength")
+    @SuppressWarnings("FunctionMaxLength")
     fun getInAppMessagingSubscriptionKey(): String?
 
     /**
@@ -61,15 +61,14 @@ internal interface HostAppInfoRepository {
     }
 
     private class HostAppInfoRepositoryImpl : HostAppInfoRepository {
-        @SuppressWarnings("PMD")
         @Volatile
         private var hostAppInfo: HostAppInfo? = null
 
-        @Suppress("LongMethod", "FunctionMaxLength")
-        @Throws(InAppMessagingInitializationException::class)
+        @SuppressWarnings("LongMethod", "FunctionMaxLength")
+        @Throws(InAppMessagingException::class)
         override fun addHostInfo(hostAppInfo: HostAppInfo?) {
             if (hostAppInfo == null) {
-                throw InAppMessagingInitializationException(ARGUMENT_IS_NULL_EXCEPTION)
+                throw InAppMessagingException(ARGUMENT_IS_NULL_EXCEPTION)
             }
             synchronized(hostAppInfo) {
                 var message = ""
@@ -84,7 +83,7 @@ internal interface HostAppInfoRepository {
                         Timber.tag(TAG).e(DEVICE_ID_IS_EMPTY_EXCEPTION)
                 }
                 if (message.isNotEmpty()) {
-                    throw InAppMessagingInitializationException(message)
+                    throw InAppMessagingException(message)
                 }
                 this.hostAppInfo = hostAppInfo
             }
@@ -99,7 +98,7 @@ internal interface HostAppInfoRepository {
             return locale.toString().replace("_", "-").toLowerCase(Locale.getDefault())
         }
 
-        @Suppress("FunctionMaxLength")
+        @SuppressWarnings("FunctionMaxLength")
         override fun getInAppMessagingSubscriptionKey(): String? = hostAppInfo?.subscriptionKey ?: ""
 
         override fun getDeviceId(): String? = hostAppInfo?.deviceId ?: ""

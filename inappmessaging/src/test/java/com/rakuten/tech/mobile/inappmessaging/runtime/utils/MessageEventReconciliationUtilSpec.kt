@@ -47,7 +47,7 @@ open class MessageEventReconciliationUtilSpec : BaseTest() {
      * Setting up data and mocks.
      */
     @Before
-    @Suppress("LongMethod")
+    @SuppressWarnings("LongMethod")
     fun setup() {
         // Arranging message1's data.
         val trigger1List = ArrayList<Trigger>()
@@ -94,7 +94,7 @@ class MessageEventReconciliationUtilExtractSpec : MessageEventReconciliationUtil
     }
 }
 
-@Suppress("LargeClass")
+@SuppressWarnings("LargeClass")
 class MessageEventReconciliationUtilReconcileSpec : MessageEventReconciliationUtilSpec() {
 
     @Test

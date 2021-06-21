@@ -14,7 +14,7 @@ internal interface EventMessageReconciliationScheduler {
      * A chain work requests, first reconcile messages and events. After work has been successfully
      * completed, schedule to display next ready message.
      */
-    @Suppress("FunctionMaxLength")
+    @SuppressWarnings("FunctionMaxLength")
     fun startEventMessageReconciliationWorker()
 
     companion object {
@@ -26,7 +26,7 @@ internal interface EventMessageReconciliationScheduler {
 
     private class EventMessageReconciliationSchedulerImpl : EventMessageReconciliationScheduler {
 
-        @Suppress("FunctionMaxLength")
+        @SuppressWarnings("FunctionMaxLength")
         override fun startEventMessageReconciliationWorker() {
             // Starts MessageEventReconciliationWorker as a unique worker.
             // This worker must be a unique worker, but it can be replaced with a new one. Because we don't

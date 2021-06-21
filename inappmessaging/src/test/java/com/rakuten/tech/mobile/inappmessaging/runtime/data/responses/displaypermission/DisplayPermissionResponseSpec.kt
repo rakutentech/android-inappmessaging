@@ -21,7 +21,7 @@ class DisplayPermissionResponseSpec(
         @ParameterizedRobolectricTestRunner.Parameters(
                 name = "{0} type test"
         )
-        @Suppress("LongMethod")
+        @SuppressWarnings("LongMethod")
         fun data(): List<Array<out Any?>> {
             return listOf(
                     arrayOf("display-true", response.display, true),

@@ -84,7 +84,7 @@ class CustomEventParameterizedSpec(
     }
 
     @Test
-    @Suppress("LongMethod")
+    @SuppressWarnings("LongMethod")
     fun `should add correct attribute type and value`() {
         when (attrType) {
             ValueType.STRING -> {
@@ -123,7 +123,7 @@ class CustomEventParameterizedSpec(
     }
 
     @Test
-    @Suppress("LongMethod")
+    @SuppressWarnings("LongMethod")
     fun `should add correct attribute type and value with uppercase key`() {
         when (attrType) {
             ValueType.STRING -> {

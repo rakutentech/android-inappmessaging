@@ -46,9 +46,7 @@ internal abstract class AccountRepository {
     private class AccountRepositoryImpl : AccountRepository() {
 
         override fun getRaeToken(): String = if (this.userInfoProvider == null ||
-                this.userInfoProvider?.provideRaeToken() == null ||
-                this.userInfoProvider?.provideRaeToken()!!.isEmpty()) {
-
+                this.userInfoProvider?.provideRaeToken().isNullOrEmpty()) {
             ""
         } else TOKEN_PREFIX + this.userInfoProvider?.provideRaeToken()
         // According to backend specs, token has to start with "OAuth2{space}", followed by real token.
@@ -74,7 +72,7 @@ internal abstract class AccountRepository {
             return false
         }
 
-        @Suppress("MagicNumber")
+        @SuppressWarnings("MagicNumber")
         private fun hash(input: String): String {
             // MD5 hashing
             val bytes = MessageDigest

@@ -39,7 +39,7 @@ internal class ValidTestMessage(
         timesClosed++
     }
 
-    @Suppress("ComplexCondition")
+    @SuppressWarnings("ComplexCondition")
     override fun equals(other: Any?): Boolean {
         val otherObject = other as Message
         if (getType() != otherObject.getType() ||
