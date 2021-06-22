@@ -328,12 +328,12 @@ class InAppMessagingSpec : BaseTest() {
     }
 
     @Test
-    fun `should return false when initialization have no fails`() {
+    fun `should return false when initialization failed`() {
         InAppMessaging.init(mockContext).shouldBeFalse()
     }
 
     @Test
-    fun `should return false when initialization have no fails with callback`() {
+    fun `should return false when initialization failed with callback`() {
         val function: (ex: Exception) -> Unit = {}
         val mockCallback = Mockito.mock(function.javaClass)
         InAppMessaging.init(mockContext, mockCallback).shouldBeFalse()

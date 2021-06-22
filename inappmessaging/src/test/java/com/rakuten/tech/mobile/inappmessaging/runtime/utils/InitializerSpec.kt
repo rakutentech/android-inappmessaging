@@ -49,6 +49,7 @@ class InitializerSpec : BaseTest() {
         WorkManagerTestInitHelper.initializeTestWorkManager(context!!)
         InAppMessaging.initialize(context, true)
         InAppMessaging.instance().registerPreference(TestUserInfoProvider())
+        HostAppInfoRepository.instance().getInAppMessagingSubscriptionKey().shouldNotBeNullOrEmpty()
         HostAppInfoRepository.instance()
                 .getInAppMessagingSubscriptionKey() shouldBeEqualTo AppManifestConfig(context).subscriptionKey()
         HostAppInfoRepository.instance()

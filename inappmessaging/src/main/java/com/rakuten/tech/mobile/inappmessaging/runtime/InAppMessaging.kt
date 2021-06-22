@@ -136,11 +136,6 @@ abstract class InAppMessaging internal constructor() {
             }
         }
 
-        /**
-         * [isDebugLogging] is used to enable/disable the debug logging of InAppMessaging SDK.
-         * Debug logging is disabled by default.
-         * Note: All InAppMessaging SDK logs' tags begins with "IAM_".
-         */
         @Throws(InAppMessagingInitializationException::class)
         internal fun initialize(
             context: Context,
@@ -154,6 +149,8 @@ abstract class InAppMessaging internal constructor() {
             val config = Configuration.Builder().build()
             WorkManager.initialize(context, config)
 
+            // `manifestConfig.isDebugging()` is used to enable/disable the debug logging of InAppMessaging SDK.
+            // Note: All InAppMessaging SDK logs' tags begins with "IAM_".
             instance = InApp(context, manifestConfig.isDebugging(), isCacheHandling = isCacheHandling)
 
             // Initializing SDK using background worker thread.
