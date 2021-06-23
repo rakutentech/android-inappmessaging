@@ -50,8 +50,8 @@ class CustomEventSpec : BaseTest() {
 class CustomEventParameterizedSpec(
     val testName: String,
     val event: CustomEvent,
-    val attrType: ValueType,
-    val attrValue: String
+    private val attrType: ValueType,
+    private val attrValue: String
 ) {
 
     companion object {

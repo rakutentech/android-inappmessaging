@@ -46,8 +46,7 @@ class SessionManagerSpec : BaseTest() {
                 ApplicationProvider.getApplicationContext<Context>().contentResolver,
                 Settings.Secure.ANDROID_ID,
                 "test_device_id")
-        InAppMessaging.init(ApplicationProvider.getApplicationContext(), "test", "",
-                isDebugLogging = true, isForTesting = true)
+        InAppMessaging.initialize(ApplicationProvider.getApplicationContext(), true)
         When calling configResponseData.rollOutPercentage itReturns 100
         When calling configResponseData.endpoints itReturns endpoints
         ConfigResponseRepository.instance().addConfigResponse(configResponseData)
@@ -63,8 +62,7 @@ class SessionManagerSpec : BaseTest() {
                 ApplicationProvider.getApplicationContext<Context>().contentResolver,
                 Settings.Secure.ANDROID_ID,
                 "test_device_id")
-        InAppMessaging.init(ApplicationProvider.getApplicationContext(), "test", "",
-                isDebugLogging = true, isForTesting = true)
+        InAppMessaging.initialize(ApplicationProvider.getApplicationContext(), true)
         When calling configResponseData.rollOutPercentage itReturns 0
 
         addTestData()
@@ -81,8 +79,7 @@ class SessionManagerSpec : BaseTest() {
                 ApplicationProvider.getApplicationContext<Context>().contentResolver,
                 Settings.Secure.ANDROID_ID,
                 "test_device_id")
-        InAppMessaging.init(ApplicationProvider.getApplicationContext(), "test", "",
-                isDebugLogging = true, isForTesting = true)
+        InAppMessaging.initialize(ApplicationProvider.getApplicationContext(), true)
         When calling configResponseData.rollOutPercentage itReturns 0
 
         addTestData()
@@ -99,8 +96,7 @@ class SessionManagerSpec : BaseTest() {
                 ApplicationProvider.getApplicationContext<Context>().contentResolver,
                 Settings.Secure.ANDROID_ID,
                 "test_device_id")
-        InAppMessaging.init(ApplicationProvider.getApplicationContext(), "test", "",
-                isDebugLogging = true, isForTesting = true)
+        InAppMessaging.initialize(ApplicationProvider.getApplicationContext(), true)
         When calling configResponseData.rollOutPercentage itReturns 0
 
         addTestData()

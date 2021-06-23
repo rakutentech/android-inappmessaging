@@ -1,11 +1,13 @@
 package com.rakuten.tech.mobile.inappmessaging.runtime.data.repositories
 
+import androidx.annotation.VisibleForTesting
 import com.google.gson.Gson
 import com.google.gson.reflect.TypeToken
 import com.rakuten.tech.mobile.inappmessaging.runtime.InAppMessaging
 import com.rakuten.tech.mobile.inappmessaging.runtime.data.models.messages.Message
 import com.rakuten.tech.mobile.inappmessaging.runtime.utils.InAppMessagingConstants
 import timber.log.Timber
+import java.lang.ClassCastException
 import java.util.Calendar
 import java.util.concurrent.ConcurrentHashMap
 import kotlin.collections.ArrayList
@@ -49,10 +51,13 @@ internal interface LocalDisplayedMessageRepository {
 
     companion object {
         private var instance: LocalDisplayedMessageRepository = LocalDisplayedMessageRepositoryImpl()
-        private const val LOCAL_DISPLAYED_KEY = "local_displayed_list"
-        private const val LOCAL_DISPLAYED_CLOSED_KEY = "local_displayed_closed"
-        private const val LOCAL_DISPLAYED_CLOSED_LIST_KEY = "local_displayed_closed_list"
-        private const val TAG = "IAM_LocalEventRepo"
+        @VisibleForTesting
+        internal const val LOCAL_DISPLAYED_KEY = "local_displayed_list"
+        @VisibleForTesting
+        internal const val LOCAL_DISPLAYED_CLOSED_KEY = "local_displayed_closed"
+        @VisibleForTesting
+        internal const val LOCAL_DISPLAYED_CLOSED_LIST_KEY = "local_displayed_closed_list"
+        private const val TAG = "IAM_LocalDisplayRepo"
 
         internal var isInitialLaunch = false
 
@@ -133,7 +138,7 @@ internal interface LocalDisplayedMessageRepository {
             saveUpdatedMap()
         }
 
-        @SuppressWarnings("LongMethod")
+        @SuppressWarnings("LongMethod", "ComplexMethod")
         private fun checkAndResetMap(onLaunch: Boolean = false) {
             // check if caching is enabled and if there are changes in user info
             if (InAppMessaging.instance().isLocalCachingEnabled() &&
@@ -141,21 +146,36 @@ internal interface LocalDisplayedMessageRepository {
                 user = AccountRepository.instance().userInfoHash
                 // reset message list from cached using updated user info
                 val sharedPref = InAppMessaging.instance().getSharedPref()
-                val listString = sharedPref?.getString(LOCAL_DISPLAYED_KEY, "") ?: ""
+                val listString = try {
+                    sharedPref?.getString(LOCAL_DISPLAYED_KEY, "") ?: ""
+                } catch (ex: ClassCastException) {
+                    Timber.tag(TAG).d(ex.cause, "Incorrect type for $LOCAL_DISPLAYED_KEY data")
+                    ""
+                }
                 messages.clear()
                 if (listString.isNotEmpty()) {
                     val type = object : TypeToken<HashMap<String, List<Long>>>() {}.type
                     messages.putAll(Gson().fromJson(listString, type))
                 }
 
-                val removedList = sharedPref?.getString(LOCAL_DISPLAYED_CLOSED_LIST_KEY, "") ?: ""
+                val removedList = try {
+                    sharedPref?.getString(LOCAL_DISPLAYED_CLOSED_LIST_KEY, "") ?: ""
+                } catch (ex: ClassCastException) {
+                    Timber.tag(TAG).d(ex.cause, "Incorrect type for $LOCAL_DISPLAYED_CLOSED_LIST_KEY data")
+                    ""
+                }
                 removedMessages.clear()
                 if (removedList.isNotEmpty()) {
                     val type = object : TypeToken<HashMap<String, Int>>() {}.type
                     removedMessages.putAll(Gson().fromJson(removedList, type))
                 }
 
-                removedMessage = sharedPref?.getString(LOCAL_DISPLAYED_CLOSED_KEY, "") ?: ""
+                removedMessage = try {
+                    sharedPref?.getString(LOCAL_DISPLAYED_CLOSED_KEY, "") ?: ""
+                } catch (ex: ClassCastException) {
+                    Timber.tag(TAG).d(ex.cause, "Incorrect type for $LOCAL_DISPLAYED_CLOSED_KEY data")
+                    ""
+                }
             }
         }
 

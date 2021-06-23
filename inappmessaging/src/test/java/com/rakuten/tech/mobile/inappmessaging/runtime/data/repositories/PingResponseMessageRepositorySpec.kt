@@ -116,19 +116,7 @@ class PingResponseMessageRepositorySpec : BaseTest() {
 
     @Test
     fun `should save and restore values for different users`() {
-        val infoProvider = TestUserInfoProvider()
-        initializeInstance(infoProvider)
-
-        PingResponseMessageRepository.instance().replaceAllMessages(messageList)
-        PingResponseMessageRepository.instance().getAllMessagesCopy().shouldHaveSize(2)
-
-        infoProvider.rakutenId = "user2"
-        AccountRepository.instance().updateUserInfo()
-        PingResponseMessageRepository.instance().getAllMessagesCopy().shouldBeEmpty()
-
-        // revert to initial user info
-        infoProvider.rakutenId = TestUserInfoProvider.TEST_RAKUTEN_ID
-        AccountRepository.instance().updateUserInfo()
+        setupAndTestMultipleUser()
         PingResponseMessageRepository.instance().getAllMessagesCopy().shouldHaveSize(2)
     }
 
@@ -192,12 +180,36 @@ class PingResponseMessageRepositorySpec : BaseTest() {
         }
     }
 
+    @Test
+    fun `should not crash and clear previous when forced cast exception`() {
+        setupAndTestMultipleUser()
+        val editor = InAppMessaging.instance().getSharedPref()?.edit()
+        editor?.putInt(PingResponseMessageRepository.PING_RESPONSE_KEY, 1)?.apply()
+        PingResponseMessageRepository.instance().getAllMessagesCopy().shouldBeEmpty()
+    }
+
+    private fun setupAndTestMultipleUser() {
+        val infoProvider = TestUserInfoProvider()
+        initializeInstance(infoProvider)
+
+        PingResponseMessageRepository.instance().replaceAllMessages(messageList)
+        PingResponseMessageRepository.instance().getAllMessagesCopy().shouldHaveSize(2)
+
+        infoProvider.rakutenId = "user2"
+        AccountRepository.instance().updateUserInfo()
+        PingResponseMessageRepository.instance().getAllMessagesCopy().shouldBeEmpty()
+
+        // revert to initial user info
+        infoProvider.rakutenId = TestUserInfoProvider.TEST_RAKUTEN_ID
+        AccountRepository.instance().updateUserInfo()
+    }
+
     private fun initializeInstance(infoProvider: UserInfoProvider, isCache: Boolean = true) {
         WorkManagerTestInitHelper.initializeTestWorkManager(ApplicationProvider.getApplicationContext())
         Settings.Secure.putString(ApplicationProvider.getApplicationContext<Context>().contentResolver,
                 Settings.Secure.ANDROID_ID, "test_device_id")
-        InAppMessaging.init(ApplicationProvider.getApplicationContext(), "test", "",
-                isDebugLogging = true, isForTesting = true, isCacheHandling = isCache)
+        InAppMessaging.initialize(ApplicationProvider.getApplicationContext(), isForTesting = true,
+                isCacheHandling = isCache)
         InAppMessaging.instance().registerPreference(infoProvider)
     }
 }

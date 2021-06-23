@@ -53,8 +53,7 @@ class MessageMixerWorkerSpec : BaseTest() {
                 ApplicationProvider.getApplicationContext<Context>().contentResolver,
                 Settings.Secure.ANDROID_ID,
                 "test_device_id")
-        InAppMessaging.init(ApplicationProvider.getApplicationContext(), "test-key", "",
-                isForTesting = true)
+        InAppMessaging.initialize(ApplicationProvider.getApplicationContext(), true)
         MessageMixerPingScheduler.currDelay = RetryDelayUtil.INITIAL_BACKOFF_DELAY
     }
 
@@ -157,7 +156,7 @@ class MessageMixerWorkerSpec : BaseTest() {
                         "test-key",
                         InAppMessagingTestConstants.LOCALE))
         retrieveValidConfig()
-        MessageMixerWorker(context!!, workerParameters!!).doWork() shouldNotEqual ListenableWorker.Result.retry()
+        MessageMixerWorker(context!!, workerParameters!!).doWork() shouldNotBeEqualTo ListenableWorker.Result.retry()
     }
 
     private fun retrieveValidConfig() {

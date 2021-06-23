@@ -4,6 +4,8 @@ import android.app.Activity
 import android.content.Context
 import android.content.SharedPreferences
 import androidx.annotation.RestrictTo
+import androidx.work.Configuration
+import androidx.work.WorkManager
 import com.rakuten.tech.mobile.inappmessaging.runtime.data.models.appevents.Event
 import com.rakuten.tech.mobile.inappmessaging.runtime.data.repositories.LocalDisplayedMessageRepository
 import com.rakuten.tech.mobile.inappmessaging.runtime.data.repositories.PingResponseMessageRepository
@@ -115,24 +117,45 @@ abstract class InAppMessaging internal constructor() {
         fun instance(): InAppMessaging = instance
 
         /**
-         * [isDebugLogging] is used to enable/disable the debug logging of InAppMessaging SDK.
-         * Debug logging is disabled by default.
-         * Note: All InAppMessaging SDK logs' tags begins with "IAM_".
+         * Initializes the In-App Messaging SDK. [errorCallback] is an optional callback function for
+         * app to receive the exception that caused failed init.
+         *
+         * @return `true` if initialization is successful, and `false` otherwise.
          */
-        @Suppress("LongParameterList")
+        @SuppressWarnings("TooGenericExceptionCaught")
+        fun init(context: Context, errorCallback: ((ex: Exception) -> Unit)? = null): Boolean {
+            InApp.errorCallback = errorCallback
+            return try {
+                initialize(context, isCacheHandling = BuildConfig.IS_CACHE_HANDLING)
+                true
+            } catch (ex: Exception) {
+                errorCallback?.let {
+                    it(InAppMessagingInitializationException("In-App Messaging initialization failed", ex.cause))
+                }
+                false
+            }
+        }
+
         @Throws(InAppMessagingInitializationException::class)
-        internal fun init(
+        internal fun initialize(
             context: Context,
-            subscriptionKey: String?,
-            configUrl: String?,
-            isDebugLogging: Boolean = false,
             isForTesting: Boolean = false,
             isCacheHandling: Boolean = false,
             configScheduler: ConfigScheduler = ConfigScheduler.instance()
         ) {
-            instance = InApp(context, isDebugLogging, isCacheHandling = isCacheHandling)
+            val manifestConfig = AppManifestConfig(context)
+
+            // Special handling of WorkManager initialization for Android 11
+            val config = Configuration.Builder().build()
+            WorkManager.initialize(context, config)
+
+            // `manifestConfig.isDebugging()` is used to enable/disable the debug logging of InAppMessaging SDK.
+            // Note: All InAppMessaging SDK logs' tags begins with "IAM_".
+            instance = InApp(context, manifestConfig.isDebugging(), isCacheHandling = isCacheHandling)
+
             // Initializing SDK using background worker thread.
-            Initializer.initializeSdk(context, subscriptionKey, configUrl, isForTesting)
+            Initializer.initializeSdk(context, manifestConfig.subscriptionKey(), manifestConfig.configUrl(),
+                    isForTesting)
 
             // inform ping response repository that it is initial launch to display app launch campaign at least once
             PingResponseMessageRepository.isInitialLaunch = true

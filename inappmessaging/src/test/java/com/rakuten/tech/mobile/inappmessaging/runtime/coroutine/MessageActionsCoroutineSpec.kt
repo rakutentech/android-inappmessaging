@@ -30,7 +30,11 @@ import org.robolectric.annotation.Config
 @RunWith(ParameterizedRobolectricTestRunner::class)
 @Config(sdk = [Build.VERSION_CODES.O_MR1])
 @Suppress("LongMethod")
-internal class MessageActionsCoroutineSpec(val testName: String, val resourceId: Int, val isOpt: Boolean) : BaseTest() {
+internal class MessageActionsCoroutineSpec(
+    val testName: String,
+    private val resourceId: Int,
+    private val isOpt: Boolean
+) : BaseTest() {
 
     companion object {
         @JvmStatic
@@ -192,8 +196,7 @@ internal class MessageActionsCoroutineSpec(val testName: String, val resourceId:
         Settings.Secure.putString(ApplicationProvider.getApplicationContext<Context>().contentResolver,
                 Settings.Secure.ANDROID_ID,
                 "test_device_id")
-        InAppMessaging.init(ApplicationProvider.getApplicationContext(), "test-key", "",
-                isForTesting = true)
+        InAppMessaging.initialize(ApplicationProvider.getApplicationContext(), true)
         InAppMessaging.instance().registerMessageDisplayActivity(activity)
         InAppMessaging.instance().registerPreference(TestUserInfoProvider())
     }

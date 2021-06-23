@@ -30,8 +30,7 @@ class ImpressionSchedulerSpec {
         Settings.Secure.putString(ApplicationProvider.getApplicationContext<Context>().contentResolver,
                 Settings.Secure.ANDROID_ID,
                 "test_device_id")
-        InAppMessaging.init(ApplicationProvider.getApplicationContext(), "test", "",
-                isDebugLogging = false, isForTesting = true)
+        InAppMessaging.initialize(ApplicationProvider.getApplicationContext(), true)
         val impressionTypes = mutableListOf(ImpressionType.CLICK_CONTENT)
         // Assemble ImpressionRequest object.
         val impressionRequest = ImpressionRequest(

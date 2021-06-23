@@ -12,6 +12,7 @@ import com.rakuten.tech.mobile.inappmessaging.runtime.data.models.appevents.Even
 import com.rakuten.tech.mobile.inappmessaging.runtime.utils.InAppMessagingConstants
 import org.json.JSONArray
 import timber.log.Timber
+import java.lang.ClassCastException
 import java.util.Collections
 import kotlin.collections.ArrayList
 import kotlin.collections.component1
@@ -36,7 +37,9 @@ internal interface LocalEventRepository : EventRepository {
     companion object {
         private const val TAG = "IAM_LocalEventRepo"
         private var instance: LocalEventRepository = LocalEventRepositoryImpl()
-        private const val LOCAL_EVENT_KEY = "local_event_list"
+
+        @VisibleForTesting
+        internal const val LOCAL_EVENT_KEY = "local_event_list"
 
         fun instance() = instance
     }
@@ -123,8 +126,12 @@ internal interface LocalEventRepository : EventRepository {
                     (onLaunch || user != AccountRepository.instance().userInfoHash)) {
                 user = AccountRepository.instance().userInfoHash
                 // reset event list from cached using updated user info
-                val listString = InAppMessaging.instance().getSharedPref()?.getString(LOCAL_EVENT_KEY, "")
-                        ?: ""
+                val listString = try {
+                    InAppMessaging.instance().getSharedPref()?.getString(LOCAL_EVENT_KEY, "") ?: ""
+                } catch (ex: ClassCastException) {
+                    Timber.tag(TAG).d(ex.cause, "Incorrect type for $LOCAL_EVENT_KEY data")
+                    ""
+                }
                 if (listString.isNotEmpty()) {
                     events.clear()
                     deserializeLocalEvents(listString)

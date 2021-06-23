@@ -19,9 +19,9 @@ import java.util.Locale
 class EventSpec(
     val eventName: String,
     val event: BaseEvent,
-    val expectedType: EventType,
-    val expectedName: String,
-    val expectedPersistType: Boolean
+    private val expectedType: EventType,
+    private val expectedName: String,
+    private val expectedPersistType: Boolean
 ) : BaseTest() {
 
     companion object {

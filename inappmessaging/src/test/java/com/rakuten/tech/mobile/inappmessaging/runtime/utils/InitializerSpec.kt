@@ -10,6 +10,7 @@ import androidx.work.WorkerParameters
 import androidx.work.testing.WorkManagerTestInitHelper
 import com.nhaarman.mockitokotlin2.eq
 import com.nhaarman.mockitokotlin2.never
+import com.rakuten.tech.mobile.inappmessaging.runtime.AppManifestConfig
 import com.rakuten.tech.mobile.inappmessaging.runtime.BaseTest
 import com.rakuten.tech.mobile.inappmessaging.runtime.InAppMessaging
 import com.rakuten.tech.mobile.inappmessaging.runtime.TestUserInfoProvider
@@ -22,6 +23,7 @@ import org.junit.runner.RunWith
 import org.mockito.Mockito
 import org.robolectric.RobolectricTestRunner
 import org.robolectric.annotation.Config
+import java.lang.ClassCastException
 
 /**
  * Test class for InitializationWorker.
@@ -32,6 +34,7 @@ class InitializerSpec : BaseTest() {
     private val context = ApplicationProvider.getApplicationContext<Context>()
     private val mockUtil = Mockito.mock(SharedPreferencesUtil::class.java)
     private val mockPref = Mockito.mock(SharedPreferences::class.java)
+    private val mockEditor = Mockito.mock(SharedPreferences.Editor::class.java)
 
     @Before
     fun setup() {
@@ -44,14 +47,11 @@ class InitializerSpec : BaseTest() {
     @Test
     fun `should add host app info with basic attributes`() {
         WorkManagerTestInitHelper.initializeTestWorkManager(context!!)
-        InAppMessaging.init(
-                context,
-                "test_sub_key",
-                "",
-                isDebugLogging = false,
-                isForTesting = true)
+        InAppMessaging.initialize(context, true)
         InAppMessaging.instance().registerPreference(TestUserInfoProvider())
-        HostAppInfoRepository.instance().getInAppMessagingSubscriptionKey() shouldBeEqualTo "test_sub_key"
+        HostAppInfoRepository.instance().getInAppMessagingSubscriptionKey().shouldNotBeNullOrEmpty()
+        HostAppInfoRepository.instance()
+                .getInAppMessagingSubscriptionKey() shouldBeEqualTo AppManifestConfig(context).subscriptionKey()
         HostAppInfoRepository.instance()
                 .getPackageName() shouldBeEqualTo "com.rakuten.tech.mobile.inappmessaging.runtime.test"
         HostAppInfoRepository.instance().getVersion() shouldBeEqualTo "1.0.2"
@@ -113,7 +113,6 @@ class InitializerSpec : BaseTest() {
     @Test
     fun `should generate uuid using mock with null android ID with empty pref`() {
         Settings.Secure.putString(context.contentResolver, Settings.Secure.ANDROID_ID, null)
-        val mockEditor = Mockito.mock(SharedPreferences.Editor::class.java)
 
         When calling mockPref.contains(Initializer.ID_KEY) itReturns false
         When calling mockPref.edit() itReturns mockEditor
@@ -142,5 +141,24 @@ class InitializerSpec : BaseTest() {
         Mockito.verify(mockPref, never()).edit()
         Mockito.verify(mockPref).getString(Initializer.ID_KEY, "")
         HostAppInfoRepository.instance().getDeviceId() shouldBeEqualTo "random_uuid"
+    }
+
+    @Test
+    fun `should not crash and generate new if forced exception`() {
+        Settings.Secure.putString(context.contentResolver, Settings.Secure.ANDROID_ID, null)
+
+        When calling mockPref.contains(Initializer.ID_KEY) itReturns true
+        When calling mockPref.getString(Initializer.ID_KEY, "") itThrows ClassCastException()
+        When calling mockPref.edit() itReturns mockEditor
+        When calling mockEditor.putString(any(), any()) itReturns mockEditor
+
+        Initializer.initializeSdk(context, "test", "", true, mockUtil)
+
+        Mockito.verify(mockUtil).createSharedPreference(context, "uuid")
+        Mockito.verify(mockPref).contains(Initializer.ID_KEY)
+        Mockito.verify(mockPref).edit()
+        Mockito.verify(mockPref).getString(Initializer.ID_KEY, "")
+        Mockito.verify(mockEditor).putString(eq(Initializer.ID_KEY), any())
+        HostAppInfoRepository.instance().getDeviceId().shouldNotBeNullOrEmpty()
     }
 }
