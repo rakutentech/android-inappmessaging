@@ -7,6 +7,7 @@ import com.rakuten.tech.mobile.inappmessaging.runtime.data.models.messages.Messa
 import com.rakuten.tech.mobile.inappmessaging.runtime.data.responses.ping.CampaignData
 import com.rakuten.tech.mobile.inappmessaging.runtime.utils.InAppMessagingConstants
 import org.json.JSONArray
+import org.json.JSONException
 import timber.log.Timber
 import java.lang.ClassCastException
 
@@ -35,9 +36,7 @@ internal abstract class ReadyForDisplayMessageRepository : ReadyMessageRepositor
             }
         }
 
-        @Throws(IllegalArgumentException::class)
-        override fun replaceAllMessages(messageList: List<Message>?) {
-            require(messageList != null) { InAppMessagingConstants.ARGUMENT_IS_NULL_EXCEPTION }
+        override fun replaceAllMessages(messageList: List<Message>) {
             // Preventing race condition.
             synchronized(messages) {
                 messages.clear()
@@ -96,9 +95,14 @@ internal abstract class ReadyForDisplayMessageRepository : ReadyMessageRepositor
 
                 messages.clear()
                 if (listString.isNotEmpty()) {
-                    val jsonArray = JSONArray(listString)
-                    for (i in 0 until jsonArray.length()) {
-                        messages.add(Gson().fromJson(jsonArray.getJSONObject(i).toString(), CampaignData::class.java))
+                    try {
+                        val jsonArray = JSONArray(listString)
+                        for (i in 0 until jsonArray.length()) {
+                            messages.add(Gson().fromJson(jsonArray.getJSONObject(i).toString(),
+                                    CampaignData::class.java))
+                        }
+                    } catch (jex: JSONException) {
+                        Timber.tag(TAG).d(jex.cause, "Invalid JSON format for $READY_DISPLAY_KEY data")
                     }
                 }
             }

@@ -37,7 +37,7 @@ internal class ImpressionWorker(
         val impressionRequestJsonRequest = inputData.getString(IMPRESSION_REQUEST_KEY)
 
         // Validate input data.
-        if (impressionEndpoint.isNullOrEmpty() || impressionRequestJsonRequest.isNullOrEmpty()) {
+        if (impressionEndpoint.isEmpty() || impressionRequestJsonRequest.isNullOrEmpty()) {
             return Result.failure()
         }
 

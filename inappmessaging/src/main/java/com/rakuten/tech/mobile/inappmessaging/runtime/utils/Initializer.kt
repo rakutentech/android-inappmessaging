@@ -72,10 +72,6 @@ internal object Initializer {
     private fun getHostAppPackageName(context: Context): String =
             if (context.packageName != null) context.packageName else ""
 
-    /**
-     * This method returns the result of the background work. Work is consist of retrieve and
-     * store host app information, then schedule a request to sync with config service.
-     */
     @SuppressWarnings("LongParameterList")
     @Throws(InAppMessagingException::class)
     fun initializeSdk(

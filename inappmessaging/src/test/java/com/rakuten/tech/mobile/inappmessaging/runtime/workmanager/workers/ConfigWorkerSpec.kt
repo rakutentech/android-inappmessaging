@@ -227,24 +227,8 @@ class ConfigWorkerFailSpec : ConfigWorkerSpec() {
     }
 
     @Test
-    fun `should fail if hostapp id is null`() {
-        When calling mockHostRepository.getPackageName() itReturns null
-        val worker = ConfigWorker(context, workerParameters, mockHostRepository, ConfigResponseRepository.instance(),
-                MessageMixerPingScheduler.instance())
-        worker.doWork() shouldBeEqualTo ListenableWorker.Result.failure()
-    }
-
-    @Test
     fun `should fail if hostapp id is empty`() {
         When calling mockHostRepository.getPackageName() itReturns ""
-        val worker = ConfigWorker(context, workerParameters, mockHostRepository, ConfigResponseRepository.instance(),
-                MessageMixerPingScheduler.instance())
-        worker.doWork() shouldBeEqualTo ListenableWorker.Result.failure()
-    }
-
-    @Test
-    fun `should fail if hostapp version is null`() {
-        When calling mockHostRepository.getPackageName() itReturns "valid.package.name"
         val worker = ConfigWorker(context, workerParameters, mockHostRepository, ConfigResponseRepository.instance(),
                 MessageMixerPingScheduler.instance())
         worker.doWork() shouldBeEqualTo ListenableWorker.Result.failure()
@@ -254,6 +238,16 @@ class ConfigWorkerFailSpec : ConfigWorkerSpec() {
     fun `should fail if hostapp version is empty`() {
         When calling mockHostRepository.getPackageName() itReturns "valid.package.name"
         When calling mockHostRepository.getVersion() itReturns ""
+        val worker = ConfigWorker(context, workerParameters, mockHostRepository, ConfigResponseRepository.instance(),
+                MessageMixerPingScheduler.instance())
+        worker.doWork() shouldBeEqualTo ListenableWorker.Result.failure()
+    }
+
+    @Test
+    fun `should fail if subscription key is empty`() {
+        When calling mockHostRepository.getPackageName() itReturns "valid.package.name"
+        When calling mockHostRepository.getVersion() itReturns "valid.version"
+        When calling mockHostRepository.getInAppMessagingSubscriptionKey() itReturns ""
         val worker = ConfigWorker(context, workerParameters, mockHostRepository, ConfigResponseRepository.instance(),
                 MessageMixerPingScheduler.instance())
         worker.doWork() shouldBeEqualTo ListenableWorker.Result.failure()

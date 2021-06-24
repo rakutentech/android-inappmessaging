@@ -3,8 +3,10 @@ package com.rakuten.tech.mobile.inappmessaging.runtime.data.repositories
 import androidx.annotation.VisibleForTesting
 import com.google.gson.Gson
 import com.google.gson.reflect.TypeToken
+import com.rakuten.tech.mobile.inappmessaging.runtime.InApp
 import com.rakuten.tech.mobile.inappmessaging.runtime.InAppMessaging
 import com.rakuten.tech.mobile.inappmessaging.runtime.data.models.messages.Message
+import com.rakuten.tech.mobile.inappmessaging.runtime.exception.InAppMessagingException
 import com.rakuten.tech.mobile.inappmessaging.runtime.utils.InAppMessagingConstants
 import timber.log.Timber
 import java.lang.ClassCastException
@@ -22,10 +24,8 @@ internal interface LocalDisplayedMessageRepository {
 
     /**
      * This method adds a message campaign ID with time stamp in the repository.
-     * Throws IllegalArgumentException if argument empty.
      */
-    @Throws(IllegalArgumentException::class)
-    fun addMessage(message: Message?)
+    fun addMessage(message: Message)
 
     /**
      * Sets the last message campaign ID in the repository which was closed after unregistering activity.
@@ -77,10 +77,13 @@ internal interface LocalDisplayedMessageRepository {
             checkAndResetMap(true)
         }
 
-        @Throws(IllegalArgumentException::class)
-        override fun addMessage(message: Message?) {
-            requireNotNull(message) { InAppMessagingConstants.ARGUMENT_IS_NULL_EXCEPTION }
-            require(!message.getCampaignId().isNullOrEmpty()) { InAppMessagingConstants.ARGUMENT_IS_EMPTY_EXCEPTION }
+        override fun addMessage(message: Message) {
+            if (message.getCampaignId().isNullOrEmpty()) {
+                InApp.errorCallback?.let {
+                    it(InAppMessagingException("In-App Messaging storing campaign failed due to invalid value"))
+                }
+                return
+            }
 
             // Add a message to repository with time stamp.
             val campaignId = message.getCampaignId()
@@ -155,7 +158,11 @@ internal interface LocalDisplayedMessageRepository {
                 messages.clear()
                 if (listString.isNotEmpty()) {
                     val type = object : TypeToken<HashMap<String, List<Long>>>() {}.type
-                    messages.putAll(Gson().fromJson(listString, type))
+                    try {
+                        messages.putAll(Gson().fromJson(listString, type))
+                    } catch (ex: Exception) {
+                        Timber.tag(TAG).d(ex.cause, "Incorrect JSON format for $LOCAL_DISPLAYED_KEY data")
+                    }
                 }
 
                 val removedList = try {
@@ -167,7 +174,11 @@ internal interface LocalDisplayedMessageRepository {
                 removedMessages.clear()
                 if (removedList.isNotEmpty()) {
                     val type = object : TypeToken<HashMap<String, Int>>() {}.type
-                    removedMessages.putAll(Gson().fromJson(removedList, type))
+                    try {
+                        removedMessages.putAll(Gson().fromJson(removedList, type))
+                    } catch (ex: Exception) {
+                        Timber.tag(TAG).d(ex.cause, "Incorrect JSON format for $LOCAL_DISPLAYED_CLOSED_LIST_KEY data")
+                    }
                 }
 
                 removedMessage = try {

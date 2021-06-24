@@ -6,6 +6,7 @@ import com.rakuten.tech.mobile.inappmessaging.runtime.InAppMessaging
 import com.rakuten.tech.mobile.inappmessaging.runtime.data.models.messages.Message
 import com.rakuten.tech.mobile.inappmessaging.runtime.data.responses.ping.CampaignData
 import com.rakuten.tech.mobile.inappmessaging.runtime.utils.InAppMessagingConstants
+import org.json.JSONException
 import org.json.JSONObject
 import timber.log.Timber
 import java.lang.ClassCastException
@@ -45,14 +46,15 @@ internal abstract class PingResponseMessageRepository : MessageRepository {
          * Replacing all new messages to the [messageList].
          * If messageList empty, IllegalArgumentException will be thrown.
          */
-        @Throws(IllegalArgumentException::class)
-        override fun replaceAllMessages(messageList: List<Message>?) {
-            requireNotNull(messageList) { InAppMessagingConstants.ARGUMENT_IS_NULL_EXCEPTION }
+        override fun replaceAllMessages(messageList: List<Message>) {
             checkAndResetMap()
 
             messages = LinkedHashMap()
             appLaunchList = LinkedHashMap()
             for (message in messageList) {
+                if (message.getCampaignId().isNullOrEmpty()) {
+                    continue
+                }
                 messages[message.getCampaignId()!!] = message
                 if (message.getTriggers()?.size == 1) {
                     appLaunchList[message.getCampaignId()!!] = isInitialLaunch
@@ -103,13 +105,17 @@ internal abstract class PingResponseMessageRepository : MessageRepository {
                 }
                 messages.clear()
                 if (listString.isNotEmpty()) {
-                    val jsonObject = JSONObject(listString)
-                    for (key in jsonObject.keys()) {
-                        val campaign = Gson().fromJson(
-                                jsonObject.getJSONObject(key).toString(), CampaignData::class.java)
-                        // manual setting since not part of constructor
-                        campaign.timesClosed = jsonObject.getJSONObject(key).getInt("timesClosed")
-                        messages[key] = campaign
+                    try {
+                        val jsonObject = JSONObject(listString)
+                        for (key in jsonObject.keys()) {
+                            val campaign = Gson().fromJson(
+                                    jsonObject.getJSONObject(key).toString(), CampaignData::class.java)
+                            // manual setting since not part of constructor
+                            campaign.timesClosed = jsonObject.getJSONObject(key).getInt("timesClosed")
+                            messages[key] = campaign
+                        }
+                    } catch (jex: JSONException) {
+                        Timber.tag(TAG).d(jex.cause, "Invalid JSON format for $PING_RESPONSE_KEY data")
                     }
                 }
             }

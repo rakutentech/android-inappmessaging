@@ -10,7 +10,6 @@ import java.lang.ClassCastException
 /**
  * This class contains opted out messages that user chose not to see it again.
  */
-@WorkerThread
 internal interface LocalOptedOutMessageRepository {
 
     /**
