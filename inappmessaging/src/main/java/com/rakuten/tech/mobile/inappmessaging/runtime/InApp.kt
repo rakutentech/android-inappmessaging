@@ -144,7 +144,7 @@ internal class InApp(
 
     // ------------------------------------Library Internal APIs-------------------------------------
     @RestrictTo(RestrictTo.Scope.LIBRARY)
-    override fun getRegisteredActivity() = if (activityWeakReference != null) activityWeakReference!!.get() else null
+    override fun getRegisteredActivity() = activityWeakReference?.get()
 
     @RestrictTo(RestrictTo.Scope.LIBRARY)
     override fun getHostAppContext() = context

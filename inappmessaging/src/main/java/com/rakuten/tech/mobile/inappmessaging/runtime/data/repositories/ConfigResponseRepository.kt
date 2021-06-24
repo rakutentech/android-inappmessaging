@@ -28,7 +28,7 @@ internal interface ConfigResponseRepository {
     /**
      * This method returns the reporting impression endpoint string.
      */
-    fun getImpressionEndpoint(): String?
+    fun getImpressionEndpoint(): String
 
     /**
      * This method returns the display permission endpoint string.
@@ -71,25 +71,10 @@ internal interface ConfigResponseRepository {
 
         override fun isConfigEnabled(): Boolean = isEnabled
 
-        override fun getPingEndpoint(): String =
-                if (configResponseData != null) {
-                    configResponseData!!.endpoints?.ping.toString()
-                } else {
-                    ""
-                }
+        override fun getPingEndpoint(): String = configResponseData?.endpoints?.ping ?: ""
 
-        override fun getImpressionEndpoint(): String? =
-                if (configResponseData != null) {
-                    configResponseData!!.endpoints?.impression
-                } else {
-                    ""
-                }
+        override fun getImpressionEndpoint(): String = configResponseData?.endpoints?.impression ?: ""
 
-        override fun getDisplayPermissionEndpoint(): String =
-                if (configResponseData != null) {
-                    configResponseData!!.endpoints?.displayPermission.toString()
-                } else {
-                    ""
-                }
+        override fun getDisplayPermissionEndpoint(): String = configResponseData?.endpoints?.displayPermission ?: ""
     }
 }

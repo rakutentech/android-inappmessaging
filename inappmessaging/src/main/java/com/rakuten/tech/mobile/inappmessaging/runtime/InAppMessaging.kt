@@ -153,11 +153,10 @@ abstract class InAppMessaging internal constructor() {
             // Note: All InAppMessaging SDK logs' tags begins with "IAM_".
             instance = InApp(context, manifestConfig.isDebugging(), isCacheHandling = isCacheHandling)
 
-            // Initializing SDK using background worker thread.
             Initializer.initializeSdk(context, manifestConfig.subscriptionKey(), manifestConfig.configUrl(),
                     isForTesting)
 
-            // inform ping response repository that it is initial launch to display app launch campaign at least once
+            // inform repositories that it is initial launch to display app launch campaign at least once
             PingResponseMessageRepository.isInitialLaunch = true
             LocalDisplayedMessageRepository.isInitialLaunch = true
 

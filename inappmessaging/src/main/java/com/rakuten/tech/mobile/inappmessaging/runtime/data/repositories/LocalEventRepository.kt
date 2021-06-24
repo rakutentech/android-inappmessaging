@@ -2,6 +2,7 @@ package com.rakuten.tech.mobile.inappmessaging.runtime.data.repositories
 
 import androidx.annotation.VisibleForTesting
 import com.google.gson.Gson
+import com.rakuten.tech.mobile.inappmessaging.runtime.InApp
 import com.rakuten.tech.mobile.inappmessaging.runtime.InAppMessaging
 import com.rakuten.tech.mobile.inappmessaging.runtime.data.enums.EventType
 import com.rakuten.tech.mobile.inappmessaging.runtime.data.models.appevents.AppStartEvent
@@ -9,8 +10,10 @@ import com.rakuten.tech.mobile.inappmessaging.runtime.data.models.appevents.Cust
 import com.rakuten.tech.mobile.inappmessaging.runtime.data.models.appevents.LoginSuccessfulEvent
 import com.rakuten.tech.mobile.inappmessaging.runtime.data.models.appevents.PurchaseSuccessfulEvent
 import com.rakuten.tech.mobile.inappmessaging.runtime.data.models.appevents.Event
+import com.rakuten.tech.mobile.inappmessaging.runtime.exception.InAppMessagingException
 import com.rakuten.tech.mobile.inappmessaging.runtime.utils.InAppMessagingConstants
 import org.json.JSONArray
+import org.json.JSONException
 import timber.log.Timber
 import java.lang.ClassCastException
 import java.util.Collections
@@ -60,7 +63,12 @@ internal interface LocalEventRepository : EventRepository {
          */
         @Throws(IllegalArgumentException::class)
         override fun addEvent(event: Event): Boolean {
-            require(!event.getEventName().isNullOrEmpty()) { InAppMessagingConstants.ARGUMENT_IS_EMPTY_EXCEPTION }
+            if (event.getEventName().isNullOrEmpty()) {
+                InApp.errorCallback?.let {
+                    it(InAppMessagingException("In-App Messaging adding event failed due to invalid event name"))
+                }
+                return false
+            }
 
             synchronized(events) {
                 checkAndResetList()
@@ -143,21 +151,25 @@ internal interface LocalEventRepository : EventRepository {
         }
 
         private fun deserializeLocalEvents(listString: String) {
-            val jsonArray = JSONArray(listString)
-            for (i in 0 until jsonArray.length()) {
-                val item = jsonArray.getJSONObject(i)
-                val event = when (item["eventType"].toString()) {
-                    EventType.APP_START.name -> Gson().fromJson(item.toString(), AppStartEvent::class.java)
-                    EventType.LOGIN_SUCCESSFUL.name ->
-                        Gson().fromJson(item.toString(), LoginSuccessfulEvent::class.java)
-                    EventType.PURCHASE_SUCCESSFUL.name ->
-                        Gson().fromJson(item.toString(), PurchaseSuccessfulEvent::class.java)
-                    EventType.CUSTOM.name -> Gson().fromJson(item.toString(), CustomEvent::class.java)
-                    else -> null
+            try {
+                val jsonArray = JSONArray(listString)
+                for (i in 0 until jsonArray.length()) {
+                    val item = jsonArray.getJSONObject(i)
+                    val event = when (item["eventType"].toString()) {
+                        EventType.APP_START.name -> Gson().fromJson(item.toString(), AppStartEvent::class.java)
+                        EventType.LOGIN_SUCCESSFUL.name ->
+                            Gson().fromJson(item.toString(), LoginSuccessfulEvent::class.java)
+                        EventType.PURCHASE_SUCCESSFUL.name ->
+                            Gson().fromJson(item.toString(), PurchaseSuccessfulEvent::class.java)
+                        EventType.CUSTOM.name -> Gson().fromJson(item.toString(), CustomEvent::class.java)
+                        else -> null
+                    }
+                    if (event != null) {
+                        events.add(event)
+                    }
                 }
-                if (event != null) {
-                    events.add(event)
-                }
+            } catch (jex: JSONException) {
+                Timber.tag(TAG).d(jex.cause, "Invalid JSON format for $LOCAL_EVENT_KEY data")
             }
         }
 
@@ -166,7 +178,7 @@ internal interface LocalEventRepository : EventRepository {
             if (InAppMessaging.instance().isLocalCachingEnabled()) {
                 // save updated event list
                 InAppMessaging.instance().getSharedPref()?.edit()?.putString(LOCAL_EVENT_KEY,
-                        Gson().toJson(events))?.apply()
+                        Gson().toJson(events))?.apply() ?: Timber.tag(TAG).d("failed saving event data")
             }
         }
     }

@@ -25,12 +25,12 @@ internal interface HostAppInfoRepository {
     /**
      * This method returns host app's version or empty string if not set.
      */
-    fun getVersion(): String?
+    fun getVersion(): String
 
     /**
      * This method returns host app's package name or empty string if not set.
      */
-    fun getPackageName(): String?
+    fun getPackageName(): String
 
     /**
      * This method returns device's locale or default if not set in String and lowercase format (i.e. xx_xx).
@@ -41,17 +41,17 @@ internal interface HostAppInfoRepository {
      * This method returns IAM subscription key.
      */
     @SuppressWarnings("FunctionMaxLength")
-    fun getInAppMessagingSubscriptionKey(): String?
+    fun getInAppMessagingSubscriptionKey(): String
 
     /**
      * This method returns Android device ID or empty String if not set.
      */
-    fun getDeviceId(): String?
+    fun getDeviceId(): String
 
     /**
      * This method returns IAM config url.
      */
-    fun getConfigUrl(): String?
+    fun getConfigUrl(): String
 
     companion object {
         private const val TAG = "IAM_HostAppRepository"
@@ -89,9 +89,9 @@ internal interface HostAppInfoRepository {
             }
         }
 
-        override fun getVersion(): String? = hostAppInfo?.version ?: ""
+        override fun getVersion(): String = hostAppInfo?.version ?: ""
 
-        override fun getPackageName(): String? = hostAppInfo?.packageName ?: ""
+        override fun getPackageName(): String = hostAppInfo?.packageName ?: ""
 
         override fun getDeviceLocale(): String {
             val locale = hostAppInfo?.locale ?: Locale.getDefault()
@@ -99,10 +99,10 @@ internal interface HostAppInfoRepository {
         }
 
         @SuppressWarnings("FunctionMaxLength")
-        override fun getInAppMessagingSubscriptionKey(): String? = hostAppInfo?.subscriptionKey ?: ""
+        override fun getInAppMessagingSubscriptionKey(): String = hostAppInfo?.subscriptionKey ?: ""
 
-        override fun getDeviceId(): String? = hostAppInfo?.deviceId ?: ""
+        override fun getDeviceId(): String = hostAppInfo?.deviceId ?: ""
 
-        override fun getConfigUrl(): String? = hostAppInfo?.configUrl ?: ""
+        override fun getConfigUrl(): String = hostAppInfo?.configUrl ?: ""
     }
 }

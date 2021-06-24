@@ -53,16 +53,15 @@ internal class ConfigWorker(
         val hostAppId = hostRepo.getPackageName()
         val locale = hostRepo.getDeviceLocale()
         val hostAppVersion = hostRepo.getVersion()
-        // Terminate request if any of the following values is empty or null: appId, appVersion or subscription key.
-        if (hostAppId.isNullOrEmpty() || hostAppVersion.isNullOrEmpty() ||
-                hostRepo.getInAppMessagingSubscriptionKey().isNullOrEmpty()) {
+        val subscriptionId = hostRepo.getInAppMessagingSubscriptionKey()
+        // Terminate request if any of the following values are empty: appId, appVersion or subscription key.
+        if (hostAppId.isEmpty() || hostAppVersion.isEmpty() || subscriptionId.isEmpty()) {
             return Result.failure()
         }
 
-        val configUrl = hostRepo.getConfigUrl() ?: ""
+        val configUrl = hostRepo.getConfigUrl()
         val sdkVersion = BuildConfig.VERSION_NAME
         val params = ConfigQueryParamsBuilder(hostAppId, locale, hostAppVersion, sdkVersion).queryParams
-        val subscriptionId = hostRepo.getInAppMessagingSubscriptionKey()!!
         val configServiceCall = RuntimeUtil.getRetrofit()
                 .create(ConfigRetrofitService::class.java)
                 .getConfigService(configUrl, subscriptionId, params)

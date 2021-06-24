@@ -10,8 +10,7 @@ internal interface ReadyMessageRepository {
      * This method replaces with a new list of messages with [messageList].
      * Throws IllegalArgumentException if messageList argument is empty.
      */
-    @Throws(IllegalArgumentException::class)
-    fun replaceAllMessages(messageList: List<Message>?)
+    fun replaceAllMessages(messageList: List<Message>)
 
     /**
      * This method returns a copy of all the messages.
