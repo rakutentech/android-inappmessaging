@@ -5,8 +5,6 @@ import com.google.gson.Gson
 import com.rakuten.tech.mobile.inappmessaging.runtime.InAppMessaging
 import com.rakuten.tech.mobile.inappmessaging.runtime.data.models.messages.Message
 import com.rakuten.tech.mobile.inappmessaging.runtime.data.responses.ping.CampaignData
-import com.rakuten.tech.mobile.inappmessaging.runtime.utils.InAppMessagingConstants
-import org.json.JSONException
 import org.json.JSONObject
 import timber.log.Timber
 import java.lang.ClassCastException
@@ -114,8 +112,8 @@ internal abstract class PingResponseMessageRepository : MessageRepository {
                             campaign.timesClosed = jsonObject.getJSONObject(key).getInt("timesClosed")
                             messages[key] = campaign
                         }
-                    } catch (jex: JSONException) {
-                        Timber.tag(TAG).d(jex.cause, "Invalid JSON format for $PING_RESPONSE_KEY data")
+                    } catch (ex: Exception) {
+                        Timber.tag(TAG).d(ex.cause, "Invalid JSON format for $PING_RESPONSE_KEY data")
                     }
                 }
             }

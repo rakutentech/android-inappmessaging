@@ -61,7 +61,7 @@ internal class InApp(
             AccountRepository.instance().updateUserInfo()
         } catch (ex: Exception) {
             errorCallback?.let {
-                it(InAppMessagingException("In-App Messaging register preference failed", ex.cause))
+                it(InAppMessagingException("In-App Messaging register preference failed", ex))
             }
         }
     }
@@ -75,7 +75,7 @@ internal class InApp(
             }
         } catch (ex: Exception) {
             errorCallback?.let {
-                it(InAppMessagingException("In-App Messaging register activity failed", ex.cause))
+                it(InAppMessagingException("In-App Messaging register activity failed", ex))
             }
         }
     }
@@ -93,7 +93,7 @@ internal class InApp(
             Timber.d("unregisterMessageDisplayActivity()")
         } catch (ex: Exception) {
             errorCallback?.let {
-                it(InAppMessagingException("In-App Messaging unregister activity failed", ex.cause))
+                it(InAppMessagingException("In-App Messaging unregister activity failed", ex))
             }
         }
     }
@@ -109,7 +109,7 @@ internal class InApp(
             }
         } catch (ex: Exception) {
             errorCallback?.let {
-                it(InAppMessagingException("In-App Messaging log event failed", ex.cause))
+                it(InAppMessagingException("In-App Messaging log event failed", ex))
             }
         }
     }
@@ -122,7 +122,7 @@ internal class InApp(
             }
         } catch (ex: Exception) {
             errorCallback?.let {
-                it(InAppMessagingException("In-App Messaging session update failed", ex.cause))
+                it(InAppMessagingException("In-App Messaging session update failed", ex))
             }
         }
     }
@@ -137,7 +137,7 @@ internal class InApp(
             }
         } catch (ex: Exception) {
             errorCallback?.let {
-                it(InAppMessagingException("In-App Messaging close message failed", ex.cause))
+                it(InAppMessagingException("In-App Messaging close message failed", ex))
             }
         }
     }
@@ -163,7 +163,7 @@ internal class InApp(
             }
         } catch (ex: Exception) {
             errorCallback?.let {
-                it(InAppMessagingException("In-App Messaging moving temp data to cache failed", ex.cause))
+                it(InAppMessagingException("In-App Messaging moving temp data to cache failed", ex))
             }
         }
     }

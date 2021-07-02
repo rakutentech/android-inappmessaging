@@ -39,16 +39,6 @@ class ReadyForDisplayMessageRepositorySpec : BaseTest() {
     }
 
     @Test
-    fun `should throw exception when list is null`() {
-        try {
-            ReadyForDisplayMessageRepository.instance().replaceAllMessages(null)
-            Assert.fail()
-        } catch (e: IllegalArgumentException) {
-            e.localizedMessage shouldBeEqualTo InAppMessagingConstants.ARGUMENT_IS_NULL_EXCEPTION
-        }
-    }
-
-    @Test
     fun `should be empty after clearing`() {
         ReadyForDisplayMessageRepository.instance().replaceAllMessages(messageList)
         ReadyForDisplayMessageRepository.instance().getAllMessagesCopy().shouldHaveSize(2)

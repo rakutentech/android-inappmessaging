@@ -48,16 +48,6 @@ class LocalDisplayedMessageRepositorySpec : BaseTest() {
     }
 
     @Test
-    fun `should throw exception with null message`() {
-        try {
-            LocalDisplayedMessageRepository.instance().addMessage(null)
-            fail("should throw exception")
-        } catch (e: IllegalArgumentException) {
-            e.localizedMessage shouldBeEqualTo InAppMessagingConstants.ARGUMENT_IS_NULL_EXCEPTION
-        }
-    }
-
-    @Test
     fun `should throw exception with empty campaign id`() {
         try {
             LocalDisplayedMessageRepository.instance().addMessage(ValidTestMessage(""))

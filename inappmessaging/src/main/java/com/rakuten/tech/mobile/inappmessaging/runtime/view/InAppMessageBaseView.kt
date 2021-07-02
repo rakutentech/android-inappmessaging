@@ -80,16 +80,15 @@ internal open class InAppMessageBaseView(context: Context, attrs: AttributeSet?)
         // Set onClick listener to close button.
         val closeButton = message_close_button
         closeButton.setOnClickListener(this.listener)
-        if (this.buttons?.size == 1) { // NOPMD
+        if (this.buttons?.size == 1) {
             // Set bigger layout_margin if there's only one button.
             val view = message_single_button
             if (view is MaterialButton) {
                 setButtonInfo(view, this.buttons!![0])
             }
-        } else // NOPMD
-        // Set bigger layout_margin if there's only one button.
-        {
-            if (buttons?.size == 2) { // NOPMD
+        } else {
+            // Set bigger layout_margin if there's only one button.
+            if (buttons?.size == 2) {
                 setButtonInfo(message_button_left as MaterialButton, this.buttons!![0])
                 setButtonInfo(message_button_right as MaterialButton, this.buttons!![1])
             }

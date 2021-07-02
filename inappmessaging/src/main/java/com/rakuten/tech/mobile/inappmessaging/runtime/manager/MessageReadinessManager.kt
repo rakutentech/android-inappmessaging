@@ -58,7 +58,7 @@ internal interface MessageReadinessManager {
         @WorkerThread
         @SuppressWarnings("LongMethod", "ReturnCount")
         override fun getNextDisplayMessage(): Message? {
-            var messageList: List<Message> = ReadyForDisplayMessageRepository.instance().getAllMessagesCopy()
+            val messageList: List<Message> = ReadyForDisplayMessageRepository.instance().getAllMessagesCopy()
             for (message in messageList) {
                 Timber.tag(TAG).d("checking permission for message: %s", message.getCampaignId())
 
@@ -111,7 +111,7 @@ internal interface MessageReadinessManager {
                 RuntimeUtil.getRetrofit()
                         .create(MessageMixerRetrofitService::class.java)
                         .getDisplayPermissionService(
-                                HostAppInfoRepository.instance().getInAppMessagingSubscriptionKey().toString(),
+                                HostAppInfoRepository.instance().getInAppMessagingSubscriptionKey(),
                                 AccountRepository.instance().getRaeToken(),
                                 displayPermissionUrl,
                                 request)
@@ -122,7 +122,7 @@ internal interface MessageReadinessManager {
          */
         private fun shouldDisplayMessage(message: Message): Boolean =
                 (LocalDisplayedMessageRepository.instance().numberOfTimesDisplayed(message)
-                        < message.getMaxImpressions()!!) &&
+                        < message.getMaxImpressions() ?: 0) &&
                         !LocalOptedOutMessageRepository.instance().hasMessage(message.getCampaignId())
 
         /**
@@ -160,7 +160,7 @@ internal interface MessageReadinessManager {
                             "display: %b performPing: %b", response.body()?.display, response.body()?.performPing)
                     return response.body()
                 }
-            } catch (e: IOException) {
+            } catch (e: Exception) {
                 Timber.tag(TAG).d(e)
             }
             return null

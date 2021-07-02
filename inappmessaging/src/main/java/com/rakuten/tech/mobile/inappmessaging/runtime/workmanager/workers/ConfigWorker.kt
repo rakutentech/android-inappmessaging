@@ -69,7 +69,7 @@ internal class ConfigWorker(
         return try {
             // Executing the API network call.
             onResponse(configServiceCall.execute())
-        } catch (e: IOException) {
+        } catch (e: Exception) {
             Timber.tag(TAG).d(e)
             // RETRY by default has exponential backoff baked in.
             Result.retry()

@@ -68,7 +68,7 @@ internal class MessageMixerWorker(
         return try {
             // Execute a thread blocking API network call, and handle response.
             onResponse(responseCall.execute())
-        } catch (e: IOException) {
+        } catch (e: Exception) {
             Timber.tag(TAG).d(e)
             Result.failure()
         }

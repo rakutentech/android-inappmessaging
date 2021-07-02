@@ -26,6 +26,7 @@ class LocalOptedOutMessageRepositorySpec : BaseTest() {
         LocalOptedOutMessageRepository.instance().addMessage(message)
         LocalOptedOutMessageRepository.instance().hasMessage(message.getCampaignId()).shouldBeTrue()
         LocalOptedOutMessageRepository.instance().hasMessage("123").shouldBeFalse()
+        LocalOptedOutMessageRepository.instance().hasMessage(null).shouldBeFalse()
     }
 
     @Test
