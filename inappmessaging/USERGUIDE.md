@@ -88,7 +88,7 @@ If you want to enable debug logging in In-App Messaging SDK (tags begins with "I
 | Debugging        | boolean | `com.rakuten.tech.mobile.inappmessaging.debugging`       | ✅         | `false` |
 
 #### **Enable and disable the SDK remotely**
-We recommend, as good engineering practice, that you integrate with a remote config service so that you can fetch an e.g. `Enable_IAM_SDK` feature flag and use its value to dynamically enable/disable the SDK without making an app release. There are many remote config services on the market, both free and paid.
+We recommend, as good engineering practice, that you integrate with a remote config service so that you can fetch a feature flag, e.g. `Enable_IAM_SDK`, and use its value to dynamically enable/disable the SDK without making an app release. There are many remote config services on the market, both free and paid.
 
 ### #5 <a name="info-provider"></a> Creating UserInfoProvider.
 Create a new class in your project that implements the following class:
