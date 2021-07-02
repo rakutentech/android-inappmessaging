@@ -17,6 +17,7 @@ import kotlinx.android.synthetic.main.message_buttons.view.*
 import kotlinx.android.synthetic.main.message_image_view.view.*
 import kotlinx.android.synthetic.main.message_scrollview.view.*
 import kotlinx.android.synthetic.main.opt_out_checkbox.view.*
+import timber.log.Timber
 
 /**
  * Base class of all custom views.
@@ -43,16 +44,26 @@ internal open class InAppMessageBaseView(context: Context, attrs: AttributeSet?)
      * Sets campaign message data onto the view.
      */
     override fun populateViewData(message: Message, imageAspectRatio: Float) {
-        this.headerColor = Color.parseColor(message.getMessagePayload()?.headerColor)
-        this.messageBodyColor = Color.parseColor(message.getMessagePayload()?.messageBodyColor)
-        this.bgColor = Color.parseColor(message.getMessagePayload()?.backgroundColor)
+        try {
+            this.headerColor = Color.parseColor(message.getMessagePayload()?.headerColor ?: "")
+            this.messageBodyColor = Color.parseColor(message.getMessagePayload()?.messageBodyColor ?: "")
+            this.bgColor = Color.parseColor(message.getMessagePayload()?.backgroundColor ?: "")
+        } catch (e: IllegalArgumentException) {
+            // values are from backend
+            Timber.tag(TAG).e(e)
+            // change to default
+            this.headerColor = Color.BLACK
+            this.messageBodyColor = Color.BLACK
+            this.bgColor = Color.WHITE
+        }
+
         this.header = message.getMessagePayload()?.header
         this.messageBody = message.getMessagePayload()?.messageBody
         this.buttons = message.getMessagePayload()?.messageSettings?.controlSettings?.buttons
         this.imageUrl = message.getMessagePayload()?.resource?.imageUrl
         this.listener = InAppMessageViewListener(message)
         this.imageAspectRatio = imageAspectRatio
-        this.displayOptOut = message.getMessagePayload()?.messageSettings?.displaySettings?.optOut!!
+        this.displayOptOut = message.getMessagePayload()?.messageSettings?.displaySettings?.optOut ?: false
         bindViewData()
         this.tag = message.getCampaignId()
     }
@@ -86,12 +97,10 @@ internal open class InAppMessageBaseView(context: Context, attrs: AttributeSet?)
             if (view is MaterialButton) {
                 setButtonInfo(view, this.buttons!![0])
             }
-        } else {
+        } else if (buttons?.size == 2) {
             // Set bigger layout_margin if there's only one button.
-            if (buttons?.size == 2) {
-                setButtonInfo(message_button_left as MaterialButton, this.buttons!![0])
-                setButtonInfo(message_button_right as MaterialButton, this.buttons!![1])
-            }
+            setButtonInfo(message_button_left as MaterialButton, this.buttons!![0])
+            setButtonInfo(message_button_right as MaterialButton, this.buttons!![1])
         }
     }
 
@@ -134,10 +143,28 @@ internal open class InAppMessageBaseView(context: Context, attrs: AttributeSet?)
      */
     private fun setButtonInfo(buttonView: MaterialButton, button: MessageButton) {
         buttonView.text = button.buttonText
-        buttonView.setTextColor(Color.parseColor(button.buttonTextColor))
-        buttonView.backgroundTintList = ColorStateList.valueOf(Color.parseColor(button.buttonBackgroundColor))
+        val textColor = try {
+            Color.parseColor(button.buttonTextColor)
+        } catch (e: IllegalArgumentException) {
+            // values are from backend
+            Timber.tag(TAG).e(e)
+            // set to default color
+            Color.parseColor("#1D1D1D")
+        }
+        buttonView.setTextColor(textColor)
+
+        val bgColor = try {
+            Color.parseColor(button.buttonBackgroundColor)
+        } catch (e: IllegalArgumentException) {
+            // values are from backend
+            Timber.tag(TAG).e(e)
+            // set to default color
+            Color.WHITE
+        }
+
+        buttonView.backgroundTintList = ColorStateList.valueOf(bgColor)
         // Button stroke color equals to button text color.
-        buttonView.strokeColor = ColorStateList.valueOf(Color.parseColor(button.buttonTextColor))
+        buttonView.strokeColor = ColorStateList.valueOf(textColor)
         buttonView.setOnClickListener(this.listener)
         buttonView.visibility = View.VISIBLE
         message_buttons.visibility = View.VISIBLE
@@ -173,5 +200,9 @@ internal open class InAppMessageBaseView(context: Context, attrs: AttributeSet?)
                 messageBodyTextView.visibility = View.VISIBLE
             }
         }
+    }
+
+    companion object {
+        private const val TAG = "IAM_BaseView"
     }
 }
