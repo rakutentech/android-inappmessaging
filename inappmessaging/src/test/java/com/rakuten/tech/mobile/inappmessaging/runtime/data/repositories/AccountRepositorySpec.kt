@@ -13,8 +13,6 @@ import org.amshove.kluent.*
 import org.junit.Before
 import org.junit.Test
 import org.mockito.Mockito
-import java.security.MessageDigest
-import java.security.NoSuchAlgorithmException
 
 /**
  * Test class for AccountRepository class.

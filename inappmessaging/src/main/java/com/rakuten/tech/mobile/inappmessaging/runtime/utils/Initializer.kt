@@ -53,15 +53,13 @@ internal object Initializer {
     @TargetApi(Build.VERSION_CODES.P)
     private fun getHostAppVersion(context: Context): String {
         val hostPackageName = getHostAppPackageName(context)
-        var packageInfo: PackageInfo? = null
-        try {
-            packageInfo = context.packageManager.getPackageInfo(hostPackageName, 0)
+        val packageInfo: PackageInfo = try {
+            context.packageManager.getPackageInfo(hostPackageName, 0)
         } catch (e: NameNotFoundException) {
             Timber.tag(TAG).d(e)
-        }
-        if (packageInfo == null) {
             return ""
         }
+
         val versionCode = PackageInfoCompat.getLongVersionCode(packageInfo)
         return packageInfo.versionName + "." + versionCode
     }

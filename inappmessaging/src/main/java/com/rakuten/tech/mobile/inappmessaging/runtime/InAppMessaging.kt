@@ -130,7 +130,7 @@ abstract class InAppMessaging internal constructor() {
                 true
             } catch (ex: Exception) {
                 errorCallback?.let {
-                    it(InAppMessagingException("In-App Messaging initialization failed", ex.cause))
+                    it(InAppMessagingException("In-App Messaging initialization failed", ex))
                 }
                 false
             }

@@ -5,9 +5,7 @@ import com.google.gson.Gson
 import com.rakuten.tech.mobile.inappmessaging.runtime.InAppMessaging
 import com.rakuten.tech.mobile.inappmessaging.runtime.data.models.messages.Message
 import com.rakuten.tech.mobile.inappmessaging.runtime.data.responses.ping.CampaignData
-import com.rakuten.tech.mobile.inappmessaging.runtime.utils.InAppMessagingConstants
 import org.json.JSONArray
-import org.json.JSONException
 import timber.log.Timber
 import java.lang.ClassCastException
 
@@ -101,8 +99,8 @@ internal abstract class ReadyForDisplayMessageRepository : ReadyMessageRepositor
                             messages.add(Gson().fromJson(jsonArray.getJSONObject(i).toString(),
                                     CampaignData::class.java))
                         }
-                    } catch (jex: JSONException) {
-                        Timber.tag(TAG).d(jex.cause, "Invalid JSON format for $READY_DISPLAY_KEY data")
+                    } catch (ex: Exception) {
+                        Timber.tag(TAG).d(ex.cause, "Invalid JSON format for $READY_DISPLAY_KEY data")
                     }
                 }
             }

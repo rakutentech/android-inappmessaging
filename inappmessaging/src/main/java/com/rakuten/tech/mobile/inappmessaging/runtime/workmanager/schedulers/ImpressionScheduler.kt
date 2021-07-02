@@ -4,8 +4,10 @@ import androidx.work.Data
 import androidx.work.OneTimeWorkRequest
 import androidx.work.WorkManager
 import com.google.gson.Gson
+import com.rakuten.tech.mobile.inappmessaging.runtime.InApp
 import com.rakuten.tech.mobile.inappmessaging.runtime.InAppMessaging
 import com.rakuten.tech.mobile.inappmessaging.runtime.data.requests.ImpressionRequest
+import com.rakuten.tech.mobile.inappmessaging.runtime.exception.InAppMessagingException
 import com.rakuten.tech.mobile.inappmessaging.runtime.utils.WorkManagerUtil
 import com.rakuten.tech.mobile.inappmessaging.runtime.workmanager.workers.ImpressionWorker
 import com.rakuten.tech.mobile.inappmessaging.runtime.workmanager.workers.ImpressionWorker.Companion.IMPRESSION_REQUEST_KEY
@@ -20,8 +22,15 @@ internal class ImpressionScheduler {
      */
     fun startImpressionWorker(impressionRequest: ImpressionRequest) {
         // Enqueue unique work request in the background.
-        WorkManager.getInstance(InAppMessaging.instance().getHostAppContext()!!).enqueue(
-                createWorkRequest(impressionRequest))
+        try {
+            WorkManager.getInstance(InAppMessaging.instance().getHostAppContext()!!).enqueue(
+                    createWorkRequest(impressionRequest))
+        } catch (ie: IllegalStateException) {
+            // this should not occur since work manager is initialized during SDK initialization
+            InApp.errorCallback?.let {
+                it(InAppMessagingException("In-App Messaging impression request failed", ie))
+            }
+        }
     }
 
     /**

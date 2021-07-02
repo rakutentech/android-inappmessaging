@@ -7,7 +7,6 @@ import com.rakuten.tech.mobile.inappmessaging.runtime.InApp
 import com.rakuten.tech.mobile.inappmessaging.runtime.InAppMessaging
 import com.rakuten.tech.mobile.inappmessaging.runtime.data.models.messages.Message
 import com.rakuten.tech.mobile.inappmessaging.runtime.exception.InAppMessagingException
-import com.rakuten.tech.mobile.inappmessaging.runtime.utils.InAppMessagingConstants
 import timber.log.Timber
 import java.lang.ClassCastException
 import java.util.Calendar

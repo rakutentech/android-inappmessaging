@@ -11,9 +11,7 @@ import com.rakuten.tech.mobile.inappmessaging.runtime.data.models.appevents.Logi
 import com.rakuten.tech.mobile.inappmessaging.runtime.data.models.appevents.PurchaseSuccessfulEvent
 import com.rakuten.tech.mobile.inappmessaging.runtime.data.models.appevents.Event
 import com.rakuten.tech.mobile.inappmessaging.runtime.exception.InAppMessagingException
-import com.rakuten.tech.mobile.inappmessaging.runtime.utils.InAppMessagingConstants
 import org.json.JSONArray
-import org.json.JSONException
 import timber.log.Timber
 import java.lang.ClassCastException
 import java.util.Collections
@@ -168,8 +166,8 @@ internal interface LocalEventRepository : EventRepository {
                         events.add(event)
                     }
                 }
-            } catch (jex: JSONException) {
-                Timber.tag(TAG).d(jex.cause, "Invalid JSON format for $LOCAL_EVENT_KEY data")
+            } catch (ex: Exception) {
+                Timber.tag(TAG).d(ex.cause, "Invalid JSON format for $LOCAL_EVENT_KEY data")
             }
         }
 

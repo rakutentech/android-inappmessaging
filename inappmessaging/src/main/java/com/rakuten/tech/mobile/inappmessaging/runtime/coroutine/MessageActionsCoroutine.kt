@@ -33,7 +33,7 @@ internal class MessageActionsCoroutine(
 
     fun executeTask(message: Message?, viewResourceId: Int, optOut: Boolean): Boolean {
 
-        if (message == null) {
+        if (message == null || message.getCampaignId().isNullOrEmpty()) {
             return false
         }
 
@@ -77,8 +77,8 @@ internal class MessageActionsCoroutine(
     /**
      * Returns an ImpressionType array which contains clicked button, checkbox impressions.
      */
-    private fun getImpressionTypes(optOut: Boolean, impressionType: ImpressionType): MutableList<ImpressionType?> {
-        val impressionTypes: MutableList<ImpressionType?> = ArrayList()
+    private fun getImpressionTypes(optOut: Boolean, impressionType: ImpressionType): MutableList<ImpressionType> {
+        val impressionTypes: MutableList<ImpressionType> = ArrayList()
         impressionTypes.add(impressionType)
         if (optOut) {
             // No need to include optOut if it's false.
@@ -129,7 +129,7 @@ internal class MessageActionsCoroutine(
      * @param message A Message object.
      * @param impressionTypes An ImpressionType of the button click.
      */
-    private fun scheduleReportImpression(message: Message, impressionTypes: List<ImpressionType?>) {
+    private fun scheduleReportImpression(message: Message, impressionTypes: List<ImpressionType>) {
 
         val impressionManager = ImpressionManager()
         impressionManager.scheduleReportImpression(

@@ -7,11 +7,13 @@ import com.rakuten.tech.mobile.inappmessaging.runtime.api.MessageMixerRetrofitSe
 import com.rakuten.tech.mobile.inappmessaging.runtime.data.enums.UserIdentifierType
 import com.rakuten.tech.mobile.inappmessaging.runtime.data.models.UserIdentifier
 import com.rakuten.tech.mobile.inappmessaging.runtime.data.repositories.AccountRepository
+import com.rakuten.tech.mobile.inappmessaging.runtime.manager.MessageReadinessManager
 import okhttp3.OkHttpClient
 import okhttp3.ResponseBody
 import retrofit2.Call
 import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory
+import timber.log.Timber
 import java.io.IOException
 import java.util.Calendar
 import java.util.concurrent.Executors
@@ -30,6 +32,7 @@ internal object RuntimeUtil {
             .build()
     private val EXECUTOR = Executors.newSingleThreadExecutor()
     private val GSON_CONVERTER_FACTORY = GsonConverterFactory.create()
+    private const val TAG = "IAM_RuntimeUtil"
 
     /**
      * This method returns a reference of Retrofit. Retrofit is handling API calls.
@@ -55,10 +58,14 @@ internal object RuntimeUtil {
         if (URLUtil.isNetworkUrl(imageUrl)) {
             val getImageCall: Call<ResponseBody> =
                     getRetrofit().create(MessageMixerRetrofitService::class.java).getImage(imageUrl)
-            val imageResponse = getImageCall.execute()
-            if (imageResponse.isSuccessful && imageResponse.body() != null) {
-                val bytes = imageResponse.body()!!.bytes()
-                return BitmapFactory.decodeByteArray(bytes, 0, bytes.size)
+            try {
+                val imageResponse = getImageCall.execute()
+                if (imageResponse.isSuccessful && imageResponse.body() != null) {
+                    val bytes = imageResponse.body()!!.bytes() // should no longer be null
+                    return BitmapFactory.decodeByteArray(bytes, 0, bytes.size)
+                }
+            } catch (ex: Exception) {
+                Timber.tag(TAG).d(ex)
             }
         }
         return null

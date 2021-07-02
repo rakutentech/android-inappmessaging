@@ -50,14 +50,6 @@ class ImpressionManagerSpec : BaseTest() {
     }
 
     @Test
-    fun `should not throw exception create impression list with null arguments`() {
-        val impressionTypes = mutableListOf(ImpressionType.ACTION_ONE, ImpressionType.OPT_OUT, null)
-        val impressions: List<Impression> = ImpressionManager().createImpressionList(impressionTypes)
-        // Impression + Action_One + Opt_out = 3. If null was counted, then 4.
-        impressions.shouldHaveSize(3)
-    }
-
-    @Test
     @Throws(ExecutionException::class, InterruptedException::class)
     fun `should invoke start impression worker`() {
         WorkManagerTestInitHelper.initializeTestWorkManager(ApplicationProvider.getApplicationContext())
@@ -93,9 +85,9 @@ class ImpressionManagerSpec : BaseTest() {
 
     companion object {
         private const val IMPRESSION_WORKER_NAME = "iam_impression_work"
-        private val VALID_IMPRESSION_TYPES: MutableList<ImpressionType?> =
+        private val VALID_IMPRESSION_TYPES: MutableList<ImpressionType> =
                 mutableListOf(ImpressionType.ACTION_ONE, ImpressionType.OPT_OUT)
-        private val INVALID_IMPRESSION_TYPES: MutableList<ImpressionType?> =
+        private val INVALID_IMPRESSION_TYPES: MutableList<ImpressionType> =
                 mutableListOf(ImpressionType.ACTION_ONE, ImpressionType.IMPRESSION)
         private var impressionList: List<Impression>? = null
     }

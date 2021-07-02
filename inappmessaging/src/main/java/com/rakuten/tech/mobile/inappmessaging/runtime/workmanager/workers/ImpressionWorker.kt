@@ -62,7 +62,7 @@ internal class ImpressionWorker(
             } else if (response.code() >= HttpURLConnection.HTTP_BAD_REQUEST) {
                 return Result.failure()
             }
-        } catch (e: IOException) {
+        } catch (e: Exception) {
             Timber.tag(TAG).e(e)
             return Result.retry()
         }

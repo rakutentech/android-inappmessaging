@@ -1,7 +1,6 @@
 package com.rakuten.tech.mobile.inappmessaging.runtime.data.repositories
 
 import androidx.annotation.VisibleForTesting
-import androidx.annotation.WorkerThread
 import com.rakuten.tech.mobile.inappmessaging.runtime.InAppMessaging
 import com.rakuten.tech.mobile.inappmessaging.runtime.data.models.messages.Message
 import timber.log.Timber

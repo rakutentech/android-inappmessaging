@@ -47,16 +47,6 @@ class PingResponseMessageRepositorySpec : BaseTest() {
     }
 
     @Test
-    fun `should throw exception when list is null`() {
-        try {
-            PingResponseMessageRepository.instance().replaceAllMessages(null)
-            Assert.fail()
-        } catch (e: IllegalArgumentException) {
-            e.localizedMessage shouldBeEqualTo InAppMessagingConstants.ARGUMENT_IS_NULL_EXCEPTION
-        }
-    }
-
-    @Test
     fun `should not throw exception when list is empty`() {
         PingResponseMessageRepository.instance().replaceAllMessages(ArrayList())
     }

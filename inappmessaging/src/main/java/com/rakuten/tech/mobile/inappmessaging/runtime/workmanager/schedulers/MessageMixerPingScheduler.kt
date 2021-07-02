@@ -3,8 +3,10 @@ package com.rakuten.tech.mobile.inappmessaging.runtime.workmanager.schedulers
 import androidx.work.ExistingWorkPolicy
 import androidx.work.OneTimeWorkRequest
 import androidx.work.WorkManager
+import com.rakuten.tech.mobile.inappmessaging.runtime.InApp
 import com.rakuten.tech.mobile.inappmessaging.runtime.InAppMessaging
 import com.rakuten.tech.mobile.inappmessaging.runtime.data.repositories.ConfigResponseRepository
+import com.rakuten.tech.mobile.inappmessaging.runtime.exception.InAppMessagingException
 import com.rakuten.tech.mobile.inappmessaging.runtime.utils.RetryDelayUtil
 import com.rakuten.tech.mobile.inappmessaging.runtime.utils.WorkManagerUtil
 import com.rakuten.tech.mobile.inappmessaging.runtime.workmanager.workers.MessageMixerWorker
@@ -36,18 +38,36 @@ internal interface MessageMixerPingScheduler {
             if (!ConfigResponseRepository.instance().isConfigEnabled()) {
                 return
             }
+
+            // this is just to handle possible overflow but should never occur
+            val delay = if (Long.MAX_VALUE - System.currentTimeMillis()
+                    <= TimeUnit.MILLISECONDS.toMillis(initialDelay)) {
+                        // reset current delay
+                        currDelay = RetryDelayUtil.INITIAL_BACKOFF_DELAY
+                        RetryDelayUtil.INITIAL_BACKOFF_DELAY
+            } else {
+                initialDelay
+            }
+
             // Schedule a work request to fetch campaigns. Add a unique tag with this request.
             val periodicMessageMixerFetch = OneTimeWorkRequest.Builder(MessageMixerWorker::class.java)
                     // Delay will be between androidx.work.WorkRequest.MAX_BACKOFF_MILLIS,
                     // and androidx.work.WorkRequest.MIN_BACKOFF_MILLIS.
-                    .setInitialDelay(initialDelay, TimeUnit.MILLISECONDS)
+                    .setInitialDelay(delay, TimeUnit.MILLISECONDS)
                     .setConstraints(WorkManagerUtil.getNetworkConnectedConstraint())
                     .addTag(MESSAGE_MIXER_PING_WORKER)
                     .build()
 
             // Enqueue work request in the background.
-            WorkManager.getInstance(InAppMessaging.instance().getHostAppContext()!!)
-                    .enqueueUniqueWork(MESSAGE_MIXER_PING_WORKER, ExistingWorkPolicy.REPLACE, periodicMessageMixerFetch)
+            try {
+                WorkManager.getInstance(InAppMessaging.instance().getHostAppContext()!!).enqueueUniqueWork(
+                        MESSAGE_MIXER_PING_WORKER, ExistingWorkPolicy.REPLACE, periodicMessageMixerFetch)
+            } catch (ie: IllegalStateException) {
+                // this should not occur since work manager is initialized during SDK initialization
+                InApp.errorCallback?.let {
+                    it(InAppMessagingException("In-App Messaging ping request failed", ie))
+                }
+            }
         }
     }
 }

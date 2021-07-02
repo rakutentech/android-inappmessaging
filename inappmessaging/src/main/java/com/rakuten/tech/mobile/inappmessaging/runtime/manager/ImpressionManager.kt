@@ -54,8 +54,7 @@ internal class ImpressionManager {
      * This method creates a list of impressions based on input arguments.
      * Throws IllegalArgumentException if impressionTypes is IMPRESSION or INVALID.
      */
-    @Throws(IllegalArgumentException::class)
-    fun createImpressionList(impressionTypes: List<ImpressionType?>): List<Impression> {
+    fun createImpressionList(impressionTypes: List<ImpressionType>): List<Impression> {
         // Create Impression objects list.
 
         val impressionList = ArrayList<Impression>()
@@ -68,11 +67,12 @@ internal class ImpressionManager {
         for (impressionType in impressionTypes) {
 
             // If impressionType is Impression or Invalid, there's something wrong, do not proceed.
-            require(!(ImpressionType.IMPRESSION == impressionType || ImpressionType.INVALID == impressionType))
-            if (impressionType != null) {
-                impressionList.add(Impression(impressionType, currentTimeInMillis)) // NOPMD
-                Timber.tag(TAG).d("impression %s, time: %d", impressionType.name, currentTimeInMillis)
+            if (ImpressionType.IMPRESSION == impressionType || ImpressionType.INVALID == impressionType) {
+                return ArrayList()
             }
+
+            impressionList.add(Impression(impressionType, currentTimeInMillis))
+            Timber.tag(TAG).d("impression %s, time: %d", impressionType.name, currentTimeInMillis)
         }
         return impressionList
     }
@@ -92,7 +92,7 @@ internal class ImpressionManager {
         // Adding impression list to an unmodifiable map.
         val ratMap = HashMap<String, List<RatImpression>>()
         ratMap[InAppMessagingConstants.RAT_EVENT_KEY_IMPRESSION_VALUE] = ratImpressionList
-        return Collections.unmodifiableMap<String, List<RatImpression>>(ratMap)
+        return Collections.unmodifiableMap(ratMap)
     }
 
     companion object {
