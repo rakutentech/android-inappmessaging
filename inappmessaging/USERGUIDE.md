@@ -87,6 +87,9 @@ If you want to enable debug logging in In-App Messaging SDK (tags begins with "I
 | Config URL       | String  | `com.rakuten.tech.mobile.inappmessaging.configurl`       | ❌         | 🚫      |
 | Debugging        | boolean | `com.rakuten.tech.mobile.inappmessaging.debugging`       | ✅         | `false` |
 
+#### **Enable and disable the SDK remotely**
+We recommend, as good engineering practice, that you integrate with a remote config service so that you can fetch an e.g. `Enable_IAM_SDK` feature flag and use its value to dynamically enable/disable the SDK without making an app release. There are many remote config services on the market, both free and paid.
+
 ### #5 <a name="info-provider"></a> Creating UserInfoProvider.
 Create a new class in your project that implements the following class:
 ```kotlin
@@ -138,7 +141,10 @@ if (iamFlag) {
 }
 ```
 
-**<font color="red">Notes:</font> Missing Subscription Key or other critical information are some of the possible issues that can be encountered during initialization.**
+**<font color="red">Notes:</font>**
+* Missing Subscription Key or other critical information are some of the possible issues that can be encountered during initialization.
+* You can move the `init()` call inside an `if (<enable IAM-SDK boolean value> == true)` block to control enabling/disabling the SDK.
+* If `init()` is not called, subsequent calls to other public API SDK functions have no effect.
 
 ### #7 Registering and unregistering activities.
 Only register activities that are allowed to display In-App messages. Your activities will be kept in a `WeakReference` object, so it will not cause any memory leaks. Don't forget to unregister your activities in `onPause()` method.
@@ -344,6 +350,7 @@ Documents targeting Product Managers:
 * SDKCF-3781/SDKCF-3915: Fixed crash due to failing master key generation for encrypted shared preferences. The root cause of the crash is suspected to be these Android platform issues [#147480931](https://issuetracker.google.com/issues/147480931) and [#176215143](https://issuetracker.google.com/issues/176215143).
   - To prevent the crash, SDK use normal shared preferences.
 * SDKCF-3908: Changed auto-initialization to explicit init for better control and handling for any initialization issue. Please refer to [SDK Integration](#integration) for details.
+* SDKCF-3939: Added recommendation to use a remote feature flag to enable/disable the SDK.
 
 ### 3.0.0 (2021-03-24)
 * SDKCF-3450: Update Fresco dependency to v2.4.0 to fix SoLoader issue.
