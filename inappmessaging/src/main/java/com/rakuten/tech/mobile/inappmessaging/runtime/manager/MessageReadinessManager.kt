@@ -19,7 +19,6 @@ import com.rakuten.tech.mobile.inappmessaging.runtime.utils.RuntimeUtil
 import com.rakuten.tech.mobile.inappmessaging.runtime.workmanager.schedulers.MessageMixerPingScheduler
 import retrofit2.Call
 import timber.log.Timber
-import java.io.IOException
 
 /**
  * The MessageReadinessManager dispatches the actual work to check if a message is ready to display.
@@ -143,7 +142,7 @@ internal interface MessageReadinessManager {
         /**
          * This method returns display message permission (from server).
          */
-        @SuppressWarnings("ReturnCount")
+        @SuppressWarnings("ReturnCount", "TooGenericExceptionCaught")
         private fun getMessagePermission(message: Message): DisplayPermissionResponse? {
             // Prepare request data.
             val displayPermissionUrl: String = ConfigResponseRepository.instance().getDisplayPermissionEndpoint()

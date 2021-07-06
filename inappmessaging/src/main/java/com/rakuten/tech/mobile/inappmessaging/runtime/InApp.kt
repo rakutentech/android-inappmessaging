@@ -24,13 +24,14 @@ import kotlinx.coroutines.launch
 import timber.log.Timber
 import java.lang.ref.WeakReference
 
-@SuppressWarnings("TooManyFunctions")
+@SuppressWarnings("TooManyFunctions", "TooGenericExceptionCaught")
 internal class InApp(
     private val context: Context,
     isDebugLogging: Boolean,
     private val displayManager: DisplayManager = DisplayManager.instance(),
     private var isCacheHandling: Boolean = BuildConfig.IS_CACHE_HANDLING,
-    private val eventsManager: EventsManager = EventsManager
+    private val eventsManager: EventsManager = EventsManager,
+    private val sessionManager: SessionManager = SessionManager
 ) : InAppMessaging() {
 
     // Used for displaying or removing messages from screen.
@@ -118,7 +119,7 @@ internal class InApp(
         try {
             if (ConfigResponseRepository.instance().isConfigEnabled()) {
                 // Updates the current session to update all locally stored messages
-                SessionManager.onSessionUpdate()
+                sessionManager.onSessionUpdate()
             }
         } catch (ex: Exception) {
             errorCallback?.let {

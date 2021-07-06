@@ -14,8 +14,8 @@ import kotlinx.android.synthetic.main.in_app_message_slide_up.view.*
  * This is a custom view that extends from InAppMessageBaseView.
  */
 internal class InAppMessageSlideUpView(
-        context: Context,
-        attrs: AttributeSet?
+    context: Context,
+    attrs: AttributeSet?
 ) :
         InAppMessageBaseView(context, attrs) {
 

@@ -37,7 +37,8 @@ class InitializerSpec : BaseTest() {
     private val mockEditor = Mockito.mock(SharedPreferences.Editor::class.java)
 
     @Before
-    fun setup() {
+    override fun setup() {
+        super.setup()
         When calling workerParameters.inputData itReturns Data.EMPTY
         Settings.Secure.putString(context.contentResolver, Settings.Secure.ANDROID_ID, "testid")
 

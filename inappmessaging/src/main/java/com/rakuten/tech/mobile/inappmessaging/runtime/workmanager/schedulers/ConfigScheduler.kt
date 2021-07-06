@@ -3,7 +3,9 @@ package com.rakuten.tech.mobile.inappmessaging.runtime.workmanager.schedulers
 import androidx.work.ExistingWorkPolicy
 import androidx.work.OneTimeWorkRequest
 import androidx.work.WorkManager
+import com.rakuten.tech.mobile.inappmessaging.runtime.InApp
 import com.rakuten.tech.mobile.inappmessaging.runtime.InAppMessaging
+import com.rakuten.tech.mobile.inappmessaging.runtime.exception.InAppMessagingException
 import com.rakuten.tech.mobile.inappmessaging.runtime.utils.RetryDelayUtil
 import com.rakuten.tech.mobile.inappmessaging.runtime.utils.WorkManagerUtil
 import com.rakuten.tech.mobile.inappmessaging.runtime.workmanager.workers.ConfigWorker
@@ -14,7 +16,7 @@ import java.util.concurrent.TimeUnit
  */
 internal interface ConfigScheduler {
 
-    fun startConfig(delay: Long = 0)
+    fun startConfig(delay: Long = 0, workManager: WorkManager? = null)
 
     companion object {
         private const val CONFIG_WORKER_NAME = "iam_config_worker"
@@ -25,24 +27,42 @@ internal interface ConfigScheduler {
     }
 
     private class ConfigSchedulerImpl : ConfigScheduler {
-        override fun startConfig(delay: Long) {
-            WorkManager.getInstance(InAppMessaging.instance().getHostAppContext()!!)
-                    .beginUniqueWork(
-                            CONFIG_WORKER_NAME,
-                            ExistingWorkPolicy.REPLACE,
-                            getConfigWorkRequest(delay)!!)
-                    .enqueue()
+        override fun startConfig(delay: Long, workManager: WorkManager?) {
+            try {
+                val context = InAppMessaging.instance().getHostAppContext()
+                context?.let {
+                    val manager = workManager ?: WorkManager.getInstance(it)
+                    manager.beginUniqueWork(CONFIG_WORKER_NAME, ExistingWorkPolicy.REPLACE,
+                            getConfigWorkRequest(delay))
+                            .enqueue()
+                }
+            } catch (ie: IllegalStateException) {
+                // this should not occur since work manager is initialized during SDK initialization
+                InApp.errorCallback?.let {
+                    it(InAppMessagingException("In-App Messaging config request failed", ie))
+                }
+            }
         }
 
         /**
          * This method syncs with config service in the background with all necessary input data
          * bundled into Data and passed into Worker.
          */
-        private fun getConfigWorkRequest(delay: Long): OneTimeWorkRequest? =
-                // Creating a config work request.
-                OneTimeWorkRequest.Builder(ConfigWorker::class.java)
-                        .setInitialDelay(delay, TimeUnit.MILLISECONDS)
-                        .setConstraints(WorkManagerUtil.getNetworkConnectedConstraint())
-                        .build()
+        private fun getConfigWorkRequest(delay: Long): OneTimeWorkRequest {
+            // this is just to handle possible overflow but should never occur
+            val newDelay = if (Long.MAX_VALUE - System.currentTimeMillis()
+                    <= TimeUnit.MILLISECONDS.toMillis(delay)) {
+                // reset current delay
+                currDelay = RetryDelayUtil.INITIAL_BACKOFF_DELAY
+                RetryDelayUtil.INITIAL_BACKOFF_DELAY
+            } else {
+                delay
+            }
+            // Creating a config work request.
+            return OneTimeWorkRequest.Builder(ConfigWorker::class.java)
+                    .setInitialDelay(newDelay, TimeUnit.MILLISECONDS)
+                    .setConstraints(WorkManagerUtil.getNetworkConnectedConstraint())
+                    .build()
+        }
     }
 }

@@ -34,7 +34,8 @@ class ImpressionManagerSpec : BaseTest() {
     private val eventBroadcaster = Mockito.mock(LegacyEventBroadcasterHelper::class.java)
 
     @Before
-    fun setup() {
+    override fun setup() {
+        super.setup()
         impressionList = ImpressionManager().createImpressionList(VALID_IMPRESSION_TYPES)
     }
 
@@ -44,9 +45,9 @@ class ImpressionManagerSpec : BaseTest() {
         impressionList!![1].type shouldBeEqualTo ImpressionType.ACTION_ONE.typeId
     }
 
-    @Test(expected = IllegalArgumentException::class)
+    @Test
     fun `should throw exception when create impression list with wrong arg`() {
-        ImpressionManager().createImpressionList(INVALID_IMPRESSION_TYPES)
+        ImpressionManager().createImpressionList(INVALID_IMPRESSION_TYPES).isEmpty()
     }
 
     @Test

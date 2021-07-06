@@ -18,7 +18,6 @@ import com.rakuten.tech.mobile.inappmessaging.runtime.workmanager.schedulers.Eve
 import com.rakuten.tech.mobile.inappmessaging.runtime.workmanager.schedulers.MessageMixerPingScheduler
 import retrofit2.Response
 import timber.log.Timber
-import java.io.IOException
 import java.net.HttpURLConnection
 
 /**
@@ -26,6 +25,7 @@ import java.net.HttpURLConnection
  * class, and uses synchronized network call to make request to Message Mixer Service. Note: If
  * return RETRY, WorkerManager will make exponential backoff retries by itself.
  */
+@SuppressWarnings("TooGenericExceptionCaught")
 internal class MessageMixerWorker(
     context: Context,
     workerParams: WorkerParameters,
@@ -60,9 +60,9 @@ internal class MessageMixerWorker(
 
         // Create an retrofit API network call.
         val responseCall = serviceApi.performPing(
-                HostAppInfoRepository.instance().getInAppMessagingSubscriptionKey().toString(),
+                HostAppInfoRepository.instance().getInAppMessagingSubscriptionKey(),
                 AccountRepository.instance().getRaeToken(),
-                HostAppInfoRepository.instance().getDeviceId().toString(),
+                HostAppInfoRepository.instance().getDeviceId(),
                 ConfigResponseRepository.instance().getPingEndpoint(),
                 pingRequest)
         return try {
@@ -124,7 +124,6 @@ internal class MessageMixerWorker(
      * This method schedules the next ping to Message Mixer. Due to JobScheduler's limitation,
      * WorkRequest backoff time has to be between 10 seconds to 5 hours.
      */
-    @Throws(IllegalArgumentException::class)
     private fun scheduleNextPing(nextPingMillis: Long) {
         // reset current delay to initial
         MessageMixerPingScheduler.currDelay = RetryDelayUtil.INITIAL_BACKOFF_DELAY

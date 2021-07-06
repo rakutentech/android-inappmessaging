@@ -22,7 +22,7 @@ internal interface MessageMixerPingScheduler {
      * request to Message Mixer is successful, a new request will be automatically scheduled for the
      * future.
      */
-    fun pingMessageMixerService(initialDelay: Long)
+    fun pingMessageMixerService(initialDelay: Long, workManager: WorkManager? = null)
 
     companion object {
         private const val MESSAGE_MIXER_PING_WORKER = "iam_message_mixer_worker"
@@ -32,8 +32,9 @@ internal interface MessageMixerPingScheduler {
         fun instance(): MessageMixerPingScheduler = instance
     }
 
+    @SuppressWarnings("LongMethod")
     private class MessageMixerPingSchedulerImpl : MessageMixerPingScheduler {
-        override fun pingMessageMixerService(initialDelay: Long) {
+        override fun pingMessageMixerService(initialDelay: Long, workManager: WorkManager?) {
             // Do not continue if config is disabled.
             if (!ConfigResponseRepository.instance().isConfigEnabled()) {
                 return
@@ -42,9 +43,9 @@ internal interface MessageMixerPingScheduler {
             // this is just to handle possible overflow but should never occur
             val delay = if (Long.MAX_VALUE - System.currentTimeMillis()
                     <= TimeUnit.MILLISECONDS.toMillis(initialDelay)) {
-                        // reset current delay
-                        currDelay = RetryDelayUtil.INITIAL_BACKOFF_DELAY
-                        RetryDelayUtil.INITIAL_BACKOFF_DELAY
+                // reset current delay
+                currDelay = RetryDelayUtil.INITIAL_BACKOFF_DELAY
+                RetryDelayUtil.INITIAL_BACKOFF_DELAY
             } else {
                 initialDelay
             }
@@ -60,8 +61,12 @@ internal interface MessageMixerPingScheduler {
 
             // Enqueue work request in the background.
             try {
-                WorkManager.getInstance(InAppMessaging.instance().getHostAppContext()!!).enqueueUniqueWork(
-                        MESSAGE_MIXER_PING_WORKER, ExistingWorkPolicy.REPLACE, periodicMessageMixerFetch)
+                val context = InAppMessaging.instance().getHostAppContext()
+                context?.let {
+                    val manager = workManager ?: WorkManager.getInstance(it)
+                    manager.enqueueUniqueWork(
+                            MESSAGE_MIXER_PING_WORKER, ExistingWorkPolicy.REPLACE, periodicMessageMixerFetch)
+                }
             } catch (ie: IllegalStateException) {
                 // this should not occur since work manager is initialized during SDK initialization
                 InApp.errorCallback?.let {

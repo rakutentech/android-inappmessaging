@@ -16,7 +16,8 @@ import kotlin.random.Random
 class ConfigResponseRepositorySpec : BaseTest() {
 
     @Before
-    fun setup() {
+    override fun setup() {
+        super.setup()
         ConfigResponseRepository.resetInstance()
     }
 

@@ -7,14 +7,12 @@ import com.rakuten.tech.mobile.inappmessaging.runtime.api.MessageMixerRetrofitSe
 import com.rakuten.tech.mobile.inappmessaging.runtime.data.enums.UserIdentifierType
 import com.rakuten.tech.mobile.inappmessaging.runtime.data.models.UserIdentifier
 import com.rakuten.tech.mobile.inappmessaging.runtime.data.repositories.AccountRepository
-import com.rakuten.tech.mobile.inappmessaging.runtime.manager.MessageReadinessManager
 import okhttp3.OkHttpClient
 import okhttp3.ResponseBody
 import retrofit2.Call
 import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory
 import timber.log.Timber
-import java.io.IOException
 import java.util.Calendar
 import java.util.concurrent.Executors
 import java.util.concurrent.TimeUnit
@@ -53,7 +51,7 @@ internal object RuntimeUtil {
      * Throws IOException if an error occur when making Get request, or converting image data
      * into bytes.
      */
-    @Throws(IOException::class)
+    @SuppressWarnings("TooGenericExceptionCaught")
     fun getImage(imageUrl: String): Bitmap? {
         if (URLUtil.isNetworkUrl(imageUrl)) {
             val getImageCall: Call<ResponseBody> =

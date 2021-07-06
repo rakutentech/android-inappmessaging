@@ -27,6 +27,7 @@ import kotlin.collections.ArrayList
 /**
  * Task which should be ran in the background.
  */
+@SuppressWarnings("TooGenericExceptionCaught")
 internal class MessageActionsCoroutine(
     private val localDisplayRepo: LocalDisplayedMessageRepository = LocalDisplayedMessageRepository.instance()
 ) {
@@ -183,31 +184,12 @@ internal class MessageActionsCoroutine(
      * This method retrieves embedded event object from message based on impressionType.
      */
     @SuppressWarnings("LongMethod", "ComplexCondition", "ReturnCount", "MaxLineLength", "MaximumLineLength")
-    private fun getEmbeddedEvent(impressionType: ImpressionType, message: Message?): Trigger? {
-        try {
-            if (ImpressionType.ACTION_ONE == impressionType || ImpressionType.ACTION_TWO == impressionType) {
-                val index = if (impressionType == ImpressionType.ACTION_ONE) 0 else 1
-                if (message?.getMessagePayload() != null &&
-                        message.getMessagePayload()!!.messageSettings != null &&
-                        message.getMessagePayload()!!.messageSettings?.controlSettings != null &&
-                        message.getMessagePayload()!!.messageSettings?.controlSettings?.buttons != null &&
-                        message.getMessagePayload()!!.messageSettings?.controlSettings?.buttons?.get(index) != null) {
-
-                    return message.getMessagePayload()!!.messageSettings
-                            ?.controlSettings?.buttons?.get(index)?.embeddedEvent
-                }
-            } else if (ImpressionType.CLICK_CONTENT == impressionType &&
-                    message != null &&
-                    message.getMessagePayload() != null &&
-                    message.getMessagePayload()!!.messageSettings != null &&
-                    message.getMessagePayload()!!.messageSettings?.controlSettings != null &&
-                    message.getMessagePayload()!!.messageSettings?.controlSettings?.content != null) {
-
-                return message.getMessagePayload()!!.messageSettings?.controlSettings?.content?.embeddedEvent
-            }
-        } catch (ex: Exception) {
-            // no need to call error callback since this is an internal issue
-            Timber.tag(TAG).d(ex)
+    private fun getEmbeddedEvent(impressionType: ImpressionType, message: Message): Trigger? {
+        if (ImpressionType.ACTION_ONE == impressionType || ImpressionType.ACTION_TWO == impressionType) {
+            val index = if (impressionType == ImpressionType.ACTION_ONE) 0 else 1
+            return message.getMessagePayload()?.messageSettings?.controlSettings?.buttons?.get(index)?.embeddedEvent
+        } else if (ImpressionType.CLICK_CONTENT == impressionType) {
+            return message.getMessagePayload()?.messageSettings?.controlSettings?.content?.embeddedEvent
         }
         return null
     }

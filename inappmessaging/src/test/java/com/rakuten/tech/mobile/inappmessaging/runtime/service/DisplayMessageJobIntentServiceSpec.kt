@@ -57,7 +57,8 @@ class DisplayMessageJobIntentServiceSpec : BaseTest() {
     private val configResponseData = Mockito.mock(ConfigResponseData::class.java)
 
     @Before
-    fun setup() {
+    override fun setup() {
+        super.setup()
         SoLoader.setInTestMode()
         serviceController = Robolectric.buildService(DisplayMessageJobIntentService::class.java)
         displayMessageJobIntentService = serviceController?.bind()?.create()?.get()
@@ -77,7 +78,8 @@ class DisplayMessageJobIntentServiceSpec : BaseTest() {
     }
 
     @After
-    fun tearDown() {
+    override fun tearDown() {
+        super.tearDown()
         ConfigResponseRepository.resetInstance()
         serviceController!!.destroy()
         validateMockitoUsage()
@@ -253,6 +255,28 @@ class DisplayMessageJobIntentServiceSpec : BaseTest() {
         argumentCaptor<String>().apply {
             Mockito.verify(mockReadyForDisplayRepo).removeMessage(capture(), eq(true))
             firstValue shouldBeEqualTo message.getCampaignId()
+        }
+    }
+
+    @Test
+    fun `should not crash when campaign id is null`() {
+        val message = Mockito.mock(Message::class.java)
+
+        When calling onVerifyContexts.invoke(any(), any()) itReturns false
+        InAppMessaging.instance().onVerifyContext = onVerifyContexts
+
+        When calling message.getCampaignId() itReturns null
+        When calling message.isTest() itReturns false
+        When calling message.getMaxImpressions() itReturns 1
+        When calling message.getMessagePayload() itReturns Gson().fromJson(MESSAGE_PAYLOAD_NO_URL.trimIndent(),
+                MessagePayload::class.java)
+        When calling message.getContexts() itReturns listOf("ctx")
+        When calling mockMessageManager.getNextDisplayMessage() itReturns message itReturns null
+        displayMessageJobIntentService!!.onHandleWork(intent!!)
+
+        argumentCaptor<String>().apply {
+            Mockito.verify(mockReadyForDisplayRepo).removeMessage(capture(), eq(true))
+            firstValue shouldBeEqualTo ""
         }
     }
 

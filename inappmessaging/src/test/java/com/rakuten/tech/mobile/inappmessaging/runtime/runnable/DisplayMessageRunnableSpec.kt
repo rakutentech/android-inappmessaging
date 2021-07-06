@@ -39,7 +39,8 @@ class DisplayMessageRunnableSpec : BaseTest() {
     private val window = Mockito.mock(Window::class.java)
 
     @Before
-    fun setup() {
+    override fun setup() {
+        super.setup()
         SoLoader.setInTestMode()
         When calling view!!.id itReturns 12343254
         When calling hostAppActivity.window itReturns window

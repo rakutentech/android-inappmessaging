@@ -17,7 +17,6 @@ import com.rakuten.tech.mobile.inappmessaging.runtime.workmanager.schedulers.Con
 import com.rakuten.tech.mobile.inappmessaging.runtime.workmanager.schedulers.MessageMixerPingScheduler
 import retrofit2.Response
 import timber.log.Timber
-import java.io.IOException
 import java.net.HttpURLConnection
 
 /**
@@ -47,7 +46,7 @@ internal class ConfigWorker(
      * the response(200/400) returned from Config Service, `WorkerResult.Success` should always be
      * returned. Because this work(network call to config service) was scheduled and executed.
      */
-    @SuppressWarnings("LongMethod")
+    @SuppressWarnings("LongMethod", "TooGenericExceptionCaught")
     override fun doWork(): Result {
         Timber.tag(TAG).d(hostRepo.getConfigUrl())
         val hostAppId = hostRepo.getPackageName()
