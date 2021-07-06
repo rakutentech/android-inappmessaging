@@ -1,8 +1,10 @@
 package com.rakuten.tech.mobile.inappmessaging.runtime.workmanager.schedulers
 
 import androidx.test.core.app.ApplicationProvider
+import androidx.work.OneTimeWorkRequest
 import androidx.work.WorkManager
 import androidx.work.WorkRequest
+import com.nhaarman.mockitokotlin2.atLeastOnce
 import com.nhaarman.mockitokotlin2.times
 import com.rakuten.tech.mobile.inappmessaging.runtime.BaseTest
 import com.rakuten.tech.mobile.inappmessaging.runtime.InAppMessaging
@@ -28,7 +30,8 @@ class MessageMixerPingSchedulerSpec : BaseTest() {
     @Before
     override fun setup() {
         super.setup()
-        When calling mockWorkManager.enqueue(any(WorkRequest::class)) itThrows IllegalStateException("test")
+        When calling mockWorkManager.enqueueUniqueWork(
+                any(), any(), any(OneTimeWorkRequest::class)) itThrows IllegalStateException("test")
     }
 
     @Test
@@ -58,6 +61,6 @@ class MessageMixerPingSchedulerSpec : BaseTest() {
         ConfigResponseRepository.instance().addConfigResponse(configResponseData)
         MessageMixerPingScheduler.instance().pingMessageMixerService(10L, mockWorkManager)
 
-        Mockito.verify(mockCallback).invoke(any(InAppMessagingException::class))
+        Mockito.verify(mockCallback, atLeastOnce()).invoke(any(InAppMessagingException::class))
     }
 }
