@@ -132,7 +132,7 @@ abstract class InAppMessaging internal constructor() {
             }
         }
 
-        @Throws(InAppMessagingInitializationException::class)
+        @Throws(InAppMessagingException::class)
         internal fun initialize(
             context: Context,
             isForTesting: Boolean = false,
