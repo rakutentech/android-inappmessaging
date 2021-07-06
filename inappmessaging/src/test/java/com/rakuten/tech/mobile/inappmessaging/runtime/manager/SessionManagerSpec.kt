@@ -34,7 +34,8 @@ class SessionManagerSpec : BaseTest() {
     private val message = ValidTestMessage()
 
     @Before
-    fun setup() {
+    override fun setup() {
+        super.setup()
         LocalEventRepository.instance().clearEvents()
     }
 

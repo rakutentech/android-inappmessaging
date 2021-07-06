@@ -14,7 +14,8 @@ import org.junit.Test
  */
 class PurchaseSuccessfulEventSpec : BaseTest() {
     @Before
-    fun setup() {
+    override fun setup() {
+        super.setup()
         itemList.add("item_id_1")
         itemList.add("item_id_2")
         itemList.add("item_id_3")

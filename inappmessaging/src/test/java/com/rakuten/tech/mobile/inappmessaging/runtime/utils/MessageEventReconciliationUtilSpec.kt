@@ -48,7 +48,8 @@ open class MessageEventReconciliationUtilSpec : BaseTest() {
      */
     @Before
     @SuppressWarnings("LongMethod")
-    fun setup() {
+    override fun setup() {
+        super.setup()
         // Arranging message1's data.
         val trigger1List = ArrayList<Trigger>()
         trigger1List.add(trigger1)

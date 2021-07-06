@@ -59,7 +59,7 @@ internal interface LocalEventRepository : EventRepository {
          * This method adds logEvent into the events map.
          * If logEvent name is empty, an IllegalArgumentException will be thrown.
          */
-        @Throws(IllegalArgumentException::class)
+        @SuppressWarnings("ReturnCount")
         override fun addEvent(event: Event): Boolean {
             if (event.getEventName().isNullOrEmpty()) {
                 InApp.errorCallback?.let {
@@ -74,16 +74,20 @@ internal interface LocalEventRepository : EventRepository {
                 if (shouldIgnore(event)) return false
 
                 events.add(event)
-                Timber.tag(TAG).d(event.getEventName())
-                event.getAttributeMap().forEach { (key, value) ->
-                    Timber.tag(TAG).d("Key: %s", key)
-                    Timber.tag(TAG).d(
-                            "Value name: %s, Value Type: %d, Value data: %s", value?.name, value?.valueType,
-                            value?.value)
-                }
+                debugLog(event)
                 saveUpdatedList()
             }
             return true
+        }
+
+        private fun debugLog(event: Event) {
+            Timber.tag(TAG).d(event.getEventName())
+            event.getAttributeMap().forEach { (key, value) ->
+                Timber.tag(TAG).d("Key: %s", key)
+                Timber.tag(TAG).d(
+                        "Value name: %s, Value Type: %d, Value data: %s", value?.name, value?.valueType,
+                        value?.value)
+            }
         }
 
         /**
@@ -148,6 +152,7 @@ internal interface LocalEventRepository : EventRepository {
             }
         }
 
+        @SuppressWarnings("TooGenericExceptionCaught", "ComplexMethod")
         private fun deserializeLocalEvents(listString: String) {
             try {
                 val jsonArray = JSONArray(listString)
@@ -162,13 +167,9 @@ internal interface LocalEventRepository : EventRepository {
                         EventType.CUSTOM.name -> Gson().fromJson(item.toString(), CustomEvent::class.java)
                         else -> null
                     }
-                    if (event != null) {
-                        events.add(event)
-                    }
+                    event?.let { events.add(it) }
                 }
-            } catch (ex: Exception) {
-                Timber.tag(TAG).d(ex.cause, "Invalid JSON format for $LOCAL_EVENT_KEY data")
-            }
+            } catch (ex: Exception) { Timber.tag(TAG).d(ex.cause, "Invalid JSON format for $LOCAL_EVENT_KEY data") }
         }
 
         private fun saveUpdatedList() {

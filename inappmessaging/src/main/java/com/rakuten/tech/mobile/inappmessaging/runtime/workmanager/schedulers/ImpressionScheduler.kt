@@ -20,11 +20,14 @@ internal class ImpressionScheduler {
     /**
      * This method starts to report a campaign impression to IAM backend.
      */
-    fun startImpressionWorker(impressionRequest: ImpressionRequest) {
+    fun startImpressionWorker(impressionRequest: ImpressionRequest, workManager: WorkManager? = null) {
         // Enqueue unique work request in the background.
         try {
-            WorkManager.getInstance(InAppMessaging.instance().getHostAppContext()!!).enqueue(
-                    createWorkRequest(impressionRequest))
+            val context = InAppMessaging.instance().getHostAppContext()
+            context?.let {
+                val manager = workManager ?: WorkManager.getInstance(it)
+                manager.enqueue(createWorkRequest(impressionRequest))
+            }
         } catch (ie: IllegalStateException) {
             // this should not occur since work manager is initialized during SDK initialization
             InApp.errorCallback?.let {

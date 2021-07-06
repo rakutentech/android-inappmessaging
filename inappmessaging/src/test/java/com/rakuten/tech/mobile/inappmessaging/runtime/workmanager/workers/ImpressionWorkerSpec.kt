@@ -51,7 +51,8 @@ class ImpressionWorkerSpec : BaseTest() {
     private var responseBodyCall: Call<ResponseBody>? = null
 
     @Before
-    fun setup() {
+    override fun setup() {
+        super.setup()
         AccountRepository.instance().userInfoProvider = TestUserInfoProvider()
         HostAppInfoRepository.instance().addHostInfo(HostAppInfo(InAppMessagingTestConstants.APP_ID,
                 InAppMessagingTestConstants.DEVICE_ID, InAppMessagingTestConstants.APP_VERSION,
@@ -219,6 +220,7 @@ class ImpressionWorkerSpec : BaseTest() {
         When calling mockHostRespository.getPackageName() itReturns ctx.packageName
         val version = ctx.packageManager.getPackageInfo(ctx.packageName, 0).versionName
         When calling mockHostRespository.getVersion() itReturns version
+        When calling mockHostRespository.getInAppMessagingSubscriptionKey() itReturns "test_key"
         val worker = ConfigWorker(context, workerParameters, mockHostRespository, ConfigResponseRepository.instance(),
                 mockMessageScheduler)
         worker.doWork()

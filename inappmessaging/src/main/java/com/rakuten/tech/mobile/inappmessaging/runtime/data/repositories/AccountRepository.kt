@@ -52,15 +52,9 @@ internal abstract class AccountRepository {
         } else TOKEN_PREFIX + this.userInfoProvider?.provideRaeToken()
         // According to backend specs, token has to start with "OAuth2{space}", followed by real token.
 
-        override fun getUserId(): String =
-                if (this.userInfoProvider?.provideUserId() == null) {
-                    ""
-                } else userInfoProvider!!.provideUserId().toString()
+        override fun getUserId(): String = this.userInfoProvider?.provideUserId() ?: ""
 
-        override fun getRakutenId(): String =
-                if (this.userInfoProvider?.provideRakutenId() == null) {
-                    ""
-                } else userInfoProvider!!.provideRakutenId().toString()
+        override fun getRakutenId(): String = this.userInfoProvider?.provideRakutenId() ?: ""
 
         override fun updateUserInfo(algo: String?): Boolean {
             val curr = hash(getUserId() + getRakutenId(), algo)
@@ -73,7 +67,7 @@ internal abstract class AccountRepository {
             return false
         }
 
-        @SuppressWarnings("MagicNumber")
+        @SuppressWarnings("MagicNumber", "SwallowedException", "TooGenericExceptionCaught")
         private fun hash(input: String, algo: String?): String {
             return try {
                 // MD5 hashing

@@ -88,7 +88,7 @@ internal abstract class PingResponseMessageRepository : MessageRepository {
             return result ?: false
         }
 
-        @SuppressWarnings("LongMethod")
+        @SuppressWarnings("LongMethod", "TooGenericExceptionCaught")
         private fun checkAndResetMap(onLaunch: Boolean = false) {
             // check if caching is enabled and if there are changes in user info
             if (InAppMessaging.instance().isLocalCachingEnabled() &&
@@ -102,19 +102,17 @@ internal abstract class PingResponseMessageRepository : MessageRepository {
                     ""
                 }
                 messages.clear()
-                if (listString.isNotEmpty()) {
-                    try {
-                        val jsonObject = JSONObject(listString)
-                        for (key in jsonObject.keys()) {
-                            val campaign = Gson().fromJson(
-                                    jsonObject.getJSONObject(key).toString(), CampaignData::class.java)
-                            // manual setting since not part of constructor
-                            campaign.timesClosed = jsonObject.getJSONObject(key).getInt("timesClosed")
-                            messages[key] = campaign
-                        }
-                    } catch (ex: Exception) {
-                        Timber.tag(TAG).d(ex.cause, "Invalid JSON format for $PING_RESPONSE_KEY data")
+                try {
+                    val jsonObject = JSONObject(listString)
+                    for (key in jsonObject.keys()) {
+                        val campaign = Gson().fromJson(
+                                jsonObject.getJSONObject(key).toString(), CampaignData::class.java)
+                        // manual setting since not part of constructor
+                        campaign.timesClosed = jsonObject.getJSONObject(key).getInt("timesClosed")
+                        messages[key] = campaign
                     }
+                } catch (ex: Exception) {
+                    Timber.tag(TAG).d(ex.cause, "Invalid JSON format for $PING_RESPONSE_KEY data")
                 }
             }
         }

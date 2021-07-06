@@ -6,8 +6,6 @@ import android.content.SharedPreferences
 import androidx.annotation.NonNull
 import androidx.annotation.Nullable
 import androidx.annotation.RestrictTo
-import androidx.work.Configuration
-import androidx.work.WorkManager
 import com.rakuten.tech.mobile.inappmessaging.runtime.data.models.appevents.Event
 import com.rakuten.tech.mobile.inappmessaging.runtime.data.repositories.LocalDisplayedMessageRepository
 import com.rakuten.tech.mobile.inappmessaging.runtime.data.repositories.PingResponseMessageRepository
@@ -38,7 +36,6 @@ abstract class InAppMessaging internal constructor() {
      * In order for InAppMessaging SDK to display messages, host app must pass an Activity
      * which the host app allows the SDK to display any Messages.
      */
-    @Throws(IllegalArgumentException::class)
     abstract fun registerMessageDisplayActivity(@NonNull activity: Activity)
 
     /**
@@ -53,7 +50,6 @@ abstract class InAppMessaging internal constructor() {
      * This methods logs the [event] which the InAppMessaging SDK checks to know the messages'
      * triggers are satisfied, then display that message if all trigger conditions are satisfied.
      */
-    @Throws(IllegalArgumentException::class, NullPointerException::class)
     abstract fun logEvent(@NonNull event: Event)
 
     /**
@@ -144,10 +140,6 @@ abstract class InAppMessaging internal constructor() {
             configScheduler: ConfigScheduler = ConfigScheduler.instance()
         ) {
             val manifestConfig = AppManifestConfig(context)
-
-            // Special handling of WorkManager initialization for Android 11
-            val config = Configuration.Builder().build()
-            WorkManager.initialize(context, config)
 
             // `manifestConfig.isDebugging()` is used to enable/disable the debug logging of InAppMessaging SDK.
             // Note: All InAppMessaging SDK logs' tags begins with "IAM_".

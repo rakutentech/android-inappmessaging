@@ -4,7 +4,7 @@ import android.content.Context
 import androidx.work.Worker
 import androidx.work.WorkerParameters
 import com.google.gson.Gson
-import com.google.gson.JsonSyntaxException
+import com.google.gson.JsonParseException
 import com.rakuten.tech.mobile.inappmessaging.runtime.api.MessageMixerRetrofitService
 import com.rakuten.tech.mobile.inappmessaging.runtime.data.repositories.AccountRepository
 import com.rakuten.tech.mobile.inappmessaging.runtime.data.repositories.ConfigResponseRepository
@@ -14,7 +14,6 @@ import com.rakuten.tech.mobile.inappmessaging.runtime.utils.RuntimeUtil
 import okhttp3.ResponseBody
 import retrofit2.Call
 import timber.log.Timber
-import java.io.IOException
 import java.net.HttpURLConnection
 
 /**
@@ -24,13 +23,13 @@ internal class ImpressionWorker(
     context: Context,
     workerParams: WorkerParameters
 ) :
-    Worker(context, workerParams) {
+        Worker(context, workerParams) {
 
     /**
      * This method makes a thread blocking network call to post impression.
      * If server responding a non-successful response, work will be retried again with exponential backoff.
      */
-    @SuppressWarnings("LongMethod", "ReturnCount")
+    @SuppressWarnings("LongMethod", "ReturnCount", "TooGenericExceptionCaught")
     override fun doWork(): Result {
         // Retrieve input data.
         val impressionEndpoint = ConfigResponseRepository.instance().getImpressionEndpoint()
@@ -44,7 +43,7 @@ internal class ImpressionWorker(
         // Convert impressionRequestJsonString to ImpressionRequest object.
         val impressionRequest = try {
             Gson().fromJson(impressionRequestJsonRequest, ImpressionRequest::class.java)
-        } catch (e: JsonSyntaxException) {
+        } catch (e: JsonParseException) {
             Timber.tag(TAG).e(e)
             return Result.failure()
         }
@@ -81,8 +80,8 @@ internal class ImpressionWorker(
             RuntimeUtil.getRetrofit()
                     .create(MessageMixerRetrofitService::class.java)
                     .reportImpression(
-                            HostAppInfoRepository.instance().getInAppMessagingSubscriptionKey().toString(),
-                            HostAppInfoRepository.instance().getDeviceId().toString(),
+                            HostAppInfoRepository.instance().getInAppMessagingSubscriptionKey(),
+                            HostAppInfoRepository.instance().getDeviceId(),
                             accountRepo.getRaeToken(),
                             impressionEndpoint,
                             impressionRequest)

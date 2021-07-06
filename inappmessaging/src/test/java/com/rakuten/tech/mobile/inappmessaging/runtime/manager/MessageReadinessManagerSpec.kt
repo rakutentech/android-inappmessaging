@@ -41,7 +41,8 @@ class MessageReadinessManagerSpec : BaseTest() {
     private var configResponseEndpoints = Mockito.mock(ConfigResponseEndpoints::class.java)
 
     @Before
-    fun setup() {
+    override fun setup() {
+        super.setup()
         AccountRepository.instance().userInfoProvider = TestUserInfoProvider()
         HostAppInfoRepository.instance().addHostInfo(HostAppInfo(
                 InAppMessagingTestConstants.APP_ID,

@@ -131,7 +131,7 @@ internal class DisplayMessageJobIntentService : JobIntentService() {
                     val closeableImage = closeableReference.get()
                     return closeableImage.width.toFloat() / closeableImage.height.toFloat()
                 } catch (ie: IllegalStateException) {
-                    Timber.tag(TAG).d(ie.cause,"unable to compute for aspect ratio")
+                    Timber.tag(TAG).d(ie.cause, "unable to compute for aspect ratio")
                 }
             }
         }

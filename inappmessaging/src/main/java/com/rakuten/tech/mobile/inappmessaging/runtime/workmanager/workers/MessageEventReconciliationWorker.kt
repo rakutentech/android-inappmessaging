@@ -51,7 +51,6 @@ internal class MessageEventReconciliationWorker(
             return Result.success()
         }
 
-        val messageUtil = messageUtil
         // Move test messages(ready to display) from messageList to a new list readyMessageList.
         val readyMessageList = ArrayList(messageUtil.extractTestMessages(messageListCopy))
 

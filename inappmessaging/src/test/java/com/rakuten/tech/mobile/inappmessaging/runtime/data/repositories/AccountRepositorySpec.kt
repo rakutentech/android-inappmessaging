@@ -19,7 +19,8 @@ import org.mockito.Mockito
  */
 class AccountRepositorySpec : BaseTest() {
     @Before
-    fun setup() {
+    override fun setup() {
+        super.setup()
         AccountRepository.instance().userInfoProvider = null
     }
 

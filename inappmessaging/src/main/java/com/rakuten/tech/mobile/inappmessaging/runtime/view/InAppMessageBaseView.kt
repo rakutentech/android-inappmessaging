@@ -43,11 +43,12 @@ internal open class InAppMessageBaseView(context: Context, attrs: AttributeSet?)
     /**
      * Sets campaign message data onto the view.
      */
+    @SuppressWarnings("LongMethod")
     override fun populateViewData(message: Message, imageAspectRatio: Float) {
         try {
-            this.headerColor = Color.parseColor(message.getMessagePayload()?.headerColor ?: "")
-            this.messageBodyColor = Color.parseColor(message.getMessagePayload()?.messageBodyColor ?: "")
-            this.bgColor = Color.parseColor(message.getMessagePayload()?.backgroundColor ?: "")
+            this.headerColor = Color.parseColor(message.getMessagePayload()?.headerColor ?: "#")
+            this.messageBodyColor = Color.parseColor(message.getMessagePayload()?.messageBodyColor ?: "#")
+            this.bgColor = Color.parseColor(message.getMessagePayload()?.backgroundColor ?: "#")
         } catch (e: IllegalArgumentException) {
             // values are from backend
             Timber.tag(TAG).e(e)
@@ -141,6 +142,7 @@ internal open class InAppMessageBaseView(context: Context, attrs: AttributeSet?)
     /**
      * This method adds button information, then set it to visible.
      */
+    @SuppressWarnings("LongMethod")
     private fun setButtonInfo(buttonView: MaterialButton, button: MessageButton) {
         buttonView.text = button.buttonText
         val textColor = try {

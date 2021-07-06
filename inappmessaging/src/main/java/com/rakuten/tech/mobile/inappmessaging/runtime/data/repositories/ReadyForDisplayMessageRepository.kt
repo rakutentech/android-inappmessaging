@@ -79,6 +79,7 @@ internal abstract class ReadyForDisplayMessageRepository : ReadyMessageRepositor
             }
         }
 
+        @SuppressWarnings("TooGenericExceptionCaught", "LongMethod")
         private fun checkAndResetList(onLaunch: Boolean = false) {
             if (InAppMessaging.instance().isLocalCachingEnabled() &&
                     (onLaunch || user != AccountRepository.instance().userInfoHash)) {
@@ -92,16 +93,13 @@ internal abstract class ReadyForDisplayMessageRepository : ReadyMessageRepositor
                 }
 
                 messages.clear()
-                if (listString.isNotEmpty()) {
-                    try {
-                        val jsonArray = JSONArray(listString)
-                        for (i in 0 until jsonArray.length()) {
-                            messages.add(Gson().fromJson(jsonArray.getJSONObject(i).toString(),
-                                    CampaignData::class.java))
-                        }
-                    } catch (ex: Exception) {
-                        Timber.tag(TAG).d(ex.cause, "Invalid JSON format for $READY_DISPLAY_KEY data")
+                try {
+                    val jsonArray = JSONArray(listString)
+                    for (i in 0 until jsonArray.length()) {
+                        messages.add(Gson().fromJson(jsonArray.getJSONObject(i).toString(), CampaignData::class.java))
                     }
+                } catch (ex: Exception) {
+                    Timber.tag(TAG).d(ex.cause, "Invalid JSON format for $READY_DISPLAY_KEY data")
                 }
             }
         }

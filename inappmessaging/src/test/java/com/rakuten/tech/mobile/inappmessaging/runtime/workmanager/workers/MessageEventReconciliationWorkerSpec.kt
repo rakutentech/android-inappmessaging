@@ -34,7 +34,8 @@ class MessageEventReconciliationWorkerSpec : BaseTest() {
     private val mockPingResponseRepo = Mockito.mock(PingResponseMessageRepository::class.java)
 
     @Before
-    fun setup() {
+    override fun setup() {
+        super.setup()
         When calling workerParameters!!.inputData itReturns Data.EMPTY
         val context = ApplicationProvider.getApplicationContext<Context>()
         WorkManagerTestInitHelper.initializeTestWorkManager(context)

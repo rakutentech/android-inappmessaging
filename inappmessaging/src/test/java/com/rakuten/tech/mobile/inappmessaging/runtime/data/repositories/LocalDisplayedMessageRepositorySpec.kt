@@ -9,15 +9,13 @@ import com.rakuten.tech.mobile.inappmessaging.runtime.coroutine.MessageActionsCo
 import com.rakuten.tech.mobile.inappmessaging.runtime.data.models.messages.InvalidTestMessage
 import com.rakuten.tech.mobile.inappmessaging.runtime.data.models.messages.Message
 import com.rakuten.tech.mobile.inappmessaging.runtime.data.models.messages.ValidTestMessage
-import com.rakuten.tech.mobile.inappmessaging.runtime.utils.InAppMessagingConstants
+import com.rakuten.tech.mobile.inappmessaging.runtime.exception.InAppMessagingException
 import org.amshove.kluent.*
-import org.junit.Assert
 import org.junit.Before
 import org.junit.Test
 import org.junit.runner.RunWith
 import org.mockito.Mockito
 import org.robolectric.RobolectricTestRunner
-import kotlin.test.fail
 
 /**
  * Test class for LocalDisplayedMessageRepository.
@@ -25,19 +23,26 @@ import kotlin.test.fail
 @RunWith(RobolectricTestRunner::class)
 class LocalDisplayedMessageRepositorySpec : BaseTest() {
 
+    private val function: (ex: Exception) -> Unit = {}
+    private val mockCallback = Mockito.mock(function.javaClass)
+
     @Before
-    fun setup() {
+    override fun setup() {
+        super.setup()
         LocalDisplayedMessageRepository.instance().clearMessages()
     }
 
     @Test
-    fun `should throw exception when message's campaign ID is empty`() {
-        try {
-            LocalDisplayedMessageRepository.instance().addMessage(InvalidTestMessage())
-            Assert.fail()
-        } catch (e: IllegalArgumentException) {
-            e.localizedMessage shouldBeEqualTo InAppMessagingConstants.ARGUMENT_IS_EMPTY_EXCEPTION
-        }
+    fun `should not crash when message's campaign ID is empty and no callback`() {
+        LocalDisplayedMessageRepository.instance().addMessage(InvalidTestMessage())
+    }
+
+    @Test
+    fun `should invoke callback when message's campaign ID is empty`() {
+        InApp.errorCallback = mockCallback
+        LocalDisplayedMessageRepository.instance().addMessage(InvalidTestMessage())
+
+        Mockito.verify(mockCallback).invoke(any(InAppMessagingException::class))
     }
 
     @Test
@@ -49,12 +54,10 @@ class LocalDisplayedMessageRepositorySpec : BaseTest() {
 
     @Test
     fun `should throw exception with empty campaign id`() {
-        try {
-            LocalDisplayedMessageRepository.instance().addMessage(ValidTestMessage(""))
-            fail("should throw exception")
-        } catch (e: IllegalArgumentException) {
-            e.localizedMessage shouldBeEqualTo InAppMessagingConstants.ARGUMENT_IS_EMPTY_EXCEPTION
-        }
+        InApp.errorCallback = mockCallback
+        LocalDisplayedMessageRepository.instance().addMessage(ValidTestMessage(""))
+
+        Mockito.verify(mockCallback).invoke(any(InAppMessagingException::class))
     }
 
     @Test
@@ -156,6 +159,17 @@ class LocalDisplayedMessageRepositorySpec : BaseTest() {
         editor?.putInt(LocalDisplayedMessageRepository.LOCAL_DISPLAYED_CLOSED_LIST_KEY, 1)
                 ?.putInt(LocalDisplayedMessageRepository.LOCAL_DISPLAYED_CLOSED_KEY, 1)
                 ?.putInt(LocalDisplayedMessageRepository.LOCAL_DISPLAYED_KEY, 1)?.apply()
+
+        LocalDisplayedMessageRepository.instance().numberOfTimesDisplayed(message) shouldBeEqualTo 0
+    }
+
+    @Test
+    fun `should not crash and clear previous when invalid format`() {
+        val message = setupAndTestMultipleUser()
+        val editor = InAppMessaging.instance().getSharedPref()?.edit()
+        editor?.putString(LocalDisplayedMessageRepository.LOCAL_DISPLAYED_CLOSED_LIST_KEY, "invalid")
+                ?.putString(LocalDisplayedMessageRepository.LOCAL_DISPLAYED_CLOSED_KEY, "invalid")
+                ?.putString(LocalDisplayedMessageRepository.LOCAL_DISPLAYED_KEY, "invalid")?.apply()
 
         LocalDisplayedMessageRepository.instance().numberOfTimesDisplayed(message) shouldBeEqualTo 0
     }

@@ -76,6 +76,7 @@ internal interface LocalDisplayedMessageRepository {
             checkAndResetMap(true)
         }
 
+        @SuppressWarnings("LongMethod")
         override fun addMessage(message: Message) {
             if (message.getCampaignId().isNullOrEmpty()) {
                 InApp.errorCallback?.let {
@@ -140,7 +141,7 @@ internal interface LocalDisplayedMessageRepository {
             saveUpdatedMap()
         }
 
-        @SuppressWarnings("LongMethod", "ComplexMethod")
+        @SuppressWarnings("LongMethod", "ComplexMethod", "TooGenericExceptionCaught")
         private fun checkAndResetMap(onLaunch: Boolean = false) {
             // check if caching is enabled and if there are changes in user info
             if (InAppMessaging.instance().isLocalCachingEnabled() &&

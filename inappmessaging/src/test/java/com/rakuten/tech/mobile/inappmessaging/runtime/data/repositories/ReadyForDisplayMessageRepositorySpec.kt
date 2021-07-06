@@ -10,9 +10,7 @@ import com.rakuten.tech.mobile.inappmessaging.runtime.TestUserInfoProvider
 import com.rakuten.tech.mobile.inappmessaging.runtime.UserInfoProvider
 import com.rakuten.tech.mobile.inappmessaging.runtime.data.models.messages.Message
 import com.rakuten.tech.mobile.inappmessaging.runtime.data.models.messages.ValidTestMessage
-import com.rakuten.tech.mobile.inappmessaging.runtime.utils.InAppMessagingConstants
 import org.amshove.kluent.*
-import org.junit.Assert
 import org.junit.Before
 import org.junit.Test
 import org.junit.runner.RunWith
@@ -28,7 +26,8 @@ class ReadyForDisplayMessageRepositorySpec : BaseTest() {
     private val message1 = ValidTestMessage("1234")
 
     @Before
-    fun setup() {
+    override fun setup() {
+        super.setup()
         ReadyForDisplayMessageRepository.instance().clearMessages()
         PingResponseMessageRepository.instance().clearMessages()
         message0.timesClosed = 0

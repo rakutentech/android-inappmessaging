@@ -40,7 +40,8 @@ class EventsManagerSpec : BaseTest() {
     private val eventRecon = Mockito.mock(EventMessageReconciliationScheduler::class.java)
 
     @Before
-    fun setup() {
+    override fun setup() {
+        super.setup()
         WorkManagerTestInitHelper.initializeTestWorkManager(context)
         When calling mockEvent.getEventName() itReturns EVENT_NAME
         When calling mockEvent.getRatEventMap() itReturns map
