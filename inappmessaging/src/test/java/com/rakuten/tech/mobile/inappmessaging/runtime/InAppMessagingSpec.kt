@@ -6,6 +6,7 @@ import android.provider.Settings
 import android.view.ViewGroup
 import androidx.test.core.app.ApplicationProvider
 import androidx.work.testing.WorkManagerTestInitHelper
+import com.nhaarman.mockitokotlin2.anyOrNull
 import com.nhaarman.mockitokotlin2.never
 import com.rakuten.tech.mobile.inappmessaging.runtime.data.models.appevents.AppStartEvent
 import com.rakuten.tech.mobile.inappmessaging.runtime.data.models.appevents.LoginSuccessfulEvent
@@ -14,8 +15,10 @@ import com.rakuten.tech.mobile.inappmessaging.runtime.data.models.messages.Messa
 import com.rakuten.tech.mobile.inappmessaging.runtime.data.models.messages.ValidTestMessage
 import com.rakuten.tech.mobile.inappmessaging.runtime.data.repositories.*
 import com.rakuten.tech.mobile.inappmessaging.runtime.data.responses.config.ConfigResponseData
+import com.rakuten.tech.mobile.inappmessaging.runtime.exception.InAppMessagingException
 import com.rakuten.tech.mobile.inappmessaging.runtime.manager.DisplayManager
 import com.rakuten.tech.mobile.inappmessaging.runtime.manager.EventsManager
+import com.rakuten.tech.mobile.inappmessaging.runtime.manager.SessionManager
 import org.amshove.kluent.*
 import org.junit.After
 import org.junit.Assert
@@ -31,23 +34,29 @@ import kotlin.test.fail
  */
 @RunWith(RobolectricTestRunner::class)
 @SuppressWarnings("LargeClass")
-class InAppMessagingSpec : BaseTest() {
+open class InAppMessagingSpec : BaseTest() {
     private val activity = Mockito.mock(Activity::class.java)
     private val configResponseData = Mockito.mock(ConfigResponseData::class.java)
-    private val displayManager = Mockito.mock(DisplayManager::class.java)
-    private val eventsManager = Mockito.mock(EventsManager::class.java)
+    internal val displayManager = Mockito.mock(DisplayManager::class.java)
+    internal val eventsManager = Mockito.mock(EventsManager::class.java)
+    internal val sessionManager = Mockito.mock(SessionManager::class.java)
     private val viewGroup = Mockito.mock(ViewGroup::class.java)
     private val parentViewGroup = Mockito.mock(ViewGroup::class.java)
     private val mockContext = Mockito.mock(Context::class.java)
 
+    private val function: (ex: Exception) -> Unit = {}
+    internal val mockCallback = Mockito.mock(function.javaClass)
+
     @Before
-    fun setup() {
+    override fun setup() {
+        super.setup()
         LocalEventRepository.instance().clearEvents()
         When calling mockContext.applicationContext itReturns null
     }
 
     @After
-    fun tearDown() {
+    override fun tearDown() {
+        super.tearDown()
         ConfigResponseRepository.resetInstance()
     }
 
@@ -121,7 +130,7 @@ class InAppMessagingSpec : BaseTest() {
     }
 
     @Test
-    @Suppress("SwallowedException")
+    @SuppressWarnings("SwallowedException")
     fun `should not crash logging event for initialized instance`() {
         initializeInstance()
 
@@ -133,7 +142,7 @@ class InAppMessagingSpec : BaseTest() {
     }
 
     @Test
-    @Suppress("SwallowedException")
+    @SuppressWarnings("SwallowedException")
     // For code coverage. will be deleted when updateSession() is removed
     fun `should not crash update session for initialized instance`() {
         initializeInstance()
@@ -146,7 +155,7 @@ class InAppMessagingSpec : BaseTest() {
     }
 
     @Test
-    @Suppress("SwallowedException")
+    @SuppressWarnings("SwallowedException")
     fun `should not crash close message for initialized instance`() {
         initializeInstance()
 
@@ -286,6 +295,7 @@ class InAppMessagingSpec : BaseTest() {
     @Test
     fun `should move temp data to repo`() {
         val instance = initializeMockInstance(0)
+        instance.registerPreference(TestUserInfoProvider())
 
         instance.logEvent(AppStartEvent())
         instance.logEvent(AppStartEvent())
@@ -334,8 +344,6 @@ class InAppMessagingSpec : BaseTest() {
 
     @Test
     fun `should return false when initialization failed with callback`() {
-        val function: (ex: Exception) -> Unit = {}
-        val mockCallback = Mockito.mock(function.javaClass)
         InAppMessaging.init(mockContext, mockCallback).shouldBeFalse()
 
         Mockito.verify(mockCallback).invoke(any())
@@ -362,11 +370,118 @@ class InAppMessagingSpec : BaseTest() {
         InAppMessaging.initialize(ApplicationProvider.getApplicationContext(), true, shouldEnableCaching)
     }
 
-    private fun initializeMockInstance(rollout: Int): InAppMessaging {
+    internal fun initializeMockInstance(rollout: Int): InAppMessaging {
         When calling configResponseData.rollOutPercentage itReturns rollout
         ConfigResponseRepository.instance().addConfigResponse(configResponseData)
 
         return InApp(ApplicationProvider.getApplicationContext(), false, displayManager,
-                eventsManager = eventsManager)
+                eventsManager = eventsManager, sessionManager = sessionManager)
+    }
+}
+
+class InAppMessagingExceptionSpec : InAppMessagingSpec() {
+
+    private val mockActivity = Mockito.mock(Activity::class.java)
+    private val instance = initializeMockInstance(100)
+
+    @Before
+    override fun setup() {
+        super.setup()
+        InApp.errorCallback = null
+        When calling displayManager.displayMessage() itThrows NullPointerException()
+        When calling displayManager.removeMessage(anyOrNull()) itThrows NullPointerException()
+        When calling eventsManager.onEventReceived(any(), any(), any(), any(), any()) itThrows NullPointerException()
+        When calling sessionManager.onSessionUpdate() itThrows NullPointerException()
+    }
+
+    @After
+    override fun tearDown() {
+        super.tearDown()
+        InApp.errorCallback = null
+    }
+
+    @Test
+    fun `should not crash when register preference failed due to forced exception`() {
+        val mockProvider = Mockito.mock(UserInfoProvider::class.java)
+        When calling mockProvider.provideUserId() itThrows NullPointerException()
+
+        instance.registerPreference(mockProvider)
+    }
+
+    @Test
+    fun `should trigger callback when register preference failed due to forced exception`() {
+        InApp.errorCallback = mockCallback
+        val mockProvider = Mockito.mock(UserInfoProvider::class.java)
+        When calling mockProvider.provideUserId() itThrows NullPointerException()
+
+        instance.registerPreference(mockProvider)
+
+        Mockito.verify(mockCallback).invoke(any(InAppMessagingException::class))
+    }
+
+    @Test
+    fun `should not crash when register activity failed due to forced exception`() {
+        instance.registerMessageDisplayActivity(mockActivity)
+    }
+
+    @Test
+    fun `should trigger callback when register activity failed due to forced exception`() {
+        InApp.errorCallback = mockCallback
+        instance.registerMessageDisplayActivity(mockActivity)
+
+        Mockito.verify(mockCallback).invoke(any(InAppMessagingException::class))
+    }
+
+    @Test
+    fun `should not crash when unregister activity failed due to forced exception`() {
+        instance.registerMessageDisplayActivity(mockActivity)
+        instance.unregisterMessageDisplayActivity()
+    }
+
+    @Test
+    fun `should trigger callback when unregister activity failed due to forced exception`() {
+        InApp.errorCallback = mockCallback
+        instance.unregisterMessageDisplayActivity()
+
+        Mockito.verify(mockCallback).invoke(any(InAppMessagingException::class))
+    }
+
+    @Test
+    fun `should not crash when log event failed due to forced exception`() {
+        instance.logEvent(AppStartEvent())
+    }
+
+    @Test
+    fun `should trigger callback when log event failed due to forced exception`() {
+        InApp.errorCallback = mockCallback
+        instance.logEvent(AppStartEvent())
+
+        Mockito.verify(mockCallback).invoke(any(InAppMessagingException::class))
+    }
+
+    @Test
+    fun `should not crash when update session failed due to forced exception`() {
+        instance.updateSession()
+    }
+
+    @Test
+    fun `should trigger callback when update session failed due to forced exception`() {
+        InApp.errorCallback = mockCallback
+        instance.updateSession()
+
+        Mockito.verify(mockCallback).invoke(any(InAppMessagingException::class))
+    }
+
+    @Test
+    fun `should not crash when save temp data failed due to forced exception`() {
+        instance.saveTempData()
+    }
+
+    @Test
+    fun `should trigger callback when save temp data failed due to forced exception`() {
+        InApp.errorCallback = mockCallback
+        instance.saveTempData()
+
+        Mockito.verify(mockCallback).invoke(any(InAppMessagingException::class))
     }
 }

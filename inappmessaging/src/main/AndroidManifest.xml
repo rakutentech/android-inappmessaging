@@ -12,13 +12,6 @@
       android:name="com.rakuten.tech.mobile.inappmessaging.runtime.service.DisplayMessageJobIntentService"
       android:permission="android.permission.BIND_JOB_SERVICE"/>
 
-    <!-- disable default provider: Android 11 handling -->
-    <provider
-      android:name="androidx.work.impl.WorkManagerInitializer"
-      android:authorities="${applicationId}.workmanager-init"
-      android:exported="false"
-      android:enabled="false"/>
-
   </application>
 
 </manifest>

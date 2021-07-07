@@ -11,7 +11,9 @@ import com.rakuten.tech.mobile.inappmessaging.runtime.BaseTest
 import com.rakuten.tech.mobile.inappmessaging.runtime.InAppMessaging
 import com.rakuten.tech.mobile.inappmessaging.runtime.R
 import com.rakuten.tech.mobile.inappmessaging.runtime.TestUserInfoProvider
+import com.rakuten.tech.mobile.inappmessaging.runtime.data.models.messages.InvalidTestMessage
 import com.rakuten.tech.mobile.inappmessaging.runtime.data.models.messages.Message
+import com.rakuten.tech.mobile.inappmessaging.runtime.data.models.messages.ValidTestMessage
 import com.rakuten.tech.mobile.inappmessaging.runtime.data.repositories.LocalDisplayedMessageRepository
 import com.rakuten.tech.mobile.inappmessaging.runtime.data.repositories.ReadyForDisplayMessageRepository
 import com.rakuten.tech.mobile.inappmessaging.runtime.data.responses.ping.CampaignData
@@ -29,7 +31,7 @@ import org.robolectric.annotation.Config
  */
 @RunWith(ParameterizedRobolectricTestRunner::class)
 @Config(sdk = [Build.VERSION_CODES.O_MR1])
-@Suppress("LongMethod")
+@SuppressWarnings("LongMethod")
 internal class MessageActionsCoroutineSpec(
     val testName: String,
     private val resourceId: Int,
@@ -188,7 +190,8 @@ internal class MessageActionsCoroutineSpec(
     private val activity = Mockito.mock(Activity::class.java)
 
     @Before
-    fun setup() {
+    override fun setup() {
+        super.setup()
         When calling activity.packageManager itReturns ApplicationProvider
                 .getApplicationContext<Context>().packageManager
 
@@ -205,6 +208,20 @@ internal class MessageActionsCoroutineSpec(
     fun `should return false when message is null`() {
         DisplayManager.instance().removeMessage(InAppMessaging.instance().getRegisteredActivity())
         val result = MessageActionsCoroutine().executeTask(null, resourceId, isOpt)
+        result.shouldBeFalse()
+    }
+
+    @Test
+    fun `should return false when campaign id is null`() {
+        DisplayManager.instance().removeMessage(InAppMessaging.instance().getRegisteredActivity())
+        val result = MessageActionsCoroutine().executeTask(InvalidTestMessage(), resourceId, isOpt)
+        result.shouldBeFalse()
+    }
+
+    @Test
+    fun `should return false when campaign id is empty`() {
+        DisplayManager.instance().removeMessage(InAppMessaging.instance().getRegisteredActivity())
+        val result = MessageActionsCoroutine().executeTask(ValidTestMessage(""), resourceId, isOpt)
         result.shouldBeFalse()
     }
 

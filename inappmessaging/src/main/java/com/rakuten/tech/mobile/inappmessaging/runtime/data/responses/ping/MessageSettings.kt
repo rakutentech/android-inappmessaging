@@ -3,7 +3,7 @@ package com.rakuten.tech.mobile.inappmessaging.runtime.data.responses.ping
 import com.google.gson.annotations.SerializedName
 
 /**
- * Class for parsing DataItem, which is a response from MessageMixer.
+ * Class for parsing MessageSettings, which is a response from MessageMixer.
  */
 internal data class MessageSettings(
     @SerializedName("displaySettings")

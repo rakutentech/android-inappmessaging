@@ -16,7 +16,8 @@ import kotlin.random.Random
 class ConfigResponseRepositorySpec : BaseTest() {
 
     @Before
-    fun setup() {
+    override fun setup() {
+        super.setup()
         ConfigResponseRepository.resetInstance()
     }
 
@@ -37,6 +38,24 @@ class ConfigResponseRepositorySpec : BaseTest() {
 
     @Test
     fun `should be empty string for ping endpoints with initial values`() {
+        ConfigResponseRepository.instance().getPingEndpoint() shouldBeEqualTo ""
+    }
+
+    @Test
+    fun `should be empty string for endpoints with no values in response`() {
+        val response = Gson().fromJson(CONFIG_NO_VALUES_RESPONSE.trimIndent(), ConfigResponse::class.java)
+        ConfigResponseRepository.instance().addConfigResponse(response.data)
+        ConfigResponseRepository.instance().getImpressionEndpoint() shouldBeEqualTo ""
+        ConfigResponseRepository.instance().getDisplayPermissionEndpoint() shouldBeEqualTo ""
+        ConfigResponseRepository.instance().getPingEndpoint() shouldBeEqualTo ""
+    }
+
+    @Test
+    fun `should be empty string for endpoints with no endpoints in response`() {
+        val response = Gson().fromJson(CONFIG_NO_ENDPOINTS_RESPONSE.trimIndent(), ConfigResponse::class.java)
+        ConfigResponseRepository.instance().addConfigResponse(response.data)
+        ConfigResponseRepository.instance().getImpressionEndpoint() shouldBeEqualTo ""
+        ConfigResponseRepository.instance().getDisplayPermissionEndpoint() shouldBeEqualTo ""
         ConfigResponseRepository.instance().getPingEndpoint() shouldBeEqualTo ""
     }
 
@@ -117,6 +136,20 @@ class ConfigResponseRepositorySpec : BaseTest() {
                     "impression":"https://sample.impression",
                     "ping":"https://sample.ping"
                 }
+            }
+        }"""
+
+        private const val CONFIG_NO_VALUES_RESPONSE = """{
+            "data":{
+                "rolloutPercentage":0,
+                "endpoints":{
+                }
+            }
+        }"""
+
+        private const val CONFIG_NO_ENDPOINTS_RESPONSE = """{
+            "data":{
+                "rolloutPercentage":0
             }
         }"""
     }

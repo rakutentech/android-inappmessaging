@@ -19,7 +19,8 @@ import org.mockito.Mockito
  */
 class AccountRepositorySpec : BaseTest() {
     @Before
-    fun setup() {
+    override fun setup() {
+        super.setup()
         AccountRepository.instance().userInfoProvider = null
     }
 
@@ -167,5 +168,17 @@ class AccountRepositorySpec : BaseTest() {
         infoProvider.raeToken = "rae-token"
 
         AccountRepository.instance().updateUserInfo().shouldBeFalse()
+    }
+
+    @Test
+    fun `should not crash when hashing failed`() {
+        // note: this should never occur since "MD5" is supported since API 1
+        val infoProvider = TestUserInfoProvider()
+        AccountRepository.instance().userInfoProvider = infoProvider
+        // initial setting of hashed user info
+        AccountRepository.instance().updateUserInfo("test").shouldBeTrue()
+
+        AccountRepository.instance().userInfoHash shouldBeEqualTo TestUserInfoProvider.TEST_USER_ID +
+                TestUserInfoProvider.TEST_RAKUTEN_ID
     }
 }

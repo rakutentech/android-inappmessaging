@@ -34,7 +34,8 @@ class ImpressionManagerSpec : BaseTest() {
     private val eventBroadcaster = Mockito.mock(LegacyEventBroadcasterHelper::class.java)
 
     @Before
-    fun setup() {
+    override fun setup() {
+        super.setup()
         impressionList = ImpressionManager().createImpressionList(VALID_IMPRESSION_TYPES)
     }
 
@@ -44,17 +45,9 @@ class ImpressionManagerSpec : BaseTest() {
         impressionList!![1].type shouldBeEqualTo ImpressionType.ACTION_ONE.typeId
     }
 
-    @Test(expected = IllegalArgumentException::class)
-    fun `should throw exception when create impression list with wrong arg`() {
-        ImpressionManager().createImpressionList(INVALID_IMPRESSION_TYPES)
-    }
-
     @Test
-    fun `should not throw exception create impression list with null arguments`() {
-        val impressionTypes = mutableListOf(ImpressionType.ACTION_ONE, ImpressionType.OPT_OUT, null)
-        val impressions: List<Impression> = ImpressionManager().createImpressionList(impressionTypes)
-        // Impression + Action_One + Opt_out = 3. If null was counted, then 4.
-        impressions.shouldHaveSize(3)
+    fun `should throw exception when create impression list with wrong arg`() {
+        ImpressionManager().createImpressionList(INVALID_IMPRESSION_TYPES).isEmpty()
     }
 
     @Test
@@ -93,9 +86,9 @@ class ImpressionManagerSpec : BaseTest() {
 
     companion object {
         private const val IMPRESSION_WORKER_NAME = "iam_impression_work"
-        private val VALID_IMPRESSION_TYPES: MutableList<ImpressionType?> =
+        private val VALID_IMPRESSION_TYPES: MutableList<ImpressionType> =
                 mutableListOf(ImpressionType.ACTION_ONE, ImpressionType.OPT_OUT)
-        private val INVALID_IMPRESSION_TYPES: MutableList<ImpressionType?> =
+        private val INVALID_IMPRESSION_TYPES: MutableList<ImpressionType> =
                 mutableListOf(ImpressionType.ACTION_ONE, ImpressionType.IMPRESSION)
         private var impressionList: List<Impression>? = null
     }

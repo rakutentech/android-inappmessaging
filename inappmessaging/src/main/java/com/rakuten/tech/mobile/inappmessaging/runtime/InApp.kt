@@ -2,6 +2,7 @@ package com.rakuten.tech.mobile.inappmessaging.runtime
 
 import android.app.Activity
 import android.content.Context
+import androidx.annotation.NonNull
 import androidx.annotation.RestrictTo
 import androidx.annotation.VisibleForTesting
 import com.rakuten.tech.mobile.inappmessaging.runtime.data.models.appevents.Event
@@ -10,6 +11,7 @@ import com.rakuten.tech.mobile.inappmessaging.runtime.data.repositories.ConfigRe
 import com.rakuten.tech.mobile.inappmessaging.runtime.data.repositories.LocalDisplayedMessageRepository
 import com.rakuten.tech.mobile.inappmessaging.runtime.data.repositories.LocalEventRepository
 import com.rakuten.tech.mobile.inappmessaging.runtime.data.repositories.ReadyForDisplayMessageRepository
+import com.rakuten.tech.mobile.inappmessaging.runtime.exception.InAppMessagingException
 import com.rakuten.tech.mobile.inappmessaging.runtime.manager.DisplayManager
 import com.rakuten.tech.mobile.inappmessaging.runtime.manager.EventsManager
 import com.rakuten.tech.mobile.inappmessaging.runtime.manager.SessionManager
@@ -22,13 +24,14 @@ import kotlinx.coroutines.launch
 import timber.log.Timber
 import java.lang.ref.WeakReference
 
-@SuppressWarnings("TooManyFunctions")
+@SuppressWarnings("TooManyFunctions", "TooGenericExceptionCaught")
 internal class InApp(
     private val context: Context,
     isDebugLogging: Boolean,
     private val displayManager: DisplayManager = DisplayManager.instance(),
     private var isCacheHandling: Boolean = BuildConfig.IS_CACHE_HANDLING,
-    private val eventsManager: EventsManager = EventsManager
+    private val eventsManager: EventsManager = EventsManager,
+    private val sessionManager: SessionManager = SessionManager
 ) : InAppMessaging() {
 
     // Used for displaying or removing messages from screen.
@@ -47,65 +50,102 @@ internal class InApp(
     }
 
     // ------------------------------------Public APIs-----------------------------------------------
+    @NonNull
     override var onVerifyContext: (contexts: List<String>, campaignTitle: String) -> Boolean = { _, _ -> Boolean
         // Allow all contexts by default
         true
     }
 
     override fun registerPreference(userInfoProvider: UserInfoProvider) {
-        AccountRepository.instance().userInfoProvider = userInfoProvider
-        AccountRepository.instance().updateUserInfo()
+        try {
+            AccountRepository.instance().userInfoProvider = userInfoProvider
+            AccountRepository.instance().updateUserInfo()
+        } catch (ex: Exception) {
+            errorCallback?.let {
+                it(InAppMessagingException("In-App Messaging register preference failed", ex))
+            }
+        }
     }
 
     override fun registerMessageDisplayActivity(activity: Activity) {
-        activityWeakReference = WeakReference(activity)
-        // Making worker thread to display message.
-        if (ConfigResponseRepository.instance().isConfigEnabled()) {
-            displayManager.displayMessage()
+        try {
+            activityWeakReference = WeakReference(activity)
+            // Making worker thread to display message.
+            if (ConfigResponseRepository.instance().isConfigEnabled()) {
+                displayManager.displayMessage()
+            }
+        } catch (ex: Exception) {
+            errorCallback?.let {
+                it(InAppMessagingException("In-App Messaging register activity failed", ex))
+            }
         }
     }
 
-    @Suppress("FunctionMaxLength")
+    @SuppressWarnings("FunctionMaxLength")
     override fun unregisterMessageDisplayActivity() {
-        if (ConfigResponseRepository.instance().isConfigEnabled()) {
-            val id = displayManager.removeMessage(getRegisteredActivity())
-            LocalDisplayedMessageRepository.instance().setRemovedMessage(id as String?)
-        }
-        activityWeakReference?.clear()
+        try {
+            if (ConfigResponseRepository.instance().isConfigEnabled()) {
+                val id = displayManager.removeMessage(getRegisteredActivity())
+                LocalDisplayedMessageRepository.instance().setRemovedMessage(id as String?)
+            }
+            activityWeakReference?.clear()
 
-        Timber.tag(TAG)
-        Timber.d("unregisterMessageDisplayActivity()")
+            Timber.tag(TAG)
+            Timber.d("unregisterMessageDisplayActivity()")
+        } catch (ex: Exception) {
+            errorCallback?.let {
+                it(InAppMessagingException("In-App Messaging unregister activity failed", ex))
+            }
+        }
     }
 
     override fun logEvent(event: Event) {
-        if (ConfigResponseRepository.instance().isConfigEnabled()) {
-            eventsManager.onEventReceived(event)
-        } else {
-            synchronized(tempEventList) {
-                tempEventList.add(event)
+        try {
+            if (ConfigResponseRepository.instance().isConfigEnabled()) {
+                eventsManager.onEventReceived(event)
+            } else {
+                synchronized(tempEventList) {
+                    tempEventList.add(event)
+                }
+            }
+        } catch (ex: Exception) {
+            errorCallback?.let {
+                it(InAppMessagingException("In-App Messaging log event failed", ex))
             }
         }
     }
 
     override fun updateSession() {
-        if (ConfigResponseRepository.instance().isConfigEnabled()) {
-            // Updates the current session to update all locally stored messages
-            SessionManager.onSessionUpdate()
+        try {
+            if (ConfigResponseRepository.instance().isConfigEnabled()) {
+                // Updates the current session to update all locally stored messages
+                sessionManager.onSessionUpdate()
+            }
+        } catch (ex: Exception) {
+            errorCallback?.let {
+                it(InAppMessagingException("In-App Messaging session update failed", ex))
+            }
         }
     }
 
     override fun closeMessage(clearQueuedCampaigns: Boolean) {
-        if (ConfigResponseRepository.instance().isConfigEnabled()) {
-            CoroutineScope(Dispatchers.Main).launch {
-                // called inside main dispatcher to make sure that it is always called in UI thread
-                removeMessage(clearQueuedCampaigns)
+        try {
+            if (ConfigResponseRepository.instance().isConfigEnabled()) {
+                CoroutineScope(Dispatchers.Main).launch {
+                    // called inside main dispatcher to make sure that it is always called in UI thread
+                    removeMessage(clearQueuedCampaigns)
+                }
+            }
+        } catch (ex: Exception) {
+            errorCallback?.let {
+                it(InAppMessagingException("In-App Messaging close message failed", ex))
             }
         }
     }
 
     // ------------------------------------Library Internal APIs-------------------------------------
     @RestrictTo(RestrictTo.Scope.LIBRARY)
-    override fun getRegisteredActivity() = if (activityWeakReference != null) activityWeakReference!!.get() else null
+    override fun getRegisteredActivity() = activityWeakReference?.get()
 
     @RestrictTo(RestrictTo.Scope.LIBRARY)
     override fun getHostAppContext() = context
@@ -116,10 +156,16 @@ internal class InApp(
             AccountRepository.instance().userInfoHash)
 
     override fun saveTempData() {
-        AccountRepository.instance().updateUserInfo()
-        synchronized(tempEventList) {
-            tempEventList.forEach { LocalEventRepository.instance().addEvent(it) }
-            tempEventList.clear()
+        try {
+            AccountRepository.instance().updateUserInfo()
+            synchronized(tempEventList) {
+                tempEventList.forEach { LocalEventRepository.instance().addEvent(it) }
+                tempEventList.clear()
+            }
+        } catch (ex: Exception) {
+            errorCallback?.let {
+                it(InAppMessagingException("In-App Messaging moving temp data to cache failed", ex))
+            }
         }
     }
 

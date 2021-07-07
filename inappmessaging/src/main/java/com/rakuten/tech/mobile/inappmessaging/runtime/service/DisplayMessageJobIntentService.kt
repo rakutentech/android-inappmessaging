@@ -80,7 +80,7 @@ internal class DisplayMessageJobIntentService : JobIntentService() {
             Timber.tag(TAG).d("message display cancelled by the host app")
 
             // increment time closed to handle required number of events to be triggered
-            readyMessagesRepo.removeMessage(message.getCampaignId()!!, true)
+            readyMessagesRepo.removeMessage(message.getCampaignId() ?: "", true)
 
             prepareNextMessage()
             return
@@ -127,8 +127,12 @@ internal class DisplayMessageJobIntentService : JobIntentService() {
 
             // Get image from the reference.
             if (closeableReference != null) {
-                val closeableImage = closeableReference.get()
-                return closeableImage.width.toFloat() / closeableImage.height.toFloat()
+                try {
+                    val closeableImage = closeableReference.get()
+                    return closeableImage.width.toFloat() / closeableImage.height.toFloat()
+                } catch (ie: IllegalStateException) {
+                    Timber.tag(TAG).d(ie.cause, "unable to compute for aspect ratio")
+                }
             }
         }
         return DEFAULT_IMAGE_ASPECT_RATIO

@@ -3,6 +3,7 @@ package com.rakuten.tech.mobile.inappmessaging.runtime.data.repositories
 import com.rakuten.tech.mobile.inappmessaging.runtime.UserInfoProvider
 import java.math.BigInteger
 import java.security.MessageDigest
+import kotlin.Exception
 
 /**
  * This object contains userInfoProvider ID used when logging in, and RAE token.
@@ -33,7 +34,7 @@ internal abstract class AccountRepository {
      * This method updates the encrypted value using the current user information.
      * @return true if there are changes in user info.
      */
-    abstract fun updateUserInfo(): Boolean
+    abstract fun updateUserInfo(algo: String? = null): Boolean
 
     companion object {
         private const val TOKEN_PREFIX = "OAuth2 "
@@ -46,25 +47,17 @@ internal abstract class AccountRepository {
     private class AccountRepositoryImpl : AccountRepository() {
 
         override fun getRaeToken(): String = if (this.userInfoProvider == null ||
-                this.userInfoProvider?.provideRaeToken() == null ||
-                this.userInfoProvider?.provideRaeToken()!!.isEmpty()) {
-
+                this.userInfoProvider?.provideRaeToken().isNullOrEmpty()) {
             ""
         } else TOKEN_PREFIX + this.userInfoProvider?.provideRaeToken()
         // According to backend specs, token has to start with "OAuth2{space}", followed by real token.
 
-        override fun getUserId(): String =
-                if (this.userInfoProvider == null || this.userInfoProvider?.provideUserId() == null) {
-                    ""
-                } else userInfoProvider!!.provideUserId().toString()
+        override fun getUserId(): String = this.userInfoProvider?.provideUserId() ?: ""
 
-        override fun getRakutenId(): String =
-                if (this.userInfoProvider == null || this.userInfoProvider?.provideRakutenId() == null) {
-                    ""
-                } else userInfoProvider!!.provideRakutenId().toString()
+        override fun getRakutenId(): String = this.userInfoProvider?.provideRakutenId() ?: ""
 
-        override fun updateUserInfo(): Boolean {
-            val curr = hash(getUserId() + getRakutenId())
+        override fun updateUserInfo(algo: String?): Boolean {
+            val curr = hash(getUserId() + getRakutenId(), algo)
 
             if (userInfoHash != curr) {
                 userInfoHash = curr
@@ -74,14 +67,19 @@ internal abstract class AccountRepository {
             return false
         }
 
-        @Suppress("MagicNumber")
-        private fun hash(input: String): String {
-            // MD5 hashing
-            val bytes = MessageDigest
-                    .getInstance("MD5")
-                    .digest(input.toByteArray())
+        @SuppressWarnings("MagicNumber", "SwallowedException", "TooGenericExceptionCaught")
+        private fun hash(input: String, algo: String?): String {
+            return try {
+                // MD5 hashing
+                val bytes = MessageDigest
+                        .getInstance(algo ?: "MD5")
+                        .digest(input.toByteArray())
 
-            return BigInteger(1, bytes).toString(16).padStart(32, '0')
+                BigInteger(1, bytes).toString(16).padStart(32, '0')
+            } catch (ex: Exception) {
+                // should never happen since "MD5" is a supported algorithm
+                input
+            }
         }
     }
 }

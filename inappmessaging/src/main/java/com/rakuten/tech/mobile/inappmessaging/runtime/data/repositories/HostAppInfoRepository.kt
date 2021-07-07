@@ -1,7 +1,7 @@
 package com.rakuten.tech.mobile.inappmessaging.runtime.data.repositories
 
 import com.rakuten.tech.mobile.inappmessaging.runtime.data.models.HostAppInfo
-import com.rakuten.tech.mobile.inappmessaging.runtime.exception.InAppMessagingInitializationException
+import com.rakuten.tech.mobile.inappmessaging.runtime.exception.InAppMessagingException
 import com.rakuten.tech.mobile.inappmessaging.runtime.utils.InAppMessagingConstants.Companion.ARGUMENT_IS_NULL_EXCEPTION
 import com.rakuten.tech.mobile.inappmessaging.runtime.utils.InAppMessagingConstants.Companion.DEVICE_ID_IS_EMPTY_EXCEPTION
 import com.rakuten.tech.mobile.inappmessaging.runtime.utils.InAppMessagingConstants.Companion.LOCALE_IS_EMPTY_EXCEPTION
@@ -19,18 +19,18 @@ internal interface HostAppInfoRepository {
     /**
      * This method adds host information.
      */
-    @Throws(InAppMessagingInitializationException::class)
+    @Throws(InAppMessagingException::class)
     fun addHostInfo(hostAppInfo: HostAppInfo?)
 
     /**
      * This method returns host app's version or empty string if not set.
      */
-    fun getVersion(): String?
+    fun getVersion(): String
 
     /**
      * This method returns host app's package name or empty string if not set.
      */
-    fun getPackageName(): String?
+    fun getPackageName(): String
 
     /**
      * This method returns device's locale or default if not set in String and lowercase format (i.e. xx_xx).
@@ -40,18 +40,18 @@ internal interface HostAppInfoRepository {
     /**
      * This method returns IAM subscription key.
      */
-    @Suppress("FunctionMaxLength")
-    fun getInAppMessagingSubscriptionKey(): String?
+    @SuppressWarnings("FunctionMaxLength")
+    fun getInAppMessagingSubscriptionKey(): String
 
     /**
      * This method returns Android device ID or empty String if not set.
      */
-    fun getDeviceId(): String?
+    fun getDeviceId(): String
 
     /**
      * This method returns IAM config url.
      */
-    fun getConfigUrl(): String?
+    fun getConfigUrl(): String
 
     companion object {
         private const val TAG = "IAM_HostAppRepository"
@@ -61,15 +61,14 @@ internal interface HostAppInfoRepository {
     }
 
     private class HostAppInfoRepositoryImpl : HostAppInfoRepository {
-        @SuppressWarnings("PMD")
         @Volatile
         private var hostAppInfo: HostAppInfo? = null
 
-        @Suppress("LongMethod", "FunctionMaxLength")
-        @Throws(InAppMessagingInitializationException::class)
+        @SuppressWarnings("LongMethod", "FunctionMaxLength")
+        @Throws(InAppMessagingException::class)
         override fun addHostInfo(hostAppInfo: HostAppInfo?) {
             if (hostAppInfo == null) {
-                throw InAppMessagingInitializationException(ARGUMENT_IS_NULL_EXCEPTION)
+                throw InAppMessagingException(ARGUMENT_IS_NULL_EXCEPTION)
             }
             synchronized(hostAppInfo) {
                 var message = ""
@@ -84,26 +83,26 @@ internal interface HostAppInfoRepository {
                         Timber.tag(TAG).e(DEVICE_ID_IS_EMPTY_EXCEPTION)
                 }
                 if (message.isNotEmpty()) {
-                    throw InAppMessagingInitializationException(message)
+                    throw InAppMessagingException(message)
                 }
                 this.hostAppInfo = hostAppInfo
             }
         }
 
-        override fun getVersion(): String? = hostAppInfo?.version ?: ""
+        override fun getVersion(): String = hostAppInfo?.version ?: ""
 
-        override fun getPackageName(): String? = hostAppInfo?.packageName ?: ""
+        override fun getPackageName(): String = hostAppInfo?.packageName ?: ""
 
         override fun getDeviceLocale(): String {
             val locale = hostAppInfo?.locale ?: Locale.getDefault()
             return locale.toString().replace("_", "-").toLowerCase(Locale.getDefault())
         }
 
-        @Suppress("FunctionMaxLength")
-        override fun getInAppMessagingSubscriptionKey(): String? = hostAppInfo?.subscriptionKey ?: ""
+        @SuppressWarnings("FunctionMaxLength")
+        override fun getInAppMessagingSubscriptionKey(): String = hostAppInfo?.subscriptionKey ?: ""
 
-        override fun getDeviceId(): String? = hostAppInfo?.deviceId ?: ""
+        override fun getDeviceId(): String = hostAppInfo?.deviceId ?: ""
 
-        override fun getConfigUrl(): String? = hostAppInfo?.configUrl ?: ""
+        override fun getConfigUrl(): String = hostAppInfo?.configUrl ?: ""
     }
 }

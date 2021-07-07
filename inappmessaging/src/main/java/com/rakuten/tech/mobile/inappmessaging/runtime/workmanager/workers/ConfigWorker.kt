@@ -17,7 +17,6 @@ import com.rakuten.tech.mobile.inappmessaging.runtime.workmanager.schedulers.Con
 import com.rakuten.tech.mobile.inappmessaging.runtime.workmanager.schedulers.MessageMixerPingScheduler
 import retrofit2.Response
 import timber.log.Timber
-import java.io.IOException
 import java.net.HttpURLConnection
 
 /**
@@ -47,22 +46,21 @@ internal class ConfigWorker(
      * the response(200/400) returned from Config Service, `WorkerResult.Success` should always be
      * returned. Because this work(network call to config service) was scheduled and executed.
      */
-    @Suppress("LongMethod")
+    @SuppressWarnings("LongMethod", "TooGenericExceptionCaught")
     override fun doWork(): Result {
         Timber.tag(TAG).d(hostRepo.getConfigUrl())
         val hostAppId = hostRepo.getPackageName()
         val locale = hostRepo.getDeviceLocale()
         val hostAppVersion = hostRepo.getVersion()
-        // Terminate request if any of the following values is empty or null: appId, appVersion or subscription key.
-        if (hostAppId.isNullOrEmpty() || hostAppVersion.isNullOrEmpty() ||
-                hostRepo.getInAppMessagingSubscriptionKey().isNullOrEmpty()) {
+        val subscriptionId = hostRepo.getInAppMessagingSubscriptionKey()
+        // Terminate request if any of the following values are empty: appId, appVersion or subscription key.
+        if (hostAppId.isEmpty() || hostAppVersion.isEmpty() || subscriptionId.isEmpty()) {
             return Result.failure()
         }
 
-        val configUrl = hostRepo.getConfigUrl() ?: ""
+        val configUrl = hostRepo.getConfigUrl()
         val sdkVersion = BuildConfig.VERSION_NAME
         val params = ConfigQueryParamsBuilder(hostAppId, locale, hostAppVersion, sdkVersion).queryParams
-        val subscriptionId = hostRepo.getInAppMessagingSubscriptionKey()!!
         val configServiceCall = RuntimeUtil.getRetrofit()
                 .create(ConfigRetrofitService::class.java)
                 .getConfigService(configUrl, subscriptionId, params)
@@ -70,7 +68,7 @@ internal class ConfigWorker(
         return try {
             // Executing the API network call.
             onResponse(configServiceCall.execute())
-        } catch (e: IOException) {
+        } catch (e: Exception) {
             Timber.tag(TAG).d(e)
             // RETRY by default has exponential backoff baked in.
             Result.retry()

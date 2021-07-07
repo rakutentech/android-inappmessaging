@@ -8,12 +8,11 @@ import com.rakuten.tech.mobile.inappmessaging.runtime.BaseTest
 import com.rakuten.tech.mobile.inappmessaging.runtime.InAppMessaging
 import com.rakuten.tech.mobile.inappmessaging.runtime.TestUserInfoProvider
 import com.rakuten.tech.mobile.inappmessaging.runtime.UserInfoProvider
+import com.rakuten.tech.mobile.inappmessaging.runtime.data.models.messages.InvalidTestMessage
 import com.rakuten.tech.mobile.inappmessaging.runtime.data.models.messages.Message
 import com.rakuten.tech.mobile.inappmessaging.runtime.data.models.messages.ValidTestMessage
 import com.rakuten.tech.mobile.inappmessaging.runtime.data.responses.ping.Trigger
-import com.rakuten.tech.mobile.inappmessaging.runtime.utils.InAppMessagingConstants
 import org.amshove.kluent.*
-import org.junit.Assert
 import org.junit.Before
 import org.junit.Test
 import org.junit.runner.RunWith
@@ -31,7 +30,8 @@ class PingResponseMessageRepositorySpec : BaseTest() {
     private val messageList = ArrayList<Message>()
 
     @Before
-    fun setup() {
+    override fun setup() {
+        super.setup()
         PingResponseMessageRepository.instance().clearMessages()
         messageList.clear()
         messageList.add(message0)
@@ -47,18 +47,15 @@ class PingResponseMessageRepositorySpec : BaseTest() {
     }
 
     @Test
-    fun `should throw exception when list is null`() {
-        try {
-            PingResponseMessageRepository.instance().replaceAllMessages(null)
-            Assert.fail()
-        } catch (e: IllegalArgumentException) {
-            e.localizedMessage shouldBeEqualTo InAppMessagingConstants.ARGUMENT_IS_NULL_EXCEPTION
-        }
+    fun `should not throw exception when list is empty`() {
+        PingResponseMessageRepository.instance().replaceAllMessages(ArrayList())
     }
 
     @Test
-    fun `should not throw exception when list is empty`() {
-        PingResponseMessageRepository.instance().replaceAllMessages(ArrayList())
+    fun `should ignore invalid message in the list`() {
+        PingResponseMessageRepository.instance().replaceAllMessages(
+                listOf(InvalidTestMessage(), message0, ValidTestMessage("")))
+        PingResponseMessageRepository.instance().getAllMessagesCopy().shouldHaveSize(1)
     }
 
     @Test

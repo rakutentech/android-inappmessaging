@@ -4,7 +4,7 @@ import androidx.annotation.RestrictTo
 import com.google.gson.annotations.SerializedName
 
 /**
- * Class for parsing DataItem, which is a response from MessageMixer.
+ * Class for parsing Resource, which is a response from MessageMixer.
  */
 @RestrictTo(RestrictTo.Scope.LIBRARY)
 internal data class Resource(

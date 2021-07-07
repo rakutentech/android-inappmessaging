@@ -21,8 +21,7 @@ import kotlin.collections.set
 /**
  * Utility class helping MessageEventReconciliationWorker for reconciliation.
  */
-@Suppress("LargeClass", "LabeledExpression")
-@SuppressWarnings("PMD.GodClass")
+@SuppressWarnings("LargeClass", "LabeledExpression")
 internal interface MessageEventReconciliationUtil {
 
     /**
@@ -85,7 +84,7 @@ internal interface MessageEventReconciliationUtil {
          * Note: once the event has been reconciled with the message, it will be removed from the
          * argument eventMap. Because each event can only be used once against a message.
          */
-        @Suppress("LongMethod", "ComplexMethod", "NestedBlockDepth", "ReturnCount")
+        @SuppressWarnings("LongMethod", "ComplexMethod", "NestedBlockDepth", "ReturnCount")
         private fun isMessageReconciled(message: Message, eventMap: Map<String, MutableList<Event>>): Boolean {
             // Getting the number of reconciliations are needed in order to reconcile this message.
             val requiredSetsOfSatisfiedTriggersToDisplayMessage = getNumTimesToSatisfyTriggersForDisplay(message)
@@ -108,7 +107,7 @@ internal interface MessageEventReconciliationUtil {
                 var numTriggersSatisfied = 0
                 // Create an empty list which will contain reconciled events. They will be removed
                 // from the relevantEventsCopy iff Trigger is reconciled.
-                val eventsToBeRemoved = ArrayList<Event>() // NOPMD
+                val eventsToBeRemoved = ArrayList<Event>()
                 // Reconcile each trigger with all relevant events.
                 for (event in relevantEventsCopy) {
                     if (isTriggerReconciled(trigger, event)) {
@@ -116,7 +115,7 @@ internal interface MessageEventReconciliationUtil {
                         // to satisfy any more triggers.
                         if (event.isPersistentType()) {
                             if (triggerList.size > 1 || PingResponseMessageRepository.instance()
-                                            .shouldDisplayAppLaunchCampaign(message.getCampaignId()!!)) {
+                                            .shouldDisplayAppLaunchCampaign(message.getCampaignId() ?: "")) {
                                 // If campaign depends on other events other than a persistent type (i.e. App Launch)
                                 // or should at least be displayed once,
                                 // no need to check the required number for satisfied triggers
@@ -162,14 +161,14 @@ internal interface MessageEventReconciliationUtil {
          * can have attributes that are not part of trigger's attributes. Also, all trigger's attributes
          * just need to be satisfied once by event's attributes.
          */
-        @Suppress("ReturnCount")
+        @SuppressWarnings("ReturnCount")
         private fun isTriggerReconciled(trigger: Trigger, event: Event): Boolean {
             // Validate argument event is for the argument trigger and
             // if different custom events share the same eventType.
             if (trigger.eventType != event.getEventType() || (trigger.eventType == EventType.CUSTOM.typeId &&
                             trigger.eventName != event.getEventName())) return false
 
-            for (triggerAttribute in trigger.triggerAttributes!!) {
+            for (triggerAttribute in trigger.triggerAttributes ?: listOf()) {
                 // Get attribute from event by triggerAttribute's name.
                 // Attribute's name should be in lower case.
                 val eventAttribute = event.getAttributeMap()[triggerAttribute.name] ?: return false
@@ -213,7 +212,7 @@ internal interface MessageEventReconciliationUtil {
          * The method checks if the value from event attribute can satisfy trigger's attribute values according to
          * trigger attribute's operator type.
          */
-        @Suppress("ReturnCount", "ComplexCondition", "LongMethod")
+        @SuppressWarnings("ReturnCount", "ComplexCondition", "LongMethod")
         private fun isValueReconciled(
             valueTypeId: Int,
             eventValue: String?,
@@ -257,12 +256,14 @@ internal interface MessageEventReconciliationUtil {
          * qualified local events are needed to satisfy this message's triggers, and so on. In summary,
          * getNumTimesToSatisfyTriggersForDisplay = displayedImpression + 1.
          */
-        @Suppress("FunctionMaxLength")
+        @SuppressWarnings("FunctionMaxLength")
         private fun getNumTimesToSatisfyTriggersForDisplay(message: Message): Int {
             val maxImpression = message.getMaxImpressions()
             val displayedImpression: Int = LocalDisplayedMessageRepository.instance().numberOfTimesDisplayed(message)
-            val incrementRemoved = LocalDisplayedMessageRepository.instance()
-                    .numberOfTimesClosed(message.getCampaignId()!!)
+            val incrementRemoved = message.getCampaignId()?.let {
+                LocalDisplayedMessageRepository.instance()
+                        .numberOfTimesClosed(it)
+            } ?: 0
 
             // Only check for message has been displayed less than its max impressions.
             // The number of times the message was removed from ready for display repository is considered since local
@@ -286,7 +287,7 @@ internal interface MessageEventReconciliationUtil {
                 if (!eventName.isNullOrEmpty()) {
                     var eventList = eventMap[eventName]
                     if (eventList == null || eventList.isEmpty()) {
-                        eventList = ArrayList() // NOPMD
+                        eventList = ArrayList()
                         eventMap[eventName] = eventList
                     }
                     eventList.add(event)
@@ -306,7 +307,7 @@ internal interface MessageEventReconciliationUtil {
          * The purpose of only extracting relevant events is to increase performance
          * by only reconcile these relevant events.
          */
-        @Suppress("ReturnCount", "LongMethod")
+        @SuppressWarnings("ReturnCount", "LongMethod")
         private fun copyEventsForTrigger(trigger: Trigger, eventMap: Map<String, MutableList<Event>>):
                 MutableList<Event>? {
             // Reconcile by trigger's type.
@@ -318,9 +319,8 @@ internal interface MessageEventReconciliationUtil {
                 // Trigger is null or INVALID, therefore, it can't be reconciled.
                 return null
             }
-            val eventName: String?
             // CUSTOM event and trigger reconciliation.
-            eventName = if (eventType == EventType.CUSTOM) {
+            val eventName = if (eventType == EventType.CUSTOM) {
                 // Custom event's name should go by the eventName variable in trigger.
                 trigger.eventName
             } else {

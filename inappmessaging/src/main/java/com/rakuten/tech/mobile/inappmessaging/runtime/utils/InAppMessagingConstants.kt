@@ -8,8 +8,6 @@ internal class InAppMessagingConstants {
         const val ANDROID_PLATFORM_ENUM = 2
 
         // ------------------------------Exception Messages-----------------------------------------------
-        const val REGISTER_IN_APP_MESSAGING_EXCEPTION = "Activity can't be null."
-        const val HOST_CONTEXT_IS_NULL = "Context can't be null."
         const val EVENT_NAME_EMPTY_EXCEPTION = "Event name can't be empty."
         const val EVENT_NAME_TOO_LONG_EXCEPTION = "Event name can't exceed 255 characters."
         const val ARGUMENT_IS_NULL_EXCEPTION = "Argument can't be null."
@@ -19,15 +17,6 @@ internal class InAppMessagingConstants {
         const val LOCALE_IS_EMPTY_EXCEPTION = "Device locale not found in context"
         const val DEVICE_ID_IS_EMPTY_EXCEPTION = "Device ID not found in context"
         const val SUBSCRIPTION_KEY_IS_EMPTY_EXCEPTION = "InAppMessaging Subscription Key was not found in context"
-
-        // ------------------------------WorkManager Related Only-----------------------------------------
-        // Host app info keys.
-        const val HOST_APP_ID = "hostAppId"
-        const val HOST_APP_VERSION = "hostAppVersion"
-        const val IN_APP_SDK_VERSION = "inAppSdkVersion"
-        const val LOCALE_KEY = "locale"
-        const val URL_KEY = "url"
-        const val SUBSCRIPTION_KEY = "com.rakuten.tech.mobile.inappmessaging.subscriptionkey"
 
         // -------------------------------URL Only--------------------------------------------------------
         const val TEMPLATE_BASE_URL = "http://your.base.url/"

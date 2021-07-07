@@ -57,7 +57,7 @@ internal object ValueMatchingUtil {
      * Note: If values are in milliseconds, and difference is within 1000ms, they are
      * considered equal. If values are not time, they are compared normally.
      */
-    @Suppress("ComplexMethod", "LongMethod")
+    @SuppressWarnings("ComplexMethod", "LongMethod")
     fun isOperatorConditionSatisfied(
         eventValue: Long?,
         operatorType: OperatorType?,
@@ -117,7 +117,7 @@ internal object ValueMatchingUtil {
      * Supported operators are: EQUALS, DOES_NOT_EQUAL, IS_BLANK, IS_NOT_BLANK, MATCHES_REGEX,
      * DOES_NOT_MATCH_REGEX.
      */
-    @Suppress("ComplexMethod")
+    @SuppressWarnings("ComplexMethod")
     fun isOperatorConditionSatisfied(eventValue: String?, operatorType: OperatorType?, triggerValue: String?): Boolean {
         return if (eventValue == null || operatorType == null || triggerValue == null) {
             false

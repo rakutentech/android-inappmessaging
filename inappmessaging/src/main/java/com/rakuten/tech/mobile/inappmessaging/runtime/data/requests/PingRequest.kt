@@ -8,7 +8,7 @@ import com.rakuten.tech.mobile.inappmessaging.runtime.data.models.UserIdentifier
  */
 internal data class PingRequest(
     @SerializedName("appVersion")
-    private val appVersion: String?, // NOPMD
+    private val appVersion: String?,
     @SerializedName("userIdentifiers")
-    private val userIdentifiers: MutableList<UserIdentifier>? // NOPMD
+    private val userIdentifiers: MutableList<UserIdentifier>?
 )

@@ -10,9 +10,7 @@ import com.rakuten.tech.mobile.inappmessaging.runtime.TestUserInfoProvider
 import com.rakuten.tech.mobile.inappmessaging.runtime.UserInfoProvider
 import com.rakuten.tech.mobile.inappmessaging.runtime.data.models.messages.Message
 import com.rakuten.tech.mobile.inappmessaging.runtime.data.models.messages.ValidTestMessage
-import com.rakuten.tech.mobile.inappmessaging.runtime.utils.InAppMessagingConstants
 import org.amshove.kluent.*
-import org.junit.Assert
 import org.junit.Before
 import org.junit.Test
 import org.junit.runner.RunWith
@@ -28,7 +26,8 @@ class ReadyForDisplayMessageRepositorySpec : BaseTest() {
     private val message1 = ValidTestMessage("1234")
 
     @Before
-    fun setup() {
+    override fun setup() {
+        super.setup()
         ReadyForDisplayMessageRepository.instance().clearMessages()
         PingResponseMessageRepository.instance().clearMessages()
         message0.timesClosed = 0
@@ -36,16 +35,6 @@ class ReadyForDisplayMessageRepositorySpec : BaseTest() {
         messageList.add(message0)
         messageList.add(message1)
         PingResponseMessageRepository.instance().replaceAllMessages(messageList)
-    }
-
-    @Test
-    fun `should throw exception when list is null`() {
-        try {
-            ReadyForDisplayMessageRepository.instance().replaceAllMessages(null)
-            Assert.fail()
-        } catch (e: IllegalArgumentException) {
-            e.localizedMessage shouldBeEqualTo InAppMessagingConstants.ARGUMENT_IS_NULL_EXCEPTION
-        }
     }
 
     @Test

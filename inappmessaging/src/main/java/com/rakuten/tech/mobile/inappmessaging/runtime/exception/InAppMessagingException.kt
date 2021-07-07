@@ -1,9 +1,9 @@
 package com.rakuten.tech.mobile.inappmessaging.runtime.exception
 
 /**
- * Custom Exception of InAppMessaging.
+ * Custom exception of In-App Messaging.
  */
-internal class InAppMessagingInitializationException(
+class InAppMessagingException(
     name: String,
     cause: Throwable? = null
 ) : RuntimeException(name, cause)

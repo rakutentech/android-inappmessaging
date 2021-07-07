@@ -31,7 +31,7 @@ import org.robolectric.annotation.Config
  */
 @RunWith(RobolectricTestRunner::class)
 @Config(sdk = [Build.VERSION_CODES.O_MR1])
-@Suppress("LargeClass")
+@SuppressWarnings("LargeClass")
 class DisplayMessageRunnableSpec : BaseTest() {
     private val message = Mockito.mock(CampaignData::class.java)
     private val hostAppActivity = Mockito.mock(Activity::class.java)
@@ -39,7 +39,8 @@ class DisplayMessageRunnableSpec : BaseTest() {
     private val window = Mockito.mock(Window::class.java)
 
     @Before
-    fun setup() {
+    override fun setup() {
+        super.setup()
         SoLoader.setInTestMode()
         When calling view!!.id itReturns 12343254
         When calling hostAppActivity.window itReturns window
@@ -128,6 +129,23 @@ class DisplayMessageRunnableSpec : BaseTest() {
         When calling message.getType() itReturns InAppMessageType.MODAL.typeId
         When calling message.getMessagePayload() itReturns Gson().fromJson(MESSAGE_PAYLOAD_TWO_BUTTONS.trimIndent(),
                 MessagePayload::class.java)
+        When calling hostAppActivity
+                .layoutInflater itReturns LayoutInflater.from(ApplicationProvider.getApplicationContext())
+        DisplayMessageRunnable(message, hostAppActivity, IMAGE_ASPECT_RATIO).run()
+    }
+
+    @Test
+    fun `should not throw exception with mock activity for slide with null settings`() {
+        WorkManagerTestInitHelper.initializeTestWorkManager(ApplicationProvider.getApplicationContext())
+        Settings.Secure.putString(
+                ApplicationProvider.getApplicationContext<Context>().contentResolver,
+                Settings.Secure.ANDROID_ID,
+                "test_device_id")
+        InAppMessaging.initialize(ApplicationProvider.getApplicationContext())
+        When calling message.getType() itReturns InAppMessageType.MODAL.typeId
+        val mockPayload = Mockito.mock(MessagePayload::class.java)
+        When calling message.getMessagePayload() itReturns mockPayload
+        When calling mockPayload.messageSettings itReturns null
         When calling hostAppActivity
                 .layoutInflater itReturns LayoutInflater.from(ApplicationProvider.getApplicationContext())
         DisplayMessageRunnable(message, hostAppActivity, IMAGE_ASPECT_RATIO).run()

@@ -3,23 +3,21 @@ package com.rakuten.tech.mobile.inappmessaging.runtime
 import android.app.Activity
 import android.content.Context
 import android.content.SharedPreferences
+import androidx.annotation.NonNull
+import androidx.annotation.Nullable
 import androidx.annotation.RestrictTo
-import androidx.work.Configuration
-import androidx.work.WorkManager
 import com.rakuten.tech.mobile.inappmessaging.runtime.data.models.appevents.Event
 import com.rakuten.tech.mobile.inappmessaging.runtime.data.repositories.LocalDisplayedMessageRepository
 import com.rakuten.tech.mobile.inappmessaging.runtime.data.repositories.PingResponseMessageRepository
-import com.rakuten.tech.mobile.inappmessaging.runtime.exception.InAppMessagingInitializationException
+import com.rakuten.tech.mobile.inappmessaging.runtime.exception.InAppMessagingException
 import com.rakuten.tech.mobile.inappmessaging.runtime.utils.Initializer
 import com.rakuten.tech.mobile.inappmessaging.runtime.workmanager.schedulers.ConfigScheduler
-import org.jetbrains.annotations.NotNull
-import org.jetbrains.annotations.Nullable
 
 /**
  * Main entry point for the IAM SDK.
  * Should be accessed via [InAppMessaging.instance].
  */
-@Suppress("UnnecessaryAbstractClass", "TooManyFunctions")
+@SuppressWarnings("UnnecessaryAbstractClass", "TooManyFunctions")
 abstract class InAppMessaging internal constructor() {
     /**
      * This callback is called just before showing a message of campaign that has registered contexts.
@@ -30,7 +28,7 @@ abstract class InAppMessaging internal constructor() {
     /**
      * This method registers provider containing user information [userInfoProvider], like RAE Token and Uer ID.
      */
-    abstract fun registerPreference(@NotNull userInfoProvider: UserInfoProvider)
+    abstract fun registerPreference(@NonNull userInfoProvider: UserInfoProvider)
 
     /**
      * This method registers [activity] where message can be displayed
@@ -38,23 +36,21 @@ abstract class InAppMessaging internal constructor() {
      * In order for InAppMessaging SDK to display messages, host app must pass an Activity
      * which the host app allows the SDK to display any Messages.
      */
-    @Throws(IllegalArgumentException::class)
-    abstract fun registerMessageDisplayActivity(@NotNull activity: Activity)
+    abstract fun registerMessageDisplayActivity(@NonNull activity: Activity)
 
     /**
      * This method unregisters the activity from InAppMessaging
      * This method should be called in onPause() of the registered activity in order to avoid memory leaks.
      * If there is message being displayed, it will be closed automatically.
      */
-    @Suppress("FunctionMaxLength")
+    @SuppressWarnings("FunctionMaxLength")
     abstract fun unregisterMessageDisplayActivity()
 
     /**
      * This methods logs the [event] which the InAppMessaging SDK checks to know the messages'
      * triggers are satisfied, then display that message if all trigger conditions are satisfied.
      */
-    @Throws(IllegalArgumentException::class, NullPointerException::class)
-    abstract fun logEvent(@NotNull event: Event)
+    abstract fun logEvent(@NonNull event: Event)
 
     /**
      * This methods updates the host app's session. This allows InAppMessaging to update the locally stored
@@ -130,13 +126,13 @@ abstract class InAppMessaging internal constructor() {
                 true
             } catch (ex: Exception) {
                 errorCallback?.let {
-                    it(InAppMessagingInitializationException("In-App Messaging initialization failed", ex.cause))
+                    it(InAppMessagingException("In-App Messaging initialization failed", ex))
                 }
                 false
             }
         }
 
-        @Throws(InAppMessagingInitializationException::class)
+        @Throws(InAppMessagingException::class)
         internal fun initialize(
             context: Context,
             isForTesting: Boolean = false,
@@ -145,19 +141,14 @@ abstract class InAppMessaging internal constructor() {
         ) {
             val manifestConfig = AppManifestConfig(context)
 
-            // Special handling of WorkManager initialization for Android 11
-            val config = Configuration.Builder().build()
-            WorkManager.initialize(context, config)
-
             // `manifestConfig.isDebugging()` is used to enable/disable the debug logging of InAppMessaging SDK.
             // Note: All InAppMessaging SDK logs' tags begins with "IAM_".
             instance = InApp(context, manifestConfig.isDebugging(), isCacheHandling = isCacheHandling)
 
-            // Initializing SDK using background worker thread.
             Initializer.initializeSdk(context, manifestConfig.subscriptionKey(), manifestConfig.configUrl(),
                     isForTesting)
 
-            // inform ping response repository that it is initial launch to display app launch campaign at least once
+            // inform repositories that it is initial launch to display app launch campaign at least once
             PingResponseMessageRepository.isInitialLaunch = true
             LocalDisplayedMessageRepository.isInitialLaunch = true
 
@@ -169,7 +160,7 @@ abstract class InAppMessaging internal constructor() {
         }
     }
 
-    @Suppress("EmptyFunctionBlock", "TooManyFunctions")
+    @SuppressWarnings("EmptyFunctionBlock", "TooManyFunctions")
     internal class NotInitializedInAppMessaging : InAppMessaging() {
         override var onVerifyContext: (contexts: List<String>, campaignTitle: String) -> Boolean = { _, _ -> true }
 
@@ -177,7 +168,7 @@ abstract class InAppMessaging internal constructor() {
 
         override fun registerMessageDisplayActivity(activity: Activity) {}
 
-        @Suppress("FunctionMaxLength")
+        @SuppressWarnings("FunctionMaxLength")
         override fun unregisterMessageDisplayActivity() {}
 
         override fun logEvent(event: Event) {}

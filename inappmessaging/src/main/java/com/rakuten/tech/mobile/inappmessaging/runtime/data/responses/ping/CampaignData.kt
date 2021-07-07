@@ -4,7 +4,7 @@ import com.google.gson.annotations.SerializedName
 import com.rakuten.tech.mobile.inappmessaging.runtime.data.models.messages.Message
 
 /**
- * Class for parsing DataItem, which is a response from MessageMixer.
+ * Class for parsing CampaignData, which is a response from MessageMixer.
  */
 internal data class CampaignData(
     @SerializedName("messagePayload")

@@ -351,6 +351,7 @@ Documents targeting Product Managers:
   - To prevent the crash, SDK use normal shared preferences.
 * SDKCF-3908: Changed auto-initialization to explicit init for better control and handling for any initialization issue. Please refer to [SDK Integration](#integration) for details.
 * SDKCF-3939: Added recommendation to use a remote feature flag to enable/disable the SDK.
+* SDKCF-3916: Added internal handling of OS exception and triggering `errorCallback` if set.
 
 ### 3.0.0 (2021-03-24)
 * SDKCF-3450: Update Fresco dependency to v2.4.0 to fix SoLoader issue.

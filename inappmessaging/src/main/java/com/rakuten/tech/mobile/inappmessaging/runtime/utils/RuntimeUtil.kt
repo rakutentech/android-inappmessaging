@@ -12,7 +12,7 @@ import okhttp3.ResponseBody
 import retrofit2.Call
 import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory
-import java.io.IOException
+import timber.log.Timber
 import java.util.Calendar
 import java.util.concurrent.Executors
 import java.util.concurrent.TimeUnit
@@ -22,7 +22,6 @@ import java.util.concurrent.TimeUnit
  * more. Methods are not static because dependency injection makes this util object available to
  * everyone and easy to use. Plus static functions are difficult to test.
  */
-@SuppressWarnings("PMD.ExcessiveImports")
 internal object RuntimeUtil {
     private const val DEFAULT_TIMEOUT_IN_SECONDS = 5
     private val OK_HTTP_CLIENT = OkHttpClient.Builder()
@@ -31,6 +30,7 @@ internal object RuntimeUtil {
             .build()
     private val EXECUTOR = Executors.newSingleThreadExecutor()
     private val GSON_CONVERTER_FACTORY = GsonConverterFactory.create()
+    private const val TAG = "IAM_RuntimeUtil"
 
     /**
      * This method returns a reference of Retrofit. Retrofit is handling API calls.
@@ -51,15 +51,19 @@ internal object RuntimeUtil {
      * Throws IOException if an error occur when making Get request, or converting image data
      * into bytes.
      */
-    @Throws(IOException::class)
+    @SuppressWarnings("TooGenericExceptionCaught")
     fun getImage(imageUrl: String): Bitmap? {
         if (URLUtil.isNetworkUrl(imageUrl)) {
             val getImageCall: Call<ResponseBody> =
                     getRetrofit().create(MessageMixerRetrofitService::class.java).getImage(imageUrl)
-            val imageResponse = getImageCall.execute()
-            if (imageResponse.isSuccessful && imageResponse.body() != null) {
-                val bytes = imageResponse.body()!!.bytes()
-                return BitmapFactory.decodeByteArray(bytes, 0, bytes.size)
+            try {
+                val imageResponse = getImageCall.execute()
+                if (imageResponse.isSuccessful && imageResponse.body() != null) {
+                    val bytes = imageResponse.body()!!.bytes() // should no longer be null
+                    return BitmapFactory.decodeByteArray(bytes, 0, bytes.size)
+                }
+            } catch (ex: Exception) {
+                Timber.tag(TAG).d(ex)
             }
         }
         return null

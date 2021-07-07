@@ -15,7 +15,7 @@ import com.rakuten.tech.mobile.inappmessaging.runtime.BaseTest
 import com.rakuten.tech.mobile.inappmessaging.runtime.InAppMessaging
 import com.rakuten.tech.mobile.inappmessaging.runtime.TestUserInfoProvider
 import com.rakuten.tech.mobile.inappmessaging.runtime.data.repositories.HostAppInfoRepository
-import com.rakuten.tech.mobile.inappmessaging.runtime.exception.InAppMessagingInitializationException
+import com.rakuten.tech.mobile.inappmessaging.runtime.exception.InAppMessagingException
 import org.amshove.kluent.*
 import org.junit.Before
 import org.junit.Test
@@ -37,7 +37,8 @@ class InitializerSpec : BaseTest() {
     private val mockEditor = Mockito.mock(SharedPreferences.Editor::class.java)
 
     @Before
-    fun setup() {
+    override fun setup() {
+        super.setup()
         When calling workerParameters.inputData itReturns Data.EMPTY
         Settings.Secure.putString(context.contentResolver, Settings.Secure.ANDROID_ID, "testid")
 
@@ -63,7 +64,7 @@ class InitializerSpec : BaseTest() {
         Initializer.initializeSdk(context, "test", "", true)
     }
 
-    @Test(expected = InAppMessagingInitializationException::class)
+    @Test(expected = InAppMessagingException::class)
     fun `should throw exception with null package name`() {
         val context = Mockito.mock(Context::class.java)
         Settings.Secure.putString(

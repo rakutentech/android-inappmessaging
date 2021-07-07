@@ -40,7 +40,7 @@ import java.util.*
  */
 @RunWith(RobolectricTestRunner::class)
 @Config(sdk = [Build.VERSION_CODES.O_MR1])
-@Suppress("LargeClass")
+@SuppressWarnings("LargeClass")
 class ImpressionWorkerSpec : BaseTest() {
 
     private val context = Mockito.mock(Context::class.java)
@@ -51,7 +51,8 @@ class ImpressionWorkerSpec : BaseTest() {
     private var responseBodyCall: Call<ResponseBody>? = null
 
     @Before
-    fun setup() {
+    override fun setup() {
+        super.setup()
         AccountRepository.instance().userInfoProvider = TestUserInfoProvider()
         HostAppInfoRepository.instance().addHostInfo(HostAppInfo(InAppMessagingTestConstants.APP_ID,
                 InAppMessagingTestConstants.DEVICE_ID, InAppMessagingTestConstants.APP_VERSION,
@@ -167,6 +168,8 @@ class ImpressionWorkerSpec : BaseTest() {
                 impressionRequest, ImpressionWorker.IMPRESSION_REQUEST_KEY, false)
 
         retrieveValidConfig()
+        val response = Gson().fromJson(CONFIG_RESPONSE_INVALID.trimIndent(), ConfigResponse::class.java)
+        ConfigResponseRepository.instance().addConfigResponse(response.data)
         workManager.enqueue(request).result.get()
         val workInfo = workManager.getWorkInfoById(request.id).get()
         workInfo.state shouldBeEqualTo WorkInfo.State.FAILED
@@ -219,6 +222,7 @@ class ImpressionWorkerSpec : BaseTest() {
         When calling mockHostRespository.getPackageName() itReturns ctx.packageName
         val version = ctx.packageManager.getPackageInfo(ctx.packageName, 0).versionName
         When calling mockHostRespository.getVersion() itReturns version
+        When calling mockHostRespository.getInAppMessagingSubscriptionKey() itReturns "test_key"
         val worker = ConfigWorker(context, workerParameters, mockHostRespository, ConfigResponseRepository.instance(),
                 mockMessageScheduler)
         worker.doWork()

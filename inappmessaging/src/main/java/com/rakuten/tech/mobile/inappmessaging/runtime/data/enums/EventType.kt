@@ -9,7 +9,7 @@ import org.jetbrains.annotations.Nullable
  * Local events type according to type ID.
  */
 @RestrictTo(LIBRARY)
-@Suppress("MagicNumber")
+@SuppressWarnings("MagicNumber")
 enum class EventType(@NotNull val typeId: Int) {
     INVALID(0),
     APP_START(1),

@@ -4,12 +4,17 @@ import android.content.Context
 import android.provider.Settings
 import androidx.test.core.app.ApplicationProvider
 import androidx.work.testing.WorkManagerTestInitHelper
+import com.nhaarman.mockitokotlin2.times
 import com.rakuten.tech.mobile.inappmessaging.runtime.*
+import com.rakuten.tech.mobile.inappmessaging.runtime.data.models.Attribute
 import com.rakuten.tech.mobile.inappmessaging.runtime.data.models.appevents.*
+import com.rakuten.tech.mobile.inappmessaging.runtime.exception.InAppMessagingException
 import com.rakuten.tech.mobile.inappmessaging.runtime.manager.EventsManager
 import com.rakuten.tech.mobile.inappmessaging.runtime.utils.InAppMessagingConstants
 import com.rakuten.tech.mobile.inappmessaging.runtime.workmanager.schedulers.EventMessageReconciliationScheduler
+import org.amshove.kluent.any
 import org.amshove.kluent.shouldBeEqualTo
+import org.amshove.kluent.shouldBeFalse
 import org.amshove.kluent.shouldHaveSize
 import org.junit.Assert
 import org.junit.Before
@@ -22,21 +27,14 @@ import org.robolectric.RobolectricTestRunner
  * Test class for LocalEventRepository.
  */
 @RunWith(RobolectricTestRunner::class)
-class LocalEventRepositorySpec : BaseTest() {
+open class LocalEventRepositorySpec : BaseTest() {
+    private val function: (ex: Exception) -> Unit = {}
+    internal val mockCallback = Mockito.mock(function.javaClass)
 
     @Before
-    fun setup() {
+    override fun setup() {
+        super.setup()
         LocalEventRepository.instance().clearEvents()
-    }
-
-    @Test
-    fun `should throw exception when event has empty event name`() {
-        try {
-            LocalEventRepository.instance().addEvent(CustomEvent(""))
-            Assert.fail()
-        } catch (e: IllegalArgumentException) {
-            e.localizedMessage shouldBeEqualTo InAppMessagingConstants.EVENT_NAME_EMPTY_EXCEPTION
-        }
     }
 
     @Test
@@ -137,27 +135,7 @@ class LocalEventRepositorySpec : BaseTest() {
         LocalEventRepository.instance().getEvents().shouldHaveSize(4)
     }
 
-    @Test
-    fun `should not crash and clear previous when forced cast exception`() {
-        setupAndTestMultipleUser()
-        val editor = InAppMessaging.instance().getSharedPref()?.edit()
-        editor?.putInt(LocalEventRepository.LOCAL_EVENT_KEY, 1)?.apply()
-
-        LocalEventRepository.instance().addEvent(LoginSuccessfulEvent())
-        LocalEventRepository.instance().getEvents().shouldHaveSize(2) // including persistent type
-    }
-
-    @Test
-    fun `should not crash and clear previous when parsing invalid json`() {
-        setupAndTestMultipleUser()
-        val editor = InAppMessaging.instance().getSharedPref()?.edit()
-        editor?.putString(LocalEventRepository.LOCAL_EVENT_KEY, "[{eventType:\"invalid\"}]")?.apply()
-
-        LocalEventRepository.instance().addEvent(LoginSuccessfulEvent())
-        LocalEventRepository.instance().getEvents().shouldHaveSize(1) // clear all due to invalid data
-    }
-
-    private fun setupAndTestMultipleUser() {
+    internal fun setupAndTestMultipleUser() {
         val infoProvider = TestUserInfoProvider()
         initializeInstance(infoProvider)
 
@@ -191,4 +169,64 @@ class LocalEventRepositorySpec : BaseTest() {
         LocalEventRepository.instance().addEvent(PurchaseSuccessfulEvent())
         LocalEventRepository.instance().addEvent(CustomEvent("test"))
     }
+}
+
+class LocalEventRepositoryExceptionSpec : LocalEventRepositorySpec() {
+    @Test
+    fun `should throw exception when event has empty event name`() {
+        try {
+            LocalEventRepository.instance().addEvent(CustomEvent(""))
+            Assert.fail()
+        } catch (e: IllegalArgumentException) {
+            e.localizedMessage shouldBeEqualTo InAppMessagingConstants.EVENT_NAME_EMPTY_EXCEPTION
+        }
+    }
+
+    @Test
+    fun `should not crash and clear previous when parsing invalid format`() {
+        setupAndTestMultipleUser()
+        val editor = InAppMessaging.instance().getSharedPref()?.edit()
+        editor?.putString(LocalEventRepository.LOCAL_EVENT_KEY, "[{eve")?.apply()
+
+        LocalEventRepository.instance().addEvent(LoginSuccessfulEvent())
+        LocalEventRepository.instance().getEvents().shouldHaveSize(1) // clear all due to invalid data
+    }
+
+    @Test
+    fun `should throw exception with null or empty campaign id`() {
+        InApp.errorCallback = mockCallback
+        LocalEventRepository.instance().addEvent(TestEvent("")).shouldBeFalse()
+        LocalEventRepository.instance().addEvent(TestEvent(null)).shouldBeFalse()
+
+        Mockito.verify(mockCallback, times(2)).invoke(any(InAppMessagingException::class))
+    }
+
+    @Test
+    fun `should not crash and clear previous when forced cast exception`() {
+        setupAndTestMultipleUser()
+        val editor = InAppMessaging.instance().getSharedPref()?.edit()
+        editor?.putInt(LocalEventRepository.LOCAL_EVENT_KEY, 1)?.apply()
+
+        LocalEventRepository.instance().addEvent(LoginSuccessfulEvent())
+        LocalEventRepository.instance().getEvents().shouldHaveSize(2) // including persistent type
+    }
+
+    @Test
+    fun `should not crash and clear previous when parsing invalid type`() {
+        setupAndTestMultipleUser()
+        val editor = InAppMessaging.instance().getSharedPref()?.edit()
+        editor?.putString(LocalEventRepository.LOCAL_EVENT_KEY, "[{eventType:\"invalid\"}]")?.apply()
+
+        LocalEventRepository.instance().addEvent(LoginSuccessfulEvent())
+        LocalEventRepository.instance().getEvents().shouldHaveSize(1) // clear all due to invalid data
+    }
+}
+
+internal class TestEvent(private val name: String?) : Event {
+    override fun getEventName(): String? = name
+    override fun getEventType() = 0
+    override fun getTimestamp(): Long = 0
+    override fun isPersistentType(): Boolean = false
+    override fun getRatEventMap(): Map<String, Any> = mapOf()
+    override fun getAttributeMap(): Map<String, Attribute?> = mapOf()
 }
