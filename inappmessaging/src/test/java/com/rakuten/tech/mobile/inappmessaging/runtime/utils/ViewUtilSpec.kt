@@ -21,10 +21,34 @@ import org.robolectric.annotation.Config
 class ViewUtilSpec : BaseTest() {
 
     @Test
-    fun `should have correct animation duration`() {
+    fun `should have correct duration for bottom animation`() {
         val animation = ViewUtil.getSlidingAnimation(
                 ApplicationProvider.getApplicationContext(),
                 SlideFromDirectionType.BOTTOM)
+        animation?.duration shouldBeEqualTo 400L
+    }
+
+    @Test
+    fun `should have correct duration for right animation`() {
+        val animation = ViewUtil.getSlidingAnimation(
+                ApplicationProvider.getApplicationContext(),
+                SlideFromDirectionType.RIGHT)
+        animation?.duration shouldBeEqualTo 400L
+    }
+
+    @Test
+    fun `should have correct duration for left animation`() {
+        val animation = ViewUtil.getSlidingAnimation(
+                ApplicationProvider.getApplicationContext(),
+                SlideFromDirectionType.LEFT)
+        animation?.duration shouldBeEqualTo 400L
+    }
+
+    @Test
+    fun `should have correct duration for others animation`() {
+        val animation = ViewUtil.getSlidingAnimation(
+                ApplicationProvider.getApplicationContext(),
+                SlideFromDirectionType.INVALID)
         animation?.duration shouldBeEqualTo 400L
     }
 

@@ -168,6 +168,8 @@ class ImpressionWorkerSpec : BaseTest() {
                 impressionRequest, ImpressionWorker.IMPRESSION_REQUEST_KEY, false)
 
         retrieveValidConfig()
+        val response = Gson().fromJson(CONFIG_RESPONSE_INVALID.trimIndent(), ConfigResponse::class.java)
+        ConfigResponseRepository.instance().addConfigResponse(response.data)
         workManager.enqueue(request).result.get()
         val workInfo = workManager.getWorkInfoById(request.id).get()
         workInfo.state shouldBeEqualTo WorkInfo.State.FAILED

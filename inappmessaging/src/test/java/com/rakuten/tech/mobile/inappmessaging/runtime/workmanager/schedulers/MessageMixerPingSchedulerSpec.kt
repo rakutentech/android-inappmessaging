@@ -3,7 +3,6 @@ package com.rakuten.tech.mobile.inappmessaging.runtime.workmanager.schedulers
 import androidx.test.core.app.ApplicationProvider
 import androidx.work.OneTimeWorkRequest
 import androidx.work.WorkManager
-import androidx.work.WorkRequest
 import com.nhaarman.mockitokotlin2.atLeastOnce
 import com.nhaarman.mockitokotlin2.times
 import com.rakuten.tech.mobile.inappmessaging.runtime.BaseTest
