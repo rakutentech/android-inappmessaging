@@ -1,5 +1,6 @@
 package com.rakuten.tech.mobile.inappmessaging.runtime.data.repositories
 
+import android.content.SharedPreferences
 import androidx.annotation.VisibleForTesting
 import com.google.gson.Gson
 import com.google.gson.reflect.TypeToken
@@ -149,43 +150,54 @@ internal interface LocalDisplayedMessageRepository {
                 user = AccountRepository.instance().userInfoHash
                 // reset message list from cached using updated user info
                 val sharedPref = InAppMessaging.instance().getSharedPref()
-                val listString = try {
-                    sharedPref?.getString(LOCAL_DISPLAYED_KEY, "") ?: ""
-                } catch (ex: ClassCastException) {
-                    Timber.tag(TAG).d(ex.cause, "Incorrect type for $LOCAL_DISPLAYED_KEY data")
-                    ""
-                }
-                messages.clear()
-                if (listString.isNotEmpty()) {
-                    val type = object : TypeToken<HashMap<String, List<Long>>>() {}.type
-                    try {
-                        messages.putAll(Gson().fromJson(listString, type))
-                    } catch (ex: Exception) {
-                        Timber.tag(TAG).d(ex.cause, "Incorrect JSON format for $LOCAL_DISPLAYED_KEY data")
-                    }
-                }
 
-                val removedList = try {
-                    sharedPref?.getString(LOCAL_DISPLAYED_CLOSED_LIST_KEY, "") ?: ""
-                } catch (ex: ClassCastException) {
-                    Timber.tag(TAG).d(ex.cause, "Incorrect type for $LOCAL_DISPLAYED_CLOSED_LIST_KEY data")
-                    ""
-                }
-                removedMessages.clear()
-                if (removedList.isNotEmpty()) {
-                    val type = object : TypeToken<HashMap<String, Int>>() {}.type
-                    try {
-                        removedMessages.putAll(Gson().fromJson(removedList, type))
-                    } catch (ex: Exception) {
-                        Timber.tag(TAG).d(ex.cause, "Incorrect JSON format for $LOCAL_DISPLAYED_CLOSED_LIST_KEY data")
-                    }
-                }
+                resetDisplayed(sharedPref)
+                resetRemovedMessages(sharedPref)
+                resetRemovedMessage(sharedPref)
+            }
+        }
 
-                removedMessage = try {
-                    sharedPref?.getString(LOCAL_DISPLAYED_CLOSED_KEY, "") ?: ""
-                } catch (ex: ClassCastException) {
-                    Timber.tag(TAG).d(ex.cause, "Incorrect type for $LOCAL_DISPLAYED_CLOSED_KEY data")
-                    ""
+        private fun resetRemovedMessage(sharedPref: SharedPreferences?) {
+            removedMessage = try {
+                sharedPref?.getString(LOCAL_DISPLAYED_CLOSED_KEY, "") ?: ""
+            } catch (ex: ClassCastException) {
+                Timber.tag(TAG).d(ex.cause, "Incorrect type for $LOCAL_DISPLAYED_CLOSED_KEY data")
+                ""
+            }
+        }
+
+        private fun resetRemovedMessages(sharedPref: SharedPreferences?) {
+            val removedList = try {
+                sharedPref?.getString(LOCAL_DISPLAYED_CLOSED_LIST_KEY, "") ?: ""
+            } catch (ex: ClassCastException) {
+                Timber.tag(TAG).d(ex.cause, "Incorrect type for $LOCAL_DISPLAYED_CLOSED_LIST_KEY data")
+                ""
+            }
+            removedMessages.clear()
+            if (removedList.isNotEmpty()) {
+                val type = object : TypeToken<HashMap<String, Int>>() {}.type
+                try {
+                    removedMessages.putAll(Gson().fromJson(removedList, type))
+                } catch (ex: Exception) {
+                    Timber.tag(TAG).d(ex.cause, "Incorrect JSON format for $LOCAL_DISPLAYED_CLOSED_LIST_KEY data")
+                }
+            }
+        }
+
+        private fun resetDisplayed(sharedPref: SharedPreferences?) {
+            val listString = try {
+                sharedPref?.getString(LOCAL_DISPLAYED_KEY, "") ?: ""
+            } catch (ex: ClassCastException) {
+                Timber.tag(TAG).d(ex.cause, "Incorrect type for $LOCAL_DISPLAYED_KEY data")
+                ""
+            }
+            messages.clear()
+            if (listString.isNotEmpty()) {
+                val type = object : TypeToken<HashMap<String, List<Long>>>() {}.type
+                try {
+                    messages.putAll(Gson().fromJson(listString, type))
+                } catch (ex: Exception) {
+                    Timber.tag(TAG).d(ex.cause, "Incorrect JSON format for $LOCAL_DISPLAYED_KEY data")
                 }
             }
         }

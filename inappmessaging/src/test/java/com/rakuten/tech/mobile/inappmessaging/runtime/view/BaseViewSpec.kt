@@ -70,7 +70,7 @@ class BaseViewSpec : BaseTest() {
 
     @Test
     fun `should set default when null body color`() {
-        When calling mockPayload.headerColor itReturns "#FFFFFF"
+        When calling mockPayload.headerColor itReturns WHITE_HEX
         When calling mockPayload.messageBodyColor itReturns null
         view?.populateViewData(mockMessage, 1f)
 
@@ -79,8 +79,8 @@ class BaseViewSpec : BaseTest() {
 
     @Test
     fun `should set default when null bg color`() {
-        When calling mockPayload.headerColor itReturns "#FFFFFF"
-        When calling mockPayload.messageBodyColor itReturns "#FFFFFF"
+        When calling mockPayload.headerColor itReturns WHITE_HEX
+        When calling mockPayload.messageBodyColor itReturns WHITE_HEX
         When calling mockPayload.backgroundColor itReturns null
         view?.populateViewData(mockMessage, 1f)
 
@@ -104,5 +104,9 @@ class BaseViewSpec : BaseTest() {
     private fun verifyDefault() {
         view?.header_text?.textColors shouldBeEqualTo ColorStateList.valueOf(Color.BLACK)
         view?.message_body?.textColors shouldBeEqualTo ColorStateList.valueOf(Color.BLACK)
+    }
+
+    companion object {
+        private const val WHITE_HEX = "#FFFFFF"
     }
 }
