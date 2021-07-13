@@ -93,7 +93,7 @@ class InitializerSpec : BaseTest() {
     }
 
     @Test
-    fun `should generate uuid when null android ID with non-empty pref`() {
+    fun `should generate uuid when null android ID and device with non-empty pref`() {
         val appCtx = ApplicationProvider.getApplicationContext<Context>()
         Settings.Secure.putString(appCtx.contentResolver, Settings.Secure.ANDROID_ID, null)
 
