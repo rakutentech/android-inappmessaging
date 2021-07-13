@@ -28,9 +28,9 @@
   <dimen name="modal_corner_radius">8dp</dimen>
 
   <!--Modal Close Button-->
-  <dimen name="modal_close_button_height">20dp</dimen>
-  <dimen name="modal_close_button_margin_bottom">16dp</dimen>
-  <dimen name="modal_close_button_width">20dp</dimen>
+  <dimen name="modal_close_button_height">48dp</dimen>
+  <dimen name="modal_close_button_width">48dp</dimen>
+  <dimen name="modal_close_button_padding">24dp</dimen>
 
   <!--Full Screen Close Button -->
   <dimen name="full_screen_close_button_margin_top">24dp</dimen>
