@@ -2,7 +2,6 @@ package com.rakuten.tech.mobile.inappmessaging.runtime.utils
 
 import android.content.Context
 import android.content.SharedPreferences
-import android.os.Build
 import android.provider.Settings
 import androidx.test.core.app.ApplicationProvider
 import androidx.work.Data
@@ -22,7 +21,6 @@ import org.junit.Test
 import org.junit.runner.RunWith
 import org.mockito.Mockito
 import org.robolectric.RobolectricTestRunner
-import org.robolectric.annotation.Config
 import java.lang.ClassCastException
 
 /**
@@ -81,8 +79,7 @@ class InitializerSpec : BaseTest() {
     }
 
     @Test
-    @Config(sdk = [Build.VERSION_CODES.LOLLIPOP])
-    fun `should generate uuid when null android ID and device below android m with empty pref`() {
+    fun `should generate uuid when null android ID and device with empty pref`() {
         val appCtx = ApplicationProvider.getApplicationContext<Context>()
         Settings.Secure.putString(appCtx.contentResolver, Settings.Secure.ANDROID_ID, null)
 
@@ -96,8 +93,7 @@ class InitializerSpec : BaseTest() {
     }
 
     @Test
-    @Config(sdk = [Build.VERSION_CODES.LOLLIPOP])
-    fun `should generate uuid when null android ID and device below android m with non-empty pref`() {
+    fun `should generate uuid when null android ID with non-empty pref`() {
         val appCtx = ApplicationProvider.getApplicationContext<Context>()
         Settings.Secure.putString(appCtx.contentResolver, Settings.Secure.ANDROID_ID, null)
 
