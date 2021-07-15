@@ -12,7 +12,7 @@ android {
         versionCode 2
         versionName "0.0"
         // Defines the minimum API level required to run the app.
-        minSdkVersion 21
+        minSdkVersion CONFIG.versions.android.sdk.min
         // Specifies the API level used to test the app.
         targetSdkVersion 30
 

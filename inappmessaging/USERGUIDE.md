@@ -19,7 +19,7 @@ In-App Messaging (IAM) module allows app developers to easily configure and disp
 
 ## <a name="requirements"></a> Requirements
 ### Supported Android Versions
-This SDK supports Android API level 21 (Lollipop) and above.
+This SDK supports Android API level 23 (Marshmallow) and above.
 
 ### In-App Messaging Subscription Key
 You must have a subscription key for your application from IAM Dashboard.
@@ -55,7 +55,7 @@ android {
 
     defaultConfig {
     // Defines the minimum API level required to run the app.
-    minSdkVersion 21
+    minSdkVersion 23
     // Specifies the API level used to test the app.
     targetSdkVersion 30
     }
