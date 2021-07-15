@@ -10,14 +10,25 @@
   <style name="InAppMessaging.CloseButton">
     <item name="android:layout_height">@dimen/modal_close_button_height</item>
     <item name="android:layout_width">@dimen/modal_close_button_width</item>
+    <item name="android:background">@android:color/transparent</item>
   </style>
 
-  <style name="InAppMessaging.CloseButton.Modal">
+  <style name="InAppMessaging.CloseButton.White">
+    <!--Default background as white.-->
+    <item name="android:src">@drawable/close_button_white_background</item>
+    <item name="android:padding">@dimen/modal_close_button_padding</item>
+    <item name="android:layout_gravity">end</item>
+  </style>
+
+  <style name="InAppMessaging.CloseButton.Modal" >
     <!--Default background as white.-->
     <item name="android:src">@drawable/close_button_white_background</item>
     <item name="android:layout_gravity">end</item>
-    <item name="android:padding">@dimen/modal_close_button_padding</item>
-    <item name="android:background">@android:color/transparent</item>
+    <!--Padding to display the drawable background on the right edge-->
+    <item name="android:paddingStart">@dimen/modal_close_button_padding_start</item>
+    <item name="android:paddingTop">@dimen/modal_close_button_padding_top</item>
+    <item name="android:paddingEnd">@dimen/modal_close_button_padding_end</item>
+    <item name="android:paddingBottom">@dimen/modal_close_button_padding_bottom</item>
   </style>
 
   <style name="InAppMessaging.CloseButton.FullScreen">

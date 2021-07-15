@@ -31,6 +31,10 @@
   <dimen name="modal_close_button_height">48dp</dimen>
   <dimen name="modal_close_button_width">48dp</dimen>
   <dimen name="modal_close_button_padding">24dp</dimen>
+  <dimen name="modal_close_button_padding_start">24dp</dimen>
+  <dimen name="modal_close_button_padding_top">18dp</dimen>
+  <dimen name="modal_close_button_padding_end">0dp</dimen>
+  <dimen name="modal_close_button_padding_bottom">6dp</dimen>
 
   <!--Full Screen Close Button -->
   <dimen name="full_screen_text_margin_left_right">39dp</dimen>
