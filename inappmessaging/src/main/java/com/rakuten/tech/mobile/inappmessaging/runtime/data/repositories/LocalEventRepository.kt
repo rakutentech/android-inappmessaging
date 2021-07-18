@@ -35,6 +35,13 @@ internal interface LocalEventRepository : EventRepository {
      */
     fun clearNonPersistentEvents()
 
+    /**
+     * This method removes all stored non-persistent events triggered before the given time [timeMillis].
+     *
+     * @param timeMillis represents the given time in UTC milliseconds from the epoch.
+     */
+    fun clearNonPersistentEvents(timeMillis: Long)
+
     companion object {
         private const val TAG = "IAM_LocalEventRepo"
         private var instance: LocalEventRepository = LocalEventRepositoryImpl()
@@ -115,6 +122,17 @@ internal interface LocalEventRepository : EventRepository {
             synchronized(events) {
                 if (events.isNotEmpty()) {
                     events.removeAll { ev -> !ev.isPersistentType() }
+                }
+            }
+        }
+
+        /**
+         * {@inheritDoc}.
+         * */
+        override fun clearNonPersistentEvents(timeMillis: Long) {
+            synchronized(events) {
+                if (events.isNotEmpty()) {
+                    events.removeAll { ev -> !ev.isPersistentType() && ev.getTimestamp() < timeMillis }
                 }
             }
         }

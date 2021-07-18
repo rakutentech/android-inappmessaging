@@ -9,6 +9,7 @@ import com.rakuten.tech.mobile.inappmessaging.runtime.data.models.messages.Messa
 import com.rakuten.tech.mobile.inappmessaging.runtime.data.repositories.AccountRepository
 import com.rakuten.tech.mobile.inappmessaging.runtime.data.repositories.ConfigResponseRepository
 import com.rakuten.tech.mobile.inappmessaging.runtime.data.repositories.HostAppInfoRepository
+import com.rakuten.tech.mobile.inappmessaging.runtime.data.repositories.LocalEventRepository
 import com.rakuten.tech.mobile.inappmessaging.runtime.data.repositories.PingResponseMessageRepository
 import com.rakuten.tech.mobile.inappmessaging.runtime.data.requests.PingRequest
 import com.rakuten.tech.mobile.inappmessaging.runtime.data.responses.ping.MessageMixerResponse
@@ -19,6 +20,7 @@ import com.rakuten.tech.mobile.inappmessaging.runtime.workmanager.schedulers.Mes
 import retrofit2.Response
 import timber.log.Timber
 import java.net.HttpURLConnection
+import kotlin.collections.ArrayList
 
 /**
  * This class contains the actual work to communicate with Message Mixer Service. It extends Worker
@@ -97,6 +99,9 @@ internal class MessageMixerWorker(
 
                 // Add all parsed messages into PingResponseMessageRepository.
                 PingResponseMessageRepository.instance().replaceAllMessages(parsedMessages)
+
+                // Clear non-persistent local events triggered before current ping
+                LocalEventRepository.instance().clearNonPersistentEvents(messageMixerResponse.currentPingMillis)
 
                 // Start a new MessageEventReconciliationWorker, there was a new Ping Response to parse.
                 // This worker will attempt to cancel message scheduled but hasn't been displayed yet
