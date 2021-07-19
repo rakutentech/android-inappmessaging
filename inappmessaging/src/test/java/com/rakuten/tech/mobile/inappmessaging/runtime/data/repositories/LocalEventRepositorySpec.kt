@@ -22,6 +22,7 @@ import org.junit.Test
 import org.junit.runner.RunWith
 import org.mockito.Mockito
 import org.robolectric.RobolectricTestRunner
+import java.util.Calendar
 
 /**
  * Test class for LocalEventRepository.
@@ -121,6 +122,31 @@ open class LocalEventRepositorySpec : BaseTest() {
         LocalEventRepository.instance().addEvent(PurchaseSuccessfulEvent())
         LocalEventRepository.instance().addEvent(CustomEvent("test"))
         LocalEventRepository.instance().getEvents().shouldHaveSize(4)
+    }
+
+    @Test
+    fun `should remove all events triggered before a given time`() {
+        initializeLocalEvent()
+        LocalEventRepository.instance().getEvents().shouldHaveSize(4)
+        val timeMillis = LocalEventRepository.instance().getEvents()[3].getTimestamp() + 1
+        LocalEventRepository.instance().clearNonPersistentEvents(timeMillis)
+        LocalEventRepository.instance().getEvents().shouldHaveSize(1)
+    }
+
+    @Test
+    fun `should keep all events triggered after a given time`() {
+        initializeLocalEvent()
+        LocalEventRepository.instance().getEvents().shouldHaveSize(4)
+        val timeMillis = LocalEventRepository.instance().getEvents()[0].getTimestamp() - 1
+        LocalEventRepository.instance().clearNonPersistentEvents(timeMillis)
+        LocalEventRepository.instance().getEvents().shouldHaveSize(4)
+    }
+
+    @Test
+    fun `should not throw exception when clearing with empty events for a given time`() {
+        val timeMillis = Calendar.getInstance().timeInMillis
+        LocalEventRepository.instance().clearNonPersistentEvents(timeMillis)
+        LocalEventRepository.instance().getEvents().shouldHaveSize(0)
     }
 
     @Test
