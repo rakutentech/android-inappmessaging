@@ -39,6 +39,17 @@ internal interface LocalDisplayedMessageRepository {
     fun numberOfTimesDisplayed(message: Message): Int
 
     /**
+     * Return the number of times this message has been displayed in this session
+     * after the last ping request response.
+     *
+     * @param message the given InApp campaign message.
+     *
+     * @return the number of times this message has been displayed,
+     * when message is null or message's campaignId is empty, return 0.
+     */
+    fun numberOfTimesDisplayedAfterLastPing(message: Message): Int
+
+    /**
      * Returns the number of times the campaign ID was closed after unregistering activity.
      */
     fun numberOfTimesClosed(id: String): Int
@@ -132,6 +143,19 @@ internal interface LocalDisplayedMessageRepository {
                 // Prevents race condition.
                 val messageTimeStampList = messages[message.getCampaignId()]
                 return messageTimeStampList?.size ?: 0
+            }
+        }
+
+        /**
+         * {@inheritDoc}
+         */
+        override fun numberOfTimesDisplayedAfterLastPing(message: Message): Int {
+            synchronized(messages) {
+                val lastPingMillis = PingResponseMessageRepository.instance().lastPingMillis
+                val messageTimeStampList = messages[message.getCampaignId()]?.filter {
+                    it > lastPingMillis
+                } ?: mutableListOf()
+                return messageTimeStampList.size
             }
         }
 
