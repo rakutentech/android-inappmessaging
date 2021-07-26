@@ -259,11 +259,12 @@ internal interface MessageEventReconciliationUtil {
         @SuppressWarnings("FunctionMaxLength")
         private fun getNumTimesToSatisfyTriggersForDisplay(message: Message): Int {
             val maxImpression = message.getMaxImpressions()
-            val displayedImpression: Int = LocalDisplayedMessageRepository.instance().numberOfTimesDisplayed(message)
-            val displayedImpressionAfterLastPing: Int = LocalDisplayedMessageRepository.instance().numberOfTimesDisplayedAfterLastPing(message)
+            val displayedImpression: Int = LocalDisplayedMessageRepository.instance()
+                    .numberOfTimesDisplayed(message)
+            val displayedImpressionAfterLastPing: Int = LocalDisplayedMessageRepository.instance()
+                    .numberOfDisplaysAfterPing(message)
             val incrementRemoved = message.getCampaignId()?.let {
-                LocalDisplayedMessageRepository.instance()
-                        .numberOfTimesClosed(it)
+                LocalDisplayedMessageRepository.instance().numberOfTimesClosed(it)
             } ?: 0
 
             // Only check for message has been displayed less than its max impressions.
