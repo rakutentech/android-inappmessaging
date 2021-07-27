@@ -190,8 +190,19 @@ class LocalDisplayedMessageRepositorySpec : BaseTest() {
     fun `should return empty timestamp list after last ping`() {
         val message = ValidTestMessage()
         LocalDisplayedMessageRepository.instance().addMessage(message)
-        PingResponseMessageRepository.instance().lastPingMillis = Calendar.getInstance().timeInMillis + 60000
+        PingResponseMessageRepository.instance().lastPingMillis = Calendar.getInstance().timeInMillis + 5
         LocalDisplayedMessageRepository.instance().numberOfDisplaysAfterPing(message) shouldBeEqualTo 0
+    }
+
+    @Test
+    @Synchronized
+    fun `should return valid timestamp list when ping response time is between adding two messages`() {
+        val message = ValidTestMessage()
+        LocalDisplayedMessageRepository.instance().addMessage(message)
+        Thread.sleep(1)
+        PingResponseMessageRepository.instance().lastPingMillis = Calendar.getInstance().timeInMillis
+        LocalDisplayedMessageRepository.instance().addMessage(message)
+        LocalDisplayedMessageRepository.instance().numberOfDisplaysAfterPing(message) shouldBeEqualTo 1
     }
 
     private fun setupAndTestMultipleUser(): ValidTestMessage {
