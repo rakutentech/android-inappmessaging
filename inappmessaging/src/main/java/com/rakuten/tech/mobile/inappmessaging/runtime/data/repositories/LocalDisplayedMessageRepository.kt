@@ -28,11 +28,6 @@ internal interface LocalDisplayedMessageRepository {
     fun addMessage(message: Message)
 
     /**
-     * Sets the last message campaign ID in the repository which was closed after unregistering activity.
-     */
-    fun setRemovedMessage(id: String?)
-
-    /**
      * Return the number of times this message has been displayed in this session.
      * When message is null or message's campaignId is empty, return 0.
      */
@@ -111,12 +106,6 @@ internal interface LocalDisplayedMessageRepository {
                 }
                 saveUpdatedMap()
             }
-        }
-
-        override fun setRemovedMessage(id: String?) {
-            checkAndResetMap()
-            removedMessage = id ?: ""
-            saveUpdatedMap()
         }
 
         override fun numberOfTimesDisplayed(message: Message): Int {
