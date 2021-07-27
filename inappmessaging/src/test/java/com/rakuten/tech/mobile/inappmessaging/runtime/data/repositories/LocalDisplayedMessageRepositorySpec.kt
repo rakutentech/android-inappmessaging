@@ -112,9 +112,7 @@ class LocalDisplayedMessageRepositorySpec : BaseTest() {
     fun `should not crash and clear previous when forced cast exception`() {
         val message = setupAndTestMultipleUser()
         val editor = InAppMessaging.instance().getSharedPref()?.edit()
-        editor?.putInt(LocalDisplayedMessageRepository.LOCAL_DISPLAYED_CLOSED_LIST_KEY, 1)
-                ?.putInt(LocalDisplayedMessageRepository.LOCAL_DISPLAYED_CLOSED_KEY, 1)
-                ?.putInt(LocalDisplayedMessageRepository.LOCAL_DISPLAYED_KEY, 1)?.apply()
+        editor?.putInt(LocalDisplayedMessageRepository.LOCAL_DISPLAYED_KEY, 1)?.apply()
 
         LocalDisplayedMessageRepository.instance().numberOfTimesDisplayed(message) shouldBeEqualTo 0
     }
@@ -123,9 +121,7 @@ class LocalDisplayedMessageRepositorySpec : BaseTest() {
     fun `should not crash and clear previous when invalid format`() {
         val message = setupAndTestMultipleUser()
         val editor = InAppMessaging.instance().getSharedPref()?.edit()
-        editor?.putString(LocalDisplayedMessageRepository.LOCAL_DISPLAYED_CLOSED_LIST_KEY, "invalid")
-                ?.putString(LocalDisplayedMessageRepository.LOCAL_DISPLAYED_CLOSED_KEY, "invalid")
-                ?.putString(LocalDisplayedMessageRepository.LOCAL_DISPLAYED_KEY, "invalid")?.apply()
+        editor?.putString(LocalDisplayedMessageRepository.LOCAL_DISPLAYED_KEY, "invalid")?.apply()
 
         LocalDisplayedMessageRepository.instance().numberOfTimesDisplayed(message) shouldBeEqualTo 0
     }

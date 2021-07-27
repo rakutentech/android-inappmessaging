@@ -54,13 +54,7 @@ internal interface LocalDisplayedMessageRepository {
         private var instance: LocalDisplayedMessageRepository = LocalDisplayedMessageRepositoryImpl()
         @VisibleForTesting
         internal const val LOCAL_DISPLAYED_KEY = "local_displayed_list"
-        @VisibleForTesting
-        internal const val LOCAL_DISPLAYED_CLOSED_KEY = "local_displayed_closed"
-        @VisibleForTesting
-        internal const val LOCAL_DISPLAYED_CLOSED_LIST_KEY = "local_displayed_closed_list"
         private const val TAG = "IAM_LocalDisplayRepo"
-
-        internal var isInitialLaunch = false
 
         fun instance() = instance
     }
@@ -71,8 +65,6 @@ internal interface LocalDisplayedMessageRepository {
         // Such as:
         // {5bf41c52-e4c0-4cb2-9183-df429e84d681, [1537309879557,1537309879557,1537309879557]}
         private val messages = ConcurrentHashMap<String, List<Long>>()
-        private val removedMessages = ConcurrentHashMap<String, Int>()
-        private var removedMessage = ""
         private var user = ""
 
         init {
@@ -132,8 +124,6 @@ internal interface LocalDisplayedMessageRepository {
 
         override fun clearMessages() {
             messages.clear()
-            removedMessages.clear()
-            removedMessage = ""
             saveUpdatedMap()
         }
 
@@ -147,35 +137,6 @@ internal interface LocalDisplayedMessageRepository {
                 val sharedPref = InAppMessaging.instance().getSharedPref()
 
                 resetDisplayed(sharedPref)
-                resetRemovedMessages(sharedPref)
-                resetRemovedMessage(sharedPref)
-            }
-        }
-
-        private fun resetRemovedMessage(sharedPref: SharedPreferences?) {
-            removedMessage = try {
-                sharedPref?.getString(LOCAL_DISPLAYED_CLOSED_KEY, "") ?: ""
-            } catch (ex: ClassCastException) {
-                Timber.tag(TAG).d(ex.cause, "Incorrect type for $LOCAL_DISPLAYED_CLOSED_KEY data")
-                ""
-            }
-        }
-
-        private fun resetRemovedMessages(sharedPref: SharedPreferences?) {
-            val removedList = try {
-                sharedPref?.getString(LOCAL_DISPLAYED_CLOSED_LIST_KEY, "") ?: ""
-            } catch (ex: ClassCastException) {
-                Timber.tag(TAG).d(ex.cause, "Incorrect type for $LOCAL_DISPLAYED_CLOSED_LIST_KEY data")
-                ""
-            }
-            removedMessages.clear()
-            if (removedList.isNotEmpty()) {
-                val type = object : TypeToken<HashMap<String, Int>>() {}.type
-                try {
-                    removedMessages.putAll(Gson().fromJson(removedList, type))
-                } catch (ex: Exception) {
-                    Timber.tag(TAG).d(ex.cause, "Incorrect JSON format for $LOCAL_DISPLAYED_CLOSED_LIST_KEY data")
-                }
             }
         }
 
@@ -203,8 +164,6 @@ internal interface LocalDisplayedMessageRepository {
                 // reset message list from cached using updated user info
                 val editor = InAppMessaging.instance().getSharedPref()?.edit()
                 editor?.putString(LOCAL_DISPLAYED_KEY, Gson().toJson(messages))
-                        ?.putString(LOCAL_DISPLAYED_CLOSED_KEY, removedMessage)
-                        ?.putString(LOCAL_DISPLAYED_CLOSED_LIST_KEY, Gson().toJson(removedMessages))
                         ?.apply() ?: Timber.tag(TAG).d("failed saving displayed data")
             }
         }
