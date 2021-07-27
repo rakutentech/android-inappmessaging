@@ -50,11 +50,6 @@ internal interface LocalDisplayedMessageRepository {
     fun numberOfDisplaysAfterPing(message: Message): Int
 
     /**
-     * Returns the number of times the campaign ID was closed after unregistering activity.
-     */
-    fun numberOfTimesClosed(id: String): Int
-
-    /**
      * This method removes all stored messages.
      * This is done during session update due to user info update.
      */
@@ -122,20 +117,6 @@ internal interface LocalDisplayedMessageRepository {
             checkAndResetMap()
             removedMessage = id ?: ""
             saveUpdatedMap()
-        }
-
-        override fun numberOfTimesClosed(id: String): Int {
-            synchronized(removedMessages) {
-                if (isInitialLaunch && removedMessage.isNotEmpty()) {
-                    isInitialLaunch = false
-                    // only increment if campaign is removed then relaunch
-                    removedMessages[removedMessage] = removedMessages.getOrElse(removedMessage) { 0 } + 1
-                    saveUpdatedMap()
-                } else {
-                    checkAndResetMap()
-                }
-                return removedMessages[id] ?: 0
-            }
         }
 
         override fun numberOfTimesDisplayed(message: Message): Int {
