@@ -34,6 +34,7 @@ class MainActivityFragment : Fragment(), View.OnClickListener {
         login_successful_twice.setOnClickListener(this)
         purchase_successful_twice.setOnClickListener(this)
         login_purchase_successful.setOnClickListener(this)
+        close_message.setOnClickListener(this)
     }
 
     override fun onClick(v: View) {
@@ -56,6 +57,9 @@ class MainActivityFragment : Fragment(), View.OnClickListener {
             login_purchase_successful -> {
                 InAppMessaging.instance().logEvent(LoginSuccessfulEvent())
                 InAppMessaging.instance().logEvent(PurchaseSuccessfulEvent().currencyCode("JPY"))
+            }
+            close_message -> {
+                InAppMessaging.instance().closeMessage()
             }
             else -> {
             }

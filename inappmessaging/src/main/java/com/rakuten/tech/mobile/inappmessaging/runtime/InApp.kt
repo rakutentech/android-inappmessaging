@@ -8,7 +8,6 @@ import androidx.annotation.VisibleForTesting
 import com.rakuten.tech.mobile.inappmessaging.runtime.data.models.appevents.Event
 import com.rakuten.tech.mobile.inappmessaging.runtime.data.repositories.AccountRepository
 import com.rakuten.tech.mobile.inappmessaging.runtime.data.repositories.ConfigResponseRepository
-import com.rakuten.tech.mobile.inappmessaging.runtime.data.repositories.LocalDisplayedMessageRepository
 import com.rakuten.tech.mobile.inappmessaging.runtime.data.repositories.LocalEventRepository
 import com.rakuten.tech.mobile.inappmessaging.runtime.data.repositories.ReadyForDisplayMessageRepository
 import com.rakuten.tech.mobile.inappmessaging.runtime.exception.InAppMessagingException
@@ -85,8 +84,7 @@ internal class InApp(
     override fun unregisterMessageDisplayActivity() {
         try {
             if (ConfigResponseRepository.instance().isConfigEnabled()) {
-                val id = displayManager.removeMessage(getRegisteredActivity())
-                LocalDisplayedMessageRepository.instance().setRemovedMessage(id as String?)
+                displayManager.removeMessage(getRegisteredActivity())
             }
             activityWeakReference?.clear()
 

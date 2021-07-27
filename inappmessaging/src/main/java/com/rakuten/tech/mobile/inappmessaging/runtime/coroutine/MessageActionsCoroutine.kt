@@ -67,7 +67,6 @@ internal class MessageActionsCoroutine(
 
         // Adding message to LocalDisplayedMessageRepository.
         localDisplayRepo.addMessage(message)
-        localDisplayRepo.setRemovedMessage("")
 
         // If message is opted out, add it to LocalOptedOutMessageRepository.
         if (optOut) {

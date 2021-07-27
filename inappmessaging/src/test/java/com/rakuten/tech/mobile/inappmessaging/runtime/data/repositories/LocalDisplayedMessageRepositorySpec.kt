@@ -16,10 +16,12 @@ import org.junit.Test
 import org.junit.runner.RunWith
 import org.mockito.Mockito
 import org.robolectric.RobolectricTestRunner
+import java.util.*
 
 /**
  * Test class for LocalDisplayedMessageRepository.
  */
+@SuppressWarnings("LargeClass")
 @RunWith(RobolectricTestRunner::class)
 class LocalDisplayedMessageRepositorySpec : BaseTest() {
 
@@ -107,58 +109,10 @@ class LocalDisplayedMessageRepositorySpec : BaseTest() {
     }
 
     @Test
-    fun `should return zero for times closed when not first launch`() {
-        initializeInstance(TestUserInfoProvider())
-        LocalDisplayedMessageRepository.isInitialLaunch = false
-        LocalDisplayedMessageRepository.instance().setRemovedMessage("1234")
-
-        LocalDisplayedMessageRepository.instance().numberOfTimesClosed("1234") shouldBeEqualTo 0
-    }
-
-    @Test
-    fun `should return correct number of times closed for removed when first launch`() {
-        initializeInstance(TestUserInfoProvider(), false)
-        LocalDisplayedMessageRepository.isInitialLaunch = true
-        LocalDisplayedMessageRepository.instance().setRemovedMessage("1234")
-
-        LocalDisplayedMessageRepository.instance().numberOfTimesClosed("1234") shouldBeEqualTo 1
-        // should not increment since no longer initial launch
-        LocalDisplayedMessageRepository.instance().numberOfTimesClosed("1234") shouldBeEqualTo 1
-
-        // should increment since initial launch
-        LocalDisplayedMessageRepository.isInitialLaunch = true
-        LocalDisplayedMessageRepository.instance().numberOfTimesClosed("1234") shouldBeEqualTo 2
-    }
-
-    @Test
-    fun `should return false for removed when first launch and no removed messages`() {
-        initializeInstance(TestUserInfoProvider(), false)
-        LocalDisplayedMessageRepository.isInitialLaunch = true
-        LocalDisplayedMessageRepository.instance().setRemovedMessage("")
-
-        LocalDisplayedMessageRepository.instance().numberOfTimesClosed("1234") shouldBeEqualTo 0
-
-        LocalDisplayedMessageRepository.instance().setRemovedMessage(null)
-
-        LocalDisplayedMessageRepository.instance().numberOfTimesClosed("1234") shouldBeEqualTo 0
-    }
-
-    @Test
-    fun `should return false not the same campaign id`() {
-        initializeInstance(TestUserInfoProvider(), false)
-        LocalDisplayedMessageRepository.isInitialLaunch = true
-        LocalDisplayedMessageRepository.instance().setRemovedMessage("1234")
-
-        LocalDisplayedMessageRepository.instance().numberOfTimesClosed("4321") shouldBeEqualTo 0
-    }
-
-    @Test
     fun `should not crash and clear previous when forced cast exception`() {
         val message = setupAndTestMultipleUser()
         val editor = InAppMessaging.instance().getSharedPref()?.edit()
-        editor?.putInt(LocalDisplayedMessageRepository.LOCAL_DISPLAYED_CLOSED_LIST_KEY, 1)
-                ?.putInt(LocalDisplayedMessageRepository.LOCAL_DISPLAYED_CLOSED_KEY, 1)
-                ?.putInt(LocalDisplayedMessageRepository.LOCAL_DISPLAYED_KEY, 1)?.apply()
+        editor?.putInt(LocalDisplayedMessageRepository.LOCAL_DISPLAYED_KEY, 1)?.apply()
 
         LocalDisplayedMessageRepository.instance().numberOfTimesDisplayed(message) shouldBeEqualTo 0
     }
@@ -167,11 +121,38 @@ class LocalDisplayedMessageRepositorySpec : BaseTest() {
     fun `should not crash and clear previous when invalid format`() {
         val message = setupAndTestMultipleUser()
         val editor = InAppMessaging.instance().getSharedPref()?.edit()
-        editor?.putString(LocalDisplayedMessageRepository.LOCAL_DISPLAYED_CLOSED_LIST_KEY, "invalid")
-                ?.putString(LocalDisplayedMessageRepository.LOCAL_DISPLAYED_CLOSED_KEY, "invalid")
-                ?.putString(LocalDisplayedMessageRepository.LOCAL_DISPLAYED_KEY, "invalid")?.apply()
+        editor?.putString(LocalDisplayedMessageRepository.LOCAL_DISPLAYED_KEY, "invalid")?.apply()
 
         LocalDisplayedMessageRepository.instance().numberOfTimesDisplayed(message) shouldBeEqualTo 0
+    }
+
+    @Test
+    @Synchronized
+    fun `should return valid timestamp list after last ping`() {
+        val message = ValidTestMessage()
+        PingResponseMessageRepository.instance().lastPingMillis = Calendar.getInstance().timeInMillis
+        LocalDisplayedMessageRepository.instance().addMessage(message)
+        LocalDisplayedMessageRepository.instance().numberOfDisplaysAfterPing(message) shouldBeEqualTo 1
+    }
+
+    @Test
+    @Synchronized
+    fun `should return empty timestamp list after last ping`() {
+        val message = ValidTestMessage()
+        LocalDisplayedMessageRepository.instance().addMessage(message)
+        PingResponseMessageRepository.instance().lastPingMillis = Calendar.getInstance().timeInMillis + 5
+        LocalDisplayedMessageRepository.instance().numberOfDisplaysAfterPing(message) shouldBeEqualTo 0
+    }
+
+    @Test
+    @Synchronized
+    fun `should return valid timestamp list when ping response time is between adding two messages`() {
+        val message = ValidTestMessage()
+        LocalDisplayedMessageRepository.instance().addMessage(message)
+        Thread.sleep(1)
+        PingResponseMessageRepository.instance().lastPingMillis = Calendar.getInstance().timeInMillis
+        LocalDisplayedMessageRepository.instance().addMessage(message)
+        LocalDisplayedMessageRepository.instance().numberOfDisplaysAfterPing(message) shouldBeEqualTo 1
     }
 
     private fun setupAndTestMultipleUser(): ValidTestMessage {
