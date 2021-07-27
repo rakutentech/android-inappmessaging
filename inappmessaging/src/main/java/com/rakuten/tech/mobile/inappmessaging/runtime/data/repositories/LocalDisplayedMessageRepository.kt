@@ -75,6 +75,7 @@ internal interface LocalDisplayedMessageRepository {
         fun instance() = instance
     }
 
+    @SuppressWarnings("TooManyFunctions")
     private class LocalDisplayedMessageRepositoryImpl : LocalDisplayedMessageRepository {
         // Displayed message campaign ID and a list of the epoch time in UTC this message was displayed.
         // Such as:
@@ -153,7 +154,7 @@ internal interface LocalDisplayedMessageRepository {
             synchronized(messages) {
                 val lastPingMillis = PingResponseMessageRepository.instance().lastPingMillis
                 val messageTimeStampList = messages[message.getCampaignId()]?.filter {
-                    it > lastPingMillis
+                    it >= lastPingMillis
                 } ?: mutableListOf()
                 return messageTimeStampList.size
             }

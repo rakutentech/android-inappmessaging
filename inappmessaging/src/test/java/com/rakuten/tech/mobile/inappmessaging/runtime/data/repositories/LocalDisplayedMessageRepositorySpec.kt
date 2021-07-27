@@ -16,10 +16,12 @@ import org.junit.Test
 import org.junit.runner.RunWith
 import org.mockito.Mockito
 import org.robolectric.RobolectricTestRunner
+import java.util.*
 
 /**
  * Test class for LocalDisplayedMessageRepository.
  */
+@SuppressWarnings("LargeClass")
 @RunWith(RobolectricTestRunner::class)
 class LocalDisplayedMessageRepositorySpec : BaseTest() {
 
@@ -172,6 +174,24 @@ class LocalDisplayedMessageRepositorySpec : BaseTest() {
                 ?.putString(LocalDisplayedMessageRepository.LOCAL_DISPLAYED_KEY, "invalid")?.apply()
 
         LocalDisplayedMessageRepository.instance().numberOfTimesDisplayed(message) shouldBeEqualTo 0
+    }
+
+    @Test
+    @Synchronized
+    fun `should return valid timestamp list after last ping`() {
+        val message = ValidTestMessage()
+        PingResponseMessageRepository.instance().lastPingMillis = Calendar.getInstance().timeInMillis
+        LocalDisplayedMessageRepository.instance().addMessage(message)
+        LocalDisplayedMessageRepository.instance().numberOfDisplaysAfterPing(message) shouldBeEqualTo 1
+    }
+
+    @Test
+    @Synchronized
+    fun `should return empty timestamp list after last ping`() {
+        val message = ValidTestMessage()
+        LocalDisplayedMessageRepository.instance().addMessage(message)
+        PingResponseMessageRepository.instance().lastPingMillis = Calendar.getInstance().timeInMillis + 60000
+        LocalDisplayedMessageRepository.instance().numberOfDisplaysAfterPing(message) shouldBeEqualTo 0
     }
 
     private fun setupAndTestMultipleUser(): ValidTestMessage {
