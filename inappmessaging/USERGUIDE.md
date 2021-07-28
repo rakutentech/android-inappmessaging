@@ -337,7 +337,7 @@ Documents targeting Product Managers:
 
 ## <a name="changelog"></a> Changelog
 
-### 4.0.0 (in-progress)
+### 4.0.0 (2021-08-04)
 * SDKCF-3651: Changed Config API call to /GET with query params. This allows the backend to filter requests if required.
 * SDKCF-3653: Added handling for Config and Ping API calls for "429 too many requests" response. The SDK will start exponential backoff (plus a random factor) retries to space out the requests to the backend when code 429 is received.
 * SDKCF-3655: Handled opt-out and max impression tracking logic solely on SDK. This change reduces the backend's load per request.
@@ -352,6 +352,8 @@ Documents targeting Product Managers:
 * SDKCF-3908: Changed auto-initialization to explicit init for better control and handling for any initialization issue. Please refer to [SDK Integration](#integration) for details.
 * SDKCF-3939: Added recommendation to use a remote feature flag to enable/disable the SDK.
 * SDKCF-3916: Added internal handling of OS exception and triggering `errorCallback` if set.
+* SDKCF-3957: Increased the "hit area" of the close button.
+* SDKCF-3992: Updated minimum SDK to API 23.
 
 ### 3.0.0 (2021-03-24)
 * SDKCF-3450: Update Fresco dependency to v2.4.0 to fix SoLoader issue.
