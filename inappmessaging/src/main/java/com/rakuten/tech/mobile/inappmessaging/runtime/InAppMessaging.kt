@@ -124,6 +124,8 @@ abstract class InAppMessaging internal constructor() {
                 initialize(context, isCacheHandling = BuildConfig.IS_CACHE_HANDLING)
                 true
             } catch (ex: Exception) {
+                // reset instance when initialization failed
+                setUninitializedInstance()
                 errorCallback?.let {
                     it(InAppMessagingException("In-App Messaging initialization failed", ex))
                 }
