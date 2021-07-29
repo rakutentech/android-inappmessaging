@@ -344,11 +344,7 @@ Documents targeting Product Managers:
 * SDKCF-3664: Added support on roll-out percentage for computing if In-App Messaging is enabled. This allows the backend to gradually increase campaign distribution.
 * SDKCF-3715: Included subscription key in Config API request header to enable better filtering of requests.
 * SDKCF-3742: Fixed opt-out wording in JP and EN for consistency with iOS.
-* SDKCF-3793: Added handling for concurrent access to persistent cache by having data synchronization.
-* SDKCF-3794: Fixed crash issue due to missing proguard configuration for events.
 * SDKCF-3820: Added disabling of SDK features when response received from backend is disabled config.
-* SDKCF-3781/SDKCF-3915: Fixed crash due to failing master key generation for encrypted shared preferences. The root cause of the crash is suspected to be these Android platform issues [#147480931](https://issuetracker.google.com/issues/147480931) and [#176215143](https://issuetracker.google.com/issues/176215143).
-  - To prevent the crash, SDK use normal shared preferences.
 * SDKCF-3908: Changed auto-initialization to explicit init for better control and handling for any initialization issue. Please refer to [SDK Integration](#integration) for details.
 * SDKCF-3939: Added recommendation to use a remote feature flag to enable/disable the SDK.
 * SDKCF-3916: Added internal handling of OS exception and triggering `errorCallback` if set.
