@@ -28,6 +28,7 @@ import java.util.Calendar
  * Test class for LocalEventRepository.
  */
 @RunWith(RobolectricTestRunner::class)
+@SuppressWarnings("LargeClass")
 open class LocalEventRepositorySpec : BaseTest() {
     private val function: (ex: Exception) -> Unit = {}
     internal val mockCallback = Mockito.mock(function.javaClass)
@@ -177,6 +178,32 @@ open class LocalEventRepositorySpec : BaseTest() {
         AccountRepository.instance().updateUserInfo()
     }
 
+    @Test
+    fun `should remove all events triggered before a given time with false user updated flag`() {
+        initializeLocalEvent()
+        val event = LoginSuccessfulEvent()
+        event.setUserUpdated(true)
+        val timeMillis = event.getTimestamp() + 1
+        LocalEventRepository.instance().addEvent(event)
+        LocalEventRepository.instance().getEvents().shouldHaveSize(5)
+        LocalEventRepository.instance().clearNonPersistentEvents(timeMillis)
+        LocalEventRepository.instance().getEvents().shouldHaveSize(2)
+    }
+
+    @Test
+    fun `should keep all events triggered after a given time with true user updated flag`() {
+        val event = LoginSuccessfulEvent()
+        event.setUserUpdated(true)
+        val timeMillis = event.getTimestamp() - 1
+        LocalEventRepository.instance().addEvent(event)
+        LocalEventRepository.instance().addEvent(event)
+        LocalEventRepository.instance().addEvent(event)
+        LocalEventRepository.instance().addEvent(event)
+        LocalEventRepository.instance().getEvents().shouldHaveSize(4)
+        LocalEventRepository.instance().clearNonPersistentEvents(timeMillis)
+        LocalEventRepository.instance().getEvents().shouldHaveSize(4)
+    }
+
     private fun initializeInstance(infoProvider: UserInfoProvider) {
         WorkManagerTestInitHelper.initializeTestWorkManager(ApplicationProvider.getApplicationContext())
         Settings.Secure.putString(
@@ -248,6 +275,7 @@ class LocalEventRepositoryExceptionSpec : LocalEventRepositorySpec() {
     }
 }
 
+@SuppressWarnings("EmptyFunctionBlock")
 internal class TestEvent(private val name: String?) : Event {
     override fun getEventName(): String? = name
     override fun getEventType() = 0
@@ -255,4 +283,6 @@ internal class TestEvent(private val name: String?) : Event {
     override fun isPersistentType(): Boolean = false
     override fun getRatEventMap(): Map<String, Any> = mapOf()
     override fun getAttributeMap(): Map<String, Attribute?> = mapOf()
+    override fun isUserUpdated() = false
+    override fun setUserUpdated(isUpdated: Boolean) {}
 }

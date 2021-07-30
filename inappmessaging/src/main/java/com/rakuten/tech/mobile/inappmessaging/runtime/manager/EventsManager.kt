@@ -30,6 +30,7 @@ internal object EventsManager {
     ) {
         val isUserUpdated = accountRepo.updateUserInfo()
         // Caching events locally.
+        event.setUserUpdated(isUserUpdated || isUpdated)
         val isAdded = localEventRepo.addEvent(event)
         if (isAdded) {
             if (isUserUpdated || isUpdated) {

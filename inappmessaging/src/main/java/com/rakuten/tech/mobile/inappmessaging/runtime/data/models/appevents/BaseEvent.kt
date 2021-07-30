@@ -29,6 +29,7 @@ abstract class BaseEvent(
     @NotNull private val isPersistent: Boolean
 ) : Event {
     private val timestamp: Long
+    private var isUserUpdated = false
 
     init {
         require(this.eventName.isNotEmpty()) { InAppMessagingConstants.EVENT_NAME_EMPTY_EXCEPTION }
@@ -85,6 +86,12 @@ abstract class BaseEvent(
     @RestrictTo(LIBRARY)
     @NotNull
     override fun getAttributeMap(): Map<@NotNull String, @Nullable Attribute?> = HashMap()
+
+    override fun isUserUpdated() = isUserUpdated
+
+    override fun setUserUpdated(isUpdated: Boolean) {
+        isUserUpdated = isUpdated
+    }
 
     companion object {
         private const val MAX_EVENT_NAME_CHARACTER_LENGTH = 255

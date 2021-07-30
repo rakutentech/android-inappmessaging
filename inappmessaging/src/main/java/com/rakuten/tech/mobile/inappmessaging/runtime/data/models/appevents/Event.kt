@@ -50,4 +50,14 @@ interface Event {
     @RestrictTo(LIBRARY)
     @NotNull
     fun getAttributeMap(): Map<@NotNull String, @Nullable Attribute?>
+
+    /**
+     * This method returns true if the event was logged when user information was updated.
+     */
+    fun isUserUpdated(): Boolean
+
+    /**
+     * Set to true if the event was logged when user information was updated.
+     */
+    fun setUserUpdated(isUpdated: Boolean)
 }

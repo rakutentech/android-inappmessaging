@@ -140,6 +140,7 @@ internal interface LocalDisplayedMessageRepository {
             }
         }
 
+        @SuppressWarnings("TooGenericExceptionCaught")
         private fun resetDisplayed(sharedPref: SharedPreferences?) {
             val listString = try {
                 sharedPref?.getString(LOCAL_DISPLAYED_KEY, "") ?: ""
