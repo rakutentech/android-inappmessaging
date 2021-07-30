@@ -132,8 +132,16 @@ internal interface LocalEventRepository : EventRepository {
         override fun clearNonPersistentEvents(timeMillis: Long) {
             synchronized(events) {
                 if (events.isNotEmpty()) {
-                    events.removeAll { ev -> !ev.isPersistentType() && ev.getTimestamp() < timeMillis }
+                    events.removeAll { ev ->
+                        !ev.isPersistentType() && ev.getTimestamp() < timeMillis && !ev.isUserUpdated()
+                    }
+
+                    // reset user updated flag
+                    events.forEach {
+                        it.setUserUpdated(false)
+                    }
                 }
+                saveUpdatedList()
             }
         }
 
