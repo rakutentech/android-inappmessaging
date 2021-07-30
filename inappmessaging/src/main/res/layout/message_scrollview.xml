@@ -28,6 +28,7 @@
       android:layout_marginTop="@dimen/modal_text_header_margin_top"
       android:lineSpacingExtra="@dimen/modal_text_header_line_spacing_extra"
       android:textSize="@dimen/modal_text_header_text_size"
+      android:textAlignment="center"
       tools:text="@string/example_header_text"
       tools:visibility="visible"/>
 
