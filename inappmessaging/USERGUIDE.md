@@ -96,7 +96,7 @@ Create a new class in your project that implements the following class:
 com.rakuten.tech.mobile.inappmessaging.runtime.UserInfoProvider
 ```
 
-This class serves the purpose of providing basic user information such as user ID, Rakuten ID, and RAE Token at runtime. These user information are used by the SDK for campaigns targeting specific users.
+This class serves the purpose of providing basic user information such as user ID, Rakuten ID, RAE Token, and ID Tracking Identifier at runtime. These user information are used by the SDK for campaigns targeting specific users.
 
 ```kotlin
 class AppUserInfoProvider : UserInfoProvider {
@@ -108,8 +108,13 @@ class AppUserInfoProvider : UserInfoProvider {
     override fun provideUserId(): String? {
         return userId
     }
+
     override fun provideRakutenId(): String? {
         return rakutenId
+    }
+
+    override fun provideIdTrackingIdentifier(): String? {
+        return idTrackingIdentifier
     }
 }
 ```
@@ -117,6 +122,7 @@ class AppUserInfoProvider : UserInfoProvider {
 * Rakuten ID - Any value that is considered by the app as user identifier.
 * User ID - The ID when registering a Rakuten account (e.g. email address or username).
 * RAE Token - This is the token provided by the internal User SDK as the "authentication token" value.
+* ID Tracking Identifier - This is the value provided by the internal identity SDK as the "tracking identifier" value.
 
 **<font color="red">Notes for Rakuten Developers:</font>**
 * **Only provide RAE token if the user is logged in.**
@@ -222,7 +228,7 @@ InAppMessaging.instance().logEvent(CustomEvent("search").addAttribute("keyword",
 
 If user (with valid identifiers in [`UserInfoProvider`](#info-provider) class) opts out from a campaign, that information is saved in user cache locally on the device and the campaign won't be shown again for that user on the same device. The opt-out status is not shared between devices. The same applies for anonymous user.
 
-### Client-side max impressions handling
+### <a name="max-impression"></a> Client-side max impressions handling
 
 Campaign impressions (displays) are counted locally for each user. Meaning that a campaign with maxImpression value of 3 will be displayed to each user (different identifiers in [`UserInfoProvider`](#info-provider) class) max 3 times. Campaign's max impression number can be modified in the dashboard/backend. Then the SDK, after next ping call, will compare new value with old max impression number and add the difference to the current impression counter. The max impression data is not shared between devices. The same applies for anonymous user.
 
@@ -317,11 +323,13 @@ Rakuten developers experiencing any other problems should refer to the Troublesh
 When creating campaigns, you can set the versions which the campaign will be applied to your app.
 You can set the versions to staging versions (ex. 0.0.1, 1.0.0-staging, 0.x.x, etc.)
 
-### Q: How many times In-App Message should be sent to test device? Does it depends on Max Lifetime Impressions?
-The max impression is bind to per device ID.<br/>
-1. Scenario- Max impression set to 2. User does not login with Rakuten ID or Easy ID. So It will be shown in single device for 2 times.
-2. Scenario- Max impression is set to 2. User login with Rakuten ID or easy ID for 2 devices. It will show 2 times per devices.
+### Q: How many times In-App Message should be sent to device? Does it depends on Max Lifetime Impressions?
+The max impression is handled by SDK and is bound to user per device.<br/>
+1. Scenario- Max impression is set to 2. User does not login with any ID. So It will be shown 2 times.
+2. Scenario- Max impression is set to 2. User login with any ID for 2 devices. It will show 2 times for each device.
 3. The campaign start time can be shown
+
+Please refer to [max impression handling](#max-impression) for more details.
 
 ### Q: Is the campaign displayed if ALL or ANY of triggers are satisfied?
 All the events "launch the app event, login event, purchase successful event, custom event" work as AND. It will send to the device only all defined event are triggered.
@@ -336,6 +344,9 @@ Documents targeting Product Managers:
 + In-App Messaging Dashboard Sign Up(page is coming soon.)
 
 ## <a name="changelog"></a> Changelog
+
+### 5.0.0 (in-progress)
+* SDKCF-4071: **Breaking Change:** Added new method for providing id tracking identifier in `UserInfoProvider` interface class.
 
 ### 4.0.0 (2021-08-04)
 * SDKCF-3651: Changed Config API call to /GET with query params. This allows the backend to filter requests if required.
@@ -378,7 +389,7 @@ Documents targeting Product Managers:
 * SDKCF-2054: Converted In-App Messaging to Kotlin
 * SDKCF-1614: Polish the Public API (removed unnecessary public APIs)
 * SDKCF-1616: Auto Initialize the SDK
-* SDKCF-2342: easy_id targeting
+* SDKCF-2342: ID tracking identifier targeting
 * SDKCF-2353: Rakuten ID targeting
 * SDKCF-2402: Update locale parameter format
 * SDKCF-2429: Prevent trigger of Launch App Event multiple times

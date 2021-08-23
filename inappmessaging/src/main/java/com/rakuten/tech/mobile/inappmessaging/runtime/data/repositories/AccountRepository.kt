@@ -31,6 +31,11 @@ internal abstract class AccountRepository {
     abstract fun getRakutenId(): String
 
     /**
+     * This method returns ID tracking identifier, or empty String.
+     */
+    abstract fun getIdTrackingIdentifier(): String
+
+    /**
      * This method updates the encrypted value using the current user information.
      * @return true if there are changes in user info.
      */
@@ -46,18 +51,20 @@ internal abstract class AccountRepository {
 
     private class AccountRepositoryImpl : AccountRepository() {
 
-        override fun getRaeToken(): String = if (this.userInfoProvider == null ||
+        override fun getRaeToken() = if (this.userInfoProvider == null ||
                 this.userInfoProvider?.provideRaeToken().isNullOrEmpty()) {
             ""
         } else TOKEN_PREFIX + this.userInfoProvider?.provideRaeToken()
         // According to backend specs, token has to start with "OAuth2{space}", followed by real token.
 
-        override fun getUserId(): String = this.userInfoProvider?.provideUserId() ?: ""
+        override fun getUserId() = this.userInfoProvider?.provideUserId() ?: ""
 
-        override fun getRakutenId(): String = this.userInfoProvider?.provideRakutenId() ?: ""
+        override fun getRakutenId() = this.userInfoProvider?.provideRakutenId() ?: ""
+
+        override fun getIdTrackingIdentifier() = this.userInfoProvider?.provideIdTrackingIdentifier() ?: ""
 
         override fun updateUserInfo(algo: String?): Boolean {
-            val curr = hash(getUserId() + getRakutenId(), algo)
+            val curr = hash(getUserId() + getRakutenId() + getIdTrackingIdentifier(), algo)
 
             if (userInfoHash != curr) {
                 userInfoHash = curr

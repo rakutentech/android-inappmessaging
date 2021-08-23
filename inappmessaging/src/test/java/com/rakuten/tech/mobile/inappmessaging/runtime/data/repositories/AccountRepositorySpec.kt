@@ -40,6 +40,11 @@ class AccountRepositorySpec : BaseTest() {
     }
 
     @Test
+    fun `should get id tracking identifier`() {
+        AccountRepository.instance().getIdTrackingIdentifier() shouldBeEqualTo ""
+    }
+
+    @Test
     fun `should get user id with valid provider`() {
         AccountRepository.instance().userInfoProvider = TestUserInfoProvider()
         AccountRepository.instance().getUserId() shouldBeEqualTo TestUserInfoProvider().provideUserId()
@@ -55,6 +60,13 @@ class AccountRepositorySpec : BaseTest() {
     fun `should get rakuten id with valid provider`() {
         AccountRepository.instance().userInfoProvider = TestUserInfoProvider()
         AccountRepository.instance().getRakutenId() shouldBeEqualTo TestUserInfoProvider().provideRakutenId()
+    }
+
+    @Test
+    fun `should get id tracking identifier with valid provider`() {
+        AccountRepository.instance().userInfoProvider = TestUserInfoProvider()
+        AccountRepository.instance()
+                .getIdTrackingIdentifier() shouldBeEqualTo TestUserInfoProvider().provideIdTrackingIdentifier()
     }
 
     @Test
@@ -82,6 +94,14 @@ class AccountRepositorySpec : BaseTest() {
     }
 
     @Test
+    fun `should get id tracking identifier with null values`() {
+        val mockProvider = Mockito.mock(TestUserInfoProvider::class.java)
+        When calling mockProvider.provideIdTrackingIdentifier() itReturns null
+        AccountRepository.instance().userInfoProvider = mockProvider
+        AccountRepository.instance().getUserId() shouldBeEqualTo ""
+    }
+
+    @Test
     fun `should get be called once for get rae token`() {
         val mockAcctRepo = Mockito.mock(AccountRepository::class.java)
 
@@ -106,6 +126,7 @@ class AccountRepositorySpec : BaseTest() {
         When calling mockAcctRepo.userInfoProvider itReturns TestUserInfoProvider()
         When calling mockAcctRepo.getUserId() itReturns TestUserInfoProvider().provideUserId().toString()
         When calling mockAcctRepo.getRakutenId() itReturns ""
+        When calling mockAcctRepo.getIdTrackingIdentifier() itReturns ""
         RuntimeUtil.getUserIdentifiers(mockAcctRepo).shouldHaveSize(1)
         Mockito.verify(mockAcctRepo).getUserId()
     }
@@ -117,6 +138,20 @@ class AccountRepositorySpec : BaseTest() {
         When calling mockAcctRepo.userInfoProvider itReturns TestUserInfoProvider()
         When calling mockAcctRepo.getUserId() itReturns ""
         When calling mockAcctRepo.getRakutenId() itReturns TestUserInfoProvider().provideRakutenId().toString()
+        When calling mockAcctRepo.getIdTrackingIdentifier() itReturns ""
+        RuntimeUtil.getUserIdentifiers(mockAcctRepo).shouldHaveSize(1)
+        Mockito.verify(mockAcctRepo).getRakutenId()
+    }
+
+    @Test
+    fun `should get be called once for get id tracking identifier`() {
+        val mockAcctRepo = Mockito.mock(AccountRepository::class.java)
+
+        When calling mockAcctRepo.userInfoProvider itReturns TestUserInfoProvider()
+        When calling mockAcctRepo.getUserId() itReturns ""
+        When calling mockAcctRepo.getRakutenId() itReturns ""
+        When calling mockAcctRepo
+                .getIdTrackingIdentifier() itReturns TestUserInfoProvider().provideIdTrackingIdentifier().toString()
         RuntimeUtil.getUserIdentifiers(mockAcctRepo).shouldHaveSize(1)
         Mockito.verify(mockAcctRepo).getRakutenId()
     }
@@ -158,6 +193,19 @@ class AccountRepositorySpec : BaseTest() {
     }
 
     @Test
+    fun `should return true for changed id tracking identifier`() {
+        val infoProvider = TestUserInfoProvider()
+        AccountRepository.instance().userInfoProvider = infoProvider
+        // initial setting of hashed user info
+        AccountRepository.instance().updateUserInfo()
+
+        // updated
+        infoProvider.idTrackingIdentifier = "tracking-id"
+
+        AccountRepository.instance().updateUserInfo().shouldBeTrue()
+    }
+
+    @Test
     fun `should return false for changed rae token`() {
         val infoProvider = TestUserInfoProvider()
         AccountRepository.instance().userInfoProvider = infoProvider
@@ -179,6 +227,6 @@ class AccountRepositorySpec : BaseTest() {
         AccountRepository.instance().updateUserInfo("test").shouldBeTrue()
 
         AccountRepository.instance().userInfoHash shouldBeEqualTo TestUserInfoProvider.TEST_USER_ID +
-                TestUserInfoProvider.TEST_RAKUTEN_ID
+                TestUserInfoProvider.TEST_RAKUTEN_ID + TestUserInfoProvider.TEST_ID_TRACKING_IDENTIFIER
     }
 }

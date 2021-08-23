@@ -42,6 +42,7 @@ class IntegrationSpec {
             override fun provideRaeToken() = ""
             override fun provideUserId() = ""
             override fun provideRakutenId() = ""
+            override fun provideIdTrackingIdentifier() = ""
         })
         // to initialize host app info
         Initializer.initializeSdk(context, manifest.subscriptionKey(), manifest.configUrl(), true)

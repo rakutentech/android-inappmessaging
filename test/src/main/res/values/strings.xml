@@ -13,6 +13,7 @@
   <string name="label_userid">User ID</string>
   <string name="label_raetoken">RAE Token</string>
   <string name="label_rakutenid">Rakuten ID</string>
+  <string name="label_idtracking">ID Tracking Identifier</string>
   <string name="dialog_title_user">User Information</string>
   <string name="close_message">Close message</string>
 </resources>
