@@ -11,12 +11,14 @@ import com.rakuten.tech.mobile.inappmessaging.runtime.utils.RuntimeUtil
 import com.rakuten.tech.mobile.inappmessaging.runtime.workmanager.workers.ImpressionWorker
 import org.amshove.kluent.*
 import org.junit.Before
+import org.junit.Ignore
 import org.junit.Test
 import org.mockito.Mockito
 
 /**
  * Test class for AccountRepository class.
  */
+@Ignore("base class")
 open class AccountRepositorySpec : BaseTest() {
     @Before
     override fun setup() {
