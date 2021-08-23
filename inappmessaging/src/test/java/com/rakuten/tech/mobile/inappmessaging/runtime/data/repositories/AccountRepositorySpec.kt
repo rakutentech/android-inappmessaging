@@ -17,12 +17,14 @@ import org.mockito.Mockito
 /**
  * Test class for AccountRepository class.
  */
-class AccountRepositorySpec : BaseTest() {
+open class AccountRepositorySpec : BaseTest() {
     @Before
     override fun setup() {
         super.setup()
         AccountRepository.instance().userInfoProvider = null
     }
+}
+class AccountRepositoryDefaultSpec : AccountRepositorySpec() {
 
     @Test
     fun `should get rae token`() {
@@ -68,6 +70,9 @@ class AccountRepositorySpec : BaseTest() {
         AccountRepository.instance()
                 .getIdTrackingIdentifier() shouldBeEqualTo TestUserInfoProvider().provideIdTrackingIdentifier()
     }
+}
+
+class AccountRepositoryNullSpec : AccountRepositorySpec() {
 
     @Test
     fun `should get rae token with null values`() {
@@ -100,6 +105,9 @@ class AccountRepositorySpec : BaseTest() {
         AccountRepository.instance().userInfoProvider = mockProvider
         AccountRepository.instance().getUserId() shouldBeEqualTo ""
     }
+}
+
+class AccountRepositoryUsageSpec : AccountRepositorySpec() {
 
     @Test
     fun `should get be called once for get rae token`() {

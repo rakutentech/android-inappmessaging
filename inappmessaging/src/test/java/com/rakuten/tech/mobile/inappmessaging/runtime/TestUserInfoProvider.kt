@@ -11,8 +11,11 @@ class TestUserInfoProvider : UserInfoProvider {
     var idTrackingIdentifier = TEST_ID_TRACKING_IDENTIFIER
 
     override fun provideRaeToken(): String? = raeToken
-    override fun provideUserId(): String?  = userId
-    override fun provideRakutenId(): String?  = rakutenId
+
+    override fun provideUserId(): String? = userId
+
+    override fun provideRakutenId(): String? = rakutenId
+
     override fun provideIdTrackingIdentifier(): String? = idTrackingIdentifier
 
     companion object {

@@ -81,7 +81,7 @@ internal object RuntimeUtil {
         }
         val rakutenId = accountRepo.getRakutenId()
         if (rakutenId.isNotEmpty()) {
-            val user = UserIdentifier(rakutenId, UserIdentifierType.R_ID.typeId, )
+            val user = UserIdentifier(rakutenId, UserIdentifierType.R_ID.typeId)
             identifierList.add(user)
         }
 

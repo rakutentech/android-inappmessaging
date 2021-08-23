@@ -1,7 +1,6 @@
 package com.rakuten.tech.mobile.inappmessaging.runtime.data.models
 
 import com.google.gson.annotations.SerializedName
-import com.rakuten.tech.mobile.inappmessaging.runtime.data.enums.UserIdentifierType
 
 /**
  * This class represents user identification.
