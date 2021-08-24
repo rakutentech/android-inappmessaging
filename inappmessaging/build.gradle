@@ -10,6 +10,7 @@ apply plugin: 'kotlin-kapt'
 
 android {
   defaultConfig {
+    resValue 'string', 'inappmessaging__version', project.version
     versionName version
     consumerProguardFiles 'proguard-rules.pro'
     manifestPlaceholders.config_url = CONFIG.property("CONFIG_URL_TEST_PROD") ?: ""
