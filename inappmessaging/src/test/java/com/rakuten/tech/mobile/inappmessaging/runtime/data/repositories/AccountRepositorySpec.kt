@@ -12,6 +12,7 @@ import com.rakuten.tech.mobile.inappmessaging.runtime.data.requests.ImpressionRe
 import com.rakuten.tech.mobile.inappmessaging.runtime.utils.RuntimeUtil
 import com.rakuten.tech.mobile.inappmessaging.runtime.workmanager.workers.ImpressionWorker
 import org.amshove.kluent.*
+import org.junit.Assert
 import org.junit.Before
 import org.junit.Ignore
 import org.junit.Test
@@ -248,7 +249,13 @@ class AccountRepositoryUsageSpec : AccountRepositorySpec() {
     @Test
     fun `should log with both have valid values`() {
         AccountRepository.instance().userInfoProvider = TestUserInfoProvider()
-        AccountRepository.instance().logWarningForUserInfo("test", mockLogger)
+        try {
+            AccountRepository.instance().logWarningForUserInfo("test", mockLogger)
+            Assert.fail()
+        } catch (e: IllegalStateException) {
+            Mockito.verify(mockLogger).w(any(String::class))
+            e.localizedMessage shouldBeEqualTo AccountRepository.ID_TRACKING_ERR_MSG
+        }
 
         Mockito.verify(mockLogger).w(any(String::class))
     }
@@ -258,7 +265,7 @@ class AccountRepositoryUsageSpec : AccountRepositorySpec() {
         AccountRepository.instance().userInfoProvider = object : UserInfoProvider {
             override fun provideRaeToken() = "valid"
 
-            override fun provideUserId() = ""
+            override fun provideUserId() = "userid"
 
             override fun provideRakutenId() = ""
         }
@@ -311,5 +318,23 @@ class AccountRepositoryUsageSpec : AccountRepositorySpec() {
         AccountRepository.instance().logWarningForUserInfo("test", mockLogger)
 
         Mockito.verify(mockLogger, never()).w(any(String::class))
+    }
+
+    @Test
+    fun `should log with only rae token have valid value and not have user id`() {
+        AccountRepository.instance().userInfoProvider = object : UserInfoProvider {
+            override fun provideRaeToken() = "valid"
+
+            override fun provideUserId() = ""
+
+            override fun provideRakutenId() = ""
+        }
+        try {
+            AccountRepository.instance().logWarningForUserInfo("test", mockLogger)
+            Assert.fail()
+        } catch (e: IllegalStateException) {
+            Mockito.verify(mockLogger).w(any(String::class))
+            e.localizedMessage shouldBeEqualTo AccountRepository.TOKEN_USER_ERR_MSG
+        }
     }
 }

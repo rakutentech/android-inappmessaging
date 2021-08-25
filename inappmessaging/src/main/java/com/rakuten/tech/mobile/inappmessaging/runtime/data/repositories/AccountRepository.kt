@@ -1,6 +1,7 @@
 package com.rakuten.tech.mobile.inappmessaging.runtime.data.repositories
 
 import android.annotation.SuppressLint
+import com.rakuten.tech.mobile.inappmessaging.runtime.BuildConfig
 import com.rakuten.tech.mobile.inappmessaging.runtime.UserInfoProvider
 import timber.log.Timber
 import java.math.BigInteger
@@ -47,6 +48,9 @@ internal abstract class AccountRepository {
 
     companion object {
         private const val TOKEN_PREFIX = "OAuth2 "
+        internal const val ID_TRACKING_ERR_MSG = "Both an access token and a user tracking id have been set. " +
+                "Only one of these id types is expected to be set at the same time"
+        internal const val TOKEN_USER_ERR_MSG = "User Id must be present and not empty when access token is specified"
 
         private var instance: AccountRepository = AccountRepositoryImpl()
 
@@ -80,9 +84,19 @@ internal abstract class AccountRepository {
 
         @SuppressLint("BinaryOperationInTimber")
         override fun logWarningForUserInfo(tag: String, timber: Timber.Tree) {
-            if (getRaeToken().isNotEmpty() && getIdTrackingIdentifier().isNotEmpty()) {
-                timber.w("Both an RAE token and a user tracking id have been set. " +
-                        "Only one of these id types is expected to be set at the same time")
+            if (getRaeToken().isNotEmpty()) {
+                if (getIdTrackingIdentifier().isNotEmpty()) {
+                    timber.w(ID_TRACKING_ERR_MSG)
+                    if (BuildConfig.DEBUG) {
+                        error(ID_TRACKING_ERR_MSG)
+                    }
+                }
+                if (getUserId().isEmpty()) {
+                    timber.w(TOKEN_USER_ERR_MSG)
+                    if (BuildConfig.DEBUG) {
+                        error(TOKEN_USER_ERR_MSG)
+                    }
+                }
             }
         }
 
