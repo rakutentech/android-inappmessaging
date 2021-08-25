@@ -3,10 +3,7 @@ package com.rakuten.tech.mobile.inappmessaging.runtime.data.repositories
 import android.content.Context
 import androidx.work.WorkerParameters
 import com.nhaarman.mockitokotlin2.never
-import com.rakuten.tech.mobile.inappmessaging.runtime.BaseTest
-import com.rakuten.tech.mobile.inappmessaging.runtime.InAppMessagingTestConstants
-import com.rakuten.tech.mobile.inappmessaging.runtime.TestUserInfoProvider
-import com.rakuten.tech.mobile.inappmessaging.runtime.UserInfoProvider
+import com.rakuten.tech.mobile.inappmessaging.runtime.*
 import com.rakuten.tech.mobile.inappmessaging.runtime.data.models.HostAppInfo
 import com.rakuten.tech.mobile.inappmessaging.runtime.data.requests.ImpressionRequest
 import com.rakuten.tech.mobile.inappmessaging.runtime.utils.RuntimeUtil
@@ -162,12 +159,13 @@ class AccountRepositoryUsageSpec : AccountRepositorySpec() {
     @Test
     fun `should get be called once for get id tracking identifier`() {
         val mockAcctRepo = Mockito.mock(AccountRepository::class.java)
-
-        When calling mockAcctRepo.userInfoProvider itReturns TestUserInfoProvider()
+        val provider = TestUserInfoProvider()
+        provider.idTrackingIdentifier = TestUserInfoProvider.TEST_ID_TRACKING_IDENTIFIER
+        When calling mockAcctRepo.userInfoProvider itReturns provider
         When calling mockAcctRepo.getUserId() itReturns ""
         When calling mockAcctRepo.getRakutenId() itReturns ""
         When calling mockAcctRepo
-                .getIdTrackingIdentifier() itReturns TestUserInfoProvider().provideIdTrackingIdentifier().toString()
+                .getIdTrackingIdentifier() itReturns provider.provideIdTrackingIdentifier().toString()
         RuntimeUtil.getUserIdentifiers(mockAcctRepo).shouldHaveSize(1)
         Mockito.verify(mockAcctRepo).getRakutenId()
     }
@@ -239,6 +237,7 @@ class AccountRepositoryUsageSpec : AccountRepositorySpec() {
         // note: this should never occur since "MD5" is supported since API 1
         val infoProvider = TestUserInfoProvider()
         AccountRepository.instance().userInfoProvider = infoProvider
+        infoProvider.idTrackingIdentifier = TestUserInfoProvider.TEST_ID_TRACKING_IDENTIFIER
         // initial setting of hashed user info
         AccountRepository.instance().updateUserInfo("test").shouldBeTrue()
 
@@ -248,12 +247,15 @@ class AccountRepositoryUsageSpec : AccountRepositorySpec() {
 
     @Test
     fun `should log with both have valid values`() {
-        AccountRepository.instance().userInfoProvider = TestUserInfoProvider()
+        val provider = TestUserInfoProvider()
+        provider.idTrackingIdentifier = TestUserInfoProvider.TEST_ID_TRACKING_IDENTIFIER
+        AccountRepository.instance().userInfoProvider = provider
         try {
             AccountRepository.instance().logWarningForUserInfo("test", mockLogger)
-            Assert.fail()
+            if (BuildConfig.DEBUG) {
+                Assert.fail()
+            }
         } catch (e: IllegalStateException) {
-            Mockito.verify(mockLogger).w(any(String::class))
             e.localizedMessage shouldBeEqualTo AccountRepository.ID_TRACKING_ERR_MSG
         }
 
@@ -331,10 +333,12 @@ class AccountRepositoryUsageSpec : AccountRepositorySpec() {
         }
         try {
             AccountRepository.instance().logWarningForUserInfo("test", mockLogger)
-            Assert.fail()
+            if (BuildConfig.DEBUG) {
+                Assert.fail()
+            }
         } catch (e: IllegalStateException) {
-            Mockito.verify(mockLogger).w(any(String::class))
             e.localizedMessage shouldBeEqualTo AccountRepository.TOKEN_USER_ERR_MSG
         }
+        Mockito.verify(mockLogger).w(any(String::class))
     }
 }

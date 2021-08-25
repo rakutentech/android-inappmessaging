@@ -8,7 +8,7 @@ class TestUserInfoProvider : UserInfoProvider {
     var userId = TEST_USER_ID
     var raeToken = TEST_USER_RAE_TOKEN
     var rakutenId = TEST_RAKUTEN_ID
-    var idTrackingIdentifier = TEST_ID_TRACKING_IDENTIFIER
+    var idTrackingIdentifier = ""
 
     override fun provideRaeToken(): String? = raeToken
 
