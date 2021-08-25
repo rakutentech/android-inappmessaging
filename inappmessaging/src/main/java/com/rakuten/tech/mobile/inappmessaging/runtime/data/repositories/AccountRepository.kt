@@ -1,6 +1,8 @@
 package com.rakuten.tech.mobile.inappmessaging.runtime.data.repositories
 
+import android.annotation.SuppressLint
 import com.rakuten.tech.mobile.inappmessaging.runtime.UserInfoProvider
+import timber.log.Timber
 import java.math.BigInteger
 import java.security.MessageDigest
 import kotlin.Exception
@@ -41,6 +43,8 @@ internal abstract class AccountRepository {
      */
     abstract fun updateUserInfo(algo: String? = null): Boolean
 
+    abstract fun logWarningForUserInfo(tag: String, timber: Timber.Tree = Timber.tag(tag))
+
     companion object {
         private const val TOKEN_PREFIX = "OAuth2 "
 
@@ -72,6 +76,14 @@ internal abstract class AccountRepository {
             }
 
             return false
+        }
+
+        @SuppressLint("BinaryOperationInTimber")
+        override fun logWarningForUserInfo(tag: String, timber: Timber.Tree) {
+            if (getRaeToken().isNotEmpty() && getIdTrackingIdentifier().isNotEmpty()) {
+                timber.w("Both an RAE token and a user tracking id have been set. " +
+                        "Only one of these id types is expected to be set at the same time")
+            }
         }
 
         @SuppressWarnings("MagicNumber", "SwallowedException", "TooGenericExceptionCaught")

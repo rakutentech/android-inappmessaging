@@ -70,7 +70,7 @@ internal object RuntimeUtil {
     }
 
     /**
-     * This method retrieves a list of UserIdentifier objects which includes userId used for User SDK login.
+     * This method retrieves a list of UserIdentifier objects which includes user information used in login.
      */
     fun getUserIdentifiers(accountRepo: AccountRepository = AccountRepository.instance()): MutableList<UserIdentifier> {
         val identifierList = ArrayList<UserIdentifier>()

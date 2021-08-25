@@ -142,7 +142,7 @@ internal interface MessageReadinessManager {
         /**
          * This method returns display message permission (from server).
          */
-        @SuppressWarnings("ReturnCount", "TooGenericExceptionCaught")
+        @SuppressWarnings("ReturnCount", "TooGenericExceptionCaught", "LongMethod")
         private fun getMessagePermission(message: Message): DisplayPermissionResponse? {
             // Prepare request data.
             val displayPermissionUrl: String = ConfigResponseRepository.instance().getDisplayPermissionEndpoint()
@@ -152,6 +152,7 @@ internal interface MessageReadinessManager {
             val request = getDisplayPermissionRequest(message)
             val permissionCall: Call<DisplayPermissionResponse> =
                     getDisplayPermissionResponseCall(displayPermissionUrl, request)
+            AccountRepository.instance().logWarningForUserInfo(TAG)
             try {
                 val response = permissionCall.execute()
                 if (response.isSuccessful) {

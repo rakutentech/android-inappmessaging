@@ -49,6 +49,7 @@ internal class ImpressionWorker(
         }
 
         val impressionServiceCall = createReportImpressionCall(impressionEndpoint, impressionRequest)
+        AccountRepository.instance().logWarningForUserInfo(TAG)
         try {
             // Execute Retrofit API call and handle response.
             val response = impressionServiceCall.execute()

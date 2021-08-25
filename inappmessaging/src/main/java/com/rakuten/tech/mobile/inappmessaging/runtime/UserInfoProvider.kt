@@ -32,5 +32,5 @@ interface UserInfoProvider {
      *
      * @return String of the ID Tracking Identifier.
      */
-    fun provideIdTrackingIdentifier(): String?
+    fun provideIdTrackingIdentifier(): String? = "" // optional method for Kotlin implementing class
 }

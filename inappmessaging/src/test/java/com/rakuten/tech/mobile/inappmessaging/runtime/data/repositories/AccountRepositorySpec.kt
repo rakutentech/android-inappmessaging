@@ -2,9 +2,11 @@ package com.rakuten.tech.mobile.inappmessaging.runtime.data.repositories
 
 import android.content.Context
 import androidx.work.WorkerParameters
+import com.nhaarman.mockitokotlin2.never
 import com.rakuten.tech.mobile.inappmessaging.runtime.BaseTest
 import com.rakuten.tech.mobile.inappmessaging.runtime.InAppMessagingTestConstants
 import com.rakuten.tech.mobile.inappmessaging.runtime.TestUserInfoProvider
+import com.rakuten.tech.mobile.inappmessaging.runtime.UserInfoProvider
 import com.rakuten.tech.mobile.inappmessaging.runtime.data.models.HostAppInfo
 import com.rakuten.tech.mobile.inappmessaging.runtime.data.requests.ImpressionRequest
 import com.rakuten.tech.mobile.inappmessaging.runtime.utils.RuntimeUtil
@@ -14,6 +16,7 @@ import org.junit.Before
 import org.junit.Ignore
 import org.junit.Test
 import org.mockito.Mockito
+import timber.log.Timber
 
 /**
  * Test class for AccountRepository class.
@@ -110,6 +113,8 @@ class AccountRepositoryNullSpec : AccountRepositorySpec() {
 }
 
 class AccountRepositoryUsageSpec : AccountRepositorySpec() {
+
+    private val mockLogger = Mockito.mock(Timber.Tree::class.java)
 
     @Test
     fun `should get be called once for get rae token`() {
@@ -238,5 +243,73 @@ class AccountRepositoryUsageSpec : AccountRepositorySpec() {
 
         AccountRepository.instance().userInfoHash shouldBeEqualTo TestUserInfoProvider.TEST_USER_ID +
                 TestUserInfoProvider.TEST_RAKUTEN_ID + TestUserInfoProvider.TEST_ID_TRACKING_IDENTIFIER
+    }
+
+    @Test
+    fun `should log with both have valid values`() {
+        AccountRepository.instance().userInfoProvider = TestUserInfoProvider()
+        AccountRepository.instance().logWarningForUserInfo("test", mockLogger)
+
+        Mockito.verify(mockLogger).w(any(String::class))
+    }
+
+    @Test
+    fun `should not log with only rae token have valid value`() {
+        AccountRepository.instance().userInfoProvider = object : UserInfoProvider {
+            override fun provideRaeToken() = "valid"
+
+            override fun provideUserId() = ""
+
+            override fun provideRakutenId() = ""
+        }
+        AccountRepository.instance().logWarningForUserInfo("test", mockLogger)
+
+        Mockito.verify(mockLogger, never()).w(any(String::class))
+    }
+
+    @Test
+    fun `should not log with only tracking id have valid value`() {
+        AccountRepository.instance().userInfoProvider = object : UserInfoProvider {
+            override fun provideRaeToken() = ""
+
+            override fun provideUserId() = ""
+
+            override fun provideRakutenId() = ""
+
+            override fun provideIdTrackingIdentifier() = "valid"
+        }
+        AccountRepository.instance().logWarningForUserInfo("test", mockLogger)
+
+        Mockito.verify(mockLogger, never()).w(any(String::class))
+    }
+
+    @Test
+    fun `should not log with both have empty values`() {
+        AccountRepository.instance().userInfoProvider = object : UserInfoProvider {
+            override fun provideRaeToken() = ""
+
+            override fun provideUserId() = ""
+
+            override fun provideRakutenId() = ""
+        }
+        AccountRepository.instance().logWarningForUserInfo("test", mockLogger)
+
+        Mockito.verify(mockLogger, never()).w(any(String::class))
+    }
+
+    @Test
+    fun `should not log with both have null values`() {
+        AccountRepository.instance().userInfoProvider = object : UserInfoProvider {
+            override fun provideRaeToken(): String? = null
+
+            override fun provideUserId() = ""
+
+            override fun provideRakutenId() = ""
+
+            override fun provideIdTrackingIdentifier(): String? = null
+        }
+        AccountRepository.instance().logWarningForUserInfo("test", mockLogger)
+
+        Mockito.verify(mockLogger, never()).w(any(String::class))
     }
 }

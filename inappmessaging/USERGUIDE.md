@@ -113,6 +113,8 @@ class AppUserInfoProvider : UserInfoProvider {
         return rakutenId
     }
 
+    // This method is optional for Kotlin class
+    // If ID tracking identifier will not be used, no need to override this method (i.e. default value is "")
     override fun provideIdTrackingIdentifier(): String? {
         return idTrackingIdentifier
     }
@@ -347,6 +349,7 @@ Documents targeting Product Managers:
 
 ### 5.0.0 (in-progress)
 * SDKCF-4071: **Breaking Change:** Added new method for providing id tracking identifier in `UserInfoProvider` interface class.
+  - The new method is optional for Kotlin class implementing the interface.
 
 ### 4.0.0 (2021-08-04)
 * SDKCF-3651: Changed Config API call to /GET with query params. This allows the backend to filter requests if required.
