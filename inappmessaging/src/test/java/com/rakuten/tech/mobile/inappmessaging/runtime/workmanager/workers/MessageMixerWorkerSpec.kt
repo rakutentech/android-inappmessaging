@@ -13,13 +13,16 @@ import com.nhaarman.mockitokotlin2.eq
 import com.rakuten.tech.mobile.inappmessaging.runtime.BaseTest
 import com.rakuten.tech.mobile.inappmessaging.runtime.InAppMessaging
 import com.rakuten.tech.mobile.inappmessaging.runtime.InAppMessagingTestConstants
+import com.rakuten.tech.mobile.inappmessaging.runtime.UserInfoProvider
 import com.rakuten.tech.mobile.inappmessaging.runtime.data.models.HostAppInfo
+import com.rakuten.tech.mobile.inappmessaging.runtime.data.repositories.AccountRepository
 import com.rakuten.tech.mobile.inappmessaging.runtime.data.repositories.ConfigResponseRepository
 import com.rakuten.tech.mobile.inappmessaging.runtime.data.repositories.HostAppInfoRepository
 import com.rakuten.tech.mobile.inappmessaging.runtime.data.responses.ping.MessageMixerResponse
 import com.rakuten.tech.mobile.inappmessaging.runtime.utils.RetryDelayUtil
 import com.rakuten.tech.mobile.inappmessaging.runtime.workmanager.schedulers.EventMessageReconciliationScheduler
 import com.rakuten.tech.mobile.inappmessaging.runtime.workmanager.schedulers.MessageMixerPingScheduler
+import okio.Buffer
 import org.amshove.kluent.*
 import org.junit.Before
 import org.junit.Test
@@ -159,6 +162,29 @@ class MessageMixerWorkerSpec : BaseTest() {
                         InAppMessagingTestConstants.LOCALE))
         retrieveValidConfig()
         MessageMixerWorker(context!!, workerParameters!!).doWork() shouldNotBeEqualTo ListenableWorker.Result.retry()
+    }
+
+    @Test
+    fun `should have valid request payload`() {
+        HostAppInfoRepository.instance().addHostInfo(
+                HostAppInfo("rakuten.com.tech.mobile.test", InAppMessagingTestConstants.DEVICE_ID,
+                        InAppMessagingTestConstants.APP_VERSION, "test-key",
+                        InAppMessagingTestConstants.LOCALE))
+        AccountRepository.instance().userInfoProvider = object : UserInfoProvider {
+            override fun provideRaeToken() = ""
+            override fun provideUserId() = "user1"
+            override fun provideRakutenId() = "rakuten1"
+            override fun provideIdTrackingIdentifier() = "tracking1"
+        }
+        retrieveValidConfig()
+        val worker = MessageMixerWorker(context!!, workerParameters!!)
+        worker.doWork() shouldNotBeEqualTo ListenableWorker.Result.retry()
+        val buffer = Buffer()
+        worker.responseCall!!.request().body()!!.writeTo(buffer)
+        buffer.readUtf8().shouldContainAll(
+                "\"id\":\"rakuten1\",\"type\":1",
+                "\"id\":\"tracking1\",\"type\":2",
+                "\"id\":\"user1\",\"type\":3")
     }
 
     private fun retrieveValidConfig() {

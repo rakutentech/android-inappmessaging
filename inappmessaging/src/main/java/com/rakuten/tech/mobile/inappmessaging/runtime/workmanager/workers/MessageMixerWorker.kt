@@ -17,6 +17,7 @@ import com.rakuten.tech.mobile.inappmessaging.runtime.utils.RetryDelayUtil
 import com.rakuten.tech.mobile.inappmessaging.runtime.utils.RuntimeUtil
 import com.rakuten.tech.mobile.inappmessaging.runtime.workmanager.schedulers.EventMessageReconciliationScheduler
 import com.rakuten.tech.mobile.inappmessaging.runtime.workmanager.schedulers.MessageMixerPingScheduler
+import retrofit2.Call
 import retrofit2.Response
 import timber.log.Timber
 import java.net.HttpURLConnection
@@ -44,6 +45,9 @@ internal class MessageMixerWorker(
             this(context, workerParams, EventMessageReconciliationScheduler.instance(),
                     MessageMixerPingScheduler.instance())
 
+    @VisibleForTesting
+    internal var responseCall: Call<MessageMixerResponse>? = null
+
     /**
      * This is the main method to do the work. Making Message Mixer network call is the main work.
      * If response is successful(200-300) from the Service, `WorkerResult.Success` should always be returned.
@@ -61,15 +65,16 @@ internal class MessageMixerWorker(
         val pingRequest = PingRequest(HostAppInfoRepository.instance().getVersion(), RuntimeUtil.getUserIdentifiers())
 
         // Create an retrofit API network call.
-        val responseCall = serviceApi.performPing(
+        responseCall = serviceApi.performPing(
                 HostAppInfoRepository.instance().getInAppMessagingSubscriptionKey(),
                 AccountRepository.instance().getRaeToken(),
                 HostAppInfoRepository.instance().getDeviceId(),
                 ConfigResponseRepository.instance().getPingEndpoint(),
                 pingRequest)
+        AccountRepository.instance().logWarningForUserInfo(TAG)
         return try {
             // Execute a thread blocking API network call, and handle response.
-            onResponse(responseCall.execute())
+            onResponse(responseCall!!.execute())
         } catch (e: Exception) {
             Timber.tag(TAG).d(e)
             Result.failure()

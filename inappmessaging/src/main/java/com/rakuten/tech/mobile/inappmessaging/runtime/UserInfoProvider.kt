@@ -26,4 +26,11 @@ interface UserInfoProvider {
      * @return String of the Rakuten ID.
      */
     fun provideRakutenId(): String?
+
+    /**
+     * Only return ID tracking identifier used in the current session.
+     *
+     * @return String of the ID Tracking Identifier.
+     */
+    fun provideIdTrackingIdentifier(): String? = "" // optional method for Kotlin implementing class
 }

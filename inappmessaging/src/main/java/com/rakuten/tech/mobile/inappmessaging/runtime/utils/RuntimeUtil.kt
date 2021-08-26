@@ -70,20 +70,27 @@ internal object RuntimeUtil {
     }
 
     /**
-     * This method retrieves a list of UserIdentifier objects which includes userId used for User SDK login.
+     * This method retrieves a list of UserIdentifier objects which includes user information used in login.
      */
     fun getUserIdentifiers(accountRepo: AccountRepository = AccountRepository.instance()): MutableList<UserIdentifier> {
         val identifierList = ArrayList<UserIdentifier>()
-        val userId: String = accountRepo.getUserId()
+        val userId = accountRepo.getUserId()
         if (userId.isNotEmpty()) {
-            val user = UserIdentifier(UserIdentifierType.USER_ID, userId)
+            val user = UserIdentifier(userId, UserIdentifierType.USER_ID.typeId)
             identifierList.add(user)
         }
-        val rakutenId: String = accountRepo.getRakutenId()
+        val rakutenId = accountRepo.getRakutenId()
         if (rakutenId.isNotEmpty()) {
-            val user = UserIdentifier(UserIdentifierType.R_ID, rakutenId)
+            val user = UserIdentifier(rakutenId, UserIdentifierType.R_ID.typeId)
             identifierList.add(user)
         }
+
+        val trackingId = accountRepo.getIdTrackingIdentifier()
+        if (trackingId.isNotEmpty()) {
+            val user = UserIdentifier(trackingId, UserIdentifierType.ID_TRACKING.typeId)
+            identifierList.add(user)
+        }
+
         return identifierList
     }
 

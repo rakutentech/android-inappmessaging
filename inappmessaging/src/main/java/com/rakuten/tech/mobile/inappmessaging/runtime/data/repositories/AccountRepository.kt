@@ -1,6 +1,9 @@
 package com.rakuten.tech.mobile.inappmessaging.runtime.data.repositories
 
+import android.annotation.SuppressLint
+import com.rakuten.tech.mobile.inappmessaging.runtime.BuildConfig
 import com.rakuten.tech.mobile.inappmessaging.runtime.UserInfoProvider
+import timber.log.Timber
 import java.math.BigInteger
 import java.security.MessageDigest
 import kotlin.Exception
@@ -31,13 +34,23 @@ internal abstract class AccountRepository {
     abstract fun getRakutenId(): String
 
     /**
+     * This method returns ID tracking identifier, or empty String.
+     */
+    abstract fun getIdTrackingIdentifier(): String
+
+    /**
      * This method updates the encrypted value using the current user information.
      * @return true if there are changes in user info.
      */
     abstract fun updateUserInfo(algo: String? = null): Boolean
 
+    abstract fun logWarningForUserInfo(tag: String, timber: Timber.Tree = Timber.tag(tag))
+
     companion object {
         private const val TOKEN_PREFIX = "OAuth2 "
+        internal const val ID_TRACKING_ERR_MSG = "Both an access token and a user tracking id have been set. " +
+                "Only one of these id types is expected to be set at the same time"
+        internal const val TOKEN_USER_ERR_MSG = "User Id must be present and not empty when access token is specified"
 
         private var instance: AccountRepository = AccountRepositoryImpl()
 
@@ -46,18 +59,20 @@ internal abstract class AccountRepository {
 
     private class AccountRepositoryImpl : AccountRepository() {
 
-        override fun getRaeToken(): String = if (this.userInfoProvider == null ||
+        override fun getRaeToken() = if (this.userInfoProvider == null ||
                 this.userInfoProvider?.provideRaeToken().isNullOrEmpty()) {
             ""
         } else TOKEN_PREFIX + this.userInfoProvider?.provideRaeToken()
         // According to backend specs, token has to start with "OAuth2{space}", followed by real token.
 
-        override fun getUserId(): String = this.userInfoProvider?.provideUserId() ?: ""
+        override fun getUserId() = this.userInfoProvider?.provideUserId() ?: ""
 
-        override fun getRakutenId(): String = this.userInfoProvider?.provideRakutenId() ?: ""
+        override fun getRakutenId() = this.userInfoProvider?.provideRakutenId() ?: ""
+
+        override fun getIdTrackingIdentifier() = this.userInfoProvider?.provideIdTrackingIdentifier() ?: ""
 
         override fun updateUserInfo(algo: String?): Boolean {
-            val curr = hash(getUserId() + getRakutenId(), algo)
+            val curr = hash(getUserId() + getRakutenId() + getIdTrackingIdentifier(), algo)
 
             if (userInfoHash != curr) {
                 userInfoHash = curr
@@ -65,6 +80,24 @@ internal abstract class AccountRepository {
             }
 
             return false
+        }
+
+        @SuppressLint("BinaryOperationInTimber")
+        override fun logWarningForUserInfo(tag: String, timber: Timber.Tree) {
+            if (getRaeToken().isNotEmpty()) {
+                if (getIdTrackingIdentifier().isNotEmpty()) {
+                    timber.w(ID_TRACKING_ERR_MSG)
+                    if (BuildConfig.DEBUG) {
+                        error(ID_TRACKING_ERR_MSG)
+                    }
+                }
+                if (getUserId().isEmpty()) {
+                    timber.w(TOKEN_USER_ERR_MSG)
+                    if (BuildConfig.DEBUG) {
+                        error(TOKEN_USER_ERR_MSG)
+                    }
+                }
+            }
         }
 
         @SuppressWarnings("MagicNumber", "SwallowedException", "TooGenericExceptionCaught")
