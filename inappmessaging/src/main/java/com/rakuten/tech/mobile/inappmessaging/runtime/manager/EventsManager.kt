@@ -6,6 +6,7 @@ import com.rakuten.tech.mobile.inappmessaging.runtime.data.models.appevents.Even
 import com.rakuten.tech.mobile.inappmessaging.runtime.data.repositories.AccountRepository
 import com.rakuten.tech.mobile.inappmessaging.runtime.data.repositories.ConfigResponseRepository
 import com.rakuten.tech.mobile.inappmessaging.runtime.data.repositories.LocalEventRepository
+import com.rakuten.tech.mobile.inappmessaging.runtime.data.repositories.PingResponseMessageRepository
 import com.rakuten.tech.mobile.inappmessaging.runtime.utils.InAppMessagingConstants
 import com.rakuten.tech.mobile.inappmessaging.runtime.workmanager.schedulers.EventMessageReconciliationScheduler
 
@@ -30,7 +31,7 @@ internal object EventsManager {
     ) {
         val isUserUpdated = accountRepo.updateUserInfo()
         // Caching events locally.
-        event.setUserUpdated(isUserUpdated || isUpdated)
+        event.setShouldNotClear(isUserUpdated || isUpdated || PingResponseMessageRepository.isInitialLaunch)
         val isAdded = localEventRepo.addEvent(event)
         if (isAdded) {
             if (isUserUpdated || isUpdated) {

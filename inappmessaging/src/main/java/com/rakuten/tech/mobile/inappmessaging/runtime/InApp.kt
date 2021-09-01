@@ -9,6 +9,7 @@ import com.rakuten.tech.mobile.inappmessaging.runtime.data.models.appevents.Even
 import com.rakuten.tech.mobile.inappmessaging.runtime.data.repositories.AccountRepository
 import com.rakuten.tech.mobile.inappmessaging.runtime.data.repositories.ConfigResponseRepository
 import com.rakuten.tech.mobile.inappmessaging.runtime.data.repositories.LocalEventRepository
+import com.rakuten.tech.mobile.inappmessaging.runtime.data.repositories.PingResponseMessageRepository
 import com.rakuten.tech.mobile.inappmessaging.runtime.data.repositories.ReadyForDisplayMessageRepository
 import com.rakuten.tech.mobile.inappmessaging.runtime.exception.InAppMessagingException
 import com.rakuten.tech.mobile.inappmessaging.runtime.manager.DisplayManager
@@ -157,7 +158,10 @@ internal class InApp(
         try {
             AccountRepository.instance().updateUserInfo()
             synchronized(tempEventList) {
-                tempEventList.forEach { LocalEventRepository.instance().addEvent(it) }
+                tempEventList.forEach {
+                    it.setShouldNotClear(PingResponseMessageRepository.isInitialLaunch)
+                    LocalEventRepository.instance().addEvent(it)
+                }
                 tempEventList.clear()
             }
         } catch (ex: Exception) {

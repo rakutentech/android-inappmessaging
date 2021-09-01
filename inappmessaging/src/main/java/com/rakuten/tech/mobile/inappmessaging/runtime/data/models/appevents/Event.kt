@@ -52,12 +52,12 @@ interface Event {
     fun getAttributeMap(): Map<@NotNull String, @Nullable Attribute?>
 
     /**
-     * This method returns true if the event was logged when user information was updated.
+     * This method returns true if the event was logged when user info was updated, or before/during ping request.
      */
-    fun isUserUpdated(): Boolean
+    fun shouldNotClear(): Boolean
 
     /**
-     * Set to true if the event was logged when user information was updated.
+     * Set to true if the event was logged when user information was updated, or before/during ping request..
      */
-    fun setUserUpdated(isUpdated: Boolean)
+    fun setShouldNotClear(shouldNotClear: Boolean)
 }

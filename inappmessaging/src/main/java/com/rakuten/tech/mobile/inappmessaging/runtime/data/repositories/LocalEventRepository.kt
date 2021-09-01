@@ -133,12 +133,12 @@ internal interface LocalEventRepository : EventRepository {
             synchronized(events) {
                 if (events.isNotEmpty()) {
                     events.removeAll { ev ->
-                        !ev.isPersistentType() && ev.getTimestamp() < timeMillis && !ev.isUserUpdated()
+                        !ev.isPersistentType() && ev.getTimestamp() < timeMillis && !ev.shouldNotClear()
                     }
 
-                    // reset user updated flag
+                    // reset should not clear flag
                     events.forEach {
-                        it.setUserUpdated(false)
+                        it.setShouldNotClear(false)
                     }
                 }
                 saveUpdatedList()

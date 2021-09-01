@@ -182,7 +182,7 @@ open class LocalEventRepositorySpec : BaseTest() {
     fun `should remove all events triggered before a given time with false user updated flag`() {
         initializeLocalEvent()
         val event = LoginSuccessfulEvent()
-        event.setUserUpdated(true)
+        event.setShouldNotClear(true)
         val timeMillis = event.getTimestamp() + 1
         LocalEventRepository.instance().addEvent(event)
         LocalEventRepository.instance().getEvents().shouldHaveSize(5)
@@ -193,7 +193,7 @@ open class LocalEventRepositorySpec : BaseTest() {
     @Test
     fun `should keep all events triggered after a given time with true user updated flag`() {
         val event = LoginSuccessfulEvent()
-        event.setUserUpdated(true)
+        event.setShouldNotClear(true)
         val timeMillis = event.getTimestamp() - 1
         LocalEventRepository.instance().addEvent(event)
         LocalEventRepository.instance().addEvent(event)
@@ -283,6 +283,6 @@ internal class TestEvent(private val name: String?) : Event {
     override fun isPersistentType(): Boolean = false
     override fun getRatEventMap(): Map<String, Any> = mapOf()
     override fun getAttributeMap(): Map<String, Attribute?> = mapOf()
-    override fun isUserUpdated() = false
-    override fun setUserUpdated(isUpdated: Boolean) {}
+    override fun shouldNotClear() = false
+    override fun setShouldNotClear(shouldNotClear: Boolean) {}
 }
