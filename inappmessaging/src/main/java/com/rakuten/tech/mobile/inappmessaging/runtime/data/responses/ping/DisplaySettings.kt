@@ -19,5 +19,8 @@ internal data class DisplaySettings(
     val textAlign: Int,
 
     @SerializedName("optOut")
-    val optOut: Boolean
+    val optOut: Boolean,
+
+    @SerializedName("delay")
+    val delay: Int
 )

@@ -186,7 +186,8 @@ class MessageMixerResponseSpec(private val testname: String, private val actual:
                 messagePayload.messageSettings?.controlSettings)
         private val displaySettings = DisplaySettings(messageSettings.displaySettings?.orientation!!,
                 messageSettings.displaySettings.slideFrom, messageSettings.displaySettings.endTimeMillis,
-                messageSettings.displaySettings.textAlign, messageSettings.displaySettings.optOut)
+                messageSettings.displaySettings.textAlign, messageSettings.displaySettings.optOut,
+                messageSettings.displaySettings.delay)
         private val controlSettings = ControlSettings(messageSettings.controlSettings?.buttons,
                 messageSettings.controlSettings?.content!!)
         private val messageButton = MessageButton(controlSettings.buttons?.get(0)?.buttonBackgroundColor!!,
