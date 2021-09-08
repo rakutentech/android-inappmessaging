@@ -37,7 +37,7 @@ import kotlin.test.fail
 open class InAppMessagingSpec : BaseTest() {
     private val activity = Mockito.mock(Activity::class.java)
     private val configResponseData = Mockito.mock(ConfigResponseData::class.java)
-    internal val displayManager = Mockito.mock(DisplayManager::class.java)
+    private val displayManager = Mockito.mock(DisplayManager::class.java)
     internal val eventsManager = Mockito.mock(EventsManager::class.java)
     internal val sessionManager = Mockito.mock(SessionManager::class.java)
     private val viewGroup = Mockito.mock(ViewGroup::class.java)
@@ -201,6 +201,27 @@ open class InAppMessagingSpec : BaseTest() {
             msg.getNumberOfTimesClosed() shouldBeEqualTo 1
         }
         LocalDisplayedMessageRepository.instance().numberOfTimesDisplayed(message) shouldBeEqualTo 0
+    }
+
+    @Test
+    fun `should call display manager when removing campaign but not clear queue`() {
+        val message = ValidTestMessage("1")
+        setupDisplayedView(message)
+        val instance = initializeMockInstance(100)
+
+        When calling displayManager.removeMessage(anyOrNull()) itReturns "1"
+
+        (instance as InApp).removeMessage(false)
+        ReadyForDisplayMessageRepository.instance().getAllMessagesCopy().shouldHaveSize(1)
+        for (msg in PingResponseMessageRepository.instance().getAllMessagesCopy()) {
+            if (msg.getCampaignId() == "1") {
+                msg.getNumberOfTimesClosed() shouldBeEqualTo 1
+            } else {
+                msg.getNumberOfTimesClosed() shouldBeEqualTo 0
+            }
+        }
+        LocalDisplayedMessageRepository.instance().numberOfTimesDisplayed(message) shouldBeEqualTo 0
+        Mockito.verify(displayManager).displayMessage()
     }
 
     @Test
@@ -370,11 +391,11 @@ open class InAppMessagingSpec : BaseTest() {
         InAppMessaging.initialize(ApplicationProvider.getApplicationContext(), true, shouldEnableCaching)
     }
 
-    internal fun initializeMockInstance(rollout: Int): InAppMessaging {
+    internal fun initializeMockInstance(rollout: Int, manager: DisplayManager = displayManager): InAppMessaging {
         When calling configResponseData.rollOutPercentage itReturns rollout
         ConfigResponseRepository.instance().addConfigResponse(configResponseData)
 
-        return InApp(ApplicationProvider.getApplicationContext(), false, displayManager,
+        return InApp(ApplicationProvider.getApplicationContext(), false, manager,
                 eventsManager = eventsManager, sessionManager = sessionManager)
     }
 }
@@ -382,14 +403,15 @@ open class InAppMessagingSpec : BaseTest() {
 class InAppMessagingExceptionSpec : InAppMessagingSpec() {
 
     private val mockActivity = Mockito.mock(Activity::class.java)
-    private val instance = initializeMockInstance(100)
+    private val dispMgr = Mockito.mock(DisplayManager::class.java)
+    private val instance = initializeMockInstance(100, dispMgr)
 
     @Before
     override fun setup() {
         super.setup()
         InApp.errorCallback = null
-        When calling displayManager.displayMessage() itThrows NullPointerException()
-        When calling displayManager.removeMessage(anyOrNull()) itThrows NullPointerException()
+        When calling dispMgr.displayMessage() itThrows NullPointerException()
+        When calling dispMgr.removeMessage(anyOrNull()) itThrows NullPointerException()
         When calling eventsManager.onEventReceived(any(), any(), any(), any(), any()) itThrows NullPointerException()
         When calling sessionManager.onSessionUpdate() itThrows NullPointerException()
     }
