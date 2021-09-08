@@ -179,6 +179,7 @@ internal class InApp(
             ReadyForDisplayMessageRepository.instance().clearMessages(true)
         } else if (id != null) {
             ReadyForDisplayMessageRepository.instance().removeMessage(id as String, true)
+            displayManager.displayMessage()
         }
     }
 

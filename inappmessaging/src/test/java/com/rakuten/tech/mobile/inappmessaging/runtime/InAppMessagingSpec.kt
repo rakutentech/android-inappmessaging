@@ -204,6 +204,26 @@ open class InAppMessagingSpec : BaseTest() {
     }
 
     @Test
+    fun `should call display manager when removing campaign but not clear queue`() {
+        val message = ValidTestMessage("1")
+        setupDisplayedView(message)
+        val instance = initializeMockInstance(100)
+
+        When calling displayManager.removeMessage(anyOrNull()) itReturns "1"
+        (instance as InApp).removeMessage(false)
+        ReadyForDisplayMessageRepository.instance().getAllMessagesCopy().shouldHaveSize(1)
+        for (msg in PingResponseMessageRepository.instance().getAllMessagesCopy()) {
+            if (msg.getCampaignId() == "1") {
+                msg.getNumberOfTimesClosed() shouldBeEqualTo 1
+            } else {
+                msg.getNumberOfTimesClosed() shouldBeEqualTo 0
+            }
+        }
+        LocalDisplayedMessageRepository.instance().numberOfTimesDisplayed(message) shouldBeEqualTo 0
+        Mockito.verify(displayManager).displayMessage()
+    }
+
+    @Test
     fun `should not increment when no message is displayed`() {
         val message = ValidTestMessage("1")
         ReadyForDisplayMessageRepository.instance().replaceAllMessages(listOf(message))
