@@ -7,11 +7,18 @@ import android.view.MotionEvent
 import android.view.View
 import android.widget.CheckBox
 import android.widget.Magnifier
+import com.nhaarman.mockitokotlin2.anyOrNull
+import com.nhaarman.mockitokotlin2.eq
+import com.nhaarman.mockitokotlin2.times
 import com.rakuten.tech.mobile.inappmessaging.runtime.BaseTest
 import com.rakuten.tech.mobile.inappmessaging.runtime.InAppMessaging
 import com.rakuten.tech.mobile.inappmessaging.runtime.R
 import com.rakuten.tech.mobile.inappmessaging.runtime.coroutine.MessageActionsCoroutine
+import com.rakuten.tech.mobile.inappmessaging.runtime.data.models.messages.Message
 import com.rakuten.tech.mobile.inappmessaging.runtime.data.models.messages.ValidTestMessage
+import com.rakuten.tech.mobile.inappmessaging.runtime.data.responses.ping.DisplaySettings
+import com.rakuten.tech.mobile.inappmessaging.runtime.data.responses.ping.MessagePayload
+import com.rakuten.tech.mobile.inappmessaging.runtime.data.responses.ping.MessageSettings
 import com.rakuten.tech.mobile.inappmessaging.runtime.manager.DisplayManager
 import com.rakuten.tech.mobile.inappmessaging.runtime.utils.BuildVersionChecker
 import com.rakuten.tech.mobile.inappmessaging.runtime.workmanager.schedulers.EventMessageReconciliationScheduler
@@ -62,6 +69,11 @@ open class InAppMessageViewListenerSpec : BaseTest() {
 @Config(sdk = [Build.VERSION_CODES.Q])
 class InAppMessageViewListenerOnClickSpec : InAppMessageViewListenerSpec() {
     private val mockCheckbox = Mockito.mock(CheckBox::class.java)
+    private val mockMessage = Mockito.mock(Message::class.java)
+    private val mockPayload = Mockito.mock(MessagePayload::class.java)
+    private val mockSettings = Mockito.mock(MessageSettings::class.java)
+    private val mockDispSettings = Mockito.mock(DisplaySettings::class.java)
+    private val instance = createMockListener(mockMessage)
 
     @Test
     fun `should not throw exception when argument is null`() {
@@ -81,11 +93,7 @@ class InAppMessageViewListenerOnClickSpec : InAppMessageViewListenerSpec() {
     @Test
     fun `should not throw exception with non-checkbox click`() {
         val message = ValidTestMessage("1", true)
-        val listener = InAppMessageViewListener(message = message,
-                messageCoroutine = mockCoroutine,
-                displayManager = mockDisplayManager,
-                eventScheduler = mockEventScheduler,
-                inApp = mockInApp)
+        val listener = createMockListener(message)
         val mockView = Mockito.mock(CheckBox::class.java)
         When calling mockView.id itReturns R.id.message_close_button
         When calling mockCoroutine.executeTask(message, R.id.message_close_button, false) itReturns true
@@ -93,6 +101,44 @@ class InAppMessageViewListenerOnClickSpec : InAppMessageViewListenerSpec() {
 
         listener.onClick(mockView)
     }
+
+    @Test
+    fun `should start worker with zero delay due to null values`() {
+        When calling mockCoroutine.executeTask(mockMessage, R.id.message_close_button, false) itReturns true
+        When calling mockMessage.getMessagePayload() itReturns null
+        instance.handleMessage(R.id.message_close_button)
+        Mockito.verify(mockEventScheduler).startEventMessageReconciliationWorker(anyOrNull(), eq(0L))
+
+        When calling mockMessage.getMessagePayload() itReturns mockPayload
+        When calling mockPayload.messageSettings itReturns null
+        instance.handleMessage(R.id.message_close_button)
+        Mockito.verify(mockEventScheduler, times(2)).startEventMessageReconciliationWorker(anyOrNull(), eq(0L))
+
+        When calling mockPayload.messageSettings itReturns mockSettings
+        When calling mockSettings.displaySettings itReturns null
+        instance.handleMessage(R.id.message_close_button)
+        Mockito.verify(mockEventScheduler, times(3)).startEventMessageReconciliationWorker(anyOrNull(), eq(0L))
+    }
+
+    @Test
+    fun `should start worker with valid delay due to null values`() {
+        When calling mockCoroutine.executeTask(mockMessage, R.id.message_close_button, false) itReturns true
+        When calling mockMessage.getMessagePayload() itReturns mockPayload
+        When calling mockPayload.messageSettings itReturns mockSettings
+        When calling mockSettings.displaySettings itReturns mockDispSettings
+        When calling mockDispSettings.delay itReturns 3000
+        instance.handleMessage(R.id.message_close_button)
+        Mockito.verify(mockEventScheduler).startEventMessageReconciliationWorker(anyOrNull(), eq(3000L))
+    }
+
+    private fun createMockListener(message: Message) =
+        InAppMessageViewListener(
+            message = message,
+            messageCoroutine = mockCoroutine,
+            displayManager = mockDisplayManager,
+            eventScheduler = mockEventScheduler,
+            inApp = mockInApp
+        )
 }
 
 @Config(sdk = [Build.VERSION_CODES.Q])

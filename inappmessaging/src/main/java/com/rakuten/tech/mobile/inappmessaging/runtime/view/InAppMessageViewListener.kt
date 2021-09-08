@@ -90,13 +90,17 @@ internal class InAppMessageViewListener(
         CoroutineScope(Dispatchers.Main).launch {
             displayManager.removeMessage(inApp.getRegisteredActivity())
             withContext(Dispatchers.Default) {
-                val result = messageCoroutine.executeTask(message, id, isOptOutChecked)
-                if (result) {
-                    eventScheduler.startEventMessageReconciliationWorker(
-                        delay = (message?.getMessagePayload()?.messageSettings?.displaySettings?.delay ?: 0).toLong()
-                    )
-                }
+                handleMessage(id)
             }
+        }
+    }
+
+    internal fun handleMessage(id: Int) {
+        val result = messageCoroutine.executeTask(message, id, isOptOutChecked)
+        if (result) {
+            eventScheduler.startEventMessageReconciliationWorker(
+                delay = (message?.getMessagePayload()?.messageSettings?.displaySettings?.delay ?: 0).toLong()
+            )
         }
     }
 }
