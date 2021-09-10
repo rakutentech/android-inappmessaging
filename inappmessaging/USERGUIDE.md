@@ -347,9 +347,11 @@ Documents targeting Product Managers:
 
 ## <a name="changelog"></a> Changelog
 
-### 5.0.0 (in-progress)
+### 5.0.0 (2021-09-10)
 * SDKCF-4071: **Breaking Change:** Added new method for providing id tracking identifier in `UserInfoProvider` interface class.
   - The new method is optional for Kotlin class implementing the interface.
+* SDKCF-4174: Updated support link in documentation.
+* SDKCF-4219: Fixed issue regarding incorrect behavior of closeMessage API when queue is not cleared.
 
 ### 4.0.0 (2021-08-04)
 * SDKCF-3651: Changed Config API call to /GET with query params. This allows the backend to filter requests if required.
