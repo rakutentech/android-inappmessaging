@@ -1,0 +1,8 @@
+$dokka.format:markdown
+$dokka.linkExtension:md
+
+com.rakuten.tech.mobile.inappmessaging.runtime
+com.rakuten.tech.mobile.inappmessaging.runtime.data.enums
+com.rakuten.tech.mobile.inappmessaging.runtime.data.models
+com.rakuten.tech.mobile.inappmessaging.runtime.data.models.appevents
+com.rakuten.tech.mobile.inappmessaging.runtime.exception
