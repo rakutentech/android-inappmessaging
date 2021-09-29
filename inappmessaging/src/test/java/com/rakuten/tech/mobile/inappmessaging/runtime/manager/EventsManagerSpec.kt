@@ -7,7 +7,7 @@ import androidx.work.WorkManager
 import androidx.work.testing.WorkManagerTestInitHelper
 import com.rakuten.tech.mobile.inappmessaging.runtime.BaseTest
 import com.rakuten.tech.mobile.inappmessaging.runtime.InAppMessaging
-import com.rakuten.tech.mobile.inappmessaging.runtime.LegacyEventBroadcasterHelper
+import com.rakuten.tech.mobile.inappmessaging.runtime.LegacyEventTrackerHelper
 import com.rakuten.tech.mobile.inappmessaging.runtime.TestUserInfoProvider
 import com.rakuten.tech.mobile.inappmessaging.runtime.data.enums.EventType
 import com.rakuten.tech.mobile.inappmessaging.runtime.data.models.appevents.Event
@@ -34,7 +34,7 @@ class EventsManagerSpec : BaseTest() {
 
     private val message = ValidTestMessage()
     private val mockEvent = Mockito.mock(Event::class.java)
-    private val mockEventBroadcaster = Mockito.mock(LegacyEventBroadcasterHelper::class.java)
+    private val mockEventBroadcaster = Mockito.mock(LegacyEventTrackerHelper::class.java)
     private val configResponseData = Mockito.mock(ConfigResponseData::class.java)
     private val mockAccount = Mockito.mock(AccountRepository::class.java)
     private val eventRecon = Mockito.mock(EventMessageReconciliationScheduler::class.java)

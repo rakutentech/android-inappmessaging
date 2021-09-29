@@ -45,8 +45,6 @@ internal class InApp(
             // Start logging for debug builds.
             Timber.plant(Timber.DebugTree())
         }
-
-        LegacyEventBroadcasterHelper.setContext(context)
     }
 
     // ------------------------------------Public APIs-----------------------------------------------

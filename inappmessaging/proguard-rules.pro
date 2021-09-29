@@ -34,6 +34,7 @@
 -keep interface com.rakuten.tech.mobile.inappmessaging.runtime.api.** { *; }
 -keep class com.google.android.gms.dynamic.IObjectWrapper { *; }
 -keep class jp.co.rakuten.sdtd.user.challenges.internal.get.challenge.Request { *; }
+-keep class com.rakuten.tech.mobile.analytics.Event { *; }
 
 ##########################
 #                        #
