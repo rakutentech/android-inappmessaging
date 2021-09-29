@@ -13,8 +13,6 @@ class ConfigRequestSpec {
     fun `should return correct json from value`() {
         val request = ConfigQueryParamsBuilder("com.package.test", "jp", "0.0.1", "1.6.0-SNAPSHOT")
         val jsonString = Gson().toJson(request)
-        println(jsonString)
-        println(REQUEST)
         jsonString shouldBeEqualTo REQUEST
     }
 
