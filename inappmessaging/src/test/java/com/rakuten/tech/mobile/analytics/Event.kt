@@ -10,5 +10,6 @@ class Event(name: String, parameters: Map<String, Any>) {
     /**
      * Method to track an event.
      */
+    @SuppressWarnings("EmptyFunctionBlock")
     fun track() {}
 }

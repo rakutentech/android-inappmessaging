@@ -35,15 +35,6 @@
       android:name="com.rakuten.tech.mobile.inappmessaging.configurl"
       android:value="${config_url}"/>
 
-    <meta-data  android:name="com.rakuten.tech.mobile.analytics.RATAccountId"
-        android:value="${rat_account_id}" />
-
-    <meta-data  android:name="com.rakuten.tech.mobile.analytics.RATApplicationId"
-        android:value="${rat_application_id}" />
-
-    <meta-data  android:name="com.rakuten.tech.mobile.analytics.EnableDebugLog"
-        android:value="true" />
-
     <activity
       android:name=".SecondActivity">
       <intent-filter android:label="second_activity">

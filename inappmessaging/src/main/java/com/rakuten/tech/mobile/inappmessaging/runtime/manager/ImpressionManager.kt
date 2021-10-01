@@ -31,7 +31,7 @@ internal class ImpressionManager {
         impressionList: List<Impression>,
         campaignId: String,
         isTestMessage: Boolean,
-        sendEvent: (String, data: Map<String, *>?) -> Unit = LegacyEventTrackerHelper::sendEvent
+        sendEvent: (String, data: Map<String, *>?) -> Boolean = LegacyEventTrackerHelper::sendEvent
     ) {
         if (impressionList.isEmpty()) return
         // Assemble ImpressionRequest object.

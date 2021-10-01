@@ -4,10 +4,6 @@ apply plugin: "kotlin-android"
 apply plugin: 'kotlin-android-extensions'
 apply plugin: 'kotlin-kapt'
 
-repositories {
-    maven { url 'https://artifactory.rakuten-it.com/mobile-libs-mvn-release' }
-}
-
 android {
     compileSdkVersion 30
 
@@ -26,9 +22,6 @@ android {
         // "pm clear" command after each test invocation. This command ensures
         // that the app's state is completely cleared between tests.
         testInstrumentationRunnerArguments clearPackageData: 'true'
-
-        manifestPlaceholders.rat_account_id = CONFIG.property("RAT_ACCOUNT_ID") ?: "0"
-        manifestPlaceholders.rat_application_id = CONFIG.property("RAT_APPLICATION_ID") ?: "0"
     }
 
     buildTypes {
@@ -72,8 +65,6 @@ dependencies {
     implementation 'org.jetbrains.kotlinx:kotlinx-coroutines-android:1.3.3'
 
     implementation 'androidx.constraintlayout:constraintlayout:1.1.3'
-
-    implementation 'com.rakuten.tech.mobile.analytics:analytics:7.2.2'
 }
 repositories {
     mavenCentral()

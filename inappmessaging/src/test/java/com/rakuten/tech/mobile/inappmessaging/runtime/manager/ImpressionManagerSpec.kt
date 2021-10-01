@@ -31,7 +31,7 @@ import java.util.concurrent.ExecutionException
 @Config(sdk = [Build.VERSION_CODES.O_MR1])
 class ImpressionManagerSpec : BaseTest() {
 
-    private val eventBroadcaster = Mockito.mock(LegacyEventTrackerHelper::class.java)
+    private val eventTracker = Mockito.mock(LegacyEventTrackerHelper::class.java)
 
     @Before
     override fun setup() {
@@ -61,7 +61,7 @@ class ImpressionManagerSpec : BaseTest() {
         InAppMessaging.initialize(ApplicationProvider.getApplicationContext(), true)
         InAppMessaging.instance().registerPreference(TestUserInfoProvider())
         ImpressionManager().scheduleReportImpression(impressionList!!, "1234", false,
-                eventBroadcaster::sendEvent)
+                eventTracker::sendEvent)
         val status =
                 WorkManager.getInstance(ApplicationProvider.getApplicationContext<Context>())
                         .getWorkInfosByTag(IMPRESSION_WORKER_NAME)
@@ -80,8 +80,8 @@ class ImpressionManagerSpec : BaseTest() {
                 impressionList!!,
                 "1234",
                 false,
-                eventBroadcaster::sendEvent)
-        Mockito.verify(eventBroadcaster).sendEvent(ArgumentMatchers.anyString(), ArgumentMatchers.anyMap<String, Any>())
+                eventTracker::sendEvent)
+        Mockito.verify(eventTracker).sendEvent(ArgumentMatchers.anyString(), ArgumentMatchers.anyMap<String, Any>())
     }
 
     companion object {

@@ -24,7 +24,7 @@ internal object EventsManager {
     @SuppressWarnings("LongMethod")
     fun onEventReceived(
         event: Event,
-        sendEvent: (String, Map<String, *>?) -> Unit = LegacyEventTrackerHelper::sendEvent,
+        sendEvent: (String, Map<String, *>?) -> Boolean = LegacyEventTrackerHelper::sendEvent,
         localEventRepo: LocalEventRepository = LocalEventRepository.instance(),
         eventScheduler: EventMessageReconciliationScheduler = EventMessageReconciliationScheduler.instance(),
         accountRepo: AccountRepository = AccountRepository.instance()
