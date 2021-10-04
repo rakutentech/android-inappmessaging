@@ -71,6 +71,8 @@ dependencies {
   // Doclava needs an annotation class from this package (used by Retrofit)
   compileOnly 'org.codehaus.mojo:animal-sniffer-annotations:1.18'
 
+  compileOnly project(":analytics")
+
   testImplementation "org.amshove.kluent:kluent-android:1.63"
   testImplementation "com.nhaarman.mockitokotlin2:mockito-kotlin:2.2.0"
   testImplementation 'org.jetbrains.kotlinx:kotlinx-coroutines-test:1.3.9'

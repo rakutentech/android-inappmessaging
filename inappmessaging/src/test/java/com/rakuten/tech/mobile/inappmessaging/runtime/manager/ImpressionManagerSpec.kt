@@ -8,7 +8,7 @@ import androidx.work.WorkManager
 import androidx.work.testing.WorkManagerTestInitHelper
 import com.rakuten.tech.mobile.inappmessaging.runtime.BaseTest
 import com.rakuten.tech.mobile.inappmessaging.runtime.InAppMessaging
-import com.rakuten.tech.mobile.inappmessaging.runtime.LegacyEventBroadcasterHelper
+import com.rakuten.tech.mobile.inappmessaging.runtime.EventTrackerHelper
 import com.rakuten.tech.mobile.inappmessaging.runtime.TestUserInfoProvider
 import com.rakuten.tech.mobile.inappmessaging.runtime.data.enums.ImpressionType
 import com.rakuten.tech.mobile.inappmessaging.runtime.data.models.Impression
@@ -31,7 +31,7 @@ import java.util.concurrent.ExecutionException
 @Config(sdk = [Build.VERSION_CODES.O_MR1])
 class ImpressionManagerSpec : BaseTest() {
 
-    private val eventBroadcaster = Mockito.mock(LegacyEventBroadcasterHelper::class.java)
+    private val eventTracker = Mockito.mock(EventTrackerHelper::class.java)
 
     @Before
     override fun setup() {
@@ -61,7 +61,7 @@ class ImpressionManagerSpec : BaseTest() {
         InAppMessaging.initialize(ApplicationProvider.getApplicationContext(), true)
         InAppMessaging.instance().registerPreference(TestUserInfoProvider())
         ImpressionManager().scheduleReportImpression(impressionList!!, "1234", false,
-                eventBroadcaster::sendEvent)
+                eventTracker::sendEvent)
         val status =
                 WorkManager.getInstance(ApplicationProvider.getApplicationContext<Context>())
                         .getWorkInfosByTag(IMPRESSION_WORKER_NAME)
@@ -80,8 +80,8 @@ class ImpressionManagerSpec : BaseTest() {
                 impressionList!!,
                 "1234",
                 false,
-                eventBroadcaster::sendEvent)
-        Mockito.verify(eventBroadcaster).sendEvent(ArgumentMatchers.anyString(), ArgumentMatchers.anyMap<String, Any>())
+                eventTracker::sendEvent)
+        Mockito.verify(eventTracker).sendEvent(ArgumentMatchers.anyString(), ArgumentMatchers.anyMap<String, Any>())
     }
 
     companion object {

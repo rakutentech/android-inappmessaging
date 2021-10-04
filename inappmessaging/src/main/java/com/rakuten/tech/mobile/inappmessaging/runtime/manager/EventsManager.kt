@@ -1,7 +1,7 @@
 package com.rakuten.tech.mobile.inappmessaging.runtime.manager
 
 import com.rakuten.tech.mobile.inappmessaging.runtime.InAppMessaging
-import com.rakuten.tech.mobile.inappmessaging.runtime.LegacyEventBroadcasterHelper
+import com.rakuten.tech.mobile.inappmessaging.runtime.EventTrackerHelper
 import com.rakuten.tech.mobile.inappmessaging.runtime.data.models.appevents.Event
 import com.rakuten.tech.mobile.inappmessaging.runtime.data.repositories.AccountRepository
 import com.rakuten.tech.mobile.inappmessaging.runtime.data.repositories.ConfigResponseRepository
@@ -24,7 +24,7 @@ internal object EventsManager {
     @SuppressWarnings("LongMethod")
     fun onEventReceived(
         event: Event,
-        sendEvent: (String, Map<String, *>?) -> Unit = LegacyEventBroadcasterHelper::sendEvent,
+        sendEvent: (String, Map<String, *>?) -> Boolean = EventTrackerHelper::sendEvent,
         localEventRepo: LocalEventRepository = LocalEventRepository.instance(),
         eventScheduler: EventMessageReconciliationScheduler = EventMessageReconciliationScheduler.instance(),
         accountRepo: AccountRepository = AccountRepository.instance()

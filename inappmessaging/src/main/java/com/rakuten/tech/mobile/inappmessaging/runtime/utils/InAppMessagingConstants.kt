@@ -24,7 +24,7 @@ internal class InAppMessagingConstants {
         // ------------------------------ RAT Broadcast KEYS ---------------------------------------------
         const val RAT_EVENT_KEY_IMPRESSION = "InAppMessaging_impressions"
         const val RAT_EVENT_KEY_IMPRESSION_VALUE = "impressions"
-        const val RAT_EVENT_KEY_EVENTS = "InAppMessaging_events"
+        const val RAT_EVENT_KEY_EVENTS = "InAppMessaging_triggeredEvent"
         const val RAT_EVENT_KEY_EVENT_NAME = "eventName"
         const val RAT_EVENT_KEY_EVENT_TIMESTAMP = "timestamp"
         const val RAT_EVENT_KEY_EVENT_CUSTOM_ATTRIBUTE = "customAttributes"
