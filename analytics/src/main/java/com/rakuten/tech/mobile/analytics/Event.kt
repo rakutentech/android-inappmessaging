@@ -10,5 +10,5 @@ class Event(name: String, parameters: Map<String, Any>) {
     /**
      * Method to track an event.
      */
-    fun track() {}
+    fun track() = Unit
 }

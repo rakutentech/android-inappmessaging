@@ -4,15 +4,7 @@ import android.text.TextUtils
 import androidx.annotation.VisibleForTesting
 import timber.log.Timber
 
-/**
- * <p>Utility that allow to send events to analytics module for event tracking. If the Analytics module version
- * 4.7.0 or newer is installed (i.e. included as compile or implementation dependency of the app)
- * the event will be processed. If there is no compatible analytics module is present nothing
- * happens. To request the Analytics module to track an event use {@link #sendEvent(String,
- * Map)}. Events with names that have a `_` (underscore) as prefix will be processed by the RAT
- * tracker & parameters will be sent as `cp` data (as of 4.7.0).
- */
-internal object LegacyEventTrackerHelper {
+internal object EventTrackerHelper {
 
     private const val TAG = "EventTrackerHelper"
 

@@ -8,18 +8,19 @@ import org.robolectric.ParameterizedRobolectricTestRunner
 import org.robolectric.annotation.Config
 
 /**
- * Tests for LegacyEventTrackerHelper class.
+ * Tests for EventTrackerHelper class.
  */
 
 @RunWith(ParameterizedRobolectricTestRunner::class)
 @Config(sdk = [Build.VERSION_CODES.O_MR1])
+@SuppressWarnings("kotlin:S100")
 class SendEventSpec(
     private val eventName: String,
     private val data: Map<String, *>?,
     private val expected: Boolean
 ) {
 
-    private val sendEvent = LegacyEventTrackerHelper::sendEvent
+    private val sendEvent = EventTrackerHelper::sendEvent
     companion object {
         @JvmStatic
         @ParameterizedRobolectricTestRunner.Parameters
@@ -42,12 +43,13 @@ class SendEventSpec(
 
 @RunWith(ParameterizedRobolectricTestRunner::class)
 @Config(sdk = [Build.VERSION_CODES.O_MR1])
+@SuppressWarnings("kotlin:S100")
 class HasClassSpec(
     private val className: String,
     private val expected: Boolean
 ) {
 
-    private val hasClass = LegacyEventTrackerHelper::hasClass
+    private val hasClass = EventTrackerHelper::hasClass
     companion object {
         @JvmStatic
         @ParameterizedRobolectricTestRunner.Parameters

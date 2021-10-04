@@ -1,7 +1,7 @@
 package com.rakuten.tech.mobile.inappmessaging.runtime.manager
 
 import com.rakuten.tech.mobile.inappmessaging.runtime.BuildConfig
-import com.rakuten.tech.mobile.inappmessaging.runtime.LegacyEventTrackerHelper
+import com.rakuten.tech.mobile.inappmessaging.runtime.EventTrackerHelper
 import com.rakuten.tech.mobile.inappmessaging.runtime.data.enums.ImpressionType
 import com.rakuten.tech.mobile.inappmessaging.runtime.data.models.Impression
 import com.rakuten.tech.mobile.inappmessaging.runtime.data.models.rat.RatImpression
@@ -31,7 +31,7 @@ internal class ImpressionManager {
         impressionList: List<Impression>,
         campaignId: String,
         isTestMessage: Boolean,
-        sendEvent: (String, data: Map<String, *>?) -> Boolean = LegacyEventTrackerHelper::sendEvent
+        sendEvent: (String, data: Map<String, *>?) -> Boolean = EventTrackerHelper::sendEvent
     ) {
         if (impressionList.isEmpty()) return
         // Assemble ImpressionRequest object.

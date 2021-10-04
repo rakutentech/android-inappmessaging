@@ -8,7 +8,7 @@ import androidx.work.WorkManager
 import androidx.work.testing.WorkManagerTestInitHelper
 import com.rakuten.tech.mobile.inappmessaging.runtime.BaseTest
 import com.rakuten.tech.mobile.inappmessaging.runtime.InAppMessaging
-import com.rakuten.tech.mobile.inappmessaging.runtime.LegacyEventTrackerHelper
+import com.rakuten.tech.mobile.inappmessaging.runtime.EventTrackerHelper
 import com.rakuten.tech.mobile.inappmessaging.runtime.TestUserInfoProvider
 import com.rakuten.tech.mobile.inappmessaging.runtime.data.enums.ImpressionType
 import com.rakuten.tech.mobile.inappmessaging.runtime.data.models.Impression
@@ -31,7 +31,7 @@ import java.util.concurrent.ExecutionException
 @Config(sdk = [Build.VERSION_CODES.O_MR1])
 class ImpressionManagerSpec : BaseTest() {
 
-    private val eventTracker = Mockito.mock(LegacyEventTrackerHelper::class.java)
+    private val eventTracker = Mockito.mock(EventTrackerHelper::class.java)
 
     @Before
     override fun setup() {
