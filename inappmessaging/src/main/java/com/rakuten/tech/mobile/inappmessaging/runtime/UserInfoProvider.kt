@@ -7,25 +7,18 @@ package com.rakuten.tech.mobile.inappmessaging.runtime
 interface UserInfoProvider {
 
     /**
-     * Only return RAE token if user is logged in. Else return null.
+     * Only return access token if user is logged in. Else return null.
      *
-     * @return String of RAE token.
+     * @return String of access token.
      */
-    fun provideRaeToken(): String?
+    fun provideAccessToken(): String? = "" // optional method for Kotlin implementing class
 
     /**
      * Only return user ID used when logging if user is logged in in the current session.
      *
      * @return String of the user ID.
      */
-    fun provideUserId(): String?
-
-    /**
-     * Only return Rakuten ID used in the current session.
-     *
-     * @return String of the Rakuten ID.
-     */
-    fun provideRakutenId(): String?
+    fun provideUserId(): String? = "" // optional method for Kotlin implementing class
 
     /**
      * Only return ID tracking identifier used in the current session.

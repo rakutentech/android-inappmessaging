@@ -9,7 +9,7 @@ import java.security.MessageDigest
 import kotlin.Exception
 
 /**
- * This object contains userInfoProvider ID used when logging in, and RAE token.
+ * This object contains userInfoProvider ID used when logging in, and Access token.
  * Note: Never persist account information without encrypting first.
  */
 internal abstract class AccountRepository {
@@ -19,19 +19,14 @@ internal abstract class AccountRepository {
     internal var userInfoHash = ""
 
     /**
-     * This method returns RAE token, or empty String.
+     * This method returns access token, or empty String.
      */
-    abstract fun getRaeToken(): String
+    abstract fun getAccessToken(): String
 
     /**
      * This method returns User ID, or empty String.
      */
     abstract fun getUserId(): String
-
-    /**
-     * This method returns Rakuten ID, or empty String.
-     */
-    abstract fun getRakutenId(): String
 
     /**
      * This method returns ID tracking identifier, or empty String.
@@ -59,20 +54,18 @@ internal abstract class AccountRepository {
 
     private class AccountRepositoryImpl : AccountRepository() {
 
-        override fun getRaeToken() = if (this.userInfoProvider == null ||
-                this.userInfoProvider?.provideRaeToken().isNullOrEmpty()) {
+        override fun getAccessToken() = if (this.userInfoProvider == null ||
+                this.userInfoProvider?.provideAccessToken().isNullOrEmpty()) {
             ""
-        } else TOKEN_PREFIX + this.userInfoProvider?.provideRaeToken()
+        } else TOKEN_PREFIX + this.userInfoProvider?.provideAccessToken()
         // According to backend specs, token has to start with "OAuth2{space}", followed by real token.
 
         override fun getUserId() = this.userInfoProvider?.provideUserId() ?: ""
 
-        override fun getRakutenId() = this.userInfoProvider?.provideRakutenId() ?: ""
-
         override fun getIdTrackingIdentifier() = this.userInfoProvider?.provideIdTrackingIdentifier() ?: ""
 
         override fun updateUserInfo(algo: String?): Boolean {
-            val curr = hash(getUserId() + getRakutenId() + getIdTrackingIdentifier(), algo)
+            val curr = hash(getUserId() + getIdTrackingIdentifier(), algo)
 
             if (userInfoHash != curr) {
                 userInfoHash = curr
@@ -84,7 +77,7 @@ internal abstract class AccountRepository {
 
         @SuppressLint("BinaryOperationInTimber")
         override fun logWarningForUserInfo(tag: String, timber: Timber.Tree) {
-            if (getRaeToken().isNotEmpty()) {
+            if (getAccessToken().isNotEmpty()) {
                 if (getIdTrackingIdentifier().isNotEmpty()) {
                     timber.w(ID_TRACKING_ERR_MSG)
                     if (BuildConfig.DEBUG) {

@@ -96,21 +96,21 @@ Create a new class in your project that implements the following class:
 com.rakuten.tech.mobile.inappmessaging.runtime.UserInfoProvider
 ```
 
-This class serves the purpose of providing basic user information such as user ID, Rakuten ID, RAE Token, and ID Tracking Identifier at runtime. These user information are used by the SDK for campaigns targeting specific users.
+This class serves the purpose of providing basic user information such as user ID, Access Token, and ID Tracking Identifier at runtime. These user information are used by the SDK for campaigns targeting specific users.
 
 ```kotlin
 class AppUserInfoProvider : UserInfoProvider {
 
-    override fun provideRaeToken(): String? {
-        return raeToken
+    // This method is optional for Kotlin class
+    // If Access Token will not be used, no need to override this method (i.e. default value is "")
+    override fun provideAccessToken(): String? {
+        return accessToken
     }
 
+    // This method is optional for Kotlin class
+    // If User ID will not be used, no need to override this method (i.e. default value is "")
     override fun provideUserId(): String? {
         return userId
-    }
-
-    override fun provideRakutenId(): String? {
-        return rakutenId
     }
 
     // This method is optional for Kotlin class
@@ -121,14 +121,13 @@ class AppUserInfoProvider : UserInfoProvider {
 }
 ```
 
-* Rakuten ID - Any value that is considered by the app as user identifier.
 * User ID - The ID when registering a Rakuten account (e.g. email address or username).
-* RAE Token - This is the token provided by the internal User SDK as the "authentication token" value.
+* Access Token - This is the token provided by the internal User SDK as the "authentication token" value.
 * ID Tracking Identifier - This is the value provided by the internal identity SDK as the "tracking identifier" value.
 
 **<font color="red">Notes for Rakuten Developers:</font>**
-* **Only provide RAE token if the user is logged in.**
-* **The internal IAM backend only supports production RAE token.**
+* **Only provide Access token if the user is logged in.**
+* **The internal IAM backend only supports production Access token.**
 
 ### #6 Initializing In-App Messaging SDK.
 Host app should initialize the SDK, then register the provider containing the user information.
@@ -229,6 +228,7 @@ InAppMessaging.instance().logEvent(CustomEvent("search").addAttribute("keyword",
 ### Client-side opt-out handling
 
 If user (with valid identifiers in [`UserInfoProvider`](#info-provider) class) opts out from a campaign, that information is saved in user cache locally on the device and the campaign won't be shown again for that user on the same device. The opt-out status is not shared between devices. The same applies for anonymous user.
+* Each user has a separate cache container that is persisted in `SharedPreferences`. Each combination of userId and idTrackingIdentifier is treated as a different user including a special - anonymous user - that represents non logged-in user (userId and idTrackingIdentifier are null or empty).
 
 ### <a name="max-impression"></a> Client-side max impressions handling
 
@@ -346,6 +346,12 @@ Documents targeting Product Managers:
 + In-App Messaging Dashboard Sign Up(page is coming soon.)
 
 ## <a name="changelog"></a> Changelog
+
+### 6.0.0 (in-progress)
+* SDKCF-4151: **Breaking Changes:**
+  - Renamed method for providing access token in `UserInfoProvider` interface class from `provideRaeToken` to `provideAccessToken`.
+  - Removed `provideRakutenId` method for Rakuten Id in `UserInfoProvider` interface class from `provideRaeToken` to `provideAccessToken`. Please use `provideUserId` for specific user targeting.
+  - All the methods in `UserInfoProvider` class are optional for Kotlin class implementing the interface.
 
 ### 5.0.0 (2021-09-10)
 * SDKCF-4071: **Breaking Change:** Added new method for providing id tracking identifier in `UserInfoProvider` interface class.

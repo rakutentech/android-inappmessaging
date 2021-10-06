@@ -6,7 +6,6 @@ package com.rakuten.tech.mobile.inappmessaging.runtime.data.enums
 @SuppressWarnings("MagicNumber")
 internal enum class UserIdentifierType(val typeId: Int) {
     INVALID(0),
-    R_ID(1),
     ID_TRACKING(2),
     USER_ID(3);
 }

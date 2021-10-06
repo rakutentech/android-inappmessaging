@@ -11,9 +11,8 @@
   <string name="custom_event_newuser">Custom Event: newUser</string>
   <string name="change_user">Change User</string>
   <string name="label_userid">User ID</string>
-  <string name="label_raetoken">RAE Token</string>
-  <string name="label_rakutenid">Rakuten ID</string>
-  <string name="label_idtracking">ID Tracking Identifier</string>
+  <string name="label_accesstoken">Access Token</string>
+  <string name="label_idtracking">Tracking ID</string>
   <string name="dialog_title_user">User Information</string>
   <string name="close_message">Close message</string>
 </resources>

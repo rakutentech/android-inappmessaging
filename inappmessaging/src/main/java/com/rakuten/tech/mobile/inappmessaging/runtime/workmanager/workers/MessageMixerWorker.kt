@@ -67,7 +67,7 @@ internal class MessageMixerWorker(
         // Create an retrofit API network call.
         responseCall = serviceApi.performPing(
                 HostAppInfoRepository.instance().getInAppMessagingSubscriptionKey(),
-                AccountRepository.instance().getRaeToken(),
+                AccountRepository.instance().getAccessToken(),
                 HostAppInfoRepository.instance().getDeviceId(),
                 ConfigResponseRepository.instance().getPingEndpoint(),
                 pingRequest)

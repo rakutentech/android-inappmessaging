@@ -72,12 +72,10 @@ class MainActivityFragment : Fragment(), View.OnClickListener {
 
         val userId = contentView.findViewById<EditText>(R.id.edit_userid)
         userId.setText(application.provider.userId)
-        val rakutenId = contentView.findViewById<EditText>(R.id.edit_rakutenid)
-        rakutenId.setText(application.provider.rakutenId)
-        val raeToken = contentView.findViewById<EditText>(R.id.edit_raetoken)
-        raeToken.setText(application.provider.raeToken)
+        val accessToken = contentView.findViewById<EditText>(R.id.edit_accesstoken)
+        accessToken.setText(application.provider.accessToken)
         val idTracking = contentView.findViewById<EditText>(R.id.edit_idTracking)
-        raeToken.setText(application.provider.idTracking)
+        accessToken.setText(application.provider.idTracking)
 
         val dialog =  AlertDialog.Builder(activity)
                 .setView(contentView)
@@ -87,8 +85,7 @@ class MainActivityFragment : Fragment(), View.OnClickListener {
                         InAppMessaging.instance().closeMessage()
                     }
                     application.provider.userId = userId.text.toString()
-                    application.provider.raeToken = raeToken.text.toString()
-                    application.provider.rakutenId = rakutenId.text.toString()
+                    application.provider.accessToken = accessToken.text.toString()
                     application.provider.idTracking = idTracking.text.toString()
 
                     dialog.dismiss()

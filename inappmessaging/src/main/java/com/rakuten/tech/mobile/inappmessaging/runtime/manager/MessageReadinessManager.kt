@@ -111,7 +111,7 @@ internal interface MessageReadinessManager {
                         .create(MessageMixerRetrofitService::class.java)
                         .getDisplayPermissionService(
                                 HostAppInfoRepository.instance().getInAppMessagingSubscriptionKey(),
-                                AccountRepository.instance().getRaeToken(),
+                                AccountRepository.instance().getAccessToken(),
                                 displayPermissionUrl,
                                 request)
 

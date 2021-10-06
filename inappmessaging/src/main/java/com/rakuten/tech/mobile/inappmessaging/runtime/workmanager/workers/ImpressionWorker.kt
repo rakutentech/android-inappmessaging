@@ -83,7 +83,7 @@ internal class ImpressionWorker(
                     .reportImpression(
                             HostAppInfoRepository.instance().getInAppMessagingSubscriptionKey(),
                             HostAppInfoRepository.instance().getDeviceId(),
-                            accountRepo.getRaeToken(),
+                            accountRepo.getAccessToken(),
                             impressionEndpoint,
                             impressionRequest)
 

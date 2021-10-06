@@ -192,12 +192,12 @@ class PingResponseMessageRepositorySpec : BaseTest() {
         PingResponseMessageRepository.instance().replaceAllMessages(messageList)
         PingResponseMessageRepository.instance().getAllMessagesCopy().shouldHaveSize(2)
 
-        infoProvider.rakutenId = "user2"
+        infoProvider.userId = "user2"
         AccountRepository.instance().updateUserInfo()
         PingResponseMessageRepository.instance().getAllMessagesCopy().shouldBeEmpty()
 
         // revert to initial user info
-        infoProvider.rakutenId = TestUserInfoProvider.TEST_RAKUTEN_ID
+        infoProvider.userId = TestUserInfoProvider.TEST_USER_ID
         AccountRepository.instance().updateUserInfo()
     }
 

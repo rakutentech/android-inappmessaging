@@ -30,18 +30,13 @@ open class AccountRepositorySpec : BaseTest() {
 class AccountRepositoryDefaultSpec : AccountRepositorySpec() {
 
     @Test
-    fun `should get rae token`() {
-        AccountRepository.instance().getRaeToken() shouldBeEqualTo ""
+    fun `should get access token`() {
+        AccountRepository.instance().getAccessToken() shouldBeEqualTo ""
     }
 
     @Test
     fun `should get user id`() {
         AccountRepository.instance().getUserId() shouldBeEqualTo ""
-    }
-
-    @Test
-    fun `should get rakuten id`() {
-        AccountRepository.instance().getRakutenId() shouldBeEqualTo ""
     }
 
     @Test
@@ -56,15 +51,10 @@ class AccountRepositoryDefaultSpec : AccountRepositorySpec() {
     }
 
     @Test
-    fun `should get rae token with valid provider`() {
+    fun `should get access token with valid provider`() {
         AccountRepository.instance().userInfoProvider = TestUserInfoProvider()
-        AccountRepository.instance().getRaeToken() shouldBeEqualTo "OAuth2 " + TestUserInfoProvider().provideRaeToken()
-    }
-
-    @Test
-    fun `should get rakuten id with valid provider`() {
-        AccountRepository.instance().userInfoProvider = TestUserInfoProvider()
-        AccountRepository.instance().getRakutenId() shouldBeEqualTo TestUserInfoProvider().provideRakutenId()
+        AccountRepository.instance().getAccessToken() shouldBeEqualTo "OAuth2 " +
+                TestUserInfoProvider().provideAccessToken()
     }
 
     @Test
@@ -78,11 +68,11 @@ class AccountRepositoryDefaultSpec : AccountRepositorySpec() {
 class AccountRepositoryNullSpec : AccountRepositorySpec() {
 
     @Test
-    fun `should get rae token with null values`() {
+    fun `should get access token with null values`() {
         val mockProvider = Mockito.mock(TestUserInfoProvider::class.java)
-        When calling mockProvider.provideRaeToken() itReturns null
+        When calling mockProvider.provideAccessToken() itReturns null
         AccountRepository.instance().userInfoProvider = mockProvider
-        AccountRepository.instance().getRaeToken() shouldBeEqualTo ""
+        AccountRepository.instance().getAccessToken() shouldBeEqualTo ""
     }
 
     @Test
@@ -91,14 +81,6 @@ class AccountRepositoryNullSpec : AccountRepositorySpec() {
         When calling mockProvider.provideUserId() itReturns null
         AccountRepository.instance().userInfoProvider = mockProvider
         AccountRepository.instance().getUserId() shouldBeEqualTo ""
-    }
-
-    @Test
-    fun `should get rakuten id with null values`() {
-        val mockProvider = Mockito.mock(TestUserInfoProvider::class.java)
-        When calling mockProvider.provideRakutenId() itReturns null
-        AccountRepository.instance().userInfoProvider = mockProvider
-        AccountRepository.instance().getRakutenId() shouldBeEqualTo ""
     }
 
     @Test
@@ -115,11 +97,11 @@ class AccountRepositoryUsageSpec : AccountRepositorySpec() {
     private val mockLogger = Mockito.mock(Timber.Tree::class.java)
 
     @Test
-    fun `should get be called once for get rae token`() {
+    fun `should get be called once for get access token`() {
         val mockAcctRepo = Mockito.mock(AccountRepository::class.java)
 
         When calling mockAcctRepo.userInfoProvider itReturns TestUserInfoProvider()
-        When calling mockAcctRepo.getRaeToken() itReturns TestUserInfoProvider().provideRaeToken().toString()
+        When calling mockAcctRepo.getAccessToken() itReturns TestUserInfoProvider().provideAccessToken().toString()
         HostAppInfoRepository.instance().addHostInfo(HostAppInfo(InAppMessagingTestConstants.APP_ID,
                 InAppMessagingTestConstants.DEVICE_ID, InAppMessagingTestConstants.APP_VERSION,
                 InAppMessagingTestConstants.SUB_KEY, InAppMessagingTestConstants.LOCALE))
@@ -129,7 +111,7 @@ class AccountRepositoryUsageSpec : AccountRepositorySpec() {
         val worker = ImpressionWorker(context, workerParameters)
         worker.createReportImpressionCall("https://host/impression/", impressionRequest,
                 accountRepo = mockAcctRepo)
-        Mockito.verify(mockAcctRepo).getRaeToken()
+        Mockito.verify(mockAcctRepo).getAccessToken()
     }
 
     @Test
@@ -138,22 +120,9 @@ class AccountRepositoryUsageSpec : AccountRepositorySpec() {
 
         When calling mockAcctRepo.userInfoProvider itReturns TestUserInfoProvider()
         When calling mockAcctRepo.getUserId() itReturns TestUserInfoProvider().provideUserId().toString()
-        When calling mockAcctRepo.getRakutenId() itReturns ""
         When calling mockAcctRepo.getIdTrackingIdentifier() itReturns ""
         RuntimeUtil.getUserIdentifiers(mockAcctRepo).shouldHaveSize(1)
         Mockito.verify(mockAcctRepo).getUserId()
-    }
-
-    @Test
-    fun `should get be called once for get rakuten id`() {
-        val mockAcctRepo = Mockito.mock(AccountRepository::class.java)
-
-        When calling mockAcctRepo.userInfoProvider itReturns TestUserInfoProvider()
-        When calling mockAcctRepo.getUserId() itReturns ""
-        When calling mockAcctRepo.getRakutenId() itReturns TestUserInfoProvider().provideRakutenId().toString()
-        When calling mockAcctRepo.getIdTrackingIdentifier() itReturns ""
-        RuntimeUtil.getUserIdentifiers(mockAcctRepo).shouldHaveSize(1)
-        Mockito.verify(mockAcctRepo).getRakutenId()
     }
 
     @Test
@@ -163,11 +132,10 @@ class AccountRepositoryUsageSpec : AccountRepositorySpec() {
         provider.idTrackingIdentifier = TestUserInfoProvider.TEST_ID_TRACKING_IDENTIFIER
         When calling mockAcctRepo.userInfoProvider itReturns provider
         When calling mockAcctRepo.getUserId() itReturns ""
-        When calling mockAcctRepo.getRakutenId() itReturns ""
         When calling mockAcctRepo
                 .getIdTrackingIdentifier() itReturns provider.provideIdTrackingIdentifier().toString()
         RuntimeUtil.getUserIdentifiers(mockAcctRepo).shouldHaveSize(1)
-        Mockito.verify(mockAcctRepo).getRakutenId()
+        Mockito.verify(mockAcctRepo).getIdTrackingIdentifier()
     }
 
     @Test
@@ -194,19 +162,6 @@ class AccountRepositoryUsageSpec : AccountRepositorySpec() {
     }
 
     @Test
-    fun `should return true for changed rakuten id`() {
-        val infoProvider = TestUserInfoProvider()
-        AccountRepository.instance().userInfoProvider = infoProvider
-        // initial setting of hashed user info
-        AccountRepository.instance().updateUserInfo()
-
-        // updated
-        infoProvider.rakutenId = "rakuten-id"
-
-        AccountRepository.instance().updateUserInfo().shouldBeTrue()
-    }
-
-    @Test
     fun `should return true for changed id tracking identifier`() {
         val infoProvider = TestUserInfoProvider()
         AccountRepository.instance().userInfoProvider = infoProvider
@@ -220,14 +175,14 @@ class AccountRepositoryUsageSpec : AccountRepositorySpec() {
     }
 
     @Test
-    fun `should return false for changed rae token`() {
+    fun `should return false for changed access token`() {
         val infoProvider = TestUserInfoProvider()
         AccountRepository.instance().userInfoProvider = infoProvider
         // initial setting of hashed user info
         AccountRepository.instance().updateUserInfo()
 
         // updated
-        infoProvider.raeToken = "rae-token"
+        infoProvider.accessToken = "access-token"
 
         AccountRepository.instance().updateUserInfo().shouldBeFalse()
     }
@@ -242,7 +197,7 @@ class AccountRepositoryUsageSpec : AccountRepositorySpec() {
         AccountRepository.instance().updateUserInfo("test").shouldBeTrue()
 
         AccountRepository.instance().userInfoHash shouldBeEqualTo TestUserInfoProvider.TEST_USER_ID +
-                TestUserInfoProvider.TEST_RAKUTEN_ID + TestUserInfoProvider.TEST_ID_TRACKING_IDENTIFIER
+                TestUserInfoProvider.TEST_ID_TRACKING_IDENTIFIER
     }
 
     @Test
@@ -263,13 +218,11 @@ class AccountRepositoryUsageSpec : AccountRepositorySpec() {
     }
 
     @Test
-    fun `should not log with only rae token have valid value`() {
+    fun `should not log with only access token have valid value`() {
         AccountRepository.instance().userInfoProvider = object : UserInfoProvider {
-            override fun provideRaeToken() = "valid"
+            override fun provideAccessToken() = "valid"
 
             override fun provideUserId() = "userid"
-
-            override fun provideRakutenId() = ""
         }
         AccountRepository.instance().logWarningForUserInfo("test", mockLogger)
 
@@ -279,11 +232,9 @@ class AccountRepositoryUsageSpec : AccountRepositorySpec() {
     @Test
     fun `should not log with only tracking id have valid value`() {
         AccountRepository.instance().userInfoProvider = object : UserInfoProvider {
-            override fun provideRaeToken() = ""
+            override fun provideAccessToken() = ""
 
             override fun provideUserId() = ""
-
-            override fun provideRakutenId() = ""
 
             override fun provideIdTrackingIdentifier() = "valid"
         }
@@ -295,11 +246,9 @@ class AccountRepositoryUsageSpec : AccountRepositorySpec() {
     @Test
     fun `should not log with both have empty values`() {
         AccountRepository.instance().userInfoProvider = object : UserInfoProvider {
-            override fun provideRaeToken() = ""
+            override fun provideAccessToken() = ""
 
             override fun provideUserId() = ""
-
-            override fun provideRakutenId() = ""
         }
         AccountRepository.instance().logWarningForUserInfo("test", mockLogger)
 
@@ -309,11 +258,9 @@ class AccountRepositoryUsageSpec : AccountRepositorySpec() {
     @Test
     fun `should not log with both have null values`() {
         AccountRepository.instance().userInfoProvider = object : UserInfoProvider {
-            override fun provideRaeToken(): String? = null
+            override fun provideAccessToken(): String? = null
 
             override fun provideUserId() = ""
-
-            override fun provideRakutenId() = ""
 
             override fun provideIdTrackingIdentifier(): String? = null
         }
@@ -323,13 +270,11 @@ class AccountRepositoryUsageSpec : AccountRepositorySpec() {
     }
 
     @Test
-    fun `should log with only rae token have valid value and not have user id`() {
+    fun `should log with only access token have valid value and not have user id`() {
         AccountRepository.instance().userInfoProvider = object : UserInfoProvider {
-            override fun provideRaeToken() = "valid"
+            override fun provideAccessToken() = "valid"
 
             override fun provideUserId() = ""
-
-            override fun provideRakutenId() = ""
         }
         try {
             AccountRepository.instance().logWarningForUserInfo("test", mockLogger)

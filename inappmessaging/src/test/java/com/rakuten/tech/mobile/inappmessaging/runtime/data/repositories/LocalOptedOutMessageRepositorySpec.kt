@@ -74,12 +74,12 @@ class LocalOptedOutMessageRepositorySpec : BaseTest() {
         LocalOptedOutMessageRepository.instance().addMessage(message)
         LocalOptedOutMessageRepository.instance().hasMessage(message.getCampaignId()).shouldBeTrue()
 
-        infoProvider.rakutenId = "user2"
+        infoProvider.userId = "user2"
         AccountRepository.instance().updateUserInfo()
         LocalOptedOutMessageRepository.instance().hasMessage(message.getCampaignId()).shouldBeFalse()
 
         // revert to initial user info
-        infoProvider.rakutenId = TestUserInfoProvider.TEST_RAKUTEN_ID
+        infoProvider.userId = TestUserInfoProvider.TEST_USER_ID
         AccountRepository.instance().updateUserInfo()
         return message
     }

@@ -25,7 +25,7 @@ abstract class InAppMessaging internal constructor() {
     abstract var onVerifyContext: (contexts: List<String>, campaignTitle: String) -> Boolean
 
     /**
-     * This method registers provider containing user information [userInfoProvider], like RAE Token and Uer ID.
+     * This method registers provider containing user information [userInfoProvider], like Access Token and User ID.
      */
     abstract fun registerPreference(@NonNull userInfoProvider: UserInfoProvider)
 
