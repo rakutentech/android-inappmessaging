@@ -25,7 +25,7 @@ This SDK supports Android API level 23 (Marshmallow) and above.
 You must have a subscription key for your application from IAM Dashboard.
 
 ## <a name="integration"></a> SDK Integration
-### #1 Include JCenter repo in your project, this should be added in your project root `build.gradle` file.
+### #1 Include Maven Central repo in your project, this should be added in your project root `build.gradle` file.
 
 ```groovy
 allprojects {

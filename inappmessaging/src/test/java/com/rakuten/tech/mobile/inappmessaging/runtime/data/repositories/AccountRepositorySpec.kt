@@ -2,6 +2,7 @@ package com.rakuten.tech.mobile.inappmessaging.runtime.data.repositories
 
 import android.content.Context
 import androidx.work.WorkerParameters
+import com.nhaarman.mockitokotlin2.argumentCaptor
 import com.nhaarman.mockitokotlin2.never
 import com.rakuten.tech.mobile.inappmessaging.runtime.*
 import com.rakuten.tech.mobile.inappmessaging.runtime.data.models.HostAppInfo
@@ -14,6 +15,7 @@ import org.junit.Before
 import org.junit.Ignore
 import org.junit.Test
 import org.mockito.Mockito
+import org.mockito.Mockito.`when`
 import timber.log.Timber
 
 /**
@@ -80,7 +82,7 @@ class AccountRepositoryNullSpec : AccountRepositorySpec() {
     @Test
     fun `should get rae token with null values`() {
         val mockProvider = Mockito.mock(TestUserInfoProvider::class.java)
-        When calling mockProvider.provideRaeToken() itReturns null
+        `when`(mockProvider.provideRaeToken()).thenReturn(null)
         AccountRepository.instance().userInfoProvider = mockProvider
         AccountRepository.instance().getRaeToken() shouldBeEqualTo ""
     }
@@ -88,7 +90,7 @@ class AccountRepositoryNullSpec : AccountRepositorySpec() {
     @Test
     fun `should get user id with null values`() {
         val mockProvider = Mockito.mock(TestUserInfoProvider::class.java)
-        When calling mockProvider.provideUserId() itReturns null
+        `when`(mockProvider.provideUserId()).thenReturn(null)
         AccountRepository.instance().userInfoProvider = mockProvider
         AccountRepository.instance().getUserId() shouldBeEqualTo ""
     }
@@ -96,7 +98,7 @@ class AccountRepositoryNullSpec : AccountRepositorySpec() {
     @Test
     fun `should get rakuten id with null values`() {
         val mockProvider = Mockito.mock(TestUserInfoProvider::class.java)
-        When calling mockProvider.provideRakutenId() itReturns null
+        `when`(mockProvider.provideRakutenId()).thenReturn(null)
         AccountRepository.instance().userInfoProvider = mockProvider
         AccountRepository.instance().getRakutenId() shouldBeEqualTo ""
     }
@@ -104,22 +106,24 @@ class AccountRepositoryNullSpec : AccountRepositorySpec() {
     @Test
     fun `should get id tracking identifier with null values`() {
         val mockProvider = Mockito.mock(TestUserInfoProvider::class.java)
-        When calling mockProvider.provideIdTrackingIdentifier() itReturns null
+        `when`(mockProvider.provideIdTrackingIdentifier()).thenReturn(null)
         AccountRepository.instance().userInfoProvider = mockProvider
         AccountRepository.instance().getUserId() shouldBeEqualTo ""
     }
 }
 
+@SuppressWarnings("LargeClass")
 class AccountRepositoryUsageSpec : AccountRepositorySpec() {
 
     private val mockLogger = Mockito.mock(Timber.Tree::class.java)
+    private val captor = argumentCaptor<String>()
 
     @Test
     fun `should get be called once for get rae token`() {
         val mockAcctRepo = Mockito.mock(AccountRepository::class.java)
 
-        When calling mockAcctRepo.userInfoProvider itReturns TestUserInfoProvider()
-        When calling mockAcctRepo.getRaeToken() itReturns TestUserInfoProvider().provideRaeToken().toString()
+        `when`(mockAcctRepo.userInfoProvider).thenReturn(TestUserInfoProvider())
+        `when`(mockAcctRepo.getRaeToken()).thenReturn(TestUserInfoProvider().provideRaeToken().toString())
         HostAppInfoRepository.instance().addHostInfo(HostAppInfo(InAppMessagingTestConstants.APP_ID,
                 InAppMessagingTestConstants.DEVICE_ID, InAppMessagingTestConstants.APP_VERSION,
                 InAppMessagingTestConstants.SUB_KEY, InAppMessagingTestConstants.LOCALE))
@@ -136,10 +140,10 @@ class AccountRepositoryUsageSpec : AccountRepositorySpec() {
     fun `should get be called once for get user id`() {
         val mockAcctRepo = Mockito.mock(AccountRepository::class.java)
 
-        When calling mockAcctRepo.userInfoProvider itReturns TestUserInfoProvider()
-        When calling mockAcctRepo.getUserId() itReturns TestUserInfoProvider().provideUserId().toString()
-        When calling mockAcctRepo.getRakutenId() itReturns ""
-        When calling mockAcctRepo.getIdTrackingIdentifier() itReturns ""
+        `when`(mockAcctRepo.userInfoProvider).thenReturn(TestUserInfoProvider())
+        `when`(mockAcctRepo.getUserId()).thenReturn(TestUserInfoProvider().provideUserId().toString())
+        `when`(mockAcctRepo.getRakutenId()).thenReturn("")
+        `when`(mockAcctRepo.getIdTrackingIdentifier()).thenReturn("")
         RuntimeUtil.getUserIdentifiers(mockAcctRepo).shouldHaveSize(1)
         Mockito.verify(mockAcctRepo).getUserId()
     }
@@ -148,10 +152,10 @@ class AccountRepositoryUsageSpec : AccountRepositorySpec() {
     fun `should get be called once for get rakuten id`() {
         val mockAcctRepo = Mockito.mock(AccountRepository::class.java)
 
-        When calling mockAcctRepo.userInfoProvider itReturns TestUserInfoProvider()
-        When calling mockAcctRepo.getUserId() itReturns ""
-        When calling mockAcctRepo.getRakutenId() itReturns TestUserInfoProvider().provideRakutenId().toString()
-        When calling mockAcctRepo.getIdTrackingIdentifier() itReturns ""
+        `when`(mockAcctRepo.userInfoProvider).thenReturn(TestUserInfoProvider())
+        `when`(mockAcctRepo.getUserId()).thenReturn("")
+        `when`(mockAcctRepo.getRakutenId()).thenReturn(TestUserInfoProvider().provideRakutenId().toString())
+        `when`(mockAcctRepo.getIdTrackingIdentifier()).thenReturn("")
         RuntimeUtil.getUserIdentifiers(mockAcctRepo).shouldHaveSize(1)
         Mockito.verify(mockAcctRepo).getRakutenId()
     }
@@ -161,11 +165,11 @@ class AccountRepositoryUsageSpec : AccountRepositorySpec() {
         val mockAcctRepo = Mockito.mock(AccountRepository::class.java)
         val provider = TestUserInfoProvider()
         provider.idTrackingIdentifier = TestUserInfoProvider.TEST_ID_TRACKING_IDENTIFIER
-        When calling mockAcctRepo.userInfoProvider itReturns provider
-        When calling mockAcctRepo.getUserId() itReturns ""
-        When calling mockAcctRepo.getRakutenId() itReturns ""
-        When calling mockAcctRepo
-                .getIdTrackingIdentifier() itReturns provider.provideIdTrackingIdentifier().toString()
+        `when`(mockAcctRepo.userInfoProvider).thenReturn(provider)
+        `when`(mockAcctRepo.getUserId()).thenReturn("")
+        `when`(mockAcctRepo.getRakutenId()).thenReturn("")
+        `when`(mockAcctRepo
+                .getIdTrackingIdentifier()).thenReturn(provider.provideIdTrackingIdentifier().toString())
         RuntimeUtil.getUserIdentifiers(mockAcctRepo).shouldHaveSize(1)
         Mockito.verify(mockAcctRepo).getRakutenId()
     }
@@ -259,7 +263,8 @@ class AccountRepositoryUsageSpec : AccountRepositorySpec() {
             e.localizedMessage shouldBeEqualTo AccountRepository.ID_TRACKING_ERR_MSG
         }
 
-        Mockito.verify(mockLogger).w(any(String::class))
+        Mockito.verify(mockLogger).w(captor.capture())
+        captor.firstValue shouldBeInstanceOf String::class.java
     }
 
     @Test
@@ -273,7 +278,7 @@ class AccountRepositoryUsageSpec : AccountRepositorySpec() {
         }
         AccountRepository.instance().logWarningForUserInfo("test", mockLogger)
 
-        Mockito.verify(mockLogger, never()).w(any(String::class))
+        Mockito.verify(mockLogger, never()).w(captor.capture())
     }
 
     @Test
@@ -289,7 +294,7 @@ class AccountRepositoryUsageSpec : AccountRepositorySpec() {
         }
         AccountRepository.instance().logWarningForUserInfo("test", mockLogger)
 
-        Mockito.verify(mockLogger, never()).w(any(String::class))
+        Mockito.verify(mockLogger, never()).w(captor.capture())
     }
 
     @Test
@@ -303,7 +308,7 @@ class AccountRepositoryUsageSpec : AccountRepositorySpec() {
         }
         AccountRepository.instance().logWarningForUserInfo("test", mockLogger)
 
-        Mockito.verify(mockLogger, never()).w(any(String::class))
+        Mockito.verify(mockLogger, never()).w(captor.capture())
     }
 
     @Test
@@ -319,7 +324,7 @@ class AccountRepositoryUsageSpec : AccountRepositorySpec() {
         }
         AccountRepository.instance().logWarningForUserInfo("test", mockLogger)
 
-        Mockito.verify(mockLogger, never()).w(any(String::class))
+        Mockito.verify(mockLogger, never()).w(captor.capture())
     }
 
     @Test
@@ -339,6 +344,7 @@ class AccountRepositoryUsageSpec : AccountRepositorySpec() {
         } catch (e: IllegalStateException) {
             e.localizedMessage shouldBeEqualTo AccountRepository.TOKEN_USER_ERR_MSG
         }
-        Mockito.verify(mockLogger).w(any(String::class))
+        Mockito.verify(mockLogger).w(captor.capture())
+        captor.firstValue shouldBeInstanceOf String::class.java
     }
 }

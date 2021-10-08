@@ -6,6 +6,7 @@ import com.rakuten.tech.mobile.inappmessaging.runtime.data.repositories.AccountR
 import org.amshove.kluent.*
 import org.junit.Test
 import org.mockito.Mockito
+import org.mockito.Mockito.`when`
 
 /**
  * Test class for RuntimeUtil.
@@ -20,8 +21,8 @@ class RuntimeUtilSpec : BaseTest() {
     @Test
     fun `should get user identifier with user id`() {
         val mockProvider = Mockito.mock(UserInfoProvider::class.java)
-        When calling mockProvider.provideUserId() itReturns "test_user_id"
-        When calling mockProvider.provideRakutenId() itReturns ""
+        `when`(mockProvider.provideUserId()).thenReturn("test_user_id")
+        `when`(mockProvider.provideRakutenId()).thenReturn("")
         AccountRepository.instance().userInfoProvider = mockProvider
         RuntimeUtil.getUserIdentifiers().shouldHaveSize(1)
     }
@@ -29,8 +30,8 @@ class RuntimeUtilSpec : BaseTest() {
     @Test
     fun `should get user identifier with rakuten id`() {
         val mockProvider = Mockito.mock(UserInfoProvider::class.java)
-        When calling mockProvider.provideUserId() itReturns ""
-        When calling mockProvider.provideRakutenId() itReturns "test_rakuten_id"
+        `when`(mockProvider.provideUserId()).thenReturn("")
+        `when`(mockProvider.provideRakutenId()).thenReturn("test_rakuten_id")
         AccountRepository.instance().userInfoProvider = mockProvider
         RuntimeUtil.getUserIdentifiers().shouldHaveSize(1)
     }
@@ -38,8 +39,8 @@ class RuntimeUtilSpec : BaseTest() {
     @Test
     fun `should get user identifier with both user and rakuten id`() {
         val mockProvider = Mockito.mock(UserInfoProvider::class.java)
-        When calling mockProvider.provideUserId() itReturns "test_user_id"
-        When calling mockProvider.provideRakutenId() itReturns "test_rakuten_id"
+        `when`(mockProvider.provideUserId()).thenReturn("test_user_id")
+        `when`(mockProvider.provideRakutenId()).thenReturn("test_rakuten_id")
         AccountRepository.instance().userInfoProvider = mockProvider
         RuntimeUtil.getUserIdentifiers().shouldHaveSize(2)
     }

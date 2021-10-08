@@ -11,14 +11,12 @@ import com.rakuten.tech.mobile.inappmessaging.runtime.BaseTest
 import com.rakuten.tech.mobile.inappmessaging.runtime.data.models.messages.ValidTestMessage
 import com.rakuten.tech.mobile.inappmessaging.runtime.data.repositories.PingResponseMessageRepository
 import com.rakuten.tech.mobile.inappmessaging.runtime.utils.MessageEventReconciliationUtil
-import org.amshove.kluent.When
-import org.amshove.kluent.calling
-import org.amshove.kluent.itReturns
 import org.amshove.kluent.shouldBeEqualTo
 import org.junit.Before
 import org.junit.Test
 import org.junit.runner.RunWith
 import org.mockito.Mockito
+import org.mockito.Mockito.`when`
 import org.robolectric.RobolectricTestRunner
 import org.robolectric.annotation.Config
 
@@ -36,7 +34,7 @@ class MessageEventReconciliationWorkerSpec : BaseTest() {
     @Before
     override fun setup() {
         super.setup()
-        When calling workerParameters!!.inputData itReturns Data.EMPTY
+        `when`(workerParameters!!.inputData).thenReturn(Data.EMPTY)
         val context = ApplicationProvider.getApplicationContext<Context>()
         WorkManagerTestInitHelper.initializeTestWorkManager(context)
         worker = MessageEventReconciliationWorker(context, workerParameters)
@@ -53,7 +51,7 @@ class MessageEventReconciliationWorkerSpec : BaseTest() {
         val notTestMessage = ValidTestMessage(isTest = false)
         worker = MessageEventReconciliationWorker(ApplicationProvider.getApplicationContext(), workerParameters,
                 mockPingResponseRepo, MessageEventReconciliationUtil.instance())
-        When calling mockPingResponseRepo.getAllMessagesCopy() itReturns listOf(message, notTestMessage)
+        `when`(mockPingResponseRepo.getAllMessagesCopy()).thenReturn(listOf(message, notTestMessage))
         worker?.doWork() shouldBeEqualTo ListenableWorker.Result.success()
     }
 }

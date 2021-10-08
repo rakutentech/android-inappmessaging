@@ -4,11 +4,9 @@ import android.app.Activity
 import android.view.ViewGroup
 import com.rakuten.tech.mobile.inappmessaging.runtime.BaseTest
 import com.rakuten.tech.mobile.inappmessaging.runtime.R
-import org.amshove.kluent.When
-import org.amshove.kluent.calling
-import org.amshove.kluent.itReturns
 import org.junit.Test
 import org.mockito.Mockito
+import org.mockito.Mockito.`when`
 
 /**
  * Test class for DisplayManager.
@@ -26,8 +24,8 @@ class DisplayManagerSpec : BaseTest() {
 
     @Test
     fun `should remove message from host activity`() {
-        When calling activity.findViewById<ViewGroup>(R.id.in_app_message_base_view) itReturns viewGroup
-        When calling viewGroup.parent itReturns parentViewGroup
+        `when`(activity.findViewById<ViewGroup>(R.id.in_app_message_base_view)).thenReturn(viewGroup)
+        `when`(viewGroup.parent).thenReturn(parentViewGroup)
         DisplayManager.instance().removeMessage(activity)
         Mockito.verify(parentViewGroup).removeView(viewGroup)
     }

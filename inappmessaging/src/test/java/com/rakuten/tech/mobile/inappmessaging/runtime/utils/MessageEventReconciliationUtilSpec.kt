@@ -20,6 +20,7 @@ import org.junit.Ignore
 import org.junit.Test
 import org.junit.runner.RunWith
 import org.mockito.Mockito
+import org.mockito.Mockito.`when`
 import org.robolectric.RobolectricTestRunner
 import org.robolectric.annotation.Config
 import java.util.*
@@ -56,25 +57,25 @@ open class MessageEventReconciliationUtilSpec : BaseTest() {
         trigger1List.add(trigger2)
         trigger1List.add(trigger3)
         trigger1List.add(trigger4)
-        When calling trigger1.eventType itReturns 1
-        When calling trigger2.eventType itReturns 2
-        When calling trigger3.eventType itReturns 3
-        When calling trigger4.eventType itReturns 4
-        When calling message1.getMaxImpressions() itReturns 1
-        When calling message1.getTriggers() itReturns trigger1List
-        When calling message1.getCampaignId() itReturns "message1"
-        When calling message1.isTest() itReturns false
+        `when`(trigger1.eventType).thenReturn(1)
+        `when`(trigger2.eventType).thenReturn(2)
+        `when`(trigger3.eventType).thenReturn(3)
+        `when`(trigger4.eventType).thenReturn(4)
+        `when`(message1.getMaxImpressions()).thenReturn(1)
+        `when`(message1.getTriggers()).thenReturn(trigger1List)
+        `when`(message1.getCampaignId()).thenReturn("message1")
+        `when`(message1.isTest()).thenReturn(false)
 
         // Arranging message2's data.
         val trigger2List = ArrayList<Trigger>()
         trigger2List.add(trigger1)
-        When calling message2.getMaxImpressions() itReturns 2
-        When calling message2.getTriggers() itReturns trigger2List
-        When calling message2.getCampaignId() itReturns "message2"
-        When calling message2.isTest() itReturns false
+        `when`(message2.getMaxImpressions()).thenReturn(2)
+        `when`(message2.getTriggers()).thenReturn(trigger2List)
+        `when`(message2.getCampaignId()).thenReturn("message2")
+        `when`(message2.isTest()).thenReturn(false)
         // Arrange test message's data.
-        When calling testMessage.getCampaignId() itReturns "test"
-        When calling testMessage.isTest() itReturns true
+        `when`(testMessage.getCampaignId()).thenReturn("test")
+        `when`(testMessage.isTest()).thenReturn(true)
 
         LocalDisplayedMessageRepository.instance().clearMessages()
         LocalEventRepository.instance().clearEvents()
@@ -168,9 +169,9 @@ class MessageEventReconciliationUtilReconcileSpec : MessageEventReconciliationUt
         val triggerAttr = TriggerAttribute("name", "1", 2, 1)
         val attrList = ArrayList<TriggerAttribute>()
         attrList.add(triggerAttr)
-        When calling trigger1.triggerAttributes itReturns attrList
-        When calling trigger1.eventType itReturns 4
-        When calling trigger1.eventName itReturns "custom"
+        `when`(trigger1.triggerAttributes).thenReturn(attrList)
+        `when`(trigger1.eventType).thenReturn(4)
+        `when`(trigger1.eventName).thenReturn("custom")
         customEvent.addAttribute("name", 1)
         LocalEventRepository.instance().addEvent(customEvent)
         // Act.
@@ -188,9 +189,9 @@ class MessageEventReconciliationUtilReconcileSpec : MessageEventReconciliationUt
         val triggerAttr = TriggerAttribute("name", "1.0", 3, 1)
         val attrList = ArrayList<TriggerAttribute>()
         attrList.add(triggerAttr)
-        When calling trigger1.triggerAttributes itReturns attrList
-        When calling trigger1.eventType itReturns 4
-        When calling trigger1.eventName itReturns "custom"
+        `when`(trigger1.triggerAttributes).thenReturn(attrList)
+        `when`(trigger1.eventType).thenReturn(4)
+        `when`(trigger1.eventName).thenReturn("custom")
         customEvent.addAttribute("name", 1.0)
         LocalEventRepository.instance().addEvent(customEvent)
         // Act.
@@ -208,9 +209,9 @@ class MessageEventReconciliationUtilReconcileSpec : MessageEventReconciliationUt
         val triggerAttr = TriggerAttribute("name", "true", 4, 1)
         val attrList = ArrayList<TriggerAttribute>()
         attrList.add(triggerAttr)
-        When calling trigger1.triggerAttributes itReturns attrList
-        When calling trigger1.eventType itReturns 4
-        When calling trigger1.eventName itReturns "custom"
+        `when`(trigger1.triggerAttributes).thenReturn(attrList)
+        `when`(trigger1.eventType).thenReturn(4)
+        `when`(trigger1.eventName).thenReturn("custom")
         customEvent.addAttribute("name", true)
         LocalEventRepository.instance().addEvent(customEvent)
         // Act.
@@ -224,7 +225,7 @@ class MessageEventReconciliationUtilReconcileSpec : MessageEventReconciliationUt
     fun `should not reconcile message when events are not enough due to times closed`() {
         val inputMessageList = ArrayList<Message>()
         inputMessageList.add(message2)
-        When calling message2.getNumberOfTimesClosed() itReturns 1
+        `when`(message2.getNumberOfTimesClosed()).thenReturn(1)
         setupCustomEventStringAttribute()
         LocalEventRepository.instance().addEvent(customEvent)
 
@@ -238,7 +239,7 @@ class MessageEventReconciliationUtilReconcileSpec : MessageEventReconciliationUt
     fun `should reconcile message when events are enough with to times closes`() {
         val inputMessageList = ArrayList<Message>()
         inputMessageList.add(message2)
-        When calling message2.getNumberOfTimesClosed() itReturns 1
+        `when`(message2.getNumberOfTimesClosed()).thenReturn(1)
         setupCustomEventStringAttribute()
         LocalEventRepository.instance().addEvent(customEvent)
         LocalEventRepository.instance().addEvent(customEvent)
@@ -258,9 +259,9 @@ class MessageEventReconciliationUtilReconcileSpec : MessageEventReconciliationUt
         val triggerAttr = TriggerAttribute("name", currDate.time.toString(), 5, 1)
         val attrList = ArrayList<TriggerAttribute>()
         attrList.add(triggerAttr)
-        When calling trigger1.triggerAttributes itReturns attrList
-        When calling trigger1.eventType itReturns 4
-        When calling trigger1.eventName itReturns "custom"
+        `when`(trigger1.triggerAttributes).thenReturn(attrList)
+        `when`(trigger1.eventType).thenReturn(4)
+        `when`(trigger1.eventName).thenReturn("custom")
         customEvent.addAttribute("name", currDate)
         LocalEventRepository.instance().addEvent(customEvent)
         // Act.
@@ -277,9 +278,9 @@ class MessageEventReconciliationUtilReconcileSpec : MessageEventReconciliationUt
         val messageList = ArrayList<Message>()
         messageList.add(message1)
         messageList.add(message2)
-        When calling mockPingRepo.getAllMessagesCopy() itReturns messageList
-        When calling mockReconUtil.extractTestMessages(messageList) itReturns messageList
-        When calling mockReconUtil.reconcileMessagesAndEvents(messageList) itReturns messageList
+        `when`(mockPingRepo.getAllMessagesCopy()).thenReturn(messageList)
+        `when`(mockReconUtil.extractTestMessages(messageList)).thenReturn(messageList)
+        `when`(mockReconUtil.reconcileMessagesAndEvents(messageList)).thenReturn(messageList)
 
         val workerParameters = Mockito.mock(WorkerParameters::class.java)
         WorkManagerTestInitHelper.initializeTestWorkManager(ApplicationProvider.getApplicationContext())
@@ -297,9 +298,9 @@ class MessageEventReconciliationUtilReconcileSpec : MessageEventReconciliationUt
         inputMessageList.add(message2)
         val attrList = ArrayList<TriggerAttribute>()
         // App Start (Persistent Type)
-        When calling trigger1.triggerAttributes itReturns attrList
-        When calling trigger1.eventType itReturns EventType.APP_START.typeId
-        When calling trigger1.eventName itReturns EventType.APP_START.name
+        `when`(trigger1.triggerAttributes).thenReturn(attrList)
+        `when`(trigger1.eventType).thenReturn(EventType.APP_START.typeId)
+        `when`(trigger1.eventName).thenReturn(EventType.APP_START.name)
 
         // only App Start Event is added in local repo
         LocalEventRepository.instance().addEvent(appStartEvent)
@@ -326,9 +327,9 @@ class MessageEventReconciliationUtilReconcileSpec : MessageEventReconciliationUt
         inputMessageList.add(message2)
         val attrList = ArrayList<TriggerAttribute>()
         // Login Successful (Non-Persistent Type)
-        When calling trigger1.triggerAttributes itReturns attrList
-        When calling trigger1.eventType itReturns EventType.LOGIN_SUCCESSFUL.typeId
-        When calling trigger1.eventName itReturns EventType.LOGIN_SUCCESSFUL.name
+        `when`(trigger1.triggerAttributes).thenReturn(attrList)
+        `when`(trigger1.eventType).thenReturn(EventType.LOGIN_SUCCESSFUL.typeId)
+        `when`(trigger1.eventName).thenReturn(EventType.LOGIN_SUCCESSFUL.name)
 
         // only custom event is added in local repo
         LocalEventRepository.instance().addEvent(LoginSuccessfulEvent())
@@ -355,9 +356,9 @@ class MessageEventReconciliationUtilReconcileSpec : MessageEventReconciliationUt
         inputMessageList.add(message2)
         val attrList = ArrayList<TriggerAttribute>()
         // Purchase Successful (Non-Persistent Type)
-        When calling trigger1.triggerAttributes itReturns attrList
-        When calling trigger1.eventType itReturns EventType.PURCHASE_SUCCESSFUL.typeId
-        When calling trigger1.eventName itReturns EventType.PURCHASE_SUCCESSFUL.name
+        `when`(trigger1.triggerAttributes).thenReturn(attrList)
+        `when`(trigger1.eventType).thenReturn(EventType.PURCHASE_SUCCESSFUL.typeId)
+        `when`(trigger1.eventName).thenReturn(EventType.PURCHASE_SUCCESSFUL.name)
 
         // only custom event is added in local repo
         LocalEventRepository.instance().addEvent(PurchaseSuccessfulEvent())
@@ -386,9 +387,9 @@ class MessageEventReconciliationUtilReconcileSpec : MessageEventReconciliationUt
         val attrList = ArrayList<TriggerAttribute>()
         attrList.add(triggerAttr)
         // Custom (Non-Persistent Type)
-        When calling trigger1.triggerAttributes itReturns attrList
-        When calling trigger1.eventType itReturns 4
-        When calling trigger1.eventName itReturns "custom"
+        `when`(trigger1.triggerAttributes).thenReturn(attrList)
+        `when`(trigger1.eventType).thenReturn(4)
+        `when`(trigger1.eventName).thenReturn("custom")
         customEvent.addAttribute("name", 1)
         // only custom event is added in local repo
         LocalEventRepository.instance().addEvent(customEvent)
@@ -411,9 +412,9 @@ class MessageEventReconciliationUtilReconcileSpec : MessageEventReconciliationUt
         val triggerAttr = TriggerAttribute("name", "value", 1, 1)
         val attrList = ArrayList<TriggerAttribute>()
         attrList.add(triggerAttr)
-        When calling trigger1.triggerAttributes itReturns attrList
-        When calling trigger1.eventType itReturns 4
-        When calling trigger1.eventName itReturns "custom"
+        `when`(trigger1.triggerAttributes).thenReturn(attrList)
+        `when`(trigger1.eventType).thenReturn(4)
+        `when`(trigger1.eventName).thenReturn("custom")
         customEvent.addAttribute("name", "value")
     }
 }
@@ -435,8 +436,8 @@ class MessageEventReconciliationUtilReconcileInvalidSpec : MessageEventReconcili
         val inputMessageList = ArrayList<Message>()
         inputMessageList.add(message2)
         val mockEvent = Mockito.mock(Event::class.java)
-        When calling mockEvent.getEventType() itReturns EventType.INVALID.typeId
-        When calling mockEvent.getEventName() itReturns "invalid"
+        `when`(mockEvent.getEventType()).thenReturn(EventType.INVALID.typeId)
+        `when`(mockEvent.getEventName()).thenReturn("invalid")
         LocalEventRepository.instance().addEvent(mockEvent)
         // Act.
         val outputMessageList = MessageEventReconciliationUtil.instance()
@@ -454,9 +455,9 @@ class MessageEventReconciliationUtilReconcileInvalidSpec : MessageEventReconcili
         val triggerAttr = TriggerAttribute("name1", currDate.time.toString(), 5, 1)
         val attrList = ArrayList<TriggerAttribute>()
         attrList.add(triggerAttr)
-        When calling trigger1.triggerAttributes itReturns attrList
-        When calling trigger1.eventType itReturns 4
-        When calling trigger1.eventName itReturns "custom"
+        `when`(trigger1.triggerAttributes).thenReturn(attrList)
+        `when`(trigger1.eventType).thenReturn(4)
+        `when`(trigger1.eventName).thenReturn("custom")
         customEvent.addAttribute("name2", currDate)
         LocalEventRepository.instance().addEvent(customEvent)
         // Act.
@@ -475,9 +476,9 @@ class MessageEventReconciliationUtilReconcileInvalidSpec : MessageEventReconcili
         val triggerAttr = TriggerAttribute("name", currDate.time.toString(), 0, 1)
         val attrList = ArrayList<TriggerAttribute>()
         attrList.add(triggerAttr)
-        When calling trigger1.triggerAttributes itReturns attrList
-        When calling trigger1.eventType itReturns 4
-        When calling trigger1.eventName itReturns "custom"
+        `when`(trigger1.triggerAttributes).thenReturn(attrList)
+        `when`(trigger1.eventType).thenReturn(4)
+        `when`(trigger1.eventName).thenReturn("custom")
         customEvent.addAttribute("name", currDate)
         LocalEventRepository.instance().addEvent(customEvent)
         // Act.
@@ -496,9 +497,9 @@ class MessageEventReconciliationUtilReconcileInvalidSpec : MessageEventReconcili
         val triggerAttr = TriggerAttribute("name", currDate.time.toString(), 6, 1)
         val attrList = ArrayList<TriggerAttribute>()
         attrList.add(triggerAttr)
-        When calling trigger1.triggerAttributes itReturns attrList
-        When calling trigger1.eventType itReturns 4
-        When calling trigger1.eventName itReturns "custom"
+        `when`(trigger1.triggerAttributes).thenReturn(attrList)
+        `when`(trigger1.eventType).thenReturn(4)
+        `when`(trigger1.eventName).thenReturn("custom")
         customEvent.addAttribute("name", currDate)
         LocalEventRepository.instance().addEvent(customEvent)
         // Act.
@@ -517,10 +518,10 @@ class MessageEventReconciliationUtilReconcileInvalidSpec : MessageEventReconcili
         val triggerAttr = TriggerAttribute("name", currDate.time.toString(), 6, 1)
         val attrList = ArrayList<TriggerAttribute>()
         attrList.add(triggerAttr)
-        When calling trigger1.triggerAttributes itReturns attrList
-        When calling trigger1.eventType itReturns 4
-        When calling trigger1.eventName itReturns "custom"
-        When calling message2.getMaxImpressions() itReturns null
+        `when`(trigger1.triggerAttributes).thenReturn(attrList)
+        `when`(trigger1.eventType).thenReturn(4)
+        `when`(trigger1.eventName).thenReturn("custom")
+        `when`(message2.getMaxImpressions()).thenReturn(null)
         customEvent.addAttribute("name", currDate)
         LocalEventRepository.instance().addEvent(customEvent)
         // Act.

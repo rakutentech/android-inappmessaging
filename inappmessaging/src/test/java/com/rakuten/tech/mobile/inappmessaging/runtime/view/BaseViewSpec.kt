@@ -23,6 +23,7 @@ import org.junit.Before
 import org.junit.Test
 import org.junit.runner.RunWith
 import org.mockito.Mockito
+import org.mockito.Mockito.`when`
 import org.robolectric.RobolectricTestRunner
 import org.robolectric.annotation.Config
 
@@ -43,11 +44,11 @@ class BaseViewSpec : BaseTest() {
         super.setup()
         SoLoader.setInTestMode()
         Fresco.initialize(context)
-        When calling hostAppActivity
-                .layoutInflater itReturns LayoutInflater.from(ApplicationProvider.getApplicationContext())
-        When calling mockMessage.getMessagePayload() itReturns mockPayload
-        When calling mockPayload.header itReturns "test"
-        When calling mockPayload.messageBody itReturns "test"
+        `when`(hostAppActivity
+                .layoutInflater).thenReturn(LayoutInflater.from(ApplicationProvider.getApplicationContext()))
+        `when`(mockMessage.getMessagePayload()).thenReturn(mockPayload)
+        `when`(mockPayload.header).thenReturn("test")
+        `when`(mockPayload.messageBody).thenReturn("test")
         view = hostAppActivity
                 .layoutInflater
                 .inflate(R.layout.in_app_message_full_screen, null) as InAppMessageBaseView
@@ -55,14 +56,14 @@ class BaseViewSpec : BaseTest() {
 
     @Test
     fun `should not crash when null payload`() {
-        When calling mockMessage.getMessagePayload() itReturns null
+        `when`(mockMessage.getMessagePayload()).thenReturn(null)
 
         view?.populateViewData(mockMessage, 1f)
     }
 
     @Test
     fun `should set default when null header color`() {
-        When calling mockPayload.headerColor itReturns null
+        `when`(mockPayload.headerColor).thenReturn(null)
         view?.populateViewData(mockMessage, 1f)
 
         verifyDefault()
@@ -70,8 +71,8 @@ class BaseViewSpec : BaseTest() {
 
     @Test
     fun `should set default when null body color`() {
-        When calling mockPayload.headerColor itReturns WHITE_HEX
-        When calling mockPayload.messageBodyColor itReturns null
+        `when`(mockPayload.headerColor).thenReturn(WHITE_HEX)
+        `when`(mockPayload.messageBodyColor).thenReturn(null)
         view?.populateViewData(mockMessage, 1f)
 
         verifyDefault()
@@ -79,9 +80,9 @@ class BaseViewSpec : BaseTest() {
 
     @Test
     fun `should set default when null bg color`() {
-        When calling mockPayload.headerColor itReturns WHITE_HEX
-        When calling mockPayload.messageBodyColor itReturns WHITE_HEX
-        When calling mockPayload.backgroundColor itReturns null
+        `when`(mockPayload.headerColor).thenReturn(WHITE_HEX)
+        `when`(mockPayload.messageBodyColor).thenReturn(WHITE_HEX)
+        `when`(mockPayload.backgroundColor).thenReturn(null)
         view?.populateViewData(mockMessage, 1f)
 
         verifyDefault()
@@ -89,12 +90,12 @@ class BaseViewSpec : BaseTest() {
 
     @Test
     fun `should set default when invalid button text and bg color`() {
-        When calling mockPayload.messageSettings itReturns mockSettings
-        When calling mockSettings.controlSettings itReturns mockCtrlSettings
-        When calling mockCtrlSettings.buttons itReturns listOf(mockBtn)
-        When calling mockBtn.buttonTextColor itReturns "test"
-        When calling mockBtn.buttonTextColor itReturns "#"
-        When calling mockBtn.buttonBackgroundColor itReturns "#"
+        `when`(mockPayload.messageSettings).thenReturn(mockSettings)
+        `when`(mockSettings.controlSettings).thenReturn(mockCtrlSettings)
+        `when`(mockCtrlSettings.buttons).thenReturn(listOf(mockBtn))
+        `when`(mockBtn.buttonTextColor).thenReturn("test")
+        `when`(mockBtn.buttonTextColor).thenReturn("#")
+        `when`(mockBtn.buttonBackgroundColor).thenReturn("#")
         view?.populateViewData(mockMessage, 1f)
 
         view?.message_single_button?.textColors shouldBeEqualTo ColorStateList.valueOf(Color.parseColor("#1D1D1D"))

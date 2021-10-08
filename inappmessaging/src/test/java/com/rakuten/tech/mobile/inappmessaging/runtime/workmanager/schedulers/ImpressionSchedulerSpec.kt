@@ -7,6 +7,7 @@ import androidx.test.core.app.ApplicationProvider
 import androidx.work.WorkManager
 import androidx.work.WorkRequest
 import androidx.work.testing.WorkManagerTestInitHelper
+import com.nhaarman.mockitokotlin2.argumentCaptor
 import com.rakuten.tech.mobile.inappmessaging.runtime.BaseTest
 import com.rakuten.tech.mobile.inappmessaging.runtime.BuildConfig
 import com.rakuten.tech.mobile.inappmessaging.runtime.InApp
@@ -21,7 +22,9 @@ import org.amshove.kluent.*
 import org.junit.Before
 import org.junit.Test
 import org.junit.runner.RunWith
+import org.mockito.ArgumentMatchers
 import org.mockito.Mockito
+import org.mockito.Mockito.`when`
 import org.robolectric.RobolectricTestRunner
 import org.robolectric.annotation.Config
 
@@ -37,7 +40,8 @@ class ImpressionSchedulerSpec : BaseTest() {
     @Before
     override fun setup() {
         super.setup()
-        When calling mockWorkManager.enqueue(any(WorkRequest::class)) itThrows IllegalStateException("test")
+        `when`(mockWorkManager.enqueue(
+            ArgumentMatchers.any(WorkRequest::class.java))).thenThrow(IllegalStateException("test"))
     }
 
     @Test
@@ -61,7 +65,9 @@ class ImpressionSchedulerSpec : BaseTest() {
         InApp.errorCallback = mockCallback
         setupImpressionScheduler(mockWorkManager)
 
-        Mockito.verify(mockCallback).invoke(any(InAppMessagingException::class))
+        val captor = argumentCaptor<InAppMessagingException>()
+        Mockito.verify(mockCallback).invoke(captor.capture())
+        captor.firstValue shouldBeInstanceOf InAppMessagingException::class.java
     }
 
     @Test

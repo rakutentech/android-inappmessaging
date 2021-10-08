@@ -6,7 +6,9 @@ import android.provider.Settings
 import android.view.ViewGroup
 import androidx.test.core.app.ApplicationProvider
 import androidx.work.testing.WorkManagerTestInitHelper
+import com.nhaarman.mockitokotlin2.any
 import com.nhaarman.mockitokotlin2.anyOrNull
+import com.nhaarman.mockitokotlin2.argumentCaptor
 import com.nhaarman.mockitokotlin2.never
 import com.rakuten.tech.mobile.inappmessaging.runtime.data.models.appevents.AppStartEvent
 import com.rakuten.tech.mobile.inappmessaging.runtime.data.models.appevents.LoginSuccessfulEvent
@@ -26,8 +28,8 @@ import org.junit.Before
 import org.junit.Test
 import org.junit.runner.RunWith
 import org.mockito.Mockito
+import org.mockito.Mockito.`when`
 import org.robolectric.RobolectricTestRunner
-import kotlin.test.fail
 
 /**
  * Test class for InAppMessaging.
@@ -46,12 +48,13 @@ open class InAppMessagingSpec : BaseTest() {
 
     private val function: (ex: Exception) -> Unit = {}
     internal val mockCallback = Mockito.mock(function.javaClass)
+    internal val captor = argumentCaptor<InAppMessagingException>()
 
     @Before
     override fun setup() {
         super.setup()
         LocalEventRepository.instance().clearEvents()
-        When calling mockContext.applicationContext itReturns null
+        `when`(mockContext.applicationContext).thenReturn(null)
     }
 
     @After
@@ -74,7 +77,7 @@ open class InAppMessagingSpec : BaseTest() {
     @Test
     fun `should not display message if config is true for uninitialized instance`() {
         InAppMessaging.setUninitializedInstance()
-        When calling configResponseData.rollOutPercentage itReturns 100
+        `when`(configResponseData.rollOutPercentage).thenReturn(100)
         ConfigResponseRepository.instance().addConfigResponse(configResponseData)
 
         InAppMessaging.instance().registerMessageDisplayActivity(activity)
@@ -137,7 +140,7 @@ open class InAppMessagingSpec : BaseTest() {
         try {
             InAppMessaging.instance().logEvent(AppStartEvent())
         } catch (e: Exception) {
-            fail("should not throw exception")
+            Assert.fail("should not throw exception")
         }
     }
 
@@ -150,7 +153,7 @@ open class InAppMessagingSpec : BaseTest() {
         try {
             InAppMessaging.instance().updateSession()
         } catch (e: Exception) {
-            fail("should not throw exception")
+            Assert.fail("should not throw exception")
         }
     }
 
@@ -163,7 +166,7 @@ open class InAppMessagingSpec : BaseTest() {
             InAppMessaging.instance().closeMessage()
             InAppMessaging.instance().closeMessage(true)
         } catch (e: Exception) {
-            fail("should not throw exception")
+            Assert.fail("should not throw exception")
         }
     }
 
@@ -209,7 +212,7 @@ open class InAppMessagingSpec : BaseTest() {
         setupDisplayedView(message)
         val instance = initializeMockInstance(100)
 
-        When calling displayManager.removeMessage(anyOrNull()) itReturns "1"
+        `when`(displayManager.removeMessage(anyOrNull())).thenReturn("1")
 
         (instance as InApp).removeMessage(false)
         ReadyForDisplayMessageRepository.instance().getAllMessagesCopy().shouldHaveSize(1)
@@ -275,7 +278,7 @@ open class InAppMessagingSpec : BaseTest() {
         setupDisplayedView(message)
         initializeInstance()
 
-        When calling activity.findViewById<ViewGroup>(R.id.in_app_message_base_view) itReturns null
+        `when`(activity.findViewById<ViewGroup>(R.id.in_app_message_base_view)).thenReturn(null)
 
         InAppMessaging.instance().registerMessageDisplayActivity(activity)
         InAppMessaging.instance().unregisterMessageDisplayActivity()
@@ -375,9 +378,9 @@ open class InAppMessagingSpec : BaseTest() {
         ReadyForDisplayMessageRepository.instance().replaceAllMessages(listOf(message, message2))
         PingResponseMessageRepository.instance().replaceAllMessages(listOf(message, message2))
         LocalDisplayedMessageRepository.instance().clearMessages()
-        When calling activity.findViewById<ViewGroup>(R.id.in_app_message_base_view) itReturns viewGroup
-        When calling viewGroup.parent itReturns parentViewGroup
-        When calling viewGroup.tag itReturns "1"
+        `when`(activity.findViewById<ViewGroup>(R.id.in_app_message_base_view)).thenReturn(viewGroup)
+        `when`(viewGroup.parent).thenReturn(parentViewGroup)
+        `when`(viewGroup.tag).thenReturn("1")
     }
 
     private fun initializeInstance(shouldEnableCaching: Boolean = false) {
@@ -386,13 +389,13 @@ open class InAppMessagingSpec : BaseTest() {
                 ApplicationProvider.getApplicationContext<Context>().contentResolver,
                 Settings.Secure.ANDROID_ID,
                 "test_device_id")
-        When calling configResponseData.rollOutPercentage itReturns 100
+        `when`(configResponseData.rollOutPercentage).thenReturn(100)
         ConfigResponseRepository.instance().addConfigResponse(configResponseData)
         InAppMessaging.initialize(ApplicationProvider.getApplicationContext(), true, shouldEnableCaching)
     }
 
     internal fun initializeMockInstance(rollout: Int, manager: DisplayManager = displayManager): InAppMessaging {
-        When calling configResponseData.rollOutPercentage itReturns rollout
+        `when`(configResponseData.rollOutPercentage).thenReturn(rollout)
         ConfigResponseRepository.instance().addConfigResponse(configResponseData)
 
         return InApp(ApplicationProvider.getApplicationContext(), false, manager,
@@ -410,10 +413,10 @@ class InAppMessagingExceptionSpec : InAppMessagingSpec() {
     override fun setup() {
         super.setup()
         InApp.errorCallback = null
-        When calling dispMgr.displayMessage() itThrows NullPointerException()
-        When calling dispMgr.removeMessage(anyOrNull()) itThrows NullPointerException()
-        When calling eventsManager.onEventReceived(any(), any(), any(), any(), any()) itThrows NullPointerException()
-        When calling sessionManager.onSessionUpdate() itThrows NullPointerException()
+        `when`(dispMgr.displayMessage()).thenThrow(NullPointerException())
+        `when`(dispMgr.removeMessage(anyOrNull())).thenThrow(NullPointerException())
+        `when`(eventsManager.onEventReceived(any(), any(), any(), any(), any())).thenThrow(NullPointerException())
+        `when`(sessionManager.onSessionUpdate()).thenThrow(NullPointerException())
     }
 
     @After
@@ -425,7 +428,7 @@ class InAppMessagingExceptionSpec : InAppMessagingSpec() {
     @Test
     fun `should not crash when register preference failed due to forced exception`() {
         val mockProvider = Mockito.mock(UserInfoProvider::class.java)
-        When calling mockProvider.provideUserId() itThrows NullPointerException()
+        `when`(mockProvider.provideUserId()).thenThrow(NullPointerException())
 
         instance.registerPreference(mockProvider)
     }
@@ -434,11 +437,12 @@ class InAppMessagingExceptionSpec : InAppMessagingSpec() {
     fun `should trigger callback when register preference failed due to forced exception`() {
         InApp.errorCallback = mockCallback
         val mockProvider = Mockito.mock(UserInfoProvider::class.java)
-        When calling mockProvider.provideUserId() itThrows NullPointerException()
+        `when`(mockProvider.provideUserId()).thenThrow(NullPointerException())
 
         instance.registerPreference(mockProvider)
 
-        Mockito.verify(mockCallback).invoke(any(InAppMessagingException::class))
+        Mockito.verify(mockCallback).invoke(captor.capture())
+        captor.firstValue shouldBeInstanceOf InAppMessagingException::class.java
     }
 
     @Test
@@ -451,7 +455,8 @@ class InAppMessagingExceptionSpec : InAppMessagingSpec() {
         InApp.errorCallback = mockCallback
         instance.registerMessageDisplayActivity(mockActivity)
 
-        Mockito.verify(mockCallback).invoke(any(InAppMessagingException::class))
+        Mockito.verify(mockCallback).invoke(captor.capture())
+        captor.firstValue shouldBeInstanceOf InAppMessagingException::class.java
     }
 
     @Test
@@ -465,7 +470,8 @@ class InAppMessagingExceptionSpec : InAppMessagingSpec() {
         InApp.errorCallback = mockCallback
         instance.unregisterMessageDisplayActivity()
 
-        Mockito.verify(mockCallback).invoke(any(InAppMessagingException::class))
+        Mockito.verify(mockCallback).invoke(captor.capture())
+        captor.firstValue shouldBeInstanceOf InAppMessagingException::class.java
     }
 
     @Test
@@ -478,7 +484,8 @@ class InAppMessagingExceptionSpec : InAppMessagingSpec() {
         InApp.errorCallback = mockCallback
         instance.logEvent(AppStartEvent())
 
-        Mockito.verify(mockCallback).invoke(any(InAppMessagingException::class))
+        Mockito.verify(mockCallback).invoke(captor.capture())
+        captor.firstValue shouldBeInstanceOf InAppMessagingException::class.java
     }
 
     @Test
@@ -491,7 +498,8 @@ class InAppMessagingExceptionSpec : InAppMessagingSpec() {
         InApp.errorCallback = mockCallback
         instance.updateSession()
 
-        Mockito.verify(mockCallback).invoke(any(InAppMessagingException::class))
+        Mockito.verify(mockCallback).invoke(captor.capture())
+        captor.firstValue shouldBeInstanceOf InAppMessagingException::class.java
     }
 
     @Test
@@ -504,6 +512,7 @@ class InAppMessagingExceptionSpec : InAppMessagingSpec() {
         InApp.errorCallback = mockCallback
         instance.saveTempData()
 
-        Mockito.verify(mockCallback).invoke(any(InAppMessagingException::class))
+        Mockito.verify(mockCallback).invoke(captor.capture())
+        captor.firstValue shouldBeInstanceOf InAppMessagingException::class.java
     }
 }
