@@ -125,6 +125,9 @@ class AppUserInfoProvider : UserInfoProvider {
 * Access Token - This is the token provided by the internal User SDK as the "authentication token" value.
 * ID Tracking Identifier - This is the value provided by the internal identity SDK as the "tracking identifier" value.
 
+To help IAM identify users, please keep user information in the preference object up to date.
+After logout is complete, please ensure that all `UserInfoProvider` methods in the preference object return `null` or empty string.
+
 **<font color="red">Notes for Rakuten Developers:</font>**
 * **Only provide Access token if the user is logged in.**
 * **The internal IAM backend only supports production Access token.**
@@ -147,6 +150,10 @@ if (iamFlag) {
     InAppMessaging.instance().registerPreference(provider)
 }
 ```
+
+The preference object can be set once per app session. IAM SDK will read object's properties on demand.
+
+Preferences are not persisted so this function needs to be called on every launch.
 
 **<font color="red">Notes:</font>**
 * Missing Subscription Key or other critical information are some of the possible issues that can be encountered during initialization.
