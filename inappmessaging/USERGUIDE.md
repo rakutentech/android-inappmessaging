@@ -357,7 +357,7 @@ Documents targeting Product Managers:
 ### 6.0.0 (in-progress)
 * SDKCF-4151: **Breaking Changes:**
   - Renamed method for providing access token in `UserInfoProvider` interface class from `provideRaeToken` to `provideAccessToken`.
-  - Removed `provideRakutenId` method for Rakuten Id in `UserInfoProvider` interface class from `provideRaeToken` to `provideAccessToken`. Please use `provideUserId` for specific user targeting.
+  - Removed `provideRakutenId` method for Rakuten Id in `UserInfoProvider` interface class. Please use `provideUserId` for specific user targeting.
   - All the methods in `UserInfoProvider` class are optional for Kotlin class implementing the interface.
 
 ### 5.0.0 (2021-09-10)
