@@ -140,7 +140,7 @@ open class InAppMessagingSpec : BaseTest() {
         try {
             InAppMessaging.instance().logEvent(AppStartEvent())
         } catch (e: Exception) {
-            Assert.fail("should not throw exception")
+            Assert.fail(EXCEPTION_MSG)
         }
     }
 
@@ -153,7 +153,7 @@ open class InAppMessagingSpec : BaseTest() {
         try {
             InAppMessaging.instance().updateSession()
         } catch (e: Exception) {
-            Assert.fail("should not throw exception")
+            Assert.fail(EXCEPTION_MSG)
         }
     }
 
@@ -166,7 +166,7 @@ open class InAppMessagingSpec : BaseTest() {
             InAppMessaging.instance().closeMessage()
             InAppMessaging.instance().closeMessage(true)
         } catch (e: Exception) {
-            Assert.fail("should not throw exception")
+            Assert.fail(EXCEPTION_MSG)
         }
     }
 
@@ -400,6 +400,10 @@ open class InAppMessagingSpec : BaseTest() {
 
         return InApp(ApplicationProvider.getApplicationContext(), false, manager,
                 eventsManager = eventsManager, sessionManager = sessionManager)
+    }
+
+    companion object {
+        private const val EXCEPTION_MSG = "should not throw exception"
     }
 }
 

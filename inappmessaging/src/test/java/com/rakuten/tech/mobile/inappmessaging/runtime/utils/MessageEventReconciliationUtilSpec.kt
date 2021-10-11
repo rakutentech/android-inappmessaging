@@ -80,6 +80,24 @@ open class MessageEventReconciliationUtilSpec : BaseTest() {
         LocalDisplayedMessageRepository.instance().clearMessages()
         LocalEventRepository.instance().clearEvents()
     }
+
+    internal fun arrangeInputDataWithDate(attriName: String): MutableList<Message> {
+        // Arrange input data.
+        val inputMessageList = ArrayList<Message>()
+        inputMessageList.add(message2)
+        val currDate = Date()
+        val triggerAttr = TriggerAttribute("name", currDate.time.toString(), 5, 1)
+        val attrList = ArrayList<TriggerAttribute>()
+        attrList.add(triggerAttr)
+        `when`(trigger1.triggerAttributes).thenReturn(attrList)
+        `when`(trigger1.eventType).thenReturn(4)
+        `when`(trigger1.eventName).thenReturn("custom")
+        customEvent.addAttribute(attriName, currDate)
+        LocalEventRepository.instance().addEvent(customEvent)
+        // Act.
+        return MessageEventReconciliationUtil.instance()
+            .reconcileMessagesAndEvents(inputMessageList)
+    }
 }
 
 class MessageEventReconciliationUtilExtractSpec : MessageEventReconciliationUtilSpec() {
@@ -252,21 +270,8 @@ class MessageEventReconciliationUtilReconcileSpec : MessageEventReconciliationUt
 
     @Test
     fun `should reconcile message with valid time trigger`() {
-        // Arrange input data.
-        val inputMessageList = ArrayList<Message>()
-        inputMessageList.add(message2)
-        val currDate = Date()
-        val triggerAttr = TriggerAttribute("name", currDate.time.toString(), 5, 1)
-        val attrList = ArrayList<TriggerAttribute>()
-        attrList.add(triggerAttr)
-        `when`(trigger1.triggerAttributes).thenReturn(attrList)
-        `when`(trigger1.eventType).thenReturn(4)
-        `when`(trigger1.eventName).thenReturn("custom")
-        customEvent.addAttribute("name", currDate)
-        LocalEventRepository.instance().addEvent(customEvent)
-        // Act.
-        val outputMessageList = MessageEventReconciliationUtil.instance()
-                .reconcileMessagesAndEvents(inputMessageList)
+        val outputMessageList = arrangeInputDataWithDate("name")
+
         // Re-assert the output with qualifying event.
         outputMessageList.shouldHaveSize(1)
     }
@@ -448,21 +453,8 @@ class MessageEventReconciliationUtilReconcileInvalidSpec : MessageEventReconcili
 
     @Test
     fun `should not reconcile message with mismatched attribute name`() {
-        // Arrange input data.
-        val inputMessageList = ArrayList<Message>()
-        inputMessageList.add(message2)
-        val currDate = Date()
-        val triggerAttr = TriggerAttribute("name1", currDate.time.toString(), 5, 1)
-        val attrList = ArrayList<TriggerAttribute>()
-        attrList.add(triggerAttr)
-        `when`(trigger1.triggerAttributes).thenReturn(attrList)
-        `when`(trigger1.eventType).thenReturn(4)
-        `when`(trigger1.eventName).thenReturn("custom")
-        customEvent.addAttribute("name2", currDate)
-        LocalEventRepository.instance().addEvent(customEvent)
         // Act.
-        val outputMessageList = MessageEventReconciliationUtil.instance()
-                .reconcileMessagesAndEvents(inputMessageList)
+        val outputMessageList = arrangeInputDataWithDate("name2")
         // Re-assert the output with qualifying event.
         outputMessageList.shouldHaveSize(0)
     }
