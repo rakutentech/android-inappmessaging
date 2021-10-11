@@ -182,16 +182,7 @@ class MessageEventReconciliationUtilReconcileSpec : MessageEventReconciliationUt
     @Test
     fun `should reconcile message with valid integer trigger`() {
         // Arrange input data.
-        val inputMessageList = ArrayList<Message>()
-        inputMessageList.add(message2)
-        val triggerAttr = TriggerAttribute("name", "1", 2, 1)
-        val attrList = ArrayList<TriggerAttribute>()
-        attrList.add(triggerAttr)
-        `when`(trigger1.triggerAttributes).thenReturn(attrList)
-        `when`(trigger1.eventType).thenReturn(4)
-        `when`(trigger1.eventName).thenReturn("custom")
-        customEvent.addAttribute("name", 1)
-        LocalEventRepository.instance().addEvent(customEvent)
+        val inputMessageList = setupMessageTrigger()
         // Act.
         val outputMessageList = MessageEventReconciliationUtil.instance()
                 .reconcileMessagesAndEvents(inputMessageList)
@@ -386,18 +377,7 @@ class MessageEventReconciliationUtilReconcileSpec : MessageEventReconciliationUt
 
     @Test
     fun `should consider required set of satisfied triggers for non-persistent type (custom)`() {
-        val inputMessageList = ArrayList<Message>()
-        inputMessageList.add(message2)
-        val triggerAttr = TriggerAttribute("name", "1", 2, 1)
-        val attrList = ArrayList<TriggerAttribute>()
-        attrList.add(triggerAttr)
-        // Custom (Non-Persistent Type)
-        `when`(trigger1.triggerAttributes).thenReturn(attrList)
-        `when`(trigger1.eventType).thenReturn(4)
-        `when`(trigger1.eventName).thenReturn("custom")
-        customEvent.addAttribute("name", 1)
-        // only custom event is added in local repo
-        LocalEventRepository.instance().addEvent(customEvent)
+        val inputMessageList = setupMessageTrigger()
 
         // first display
         var outputMessageList = MessageEventReconciliationUtil.instance().reconcileMessagesAndEvents(inputMessageList)
@@ -411,6 +391,20 @@ class MessageEventReconciliationUtilReconcileSpec : MessageEventReconciliationUt
         outputMessageList = MessageEventReconciliationUtil.instance().reconcileMessagesAndEvents(inputMessageList)
         // Re-assert the output with qualifying event.
         outputMessageList.shouldHaveSize(0)
+    }
+
+    private fun setupMessageTrigger(): ArrayList<Message> {
+        val inputMessageList = ArrayList<Message>()
+        inputMessageList.add(message2)
+        val triggerAttr = TriggerAttribute("name", "1", 2, 1)
+        val attrList = ArrayList<TriggerAttribute>()
+        attrList.add(triggerAttr)
+        `when`(trigger1.triggerAttributes).thenReturn(attrList)
+        `when`(trigger1.eventType).thenReturn(4)
+        `when`(trigger1.eventName).thenReturn("custom")
+        customEvent.addAttribute("name", 1)
+        LocalEventRepository.instance().addEvent(customEvent)
+        return inputMessageList
     }
 
     private fun setupCustomEventStringAttribute() {
