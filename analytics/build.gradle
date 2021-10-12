@@ -1,7 +1,5 @@
-plugins {
-    id 'java-library'
-    id 'kotlin'
-}
+apply from: '../config/android/library.gradle'
+apply plugin: 'kotlin-android'
 
 java {
     sourceCompatibility = JavaVersion.VERSION_1_8
