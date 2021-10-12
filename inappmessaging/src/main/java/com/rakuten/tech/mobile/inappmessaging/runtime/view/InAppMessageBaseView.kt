@@ -6,17 +6,18 @@ import android.content.res.ColorStateList
 import android.graphics.Color
 import android.util.AttributeSet
 import android.view.View
+import android.widget.CheckBox
 import android.widget.FrameLayout
+import android.widget.ImageButton
+import android.widget.LinearLayout
+import android.widget.TextView
+import androidx.core.widget.NestedScrollView
 import com.facebook.drawee.backends.pipeline.Fresco
+import com.facebook.drawee.view.SimpleDraweeView
 import com.google.android.material.button.MaterialButton
 import com.rakuten.tech.mobile.inappmessaging.runtime.R
 import com.rakuten.tech.mobile.inappmessaging.runtime.data.models.messages.Message
 import com.rakuten.tech.mobile.inappmessaging.runtime.data.responses.ping.MessageButton
-import kotlinx.android.synthetic.main.close_button.view.*
-import kotlinx.android.synthetic.main.message_buttons.view.*
-import kotlinx.android.synthetic.main.message_image_view.view.*
-import kotlinx.android.synthetic.main.message_scrollview.view.*
-import kotlinx.android.synthetic.main.opt_out_checkbox.view.*
 import timber.log.Timber
 
 /**
@@ -90,18 +91,18 @@ internal open class InAppMessageBaseView(context: Context, attrs: AttributeSet?)
      */
     private fun bindButtons() {
         // Set onClick listener to close button.
-        val closeButton = message_close_button
+        val closeButton = findViewById<ImageButton>(R.id.message_close_button)
         closeButton.setOnClickListener(this.listener)
         if (this.buttons?.size == 1) {
             // Set bigger layout_margin if there's only one button.
-            val view = message_single_button
+            val view = findViewById<MaterialButton>(R.id.message_single_button)
             if (view is MaterialButton) {
                 setButtonInfo(view, this.buttons!![0])
             }
         } else if (buttons?.size == 2) {
             // Set bigger layout_margin if there's only one button.
-            setButtonInfo(message_button_left as MaterialButton, this.buttons!![0])
-            setButtonInfo(message_button_right as MaterialButton, this.buttons!![1])
+            setButtonInfo(findViewById(R.id.message_button_left), this.buttons!![0])
+            setButtonInfo(findViewById(R.id.message_button_right), this.buttons!![1])
         }
     }
 
@@ -111,7 +112,7 @@ internal open class InAppMessageBaseView(context: Context, attrs: AttributeSet?)
     private fun bindCheckBox() {
         // Display opt-out checkbox.
         if (this.displayOptOut) {
-            val checkBox = opt_out_checkbox
+            val checkBox = findViewById<CheckBox>(R.id.opt_out_checkbox)
             checkBox.setOnClickListener(this.listener)
             checkBox.visibility = View.VISIBLE
         }
@@ -123,7 +124,7 @@ internal open class InAppMessageBaseView(context: Context, attrs: AttributeSet?)
     @SuppressLint("ClickableViewAccessibility")
     private fun bindImage() { // Display image.
         if (!this.imageUrl.isNullOrEmpty()) {
-            val draweeView = message_image_view
+            val draweeView = findViewById<SimpleDraweeView>(R.id.message_image_view)
             if (draweeView != null) {
                 draweeView.setOnTouchListener(this.listener)
                 // Building a DraweeController to handle animations.
@@ -169,7 +170,7 @@ internal open class InAppMessageBaseView(context: Context, attrs: AttributeSet?)
         buttonView.strokeColor = ColorStateList.valueOf(textColor)
         buttonView.setOnClickListener(this.listener)
         buttonView.visibility = View.VISIBLE
-        message_buttons.visibility = View.VISIBLE
+        findViewById<LinearLayout>(R.id.message_buttons).visibility = View.VISIBLE
     }
 
     /**
@@ -179,13 +180,13 @@ internal open class InAppMessageBaseView(context: Context, attrs: AttributeSet?)
     @SuppressWarnings("LongMethod")
     private fun bindText() {
         if (!header.isNullOrEmpty() || !messageBody.isNullOrEmpty()) {
-            val scrollView = message_scrollview
+            val scrollView = findViewById<NestedScrollView>(R.id.message_scrollview)
             if (scrollView != null) {
                 scrollView.visibility = View.VISIBLE
             }
         }
         if (!header.isNullOrEmpty()) {
-            val headerTextView = header_text
+            val headerTextView = findViewById<TextView>(R.id.header_text)
             if (headerTextView != null) {
                 headerTextView.text = header
                 headerTextView.setTextColor(headerColor)
@@ -194,7 +195,7 @@ internal open class InAppMessageBaseView(context: Context, attrs: AttributeSet?)
             }
         }
         if (!messageBody.isNullOrEmpty()) {
-            val messageBodyTextView = message_body
+            val messageBodyTextView = findViewById<TextView>(R.id.message_body)
             if (messageBodyTextView != null) {
                 messageBodyTextView.text = messageBody
                 messageBodyTextView.setTextColor(messageBodyColor)

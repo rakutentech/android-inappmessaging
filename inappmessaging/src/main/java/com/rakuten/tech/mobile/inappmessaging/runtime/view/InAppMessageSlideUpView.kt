@@ -3,12 +3,11 @@ package com.rakuten.tech.mobile.inappmessaging.runtime.view
 import android.content.Context
 import android.util.AttributeSet
 import android.widget.ImageButton
+import androidx.constraintlayout.widget.ConstraintLayout
 import com.rakuten.tech.mobile.inappmessaging.runtime.R
 import com.rakuten.tech.mobile.inappmessaging.runtime.data.enums.SlideFromDirectionType
 import com.rakuten.tech.mobile.inappmessaging.runtime.data.models.messages.Message
 import com.rakuten.tech.mobile.inappmessaging.runtime.utils.ViewUtil
-import kotlinx.android.synthetic.main.close_button.view.*
-import kotlinx.android.synthetic.main.in_app_message_slide_up.view.*
 
 /**
  * This is a custom view that extends from InAppMessageBaseView.
@@ -26,9 +25,10 @@ internal class InAppMessageSlideUpView(
         super.populateViewData(message, imageAspectRatio)
 
         // Override image from white background to black background.
-        (message_close_button as ImageButton).setImageResource(R.drawable.close_button_black_background)
+        findViewById<ImageButton>(R.id.message_close_button)
+            .setImageResource(R.drawable.close_button_black_background)
 
-        val constraintLayout = slide_up
+        val constraintLayout = findViewById<ConstraintLayout>(R.id.slide_up)
 
         // Setting background color.
         constraintLayout.setBackgroundColor(bgColor)
@@ -41,6 +41,6 @@ internal class InAppMessageSlideUpView(
             constraintLayout.startAnimation(it)
         }
         // Set listener for special handling of the invisible constraints(button) click.
-        slide_up.setOnClickListener(listener)
+        constraintLayout.setOnClickListener(listener)
     }
 }
