@@ -5,7 +5,6 @@ apply from: '../config/quality/errorprone/android.gradle'
 apply from: '../config/documentation/dokka/android.gradle'
 
 apply plugin: "kotlin-android"
-apply plugin: 'kotlin-android-extensions'
 apply plugin: 'kotlin-kapt'
 
 android {

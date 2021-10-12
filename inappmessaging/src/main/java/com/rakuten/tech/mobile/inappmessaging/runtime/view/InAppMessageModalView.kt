@@ -2,8 +2,9 @@ package com.rakuten.tech.mobile.inappmessaging.runtime.view
 
 import android.content.Context
 import android.util.AttributeSet
+import android.widget.LinearLayout
+import com.rakuten.tech.mobile.inappmessaging.runtime.R
 import com.rakuten.tech.mobile.inappmessaging.runtime.data.models.messages.Message
-import kotlinx.android.synthetic.main.in_app_message_modal.view.*
 
 /**
  * This is a custom view that extends from InAppMessageBaseView.
@@ -19,6 +20,6 @@ internal class InAppMessageModalView(
      */
     override fun populateViewData(message: Message, imageAspectRatio: Float) {
         super.populateViewData(message, imageAspectRatio)
-        modal.setBackgroundColor(bgColor)
+        findViewById<LinearLayout>(R.id.modal)?.setBackgroundColor(bgColor)
     }
 }

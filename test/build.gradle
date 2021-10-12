@@ -1,7 +1,6 @@
 // Reduce code duplication.
 apply from: "$CONFIG.configDir/android/application.gradle"
 apply plugin: "kotlin-android"
-apply plugin: 'kotlin-android-extensions'
 apply plugin: 'kotlin-kapt'
 
 android {

@@ -6,9 +6,11 @@ import android.content.res.ColorStateList
 import android.graphics.Color
 import android.os.Build
 import android.view.LayoutInflater
+import android.widget.TextView
 import androidx.test.core.app.ApplicationProvider
 import com.facebook.drawee.backends.pipeline.Fresco
 import com.facebook.soloader.SoLoader
+import com.google.android.material.button.MaterialButton
 import com.rakuten.tech.mobile.inappmessaging.runtime.BaseTest
 import com.rakuten.tech.mobile.inappmessaging.runtime.R
 import com.rakuten.tech.mobile.inappmessaging.runtime.data.models.messages.Message
@@ -16,8 +18,6 @@ import com.rakuten.tech.mobile.inappmessaging.runtime.data.responses.ping.Contro
 import com.rakuten.tech.mobile.inappmessaging.runtime.data.responses.ping.MessageButton
 import com.rakuten.tech.mobile.inappmessaging.runtime.data.responses.ping.MessagePayload
 import com.rakuten.tech.mobile.inappmessaging.runtime.data.responses.ping.MessageSettings
-import kotlinx.android.synthetic.main.message_buttons.view.*
-import kotlinx.android.synthetic.main.message_scrollview.view.*
 import org.amshove.kluent.*
 import org.junit.Before
 import org.junit.Test
@@ -97,14 +97,14 @@ class BaseViewSpec : BaseTest() {
         `when`(mockBtn.buttonTextColor).thenReturn("#")
         `when`(mockBtn.buttonBackgroundColor).thenReturn("#")
         view?.populateViewData(mockMessage, 1f)
-
-        view?.message_single_button?.textColors shouldBeEqualTo ColorStateList.valueOf(Color.parseColor("#1D1D1D"))
-        view?.message_single_button?.backgroundTintList shouldBeEqualTo ColorStateList.valueOf(Color.WHITE)
+        val button = view?.findViewById<MaterialButton>(R.id.message_single_button)
+        button?.textColors shouldBeEqualTo ColorStateList.valueOf(Color.parseColor("#1D1D1D"))
+        button?.backgroundTintList shouldBeEqualTo ColorStateList.valueOf(Color.WHITE)
     }
 
     private fun verifyDefault() {
-        view?.header_text?.textColors shouldBeEqualTo ColorStateList.valueOf(Color.BLACK)
-        view?.message_body?.textColors shouldBeEqualTo ColorStateList.valueOf(Color.BLACK)
+        view?.findViewById<TextView>(R.id.header_text)?.textColors shouldBeEqualTo ColorStateList.valueOf(Color.BLACK)
+        view?.findViewById<TextView>(R.id.message_body)?.textColors shouldBeEqualTo ColorStateList.valueOf(Color.BLACK)
     }
 
     companion object {
