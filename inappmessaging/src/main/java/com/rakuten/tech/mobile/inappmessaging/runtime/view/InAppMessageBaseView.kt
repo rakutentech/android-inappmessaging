@@ -92,17 +92,16 @@ internal open class InAppMessageBaseView(context: Context, attrs: AttributeSet?)
     private fun bindButtons() {
         // Set onClick listener to close button.
         val closeButton = findViewById<ImageButton>(R.id.message_close_button)
-        closeButton.setOnClickListener(this.listener)
+        closeButton?.setOnClickListener(this.listener)
         if (this.buttons?.size == 1) {
             // Set bigger layout_margin if there's only one button.
-            val view = findViewById<MaterialButton>(R.id.message_single_button)
-            if (view is MaterialButton) {
-                setButtonInfo(view, this.buttons!![0])
+            findViewById<MaterialButton>(R.id.message_single_button)?.let {
+                setButtonInfo(it, this.buttons!![0])
             }
         } else if (buttons?.size == 2) {
             // Set bigger layout_margin if there's only one button.
-            setButtonInfo(findViewById(R.id.message_button_left), this.buttons!![0])
-            setButtonInfo(findViewById(R.id.message_button_right), this.buttons!![1])
+            findViewById<MaterialButton>(R.id.message_button_left)?.let { setButtonInfo(it, this.buttons!![0]) }
+            findViewById<MaterialButton>(R.id.message_button_right)?.let{ setButtonInfo(it, this.buttons!![1]) }
         }
     }
 
@@ -113,8 +112,8 @@ internal open class InAppMessageBaseView(context: Context, attrs: AttributeSet?)
         // Display opt-out checkbox.
         if (this.displayOptOut) {
             val checkBox = findViewById<CheckBox>(R.id.opt_out_checkbox)
-            checkBox.setOnClickListener(this.listener)
-            checkBox.visibility = View.VISIBLE
+            checkBox?.setOnClickListener(this.listener)
+            checkBox?.visibility = View.VISIBLE
         }
     }
 
@@ -124,18 +123,17 @@ internal open class InAppMessageBaseView(context: Context, attrs: AttributeSet?)
     @SuppressLint("ClickableViewAccessibility")
     private fun bindImage() { // Display image.
         if (!this.imageUrl.isNullOrEmpty()) {
-            val draweeView = findViewById<SimpleDraweeView>(R.id.message_image_view)
-            if (draweeView != null) {
-                draweeView.setOnTouchListener(this.listener)
+            findViewById<SimpleDraweeView>(R.id.message_image_view)?.let {
+                it.setOnTouchListener(this.listener)
                 // Building a DraweeController to handle animations.
                 // Image should be already downloaded and cached in memory. Fresco library will look for the
                 // cached image by URI.
-                draweeView.controller = Fresco.newDraweeControllerBuilder()
+                it.controller = Fresco.newDraweeControllerBuilder()
                         .setUri(this.imageUrl)
                         .setAutoPlayAnimations(true)
                         .build()
-                draweeView.aspectRatio = this.imageAspectRatio
-                draweeView.visibility = View.VISIBLE
+                it.aspectRatio = this.imageAspectRatio
+                it.visibility = View.VISIBLE
             }
         }
     }
@@ -170,7 +168,7 @@ internal open class InAppMessageBaseView(context: Context, attrs: AttributeSet?)
         buttonView.strokeColor = ColorStateList.valueOf(textColor)
         buttonView.setOnClickListener(this.listener)
         buttonView.visibility = View.VISIBLE
-        findViewById<LinearLayout>(R.id.message_buttons).visibility = View.VISIBLE
+        findViewById<LinearLayout>(R.id.message_buttons)?.visibility = View.VISIBLE
     }
 
     /**
@@ -180,27 +178,22 @@ internal open class InAppMessageBaseView(context: Context, attrs: AttributeSet?)
     @SuppressWarnings("LongMethod")
     private fun bindText() {
         if (!header.isNullOrEmpty() || !messageBody.isNullOrEmpty()) {
-            val scrollView = findViewById<NestedScrollView>(R.id.message_scrollview)
-            if (scrollView != null) {
-                scrollView.visibility = View.VISIBLE
-            }
+            findViewById<NestedScrollView>(R.id.message_scrollview)?.visibility = View.VISIBLE
         }
         if (!header.isNullOrEmpty()) {
-            val headerTextView = findViewById<TextView>(R.id.header_text)
-            if (headerTextView != null) {
-                headerTextView.text = header
-                headerTextView.setTextColor(headerColor)
-                headerTextView.setOnTouchListener(listener)
-                headerTextView.visibility = View.VISIBLE
+            findViewById<TextView>(R.id.header_text)?.let{
+                it.text = header
+                it.setTextColor(headerColor)
+                it.setOnTouchListener(listener)
+                it.visibility = View.VISIBLE
             }
         }
         if (!messageBody.isNullOrEmpty()) {
-            val messageBodyTextView = findViewById<TextView>(R.id.message_body)
-            if (messageBodyTextView != null) {
-                messageBodyTextView.text = messageBody
-                messageBodyTextView.setTextColor(messageBodyColor)
-                messageBodyTextView.setOnTouchListener(listener)
-                messageBodyTextView.visibility = View.VISIBLE
+            findViewById<TextView>(R.id.message_body)?.let{
+                it.text = messageBody
+                it.setTextColor(messageBodyColor)
+                it.setOnTouchListener(listener)
+                it.visibility = View.VISIBLE
             }
         }
     }

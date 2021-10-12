@@ -20,6 +20,6 @@ internal class InAppMessageModalView(
      */
     override fun populateViewData(message: Message, imageAspectRatio: Float) {
         super.populateViewData(message, imageAspectRatio)
-        findViewById<LinearLayout>(R.id.modal).setBackgroundColor(bgColor)
+        findViewById<LinearLayout>(R.id.modal)?.setBackgroundColor(bgColor)
     }
 }

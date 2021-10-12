@@ -24,10 +24,10 @@ internal class InAppMessageFullScreenView(
         if (imageUrl.isNullOrEmpty()) {
             // If no image, use @drawable/close_button_black_background.
             findViewById<ImageButton>(R.id.message_close_button)
-                .setImageResource(R.drawable.close_button_black_background)
+                ?.setImageResource(R.drawable.close_button_black_background)
 
             // If no image, add empty text spacer on top.
-            findViewById<View>(R.id.view_spacer).visibility = View.VISIBLE
+            findViewById<View>(R.id.view_spacer)?.visibility = View.VISIBLE
         }
         setBackgroundColor(bgColor)
     }

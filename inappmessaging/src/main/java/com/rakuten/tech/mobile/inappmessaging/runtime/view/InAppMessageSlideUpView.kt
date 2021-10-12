@@ -26,21 +26,21 @@ internal class InAppMessageSlideUpView(
 
         // Override image from white background to black background.
         findViewById<ImageButton>(R.id.message_close_button)
-            .setImageResource(R.drawable.close_button_black_background)
+            ?.setImageResource(R.drawable.close_button_black_background)
 
         val constraintLayout = findViewById<ConstraintLayout>(R.id.slide_up)
 
         // Setting background color.
-        constraintLayout.setBackgroundColor(bgColor)
+        constraintLayout?.setBackgroundColor(bgColor)
         // Start animation based on direction.
         val animation = ViewUtil.getSlidingAnimation(
                 context,
                 SlideFromDirectionType.getById(message.getMessagePayload()?.messageSettings?.displaySettings?.slideFrom
                         ?: 0))
         animation?.let {
-            constraintLayout.startAnimation(it)
+            constraintLayout?.startAnimation(it)
         }
         // Set listener for special handling of the invisible constraints(button) click.
-        constraintLayout.setOnClickListener(listener)
+        constraintLayout?.setOnClickListener(listener)
     }
 }
