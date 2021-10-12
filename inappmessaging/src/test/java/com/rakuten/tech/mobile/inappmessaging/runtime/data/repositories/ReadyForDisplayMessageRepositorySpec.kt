@@ -143,12 +143,12 @@ class ReadyForDisplayMessageRepositorySpec : BaseTest() {
         ReadyForDisplayMessageRepository.instance().replaceAllMessages(messageList)
         ReadyForDisplayMessageRepository.instance().getAllMessagesCopy().shouldHaveSize(2)
 
-        infoProvider.rakutenId = "user2"
+        infoProvider.userId = "user2"
         AccountRepository.instance().updateUserInfo()
         ReadyForDisplayMessageRepository.instance().getAllMessagesCopy().shouldBeEmpty()
 
         // revert to initial user info
-        infoProvider.rakutenId = TestUserInfoProvider.TEST_RAKUTEN_ID
+        infoProvider.userId = TestUserInfoProvider.TEST_USER_ID
         AccountRepository.instance().updateUserInfo()
     }
 

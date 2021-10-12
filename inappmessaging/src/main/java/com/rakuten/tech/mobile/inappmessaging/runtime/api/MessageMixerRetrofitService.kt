@@ -26,7 +26,7 @@ internal interface MessageMixerRetrofitService {
     @POST
     fun performPing(
         @Header(SUBSCRIPTION_ID_HEADER) subscriptionId: String,
-        @Header(RAE_TOKEN_HEADER) raeToken: String,
+        @Header(ACCESS_TOKEN_HEADER) accessToken: String,
         @Header(DEVICE_ID_HEADER) deviceId: String,
         @Url url: String,
         @Body requestBody: PingRequest
@@ -38,7 +38,7 @@ internal interface MessageMixerRetrofitService {
     @POST
     fun getDisplayPermissionService(
         @Header(SUBSCRIPTION_ID_HEADER) subscriptionId: String,
-        @Header(RAE_TOKEN_HEADER) raeToken: String,
+        @Header(ACCESS_TOKEN_HEADER) accessToken: String,
         @Url url: String,
         @Body request: DisplayPermissionRequest
     ): Call<DisplayPermissionResponse>
@@ -50,7 +50,7 @@ internal interface MessageMixerRetrofitService {
     fun reportImpression(
         @Header(SUBSCRIPTION_ID_HEADER) subscriptionId: String,
         @Header(DEVICE_ID_HEADER) deviceId: String,
-        @Header(RAE_TOKEN_HEADER) raeToken: String,
+        @Header(ACCESS_TOKEN_HEADER) accessToken: String,
         @Url impressionUrl: String,
         @Body impressionRequest: ImpressionRequest
     ): Call<ResponseBody>
@@ -66,7 +66,7 @@ internal interface MessageMixerRetrofitService {
 
     companion object {
         const val DEVICE_ID_HEADER = "device_id"
-        const val RAE_TOKEN_HEADER = "Authorization"
+        const val ACCESS_TOKEN_HEADER = "Authorization"
         const val SUBSCRIPTION_ID_HEADER = "Subscription-Id"
     }
 }

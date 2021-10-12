@@ -6,22 +6,18 @@ package com.rakuten.tech.mobile.inappmessaging.runtime
 class TestUserInfoProvider : UserInfoProvider {
 
     var userId = TEST_USER_ID
-    var raeToken = TEST_USER_RAE_TOKEN
-    var rakutenId = TEST_RAKUTEN_ID
+    var accessToken = TEST_USER_ACCESS_TOKEN
     var idTrackingIdentifier = ""
 
-    override fun provideRaeToken(): String? = raeToken
+    override fun provideAccessToken(): String? = accessToken
 
     override fun provideUserId(): String? = userId
-
-    override fun provideRakutenId(): String? = rakutenId
 
     override fun provideIdTrackingIdentifier(): String? = idTrackingIdentifier
 
     companion object {
-        const val TEST_USER_RAE_TOKEN = "test_rae_token"
+        const val TEST_USER_ACCESS_TOKEN = "test_access_token"
         const val TEST_USER_ID = "test_user_id"
-        const val TEST_RAKUTEN_ID = "test_rakuten_id"
         const val TEST_ID_TRACKING_IDENTIFIER = "test_id_tracking"
     }
 }

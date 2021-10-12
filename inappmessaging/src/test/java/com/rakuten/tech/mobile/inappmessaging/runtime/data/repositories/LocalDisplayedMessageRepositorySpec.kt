@@ -168,12 +168,12 @@ class LocalDisplayedMessageRepositorySpec : BaseTest() {
         LocalDisplayedMessageRepository.instance().addMessage(message)
         LocalDisplayedMessageRepository.instance().numberOfTimesDisplayed(message) shouldBeEqualTo 1
 
-        infoProvider.rakutenId = "user2"
+        infoProvider.userId = "user2"
         AccountRepository.instance().updateUserInfo()
         LocalDisplayedMessageRepository.instance().numberOfTimesDisplayed(message) shouldBeEqualTo 0
 
         // revert to initial user info
-        infoProvider.rakutenId = TestUserInfoProvider.TEST_RAKUTEN_ID
+        infoProvider.userId = TestUserInfoProvider.TEST_USER_ID
         AccountRepository.instance().updateUserInfo()
         return message
     }

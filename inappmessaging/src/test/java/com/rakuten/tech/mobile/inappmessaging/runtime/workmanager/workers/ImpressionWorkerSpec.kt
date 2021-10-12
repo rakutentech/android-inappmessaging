@@ -79,8 +79,8 @@ class ImpressionWorkerSpec : BaseTest() {
 
     @Test
     fun `should response body call contains token header`() {
-        responseBodyCall!!.request().header(MessageMixerRetrofitService.RAE_TOKEN_HEADER) shouldBeEqualTo
-                "OAuth2 " + TestUserInfoProvider.TEST_USER_RAE_TOKEN
+        responseBodyCall!!.request().header(MessageMixerRetrofitService.ACCESS_TOKEN_HEADER) shouldBeEqualTo
+                "OAuth2 " + TestUserInfoProvider.TEST_USER_ACCESS_TOKEN
     }
 
     @Test

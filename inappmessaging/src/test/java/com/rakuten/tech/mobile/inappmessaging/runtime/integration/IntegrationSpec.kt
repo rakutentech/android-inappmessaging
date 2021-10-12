@@ -39,9 +39,8 @@ class IntegrationSpec {
         Settings.Secure.putString(context.contentResolver, Settings.Secure.ANDROID_ID, "testid")
         ConfigResponseRepository.resetInstance()
         InAppMessaging.instance().registerPreference(object : UserInfoProvider {
-            override fun provideRaeToken() = ""
+            override fun provideAccessToken() = ""
             override fun provideUserId() = ""
-            override fun provideRakutenId() = ""
             override fun provideIdTrackingIdentifier() = ""
         })
         // to initialize host app info

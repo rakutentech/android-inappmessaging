@@ -79,11 +79,6 @@ internal object RuntimeUtil {
             val user = UserIdentifier(userId, UserIdentifierType.USER_ID.typeId)
             identifierList.add(user)
         }
-        val rakutenId = accountRepo.getRakutenId()
-        if (rakutenId.isNotEmpty()) {
-            val user = UserIdentifier(rakutenId, UserIdentifierType.R_ID.typeId)
-            identifierList.add(user)
-        }
 
         val trackingId = accountRepo.getIdTrackingIdentifier()
         if (trackingId.isNotEmpty()) {

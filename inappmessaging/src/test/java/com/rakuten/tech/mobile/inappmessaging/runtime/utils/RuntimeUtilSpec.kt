@@ -22,25 +22,24 @@ class RuntimeUtilSpec : BaseTest() {
     fun `should get user identifier with user id`() {
         val mockProvider = Mockito.mock(UserInfoProvider::class.java)
         `when`(mockProvider.provideUserId()).thenReturn("test_user_id")
-        `when`(mockProvider.provideRakutenId()).thenReturn("")
         AccountRepository.instance().userInfoProvider = mockProvider
         RuntimeUtil.getUserIdentifiers().shouldHaveSize(1)
     }
 
     @Test
-    fun `should get user identifier with rakuten id`() {
+    fun `should get user identifier with tracking identifier`() {
         val mockProvider = Mockito.mock(UserInfoProvider::class.java)
         `when`(mockProvider.provideUserId()).thenReturn("")
-        `when`(mockProvider.provideRakutenId()).thenReturn("test_rakuten_id")
+        `when`(mockProvider.provideIdTrackingIdentifier()).thenReturn("test_tracking_id")
         AccountRepository.instance().userInfoProvider = mockProvider
         RuntimeUtil.getUserIdentifiers().shouldHaveSize(1)
     }
 
     @Test
-    fun `should get user identifier with both user and rakuten id`() {
+    fun `should get user identifier with both user id and tracking identifier`() {
         val mockProvider = Mockito.mock(UserInfoProvider::class.java)
         `when`(mockProvider.provideUserId()).thenReturn("test_user_id")
-        `when`(mockProvider.provideRakutenId()).thenReturn("test_rakuten_id")
+        `when`(mockProvider.provideIdTrackingIdentifier()).thenReturn("test_tracking_id")
         AccountRepository.instance().userInfoProvider = mockProvider
         RuntimeUtil.getUserIdentifiers().shouldHaveSize(2)
     }

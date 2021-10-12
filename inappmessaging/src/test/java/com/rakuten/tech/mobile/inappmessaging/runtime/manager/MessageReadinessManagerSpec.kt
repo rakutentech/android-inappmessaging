@@ -107,8 +107,8 @@ class MessageReadinessManagerSpec : BaseTest() {
     fun `should add token to header`() {
         val responseCall: Call<DisplayPermissionResponse> =
                 MessageReadinessManager.instance().getDisplayPermissionResponseCall(DISPLAY_PERMISSION_URL, mockRequest)
-        responseCall.request().header(MessageMixerRetrofitService.RAE_TOKEN_HEADER) shouldBeEqualTo
-                "OAuth2 " + TestUserInfoProvider.TEST_USER_RAE_TOKEN
+        responseCall.request().header(MessageMixerRetrofitService.ACCESS_TOKEN_HEADER) shouldBeEqualTo
+                "OAuth2 " + TestUserInfoProvider.TEST_USER_ACCESS_TOKEN
     }
 
     @Test

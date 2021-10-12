@@ -173,9 +173,8 @@ class MessageMixerWorkerSpec : BaseTest() {
                         InAppMessagingTestConstants.APP_VERSION, "test-key",
                         InAppMessagingTestConstants.LOCALE))
         AccountRepository.instance().userInfoProvider = object : UserInfoProvider {
-            override fun provideRaeToken() = ""
+            override fun provideAccessToken() = ""
             override fun provideUserId() = "user1"
-            override fun provideRakutenId() = "rakuten1"
             override fun provideIdTrackingIdentifier() = "tracking1"
         }
         retrieveValidConfig()
@@ -184,7 +183,6 @@ class MessageMixerWorkerSpec : BaseTest() {
         val buffer = Buffer()
         worker.responseCall!!.request().body()!!.writeTo(buffer)
         buffer.readUtf8().shouldContainAll(
-                "\"id\":\"rakuten1\",\"type\":1",
                 "\"id\":\"tracking1\",\"type\":2",
                 "\"id\":\"user1\",\"type\":3")
     }

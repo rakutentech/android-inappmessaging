@@ -6,8 +6,8 @@ import org.junit.Test
 
 class MessageMixerRetrofitServiceSpec : BaseTest() {
     @Test
-    fun `should RAE token header spelled with base attributes`() {
-        MessageMixerRetrofitService.RAE_TOKEN_HEADER shouldBeEqualTo "Authorization"
+    fun `should access token header spelled with base attributes`() {
+        MessageMixerRetrofitService.ACCESS_TOKEN_HEADER shouldBeEqualTo "Authorization"
     }
 
     @Test
