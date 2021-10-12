@@ -4,12 +4,14 @@ import android.content.Context
 import android.content.res.Resources
 import android.os.Build
 import androidx.test.core.app.ApplicationProvider
+import com.nhaarman.mockitokotlin2.any
 import com.rakuten.tech.mobile.inappmessaging.runtime.BaseTest
 import com.rakuten.tech.mobile.inappmessaging.runtime.data.enums.SlideFromDirectionType
 import org.amshove.kluent.*
 import org.junit.Test
 import org.junit.runner.RunWith
 import org.mockito.Mockito
+import org.mockito.Mockito.`when`
 import org.robolectric.RobolectricTestRunner
 import org.robolectric.annotation.Config
 
@@ -56,8 +58,8 @@ class ViewUtilSpec : BaseTest() {
     fun `should return null if invalid animation`() {
         val mockContext = Mockito.mock(Context::class.java)
         val mockResource = Mockito.mock(Resources::class.java)
-        When calling mockContext.resources itReturns mockResource
-        When calling mockResource.getAnimation(any()) itThrows Resources.NotFoundException("test")
+        `when`(mockContext.resources).thenReturn(mockResource)
+        `when`(mockResource.getAnimation(any())).thenThrow(Resources.NotFoundException("test"))
         val animation = ViewUtil.getSlidingAnimation(mockContext, SlideFromDirectionType.BOTTOM)
         animation.shouldBeNull()
     }

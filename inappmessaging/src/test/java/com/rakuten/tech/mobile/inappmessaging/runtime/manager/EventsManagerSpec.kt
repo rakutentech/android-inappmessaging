@@ -23,6 +23,7 @@ import org.junit.Before
 import org.junit.Test
 import org.junit.runner.RunWith
 import org.mockito.Mockito
+import org.mockito.Mockito.`when`
 import org.robolectric.RobolectricTestRunner
 import java.util.concurrent.ExecutionException
 
@@ -43,8 +44,8 @@ class EventsManagerSpec : BaseTest() {
     override fun setup() {
         super.setup()
         WorkManagerTestInitHelper.initializeTestWorkManager(context)
-        When calling mockEvent.getEventName() itReturns EVENT_NAME
-        When calling mockEvent.getRatEventMap() itReturns map
+        `when`(mockEvent.getEventName()).thenReturn(EVENT_NAME)
+        `when`(mockEvent.getRatEventMap()).thenReturn(map)
         LocalDisplayedMessageRepository.instance().clearMessages()
         LocalEventRepository.instance().clearEvents()
         ReadyForDisplayMessageRepository.instance().clearMessages()
@@ -70,7 +71,7 @@ class EventsManagerSpec : BaseTest() {
     @Test
     fun `should check config is enabled`() {
         ConfigResponseRepository.instance().addConfigResponse(configResponseData)
-        When calling configResponseData.rollOutPercentage itReturns 0
+        `when`(configResponseData.rollOutPercentage).thenReturn(0)
         EventsManager.onEventReceived(mockEvent)
         Mockito.verify(configResponseData).rollOutPercentage
     }
@@ -85,8 +86,8 @@ class EventsManagerSpec : BaseTest() {
         InAppMessaging.initialize(ApplicationProvider.getApplicationContext(), true)
         InAppMessaging.instance().registerPreference(TestUserInfoProvider())
         ConfigResponseRepository.instance().addConfigResponse(configResponseData)
-        When calling configResponseData.rollOutPercentage itReturns 0
-        When calling mockEvent.getEventType() itReturns EventType.LOGIN_SUCCESSFUL.typeId
+        `when`(configResponseData.rollOutPercentage).thenReturn(0)
+        `when`(mockEvent.getEventType()).thenReturn(EventType.LOGIN_SUCCESSFUL.typeId)
         EventsManager.onEventReceived(mockEvent)
         WorkManager.getInstance(context).getWorkInfosByTag(MESSAGES_EVENTS_WORKER_NAME).get().shouldHaveSize(0)
     }
@@ -103,8 +104,8 @@ class EventsManagerSpec : BaseTest() {
 
         addTestData()
 
-        When calling configResponseData.rollOutPercentage itReturns 0
-        When calling mockAccount.updateUserInfo() itReturns true
+        `when`(configResponseData.rollOutPercentage).thenReturn(0)
+        `when`(mockAccount.updateUserInfo()).thenReturn(true)
 
         EventsManager.onEventReceived(event = PurchaseSuccessfulEvent(), eventScheduler = eventRecon,
                 accountRepo = mockAccount)
@@ -120,9 +121,9 @@ class EventsManagerSpec : BaseTest() {
                 "test_device_id")
         InAppMessaging.initialize(ApplicationProvider.getApplicationContext(), true)
         InAppMessaging.instance().registerPreference(TestUserInfoProvider())
-        When calling configResponseData.rollOutPercentage itReturns 100
+        `when`(configResponseData.rollOutPercentage).thenReturn(100)
         ConfigResponseRepository.instance().addConfigResponse(configResponseData)
-        When calling mockAccount.updateUserInfo() itReturns false
+        `when`(mockAccount.updateUserInfo()).thenReturn(false)
 
         addTestData()
 

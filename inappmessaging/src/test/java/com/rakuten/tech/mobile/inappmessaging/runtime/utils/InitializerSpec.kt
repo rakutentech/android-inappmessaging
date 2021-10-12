@@ -7,6 +7,7 @@ import androidx.test.core.app.ApplicationProvider
 import androidx.work.Data
 import androidx.work.WorkerParameters
 import androidx.work.testing.WorkManagerTestInitHelper
+import com.nhaarman.mockitokotlin2.any
 import com.nhaarman.mockitokotlin2.eq
 import com.nhaarman.mockitokotlin2.never
 import com.rakuten.tech.mobile.inappmessaging.runtime.AppManifestConfig
@@ -20,6 +21,7 @@ import org.junit.Before
 import org.junit.Test
 import org.junit.runner.RunWith
 import org.mockito.Mockito
+import org.mockito.Mockito.`when`
 import org.robolectric.RobolectricTestRunner
 import java.lang.ClassCastException
 
@@ -37,10 +39,10 @@ class InitializerSpec : BaseTest() {
     @Before
     override fun setup() {
         super.setup()
-        When calling workerParameters.inputData itReturns Data.EMPTY
+        `when`(workerParameters.inputData).thenReturn(Data.EMPTY)
         Settings.Secure.putString(context.contentResolver, Settings.Secure.ANDROID_ID, "testid")
 
-        When calling mockUtil.createSharedPreference(context, "uuid") itReturns mockPref
+        `when`(mockUtil.createSharedPreference(context, "uuid")).thenReturn(mockPref)
     }
 
     @Test
@@ -69,12 +71,12 @@ class InitializerSpec : BaseTest() {
                 ApplicationProvider.getApplicationContext<Context>().contentResolver,
                 Settings.Secure.ANDROID_ID,
                 "test_device_id")
-        When calling context.contentResolver itReturns ApplicationProvider.getApplicationContext<Context>()
-                .contentResolver
-        When calling context.packageManager itReturns ApplicationProvider.getApplicationContext<Context>()
-                .packageManager
-        When calling context.resources itReturns ApplicationProvider.getApplicationContext<Context>()
-                .resources
+        `when`(context.contentResolver).thenReturn(ApplicationProvider.getApplicationContext<Context>()
+                .contentResolver)
+        `when`(context.packageManager).thenReturn(ApplicationProvider.getApplicationContext<Context>()
+                .packageManager)
+        `when`(context.resources).thenReturn(ApplicationProvider.getApplicationContext<Context>()
+                .resources)
         Initializer.initializeSdk(context, "test", "", true)
     }
 
@@ -111,9 +113,9 @@ class InitializerSpec : BaseTest() {
     fun `should generate uuid using mock with null android ID with empty pref`() {
         Settings.Secure.putString(context.contentResolver, Settings.Secure.ANDROID_ID, null)
 
-        When calling mockPref.contains(Initializer.ID_KEY) itReturns false
-        When calling mockPref.edit() itReturns mockEditor
-        When calling mockEditor.putString(any(), any()) itReturns mockEditor
+        `when`(mockPref.contains(Initializer.ID_KEY)).thenReturn(false)
+        `when`(mockPref.edit()).thenReturn(mockEditor)
+        `when`(mockEditor.putString(any(), any())).thenReturn(mockEditor)
 
         Initializer.initializeSdk(context, "test", "", true, mockUtil)
 
@@ -128,8 +130,8 @@ class InitializerSpec : BaseTest() {
     fun `should generate uuid using mock with null android ID with non-empty pref`() {
         Settings.Secure.putString(context.contentResolver, Settings.Secure.ANDROID_ID, null)
 
-        When calling mockPref.contains(Initializer.ID_KEY) itReturns true
-        When calling mockPref.getString(Initializer.ID_KEY, "") itReturns "random_uuid"
+        `when`(mockPref.contains(Initializer.ID_KEY)).thenReturn(true)
+        `when`(mockPref.getString(Initializer.ID_KEY, "")).thenReturn("random_uuid")
 
         Initializer.initializeSdk(context, "test", "", true, mockUtil)
 
@@ -144,10 +146,10 @@ class InitializerSpec : BaseTest() {
     fun `should not crash and generate new if forced exception`() {
         Settings.Secure.putString(context.contentResolver, Settings.Secure.ANDROID_ID, null)
 
-        When calling mockPref.contains(Initializer.ID_KEY) itReturns true
-        When calling mockPref.getString(Initializer.ID_KEY, "") itThrows ClassCastException()
-        When calling mockPref.edit() itReturns mockEditor
-        When calling mockEditor.putString(any(), any()) itReturns mockEditor
+        `when`(mockPref.contains(Initializer.ID_KEY)).thenReturn(true)
+        `when`(mockPref.getString(Initializer.ID_KEY, "")).thenThrow(ClassCastException())
+        `when`(mockPref.edit()).thenReturn(mockEditor)
+        `when`(mockEditor.putString(any(), any())).thenReturn(mockEditor)
 
         Initializer.initializeSdk(context, "test", "", true, mockUtil)
 

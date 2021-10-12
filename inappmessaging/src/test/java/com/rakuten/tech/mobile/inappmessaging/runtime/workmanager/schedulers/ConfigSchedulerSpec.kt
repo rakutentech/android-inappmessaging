@@ -7,6 +7,8 @@ import androidx.test.core.app.ApplicationProvider
 import androidx.work.OneTimeWorkRequest
 import androidx.work.WorkManager
 import androidx.work.testing.WorkManagerTestInitHelper
+import com.nhaarman.mockitokotlin2.any
+import com.nhaarman.mockitokotlin2.argumentCaptor
 import com.rakuten.tech.mobile.inappmessaging.runtime.BaseTest
 import com.rakuten.tech.mobile.inappmessaging.runtime.InApp
 import com.rakuten.tech.mobile.inappmessaging.runtime.InAppMessaging
@@ -16,7 +18,9 @@ import org.amshove.kluent.*
 import org.junit.Before
 import org.junit.Test
 import org.junit.runner.RunWith
+import org.mockito.ArgumentMatchers
 import org.mockito.Mockito
+import org.mockito.Mockito.`when`
 import org.robolectric.RobolectricTestRunner
 import org.robolectric.annotation.Config
 
@@ -32,8 +36,8 @@ class ConfigSchedulerSpec : BaseTest() {
     @Before
     override fun setup() {
         super.setup()
-        When calling mockWorkManager.beginUniqueWork(any(), any(),
-                any(OneTimeWorkRequest::class)) itThrows IllegalStateException("test")
+        `when`(mockWorkManager.beginUniqueWork(any(), any(),
+            ArgumentMatchers.any(OneTimeWorkRequest::class.java))).thenThrow(IllegalStateException("test"))
     }
 
     @Test
@@ -62,7 +66,9 @@ class ConfigSchedulerSpec : BaseTest() {
         InAppMessaging.initialize(ApplicationProvider.getApplicationContext(), true)
         ConfigScheduler.instance().startConfig(0, mockWorkManager)
 
-        Mockito.verify(mockCallback).invoke(any(InAppMessagingException::class))
+        val captor = argumentCaptor<InAppMessagingException>()
+        Mockito.verify(mockCallback).invoke(captor.capture())
+        captor.firstValue shouldBeInstanceOf InAppMessagingException::class.java
     }
 
     @Test

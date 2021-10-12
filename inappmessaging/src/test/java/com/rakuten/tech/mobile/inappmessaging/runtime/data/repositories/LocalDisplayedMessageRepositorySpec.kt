@@ -4,6 +4,7 @@ import android.content.Context
 import android.provider.Settings
 import androidx.test.core.app.ApplicationProvider
 import androidx.work.testing.WorkManagerTestInitHelper
+import com.nhaarman.mockitokotlin2.argumentCaptor
 import com.rakuten.tech.mobile.inappmessaging.runtime.*
 import com.rakuten.tech.mobile.inappmessaging.runtime.coroutine.MessageActionsCoroutine
 import com.rakuten.tech.mobile.inappmessaging.runtime.data.models.messages.InvalidTestMessage
@@ -15,6 +16,7 @@ import org.junit.Before
 import org.junit.Test
 import org.junit.runner.RunWith
 import org.mockito.Mockito
+import org.mockito.Mockito.`when`
 import org.robolectric.RobolectricTestRunner
 import java.util.*
 
@@ -27,6 +29,7 @@ class LocalDisplayedMessageRepositorySpec : BaseTest() {
 
     private val function: (ex: Exception) -> Unit = {}
     private val mockCallback = Mockito.mock(function.javaClass)
+    private val captor = argumentCaptor<InAppMessagingException>()
 
     @Before
     override fun setup() {
@@ -44,7 +47,8 @@ class LocalDisplayedMessageRepositorySpec : BaseTest() {
         InApp.errorCallback = mockCallback
         LocalDisplayedMessageRepository.instance().addMessage(InvalidTestMessage())
 
-        Mockito.verify(mockCallback).invoke(any(InAppMessagingException::class))
+        Mockito.verify(mockCallback).invoke(captor.capture())
+        captor.firstValue shouldBeInstanceOf InAppMessagingException::class.java
     }
 
     @Test
@@ -59,7 +63,8 @@ class LocalDisplayedMessageRepositorySpec : BaseTest() {
         InApp.errorCallback = mockCallback
         LocalDisplayedMessageRepository.instance().addMessage(ValidTestMessage(""))
 
-        Mockito.verify(mockCallback).invoke(any(InAppMessagingException::class))
+        Mockito.verify(mockCallback).invoke(captor.capture())
+        captor.firstValue shouldBeInstanceOf InAppMessagingException::class.java
     }
 
     @Test
@@ -73,7 +78,7 @@ class LocalDisplayedMessageRepositorySpec : BaseTest() {
         val mockRepo = Mockito.mock(LocalDisplayedMessageRepository::class.java)
 
         val message = Mockito.mock(Message::class.java)
-        When calling message.getCampaignId() itReturns "id"
+        `when`(message.getCampaignId()).thenReturn("id")
         MessageActionsCoroutine(mockRepo).executeTask(message, R.id.message_close_button, true)
 
         Mockito.verify(mockRepo).addMessage(message)

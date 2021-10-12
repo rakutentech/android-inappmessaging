@@ -7,6 +7,8 @@ import androidx.test.core.app.ApplicationProvider
 import androidx.work.OneTimeWorkRequest
 import androidx.work.WorkManager
 import androidx.work.testing.WorkManagerTestInitHelper
+import com.nhaarman.mockitokotlin2.any
+import com.nhaarman.mockitokotlin2.argumentCaptor
 import com.rakuten.tech.mobile.inappmessaging.runtime.BaseTest
 import com.rakuten.tech.mobile.inappmessaging.runtime.InApp
 import com.rakuten.tech.mobile.inappmessaging.runtime.InAppMessaging
@@ -21,7 +23,9 @@ import org.amshove.kluent.*
 import org.junit.Before
 import org.junit.Test
 import org.junit.runner.RunWith
+import org.mockito.ArgumentMatchers
 import org.mockito.Mockito
+import org.mockito.Mockito.`when`
 import org.robolectric.RobolectricTestRunner
 import org.robolectric.annotation.Config
 import java.util.concurrent.ExecutionException
@@ -38,8 +42,8 @@ class EventMessageReconciliationSchedulerSpec : BaseTest() {
     @Before
     override fun setup() {
         super.setup()
-        When calling mockWorkManager.beginUniqueWork(any(), any(),
-                any(OneTimeWorkRequest::class)) itThrows IllegalStateException("test")
+        `when`(mockWorkManager.beginUniqueWork(any(), any(),
+            ArgumentMatchers.any(OneTimeWorkRequest::class.java))).thenThrow(IllegalStateException("test"))
     }
 
     @Test
@@ -76,7 +80,9 @@ class EventMessageReconciliationSchedulerSpec : BaseTest() {
         InAppMessaging.initialize(ApplicationProvider.getApplicationContext(), true)
         EventMessageReconciliationScheduler.instance().startEventMessageReconciliationWorker(mockWorkManager)
 
-        Mockito.verify(mockCallback).invoke(any(InAppMessagingException::class))
+        val captor = argumentCaptor<InAppMessagingException>()
+        Mockito.verify(mockCallback).invoke(captor.capture())
+        captor.firstValue shouldBeInstanceOf InAppMessagingException::class.java
     }
 
     @Test
@@ -90,8 +96,8 @@ class EventMessageReconciliationSchedulerSpec : BaseTest() {
         val configResponseData = Mockito.mock(ConfigResponseData::class.java)
         val mockAccount = Mockito.mock(AccountRepository::class.java)
 
-        When calling configResponseData.rollOutPercentage itReturns 100
-        When calling mockAccount.updateUserInfo() itReturns false
+        `when`(configResponseData.rollOutPercentage).thenReturn(100)
+        `when`(mockAccount.updateUserInfo()).thenReturn(false)
 
         ConfigResponseRepository.instance().addConfigResponse(configResponseData)
         LocalEventRepository.instance().clearEvents()

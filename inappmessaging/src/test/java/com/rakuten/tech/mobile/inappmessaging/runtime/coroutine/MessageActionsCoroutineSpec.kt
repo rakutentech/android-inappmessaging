@@ -23,6 +23,7 @@ import org.junit.Before
 import org.junit.Test
 import org.junit.runner.RunWith
 import org.mockito.Mockito
+import org.mockito.Mockito.`when`
 import org.robolectric.ParameterizedRobolectricTestRunner
 import org.robolectric.annotation.Config
 
@@ -192,8 +193,8 @@ internal class MessageActionsCoroutineSpec(
     @Before
     override fun setup() {
         super.setup()
-        When calling activity.packageManager itReturns ApplicationProvider
-                .getApplicationContext<Context>().packageManager
+        `when`(activity.packageManager).thenReturn(ApplicationProvider
+                .getApplicationContext<Context>().packageManager)
 
         WorkManagerTestInitHelper.initializeTestWorkManager(ApplicationProvider.getApplicationContext())
         Settings.Secure.putString(ApplicationProvider.getApplicationContext<Context>().contentResolver,

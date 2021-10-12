@@ -22,6 +22,7 @@ import org.junit.Before
 import org.junit.Test
 import org.junit.runner.RunWith
 import org.mockito.Mockito
+import org.mockito.Mockito.`when`
 import org.robolectric.RobolectricTestRunner
 import org.robolectric.annotation.Config
 import retrofit2.Call
@@ -52,11 +53,11 @@ class MessageReadinessManagerSpec : BaseTest() {
                 InAppMessagingTestConstants.LOCALE))
         ConfigResponseRepository.instance().addConfigResponse(configResponseData)
         PingResponseMessageRepository.instance().lastPingMillis = LAST_PING_MILLIS
-        When calling configResponseData.endpoints itReturns configResponseEndpoints
-        When calling configResponseEndpoints.displayPermission itReturns DISPLAY_PERMISSION_URL
-        When calling testMessage.isTest() itReturns true
-        When calling testMessage.getCampaignId() itReturns "2"
-        When calling testMessage.getMaxImpressions() itReturns 1
+        `when`(configResponseData.endpoints).thenReturn(configResponseEndpoints)
+        `when`(configResponseEndpoints.displayPermission).thenReturn(DISPLAY_PERMISSION_URL)
+        `when`(testMessage.isTest()).thenReturn(true)
+        `when`(testMessage.getCampaignId()).thenReturn("2")
+        `when`(testMessage.getMaxImpressions()).thenReturn(1)
     }
 
     @Test
