@@ -16,13 +16,11 @@ import com.rakuten.tech.mobile.inappmessaging.runtime.InAppMessaging
 import com.rakuten.tech.mobile.inappmessaging.runtime.data.enums.InAppMessageType
 import com.rakuten.tech.mobile.inappmessaging.runtime.data.responses.ping.CampaignData
 import com.rakuten.tech.mobile.inappmessaging.runtime.data.responses.ping.MessagePayload
-import org.amshove.kluent.When
-import org.amshove.kluent.calling
-import org.amshove.kluent.itReturns
 import org.junit.Before
 import org.junit.Test
 import org.junit.runner.RunWith
 import org.mockito.Mockito
+import org.mockito.Mockito.`when`
 import org.robolectric.RobolectricTestRunner
 import org.robolectric.annotation.Config
 
@@ -42,31 +40,31 @@ class DisplayMessageRunnableSpec : BaseTest() {
     override fun setup() {
         super.setup()
         SoLoader.setInTestMode()
-        When calling view!!.id itReturns 12343254
-        When calling hostAppActivity.window itReturns window
+        `when`(view!!.id).thenReturn(12343254)
+        `when`(hostAppActivity.window).thenReturn(window)
     }
 
     @Test
     fun `should not throw exception fo invalid message type`() {
-        When calling message.getType() itReturns 0
+        `when`(message.getType()).thenReturn(0)
         DisplayMessageRunnable(message, hostAppActivity, IMAGE_ASPECT_RATIO).run()
     }
 
     @Test
     fun `should not throw exception fo invalid does not exist`() {
-        When calling message.getType() itReturns 100
+        `when`(message.getType()).thenReturn(100)
         DisplayMessageRunnable(message, hostAppActivity, IMAGE_ASPECT_RATIO).run()
     }
 
     @Test(expected = NullPointerException::class)
     fun `should throw null pointer exception when modal`() {
-        When calling message.getType() itReturns InAppMessageType.MODAL.typeId
+        `when`(message.getType()).thenReturn(InAppMessageType.MODAL.typeId)
         DisplayMessageRunnable(message, hostAppActivity, IMAGE_ASPECT_RATIO).run()
     }
 
     @Test(expected = NullPointerException::class)
     fun `should throw null pointer exception when fullscreen`() {
-        When calling message.getType() itReturns InAppMessageType.FULL.typeId
+        `when`(message.getType()).thenReturn(InAppMessageType.FULL.typeId)
         DisplayMessageRunnable(message, hostAppActivity, IMAGE_ASPECT_RATIO).run()
     }
 
@@ -78,11 +76,11 @@ class DisplayMessageRunnableSpec : BaseTest() {
                 Settings.Secure.ANDROID_ID,
                 "test_device_id")
         InAppMessaging.initialize(ApplicationProvider.getApplicationContext())
-        When calling message.getType() itReturns InAppMessageType.FULL.typeId
-        When calling message.getMessagePayload() itReturns Gson().fromJson(MESSAGE_PAYLOAD.trimIndent(),
-                MessagePayload::class.java)
-        When calling hostAppActivity
-                .layoutInflater itReturns LayoutInflater.from(ApplicationProvider.getApplicationContext())
+        `when`(message.getType()).thenReturn(InAppMessageType.FULL.typeId)
+        `when`(message.getMessagePayload()).thenReturn(Gson().fromJson(MESSAGE_PAYLOAD.trimIndent(),
+                MessagePayload::class.java))
+        `when`(hostAppActivity
+                .layoutInflater).thenReturn(LayoutInflater.from(ApplicationProvider.getApplicationContext()))
         DisplayMessageRunnable(message, hostAppActivity, IMAGE_ASPECT_RATIO).run()
     }
 
@@ -94,11 +92,11 @@ class DisplayMessageRunnableSpec : BaseTest() {
                 Settings.Secure.ANDROID_ID,
                 "test_device_id")
         InAppMessaging.initialize(ApplicationProvider.getApplicationContext())
-        When calling message.getType() itReturns InAppMessageType.MODAL.typeId
-        When calling message.getMessagePayload() itReturns Gson().fromJson(MESSAGE_PAYLOAD.trimIndent(),
-                MessagePayload::class.java)
-        When calling hostAppActivity
-                .layoutInflater itReturns LayoutInflater.from(ApplicationProvider.getApplicationContext())
+        `when`(message.getType()).thenReturn(InAppMessageType.MODAL.typeId)
+        `when`(message.getMessagePayload()).thenReturn(Gson().fromJson(MESSAGE_PAYLOAD.trimIndent(),
+                MessagePayload::class.java))
+        `when`(hostAppActivity
+                .layoutInflater).thenReturn(LayoutInflater.from(ApplicationProvider.getApplicationContext()))
         DisplayMessageRunnable(message, hostAppActivity, IMAGE_ASPECT_RATIO).run()
     }
 
@@ -110,11 +108,11 @@ class DisplayMessageRunnableSpec : BaseTest() {
                 Settings.Secure.ANDROID_ID,
                 "test_device_id")
         InAppMessaging.initialize(ApplicationProvider.getApplicationContext())
-        When calling message.getType() itReturns InAppMessageType.SLIDE.typeId
-        When calling message.getMessagePayload() itReturns Gson().fromJson(MESSAGE_PAYLOAD_SLIDE.trimIndent(),
-                MessagePayload::class.java)
-        When calling hostAppActivity
-                .layoutInflater itReturns LayoutInflater.from(ApplicationProvider.getApplicationContext())
+        `when`(message.getType()).thenReturn(InAppMessageType.SLIDE.typeId)
+        `when`(message.getMessagePayload()).thenReturn(Gson().fromJson(MESSAGE_PAYLOAD_SLIDE.trimIndent(),
+                MessagePayload::class.java))
+        `when`(hostAppActivity
+                .layoutInflater).thenReturn(LayoutInflater.from(ApplicationProvider.getApplicationContext()))
         DisplayMessageRunnable(message, hostAppActivity, IMAGE_ASPECT_RATIO).run()
     }
 
@@ -126,11 +124,11 @@ class DisplayMessageRunnableSpec : BaseTest() {
                 Settings.Secure.ANDROID_ID,
                 "test_device_id")
         InAppMessaging.initialize(ApplicationProvider.getApplicationContext())
-        When calling message.getType() itReturns InAppMessageType.MODAL.typeId
-        When calling message.getMessagePayload() itReturns Gson().fromJson(MESSAGE_PAYLOAD_TWO_BUTTONS.trimIndent(),
-                MessagePayload::class.java)
-        When calling hostAppActivity
-                .layoutInflater itReturns LayoutInflater.from(ApplicationProvider.getApplicationContext())
+        `when`(message.getType()).thenReturn(InAppMessageType.MODAL.typeId)
+        `when`(message.getMessagePayload()).thenReturn(Gson().fromJson(MESSAGE_PAYLOAD_TWO_BUTTONS.trimIndent(),
+                MessagePayload::class.java))
+        `when`(hostAppActivity
+                .layoutInflater).thenReturn(LayoutInflater.from(ApplicationProvider.getApplicationContext()))
         DisplayMessageRunnable(message, hostAppActivity, IMAGE_ASPECT_RATIO).run()
     }
 
@@ -142,12 +140,12 @@ class DisplayMessageRunnableSpec : BaseTest() {
                 Settings.Secure.ANDROID_ID,
                 "test_device_id")
         InAppMessaging.initialize(ApplicationProvider.getApplicationContext())
-        When calling message.getType() itReturns InAppMessageType.MODAL.typeId
+        `when`(message.getType()).thenReturn(InAppMessageType.MODAL.typeId)
         val mockPayload = Mockito.mock(MessagePayload::class.java)
-        When calling message.getMessagePayload() itReturns mockPayload
-        When calling mockPayload.messageSettings itReturns null
-        When calling hostAppActivity
-                .layoutInflater itReturns LayoutInflater.from(ApplicationProvider.getApplicationContext())
+        `when`(message.getMessagePayload()).thenReturn(mockPayload)
+        `when`(mockPayload.messageSettings).thenReturn(null)
+        `when`(hostAppActivity
+                .layoutInflater).thenReturn(LayoutInflater.from(ApplicationProvider.getApplicationContext()))
         DisplayMessageRunnable(message, hostAppActivity, IMAGE_ASPECT_RATIO).run()
     }
 

@@ -22,14 +22,12 @@ import com.rakuten.tech.mobile.inappmessaging.runtime.data.responses.config.Conf
 import com.rakuten.tech.mobile.inappmessaging.runtime.utils.RuntimeUtil
 import com.rakuten.tech.mobile.inappmessaging.runtime.workmanager.schedulers.MessageMixerPingScheduler
 import okhttp3.ResponseBody
-import org.amshove.kluent.When
-import org.amshove.kluent.calling
-import org.amshove.kluent.itReturns
 import org.amshove.kluent.shouldBeEqualTo
 import org.junit.Before
 import org.junit.Test
 import org.junit.runner.RunWith
 import org.mockito.Mockito
+import org.mockito.Mockito.`when`
 import org.robolectric.RobolectricTestRunner
 import org.robolectric.annotation.Config
 import retrofit2.Call
@@ -219,10 +217,10 @@ class ImpressionWorkerSpec : BaseTest() {
         val ctx = ApplicationProvider.getApplicationContext<Context>()
         val mockHostRespository = Mockito.mock(HostAppInfoRepository::class.java)
         val mockMessageScheduler = Mockito.mock(MessageMixerPingScheduler::class.java)
-        When calling mockHostRespository.getPackageName() itReturns ctx.packageName
+        `when`(mockHostRespository.getPackageName()).thenReturn(ctx.packageName)
         val version = ctx.packageManager.getPackageInfo(ctx.packageName, 0).versionName
-        When calling mockHostRespository.getVersion() itReturns version
-        When calling mockHostRespository.getInAppMessagingSubscriptionKey() itReturns "test_key"
+        `when`(mockHostRespository.getVersion()).thenReturn(version)
+        `when`(mockHostRespository.getInAppMessagingSubscriptionKey()).thenReturn("test_key")
         val worker = ConfigWorker(context, workerParameters, mockHostRespository, ConfigResponseRepository.instance(),
                 mockMessageScheduler)
         worker.doWork()

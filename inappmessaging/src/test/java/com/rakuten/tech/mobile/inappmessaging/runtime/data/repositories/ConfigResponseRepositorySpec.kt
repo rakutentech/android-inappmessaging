@@ -8,6 +8,7 @@ import org.amshove.kluent.*
 import org.junit.Before
 import org.junit.Test
 import org.mockito.Mockito
+import org.mockito.Mockito.`when`
 import kotlin.random.Random
 
 /**
@@ -99,18 +100,18 @@ class ConfigResponseRepositorySpec : BaseTest() {
 
         ConfigResponseRepository.randomizer = mockRandomizer
 
-        When calling mockConfig.rollOutPercentage itReturns 50
-        When calling mockRandomizer.nextInt(1, 101) itReturns 50
+        `when`(mockConfig.rollOutPercentage).thenReturn(50)
+        `when`(mockRandomizer.nextInt(1, 101)).thenReturn(50)
 
         ConfigResponseRepository.instance().addConfigResponse(mockConfig)
         ConfigResponseRepository.instance().isConfigEnabled().shouldBeTrue()
 
-        When calling mockRandomizer.nextInt(1, 101) itReturns 49
+        `when`(mockRandomizer.nextInt(1, 101)).thenReturn(49)
 
         ConfigResponseRepository.instance().addConfigResponse(mockConfig)
         ConfigResponseRepository.instance().isConfigEnabled().shouldBeTrue()
 
-        When calling mockRandomizer.nextInt(1, 101) itReturns 51
+        `when`(mockRandomizer.nextInt(1, 101)).thenReturn(51)
 
         ConfigResponseRepository.instance().addConfigResponse(mockConfig)
         ConfigResponseRepository.instance().isConfigEnabled().shouldBeFalse()

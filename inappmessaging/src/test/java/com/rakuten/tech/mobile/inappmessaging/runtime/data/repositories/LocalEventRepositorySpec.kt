@@ -4,6 +4,7 @@ import android.content.Context
 import android.provider.Settings
 import androidx.test.core.app.ApplicationProvider
 import androidx.work.testing.WorkManagerTestInitHelper
+import com.nhaarman.mockitokotlin2.argumentCaptor
 import com.nhaarman.mockitokotlin2.times
 import com.rakuten.tech.mobile.inappmessaging.runtime.*
 import com.rakuten.tech.mobile.inappmessaging.runtime.data.models.Attribute
@@ -12,9 +13,9 @@ import com.rakuten.tech.mobile.inappmessaging.runtime.exception.InAppMessagingEx
 import com.rakuten.tech.mobile.inappmessaging.runtime.manager.EventsManager
 import com.rakuten.tech.mobile.inappmessaging.runtime.utils.InAppMessagingConstants
 import com.rakuten.tech.mobile.inappmessaging.runtime.workmanager.schedulers.EventMessageReconciliationScheduler
-import org.amshove.kluent.any
 import org.amshove.kluent.shouldBeEqualTo
 import org.amshove.kluent.shouldBeFalse
+import org.amshove.kluent.shouldBeInstanceOf
 import org.amshove.kluent.shouldHaveSize
 import org.junit.Assert
 import org.junit.Before
@@ -251,7 +252,9 @@ class LocalEventRepositoryExceptionSpec : LocalEventRepositorySpec() {
         LocalEventRepository.instance().addEvent(TestEvent("")).shouldBeFalse()
         LocalEventRepository.instance().addEvent(TestEvent(null)).shouldBeFalse()
 
-        Mockito.verify(mockCallback, times(2)).invoke(any(InAppMessagingException::class))
+        val captor = argumentCaptor<InAppMessagingException>()
+        Mockito.verify(mockCallback, times(2)).invoke(captor.capture())
+        captor.firstValue shouldBeInstanceOf InAppMessagingException::class.java
     }
 
     @Test

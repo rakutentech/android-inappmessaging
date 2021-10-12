@@ -12,7 +12,6 @@ buildscript {
         google()
         gradle()
         mavenCentral()
-        jcenter()
         jitpack()
     }
     dependencies {
@@ -33,7 +32,6 @@ allprojects { proj ->
     repositories {
         google()
         mavenCentral()
-        jcenter()
         jitpack()
     }
 

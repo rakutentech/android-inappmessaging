@@ -17,6 +17,7 @@ import org.junit.Before
 import org.junit.Test
 import org.junit.runner.RunWith
 import org.mockito.Mockito
+import org.mockito.Mockito.`when`
 import org.robolectric.RobolectricTestRunner
 
 /**
@@ -144,8 +145,8 @@ class PingResponseMessageRepositorySpec : BaseTest() {
         initializeInstance(TestUserInfoProvider(), false)
         PingResponseMessageRepository.isInitialLaunch = true
         val mockMessage = Mockito.mock(Message::class.java)
-        When calling mockMessage.getCampaignId() itReturns "54321"
-        When calling mockMessage.getTriggers() itReturns listOf(Trigger(), Trigger())
+        `when`(mockMessage.getCampaignId()).thenReturn("54321")
+        `when`(mockMessage.getTriggers()).thenReturn(listOf(Trigger(), Trigger()))
         messageList.add(mockMessage)
         PingResponseMessageRepository.instance().replaceAllMessages(messageList)
         for (msg in PingResponseMessageRepository.instance().getAllMessagesCopy()) {

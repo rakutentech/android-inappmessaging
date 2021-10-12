@@ -20,6 +20,7 @@ import org.junit.Before
 import org.junit.Test
 import org.junit.runner.RunWith
 import org.mockito.Mockito
+import org.mockito.Mockito.`when`
 import org.robolectric.RobolectricTestRunner
 import java.util.concurrent.ExecutionException
 
@@ -48,8 +49,8 @@ class SessionManagerSpec : BaseTest() {
                 Settings.Secure.ANDROID_ID,
                 "test_device_id")
         InAppMessaging.initialize(ApplicationProvider.getApplicationContext(), true)
-        When calling configResponseData.rollOutPercentage itReturns 100
-        When calling configResponseData.endpoints itReturns endpoints
+        `when`(configResponseData.rollOutPercentage).thenReturn(100)
+        `when`(configResponseData.endpoints).thenReturn(endpoints)
         ConfigResponseRepository.instance().addConfigResponse(configResponseData)
         onSessionUpdate()
         WorkManager.getInstance(ApplicationProvider.getApplicationContext())
@@ -64,7 +65,7 @@ class SessionManagerSpec : BaseTest() {
                 Settings.Secure.ANDROID_ID,
                 "test_device_id")
         InAppMessaging.initialize(ApplicationProvider.getApplicationContext(), true)
-        When calling configResponseData.rollOutPercentage itReturns 0
+        `when`(configResponseData.rollOutPercentage).thenReturn(0)
 
         addTestData()
         ConfigResponseRepository.instance().addConfigResponse(configResponseData)
@@ -81,7 +82,7 @@ class SessionManagerSpec : BaseTest() {
                 Settings.Secure.ANDROID_ID,
                 "test_device_id")
         InAppMessaging.initialize(ApplicationProvider.getApplicationContext(), true)
-        When calling configResponseData.rollOutPercentage itReturns 0
+        `when`(configResponseData.rollOutPercentage).thenReturn(0)
 
         addTestData()
         ConfigResponseRepository.instance().addConfigResponse(configResponseData)
@@ -98,7 +99,7 @@ class SessionManagerSpec : BaseTest() {
                 Settings.Secure.ANDROID_ID,
                 "test_device_id")
         InAppMessaging.initialize(ApplicationProvider.getApplicationContext(), true)
-        When calling configResponseData.rollOutPercentage itReturns 0
+        `when`(configResponseData.rollOutPercentage).thenReturn(0)
 
         addTestData()
         ConfigResponseRepository.instance().addConfigResponse(configResponseData)
