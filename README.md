@@ -1,6 +1,7 @@
 [![Maven Central](https://img.shields.io/maven-central/v/io.github.rakutentech.inappmessaging/inappmessaging)](https://search.maven.org/artifact/io.github.rakutentech.inappmessaging/inappmessaging)
 [![CircleCI](https://circleci.com/gh/rakutentech/android-inappmessaging.svg?style=svg)](https://circleci.com/gh/rakutentech/android-inappmessaging)
 [![codecov](https://codecov.io/gh/rakutentech/android-inappmessaging/branch/master/graph/badge.svg)](https://codecov.io/gh/rakutentech/android-inappmessaging)
+[![Quality Gate Status](https://sonarcloud.io/api/project_badges/measure?project=rakutentech_android-inappmessaging&metric=alert_status)](https://sonarcloud.io/summary/new_code?id=rakutentech_android-inappmessaging)
 
 # In-App Messaging SDK for Android
 
