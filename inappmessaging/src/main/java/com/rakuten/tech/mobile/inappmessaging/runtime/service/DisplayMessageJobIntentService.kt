@@ -3,20 +3,17 @@ package com.rakuten.tech.mobile.inappmessaging.runtime.service
 import android.app.Activity
 import android.content.Context
 import android.content.Intent
-import androidx.annotation.VisibleForTesting
 import androidx.core.app.JobIntentService
-import com.facebook.common.executors.UiThreadImmediateExecutorService
-import com.facebook.datasource.BaseDataSubscriber
-import com.facebook.datasource.DataSource
-import com.facebook.drawee.backends.pipeline.Fresco
-import com.facebook.imagepipeline.request.ImageRequest
 import com.rakuten.tech.mobile.inappmessaging.runtime.InAppMessaging
 import com.rakuten.tech.mobile.inappmessaging.runtime.data.models.messages.Message
 import com.rakuten.tech.mobile.inappmessaging.runtime.data.repositories.LocalDisplayedMessageRepository
 import com.rakuten.tech.mobile.inappmessaging.runtime.data.repositories.ReadyForDisplayMessageRepository
 import com.rakuten.tech.mobile.inappmessaging.runtime.manager.MessageReadinessManager
 import com.rakuten.tech.mobile.inappmessaging.runtime.runnable.DisplayMessageRunnable
+import com.squareup.picasso.Callback
+import com.squareup.picasso.Picasso
 import timber.log.Timber
+import java.lang.Exception
 
 /**
  * Since one service is essentially one worker thread, so there's no chance multiple worker threads
@@ -63,12 +60,17 @@ internal class DisplayMessageJobIntentService : JobIntentService() {
         hostActivity: Activity,
         imageUrl: String
     ) {
-        // If Fresco has not been initialized, initialize it first.
-        Fresco.getImagePipeline()
-                .prefetchToBitmapCache(ImageRequest.fromUri(imageUrl), null /* callerContext */)
-                .subscribe(
-                        ImagePrefetchSubscriber(message, hostActivity),
-                        UiThreadImmediateExecutorService.getInstance())
+        Picasso.get().load(imageUrl).fetch(object :Callback {
+            override fun onSuccess() {
+                displayMessage(message, hostActivity)
+                Timber.tag(TAG).d("Download image completed")
+            }
+
+            override fun onError(e: Exception?) {
+                Timber.tag(TAG).e(e, "Download image failed")
+            }
+
+        })
     }
 
     /**
@@ -86,13 +88,7 @@ internal class DisplayMessageJobIntentService : JobIntentService() {
             return
         }
 
-        UiThreadImmediateExecutorService.getInstance()
-                .execute(
-                        DisplayMessageRunnable(
-                                message,
-                                hostActivity,
-                                calculateImageAspectRatio(
-                                        message.getMessagePayload()?.resource?.imageUrl)))
+        hostActivity.runOnUiThread(DisplayMessageRunnable(message, hostActivity))
     }
 
     /**
@@ -110,62 +106,25 @@ internal class DisplayMessageJobIntentService : JobIntentService() {
     }
 
     /**
-     * This method calculates cached image aspect ratio based on its width and height(width / height).
-     * If cached image is not found, default aspect ratio (0.75) will be returned.
-     */
-    private fun calculateImageAspectRatio(imageUrl: String?): Float {
-        if (!imageUrl.isNullOrEmpty()) {
-            // Get Fresco's image pipeline.
-            val imagePipeline = Fresco.getImagePipeline()
-
-            // Get image cache key from image pipeline.
-            val cacheKey =
-                    imagePipeline.getCacheKey(ImageRequest.fromUri(imageUrl), null /*callerContext*/)
-
-            // Get reference of the cached image from image pipeline.
-            val closeableReference = imagePipeline.getCachedImage(cacheKey)
-
-            // Get image from the reference.
-            if (closeableReference != null) {
-                try {
-                    val closeableImage = closeableReference.get()
-                    return closeableImage.width.toFloat() / closeableImage.height.toFloat()
-                } catch (ie: IllegalStateException) {
-                    Timber.tag(TAG).d(ie.cause, "unable to compute for aspect ratio")
-                }
-            }
-        }
-        return DEFAULT_IMAGE_ASPECT_RATIO
-    }
-
-    /**
      * Subscriber class of downloading images from network.
      */
-    inner class ImagePrefetchSubscriber(
+    inner class ImagePrefetchCallback(
         private val message: Message,
         private val hostActivity: Activity
-    ) :
-        BaseDataSubscriber<Void>() {
+    ) : Callback {
 
-        @VisibleForTesting
-        override fun onNewResultImpl(dataSource: DataSource<Void?>) {
-            // After image is fully downloaded, then display message.
-            if (dataSource.progress >= ONE_HUNDRED_PERCENT) {
-                displayMessage(this.message, this.hostActivity)
-                Timber.tag(TAG).d("Downloading image progress: %f", dataSource.progress)
-            }
+        override fun onSuccess() {
+            displayMessage(this.message, this.hostActivity)
+            Timber.tag(TAG).d("Download image completed")
         }
 
-        override fun onFailureImpl(dataSource: DataSource<Void?>) {
-            // When image can't be downloaded, there's no need to display this message.
-            Timber.tag(TAG).d("Downloading image failed")
+        override fun onError(e: Exception?) {
+            Timber.tag(TAG).e(e,"Downloading image failed")
         }
     }
 
     companion object {
-        private const val ONE_HUNDRED_PERCENT = 1f
         private const val DISPLAY_MESSAGE_JOB_ID = 3210
-        private const val DEFAULT_IMAGE_ASPECT_RATIO = 0.75f
         private const val TAG = "IAM_JobIntentService"
 
         /**

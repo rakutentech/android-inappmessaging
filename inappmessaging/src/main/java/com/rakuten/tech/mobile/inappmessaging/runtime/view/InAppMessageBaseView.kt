@@ -6,18 +6,13 @@ import android.content.res.ColorStateList
 import android.graphics.Color
 import android.util.AttributeSet
 import android.view.View
-import android.widget.CheckBox
-import android.widget.FrameLayout
-import android.widget.ImageButton
-import android.widget.LinearLayout
-import android.widget.TextView
+import android.widget.*
 import androidx.core.widget.NestedScrollView
-import com.facebook.drawee.backends.pipeline.Fresco
-import com.facebook.drawee.view.SimpleDraweeView
 import com.google.android.material.button.MaterialButton
 import com.rakuten.tech.mobile.inappmessaging.runtime.R
 import com.rakuten.tech.mobile.inappmessaging.runtime.data.models.messages.Message
 import com.rakuten.tech.mobile.inappmessaging.runtime.data.responses.ping.MessageButton
+import com.squareup.picasso.Picasso
 import timber.log.Timber
 
 /**
@@ -38,14 +33,13 @@ internal open class InAppMessageBaseView(context: Context, attrs: AttributeSet?)
     private var header: String? = null
     private var messageBody: String? = null
     private var buttons: List<MessageButton>? = null
-    private var imageAspectRatio = 0f
     private var displayOptOut = false
 
     /**
      * Sets campaign message data onto the view.
      */
     @SuppressWarnings("LongMethod")
-    override fun populateViewData(message: Message, imageAspectRatio: Float) {
+    override fun populateViewData(message: Message) {
         try {
             this.headerColor = Color.parseColor(message.getMessagePayload()?.headerColor ?: "#")
             this.messageBodyColor = Color.parseColor(message.getMessagePayload()?.messageBodyColor ?: "#")
@@ -64,7 +58,6 @@ internal open class InAppMessageBaseView(context: Context, attrs: AttributeSet?)
         this.buttons = message.getMessagePayload()?.messageSettings?.controlSettings?.buttons
         this.imageUrl = message.getMessagePayload()?.resource?.imageUrl
         this.listener = InAppMessageViewListener(message)
-        this.imageAspectRatio = imageAspectRatio
         this.displayOptOut = message.getMessagePayload()?.messageSettings?.displaySettings?.optOut ?: false
         bindViewData()
         this.tag = message.getCampaignId()
@@ -123,16 +116,12 @@ internal open class InAppMessageBaseView(context: Context, attrs: AttributeSet?)
     @SuppressLint("ClickableViewAccessibility")
     private fun bindImage() { // Display image.
         if (!this.imageUrl.isNullOrEmpty()) {
-            findViewById<SimpleDraweeView>(R.id.message_image_view)?.let {
+            findViewById<ImageView>(R.id.message_image_view)?.let {
                 it.setOnTouchListener(this.listener)
-                // Building a DraweeController to handle animations.
-                // Image should be already downloaded and cached in memory. Fresco library will look for the
-                // cached image by URI.
-                it.controller = Fresco.newDraweeControllerBuilder()
-                        .setUri(this.imageUrl)
-                        .setAutoPlayAnimations(true)
-                        .build()
-                it.aspectRatio = this.imageAspectRatio
+                Picasso
+                    .get()
+                    .load(this.imageUrl)
+                    .into(it)
                 it.visibility = View.VISIBLE
             }
         }
