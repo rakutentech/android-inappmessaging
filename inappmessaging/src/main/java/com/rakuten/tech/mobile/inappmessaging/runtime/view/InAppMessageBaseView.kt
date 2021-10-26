@@ -6,13 +6,18 @@ import android.content.res.ColorStateList
 import android.graphics.Color
 import android.util.AttributeSet
 import android.view.View
-import android.widget.*
+import android.widget.CheckBox
+import android.widget.FrameLayout
+import android.widget.ImageButton
+import android.widget.LinearLayout
+import android.widget.TextView
+import android.widget.ImageView
 import androidx.core.widget.NestedScrollView
+import com.squareup.picasso.Picasso
 import com.google.android.material.button.MaterialButton
 import com.rakuten.tech.mobile.inappmessaging.runtime.R
 import com.rakuten.tech.mobile.inappmessaging.runtime.data.models.messages.Message
 import com.rakuten.tech.mobile.inappmessaging.runtime.data.responses.ping.MessageButton
-import com.squareup.picasso.Picasso
 import timber.log.Timber
 
 /**
@@ -94,7 +99,7 @@ internal open class InAppMessageBaseView(context: Context, attrs: AttributeSet?)
         } else if (buttons?.size == 2) {
             // Set bigger layout_margin if there's only one button.
             findViewById<MaterialButton>(R.id.message_button_left)?.let { setButtonInfo(it, this.buttons!![0]) }
-            findViewById<MaterialButton>(R.id.message_button_right)?.let{ setButtonInfo(it, this.buttons!![1]) }
+            findViewById<MaterialButton>(R.id.message_button_right)?.let { setButtonInfo(it, this.buttons!![1]) }
         }
     }
 
@@ -121,6 +126,7 @@ internal open class InAppMessageBaseView(context: Context, attrs: AttributeSet?)
                 Picasso
                     .get()
                     .load(this.imageUrl)
+                    .centerInside()
                     .into(it)
                 it.visibility = View.VISIBLE
             }
@@ -170,7 +176,7 @@ internal open class InAppMessageBaseView(context: Context, attrs: AttributeSet?)
             findViewById<NestedScrollView>(R.id.message_scrollview)?.visibility = View.VISIBLE
         }
         if (!header.isNullOrEmpty()) {
-            findViewById<TextView>(R.id.header_text)?.let{
+            findViewById<TextView>(R.id.header_text)?.let {
                 it.text = header
                 it.setTextColor(headerColor)
                 it.setOnTouchListener(listener)
@@ -178,7 +184,7 @@ internal open class InAppMessageBaseView(context: Context, attrs: AttributeSet?)
             }
         }
         if (!messageBody.isNullOrEmpty()) {
-            findViewById<TextView>(R.id.message_body)?.let{
+            findViewById<TextView>(R.id.message_body)?.let {
                 it.text = messageBody
                 it.setTextColor(messageBodyColor)
                 it.setOnTouchListener(listener)

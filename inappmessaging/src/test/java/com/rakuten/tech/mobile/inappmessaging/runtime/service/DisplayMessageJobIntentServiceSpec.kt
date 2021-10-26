@@ -9,7 +9,6 @@ import android.view.LayoutInflater
 import android.view.View
 import androidx.test.core.app.ApplicationProvider
 import androidx.work.testing.WorkManagerTestInitHelper
-import com.facebook.datasource.DataSource
 import com.facebook.soloader.SoLoader
 import com.google.gson.Gson
 import com.nhaarman.mockitokotlin2.any
@@ -23,7 +22,6 @@ import com.rakuten.tech.mobile.inappmessaging.runtime.data.repositories.ConfigRe
 import com.rakuten.tech.mobile.inappmessaging.runtime.data.repositories.LocalDisplayedMessageRepository
 import com.rakuten.tech.mobile.inappmessaging.runtime.data.repositories.ReadyForDisplayMessageRepository
 import com.rakuten.tech.mobile.inappmessaging.runtime.data.responses.config.ConfigResponseData
-import com.rakuten.tech.mobile.inappmessaging.runtime.data.responses.ping.CampaignData
 import com.rakuten.tech.mobile.inappmessaging.runtime.data.responses.ping.MessagePayload
 import com.rakuten.tech.mobile.inappmessaging.runtime.manager.MessageReadinessManager
 import org.amshove.kluent.*
@@ -317,7 +315,7 @@ class DisplayMessageJobIntentServiceSpec : BaseTest() {
 
 @RunWith(RobolectricTestRunner::class)
 @Config(sdk = [Build.VERSION_CODES.O_MR1])
-class ImagePrefetchSubscriberSpec {
+class ImagePrefetchCallbackSpec {
     private var serviceController: ServiceController<DisplayMessageJobIntentService>? = null
     private var displayMessageJobIntentService: DisplayMessageJobIntentService? = null
 
@@ -326,25 +324,5 @@ class ImagePrefetchSubscriberSpec {
         SoLoader.setInTestMode()
         serviceController = Robolectric.buildService(DisplayMessageJobIntentService::class.java)
         displayMessageJobIntentService = serviceController?.bind()?.create()?.get()
-    }
-
-    @Test
-    fun `should not throw exception on new result`() {
-        val message = Mockito.mock(CampaignData::class.java)
-        val activity = Mockito.mock(Activity::class.java)
-        val dataSource = Mockito.mock(DataSource::class.java)
-        `when`(dataSource.progress).thenReturn(1f)
-        displayMessageJobIntentService?.ImagePrefetchSubscriber(message, activity)
-                ?.onNewResult(dataSource as DataSource<Void>)
-    }
-
-    @Test
-    fun `should not throw exception on failed result`() {
-        val message = Mockito.mock(CampaignData::class.java)
-        val activity = Mockito.mock(Activity::class.java)
-        val dataSource = Mockito.mock(DataSource::class.java)
-        `when`(dataSource.progress).thenReturn(1f)
-        displayMessageJobIntentService?.ImagePrefetchSubscriber(message, activity)
-                ?.onFailure(dataSource as DataSource<Void>)
     }
 }

@@ -8,7 +8,6 @@ import android.os.Build
 import android.view.LayoutInflater
 import android.widget.TextView
 import androidx.test.core.app.ApplicationProvider
-import com.facebook.drawee.backends.pipeline.Fresco
 import com.facebook.soloader.SoLoader
 import com.google.android.material.button.MaterialButton
 import com.rakuten.tech.mobile.inappmessaging.runtime.BaseTest
@@ -43,7 +42,6 @@ class BaseViewSpec : BaseTest() {
     override fun setup() {
         super.setup()
         SoLoader.setInTestMode()
-        Fresco.initialize(context)
         `when`(hostAppActivity
                 .layoutInflater).thenReturn(LayoutInflater.from(ApplicationProvider.getApplicationContext()))
         `when`(mockMessage.getMessagePayload()).thenReturn(mockPayload)
@@ -58,13 +56,13 @@ class BaseViewSpec : BaseTest() {
     fun `should not crash when null payload`() {
         `when`(mockMessage.getMessagePayload()).thenReturn(null)
 
-        view?.populateViewData(mockMessage, 1f)
+        view?.populateViewData(mockMessage)
     }
 
     @Test
     fun `should set default when null header color`() {
         `when`(mockPayload.headerColor).thenReturn(null)
-        view?.populateViewData(mockMessage, 1f)
+        view?.populateViewData(mockMessage)
 
         verifyDefault()
     }
@@ -73,7 +71,7 @@ class BaseViewSpec : BaseTest() {
     fun `should set default when null body color`() {
         `when`(mockPayload.headerColor).thenReturn(WHITE_HEX)
         `when`(mockPayload.messageBodyColor).thenReturn(null)
-        view?.populateViewData(mockMessage, 1f)
+        view?.populateViewData(mockMessage)
 
         verifyDefault()
     }
@@ -83,7 +81,7 @@ class BaseViewSpec : BaseTest() {
         `when`(mockPayload.headerColor).thenReturn(WHITE_HEX)
         `when`(mockPayload.messageBodyColor).thenReturn(WHITE_HEX)
         `when`(mockPayload.backgroundColor).thenReturn(null)
-        view?.populateViewData(mockMessage, 1f)
+        view?.populateViewData(mockMessage)
 
         verifyDefault()
     }
@@ -96,7 +94,7 @@ class BaseViewSpec : BaseTest() {
         `when`(mockBtn.buttonTextColor).thenReturn("test")
         `when`(mockBtn.buttonTextColor).thenReturn("#")
         `when`(mockBtn.buttonBackgroundColor).thenReturn("#")
-        view?.populateViewData(mockMessage, 1f)
+        view?.populateViewData(mockMessage)
         val button = view?.findViewById<MaterialButton>(R.id.message_single_button)
         button?.textColors shouldBeEqualTo ColorStateList.valueOf(Color.parseColor("#1D1D1D"))
         button?.backgroundTintList shouldBeEqualTo ColorStateList.valueOf(Color.WHITE)

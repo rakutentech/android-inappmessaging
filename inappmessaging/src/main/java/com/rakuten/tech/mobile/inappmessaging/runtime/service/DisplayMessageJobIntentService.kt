@@ -12,6 +12,7 @@ import com.rakuten.tech.mobile.inappmessaging.runtime.manager.MessageReadinessMa
 import com.rakuten.tech.mobile.inappmessaging.runtime.runnable.DisplayMessageRunnable
 import com.squareup.picasso.Callback
 import com.squareup.picasso.Picasso
+import com.squareup.picasso.PicassoProvider
 import timber.log.Timber
 import java.lang.Exception
 
@@ -60,7 +61,8 @@ internal class DisplayMessageJobIntentService : JobIntentService() {
         hostActivity: Activity,
         imageUrl: String
     ) {
-        Picasso.get().load(imageUrl).fetch(object :Callback {
+        Picasso.setSingletonInstance(Picasso.Builder(hostActivity.applicationContext).build())
+        Picasso.get().load(imageUrl).fetch(object : Callback {
             override fun onSuccess() {
                 displayMessage(message, hostActivity)
                 Timber.tag(TAG).d("Download image completed")
@@ -69,7 +71,6 @@ internal class DisplayMessageJobIntentService : JobIntentService() {
             override fun onError(e: Exception?) {
                 Timber.tag(TAG).e(e, "Download image failed")
             }
-
         })
     }
 
@@ -119,7 +120,7 @@ internal class DisplayMessageJobIntentService : JobIntentService() {
         }
 
         override fun onError(e: Exception?) {
-            Timber.tag(TAG).e(e,"Downloading image failed")
+            Timber.tag(TAG).e(e, "Downloading image failed")
         }
     }
 

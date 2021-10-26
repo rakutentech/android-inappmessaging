@@ -61,8 +61,7 @@ internal class DisplayMessageRunnable(
                     slideUpView.populateViewData(message)
                     hostActivity.addContentView(slideUpView, hostActivity.window.attributes)
                 }
-                else -> {
-                }
+                else -> Any()
             }
         }
     }

@@ -47,25 +47,25 @@ class DisplayMessageRunnableSpec : BaseTest() {
     @Test
     fun `should not throw exception fo invalid message type`() {
         `when`(message.getType()).thenReturn(0)
-        DisplayMessageRunnable(message, hostAppActivity, IMAGE_ASPECT_RATIO).run()
+        DisplayMessageRunnable(message, hostAppActivity).run()
     }
 
     @Test
     fun `should not throw exception fo invalid does not exist`() {
         `when`(message.getType()).thenReturn(100)
-        DisplayMessageRunnable(message, hostAppActivity, IMAGE_ASPECT_RATIO).run()
+        DisplayMessageRunnable(message, hostAppActivity).run()
     }
 
     @Test(expected = NullPointerException::class)
     fun `should throw null pointer exception when modal`() {
         `when`(message.getType()).thenReturn(InAppMessageType.MODAL.typeId)
-        DisplayMessageRunnable(message, hostAppActivity, IMAGE_ASPECT_RATIO).run()
+        DisplayMessageRunnable(message, hostAppActivity).run()
     }
 
     @Test(expected = NullPointerException::class)
     fun `should throw null pointer exception when fullscreen`() {
         `when`(message.getType()).thenReturn(InAppMessageType.FULL.typeId)
-        DisplayMessageRunnable(message, hostAppActivity, IMAGE_ASPECT_RATIO).run()
+        DisplayMessageRunnable(message, hostAppActivity).run()
     }
 
     @Test
@@ -81,7 +81,7 @@ class DisplayMessageRunnableSpec : BaseTest() {
                 MessagePayload::class.java))
         `when`(hostAppActivity
                 .layoutInflater).thenReturn(LayoutInflater.from(ApplicationProvider.getApplicationContext()))
-        DisplayMessageRunnable(message, hostAppActivity, IMAGE_ASPECT_RATIO).run()
+        DisplayMessageRunnable(message, hostAppActivity).run()
     }
 
     @Test
@@ -97,7 +97,7 @@ class DisplayMessageRunnableSpec : BaseTest() {
                 MessagePayload::class.java))
         `when`(hostAppActivity
                 .layoutInflater).thenReturn(LayoutInflater.from(ApplicationProvider.getApplicationContext()))
-        DisplayMessageRunnable(message, hostAppActivity, IMAGE_ASPECT_RATIO).run()
+        DisplayMessageRunnable(message, hostAppActivity).run()
     }
 
     @Test
@@ -113,7 +113,7 @@ class DisplayMessageRunnableSpec : BaseTest() {
                 MessagePayload::class.java))
         `when`(hostAppActivity
                 .layoutInflater).thenReturn(LayoutInflater.from(ApplicationProvider.getApplicationContext()))
-        DisplayMessageRunnable(message, hostAppActivity, IMAGE_ASPECT_RATIO).run()
+        DisplayMessageRunnable(message, hostAppActivity).run()
     }
 
     @Test
@@ -129,7 +129,7 @@ class DisplayMessageRunnableSpec : BaseTest() {
                 MessagePayload::class.java))
         `when`(hostAppActivity
                 .layoutInflater).thenReturn(LayoutInflater.from(ApplicationProvider.getApplicationContext()))
-        DisplayMessageRunnable(message, hostAppActivity, IMAGE_ASPECT_RATIO).run()
+        DisplayMessageRunnable(message, hostAppActivity).run()
     }
 
     @Test
@@ -146,11 +146,10 @@ class DisplayMessageRunnableSpec : BaseTest() {
         `when`(mockPayload.messageSettings).thenReturn(null)
         `when`(hostAppActivity
                 .layoutInflater).thenReturn(LayoutInflater.from(ApplicationProvider.getApplicationContext()))
-        DisplayMessageRunnable(message, hostAppActivity, IMAGE_ASPECT_RATIO).run()
+        DisplayMessageRunnable(message, hostAppActivity).run()
     }
 
     companion object {
-        private const val IMAGE_ASPECT_RATIO = 0.75f
         private const val MESSAGE_PAYLOAD = """
             {
                 "backgroundColor":"#000000",
