@@ -12,8 +12,10 @@ import com.google.gson.Gson
 import com.rakuten.tech.mobile.inappmessaging.runtime.data.models.HostAppInfo
 import com.rakuten.tech.mobile.inappmessaging.runtime.data.repositories.HostAppInfoRepository
 import com.rakuten.tech.mobile.inappmessaging.runtime.exception.InAppMessagingException
+import com.squareup.picasso.Picasso
 import timber.log.Timber
 import java.lang.ClassCastException
+import java.lang.IllegalStateException
 import java.util.Locale
 import java.util.UUID
 
@@ -75,7 +77,6 @@ internal object Initializer {
         context: Context,
         subscriptionKey: String?,
         configUrl: String?,
-        isForTesting: Boolean = false,
         sharedUtil: SharedPreferencesUtil = SharedPreferencesUtil
     ) {
         val hostAppInfo = HostAppInfo(getHostAppPackageName(context), getDeviceId(context, sharedUtil),
@@ -83,6 +84,12 @@ internal object Initializer {
 
         // Store hostAppInfo in repository.
         HostAppInfoRepository.instance().addHostInfo(hostAppInfo)
+
+        try {
+            Picasso.setSingletonInstance(Picasso.Builder(context).build())
+        } catch (ignored: IllegalStateException) {
+            // Picasso instance was already initialized
+        }
 
         Timber.tag(TAG).d(Gson().toJson(hostAppInfo))
     }

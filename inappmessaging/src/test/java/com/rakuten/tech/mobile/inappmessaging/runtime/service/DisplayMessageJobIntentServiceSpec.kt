@@ -9,7 +9,6 @@ import android.view.LayoutInflater
 import android.view.View
 import androidx.test.core.app.ApplicationProvider
 import androidx.work.testing.WorkManagerTestInitHelper
-import com.facebook.soloader.SoLoader
 import com.google.gson.Gson
 import com.nhaarman.mockitokotlin2.any
 import com.nhaarman.mockitokotlin2.argumentCaptor
@@ -59,7 +58,6 @@ class DisplayMessageJobIntentServiceSpec : BaseTest() {
     @Before
     override fun setup() {
         super.setup()
-        SoLoader.setInTestMode()
         serviceController = Robolectric.buildService(DisplayMessageJobIntentService::class.java)
         displayMessageJobIntentService = serviceController?.bind()?.create()?.get()
         displayMessageJobIntentService!!.messageReadinessManager = mockMessageManager
@@ -310,19 +308,5 @@ class DisplayMessageJobIntentServiceSpec : BaseTest() {
                 "titleColor":"#000000"
             }
         """
-    }
-}
-
-@RunWith(RobolectricTestRunner::class)
-@Config(sdk = [Build.VERSION_CODES.O_MR1])
-class ImagePrefetchCallbackSpec {
-    private var serviceController: ServiceController<DisplayMessageJobIntentService>? = null
-    private var displayMessageJobIntentService: DisplayMessageJobIntentService? = null
-
-    @Before
-    fun setup() {
-        SoLoader.setInTestMode()
-        serviceController = Robolectric.buildService(DisplayMessageJobIntentService::class.java)
-        displayMessageJobIntentService = serviceController?.bind()?.create()?.get()
     }
 }

@@ -9,7 +9,6 @@ import android.view.View
 import android.view.Window
 import androidx.test.core.app.ApplicationProvider
 import androidx.work.testing.WorkManagerTestInitHelper
-import com.facebook.soloader.SoLoader
 import com.google.gson.Gson
 import com.rakuten.tech.mobile.inappmessaging.runtime.BaseTest
 import com.rakuten.tech.mobile.inappmessaging.runtime.InAppMessaging
@@ -39,7 +38,6 @@ class DisplayMessageRunnableSpec : BaseTest() {
     @Before
     override fun setup() {
         super.setup()
-        SoLoader.setInTestMode()
         `when`(view!!.id).thenReturn(12343254)
         `when`(hostAppActivity.window).thenReturn(window)
     }

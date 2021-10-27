@@ -391,7 +391,7 @@ open class InAppMessagingSpec : BaseTest() {
                 "test_device_id")
         `when`(configResponseData.rollOutPercentage).thenReturn(100)
         ConfigResponseRepository.instance().addConfigResponse(configResponseData)
-        InAppMessaging.initialize(ApplicationProvider.getApplicationContext(), true, shouldEnableCaching)
+        InAppMessaging.initialize(ApplicationProvider.getApplicationContext(), shouldEnableCaching)
     }
 
     internal fun initializeMockInstance(rollout: Int, manager: DisplayManager = displayManager): InAppMessaging {

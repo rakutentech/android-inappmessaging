@@ -8,7 +8,6 @@ import android.os.Build
 import android.view.LayoutInflater
 import android.widget.TextView
 import androidx.test.core.app.ApplicationProvider
-import com.facebook.soloader.SoLoader
 import com.google.android.material.button.MaterialButton
 import com.rakuten.tech.mobile.inappmessaging.runtime.BaseTest
 import com.rakuten.tech.mobile.inappmessaging.runtime.R
@@ -41,7 +40,6 @@ class BaseViewSpec : BaseTest() {
     @Before
     override fun setup() {
         super.setup()
-        SoLoader.setInTestMode()
         `when`(hostAppActivity
                 .layoutInflater).thenReturn(LayoutInflater.from(ApplicationProvider.getApplicationContext()))
         `when`(mockMessage.getMessagePayload()).thenReturn(mockPayload)

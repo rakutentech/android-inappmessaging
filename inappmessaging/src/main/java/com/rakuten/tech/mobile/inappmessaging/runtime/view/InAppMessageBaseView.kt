@@ -126,7 +126,6 @@ internal open class InAppMessageBaseView(context: Context, attrs: AttributeSet?)
                 Picasso
                     .get()
                     .load(this.imageUrl)
-                    .centerInside()
                     .into(it)
                 it.visibility = View.VISIBLE
             }

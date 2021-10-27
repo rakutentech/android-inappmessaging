@@ -2,12 +2,16 @@ package com.rakuten.tech.mobile.inappmessaging.runtime.data.repositories
 
 import androidx.annotation.VisibleForTesting
 import com.google.gson.Gson
+import com.google.gson.reflect.TypeToken
 import com.rakuten.tech.mobile.inappmessaging.runtime.InAppMessaging
 import com.rakuten.tech.mobile.inappmessaging.runtime.data.models.messages.Message
 import com.rakuten.tech.mobile.inappmessaging.runtime.data.responses.ping.CampaignData
 import org.json.JSONArray
 import timber.log.Timber
 import java.lang.ClassCastException
+
+import com.google.gson.GsonBuilder
+import java.lang.reflect.Modifier
 
 /**
  * Contains all messages are ready for display, but not yet displayed.
@@ -108,8 +112,13 @@ internal abstract class ReadyForDisplayMessageRepository : ReadyMessageRepositor
             // check if caching is enabled to update persistent data
             if (InAppMessaging.instance().isLocalCachingEnabled()) {
                 // reset updated message list
+                val arrayType = object : TypeToken<MutableList<Message>>() {}.type
+                val gson = GsonBuilder()
+                    .excludeFieldsWithModifiers(Modifier.FINAL, Modifier.TRANSIENT, Modifier.STATIC)
+                    .serializeNulls()
+                    .create()
                 InAppMessaging.instance().getSharedPref()?.edit()?.putString(READY_DISPLAY_KEY,
-                        Gson().toJson(messages))?.apply() ?: Timber.tag(TAG).d("failed saving ready data")
+                        gson.toJson(messages, arrayType))?.apply() ?: Timber.tag(TAG).d("failed saving ready data")
             }
         }
     }

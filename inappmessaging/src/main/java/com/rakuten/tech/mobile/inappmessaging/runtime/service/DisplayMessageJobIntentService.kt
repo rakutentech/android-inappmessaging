@@ -12,7 +12,9 @@ import com.rakuten.tech.mobile.inappmessaging.runtime.manager.MessageReadinessMa
 import com.rakuten.tech.mobile.inappmessaging.runtime.runnable.DisplayMessageRunnable
 import com.squareup.picasso.Callback
 import com.squareup.picasso.Picasso
-import com.squareup.picasso.PicassoProvider
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.GlobalScope
+import kotlinx.coroutines.launch
 import timber.log.Timber
 import java.lang.Exception
 
@@ -61,7 +63,6 @@ internal class DisplayMessageJobIntentService : JobIntentService() {
         hostActivity: Activity,
         imageUrl: String
     ) {
-        Picasso.setSingletonInstance(Picasso.Builder(hostActivity.applicationContext).build())
         Picasso.get().load(imageUrl).fetch(object : Callback {
             override fun onSuccess() {
                 displayMessage(message, hostActivity)
@@ -89,7 +90,9 @@ internal class DisplayMessageJobIntentService : JobIntentService() {
             return
         }
 
-        hostActivity.runOnUiThread(DisplayMessageRunnable(message, hostActivity))
+        GlobalScope.launch(Dispatchers.Main) {
+            DisplayMessageRunnable(message, hostActivity).run()
+        }
     }
 
     /**

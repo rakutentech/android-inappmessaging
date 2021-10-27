@@ -61,7 +61,7 @@ class InitializerSpec : BaseTest() {
     @Test
     fun `should not throw exception`() {
         WorkManagerTestInitHelper.initializeTestWorkManager(context)
-        Initializer.initializeSdk(context, "test", "", true)
+        Initializer.initializeSdk(context, "test", "")
     }
 
     @Test(expected = InAppMessagingException::class)
@@ -77,7 +77,7 @@ class InitializerSpec : BaseTest() {
                 .packageManager)
         `when`(context.resources).thenReturn(ApplicationProvider.getApplicationContext<Context>()
                 .resources)
-        Initializer.initializeSdk(context, "test", "", true)
+        Initializer.initializeSdk(context, "test", "")
     }
 
     @Test
@@ -89,7 +89,7 @@ class InitializerSpec : BaseTest() {
         val sharedPref = SharedPreferencesUtil.createSharedPreference(context, "uuid")
         sharedPref.edit().clear().apply()
 
-        Initializer.initializeSdk(appCtx, "test", "", true)
+        Initializer.initializeSdk(appCtx, "test", "")
 
         HostAppInfoRepository.instance().getDeviceId().shouldNotBeNullOrEmpty()
     }
@@ -104,7 +104,7 @@ class InitializerSpec : BaseTest() {
         sharedPref.edit().clear().apply()
         sharedPref.edit().putString(Initializer.ID_KEY, "test_uuid").apply()
 
-        Initializer.initializeSdk(appCtx, "test", "", true)
+        Initializer.initializeSdk(appCtx, "test", "")
 
         HostAppInfoRepository.instance().getDeviceId() shouldBeEqualTo "test_uuid"
     }
@@ -117,7 +117,7 @@ class InitializerSpec : BaseTest() {
         `when`(mockPref.edit()).thenReturn(mockEditor)
         `when`(mockEditor.putString(any(), any())).thenReturn(mockEditor)
 
-        Initializer.initializeSdk(context, "test", "", true, mockUtil)
+        Initializer.initializeSdk(context, "test", "", mockUtil)
 
         Mockito.verify(mockUtil).createSharedPreference(context, "uuid")
         Mockito.verify(mockPref).contains(Initializer.ID_KEY)
@@ -133,7 +133,7 @@ class InitializerSpec : BaseTest() {
         `when`(mockPref.contains(Initializer.ID_KEY)).thenReturn(true)
         `when`(mockPref.getString(Initializer.ID_KEY, "")).thenReturn("random_uuid")
 
-        Initializer.initializeSdk(context, "test", "", true, mockUtil)
+        Initializer.initializeSdk(context, "test", "", mockUtil)
 
         Mockito.verify(mockUtil).createSharedPreference(context, "uuid")
         Mockito.verify(mockPref).contains(Initializer.ID_KEY)
@@ -151,7 +151,7 @@ class InitializerSpec : BaseTest() {
         `when`(mockPref.edit()).thenReturn(mockEditor)
         `when`(mockEditor.putString(any(), any())).thenReturn(mockEditor)
 
-        Initializer.initializeSdk(context, "test", "", true, mockUtil)
+        Initializer.initializeSdk(context, "test", "", mockUtil)
 
         Mockito.verify(mockUtil).createSharedPreference(context, "uuid")
         Mockito.verify(mockPref).contains(Initializer.ID_KEY)
