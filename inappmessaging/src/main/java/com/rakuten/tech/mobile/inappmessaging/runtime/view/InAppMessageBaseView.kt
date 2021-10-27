@@ -101,7 +101,7 @@ internal open class InAppMessageBaseView(context: Context, attrs: AttributeSet?)
         } else if (buttons?.size == 2) {
             // Set bigger layout_margin if there's only one button.
             findViewById<MaterialButton>(R.id.message_button_left)?.let { setButtonInfo(it, this.buttons!![0]) }
-            findViewById<MaterialButton>(R.id.message_button_right)?.let{ setButtonInfo(it, this.buttons!![1]) }
+            findViewById<MaterialButton>(R.id.message_button_right)?.let { setButtonInfo(it, this.buttons!![1]) }
         }
     }
 
@@ -181,7 +181,7 @@ internal open class InAppMessageBaseView(context: Context, attrs: AttributeSet?)
             findViewById<NestedScrollView>(R.id.message_scrollview)?.visibility = View.VISIBLE
         }
         if (!header.isNullOrEmpty()) {
-            findViewById<TextView>(R.id.header_text)?.let{
+            findViewById<TextView>(R.id.header_text)?.let {
                 it.text = header
                 it.setTextColor(headerColor)
                 it.setOnTouchListener(listener)
@@ -189,7 +189,7 @@ internal open class InAppMessageBaseView(context: Context, attrs: AttributeSet?)
             }
         }
         if (!messageBody.isNullOrEmpty()) {
-            findViewById<TextView>(R.id.message_body)?.let{
+            findViewById<TextView>(R.id.message_body)?.let {
                 it.text = messageBody
                 it.setTextColor(messageBodyColor)
                 it.setOnTouchListener(listener)
