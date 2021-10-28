@@ -8,7 +8,6 @@ import android.provider.Settings
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import androidx.test.core.app.ApplicationProvider
 import androidx.work.testing.WorkManagerTestInitHelper
 import com.google.gson.Gson
 import com.nhaarman.mockitokotlin2.any
@@ -39,7 +38,6 @@ import org.robolectric.annotation.Config
 import androidx.test.core.app.ApplicationProvider.getApplicationContext
 import org.mockito.Mockito.*
 
-
 /**
  * Test class for DisplayMessageJobIntentService.
  */
@@ -58,7 +56,6 @@ class DisplayMessageJobIntentServiceSpec : BaseTest() {
     private val onVerifyContexts = Mockito.mock(InAppMessaging.instance().onVerifyContext.javaClass)
     private val configResponseData = Mockito.mock(ConfigResponseData::class.java)
     private val context = getApplicationContext<Context>()
-    private val viewGroup = Mockito.mock(ViewGroup::class.java)
 
     @Before
     override fun setup() {
@@ -69,7 +66,6 @@ class DisplayMessageJobIntentServiceSpec : BaseTest() {
         displayMessageJobIntentService!!.localDisplayRepo = mockLocalDisplayRepo
         displayMessageJobIntentService!!.readyMessagesRepo = mockReadyForDisplayRepo
         `when`(activity.layoutInflater).thenReturn(LayoutInflater.from(context))
-        `when`(activity.findViewById<ViewGroup>(R.id.in_app_message_base_view)).thenReturn(viewGroup)
         WorkManagerTestInitHelper.initializeTestWorkManager(context)
         `when`(configResponseData.rollOutPercentage).thenReturn(100)
         ConfigResponseRepository.instance().addConfigResponse(configResponseData)
@@ -80,7 +76,6 @@ class DisplayMessageJobIntentServiceSpec : BaseTest() {
         InAppMessaging.initialize(context, true)
         InAppMessaging.instance().registerMessageDisplayActivity(activity)
     }
-
 
     @After
     override fun tearDown() {

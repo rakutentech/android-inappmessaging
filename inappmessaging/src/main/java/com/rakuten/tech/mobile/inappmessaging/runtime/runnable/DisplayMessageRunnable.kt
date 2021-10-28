@@ -30,12 +30,8 @@ internal class DisplayMessageRunnable(
     @SuppressWarnings("LongMethod")
     override fun run() {
         // If there's already a message found, don't display another message.
-        try {
-            if (hostActivity.findViewById<View?>(R.id.in_app_message_base_view) != null) {
-                return
-            }
-        } catch (e: NullPointerException) {
-
+        if (hostActivity.findViewById<View?>(R.id.in_app_message_base_view) != null) {
+            return
         }
 
         val messageType = InAppMessageType.getById(message.getType())
