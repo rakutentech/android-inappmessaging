@@ -10,6 +10,7 @@ import com.rakuten.tech.mobile.inappmessaging.runtime.view.InAppMessageFullScree
 import com.rakuten.tech.mobile.inappmessaging.runtime.view.InAppMessageModalView
 import com.rakuten.tech.mobile.inappmessaging.runtime.view.InAppMessageSlideUpView
 import kotlinx.coroutines.Runnable
+import java.lang.NullPointerException
 
 /**
  * Displaying message runnable which presents the message on the UI thread. Message close, and other
@@ -29,8 +30,12 @@ internal class DisplayMessageRunnable(
     @SuppressWarnings("LongMethod")
     override fun run() {
         // If there's already a message found, don't display another message.
-        if (hostActivity.findViewById<View?>(R.id.in_app_message_base_view) != null) {
-            return
+        try {
+            if (hostActivity.findViewById<View?>(R.id.in_app_message_base_view) != null) {
+                return
+            }
+        } catch (e: NullPointerException) {
+
         }
 
         val messageType = InAppMessageType.getById(message.getType())

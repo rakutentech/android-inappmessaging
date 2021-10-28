@@ -1,7 +1,6 @@
 package com.rakuten.tech.mobile.inappmessaging.runtime.view
 
 import android.app.Activity
-import android.content.Context
 import android.content.res.ColorStateList
 import android.graphics.Color
 import android.os.Build
@@ -28,7 +27,6 @@ import org.robolectric.annotation.Config
 @RunWith(RobolectricTestRunner::class)
 @Config(sdk = [Build.VERSION_CODES.O_MR1])
 class BaseViewSpec : BaseTest() {
-    private val context = ApplicationProvider.getApplicationContext<Context>()
     private val hostAppActivity = Mockito.mock(Activity::class.java)
     private val mockMessage = Mockito.mock(Message::class.java)
     private val mockPayload = Mockito.mock(MessagePayload::class.java)

@@ -7,6 +7,7 @@ import android.os.Build
 import android.provider.Settings
 import android.view.LayoutInflater
 import android.view.View
+import android.view.ViewGroup
 import androidx.test.core.app.ApplicationProvider
 import androidx.work.testing.WorkManagerTestInitHelper
 import com.google.gson.Gson
@@ -16,6 +17,7 @@ import com.nhaarman.mockitokotlin2.eq
 import com.nhaarman.mockitokotlin2.never
 import com.rakuten.tech.mobile.inappmessaging.runtime.BaseTest
 import com.rakuten.tech.mobile.inappmessaging.runtime.InAppMessaging
+import com.rakuten.tech.mobile.inappmessaging.runtime.R
 import com.rakuten.tech.mobile.inappmessaging.runtime.data.models.messages.Message
 import com.rakuten.tech.mobile.inappmessaging.runtime.data.repositories.ConfigResponseRepository
 import com.rakuten.tech.mobile.inappmessaging.runtime.data.repositories.LocalDisplayedMessageRepository
@@ -30,12 +32,13 @@ import org.junit.Test
 import org.junit.runner.RunWith
 import org.mockito.ArgumentMatchers
 import org.mockito.Mockito
-import org.mockito.Mockito.`when`
-import org.mockito.Mockito.validateMockitoUsage
 import org.robolectric.Robolectric
 import org.robolectric.RobolectricTestRunner
 import org.robolectric.android.controller.ServiceController
 import org.robolectric.annotation.Config
+import androidx.test.core.app.ApplicationProvider.getApplicationContext
+import org.mockito.Mockito.*
+
 
 /**
  * Test class for DisplayMessageJobIntentService.
@@ -54,6 +57,8 @@ class DisplayMessageJobIntentServiceSpec : BaseTest() {
     private var mockReadyForDisplayRepo = Mockito.mock(ReadyForDisplayMessageRepository::class.java)
     private val onVerifyContexts = Mockito.mock(InAppMessaging.instance().onVerifyContext.javaClass)
     private val configResponseData = Mockito.mock(ConfigResponseData::class.java)
+    private val context = getApplicationContext<Context>()
+    private val viewGroup = Mockito.mock(ViewGroup::class.java)
 
     @Before
     override fun setup() {
@@ -63,18 +68,19 @@ class DisplayMessageJobIntentServiceSpec : BaseTest() {
         displayMessageJobIntentService!!.messageReadinessManager = mockMessageManager
         displayMessageJobIntentService!!.localDisplayRepo = mockLocalDisplayRepo
         displayMessageJobIntentService!!.readyMessagesRepo = mockReadyForDisplayRepo
-        WorkManagerTestInitHelper.initializeTestWorkManager(ApplicationProvider.getApplicationContext())
-        `when`(activity.layoutInflater).thenReturn(
-            LayoutInflater.from(ApplicationProvider.getApplicationContext()))
-
+        `when`(activity.layoutInflater).thenReturn(LayoutInflater.from(context))
+        `when`(activity.findViewById<ViewGroup>(R.id.in_app_message_base_view)).thenReturn(viewGroup)
+        WorkManagerTestInitHelper.initializeTestWorkManager(context)
         `when`(configResponseData.rollOutPercentage).thenReturn(100)
         ConfigResponseRepository.instance().addConfigResponse(configResponseData)
 
-        Settings.Secure.putString(ApplicationProvider.getApplicationContext<Context>().contentResolver,
+        Settings.Secure.putString(
+            context.contentResolver,
                 Settings.Secure.ANDROID_ID, "test_device_id")
-        InAppMessaging.initialize(ApplicationProvider.getApplicationContext(), true)
+        InAppMessaging.initialize(context, true)
         InAppMessaging.instance().registerMessageDisplayActivity(activity)
     }
+
 
     @After
     override fun tearDown() {

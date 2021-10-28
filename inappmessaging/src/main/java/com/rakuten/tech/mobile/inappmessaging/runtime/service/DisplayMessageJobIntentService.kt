@@ -3,7 +3,10 @@ package com.rakuten.tech.mobile.inappmessaging.runtime.service
 import android.app.Activity
 import android.content.Context
 import android.content.Intent
+import android.os.Handler
+import android.os.Looper
 import androidx.core.app.JobIntentService
+import androidx.core.os.HandlerCompat
 import com.rakuten.tech.mobile.inappmessaging.runtime.InAppMessaging
 import com.rakuten.tech.mobile.inappmessaging.runtime.data.models.messages.Message
 import com.rakuten.tech.mobile.inappmessaging.runtime.data.repositories.LocalDisplayedMessageRepository
@@ -12,9 +15,6 @@ import com.rakuten.tech.mobile.inappmessaging.runtime.manager.MessageReadinessMa
 import com.rakuten.tech.mobile.inappmessaging.runtime.runnable.DisplayMessageRunnable
 import com.squareup.picasso.Callback
 import com.squareup.picasso.Picasso
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.GlobalScope
-import kotlinx.coroutines.launch
 import timber.log.Timber
 import java.lang.Exception
 
@@ -90,9 +90,8 @@ internal class DisplayMessageJobIntentService : JobIntentService() {
             return
         }
 
-        GlobalScope.launch(Dispatchers.Main) {
-            DisplayMessageRunnable(message, hostActivity).run()
-        }
+        val mainThreadHandler: Handler = HandlerCompat.createAsync(Looper.getMainLooper())
+        mainThreadHandler.post(DisplayMessageRunnable(message, hostActivity))
     }
 
     /**
@@ -107,24 +106,6 @@ internal class DisplayMessageJobIntentService : JobIntentService() {
         return InAppMessaging.instance().onVerifyContext(
                 campaignContexts,
                 message.getMessagePayload()?.title ?: "")
-    }
-
-    /**
-     * Subscriber class of downloading images from network.
-     */
-    inner class ImagePrefetchCallback(
-        private val message: Message,
-        private val hostActivity: Activity
-    ) : Callback {
-
-        override fun onSuccess() {
-            displayMessage(this.message, this.hostActivity)
-            Timber.tag(TAG).d("Download image completed")
-        }
-
-        override fun onError(e: Exception?) {
-            Timber.tag(TAG).e(e, "Downloading image failed")
-        }
     }
 
     companion object {
