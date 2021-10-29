@@ -27,7 +27,7 @@ class MessageMixerResponseSpec(private val testname: String, private val actual:
                     arrayOf("type", campaignData.getType(), 2),
                     arrayOf("campaignId", campaignData.getCampaignId(), "1234567890"),
                     arrayOf("isTest", campaignData.isTest(), false),
-                    arrayOf("maxImpressions", campaignData.getMaxImpressions(), 190),
+                    arrayOf("maxImpressions", campaignData.getMaxImpressions(), 0), // default value
                     arrayOf("headerColor", messagePayload.headerColor, "#ffffff"),
                     arrayOf("backgroundColor", messagePayload.backgroundColor, "#000000"),
                     arrayOf("messageBody", messagePayload.messageBody, "Login Test"),
@@ -82,7 +82,6 @@ class MessageMixerResponseSpec(private val testname: String, private val actual:
                     "campaignData":{
                         "campaignId":"1234567890",
                         "isTest":false,
-                        "maxImpressions":190,
                         "messagePayload":{
                             "backgroundColor":"#000000",
                             "frameColor":"#ffffff",
@@ -135,7 +134,9 @@ class MessageMixerResponseSpec(private val testname: String, private val actual:
                                     "optOut":false,
                                     "orientation":1,
                                     "slideFrom":1,
-                                    "textAlign":2
+                                    "textAlign":2,
+                                    "delay":3000,
+                                    "html":false
                                 }
                             },
                             "resource":{
@@ -182,44 +183,48 @@ class MessageMixerResponseSpec(private val testname: String, private val actual:
                 campaignData.getMessagePayload().titleColor, campaignData.getMessagePayload().header,
                 campaignData.getMessagePayload().frameColor, campaignData.getMessagePayload().title,
                 campaignData.getMessagePayload().messageBodyColor)
-        private val messageSettings = MessageSettings(messagePayload.messageSettings?.displaySettings,
-                messagePayload.messageSettings?.controlSettings)
-        private val displaySettings = DisplaySettings(messageSettings.displaySettings?.orientation!!,
+        private val messageSettings = MessageSettings(messagePayload.messageSettings.displaySettings,
+                messagePayload.messageSettings.controlSettings)
+        private val displaySettings = DisplaySettings(messageSettings.displaySettings.orientation,
                 messageSettings.displaySettings.slideFrom, messageSettings.displaySettings.endTimeMillis,
                 messageSettings.displaySettings.textAlign, messageSettings.displaySettings.optOut,
-                messageSettings.displaySettings.delay)
-        private val controlSettings = ControlSettings(messageSettings.controlSettings?.buttons,
-                messageSettings.controlSettings?.content!!)
-        private val messageButton = MessageButton(controlSettings.buttons?.get(0)?.buttonBackgroundColor!!,
+                messageSettings.displaySettings.delay, messageSettings.displaySettings.html)
+        private val controlSettings = ControlSettings(messageSettings.controlSettings.buttons,
+            messageSettings.controlSettings.content
+        )
+        private val messageButton = MessageButton(controlSettings.buttons[0].buttonBackgroundColor,
                 controlSettings.buttons[0].buttonTextColor, controlSettings.buttons[0].buttonBehavior,
                 controlSettings.buttons[0].buttonText, controlSettings.buttons[0].embeddedEvent)
         private val buttonOnClickBehavior = OnClickBehavior(messageButton.buttonBehavior.action,
                 messageButton.buttonBehavior.uri)
-        private val buttonTrigger = Trigger(messageButton.embeddedEvent.type, messageButton.embeddedEvent.eventType,
+        private val buttonTrigger = Trigger(messageButton.embeddedEvent?.type!!, messageButton.embeddedEvent.eventType,
                 messageButton.embeddedEvent.eventName, messageButton.embeddedEvent.triggerAttributes)
-        private val buttonTriggerAttr = TriggerAttribute(buttonTrigger.triggerAttributes?.get(0)?.name!!,
+        private val buttonTriggerAttr = TriggerAttribute(buttonTrigger.triggerAttributes[0].name,
                 buttonTrigger.triggerAttributes[0].value, buttonTrigger.triggerAttributes[0].type,
                 buttonTrigger.triggerAttributes[0].operator)
-        private val controlContent = Content(controlSettings.content.onClick, controlSettings.content.embeddedEvent)
+        private val controlContent = Content(controlSettings.content?.onClick!!, controlSettings.content.embeddedEvent)
         private val controlContentBehavior = OnClickBehavior(controlContent.onClick.action, controlContent.onClick.uri)
-        private val controlContentTrigger = Trigger(controlContent.embeddedEvent.type,
+        private val controlContentTrigger = Trigger(controlContent.embeddedEvent?.type!!,
                 controlContent.embeddedEvent.eventType, controlContent.embeddedEvent.eventName,
                 controlContent.embeddedEvent.triggerAttributes)
-        private val controlContentTriggerAttr = TriggerAttribute(controlContentTrigger.triggerAttributes
-                ?.get(0)?.name!!, controlContentTrigger.triggerAttributes[0].value,
+        private val controlContentTriggerAttr = TriggerAttribute(controlContentTrigger.triggerAttributes[0].name,
+                controlContentTrigger.triggerAttributes[0].value,
                 controlContentTrigger.triggerAttributes[0].type, controlContentTrigger.triggerAttributes[0].operator)
-        private val resource = Resource(messagePayload.resource?.assetsUrl,
-                messagePayload.resource?.imageUrl, messagePayload.resource?.cropType)
+        private val resource = Resource(messagePayload.resource.assetsUrl, messagePayload.resource.imageUrl,
+                messagePayload.resource.cropType)
         private val campaignTrigger = Trigger(campaignData.getTriggers()[0].type,
                 campaignData.getTriggers()[0].eventType, campaignData.getTriggers()[0].eventName,
                 campaignData.getTriggers()[0].triggerAttributes)
-        private val campaignTriggerAttr = TriggerAttribute(campaignTrigger.triggerAttributes?.get(0)?.name!!,
+        private val campaignTriggerAttr = TriggerAttribute(campaignTrigger.triggerAttributes[0].name,
                 campaignTrigger.triggerAttributes[0].value, campaignTrigger.triggerAttributes[0].type,
                 campaignTrigger.triggerAttributes[0].operator)
     }
 
-    private fun generateDummyCampaign(id: String, title: String?): CampaignData {
-        val messagePayload = MessagePayload(null, null, null, null, null, null, null, null, title, null)
+    private fun generateDummyCampaign(id: String, title: String): CampaignData {
+        val messagePayload = MessagePayload("#000000", "#ffffff",
+            MessageSettings(DisplaySettings(1, 1, 1, 1, false, 1, false),
+                ControlSettings(listOf())), null, Resource(cropType = 2), "#000000", null, "#ffffff", title,
+            "#000000")
         return CampaignData(messagePayload, 1, listOf(), id, false, 1)
     }
 
@@ -273,12 +278,6 @@ class MessageMixerResponseSpec(private val testname: String, private val actual:
     @Test
     fun `should not return any context when title is empty`() {
         val campaign = generateDummyCampaign("id", "")
-        campaign.getContexts() shouldHaveSize 0
-    }
-
-    @Test
-    fun `should not return any context when title is null`() {
-        val campaign = generateDummyCampaign("id", null)
         campaign.getContexts() shouldHaveSize 0
     }
 

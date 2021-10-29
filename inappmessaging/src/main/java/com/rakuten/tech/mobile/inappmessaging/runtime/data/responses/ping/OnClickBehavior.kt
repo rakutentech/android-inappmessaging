@@ -10,5 +10,5 @@ internal data class OnClickBehavior(
     val action: Int,
 
     @SerializedName("uri")
-    val uri: String?
+    val uri: String? = null
 )

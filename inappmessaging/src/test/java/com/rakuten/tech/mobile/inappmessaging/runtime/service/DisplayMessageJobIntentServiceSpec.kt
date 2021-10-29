@@ -25,6 +25,7 @@ import com.rakuten.tech.mobile.inappmessaging.runtime.data.repositories.ReadyFor
 import com.rakuten.tech.mobile.inappmessaging.runtime.data.responses.config.ConfigResponseData
 import com.rakuten.tech.mobile.inappmessaging.runtime.data.responses.ping.CampaignData
 import com.rakuten.tech.mobile.inappmessaging.runtime.data.responses.ping.MessagePayload
+import com.rakuten.tech.mobile.inappmessaging.runtime.data.responses.ping.Resource
 import com.rakuten.tech.mobile.inappmessaging.runtime.manager.MessageReadinessManager
 import org.amshove.kluent.*
 import org.junit.After
@@ -202,28 +203,6 @@ class DisplayMessageJobIntentServiceSpec : BaseTest() {
     }
 
     @Test
-    fun `should not crash when campaign id is null`() {
-        val message = Mockito.mock(Message::class.java)
-
-        `when`(onVerifyContexts.invoke(any(), any())).thenReturn(false)
-        InAppMessaging.instance().onVerifyContext = onVerifyContexts
-
-        `when`(message.getCampaignId()).thenReturn(null)
-        `when`(message.isTest()).thenReturn(false)
-        `when`(message.getMaxImpressions()).thenReturn(1)
-        `when`(message.getMessagePayload()).thenReturn(Gson().fromJson(MESSAGE_PAYLOAD.trimIndent(),
-                MessagePayload::class.java))
-        `when`(message.getContexts()).thenReturn(listOf("ctx"))
-        `when`(mockMessageManager.getNextDisplayMessage()).thenReturn(message).thenReturn(null)
-        displayMessageJobIntentService!!.onHandleWork(intent!!)
-
-        argumentCaptor<String>().apply {
-            Mockito.verify(mockReadyForDisplayRepo).removeMessage(capture(), eq(true))
-            firstValue shouldBeEqualTo ""
-        }
-    }
-
-    @Test
     fun `should display campaign if onVerifyContext was not set (default value)`() {
         verifyActivity()
     }
@@ -333,7 +312,11 @@ class ImagePrefetchSubscriberSpec {
         val message = Mockito.mock(CampaignData::class.java)
         val activity = Mockito.mock(Activity::class.java)
         val dataSource = Mockito.mock(DataSource::class.java)
+        val payload = Mockito.mock(MessagePayload::class.java)
+        val resource = Mockito.mock(Resource::class.java)
         `when`(dataSource.progress).thenReturn(1f)
+        `when`(message.getMessagePayload()).thenReturn(payload)
+        `when`(payload.resource).thenReturn(resource)
         displayMessageJobIntentService?.ImagePrefetchSubscriber(message, activity)
                 ?.onNewResult(dataSource as DataSource<Void>)
     }

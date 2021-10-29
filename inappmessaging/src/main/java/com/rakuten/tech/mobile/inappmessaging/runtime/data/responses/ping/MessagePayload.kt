@@ -7,32 +7,32 @@ import com.google.gson.annotations.SerializedName
  */
 internal data class MessagePayload(
     @SerializedName("headerColor")
-    val headerColor: String? = null,
+    val headerColor: String,
 
     @SerializedName("backgroundColor")
-    val backgroundColor: String? = null,
+    val backgroundColor: String,
 
     @SerializedName("messageSettings")
-    val messageSettings: MessageSettings? = null,
+    val messageSettings: MessageSettings,
 
     @SerializedName("messageBody")
     val messageBody: String? = null,
 
     @SerializedName("resource")
-    val resource: Resource? = null,
+    val resource: Resource,
 
     @SerializedName("titleColor")
-    val titleColor: String? = null,
+    val titleColor: String,
 
     @SerializedName("header")
     val header: String? = null,
 
     @SerializedName("frameColor")
-    val frameColor: String? = null,
+    val frameColor: String,
 
     @SerializedName("title")
-    val title: String? = null,
+    val title: String,
 
     @SerializedName("messageBodyColor")
-    val messageBodyColor: String? = null
+    val messageBodyColor: String
 )

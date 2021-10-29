@@ -50,12 +50,12 @@ internal abstract class PingResponseMessageRepository : MessageRepository {
             messages = LinkedHashMap()
             appLaunchList = LinkedHashMap()
             for (message in messageList) {
-                if (message.getCampaignId().isNullOrEmpty()) {
+                if (message.getCampaignId().isEmpty()) {
                     continue
                 }
-                messages[message.getCampaignId()!!] = message
-                if (message.getTriggers()?.size == 1) {
-                    appLaunchList[message.getCampaignId()!!] = isInitialLaunch
+                messages[message.getCampaignId()] = message
+                if (message.getTriggers().size == 1) {
+                    appLaunchList[message.getCampaignId()] = isInitialLaunch
                 }
             }
             isInitialLaunch = false

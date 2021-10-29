@@ -125,7 +125,7 @@ class PingResponseMessageRepositorySpec : BaseTest() {
         PingResponseMessageRepository.instance().replaceAllMessages(messageList)
         for (msg in PingResponseMessageRepository.instance().getAllMessagesCopy()) {
             PingResponseMessageRepository.instance()
-                    .shouldDisplayAppLaunchCampaign(msg.getCampaignId()!!).shouldBeFalse()
+                    .shouldDisplayAppLaunchCampaign(msg.getCampaignId()).shouldBeFalse()
         }
     }
 
@@ -136,7 +136,7 @@ class PingResponseMessageRepositorySpec : BaseTest() {
         PingResponseMessageRepository.instance().replaceAllMessages(messageList)
         for (msg in PingResponseMessageRepository.instance().getAllMessagesCopy()) {
             PingResponseMessageRepository.instance()
-                    .shouldDisplayAppLaunchCampaign(msg.getCampaignId()!!).shouldBeTrue()
+                    .shouldDisplayAppLaunchCampaign(msg.getCampaignId()).shouldBeTrue()
         }
     }
 
@@ -146,11 +146,12 @@ class PingResponseMessageRepositorySpec : BaseTest() {
         PingResponseMessageRepository.isInitialLaunch = true
         val mockMessage = Mockito.mock(Message::class.java)
         `when`(mockMessage.getCampaignId()).thenReturn("54321")
-        `when`(mockMessage.getTriggers()).thenReturn(listOf(Trigger(), Trigger()))
+        `when`(mockMessage.getTriggers()).thenReturn(listOf(Trigger(1, 1, "test",
+            mutableListOf()), Trigger(1, 2, "test2", mutableListOf())))
         messageList.add(mockMessage)
         PingResponseMessageRepository.instance().replaceAllMessages(messageList)
         for (msg in PingResponseMessageRepository.instance().getAllMessagesCopy()) {
-            val id = msg.getCampaignId()!!
+            val id = msg.getCampaignId()
             if (id == "54321") {
                 PingResponseMessageRepository.instance().shouldDisplayAppLaunchCampaign(id).shouldBeFalse()
             } else {

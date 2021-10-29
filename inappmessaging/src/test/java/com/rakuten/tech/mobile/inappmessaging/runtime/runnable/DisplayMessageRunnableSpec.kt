@@ -132,23 +132,6 @@ class DisplayMessageRunnableSpec : BaseTest() {
         DisplayMessageRunnable(message, hostAppActivity, IMAGE_ASPECT_RATIO).run()
     }
 
-    @Test
-    fun `should not throw exception with mock activity for slide with null settings`() {
-        WorkManagerTestInitHelper.initializeTestWorkManager(ApplicationProvider.getApplicationContext())
-        Settings.Secure.putString(
-                ApplicationProvider.getApplicationContext<Context>().contentResolver,
-                Settings.Secure.ANDROID_ID,
-                "test_device_id")
-        InAppMessaging.initialize(ApplicationProvider.getApplicationContext())
-        `when`(message.getType()).thenReturn(InAppMessageType.MODAL.typeId)
-        val mockPayload = Mockito.mock(MessagePayload::class.java)
-        `when`(message.getMessagePayload()).thenReturn(mockPayload)
-        `when`(mockPayload.messageSettings).thenReturn(null)
-        `when`(hostAppActivity
-                .layoutInflater).thenReturn(LayoutInflater.from(ApplicationProvider.getApplicationContext()))
-        DisplayMessageRunnable(message, hostAppActivity, IMAGE_ASPECT_RATIO).run()
-    }
-
     companion object {
         private const val IMAGE_ASPECT_RATIO = 0.75f
         private const val MESSAGE_PAYLOAD = """

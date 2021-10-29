@@ -14,10 +14,7 @@ import com.google.android.material.button.MaterialButton
 import com.rakuten.tech.mobile.inappmessaging.runtime.BaseTest
 import com.rakuten.tech.mobile.inappmessaging.runtime.R
 import com.rakuten.tech.mobile.inappmessaging.runtime.data.models.messages.Message
-import com.rakuten.tech.mobile.inappmessaging.runtime.data.responses.ping.ControlSettings
-import com.rakuten.tech.mobile.inappmessaging.runtime.data.responses.ping.MessageButton
-import com.rakuten.tech.mobile.inappmessaging.runtime.data.responses.ping.MessagePayload
-import com.rakuten.tech.mobile.inappmessaging.runtime.data.responses.ping.MessageSettings
+import com.rakuten.tech.mobile.inappmessaging.runtime.data.responses.ping.*
 import org.amshove.kluent.*
 import org.junit.Before
 import org.junit.Test
@@ -36,6 +33,8 @@ class BaseViewSpec : BaseTest() {
     private val mockPayload = Mockito.mock(MessagePayload::class.java)
     private val mockSettings = Mockito.mock(MessageSettings::class.java)
     private val mockCtrlSettings = Mockito.mock(ControlSettings::class.java)
+    private val mockDisplaySettings = Mockito.mock(DisplaySettings::class.java)
+    private val mockResource = Mockito.mock(Resource::class.java)
     private val mockBtn = Mockito.mock(MessageButton::class.java)
     private var view: InAppMessageBaseView? = null
 
@@ -49,40 +48,37 @@ class BaseViewSpec : BaseTest() {
         `when`(mockMessage.getMessagePayload()).thenReturn(mockPayload)
         `when`(mockPayload.header).thenReturn("test")
         `when`(mockPayload.messageBody).thenReturn("test")
+        `when`(mockPayload.messageSettings).thenReturn(mockSettings)
+        `when`(mockSettings.controlSettings).thenReturn(mockCtrlSettings)
+        `when`(mockSettings.displaySettings).thenReturn(mockDisplaySettings)
+        `when`(mockPayload.resource).thenReturn(mockResource)
         view = hostAppActivity
                 .layoutInflater
                 .inflate(R.layout.in_app_message_full_screen, null) as InAppMessageBaseView
     }
 
     @Test
-    fun `should not crash when null payload`() {
-        `when`(mockMessage.getMessagePayload()).thenReturn(null)
-
-        view?.populateViewData(mockMessage, 1f)
-    }
-
-    @Test
-    fun `should set default when null header color`() {
-        `when`(mockPayload.headerColor).thenReturn(null)
+    fun `should set default when invalid header color`() {
+        `when`(mockPayload.headerColor).thenReturn("invalid")
         view?.populateViewData(mockMessage, 1f)
 
         verifyDefault()
     }
 
     @Test
-    fun `should set default when null body color`() {
+    fun `should set default when invalid body color`() {
         `when`(mockPayload.headerColor).thenReturn(WHITE_HEX)
-        `when`(mockPayload.messageBodyColor).thenReturn(null)
+        `when`(mockPayload.messageBodyColor).thenReturn("incorrect")
         view?.populateViewData(mockMessage, 1f)
 
         verifyDefault()
     }
 
     @Test
-    fun `should set default when null bg color`() {
+    fun `should set default when invalid bg color`() {
         `when`(mockPayload.headerColor).thenReturn(WHITE_HEX)
         `when`(mockPayload.messageBodyColor).thenReturn(WHITE_HEX)
-        `when`(mockPayload.backgroundColor).thenReturn(null)
+        `when`(mockPayload.backgroundColor).thenReturn("failed")
         view?.populateViewData(mockMessage, 1f)
 
         verifyDefault()
@@ -90,8 +86,7 @@ class BaseViewSpec : BaseTest() {
 
     @Test
     fun `should set default when invalid button text and bg color`() {
-        `when`(mockPayload.messageSettings).thenReturn(mockSettings)
-        `when`(mockSettings.controlSettings).thenReturn(mockCtrlSettings)
+        `when`(mockPayload.headerColor).thenReturn("invalid")
         `when`(mockCtrlSettings.buttons).thenReturn(listOf(mockBtn))
         `when`(mockBtn.buttonTextColor).thenReturn("test")
         `when`(mockBtn.buttonTextColor).thenReturn("#")

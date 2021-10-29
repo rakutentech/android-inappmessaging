@@ -15,8 +15,8 @@ interface Event {
     /**
      * This method returns event name.
      */
-    @Nullable
-    fun getEventName(): String?
+    @NotNull
+    fun getEventName(): String
 
     /**
      * This method returns event type.

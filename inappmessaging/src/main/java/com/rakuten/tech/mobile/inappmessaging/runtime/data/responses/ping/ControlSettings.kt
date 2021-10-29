@@ -7,7 +7,7 @@ import com.google.gson.annotations.SerializedName
  */
 internal data class ControlSettings(
     @SerializedName("buttons")
-    val buttons: List<MessageButton>?,
+    val buttons: List<MessageButton>,
     @SerializedName("content")
-    val content: Content
+    val content: Content? = null
 )

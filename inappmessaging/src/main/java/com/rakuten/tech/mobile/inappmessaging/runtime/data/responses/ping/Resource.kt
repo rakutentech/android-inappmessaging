@@ -9,11 +9,11 @@ import com.google.gson.annotations.SerializedName
 @RestrictTo(RestrictTo.Scope.LIBRARY)
 internal data class Resource(
     @SerializedName("assetsUrl")
-    val assetsUrl: String?,
+    val assetsUrl: String? = null,
 
     @SerializedName("imageUrl")
-    val imageUrl: String?,
+    val imageUrl: String? = null,
 
     @SerializedName("cropType")
-    val cropType: Int?
+    val cropType: Int
 )

@@ -43,7 +43,7 @@ internal class DisplayMessageJobIntentService : JobIntentService() {
         // Retrieving the next ready message, and its display permission been checked.
         val message: Message = messageReadinessManager.getNextDisplayMessage() ?: return
         val hostActivity = InAppMessaging.instance().getRegisteredActivity()
-        val imageUrl = message.getMessagePayload()?.resource?.imageUrl
+        val imageUrl = message.getMessagePayload().resource.imageUrl
         if (hostActivity != null) {
             if (!imageUrl.isNullOrEmpty()) {
                 fetchImageThenDisplayMessage(message, hostActivity, imageUrl)
@@ -65,10 +65,11 @@ internal class DisplayMessageJobIntentService : JobIntentService() {
     ) {
         // If Fresco has not been initialized, initialize it first.
         Fresco.getImagePipeline()
-                .prefetchToBitmapCache(ImageRequest.fromUri(imageUrl), null /* callerContext */)
-                .subscribe(
-                        ImagePrefetchSubscriber(message, hostActivity),
-                        UiThreadImmediateExecutorService.getInstance())
+            .prefetchToBitmapCache(ImageRequest.fromUri(imageUrl), null /* callerContext */)
+            .subscribe(
+                ImagePrefetchSubscriber(message, hostActivity),
+                UiThreadImmediateExecutorService.getInstance()
+            )
     }
 
     /**
@@ -80,19 +81,20 @@ internal class DisplayMessageJobIntentService : JobIntentService() {
             Timber.tag(TAG).d("message display cancelled by the host app")
 
             // increment time closed to handle required number of events to be triggered
-            readyMessagesRepo.removeMessage(message.getCampaignId() ?: "", true)
+            readyMessagesRepo.removeMessage(message.getCampaignId(), true)
 
             prepareNextMessage()
             return
         }
 
         UiThreadImmediateExecutorService.getInstance()
-                .execute(
-                        DisplayMessageRunnable(
-                                message,
-                                hostActivity,
-                                calculateImageAspectRatio(
-                                        message.getMessagePayload()?.resource?.imageUrl)))
+            .execute(
+                DisplayMessageRunnable(
+                    message,
+                    hostActivity,
+                    calculateImageAspectRatio(message.getMessagePayload().resource.imageUrl)
+                )
+            )
     }
 
     /**
@@ -104,9 +106,7 @@ internal class DisplayMessageJobIntentService : JobIntentService() {
             return true
         }
 
-        return InAppMessaging.instance().onVerifyContext(
-                campaignContexts,
-                message.getMessagePayload()?.title ?: "")
+        return InAppMessaging.instance().onVerifyContext(campaignContexts, message.getMessagePayload().title)
     }
 
     /**
@@ -120,7 +120,7 @@ internal class DisplayMessageJobIntentService : JobIntentService() {
 
             // Get image cache key from image pipeline.
             val cacheKey =
-                    imagePipeline.getCacheKey(ImageRequest.fromUri(imageUrl), null /*callerContext*/)
+                imagePipeline.getCacheKey(ImageRequest.fromUri(imageUrl), null /*callerContext*/)
 
             // Get reference of the cached image from image pipeline.
             val closeableReference = imagePipeline.getCachedImage(cacheKey)
