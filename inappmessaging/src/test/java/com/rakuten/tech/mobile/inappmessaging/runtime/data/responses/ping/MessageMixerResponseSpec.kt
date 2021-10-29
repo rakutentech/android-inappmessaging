@@ -75,7 +75,7 @@ class MessageMixerResponseSpec(private val testname: String, private val actual:
             )
         }
 
-        private const val MIXER_RESPONSE = """
+        internal const val MIXER_RESPONSE = """
             {
                 "currentPingMillis":1583890595467,
                 "data":[{
@@ -83,46 +83,46 @@ class MessageMixerResponseSpec(private val testname: String, private val actual:
                         "campaignId":"1234567890",
                         "isTest":false,
                         "messagePayload":{
-                            "backgroundColor":"#000000",
-                            "frameColor":"#ffffff",
-                            "header":"DEV-Test (Android In-App-Test) - Login",
-                            "headerColor":"#ffffff",
-                            "messageBody":"Login Test",
-                            "messageBodyColor":"#ffffff",
+                            "backgroundColor":"#000001",
+                            "frameColor":"#fffff1",
+                            "header":"DEV-Test",
+                            "headerColor":"#fffff1",
+                            "messageBody":"Response Test",
+                            "messageBodyColor":"#fffff1",
                             "messageSettings":{
                                 "controlSettings":{
                                     "buttons":[{
-                                        "buttonBackgroundColor":"#000000",
-                                        "buttonTextColor":"#ffffff",
-                                        "buttonText":"Test",
+                                        "buttonBackgroundColor":"#000001",
+                                        "buttonTextColor":"#fffff1",
+                                        "buttonText":"Close",
                                         "buttonBehavior":{
-                                            "action":1,
+                                            "action":2,
                                             "uri":"https://en.wikipedia.org/wiki/Test"
                                         },
                                         "campaignTrigger":{
-                                            "type":1,
-                                            "eventType":1,
-                                            "eventName":"event",
+                                            "type":2,
+                                            "eventType":2,
+                                            "eventName":"event name",
                                             "attributes":[{
-                                                "name":"attribute",
-                                                "value":"attrValue",
-                                                "type":1,
-                                                "operator":1
+                                                "name":"attribute name",
+                                                "value":"attribute value",
+                                                "type":2,
+                                                "operator":2
                                             }]
                                         }
                                     }],
                                     "content":{
                                         "onClickBehavior":{
-                                            "action":1,
-                                            "uri":"https://en.wikipedia.org/wiki/Test"
+                                            "action":2,
+                                            "uri":"https://en.wikipedia.org/wiki/Test1"
                                         },
                                         "campaignTrigger":{
-                                            "type":1,
-                                            "eventType":1,
+                                            "type":2,
+                                            "eventType":2,
                                             "eventName":"event",
                                             "attributes":[{
-                                                "name":"attribute",
-                                                "value":"attrValue",
+                                                "name":"attribute name2",
+                                                "value":"attribute value2",
                                                 "type":1,
                                                 "operator":1
                                             }]
@@ -130,7 +130,7 @@ class MessageMixerResponseSpec(private val testname: String, private val actual:
                                     }
                                 },
                                 "displaySettings":{
-                                    "endTimeMillis":1584109800000,
+                                    "endTimeMillis":1584109800015,
                                     "optOut":false,
                                     "orientation":1,
                                     "slideFrom":1,
