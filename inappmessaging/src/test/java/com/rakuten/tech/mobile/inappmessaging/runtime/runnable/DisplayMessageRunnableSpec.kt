@@ -10,12 +10,10 @@ import android.view.Window
 import androidx.test.core.app.ApplicationProvider
 import androidx.work.testing.WorkManagerTestInitHelper
 import com.facebook.soloader.SoLoader
-import com.google.gson.Gson
 import com.rakuten.tech.mobile.inappmessaging.runtime.BaseTest
 import com.rakuten.tech.mobile.inappmessaging.runtime.InAppMessaging
 import com.rakuten.tech.mobile.inappmessaging.runtime.data.enums.InAppMessageType
 import com.rakuten.tech.mobile.inappmessaging.runtime.data.responses.ping.CampaignData
-import com.rakuten.tech.mobile.inappmessaging.runtime.data.responses.ping.MessageMixerResponse
 import com.rakuten.tech.mobile.inappmessaging.runtime.data.responses.ping.MessageMixerResponseSpec
 import org.junit.Before
 import org.junit.Test
@@ -36,9 +34,7 @@ class DisplayMessageRunnableSpec : BaseTest() {
     private val hostAppActivity = Mockito.mock(Activity::class.java)
     private val view = Mockito.mock(View::class.java)
     private val window = Mockito.mock(Window::class.java)
-    private val response = Gson().fromJson(MessageMixerResponseSpec.MIXER_RESPONSE.trimIndent(),
-        MessageMixerResponse::class.java)
-    private val payload = response.data[0].campaignData.getMessagePayload()
+    private val payload = MessageMixerResponseSpec.response.data[0].campaignData.getMessagePayload()
 
     @Before
     override fun setup() {
@@ -111,21 +107,6 @@ class DisplayMessageRunnableSpec : BaseTest() {
                 "test_device_id")
         InAppMessaging.initialize(ApplicationProvider.getApplicationContext())
         `when`(message.getType()).thenReturn(InAppMessageType.SLIDE.typeId)
-        `when`(message.getMessagePayload()).thenReturn(payload)
-        `when`(hostAppActivity
-                .layoutInflater).thenReturn(LayoutInflater.from(ApplicationProvider.getApplicationContext()))
-        DisplayMessageRunnable(message, hostAppActivity, IMAGE_ASPECT_RATIO).run()
-    }
-
-    @Test
-    fun `should not throw exception with mock activity for modal and buttons`() {
-        WorkManagerTestInitHelper.initializeTestWorkManager(ApplicationProvider.getApplicationContext())
-        Settings.Secure.putString(
-                ApplicationProvider.getApplicationContext<Context>().contentResolver,
-                Settings.Secure.ANDROID_ID,
-                "test_device_id")
-        InAppMessaging.initialize(ApplicationProvider.getApplicationContext())
-        `when`(message.getType()).thenReturn(InAppMessageType.MODAL.typeId)
         `when`(message.getMessagePayload()).thenReturn(payload)
         `when`(hostAppActivity
                 .layoutInflater).thenReturn(LayoutInflater.from(ApplicationProvider.getApplicationContext()))

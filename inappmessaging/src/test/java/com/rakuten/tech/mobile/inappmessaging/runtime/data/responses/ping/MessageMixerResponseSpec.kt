@@ -8,12 +8,12 @@ import org.junit.Test
 import org.junit.runner.RunWith
 import org.robolectric.ParameterizedRobolectricTestRunner
 import org.robolectric.annotation.Config
+import java.io.File
 
 @RunWith(ParameterizedRobolectricTestRunner::class)
 @Config(sdk = [Build.VERSION_CODES.O_MR1])
 @SuppressWarnings("LargeClass")
 class MessageMixerResponseSpec(private val testname: String, private val actual: Any?, private val expected: Any?) {
-
     companion object {
         @JvmStatic
         @ParameterizedRobolectricTestRunner.Parameters(
@@ -75,139 +75,8 @@ class MessageMixerResponseSpec(private val testname: String, private val actual:
             )
         }
 
-        internal const val MIXER_RESPONSE = """
-            {
-                "currentPingMillis":1583890595467,
-                "data":[{
-                    "campaignData":{
-                        "campaignId":"1234567890",
-                        "isTest":false,
-                        "messagePayload":{
-                            "backgroundColor":"#000000",
-                            "frameColor":"#ffffff",
-                            "header":"DEV-Test",
-                            "headerColor":"#ffffff",
-                            "messageBody":"Response Test",
-                            "messageBodyColor":"#ffffff",
-                            "messageSettings":{
-                                "controlSettings":{
-                                    "buttons":[{
-                                        "buttonBackgroundColor":"#000000",
-                                        "buttonTextColor":"#ffffff",
-                                        "buttonText":"Test",
-                                        "buttonBehavior":{
-                                            "action":1,
-                                            "uri":"https://en.wikipedia.org/wiki/Test"
-                                        },
-                                        "campaignTrigger":{
-                                            "type":1,
-                                            "eventType":4,
-                                            "eventName":"custom",
-                                            "attributes":[{
-                                                "name":"attribute1",
-                                                "value":"attrValue1",
-                                                "type":1,
-                                                "operator":1
-                                            },{
-                                                "name":"attribute2",
-                                                "value":"1",
-                                                "type":2,
-                                                "operator":1
-                                            },{
-                                                "name":"attribute3",
-                                                "value":"1.0",
-                                                "type":3,
-                                                "operator":1
-                                            },{
-                                                "name":"attribute4",
-                                                "value":"true",
-                                                "type":4,
-                                                "operator":1
-                                            },{
-                                                "name":"attribute5",
-                                                "value":"1234567",
-                                                "type":5,
-                                                "operator":1
-                                            }]
-                                        }
-                                    },{
-                                        "buttonBackgroundColor":"#000fff",
-                                        "buttonTextColor":"#fff000",
-                                        "buttonText":"Redirect",
-                                        "buttonBehavior":{
-                                            "action":2,
-                                            "uri":"https://test.url"
-                                        },
-                                        "campaignTrigger":{
-                                            "type":2,
-                                            "eventType":3,
-                                            "eventName":"test",
-                                            "attributes":[{
-                                                "name":"attribute",
-                                                "value":"attribute Value",
-                                                "type":1,
-                                                "operator":1
-                                            }]
-                                        }
-                                    }],
-                                    "content":{
-                                        "onClickBehavior":{
-                                            "action":1,
-                                            "uri":"https://sample.url"
-                                        },
-                                        "campaignTrigger":{
-                                            "type":1,
-                                            "eventType":1,
-                                            "eventName":"event",
-                                            "attributes":[{
-                                                "name":"attribute name",
-                                                "value":"value",
-                                                "type":1,
-                                                "operator":1
-                                            }]
-                                        }
-                                    }
-                                },
-                                "displaySettings":{
-                                    "endTimeMillis":1584109800000,
-                                    "optOut":false,
-                                    "orientation":1,
-                                    "slideFrom":1,
-                                    "textAlign":2
-                                }
-                            },
-                            "resource":{
-                                "cropType":2
-                            },
-                            "title":"DEV-Test (Android In-App-Test)",
-                            "titleColor":"#000000"
-                        },
-                        "triggers":[
-                            {
-                            "eventName":"Launch the App Event",
-                            "eventType":1,
-                            "attributes":[{
-                                "name":"attribute",
-                                "value":"attrValue",
-                                "type":1,
-                                "operator":1
-                            }],
-                            "type":1
-                            },
-                            {
-                            "eventName":"Login Event",
-                            "eventType":2,
-                            "attributes":[],
-                            "type":1
-                            }
-                        ],
-                        "type":2
-                    }
-                }],
-                "nextPingMillis":3600000
-            }"""
-        private val response =
-                Gson().fromJson(MIXER_RESPONSE.trimIndent(), MessageMixerResponse::class.java)
+        internal val response = Gson().fromJson(File("src/test/resources/test_response.json").readText(),
+            MessageMixerResponse::class.java)
         private val dataItem = DataItem(response.data[0].campaignData)
         private val campaignData = CampaignData(dataItem.campaignData.getMessagePayload(),
                 dataItem.campaignData.getType(), dataItem.campaignData.getTriggers(),

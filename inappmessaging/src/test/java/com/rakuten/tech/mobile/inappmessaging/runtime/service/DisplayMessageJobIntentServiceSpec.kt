@@ -11,7 +11,6 @@ import androidx.test.core.app.ApplicationProvider
 import androidx.work.testing.WorkManagerTestInitHelper
 import com.facebook.datasource.DataSource
 import com.facebook.soloader.SoLoader
-import com.google.gson.Gson
 import com.nhaarman.mockitokotlin2.any
 import com.nhaarman.mockitokotlin2.argumentCaptor
 import com.nhaarman.mockitokotlin2.eq
@@ -56,8 +55,7 @@ class DisplayMessageJobIntentServiceSpec : BaseTest() {
     private var mockReadyForDisplayRepo = Mockito.mock(ReadyForDisplayMessageRepository::class.java)
     private val onVerifyContexts = Mockito.mock(InAppMessaging.instance().onVerifyContext.javaClass)
     private val configResponseData = Mockito.mock(ConfigResponseData::class.java)
-    private val payload = Gson().fromJson(MessageMixerResponseSpec.MIXER_RESPONSE.trimIndent(),
-        MessageMixerResponse::class.java).data[0].campaignData.getMessagePayload()
+    private val payload = MessageMixerResponseSpec.response.data[0].campaignData.getMessagePayload()
 
     @Before
     override fun setup() {

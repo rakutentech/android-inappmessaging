@@ -7,7 +7,6 @@ import androidx.test.core.app.ApplicationProvider
 import androidx.work.ListenableWorker
 import androidx.work.WorkerParameters
 import androidx.work.testing.WorkManagerTestInitHelper
-import com.google.gson.Gson
 import com.nhaarman.mockitokotlin2.any
 import com.nhaarman.mockitokotlin2.anyOrNull
 import com.nhaarman.mockitokotlin2.eq
@@ -91,8 +90,7 @@ class MessageMixerWorkerSpec : BaseTest() {
     @Test
     fun `should return success with valid response`() {
         `when`(mockResponse?.isSuccessful).thenReturn(true)
-        `when`(mockResponse?.body()).thenReturn(Gson().fromJson(MessageMixerResponseSpec.MIXER_RESPONSE.trimIndent(),
-                MessageMixerResponse::class.java))
+        `when`(mockResponse?.body()).thenReturn(MessageMixerResponseSpec.response)
         MessageMixerWorker(context!!, workerParameters!!)
                 .onResponse(mockResponse!!) shouldBeEqualTo ListenableWorker.Result.success()
     }
