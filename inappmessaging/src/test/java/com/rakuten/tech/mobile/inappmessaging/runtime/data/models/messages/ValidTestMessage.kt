@@ -20,12 +20,12 @@ internal class ValidTestMessage(
         return triggerList
     }
 
-    override fun getMessagePayload(): MessagePayload = MessagePayload("#000000", "#ffffff",
+    override fun getMessagePayload(): MessagePayload = MessagePayload(DEFAULT_COLOR, "#ffffff",
         MessageSettings(
             DisplaySettings(1, 1, 1, 1, false, 1, false),
             ControlSettings(listOf())
-        ), null, Resource(cropType = 2), "#000000", null, "#ffffff", "title",
-        "#000000")
+        ), null, Resource(cropType = 2), DEFAULT_COLOR, null, "#ffffff", "title",
+        DEFAULT_COLOR)
 
     override fun isTest(): Boolean = isTest
 
@@ -62,5 +62,6 @@ internal class ValidTestMessage(
     companion object {
         private const val DEFAULT_CAMPAIGN_ID = "5bf41c52-e4c0-4cb2-9183-df429e84d681"
         private const val IS_TEST = true
+        private const val DEFAULT_COLOR = "#000000"
     }
 }

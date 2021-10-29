@@ -30,7 +30,7 @@ class MessageMixerResponseSpec(private val testname: String, private val actual:
                     arrayOf("maxImpressions", campaignData.getMaxImpressions(), 0), // default value
                     arrayOf("headerColor", messagePayload.headerColor, "#ffffff"),
                     arrayOf("backgroundColor", messagePayload.backgroundColor, "#000000"),
-                    arrayOf("messageBody", messagePayload.messageBody, "Login Test"),
+                    arrayOf("messageBody", messagePayload.messageBody, "Response Test"),
                     arrayOf("titleColor", messagePayload.titleColor, "#000000"),
                     arrayOf("header", messagePayload.header, "DEV-Test"),
                     arrayOf("frameColor", messagePayload.frameColor, "#ffffff"),
@@ -42,12 +42,12 @@ class MessageMixerResponseSpec(private val testname: String, private val actual:
                     arrayOf("textAlign", displaySettings.textAlign, 2),
                     arrayOf("optOut", displaySettings.optOut, false),
                     arrayOf("content action", controlContentBehavior.action, 1),
-                    arrayOf("content uri", controlContentBehavior.uri, "https://en.wikipedia.org/wiki/Test"),
+                    arrayOf("content uri", controlContentBehavior.uri, "https://sample.url"),
                     arrayOf("content trigger type", controlContentTrigger.type, 1),
                     arrayOf("content trigger eventName", controlContentTrigger.eventName, "event"),
                     arrayOf("content trigger eventType", controlContentTrigger.eventType, 1),
-                    arrayOf("content trigger attribute name", controlContentTriggerAttr.name, "attribute"),
-                    arrayOf("content trigger attribute value", controlContentTriggerAttr.value, "attrValue"),
+                    arrayOf("content trigger attribute name", controlContentTriggerAttr.name, "attribute name"),
+                    arrayOf("content trigger attribute value", controlContentTriggerAttr.value, "value"),
                     arrayOf("content trigger attribute type", controlContentTriggerAttr.type, 1),
                     arrayOf("content trigger attribute operator", controlContentTriggerAttr.operator, 1),
                     arrayOf("buttonBackgroundColor", messageButton.buttonBackgroundColor, "#000000"),
@@ -59,7 +59,7 @@ class MessageMixerResponseSpec(private val testname: String, private val actual:
                     arrayOf("button trigger eventName", buttonTrigger.eventName, "custom"),
                     arrayOf("button trigger eventType", buttonTrigger.eventType, 4),
                     arrayOf("button trigger attribute name", buttonTriggerAttr.name, "attribute1"),
-                    arrayOf("button trigger attribute value", buttonTriggerAttr.value, "attrValue"),
+                    arrayOf("button trigger attribute value", buttonTriggerAttr.value, "attrValue1"),
                     arrayOf("button trigger attribute type", buttonTriggerAttr.type, 1),
                     arrayOf("button trigger attribute operator", buttonTriggerAttr.operator, 1),
                     arrayOf("cropType", resource.cropType, 2),
@@ -105,7 +105,7 @@ class MessageMixerResponseSpec(private val testname: String, private val actual:
                                             "eventName":"custom",
                                             "attributes":[{
                                                 "name":"attribute1",
-                                                "value":"attrValue",
+                                                "value":"attrValue1",
                                                 "type":1,
                                                 "operator":1
                                             },{
@@ -131,20 +131,20 @@ class MessageMixerResponseSpec(private val testname: String, private val actual:
                                             }]
                                         }
                                     },{
-                                        "buttonBackgroundColor":"#000000",
-                                        "buttonTextColor":"#ffffff",
-                                        "buttonText":"Test",
+                                        "buttonBackgroundColor":"#000fff",
+                                        "buttonTextColor":"#fff000",
+                                        "buttonText":"Redirect",
                                         "buttonBehavior":{
-                                            "action":1,
-                                            "uri":"https://en.wikipedia.org/wiki/Test"
+                                            "action":2,
+                                            "uri":"https://test.url"
                                         },
                                         "campaignTrigger":{
-                                            "type":1,
-                                            "eventType":4,
-                                            "eventName":"custom",
+                                            "type":2,
+                                            "eventType":3,
+                                            "eventName":"test",
                                             "attributes":[{
                                                 "name":"attribute",
-                                                "value":"attrValue",
+                                                "value":"attribute Value",
                                                 "type":1,
                                                 "operator":1
                                             }]
@@ -153,15 +153,15 @@ class MessageMixerResponseSpec(private val testname: String, private val actual:
                                     "content":{
                                         "onClickBehavior":{
                                             "action":1,
-                                            "uri":"https://en.wikipedia.org/wiki/Test"
+                                            "uri":"https://sample.url"
                                         },
                                         "campaignTrigger":{
                                             "type":1,
                                             "eventType":1,
                                             "eventName":"event",
                                             "attributes":[{
-                                                "name":"attribute",
-                                                "value":"attrValue",
+                                                "name":"attribute name",
+                                                "value":"value",
                                                 "type":1,
                                                 "operator":1
                                             }]
