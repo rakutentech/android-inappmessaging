@@ -23,9 +23,7 @@ import com.rakuten.tech.mobile.inappmessaging.runtime.data.repositories.ConfigRe
 import com.rakuten.tech.mobile.inappmessaging.runtime.data.repositories.LocalDisplayedMessageRepository
 import com.rakuten.tech.mobile.inappmessaging.runtime.data.repositories.ReadyForDisplayMessageRepository
 import com.rakuten.tech.mobile.inappmessaging.runtime.data.responses.config.ConfigResponseData
-import com.rakuten.tech.mobile.inappmessaging.runtime.data.responses.ping.CampaignData
-import com.rakuten.tech.mobile.inappmessaging.runtime.data.responses.ping.MessagePayload
-import com.rakuten.tech.mobile.inappmessaging.runtime.data.responses.ping.Resource
+import com.rakuten.tech.mobile.inappmessaging.runtime.data.responses.ping.*
 import com.rakuten.tech.mobile.inappmessaging.runtime.manager.MessageReadinessManager
 import org.amshove.kluent.*
 import org.junit.After
@@ -58,6 +56,8 @@ class DisplayMessageJobIntentServiceSpec : BaseTest() {
     private var mockReadyForDisplayRepo = Mockito.mock(ReadyForDisplayMessageRepository::class.java)
     private val onVerifyContexts = Mockito.mock(InAppMessaging.instance().onVerifyContext.javaClass)
     private val configResponseData = Mockito.mock(ConfigResponseData::class.java)
+    private val payload = Gson().fromJson(MessageMixerResponseSpec.MIXER_RESPONSE.trimIndent(),
+        MessageMixerResponse::class.java).data[0].campaignData.getMessagePayload()
 
     @Before
     override fun setup() {
@@ -102,8 +102,7 @@ class DisplayMessageJobIntentServiceSpec : BaseTest() {
         `when`(message.getCampaignId()).thenReturn("1")
         `when`(message.isTest()).thenReturn(true)
         `when`(message.getMaxImpressions()).thenReturn(10)
-        `when`(message.getMessagePayload()).thenReturn(Gson().fromJson(MESSAGE_PAYLOAD.trimIndent(),
-                MessagePayload::class.java))
+        `when`(message.getMessagePayload()).thenReturn(payload)
         displayMessageJobIntentService!!.onHandleWork(intent!!)
     }
 
@@ -122,7 +121,7 @@ class DisplayMessageJobIntentServiceSpec : BaseTest() {
     fun `should call onVerifyContext for non-test campaign with contexts`() {
         setupCampaign()
 
-        Mockito.verify(onVerifyContexts).invoke(listOf("ctx"), "Campaign Title")
+        Mockito.verify(onVerifyContexts).invoke(listOf("ctx"), "DEV-Test (Android In-App-Test)")
     }
 
     @Test
@@ -135,8 +134,7 @@ class DisplayMessageJobIntentServiceSpec : BaseTest() {
         `when`(message.getCampaignId()).thenReturn("1")
         `when`(message.isTest()).thenReturn(false)
         `when`(message.getMaxImpressions()).thenReturn(1)
-        `when`(message.getMessagePayload()).thenReturn(Gson().fromJson(MESSAGE_PAYLOAD.trimIndent(),
-                MessagePayload::class.java))
+        `when`(message.getMessagePayload()).thenReturn(payload)
         `when`(message.getContexts()).thenReturn(listOf())
         `when`(mockMessageManager.getNextDisplayMessage()).thenReturn(message)
         displayMessageJobIntentService!!.onHandleWork(intent!!)
@@ -154,8 +152,7 @@ class DisplayMessageJobIntentServiceSpec : BaseTest() {
         `when`(message.getCampaignId()).thenReturn("1")
         `when`(message.isTest()).thenReturn(true)
         `when`(message.getMaxImpressions()).thenReturn(1)
-        `when`(message.getMessagePayload()).thenReturn(Gson().fromJson(MESSAGE_PAYLOAD.trimIndent(),
-                MessagePayload::class.java))
+        `when`(message.getMessagePayload()).thenReturn(payload)
         `when`(message.getContexts()).thenReturn(listOf("ctx"))
         `when`(mockMessageManager.getNextDisplayMessage()).thenReturn(message)
         displayMessageJobIntentService!!.onHandleWork(intent!!)
@@ -174,7 +171,7 @@ class DisplayMessageJobIntentServiceSpec : BaseTest() {
         }
         argumentCaptor<String>().apply {
             Mockito.verify(onVerifyContexts).invoke(any(), capture())
-            firstValue shouldBeEqualTo "Campaign Title"
+            firstValue shouldBeEqualTo "DEV-Test (Android In-App-Test)"
         }
     }
 
@@ -257,40 +254,9 @@ class DisplayMessageJobIntentServiceSpec : BaseTest() {
         `when`(message.getCampaignId()).thenReturn("1")
         `when`(message.isTest()).thenReturn(false)
         `when`(message.getMaxImpressions()).thenReturn(1)
-        `when`(message.getMessagePayload()).thenReturn(Gson().fromJson(MESSAGE_PAYLOAD.trimIndent(),
-                MessagePayload::class.java))
+        `when`(message.getMessagePayload()).thenReturn(payload)
         `when`(message.getContexts()).thenReturn(listOf("ctx"))
         `when`(mockMessageManager.getNextDisplayMessage()).thenReturn(message).thenReturn(null)
-    }
-
-    companion object {
-        private const val MESSAGE_PAYLOAD = """
-            {
-                "backgroundColor":"#000000",
-                "frameColor":"#ffffff",
-                "header":"Test Header",
-                "headerColor":"#ffffff",
-                "messageBody":"Login Test",
-                "messageBodyColor":"#ffffff",
-                "messageSettings":{
-                    "controlSettings":{
-                        "buttons":[]
-                    },
-                    "displaySettings":{
-                        "endTimeMillis":1584109800000,
-                        "optOut":true,
-                        "orientation":1,
-                        "slideFrom":1,
-                        "textAlign":2
-                    }
-                },
-                "resource":{
-                    "cropType":2
-                },
-                "title":"Campaign Title",
-                "titleColor":"#000000"
-            }
-        """
     }
 }
 

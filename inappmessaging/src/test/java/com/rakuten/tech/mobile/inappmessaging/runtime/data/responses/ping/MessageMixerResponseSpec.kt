@@ -32,7 +32,7 @@ class MessageMixerResponseSpec(private val testname: String, private val actual:
                     arrayOf("backgroundColor", messagePayload.backgroundColor, "#000000"),
                     arrayOf("messageBody", messagePayload.messageBody, "Login Test"),
                     arrayOf("titleColor", messagePayload.titleColor, "#000000"),
-                    arrayOf("header", messagePayload.header, "DEV-Test (Android In-App-Test) - Login"),
+                    arrayOf("header", messagePayload.header, "DEV-Test"),
                     arrayOf("frameColor", messagePayload.frameColor, "#ffffff"),
                     arrayOf("title", messagePayload.title, "DEV-Test (Android In-App-Test)"),
                     arrayOf("messageBodyColor", messagePayload.messageBodyColor, "#ffffff"),
@@ -56,9 +56,9 @@ class MessageMixerResponseSpec(private val testname: String, private val actual:
                     arrayOf("button action", buttonOnClickBehavior.action, 1),
                     arrayOf("button uri", buttonOnClickBehavior.uri, "https://en.wikipedia.org/wiki/Test"),
                     arrayOf("button type", buttonTrigger.type, 1),
-                    arrayOf("button trigger eventName", buttonTrigger.eventName, "event"),
-                    arrayOf("button trigger eventType", buttonTrigger.eventType, 1),
-                    arrayOf("button trigger attribute name", buttonTriggerAttr.name, "attribute"),
+                    arrayOf("button trigger eventName", buttonTrigger.eventName, "custom"),
+                    arrayOf("button trigger eventType", buttonTrigger.eventType, 4),
+                    arrayOf("button trigger attribute name", buttonTriggerAttr.name, "attribute1"),
                     arrayOf("button trigger attribute value", buttonTriggerAttr.value, "attrValue"),
                     arrayOf("button trigger attribute type", buttonTriggerAttr.type, 1),
                     arrayOf("button trigger attribute operator", buttonTriggerAttr.operator, 1),
@@ -83,46 +83,85 @@ class MessageMixerResponseSpec(private val testname: String, private val actual:
                         "campaignId":"1234567890",
                         "isTest":false,
                         "messagePayload":{
-                            "backgroundColor":"#000001",
-                            "frameColor":"#fffff1",
+                            "backgroundColor":"#000000",
+                            "frameColor":"#ffffff",
                             "header":"DEV-Test",
-                            "headerColor":"#fffff1",
+                            "headerColor":"#ffffff",
                             "messageBody":"Response Test",
-                            "messageBodyColor":"#fffff1",
+                            "messageBodyColor":"#ffffff",
                             "messageSettings":{
                                 "controlSettings":{
                                     "buttons":[{
-                                        "buttonBackgroundColor":"#000001",
-                                        "buttonTextColor":"#fffff1",
-                                        "buttonText":"Close",
+                                        "buttonBackgroundColor":"#000000",
+                                        "buttonTextColor":"#ffffff",
+                                        "buttonText":"Test",
                                         "buttonBehavior":{
-                                            "action":2,
+                                            "action":1,
                                             "uri":"https://en.wikipedia.org/wiki/Test"
                                         },
                                         "campaignTrigger":{
-                                            "type":2,
-                                            "eventType":2,
-                                            "eventName":"event name",
+                                            "type":1,
+                                            "eventType":4,
+                                            "eventName":"custom",
                                             "attributes":[{
-                                                "name":"attribute name",
-                                                "value":"attribute value",
+                                                "name":"attribute1",
+                                                "value":"attrValue",
+                                                "type":1,
+                                                "operator":1
+                                            },{
+                                                "name":"attribute2",
+                                                "value":"1",
                                                 "type":2,
-                                                "operator":2
+                                                "operator":1
+                                            },{
+                                                "name":"attribute3",
+                                                "value":"1.0",
+                                                "type":3,
+                                                "operator":1
+                                            },{
+                                                "name":"attribute4",
+                                                "value":"true",
+                                                "type":4,
+                                                "operator":1
+                                            },{
+                                                "name":"attribute5",
+                                                "value":"1234567",
+                                                "type":5,
+                                                "operator":1
+                                            }]
+                                        }
+                                    },{
+                                        "buttonBackgroundColor":"#000000",
+                                        "buttonTextColor":"#ffffff",
+                                        "buttonText":"Test",
+                                        "buttonBehavior":{
+                                            "action":1,
+                                            "uri":"https://en.wikipedia.org/wiki/Test"
+                                        },
+                                        "campaignTrigger":{
+                                            "type":1,
+                                            "eventType":4,
+                                            "eventName":"custom",
+                                            "attributes":[{
+                                                "name":"attribute",
+                                                "value":"attrValue",
+                                                "type":1,
+                                                "operator":1
                                             }]
                                         }
                                     }],
                                     "content":{
                                         "onClickBehavior":{
-                                            "action":2,
-                                            "uri":"https://en.wikipedia.org/wiki/Test1"
+                                            "action":1,
+                                            "uri":"https://en.wikipedia.org/wiki/Test"
                                         },
                                         "campaignTrigger":{
-                                            "type":2,
-                                            "eventType":2,
+                                            "type":1,
+                                            "eventType":1,
                                             "eventName":"event",
                                             "attributes":[{
-                                                "name":"attribute name2",
-                                                "value":"attribute value2",
+                                                "name":"attribute",
+                                                "value":"attrValue",
                                                 "type":1,
                                                 "operator":1
                                             }]
@@ -130,18 +169,15 @@ class MessageMixerResponseSpec(private val testname: String, private val actual:
                                     }
                                 },
                                 "displaySettings":{
-                                    "endTimeMillis":1584109800015,
+                                    "endTimeMillis":1584109800000,
                                     "optOut":false,
                                     "orientation":1,
                                     "slideFrom":1,
-                                    "textAlign":2,
-                                    "delay":3000,
-                                    "html":false
+                                    "textAlign":2
                                 }
                             },
                             "resource":{
-                                "cropType":2,
-                                "imageUrl":"https://sample.image.url/test.jpg"
+                                "cropType":2
                             },
                             "title":"DEV-Test (Android In-App-Test)",
                             "titleColor":"#000000"
@@ -210,7 +246,7 @@ class MessageMixerResponseSpec(private val testname: String, private val actual:
         private val controlContentTriggerAttr = TriggerAttribute(controlContentTrigger.triggerAttributes[0].name,
                 controlContentTrigger.triggerAttributes[0].value,
                 controlContentTrigger.triggerAttributes[0].type, controlContentTrigger.triggerAttributes[0].operator)
-        private val resource = Resource(messagePayload.resource.assetsUrl, messagePayload.resource.imageUrl,
+        private val resource = Resource(messagePayload.resource.assetsUrl, "https://sample.image.url/test.jpg",
                 messagePayload.resource.cropType)
         private val campaignTrigger = Trigger(campaignData.getTriggers()[0].type,
                 campaignData.getTriggers()[0].eventType, campaignData.getTriggers()[0].eventName,
