@@ -10,7 +10,7 @@ internal data class Trigger(
     val type: Int,
 
     @SerializedName("eventType")
-    val eventType: Int? = null,
+    val eventType: Int,
 
     @SerializedName("eventName")
     val eventName: String,

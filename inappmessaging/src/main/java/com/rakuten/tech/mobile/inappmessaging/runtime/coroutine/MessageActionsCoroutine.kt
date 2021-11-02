@@ -201,7 +201,7 @@ internal class MessageActionsCoroutine(
      */
     @SuppressWarnings("LongMethod", "ReturnCount")
     private fun createLocalCustomEvent(embeddedEvent: Trigger): Event? {
-        val type = embeddedEvent.eventType ?: return null
+        val type = embeddedEvent.eventType
         if (EventType.CUSTOM != EventType.getById(type)) {
             return null
         }

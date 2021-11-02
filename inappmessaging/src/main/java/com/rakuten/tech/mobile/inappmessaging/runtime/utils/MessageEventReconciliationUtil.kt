@@ -310,8 +310,6 @@ internal interface MessageEventReconciliationUtil {
         private fun copyEventsForTrigger(trigger: Trigger, eventMap: Map<String, MutableList<Event>>):
                 MutableList<Event>? {
             // Reconcile by trigger's type.
-            if (trigger.eventType == null) return null
-
             val eventType = EventType.getById(trigger.eventType)
             if (eventType == null || eventType == EventType.INVALID) {
                 Timber.tag(TAG).d("null or INVALID EventType.")
