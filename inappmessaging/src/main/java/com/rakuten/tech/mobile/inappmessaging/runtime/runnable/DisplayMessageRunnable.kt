@@ -10,7 +10,6 @@ import com.rakuten.tech.mobile.inappmessaging.runtime.view.InAppMessageFullScree
 import com.rakuten.tech.mobile.inappmessaging.runtime.view.InAppMessageModalView
 import com.rakuten.tech.mobile.inappmessaging.runtime.view.InAppMessageSlideUpView
 import kotlinx.coroutines.Runnable
-import java.lang.NullPointerException
 
 /**
  * Displaying message runnable which presents the message on the UI thread. Message close, and other

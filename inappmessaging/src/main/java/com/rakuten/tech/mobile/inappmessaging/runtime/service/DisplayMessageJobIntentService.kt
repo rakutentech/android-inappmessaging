@@ -6,7 +6,6 @@ import android.content.Intent
 import android.os.Handler
 import android.os.Looper
 import androidx.core.app.JobIntentService
-import androidx.core.os.HandlerCompat
 import com.rakuten.tech.mobile.inappmessaging.runtime.InAppMessaging
 import com.rakuten.tech.mobile.inappmessaging.runtime.data.models.messages.Message
 import com.rakuten.tech.mobile.inappmessaging.runtime.data.repositories.LocalDisplayedMessageRepository
@@ -26,6 +25,7 @@ internal class DisplayMessageJobIntentService : JobIntentService() {
     var localDisplayRepo = LocalDisplayedMessageRepository.instance()
     var readyMessagesRepo = ReadyForDisplayMessageRepository.instance()
     var messageReadinessManager = MessageReadinessManager.instance()
+    var handler = Handler(Looper.getMainLooper())
 
     /**
      * This method starts displaying message runnable.
@@ -90,8 +90,7 @@ internal class DisplayMessageJobIntentService : JobIntentService() {
             return
         }
 
-        val mainThreadHandler: Handler = HandlerCompat.createAsync(Looper.getMainLooper())
-        mainThreadHandler.post(DisplayMessageRunnable(message, hostActivity))
+        handler.post(DisplayMessageRunnable(message, hostActivity))
     }
 
     /**

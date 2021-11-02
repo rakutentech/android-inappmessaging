@@ -4,10 +4,10 @@ import android.app.Activity
 import android.content.Context
 import android.content.Intent
 import android.os.Build
+import android.os.Handler
 import android.provider.Settings
 import android.view.LayoutInflater
 import android.view.View
-import android.view.ViewGroup
 import androidx.work.testing.WorkManagerTestInitHelper
 import com.google.gson.Gson
 import com.nhaarman.mockitokotlin2.any
@@ -16,7 +16,6 @@ import com.nhaarman.mockitokotlin2.eq
 import com.nhaarman.mockitokotlin2.never
 import com.rakuten.tech.mobile.inappmessaging.runtime.BaseTest
 import com.rakuten.tech.mobile.inappmessaging.runtime.InAppMessaging
-import com.rakuten.tech.mobile.inappmessaging.runtime.R
 import com.rakuten.tech.mobile.inappmessaging.runtime.data.models.messages.Message
 import com.rakuten.tech.mobile.inappmessaging.runtime.data.repositories.ConfigResponseRepository
 import com.rakuten.tech.mobile.inappmessaging.runtime.data.repositories.LocalDisplayedMessageRepository
@@ -30,13 +29,14 @@ import org.junit.Before
 import org.junit.Test
 import org.junit.runner.RunWith
 import org.mockito.ArgumentMatchers
-import org.mockito.Mockito
 import org.robolectric.Robolectric
 import org.robolectric.RobolectricTestRunner
 import org.robolectric.android.controller.ServiceController
 import org.robolectric.annotation.Config
 import androidx.test.core.app.ApplicationProvider.getApplicationContext
-import org.mockito.Mockito.*
+import org.mockito.Mockito
+import org.mockito.Mockito.`when`
+import org.mockito.Mockito.validateMockitoUsage
 
 /**
  * Test class for DisplayMessageJobIntentService.
@@ -55,6 +55,7 @@ class DisplayMessageJobIntentServiceSpec : BaseTest() {
     private var mockReadyForDisplayRepo = Mockito.mock(ReadyForDisplayMessageRepository::class.java)
     private val onVerifyContexts = Mockito.mock(InAppMessaging.instance().onVerifyContext.javaClass)
     private val configResponseData = Mockito.mock(ConfigResponseData::class.java)
+    private val handler = Mockito.mock(Handler::class.java)
     private val context = getApplicationContext<Context>()
 
     @Before
@@ -65,6 +66,7 @@ class DisplayMessageJobIntentServiceSpec : BaseTest() {
         displayMessageJobIntentService!!.messageReadinessManager = mockMessageManager
         displayMessageJobIntentService!!.localDisplayRepo = mockLocalDisplayRepo
         displayMessageJobIntentService!!.readyMessagesRepo = mockReadyForDisplayRepo
+        displayMessageJobIntentService!!.handler = handler
         `when`(activity.layoutInflater).thenReturn(LayoutInflater.from(context))
         WorkManagerTestInitHelper.initializeTestWorkManager(context)
         `when`(configResponseData.rollOutPercentage).thenReturn(100)
@@ -73,7 +75,7 @@ class DisplayMessageJobIntentServiceSpec : BaseTest() {
         Settings.Secure.putString(
             context.contentResolver,
                 Settings.Secure.ANDROID_ID, "test_device_id")
-        InAppMessaging.initialize(context, true)
+        InAppMessaging.initialize(context)
         InAppMessaging.instance().registerMessageDisplayActivity(activity)
     }
 
@@ -222,14 +224,14 @@ class DisplayMessageJobIntentServiceSpec : BaseTest() {
 
     @Test
     fun `should display campaign if onVerifyContext was not set (default value)`() {
-        verifyActivity()
+        verifyHandlerCalled(true)
     }
 
     @Test
     fun `should not display campaign if activity is not registered`() {
         InAppMessaging.instance().unregisterMessageDisplayActivity()
         Mockito.verify(activity).findViewById<View?>(ArgumentMatchers.anyInt())
-        verifyActivity()
+        verifyHandlerCalled()
     }
 
     @Test
@@ -262,13 +264,17 @@ class DisplayMessageJobIntentServiceSpec : BaseTest() {
         return message
     }
 
-    private fun verifyActivity() {
+    private fun verifyHandlerCalled(shouldCall: Boolean = false) {
         val message = Mockito.mock(Message::class.java)
 
         setupMocking(message)
         displayMessageJobIntentService!!.onHandleWork(intent!!)
 
-        Mockito.verify(activity).findViewById<View?>(ArgumentMatchers.anyInt())
+        if (shouldCall) {
+            Mockito.verify(handler).post(any())
+        } else {
+            Mockito.verify(handler, never()).post(any())
+        }
     }
 
     private fun setupMocking(message: Message) {

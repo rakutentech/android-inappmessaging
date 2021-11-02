@@ -2,8 +2,6 @@ package com.rakuten.tech.mobile.inappmessaging.runtime.data.repositories
 
 import androidx.annotation.VisibleForTesting
 import com.google.gson.Gson
-import com.google.gson.GsonBuilder
-import com.google.gson.reflect.TypeToken
 import com.rakuten.tech.mobile.inappmessaging.runtime.InApp
 import com.rakuten.tech.mobile.inappmessaging.runtime.InAppMessaging
 import com.rakuten.tech.mobile.inappmessaging.runtime.data.enums.EventType
@@ -16,7 +14,6 @@ import com.rakuten.tech.mobile.inappmessaging.runtime.exception.InAppMessagingEx
 import org.json.JSONArray
 import timber.log.Timber
 import java.lang.ClassCastException
-import java.lang.reflect.Modifier
 import java.util.Collections
 import kotlin.collections.ArrayList
 import kotlin.collections.component1
@@ -181,7 +178,7 @@ internal interface LocalEventRepository : EventRepository {
             }
         }
 
-        @SuppressWarnings("TooGenericExceptionCaught", "ComplexMethod", "LongMethod")
+        @SuppressWarnings("TooGenericExceptionCaught", "ComplexMethod")
         private fun deserializeLocalEvents(listString: String) {
             try {
                 val jsonArray = JSONArray(listString)
@@ -198,23 +195,15 @@ internal interface LocalEventRepository : EventRepository {
                     }
                     event?.let { events.add(it) }
                 }
-            } catch (ex: Exception) {
-                Timber.tag(TAG).d(ex.cause, "Invalid JSON format for $LOCAL_EVENT_KEY data")
-            }
+            } catch (ex: Exception) { Timber.tag(TAG).d(ex.cause, "Invalid JSON format for $LOCAL_EVENT_KEY data") }
         }
 
         private fun saveUpdatedList() {
             // check if caching is enabled to update persistent data
             if (InAppMessaging.instance().isLocalCachingEnabled()) {
                 // save updated event list
-                val arrayType = object : TypeToken<MutableList<Event>>() {}.type
-                val gson = GsonBuilder()
-                    .excludeFieldsWithModifiers(Modifier.FINAL, Modifier.TRANSIENT, Modifier.STATIC)
-                    .serializeNulls()
-                    .create()
-                InAppMessaging.instance().getSharedPref()?.edit()
-                    ?.putString(LOCAL_EVENT_KEY, gson.toJson(events, arrayType))?.apply()
-                    ?: Timber.tag(TAG).d("failed saving event data")
+                InAppMessaging.instance().getSharedPref()?.edit()?.putString(LOCAL_EVENT_KEY,
+                        Gson().toJson(events))?.apply() ?: Timber.tag(TAG).d("failed saving event data")
             }
         }
     }
