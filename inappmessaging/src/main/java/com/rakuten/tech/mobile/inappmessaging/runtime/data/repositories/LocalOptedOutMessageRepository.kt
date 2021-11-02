@@ -19,7 +19,7 @@ internal interface LocalOptedOutMessageRepository {
     /**
      * This method checks if message exists in the the opted out repository.
      */
-    fun hasMessage(messageCampaignId: String?): Boolean
+    fun hasMessage(messageCampaignId: String): Boolean
 
     /**
      * Clears all message from the repository.
@@ -37,7 +37,7 @@ internal interface LocalOptedOutMessageRepository {
     }
 
     private class LocalOptedOutMessageRepositoryImpl : LocalOptedOutMessageRepository {
-        private val optedOutMessages = HashSet<String?>()
+        private val optedOutMessages = HashSet<String>()
         private var user = ""
 
         init {
@@ -54,7 +54,7 @@ internal interface LocalOptedOutMessageRepository {
             }
         }
 
-        override fun hasMessage(messageCampaignId: String?): Boolean {
+        override fun hasMessage(messageCampaignId: String): Boolean {
             synchronized(optedOutMessages) {
                 // check if caching is enabled and if there are changes in user info
                 checkAndResetSet()

@@ -11,6 +11,7 @@ import com.rakuten.tech.mobile.inappmessaging.runtime.data.models.messages.Messa
 import com.rakuten.tech.mobile.inappmessaging.runtime.data.repositories.LocalDisplayedMessageRepository
 import com.rakuten.tech.mobile.inappmessaging.runtime.data.repositories.LocalEventRepository
 import com.rakuten.tech.mobile.inappmessaging.runtime.data.repositories.PingResponseMessageRepository
+import com.rakuten.tech.mobile.inappmessaging.runtime.data.responses.ping.MessagePayload
 import com.rakuten.tech.mobile.inappmessaging.runtime.data.responses.ping.Trigger
 import com.rakuten.tech.mobile.inappmessaging.runtime.data.responses.ping.TriggerAttribute
 import com.rakuten.tech.mobile.inappmessaging.runtime.workmanager.workers.MessageEventReconciliationWorker
@@ -38,6 +39,7 @@ open class MessageEventReconciliationUtilSpec : BaseTest() {
     val customEvent = CustomEvent("custom")
     internal val message1 = Mockito.mock(Message::class.java)
     internal val message2 = Mockito.mock(Message::class.java)
+    private val payload = Mockito.mock(MessagePayload::class.java)
     internal val testMessage = Mockito.mock(Message::class.java)
     internal val trigger1 = Mockito.mock(Trigger::class.java)
     private val trigger2 = Mockito.mock(Trigger::class.java)
@@ -65,6 +67,7 @@ open class MessageEventReconciliationUtilSpec : BaseTest() {
         `when`(message1.getTriggers()).thenReturn(trigger1List)
         `when`(message1.getCampaignId()).thenReturn("message1")
         `when`(message1.isTest()).thenReturn(false)
+        `when`(message1.getMessagePayload()).thenReturn(payload)
 
         // Arranging message2's data.
         val trigger2List = ArrayList<Trigger>()
@@ -73,6 +76,7 @@ open class MessageEventReconciliationUtilSpec : BaseTest() {
         `when`(message2.getTriggers()).thenReturn(trigger2List)
         `when`(message2.getCampaignId()).thenReturn("message2")
         `when`(message2.isTest()).thenReturn(false)
+        `when`(message2.getMessagePayload()).thenReturn(payload)
         // Arrange test message's data.
         `when`(testMessage.getCampaignId()).thenReturn("test")
         `when`(testMessage.isTest()).thenReturn(true)
@@ -507,7 +511,7 @@ class MessageEventReconciliationUtilReconcileInvalidSpec : MessageEventReconcili
         `when`(trigger1.triggerAttributes).thenReturn(attrList)
         `when`(trigger1.eventType).thenReturn(4)
         `when`(trigger1.eventName).thenReturn("custom")
-        `when`(message2.getMaxImpressions()).thenReturn(null)
+        `when`(message2.getMaxImpressions()).thenReturn(0)
         customEvent.addAttribute("name", currDate)
         LocalEventRepository.instance().addEvent(customEvent)
         // Act.

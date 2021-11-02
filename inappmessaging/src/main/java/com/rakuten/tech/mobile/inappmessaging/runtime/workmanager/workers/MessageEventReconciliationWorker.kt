@@ -63,7 +63,7 @@ internal class MessageEventReconciliationWorker(
         // Schedule to display next message.
         DisplayManager.instance().displayMessage()
         for (message in readyMessageList) {
-            Timber.tag(TAG).d("Ready Messages: %s", message.getMessagePayload()?.header)
+            Timber.tag(TAG).d("Ready Messages: %s", message.getMessagePayload().header)
         }
         var endTime: Long = 0
         if (BuildConfig.DEBUG) {

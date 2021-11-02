@@ -247,13 +247,12 @@ class LocalEventRepositoryExceptionSpec : LocalEventRepositorySpec() {
     }
 
     @Test
-    fun `should throw exception with null or empty campaign id`() {
+    fun `should throw exception with empty campaign id`() {
         InApp.errorCallback = mockCallback
         LocalEventRepository.instance().addEvent(TestEvent("")).shouldBeFalse()
-        LocalEventRepository.instance().addEvent(TestEvent(null)).shouldBeFalse()
 
         val captor = argumentCaptor<InAppMessagingException>()
-        Mockito.verify(mockCallback, times(2)).invoke(captor.capture())
+        Mockito.verify(mockCallback, times(1)).invoke(captor.capture())
         captor.firstValue shouldBeInstanceOf InAppMessagingException::class.java
     }
 
@@ -279,8 +278,8 @@ class LocalEventRepositoryExceptionSpec : LocalEventRepositorySpec() {
 }
 
 @SuppressWarnings("EmptyFunctionBlock")
-internal class TestEvent(private val name: String?) : Event {
-    override fun getEventName(): String? = name
+internal class TestEvent(private val name: String) : Event {
+    override fun getEventName(): String = name
     override fun getEventType() = 0
     override fun getTimestamp(): Long = 0
     override fun isPersistentType(): Boolean = false

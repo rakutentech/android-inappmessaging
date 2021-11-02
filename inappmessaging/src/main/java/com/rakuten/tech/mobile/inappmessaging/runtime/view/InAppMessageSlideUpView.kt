@@ -35,8 +35,9 @@ internal class InAppMessageSlideUpView(
         // Start animation based on direction.
         val animation = ViewUtil.getSlidingAnimation(
                 context,
-                SlideFromDirectionType.getById(message.getMessagePayload()?.messageSettings?.displaySettings?.slideFrom
-                        ?: 0))
+                SlideFromDirectionType.getById(
+                    message.getMessagePayload().messageSettings.displaySettings.slideFrom
+                ))
         animation?.let {
             constraintLayout?.startAnimation(it)
         }

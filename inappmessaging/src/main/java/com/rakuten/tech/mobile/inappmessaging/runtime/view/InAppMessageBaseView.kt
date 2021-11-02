@@ -47,9 +47,9 @@ internal open class InAppMessageBaseView(context: Context, attrs: AttributeSet?)
     @SuppressWarnings("LongMethod")
     override fun populateViewData(message: Message, imageAspectRatio: Float) {
         try {
-            this.headerColor = Color.parseColor(message.getMessagePayload()?.headerColor ?: "#")
-            this.messageBodyColor = Color.parseColor(message.getMessagePayload()?.messageBodyColor ?: "#")
-            this.bgColor = Color.parseColor(message.getMessagePayload()?.backgroundColor ?: "#")
+            this.headerColor = Color.parseColor(message.getMessagePayload().headerColor)
+            this.messageBodyColor = Color.parseColor(message.getMessagePayload().messageBodyColor)
+            this.bgColor = Color.parseColor(message.getMessagePayload().backgroundColor)
         } catch (e: IllegalArgumentException) {
             // values are from backend
             Timber.tag(TAG).e(e)
@@ -59,13 +59,13 @@ internal open class InAppMessageBaseView(context: Context, attrs: AttributeSet?)
             this.bgColor = Color.WHITE
         }
 
-        this.header = message.getMessagePayload()?.header
-        this.messageBody = message.getMessagePayload()?.messageBody
-        this.buttons = message.getMessagePayload()?.messageSettings?.controlSettings?.buttons
-        this.imageUrl = message.getMessagePayload()?.resource?.imageUrl
+        this.header = message.getMessagePayload().header
+        this.messageBody = message.getMessagePayload().messageBody
+        this.buttons = message.getMessagePayload().messageSettings.controlSettings.buttons
+        this.imageUrl = message.getMessagePayload().resource.imageUrl
         this.listener = InAppMessageViewListener(message)
         this.imageAspectRatio = imageAspectRatio
-        this.displayOptOut = message.getMessagePayload()?.messageSettings?.displaySettings?.optOut ?: false
+        this.displayOptOut = message.getMessagePayload().messageSettings.displaySettings.optOut
         bindViewData()
         this.tag = message.getCampaignId()
     }

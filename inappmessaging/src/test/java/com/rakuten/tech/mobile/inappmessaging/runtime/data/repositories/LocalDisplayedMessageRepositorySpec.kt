@@ -10,6 +10,9 @@ import com.rakuten.tech.mobile.inappmessaging.runtime.coroutine.MessageActionsCo
 import com.rakuten.tech.mobile.inappmessaging.runtime.data.models.messages.InvalidTestMessage
 import com.rakuten.tech.mobile.inappmessaging.runtime.data.models.messages.Message
 import com.rakuten.tech.mobile.inappmessaging.runtime.data.models.messages.ValidTestMessage
+import com.rakuten.tech.mobile.inappmessaging.runtime.data.responses.ping.ControlSettings
+import com.rakuten.tech.mobile.inappmessaging.runtime.data.responses.ping.MessagePayload
+import com.rakuten.tech.mobile.inappmessaging.runtime.data.responses.ping.MessageSettings
 import com.rakuten.tech.mobile.inappmessaging.runtime.exception.InAppMessagingException
 import org.amshove.kluent.*
 import org.junit.Before
@@ -68,6 +71,7 @@ class LocalDisplayedMessageRepositorySpec : BaseTest() {
     }
 
     @Test
+    @SuppressWarnings("LongMethod")
     fun `should be called once`() {
         WorkManagerTestInitHelper.initializeTestWorkManager(ApplicationProvider.getApplicationContext())
         Settings.Secure.putString(ApplicationProvider.getApplicationContext<Context>().contentResolver,
@@ -78,7 +82,14 @@ class LocalDisplayedMessageRepositorySpec : BaseTest() {
         val mockRepo = Mockito.mock(LocalDisplayedMessageRepository::class.java)
 
         val message = Mockito.mock(Message::class.java)
+        val payload = Mockito.mock(MessagePayload::class.java)
+        val msgSettings = Mockito.mock(MessageSettings::class.java)
+        val settings = Mockito.mock(ControlSettings::class.java)
         `when`(message.getCampaignId()).thenReturn("id")
+        `when`(message.getMessagePayload()).thenReturn(payload)
+        `when`(payload.messageSettings).thenReturn(msgSettings)
+        `when`(msgSettings.controlSettings).thenReturn(settings)
+        `when`(settings.buttons).thenReturn(listOf())
         MessageActionsCoroutine(mockRepo).executeTask(message, R.id.message_close_button, true)
 
         Mockito.verify(mockRepo).addMessage(message)

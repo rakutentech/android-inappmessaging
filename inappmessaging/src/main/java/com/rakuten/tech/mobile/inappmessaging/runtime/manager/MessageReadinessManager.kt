@@ -63,14 +63,14 @@ internal interface MessageReadinessManager {
 
                 // First, check if this message should be displayed.
                 if (!shouldDisplayMessage(message)) {
-                    Timber.tag(TAG).d(java.lang.String.format("skipping message: %s", message.getCampaignId()))
+                    Timber.tag(TAG).d("skipping message: %s", message.getCampaignId())
                     // Skip to next message.
                     continue
                 }
 
                 // If message is test message, no need to do more checks.
                 if (message.isTest()) {
-                    Timber.tag(TAG).d(java.lang.String.format("skipping test message: %s", message.getCampaignId()))
+                    Timber.tag(TAG).d("skipping test message: %s", message.getCampaignId())
                     return message
                 }
 
@@ -121,7 +121,7 @@ internal interface MessageReadinessManager {
          */
         private fun shouldDisplayMessage(message: Message): Boolean =
                 (LocalDisplayedMessageRepository.instance().numberOfTimesDisplayed(message)
-                        < message.getMaxImpressions() ?: 0) &&
+                        < message.getMaxImpressions()) &&
                         !LocalOptedOutMessageRepository.instance().hasMessage(message.getCampaignId())
 
         /**

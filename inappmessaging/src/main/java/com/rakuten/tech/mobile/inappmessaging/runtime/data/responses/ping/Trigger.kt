@@ -7,14 +7,14 @@ import com.google.gson.annotations.SerializedName
  */
 internal data class Trigger(
     @SerializedName("type")
-    val type: Int? = null,
+    val type: Int,
 
     @SerializedName("eventType")
-    val eventType: Int? = null,
+    val eventType: Int,
 
     @SerializedName("eventName")
-    val eventName: String? = null,
+    val eventName: String,
 
     @SerializedName("attributes")
-    val triggerAttributes: MutableList<TriggerAttribute>? = null
+    val triggerAttributes: MutableList<TriggerAttribute>
 )

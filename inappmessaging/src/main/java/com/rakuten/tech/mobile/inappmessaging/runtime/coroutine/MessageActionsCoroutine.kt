@@ -34,7 +34,7 @@ internal class MessageActionsCoroutine(
 
     fun executeTask(message: Message?, viewResourceId: Int, optOut: Boolean): Boolean {
 
-        if (message == null || message.getCampaignId().isNullOrEmpty()) {
+        if (message == null || message.getCampaignId().isEmpty()) {
             return false
         }
 
@@ -63,7 +63,7 @@ internal class MessageActionsCoroutine(
         optOut: Boolean
     ) {
         // Remove message from ReadyForDisplayMessageRepository.
-        ReadyForDisplayMessageRepository.instance().removeMessage(message.getCampaignId()!!)
+        ReadyForDisplayMessageRepository.instance().removeMessage(message.getCampaignId())
 
         // Adding message to LocalDisplayedMessageRepository.
         localDisplayRepo.addMessage(message)
@@ -110,15 +110,14 @@ internal class MessageActionsCoroutine(
     @WorkerThread
     private fun getOnClickBehavior(impressionType: ImpressionType, message: Message): OnClickBehavior? {
 
-        val controlSettings = message.getMessagePayload()?.messageSettings?.controlSettings
-                ?: return null
+        val controlSettings = message.getMessagePayload().messageSettings.controlSettings
 
         return when {
-            impressionType == ImpressionType.ACTION_ONE && !controlSettings.buttons.isNullOrEmpty() ->
+            impressionType == ImpressionType.ACTION_ONE && controlSettings.buttons.isNotEmpty() ->
                 controlSettings.buttons[0].buttonBehavior
-            impressionType == ImpressionType.ACTION_TWO && (controlSettings.buttons?.size ?: 0 >= 2) ->
-                controlSettings.buttons?.get(1)?.buttonBehavior
-            impressionType == ImpressionType.CLICK_CONTENT -> controlSettings.content.onClick
+            impressionType == ImpressionType.ACTION_TWO && (controlSettings.buttons.size >= 2) ->
+                controlSettings.buttons[1].buttonBehavior
+            impressionType == ImpressionType.CLICK_CONTENT -> controlSettings.content?.onClick
             else -> null
         }
     }
@@ -134,7 +133,7 @@ internal class MessageActionsCoroutine(
         val impressionManager = ImpressionManager()
         impressionManager.scheduleReportImpression(
                 impressionManager.createImpressionList(impressionTypes),
-                message.getCampaignId()!!,
+                message.getCampaignId(),
                 message.isTest())
     }
 
@@ -186,9 +185,13 @@ internal class MessageActionsCoroutine(
     private fun getEmbeddedEvent(impressionType: ImpressionType, message: Message): Trigger? {
         if (ImpressionType.ACTION_ONE == impressionType || ImpressionType.ACTION_TWO == impressionType) {
             val index = if (impressionType == ImpressionType.ACTION_ONE) 0 else 1
-            return message.getMessagePayload()?.messageSettings?.controlSettings?.buttons?.get(index)?.embeddedEvent
+            return if (message.getMessagePayload().messageSettings.controlSettings.buttons.isEmpty()) {
+                null
+            } else {
+                message.getMessagePayload().messageSettings.controlSettings.buttons[index].embeddedEvent
+            }
         } else if (ImpressionType.CLICK_CONTENT == impressionType) {
-            return message.getMessagePayload()?.messageSettings?.controlSettings?.content?.embeddedEvent
+            return message.getMessagePayload().messageSettings.controlSettings.content?.embeddedEvent
         }
         return null
     }
@@ -198,15 +201,15 @@ internal class MessageActionsCoroutine(
      */
     @SuppressWarnings("LongMethod", "ReturnCount")
     private fun createLocalCustomEvent(embeddedEvent: Trigger): Event? {
-        val type = embeddedEvent.eventType ?: return null
+        val type = embeddedEvent.eventType
         if (EventType.CUSTOM != EventType.getById(type)) {
             return null
         }
 
-        val eventName = embeddedEvent.eventName ?: return null
+        val eventName = embeddedEvent.eventName
 
         val customEvent = CustomEvent(eventName)
-        val attributes = embeddedEvent.triggerAttributes ?: return customEvent
+        val attributes = embeddedEvent.triggerAttributes
         for (attribute in attributes) {
             val valueType = ValueType.getById(attribute.type) ?: return customEvent
             when (valueType) {

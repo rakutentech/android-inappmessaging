@@ -117,7 +117,7 @@ class InAppMessageViewListenerOnClickSpec : InAppMessageViewListenerSpec() {
         Mockito.verify(mockEventScheduler, times(2)).startEventMessageReconciliationWorker(anyOrNull(), eq(0L))
 
         `when`(mockPayload.messageSettings).thenReturn(mockSettings)
-        `when`(mockSettings.displaySettings).thenReturn(null)
+        `when`(mockSettings.displaySettings).thenReturn(Mockito.mock(DisplaySettings::class.java))
         instance.handleMessage(R.id.message_close_button)
         Mockito.verify(mockEventScheduler, times(3)).startEventMessageReconciliationWorker(anyOrNull(), eq(0L))
     }

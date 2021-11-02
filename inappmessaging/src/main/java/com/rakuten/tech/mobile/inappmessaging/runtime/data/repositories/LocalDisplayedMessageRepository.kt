@@ -73,7 +73,7 @@ internal interface LocalDisplayedMessageRepository {
 
         @SuppressWarnings("LongMethod")
         override fun addMessage(message: Message) {
-            if (message.getCampaignId().isNullOrEmpty()) {
+            if (message.getCampaignId().isEmpty()) {
                 InApp.errorCallback?.let {
                     it(InAppMessagingException("In-App Messaging storing campaign failed due to invalid value"))
                 }
@@ -90,11 +90,11 @@ internal interface LocalDisplayedMessageRepository {
                 if (!messages.containsKey(campaignId)) {
                     val timeStamps = ArrayList<Long>()
                     timeStamps.add(Calendar.getInstance().timeInMillis)
-                    messages[campaignId!!] = timeStamps
+                    messages[campaignId] = timeStamps
                 } else {
                     val timeStamps = ArrayList(messages[campaignId]!!)
                     timeStamps.add(Calendar.getInstance().timeInMillis)
-                    messages[campaignId!!] = timeStamps
+                    messages[campaignId] = timeStamps
                 }
                 saveUpdatedMap()
             }
