@@ -7,6 +7,3 @@
     android:contentDescription="@string/in_app_message_image"
     android:visibility="gone"
     tools:visibility="visible" />
-
-
-
