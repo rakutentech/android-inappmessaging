@@ -10,7 +10,7 @@ import androidx.work.testing.WorkManagerTestInitHelper
 import com.nhaarman.mockitokotlin2.any
 import com.nhaarman.mockitokotlin2.eq
 import com.nhaarman.mockitokotlin2.never
-import com.rakuten.tech.mobile.inappmessaging.runtime.AppManifestConfig
+import com.rakuten.tech.mobile.inappmessaging.runtime.InApp.AppManifestConfig
 import com.rakuten.tech.mobile.inappmessaging.runtime.BaseTest
 import com.rakuten.tech.mobile.inappmessaging.runtime.InAppMessaging
 import com.rakuten.tech.mobile.inappmessaging.runtime.TestUserInfoProvider

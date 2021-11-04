@@ -139,7 +139,7 @@ abstract class InAppMessaging internal constructor() {
             isCacheHandling: Boolean = false,
             configScheduler: ConfigScheduler = ConfigScheduler.instance()
         ) {
-            val manifestConfig = AppManifestConfig(context)
+            val manifestConfig = InApp.AppManifestConfig(context)
 
             // `manifestConfig.isDebugging()` is used to enable/disable the debug logging of InAppMessaging SDK.
             // Note: All InAppMessaging SDK logs' tags begins with "IAM_".

@@ -9,5 +9,5 @@ internal data class Content(
     @SerializedName("onClickBehavior")
     val onClick: OnClickBehavior,
     @SerializedName("campaignTrigger")
-    val embeddedEvent: Trigger
+    val embeddedEvent: Trigger? = null
 )

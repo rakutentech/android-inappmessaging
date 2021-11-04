@@ -95,7 +95,7 @@ internal interface MessageEventReconciliationUtil {
                 return false
             }
 
-            val triggerList = message.getTriggers() ?: return true
+            val triggerList = message.getTriggers()
             triggers@ for (trigger in triggerList) {
                 // Make a copy of only relevant events to the argument trigger.
                 val relevantEventsCopy = copyEventsForTrigger(trigger, eventMap)
@@ -115,7 +115,7 @@ internal interface MessageEventReconciliationUtil {
                         // to satisfy any more triggers.
                         if (event.isPersistentType()) {
                             if (triggerList.size > 1 || PingResponseMessageRepository.instance()
-                                            .shouldDisplayAppLaunchCampaign(message.getCampaignId() ?: "")) {
+                                            .shouldDisplayAppLaunchCampaign(message.getCampaignId())) {
                                 // If campaign depends on other events other than a persistent type (i.e. App Launch)
                                 // or should at least be displayed once,
                                 // no need to check the required number for satisfied triggers
@@ -168,7 +168,7 @@ internal interface MessageEventReconciliationUtil {
             if (trigger.eventType != event.getEventType() || (trigger.eventType == EventType.CUSTOM.typeId &&
                             trigger.eventName != event.getEventName())) return false
 
-            for (triggerAttribute in trigger.triggerAttributes ?: listOf()) {
+            for (triggerAttribute in trigger.triggerAttributes) {
                 // Get attribute from event by triggerAttribute's name.
                 // Attribute's name should be in lower case.
                 val eventAttribute = event.getAttributeMap()[triggerAttribute.name] ?: return false
@@ -267,7 +267,7 @@ internal interface MessageEventReconciliationUtil {
             // Only check for message has been displayed less than its max impressions.
             // The number of times the message was removed from ready for display repository is considered since local
             // event list was not cleared and the triggers should  all be satisfied again.
-            return if (maxImpression != null && displayedImpression < maxImpression) {
+            return if (displayedImpression < maxImpression) {
                 displayedImpressionAfterLastPing + 1 + message.getNumberOfTimesClosed()
             } else 0
         }
@@ -283,7 +283,7 @@ internal interface MessageEventReconciliationUtil {
             val eventMap = HashMap<String, MutableList<Event>>()
             for (event in LocalEventRepository.instance().getEvents()) {
                 val eventName = event.getEventName()
-                if (!eventName.isNullOrEmpty()) {
+                if (eventName.isNotEmpty()) {
                     var eventList = eventMap[eventName]
                     if (eventList == null || eventList.isEmpty()) {
                         eventList = ArrayList()
@@ -310,8 +310,6 @@ internal interface MessageEventReconciliationUtil {
         private fun copyEventsForTrigger(trigger: Trigger, eventMap: Map<String, MutableList<Event>>):
                 MutableList<Event>? {
             // Reconcile by trigger's type.
-            if (trigger.eventType == null) return null
-
             val eventType = EventType.getById(trigger.eventType)
             if (eventType == null || eventType == EventType.INVALID) {
                 Timber.tag(TAG).d("null or INVALID EventType.")

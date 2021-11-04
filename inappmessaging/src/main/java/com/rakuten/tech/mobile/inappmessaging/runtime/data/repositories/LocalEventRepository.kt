@@ -68,7 +68,7 @@ internal interface LocalEventRepository : EventRepository {
          */
         @SuppressWarnings("ReturnCount")
         override fun addEvent(event: Event): Boolean {
-            if (event.getEventName().isNullOrEmpty()) {
+            if (event.getEventName().isEmpty()) {
                 InApp.errorCallback?.let {
                     it(InAppMessagingException("In-App Messaging adding event failed due to invalid event name"))
                 }

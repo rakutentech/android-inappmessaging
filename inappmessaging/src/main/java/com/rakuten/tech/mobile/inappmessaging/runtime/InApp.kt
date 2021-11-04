@@ -2,6 +2,7 @@ package com.rakuten.tech.mobile.inappmessaging.runtime
 
 import android.app.Activity
 import android.content.Context
+import android.content.pm.PackageManager
 import androidx.annotation.NonNull
 import androidx.annotation.RestrictTo
 import androidx.annotation.VisibleForTesting
@@ -16,8 +17,6 @@ import com.rakuten.tech.mobile.inappmessaging.runtime.manager.DisplayManager
 import com.rakuten.tech.mobile.inappmessaging.runtime.manager.EventsManager
 import com.rakuten.tech.mobile.inappmessaging.runtime.manager.SessionManager
 import com.rakuten.tech.mobile.inappmessaging.runtime.utils.SharedPreferencesUtil
-import com.rakuten.tech.mobile.manifestconfig.annotations.ManifestConfig
-import com.rakuten.tech.mobile.manifestconfig.annotations.MetaData
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
@@ -181,26 +180,25 @@ internal class InApp(
         }
     }
 
-    @ManifestConfig
-    internal interface App {
+    internal class AppManifestConfig(val context: Context) {
+
+        private val metadata = context.packageManager
+            .getApplicationInfo(context.packageName, PackageManager.GET_META_DATA).metaData
 
         /**
          * Subscription Key from the InAppMessaging Dashboard.
          **/
-        @MetaData(key = "com.rakuten.tech.mobile.inappmessaging.subscriptionkey")
-        fun subscriptionKey(): String?
+        fun subscriptionKey(): String? = metadata.getString("com.rakuten.tech.mobile.inappmessaging.subscriptionkey")
 
         /**
          * Config URL for the IAM API.
          **/
-        @MetaData(key = "com.rakuten.tech.mobile.inappmessaging.configurl")
-        fun configUrl(): String?
+        fun configUrl(): String? = metadata.getString("com.rakuten.tech.mobile.inappmessaging.configurl")
 
         /**
          * Flag to enable/disable debug logging.
          **/
-        @MetaData(key = "com.rakuten.tech.mobile.inappmessaging.debugging", value = "false")
-        fun isDebugging(): Boolean
+        fun isDebugging(): Boolean = metadata.getBoolean("com.rakuten.tech.mobile.inappmessaging.debugging")
     }
 
     companion object {

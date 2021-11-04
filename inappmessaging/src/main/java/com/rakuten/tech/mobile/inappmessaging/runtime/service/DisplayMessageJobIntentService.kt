@@ -43,7 +43,7 @@ internal class DisplayMessageJobIntentService : JobIntentService() {
         // Retrieving the next ready message, and its display permission been checked.
         val message: Message = messageReadinessManager.getNextDisplayMessage() ?: return
         val hostActivity = InAppMessaging.instance().getRegisteredActivity()
-        val imageUrl = message.getMessagePayload()?.resource?.imageUrl
+        val imageUrl = message.getMessagePayload().resource.imageUrl
         if (hostActivity != null) {
             if (!imageUrl.isNullOrEmpty()) {
                 fetchImageThenDisplayMessage(message, hostActivity, imageUrl)
@@ -84,7 +84,7 @@ internal class DisplayMessageJobIntentService : JobIntentService() {
             Timber.tag(TAG).d("message display cancelled by the host app")
 
             // increment time closed to handle required number of events to be triggered
-            readyMessagesRepo.removeMessage(message.getCampaignId() ?: "", true)
+            readyMessagesRepo.removeMessage(message.getCampaignId(), true)
 
             prepareNextMessage()
             return
@@ -102,9 +102,7 @@ internal class DisplayMessageJobIntentService : JobIntentService() {
             return true
         }
 
-        return InAppMessaging.instance().onVerifyContext(
-                campaignContexts,
-                message.getMessagePayload()?.title ?: "")
+        return InAppMessaging.instance().onVerifyContext(campaignContexts, message.getMessagePayload().title)
     }
 
     companion object {

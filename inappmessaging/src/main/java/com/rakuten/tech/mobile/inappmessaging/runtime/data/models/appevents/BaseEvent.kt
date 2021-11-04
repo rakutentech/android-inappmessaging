@@ -45,8 +45,7 @@ abstract class BaseEvent(
     /**
      * This method returns the event name.
      */
-    @Nullable
-    override fun getEventName(): String? = eventName
+    override fun getEventName(): String = eventName
 
     /**
      * This method returns the event type id.

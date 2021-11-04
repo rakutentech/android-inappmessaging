@@ -12,22 +12,22 @@ internal interface Message {
     /**
      * This method returns the message type.
      */
-    fun getType(): Int?
+    fun getType(): Int
 
     /**
      * This method returns the message campaign id.
      */
-    fun getCampaignId(): String?
+    fun getCampaignId(): String
 
     /**
      * This method returns the message trigger list.
      */
-    fun getTriggers(): List<Trigger>?
+    fun getTriggers(): List<Trigger>
 
     /**
      * This method returns the message payload.
      */
-    fun getMessagePayload(): MessagePayload?
+    fun getMessagePayload(): MessagePayload
 
     /**
      * This method checks if message is for test.
@@ -37,7 +37,7 @@ internal interface Message {
     /**
      * This method returns max impressions.
      */
-    fun getMaxImpressions(): Int?
+    fun getMaxImpressions(): Int
 
     /**
      * This method sets max impressions.

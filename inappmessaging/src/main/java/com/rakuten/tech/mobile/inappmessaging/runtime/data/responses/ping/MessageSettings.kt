@@ -7,8 +7,8 @@ import com.google.gson.annotations.SerializedName
  */
 internal data class MessageSettings(
     @SerializedName("displaySettings")
-    val displaySettings: DisplaySettings?,
+    val displaySettings: DisplaySettings,
 
     @com.google.gson.annotations.SerializedName("controlSettings")
-    val controlSettings: ControlSettings?
+    val controlSettings: ControlSettings
 )

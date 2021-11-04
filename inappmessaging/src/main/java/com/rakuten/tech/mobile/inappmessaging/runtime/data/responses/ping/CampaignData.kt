@@ -18,7 +18,7 @@ internal data class CampaignData(
     @SerializedName("isTest")
     private val isTest: Boolean,
     @SerializedName("maxImpressions")
-    private var maxImpressions: Int
+    private var maxImpressions: Int = 0
 ) : Message {
 
     @SerializedName("timesClosed")
@@ -42,7 +42,7 @@ internal data class CampaignData(
 
     override fun getContexts(): List<String> {
         val regex = Regex("\\[(.*?)\\]")
-        val matches = regex.findAll(messagePayload.title ?: "")
+        val matches = regex.findAll(messagePayload.title)
         return matches.map { it.groupValues[1] }.toList()
     }
 

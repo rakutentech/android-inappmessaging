@@ -22,5 +22,8 @@ internal data class DisplaySettings(
     val optOut: Boolean,
 
     @SerializedName("delay")
-    val delay: Int
+    val delay: Int,
+
+    @SerializedName("html")
+    val html: Boolean // currently not used (always false)
 )

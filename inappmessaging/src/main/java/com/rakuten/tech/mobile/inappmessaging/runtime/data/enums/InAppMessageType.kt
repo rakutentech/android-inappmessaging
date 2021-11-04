@@ -16,7 +16,7 @@ internal enum class InAppMessageType(val typeId: Int) {
          * Gets the campaign message type for a given [typeId].
          * If [typeId] argument is not any of the valid id, null will be returned.
          */
-        fun getById(typeId: Int?): InAppMessageType? {
+        fun getById(typeId: Int): InAppMessageType? {
             for (type in values()) {
                 if (type.typeId == typeId) {
                     return type
