@@ -54,7 +54,7 @@ internal abstract class PingResponseMessageRepository : MessageRepository {
                     continue
                 }
                 messages[message.getCampaignId()] = message
-                if (message.getTriggers().size == 1) {
+                if (message.getTriggers()?.size == 1) {
                     appLaunchList[message.getCampaignId()] = isInitialLaunch
                 }
             }

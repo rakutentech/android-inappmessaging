@@ -95,7 +95,7 @@ internal interface MessageEventReconciliationUtil {
                 return false
             }
 
-            val triggerList = message.getTriggers()
+            val triggerList = message.getTriggers() ?: listOf()
             triggers@ for (trigger in triggerList) {
                 // Make a copy of only relevant events to the argument trigger.
                 val relevantEventsCopy = copyEventsForTrigger(trigger, eventMap)
