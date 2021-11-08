@@ -22,7 +22,7 @@ internal interface Message {
     /**
      * This method returns the message trigger list.
      */
-    fun getTriggers(): List<Trigger>
+    fun getTriggers(): List<Trigger>?
 
     /**
      * This method returns the message payload.

@@ -12,7 +12,7 @@ internal data class CampaignData(
     @SerializedName("type")
     private val type: Int,
     @SerializedName("triggers")
-    private val triggers: List<Trigger>,
+    private val triggers: List<Trigger>?,
     @SerializedName("campaignId")
     private val campaignId: String,
     @SerializedName("isTest")
@@ -28,7 +28,7 @@ internal data class CampaignData(
 
     override fun getCampaignId(): String = campaignId
 
-    override fun getTriggers(): List<Trigger> = triggers
+    override fun getTriggers(): List<Trigger>? = triggers
 
     override fun getMessagePayload(): MessagePayload = messagePayload
 

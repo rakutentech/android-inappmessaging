@@ -117,9 +117,9 @@ class MessageMixerResponseSpec(private val testname: String, private val actual:
                 controlContentTrigger.triggerAttributes[0].type, controlContentTrigger.triggerAttributes[0].operator)
         private val resource = Resource(messagePayload.resource.assetsUrl, "https://sample.image.url/test.jpg",
                 messagePayload.resource.cropType)
-        private val campaignTrigger = Trigger(campaignData.getTriggers()[0].type,
-                campaignData.getTriggers()[0].eventType, campaignData.getTriggers()[0].eventName,
-                campaignData.getTriggers()[0].triggerAttributes)
+        private val campaignTrigger = Trigger(campaignData.getTriggers()!![0].type,
+                campaignData.getTriggers()!![0].eventType, campaignData.getTriggers()!![0].eventName,
+                campaignData.getTriggers()!![0].triggerAttributes)
         private val campaignTriggerAttr = TriggerAttribute(campaignTrigger.triggerAttributes[0].name,
                 campaignTrigger.triggerAttributes[0].value, campaignTrigger.triggerAttributes[0].type,
                 campaignTrigger.triggerAttributes[0].operator)
