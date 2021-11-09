@@ -49,7 +49,6 @@ class CustomEventSpec : BaseTest() {
 @Config(sdk = [Build.VERSION_CODES.O_MR1])
 class CustomEventParameterizedSpec(
     val testName: String,
-    val event: CustomEvent,
     private val attrType: ValueType,
     private val attrValue: String
 ) {
@@ -61,12 +60,12 @@ class CustomEventParameterizedSpec(
         )
         fun data(): Collection<Array<Any>> {
             return listOf(
-                    arrayOf("String", CustomEvent(EVENT_NAME), ValueType.STRING, "attribute value"),
-                    arrayOf("Integer", CustomEvent(EVENT_NAME), ValueType.INTEGER, "1"),
-                    arrayOf("Double", CustomEvent(EVENT_NAME), ValueType.DOUBLE, "10.5"),
-                    arrayOf("Boolean", CustomEvent(EVENT_NAME), ValueType.BOOLEAN, "true"),
-                    arrayOf("Boolean", CustomEvent(EVENT_NAME), ValueType.BOOLEAN, "false"),
-                    arrayOf("Long", CustomEvent(EVENT_NAME), ValueType.TIME_IN_MILLI, "9999")
+                    arrayOf("String", ValueType.STRING, "attribute value"),
+                    arrayOf("Integer", ValueType.INTEGER, "1"),
+                    arrayOf("Double", ValueType.DOUBLE, "10.5"),
+                    arrayOf("Boolean", ValueType.BOOLEAN, "true"),
+                    arrayOf("Boolean", ValueType.BOOLEAN, "false"),
+                    arrayOf("Long", ValueType.TIME_IN_MILLI, "9999")
             )
         }
 
@@ -88,81 +87,44 @@ class CustomEventParameterizedSpec(
     fun `should add correct attribute type and value`() {
         when (attrType) {
             ValueType.STRING -> {
-                event.addAttribute(STRING_ATTRIBUTE, attrValue)
-                event.getAttributeMap()[STRING_ATTRIBUTE]?.name shouldBeEqualTo STRING_ATTRIBUTE
-                event.getAttributeMap()[STRING_ATTRIBUTE]?.value shouldBeEqualTo attrValue
-                event.getAttributeMap()[STRING_ATTRIBUTE]?.valueType shouldBeEqualTo ValueType.STRING.typeId
+                confirmValues(CustomEvent(EVENT_NAME).addAttribute(STRING_ATTRIBUTE, attrValue),
+                    STRING_ATTRIBUTE, STRING_ATTRIBUTE, attrValue, ValueType.STRING.typeId)
+                confirmValues(CustomEvent(EVENT_NAME).addAttribute(STRING_ATTRIBUTE_UPPER, attrValue),
+                    STRING_ATTRIBUTE, STRING_ATTRIBUTE, attrValue, ValueType.STRING.typeId)
             }
             ValueType.INTEGER -> {
-                event.addAttribute(INTEGER_ATTRIBUTE, attrValue.toInt())
-                event.getAttributeMap()[INTEGER_ATTRIBUTE]?.name shouldBeEqualTo INTEGER_ATTRIBUTE
-                event.getAttributeMap()[INTEGER_ATTRIBUTE]?.value shouldBeEqualTo attrValue
-                event.getAttributeMap()[INTEGER_ATTRIBUTE]?.valueType shouldBeEqualTo ValueType.INTEGER.typeId
+                confirmValues(CustomEvent(EVENT_NAME).addAttribute(INTEGER_ATTRIBUTE, attrValue.toInt()),
+                    INTEGER_ATTRIBUTE, INTEGER_ATTRIBUTE, attrValue, ValueType.INTEGER.typeId)
+                confirmValues(CustomEvent(EVENT_NAME).addAttribute(INTEGER_ATTRIBUTE_UPPER, attrValue.toInt()),
+                    INTEGER_ATTRIBUTE, INTEGER_ATTRIBUTE, attrValue, ValueType.INTEGER.typeId)
             }
             ValueType.DOUBLE -> {
-                event.addAttribute(DOUBLE_ATTRIBUTE, attrValue.toDouble())
-                event.getAttributeMap()[DOUBLE_ATTRIBUTE]?.name shouldBeEqualTo DOUBLE_ATTRIBUTE
-                event.getAttributeMap()[DOUBLE_ATTRIBUTE]?.value shouldBeEqualTo attrValue
-                event.getAttributeMap()[DOUBLE_ATTRIBUTE]?.valueType shouldBeEqualTo ValueType.DOUBLE.typeId
+                confirmValues(CustomEvent(EVENT_NAME).addAttribute(DOUBLE_ATTRIBUTE, attrValue.toDouble()),
+                    DOUBLE_ATTRIBUTE, DOUBLE_ATTRIBUTE, attrValue, ValueType.DOUBLE.typeId)
+                confirmValues(CustomEvent(EVENT_NAME).addAttribute(DOUBLE_ATTRIBUTE_UPPER, attrValue.toDouble()),
+                    DOUBLE_ATTRIBUTE, DOUBLE_ATTRIBUTE, attrValue, ValueType.DOUBLE.typeId)
             }
             ValueType.BOOLEAN -> {
-                event.addAttribute(BOOLEAN_ATTRIBUTE, attrValue.toBoolean())
-                event.getAttributeMap()[BOOLEAN_ATTRIBUTE]?.name shouldBeEqualTo BOOLEAN_ATTRIBUTE
-                event.getAttributeMap()[BOOLEAN_ATTRIBUTE]?.value shouldBeEqualTo attrValue
-                event.getAttributeMap()[BOOLEAN_ATTRIBUTE]?.valueType shouldBeEqualTo ValueType.BOOLEAN.typeId
+                confirmValues(CustomEvent(EVENT_NAME).addAttribute(BOOLEAN_ATTRIBUTE, attrValue.toBoolean()),
+                    BOOLEAN_ATTRIBUTE, BOOLEAN_ATTRIBUTE, attrValue, ValueType.BOOLEAN.typeId)
+                confirmValues(CustomEvent(EVENT_NAME).addAttribute(BOOLEAN_ATTRIBUTE_UPPER, attrValue.toBoolean()),
+                    BOOLEAN_ATTRIBUTE, BOOLEAN_ATTRIBUTE, attrValue, ValueType.BOOLEAN.typeId)
             }
             ValueType.TIME_IN_MILLI -> {
-                event.addAttribute(DATE_ATTRIBUTE, Date(attrValue.toLong()))
-                event.getAttributeMap()[DATE_ATTRIBUTE]?.name shouldBeEqualTo DATE_ATTRIBUTE
-                event.getAttributeMap()[DATE_ATTRIBUTE]?.value shouldBeEqualTo attrValue
-                event.getAttributeMap()[DATE_ATTRIBUTE]?.valueType shouldBeEqualTo ValueType.TIME_IN_MILLI.typeId
+                confirmValues(CustomEvent(EVENT_NAME).addAttribute(DATE_ATTRIBUTE, Date(attrValue.toLong())),
+                    DATE_ATTRIBUTE, DATE_ATTRIBUTE, attrValue, ValueType.TIME_IN_MILLI.typeId)
+                confirmValues(CustomEvent(EVENT_NAME).addAttribute(DATE_ATTRIBUTE_UPPER, Date(attrValue.toLong())),
+                    DATE_ATTRIBUTE, DATE_ATTRIBUTE, attrValue, ValueType.TIME_IN_MILLI.typeId)
             }
             else -> {
             }
         }
     }
 
-    @Test
-    @SuppressWarnings("LongMethod")
-    fun `should add correct attribute type and value with uppercase key`() {
-        when (attrType) {
-            ValueType.STRING -> {
-                event.addAttribute(STRING_ATTRIBUTE_UPPER, attrValue)
-                event.getAttributeMap()[STRING_ATTRIBUTE]?.name shouldBeEqualTo STRING_ATTRIBUTE
-                event.getAttributeMap()[STRING_ATTRIBUTE]?.value shouldBeEqualTo attrValue
-                event.getAttributeMap()[STRING_ATTRIBUTE]?.valueType shouldBeEqualTo ValueType.STRING.typeId
-            }
-            ValueType.INTEGER -> {
-                event.addAttribute(INTEGER_ATTRIBUTE_UPPER, attrValue.toInt())
-                event.getAttributeMap()[INTEGER_ATTRIBUTE]?.name shouldBeEqualTo INTEGER_ATTRIBUTE
-                event.getAttributeMap()[INTEGER_ATTRIBUTE]?.value shouldBeEqualTo attrValue
-                event.getAttributeMap()[INTEGER_ATTRIBUTE]?.valueType shouldBeEqualTo ValueType.INTEGER.typeId
-            }
-            ValueType.DOUBLE -> {
-                event.addAttribute(DOUBLE_ATTRIBUTE, attrValue.toDouble())
-                event.getAttributeMap()[DOUBLE_ATTRIBUTE]?.name shouldBeEqualTo DOUBLE_ATTRIBUTE
-                event.getAttributeMap()[DOUBLE_ATTRIBUTE]?.value shouldBeEqualTo attrValue
-                event.getAttributeMap()[DOUBLE_ATTRIBUTE]?.valueType shouldBeEqualTo ValueType.DOUBLE.typeId
-            }
-            ValueType.BOOLEAN -> {
-                event.addAttribute(BOOLEAN_ATTRIBUTE_UPPER, attrValue.toBoolean())
-                event.getAttributeMap()[BOOLEAN_ATTRIBUTE]?.name shouldBeEqualTo BOOLEAN_ATTRIBUTE
-                event.getAttributeMap()[BOOLEAN_ATTRIBUTE]?.value shouldBeEqualTo attrValue
-                event.getAttributeMap()[BOOLEAN_ATTRIBUTE]?.valueType shouldBeEqualTo ValueType.BOOLEAN.typeId
-            }
-            ValueType.TIME_IN_MILLI -> {
-                event.addAttribute(DATE_ATTRIBUTE_UPPER, Date(attrValue.toLong()))
-                event.getAttributeMap()[DATE_ATTRIBUTE]?.name shouldBeEqualTo DATE_ATTRIBUTE
-                event.getAttributeMap()[DATE_ATTRIBUTE]?.value shouldBeEqualTo attrValue
-                event.getAttributeMap()[DATE_ATTRIBUTE]?.valueType shouldBeEqualTo ValueType.TIME_IN_MILLI.typeId
-            }
-            else -> {
-            }
-        }
-    }
-
-    @Test
-    fun `should not be persistent type`() {
+    private fun confirmValues(event: CustomEvent, key: String, name: String, value: String, type: Int) {
         event.isPersistentType().shouldBeFalse()
+        event.getAttributeMap()[key]?.name shouldBeEqualTo name
+        event.getAttributeMap()[key]?.value shouldBeEqualTo value
+        event.getAttributeMap()[key]?.valueType shouldBeEqualTo type
     }
 }
