@@ -18,6 +18,11 @@ import java.lang.ClassCastException
 import java.lang.IllegalStateException
 import java.util.Locale
 import java.util.UUID
+import com.squareup.picasso.OkHttp3Downloader
+
+import okhttp3.OkHttpClient
+import java.util.concurrent.TimeUnit
+
 
 /**
  * IAM SDK initialization class.
@@ -85,11 +90,7 @@ internal object Initializer {
         // Store hostAppInfo in repository.
         HostAppInfoRepository.instance().addHostInfo(hostAppInfo)
 
-        try {
-            Picasso.setSingletonInstance(Picasso.Builder(context).build())
-        } catch (ignored: IllegalStateException) {
-            // Picasso instance was already initialized
-        }
+        initializePicassoInstance(context)
 
         Timber.tag(TAG).d(Gson().toJson(hostAppInfo))
     }
@@ -111,5 +112,23 @@ internal object Initializer {
         val id = UUID.randomUUID().toString()
         sharedPref.edit().putString(ID_KEY, id).apply()
         return id
+    }
+
+    private fun initializePicassoInstance(context: Context) {
+        try {
+            val imageRequestTimeoutSeconds = 20L
+            val imageResourceTimeoutSeconds = 300L
+            val client = OkHttpClient.Builder()
+                .readTimeout(imageRequestTimeoutSeconds, TimeUnit.SECONDS)
+                .callTimeout(imageResourceTimeoutSeconds, TimeUnit.SECONDS)
+                .build()
+
+            val builder =  Picasso.Builder(context)
+            builder.downloader(OkHttp3Downloader(client))
+
+            Picasso.setSingletonInstance(builder.build())
+        } catch (ignored: IllegalStateException) {
+            // Picasso instance was already initialized
+        }
     }
 }
