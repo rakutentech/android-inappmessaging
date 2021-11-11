@@ -18,7 +18,12 @@ import com.google.android.material.button.MaterialButton
 import com.rakuten.tech.mobile.inappmessaging.runtime.R
 import com.rakuten.tech.mobile.inappmessaging.runtime.data.models.messages.Message
 import com.rakuten.tech.mobile.inappmessaging.runtime.data.responses.ping.MessageButton
+import com.rakuten.tech.mobile.inappmessaging.runtime.service.DisplayMessageJobIntentService
+import com.squareup.picasso.Callback
+import com.squareup.picasso.NetworkPolicy
 import timber.log.Timber
+import java.lang.Exception
+import java.util.*
 
 /**
  * Base class of all custom views.
@@ -126,8 +131,19 @@ internal open class InAppMessageBaseView(context: Context, attrs: AttributeSet?)
                 Picasso
                     .get()
                     .load(this.imageUrl)
-                    .into(it)
-                it.visibility = View.VISIBLE
+                    .into(it, object:Callback {
+                        override fun onSuccess() {
+                            Timber.tag(InAppMessageBaseView.TAG).d("Download image ended + ${Date().time}")
+                            it.visibility = View.VISIBLE
+                        }
+
+                        override fun onError(e: Exception?) {
+                            Timber.tag(InAppMessageBaseView.TAG).d("Error on loading image ")
+                        }
+
+                    })
+
+
             }
         }
     }

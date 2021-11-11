@@ -123,10 +123,10 @@ internal object Initializer {
                 .callTimeout(imageResourceTimeoutSeconds, TimeUnit.SECONDS)
                 .build()
 
-            val builder =  Picasso.Builder(context)
-            builder.downloader(OkHttp3Downloader(client))
-
-            Picasso.setSingletonInstance(builder.build())
+            val picasso =  Picasso.Builder(context)
+                .downloader(OkHttp3Downloader(client))
+                .build()
+            Picasso.setSingletonInstance(picasso)
         } catch (ignored: IllegalStateException) {
             // Picasso instance was already initialized
         }

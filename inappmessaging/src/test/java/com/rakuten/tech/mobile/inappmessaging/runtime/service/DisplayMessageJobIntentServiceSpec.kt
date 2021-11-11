@@ -9,10 +9,6 @@ import android.provider.Settings
 import android.view.LayoutInflater
 import android.view.View
 import androidx.work.testing.WorkManagerTestInitHelper
-import com.nhaarman.mockitokotlin2.any
-import com.nhaarman.mockitokotlin2.argumentCaptor
-import com.nhaarman.mockitokotlin2.eq
-import com.nhaarman.mockitokotlin2.never
 import com.rakuten.tech.mobile.inappmessaging.runtime.BaseTest
 import com.rakuten.tech.mobile.inappmessaging.runtime.InAppMessaging
 import com.rakuten.tech.mobile.inappmessaging.runtime.data.models.messages.Message
@@ -29,13 +25,17 @@ import org.junit.Test
 import org.junit.runner.RunWith
 import org.mockito.ArgumentMatchers
 import org.mockito.Mockito
-import org.mockito.Mockito.`when`
-import org.mockito.Mockito.validateMockitoUsage
 import org.robolectric.Robolectric
 import org.robolectric.RobolectricTestRunner
 import org.robolectric.android.controller.ServiceController
 import org.robolectric.annotation.Config
 import androidx.test.core.app.ApplicationProvider.getApplicationContext
+import com.nhaarman.mockitokotlin2.*
+import com.rakuten.tech.mobile.inappmessaging.runtime.runnable.DisplayMessageRunnable
+import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.runBlocking
+import org.mockito.Mockito.`when`
+
 
 /**
  * Test class for DisplayMessageJobIntentService.
@@ -58,6 +58,7 @@ class DisplayMessageJobIntentServiceSpec : BaseTest() {
     private val handler = Mockito.mock(Handler::class.java)
     private val context = getApplicationContext<Context>()
 
+    @SuppressWarnings("LongMethod")
     @Before
     override fun setup() {
         super.setup()
@@ -74,7 +75,7 @@ class DisplayMessageJobIntentServiceSpec : BaseTest() {
 
         Settings.Secure.putString(
             context.contentResolver,
-                Settings.Secure.ANDROID_ID, "test_device_id")
+            Settings.Secure.ANDROID_ID, "test_device_id")
         InAppMessaging.initialize(context)
         InAppMessaging.instance().registerMessageDisplayActivity(activity)
     }
@@ -217,6 +218,44 @@ class DisplayMessageJobIntentServiceSpec : BaseTest() {
         Mockito.verify(activity, never()).findViewById<View?>(ArgumentMatchers.anyInt())
     }
 
+    @Test
+    fun `should not display the message on invalid image url`() {
+        `when`(onVerifyContexts.invoke(any(), any())).thenReturn(true)
+        InAppMessaging.instance().onVerifyContext = onVerifyContexts
+
+        val message = setupMessageWithImage("invalid_url")
+        `when`(mockMessageManager.getNextDisplayMessage()).thenReturn(message)
+        displayMessageJobIntentService?.onHandleWork(intent)
+
+        Mockito.verify(handler, never()).post(ArgumentMatchers.any(DisplayMessageRunnable::class.java))
+    }
+
+    @ExperimentalCoroutinesApi
+    @Test
+    fun `should display message with image`() {
+        val message = setupMessageWithImage("https://upload.wikimedia.org/wikipedia/commons/3/3f/Walking_tiger_female.jpg")
+        `when`(mockMessageManager.getNextDisplayMessage()).thenReturn(message)
+        displayMessageJobIntentService?.onHandleWork(intent)
+
+        Mockito.verify(handler).post(ArgumentMatchers.any(DisplayMessageRunnable::class.java))
+    }
+
+    private fun setupMessageWithImage(imageUrl: String): Message {
+        val message = Mockito.mock(Message::class.java)
+        val payload = Mockito.mock(MessagePayload::class.java)
+        val resource = Mockito.mock(Resource::class.java)
+
+        `when`(resource.imageUrl).thenReturn(imageUrl)
+        `when`(payload.resource).thenReturn(resource)
+        `when`(message.getMessagePayload()).thenReturn(payload)
+        `when`(message.getCampaignId()).thenReturn("1")
+        `when`(message.isTest()).thenReturn(false)
+        `when`(message.getMaxImpressions()).thenReturn(1)
+        `when`(message.getMessagePayload()).thenReturn(payload)
+        `when`(message.getContexts()).thenReturn(listOf("ctx"))
+        return message
+    }
+
     private fun setupCampaign() {
         val message = Mockito.mock(Message::class.java)
 
@@ -260,4 +299,6 @@ class DisplayMessageJobIntentServiceSpec : BaseTest() {
         `when`(message.getContexts()).thenReturn(listOf("ctx"))
         `when`(mockMessageManager.getNextDisplayMessage()).thenReturn(message).thenReturn(null)
     }
+
+
 }

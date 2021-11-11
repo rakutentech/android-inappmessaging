@@ -2,9 +2,11 @@ package com.rakuten.tech.mobile.inappmessaging.runtime.service
 
 import android.app.Activity
 import android.content.Context
+import android.content.Context.NETWORK_STATS_SERVICE
 import android.content.Intent
 import android.os.Handler
 import android.os.Looper
+import android.util.Log
 import androidx.core.app.JobIntentService
 import com.rakuten.tech.mobile.inappmessaging.runtime.InAppMessaging
 import com.rakuten.tech.mobile.inappmessaging.runtime.data.models.messages.Message
@@ -13,9 +15,14 @@ import com.rakuten.tech.mobile.inappmessaging.runtime.data.repositories.ReadyFor
 import com.rakuten.tech.mobile.inappmessaging.runtime.manager.MessageReadinessManager
 import com.rakuten.tech.mobile.inappmessaging.runtime.runnable.DisplayMessageRunnable
 import com.squareup.picasso.Callback
+import com.squareup.picasso.NetworkPolicy
 import com.squareup.picasso.Picasso
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
 import timber.log.Timber
 import java.lang.Exception
+import java.util.*
 
 /**
  * Since one service is essentially one worker thread, so there's no chance multiple worker threads
@@ -44,6 +51,7 @@ internal class DisplayMessageJobIntentService : JobIntentService() {
         val message: Message = messageReadinessManager.getNextDisplayMessage() ?: return
         val hostActivity = InAppMessaging.instance().getRegisteredActivity()
         val imageUrl = message.getMessagePayload().resource.imageUrl
+        Timber.tag(TAG).d("Download image started + ${Date().time}")
         if (hostActivity != null) {
             if (!imageUrl.isNullOrEmpty()) {
                 fetchImageThenDisplayMessage(message, hostActivity, imageUrl)
@@ -63,7 +71,7 @@ internal class DisplayMessageJobIntentService : JobIntentService() {
         hostActivity: Activity,
         imageUrl: String
     ) {
-        Picasso.get().load(imageUrl).fetch(object : Callback {
+        Picasso.get().load(imageUrl).networkPolicy(NetworkPolicy.NO_STORE).fetch(object : Callback {
             override fun onSuccess() {
                 displayMessage(message, hostActivity)
                 Timber.tag(TAG).d("Download image completed")
