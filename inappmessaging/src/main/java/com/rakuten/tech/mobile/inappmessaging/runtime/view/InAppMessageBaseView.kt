@@ -1,6 +1,7 @@
 package com.rakuten.tech.mobile.inappmessaging.runtime.view
 
 import android.annotation.SuppressLint
+import android.app.Activity
 import android.content.Context
 import android.content.res.ColorStateList
 import android.graphics.Color
@@ -18,9 +19,7 @@ import com.google.android.material.button.MaterialButton
 import com.rakuten.tech.mobile.inappmessaging.runtime.R
 import com.rakuten.tech.mobile.inappmessaging.runtime.data.models.messages.Message
 import com.rakuten.tech.mobile.inappmessaging.runtime.data.responses.ping.MessageButton
-import com.rakuten.tech.mobile.inappmessaging.runtime.service.DisplayMessageJobIntentService
 import com.squareup.picasso.Callback
-import com.squareup.picasso.NetworkPolicy
 import timber.log.Timber
 import java.lang.Exception
 import java.util.*
@@ -96,15 +95,19 @@ internal open class InAppMessageBaseView(context: Context, attrs: AttributeSet?)
         // Set onClick listener to close button.
         val closeButton = findViewById<ImageButton>(R.id.message_close_button)
         closeButton?.setOnClickListener(this.listener)
-        if (this.buttons?.size == 1) {
-            // Set bigger layout_margin if there's only one button.
-            findViewById<MaterialButton>(R.id.message_single_button)?.let {
-                setButtonInfo(it, this.buttons!![0])
+        when (this.buttons?.size) {
+            1 -> {
+                // Set bigger layout_margin if there's only one button.
+                findViewById<MaterialButton>(R.id.message_single_button)?.let {
+                    setButtonInfo(it, this.buttons!![0])
+                }
             }
-        } else if (buttons?.size == 2) {
-            // Set bigger layout_margin if there's only one button.
-            findViewById<MaterialButton>(R.id.message_button_left)?.let { setButtonInfo(it, this.buttons!![0]) }
-            findViewById<MaterialButton>(R.id.message_button_right)?.let { setButtonInfo(it, this.buttons!![1]) }
+            2 -> {
+                // Set bigger layout_margin if there's only one button.
+                findViewById<MaterialButton>(R.id.message_button_left)?.let { setButtonInfo(it, this.buttons!![0]) }
+                findViewById<MaterialButton>(R.id.message_button_right)?.let { setButtonInfo(it, this.buttons!![1]) }
+            }
+            else -> Any()
         }
     }
 
@@ -128,22 +131,17 @@ internal open class InAppMessageBaseView(context: Context, attrs: AttributeSet?)
         if (!this.imageUrl.isNullOrEmpty()) {
             findViewById<ImageView>(R.id.message_image_view)?.let {
                 it.setOnTouchListener(this.listener)
-                Picasso
-                    .get()
-                    .load(this.imageUrl)
-                    .into(it, object:Callback {
+                Picasso.get().load(this@InAppMessageBaseView.imageUrl)
+                    .priority(Picasso.Priority.HIGH)
+                    .into(it, object : Callback {
                         override fun onSuccess() {
-                            Timber.tag(InAppMessageBaseView.TAG).d("Download image ended + ${Date().time}")
-                            it.visibility = View.VISIBLE
+                            it.visibility = VISIBLE
                         }
 
                         override fun onError(e: Exception?) {
-                            Timber.tag(InAppMessageBaseView.TAG).d("Error on loading image ")
+                            Timber.tag(TAG).d("Error on loading image")
                         }
-
                     })
-
-
             }
         }
     }

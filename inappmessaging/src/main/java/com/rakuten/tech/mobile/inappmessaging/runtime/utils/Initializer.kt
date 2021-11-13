@@ -19,10 +19,11 @@ import java.lang.IllegalStateException
 import java.util.Locale
 import java.util.UUID
 import com.squareup.picasso.OkHttp3Downloader
+import okhttp3.Cache
 
 import okhttp3.OkHttpClient
+import java.io.File
 import java.util.concurrent.TimeUnit
-
 
 /**
  * IAM SDK initialization class.
@@ -114,18 +115,25 @@ internal object Initializer {
         return id
     }
 
+    private const val IMAGE_REQUEST_TIMEOUT_SECONDS = 20L
+    private const val IMAGE_RESOURCE_TIMEOUT_SECONDS = 300L
     private fun initializePicassoInstance(context: Context) {
         try {
-            val imageRequestTimeoutSeconds = 20L
-            val imageResourceTimeoutSeconds = 300L
+            val cacheDirectory = File(context.cacheDir, "http_cache")
+            val cacheMaxSize = 50L * 1024L * 1024L // 50 MiB
             val client = OkHttpClient.Builder()
-                .readTimeout(imageRequestTimeoutSeconds, TimeUnit.SECONDS)
-                .callTimeout(imageResourceTimeoutSeconds, TimeUnit.SECONDS)
+                .readTimeout(IMAGE_REQUEST_TIMEOUT_SECONDS, TimeUnit.SECONDS)
+                .callTimeout(IMAGE_RESOURCE_TIMEOUT_SECONDS, TimeUnit.SECONDS)
+                .cache(Cache(cacheDirectory, cacheMaxSize))
                 .build()
 
-            val picasso =  Picasso.Builder(context)
+            val picasso = Picasso.Builder(context)
                 .downloader(OkHttp3Downloader(client))
                 .build()
+            picasso.setIndicatorsEnabled(true)
+            picasso.isLoggingEnabled = true
+            picasso.setIndicatorsEnabled(true)
+
             Picasso.setSingletonInstance(picasso)
         } catch (ignored: IllegalStateException) {
             // Picasso instance was already initialized

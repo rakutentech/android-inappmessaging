@@ -33,9 +33,8 @@ import androidx.test.core.app.ApplicationProvider.getApplicationContext
 import com.nhaarman.mockitokotlin2.*
 import com.rakuten.tech.mobile.inappmessaging.runtime.runnable.DisplayMessageRunnable
 import kotlinx.coroutines.ExperimentalCoroutinesApi
-import kotlinx.coroutines.runBlocking
+import org.junit.Ignore
 import org.mockito.Mockito.`when`
-
 
 /**
  * Test class for DisplayMessageJobIntentService.
@@ -232,8 +231,10 @@ class DisplayMessageJobIntentServiceSpec : BaseTest() {
 
     @ExperimentalCoroutinesApi
     @Test
+    @Ignore
     fun `should display message with image`() {
-        val message = setupMessageWithImage("https://upload.wikimedia.org/wikipedia/commons/3/3f/Walking_tiger_female.jpg")
+        val message = setupMessageWithImage(
+            "https://upload.wikimedia.org/wikipedia/commons/3/3f/Walking_tiger_female.jpg")
         `when`(mockMessageManager.getNextDisplayMessage()).thenReturn(message)
         displayMessageJobIntentService?.onHandleWork(intent)
 
@@ -299,6 +300,4 @@ class DisplayMessageJobIntentServiceSpec : BaseTest() {
         `when`(message.getContexts()).thenReturn(listOf("ctx"))
         `when`(mockMessageManager.getNextDisplayMessage()).thenReturn(message).thenReturn(null)
     }
-
-
 }

@@ -4,10 +4,7 @@
     android:id="@+id/message_image_view"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    tools:layout_constraintRight_toRightOf="parent"
-    tools:layout_constraintLeft_toLeftOf="parent"
-    tools:layout_constraintTop_toTopOf="parent"
     android:contentDescription="@string/in_app_message_image"
     android:visibility="gone"
     tools:visibility="visible"
-    tools:layout_constraintDimensionRatio="16:9"/>
+    android:adjustViewBounds="true"/>

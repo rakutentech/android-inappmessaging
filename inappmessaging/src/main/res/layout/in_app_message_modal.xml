@@ -50,8 +50,7 @@
             android:layout_height="wrap_content"
             android:orientation="vertical">
 
-            <include
-                layout="@layout/message_image_view" />
+            <include layout="@layout/message_image_view" />
 
             <include layout="@layout/message_scrollview" />
           </LinearLayout>
