@@ -131,9 +131,6 @@ internal object Initializer {
             val picasso = Picasso.Builder(context)
                 .downloader(OkHttp3Downloader(client))
                 .build()
-            picasso.setIndicatorsEnabled(true)
-            picasso.isLoggingEnabled = true
-            picasso.setIndicatorsEnabled(true)
 
             Picasso.setSingletonInstance(picasso)
         } catch (ignored: IllegalStateException) {

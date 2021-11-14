@@ -6,6 +6,7 @@ import com.rakuten.tech.mobile.inappmessaging.runtime.UserInfoProvider
 import timber.log.Timber
 import java.math.BigInteger
 import java.security.MessageDigest
+import kotlin.Exception
 
 /**
  * This object contains userInfoProvider ID used when logging in, and Access token.

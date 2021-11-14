@@ -83,25 +83,17 @@ internal class DisplayMessageJobIntentService : JobIntentService() {
         }
 
         target?.let {
-            handler.post { Picasso.get().load(imageUrl).into(target!!) }
+            handler.post { Picasso.get()
+                .load(imageUrl)
+                .priority(Picasso.Priority.HIGH)
+                .into(target!!) }
         }
-    }
-
-    fun getDisplayWidth(context: Context): Int {
-        val displayMetrics = context.resources.displayMetrics
-        return displayMetrics.widthPixels + 1
-    }
-
-    fun getDisplayHeight(context: Context, width: Int, height: Int): Int {
-        val displayWidth = getDisplayWidth(context)
-        val aspectRationFactor = displayWidth / width.toFloat()
-        return (height * aspectRationFactor).toInt()
     }
 
     /**
      * This method displays message on UI thread.
      */
-    internal fun displayMessage(message: Message, hostActivity: Activity, imageWidth: Int = 0, imageHeight: Int = 0) {
+    private fun displayMessage(message: Message, hostActivity: Activity, imageWidth: Int = 0, imageHeight: Int = 0) {
         if (!verifyContexts(message)) {
             // Message display aborted by the host app
             Timber.tag(TAG).d("message display cancelled by the host app")
@@ -129,10 +121,21 @@ internal class DisplayMessageJobIntentService : JobIntentService() {
             .onVerifyContext(campaignContexts, message.getMessagePayload().title)
     }
 
+    private fun getDisplayWidth(context: Context): Int {
+        val displayMetrics = context.resources.displayMetrics
+        return displayMetrics.widthPixels + 1
+    }
+
+    private fun getDisplayHeight(context: Context, width: Int, height: Int): Int {
+        val displayWidth = getDisplayWidth(context)
+        val aspectRationFactor = displayWidth / width.toFloat()
+        return (height * aspectRationFactor).toInt()
+    }
+
     companion object {
         private const val DISPLAY_MESSAGE_JOB_ID = 3210
         private const val TAG = "IAM_JobIntentService"
-        private var target: Target? = null
+        internal var target: Target? = null
 
         /** w22``QWW  NJN  ZAXZ E
          * This method enqueues work in to this service.

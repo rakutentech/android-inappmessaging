@@ -12,7 +12,7 @@ internal data class Resource(
     val assetsUrl: String? = null,
 
     @SerializedName("imageUrl")
-    var imageUrl: String? = null,
+    val imageUrl: String? = null,
 
     @SerializedName("cropType")
     val cropType: Int

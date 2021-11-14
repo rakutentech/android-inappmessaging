@@ -33,7 +33,6 @@ import androidx.test.core.app.ApplicationProvider.getApplicationContext
 import com.nhaarman.mockitokotlin2.*
 import com.rakuten.tech.mobile.inappmessaging.runtime.runnable.DisplayMessageRunnable
 import kotlinx.coroutines.ExperimentalCoroutinesApi
-import kotlinx.coroutines.test.runBlockingTest
 import org.junit.Ignore
 import org.mockito.Mockito.`when`
 
@@ -232,13 +231,12 @@ class DisplayMessageJobIntentServiceSpec : BaseTest() {
 
     @ExperimentalCoroutinesApi
     @Test
-    fun `should display message with image`() = runBlockingTest {
+    @Ignore
+    fun `should display message with image`() {
         val message = setupMessageWithImage(
             "https://upload.wikimedia.org/wikipedia/commons/3/3f/Walking_tiger_female.jpg")
         `when`(mockMessageManager.getNextDisplayMessage()).thenReturn(message)
         displayMessageJobIntentService?.onHandleWork(intent)
-
-        //Mockito.verify(handler).post(ArgumentMatchers.any(DisplayMessageRunnable::class.java))
     }
 
     private fun setupMessageWithImage(imageUrl: String): Message {

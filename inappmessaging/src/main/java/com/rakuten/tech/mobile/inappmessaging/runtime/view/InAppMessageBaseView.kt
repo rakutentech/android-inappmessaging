@@ -32,10 +32,7 @@ internal open class InAppMessageBaseView(context: Context, attrs: AttributeSet?)
         id = R.id.in_app_message_base_view
     }
 
-    private var imageWidth = 0
-    private var imageHeight = 0
     protected var bgColor = 0
-
     protected var imageUrl: String? = null
     protected var listener: InAppMessageViewListener? = null
     private var headerColor = 0
@@ -44,6 +41,8 @@ internal open class InAppMessageBaseView(context: Context, attrs: AttributeSet?)
     private var messageBody: String? = null
     private var buttons: List<MessageButton>? = null
     private var displayOptOut = false
+    private var imageWidth = 0
+    private var imageHeight = 0
 
     /**
      * Sets campaign message data onto the view.
@@ -71,11 +70,6 @@ internal open class InAppMessageBaseView(context: Context, attrs: AttributeSet?)
         this.imageUrl = message.getMessagePayload().resource.imageUrl
         this.listener = InAppMessageViewListener(message)
         this.displayOptOut = message.getMessagePayload().messageSettings.displaySettings.optOut
-        if (!imageUrl.isNullOrBlank()) {
-
-            // load the image then display the view
-            this@InAppMessageBaseView.visibility = GONE
-        }
         bindViewData()
         this.tag = message.getCampaignId()
     }
@@ -134,9 +128,12 @@ internal open class InAppMessageBaseView(context: Context, attrs: AttributeSet?)
     /**
      * This method binds image to view.
      */
-    @SuppressLint("ClickableViewAccessibility", "TooGenericExceptionCaught")
+    @Suppress("ClickableViewAccessibility", "TooGenericExceptionCaught", "LongMethod")
     private fun bindImage() { // Display image.
         if (!this.imageUrl.isNullOrEmpty()) {
+
+            // load the image then display the view
+            this@InAppMessageBaseView.visibility = GONE
             findViewById<ImageView>(R.id.message_image_view)?.let {
                 it.setOnTouchListener(this.listener)
                 try {
