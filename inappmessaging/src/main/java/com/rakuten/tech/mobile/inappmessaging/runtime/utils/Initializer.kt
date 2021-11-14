@@ -117,14 +117,15 @@ internal object Initializer {
 
     private const val IMAGE_REQUEST_TIMEOUT_SECONDS = 20L
     private const val IMAGE_RESOURCE_TIMEOUT_SECONDS = 300L
+    private const val CACHE_MAX_SIZE = 50L * 1024L * 1024L // 50 MiB
+
     private fun initializePicassoInstance(context: Context) {
         try {
             val cacheDirectory = File(context.cacheDir, "http_cache")
-            val cacheMaxSize = 50L * 1024L * 1024L // 50 MiB
             val client = OkHttpClient.Builder()
                 .readTimeout(IMAGE_REQUEST_TIMEOUT_SECONDS, TimeUnit.SECONDS)
                 .callTimeout(IMAGE_RESOURCE_TIMEOUT_SECONDS, TimeUnit.SECONDS)
-                .cache(Cache(cacheDirectory, cacheMaxSize))
+                .cache(Cache(cacheDirectory, CACHE_MAX_SIZE))
                 .build()
 
             val picasso = Picasso.Builder(context)

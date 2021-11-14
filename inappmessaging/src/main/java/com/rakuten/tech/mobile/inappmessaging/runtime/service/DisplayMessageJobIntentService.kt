@@ -14,17 +14,10 @@ import com.rakuten.tech.mobile.inappmessaging.runtime.data.repositories.LocalDis
 import com.rakuten.tech.mobile.inappmessaging.runtime.data.repositories.ReadyForDisplayMessageRepository
 import com.rakuten.tech.mobile.inappmessaging.runtime.manager.MessageReadinessManager
 import com.rakuten.tech.mobile.inappmessaging.runtime.runnable.DisplayMessageRunnable
-import com.squareup.picasso.Callback
-import com.squareup.picasso.NetworkPolicy
 import com.squareup.picasso.Picasso
 import com.squareup.picasso.Target
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.coroutineScope
-import kotlinx.coroutines.launch
 import timber.log.Timber
 import java.lang.Exception
-import java.util.*
 
 /**
  * Since one service is essentially one worker thread, so there's no chance multiple worker threads
@@ -72,22 +65,43 @@ internal class DisplayMessageJobIntentService : JobIntentService() {
         hostActivity: Activity,
         imageUrl: String
     ) {
-        Picasso.get().load(imageUrl).fetch(object : Callback {
-            override fun onSuccess() {
-                displayMessage(message, hostActivity)
-                Timber.tag(TAG).d("Download image completed")
+        target = object : Target {
+            override fun onBitmapLoaded(bitmap: Bitmap?, from: Picasso.LoadedFrom?) {
+                bitmap?.let {
+                    displayMessage(message, hostActivity, getDisplayWidth(hostActivity),
+                        getDisplayHeight(hostActivity, bitmap.width, bitmap.height))
+                }
+                target = null
             }
 
-            override fun onError(e: Exception?) {
-                Timber.tag(TAG).e(e, "Download image failed")
+            override fun onBitmapFailed(e: Exception?, errorDrawable: Drawable?) {
+                Timber.tag(TAG).d(e?.cause, "Image load failed $imageUrl")
+                target = null
             }
-        })
+
+            override fun onPrepareLoad(placeHolderDrawable: Drawable?) = Unit
+        }
+
+        target?.let {
+            handler.post { Picasso.get().load(imageUrl).into(target!!) }
+        }
+    }
+
+    fun getDisplayWidth(context: Context): Int {
+        val displayMetrics = context.resources.displayMetrics
+        return displayMetrics.widthPixels + 1
+    }
+
+    fun getDisplayHeight(context: Context, width: Int, height: Int): Int {
+        val displayWidth = getDisplayWidth(context)
+        val aspectRationFactor = displayWidth / width.toFloat()
+        return (height * aspectRationFactor).toInt()
     }
 
     /**
      * This method displays message on UI thread.
      */
-    private fun displayMessage(message: Message, hostActivity: Activity) {
+    internal fun displayMessage(message: Message, hostActivity: Activity, imageWidth: Int = 0, imageHeight: Int = 0) {
         if (!verifyContexts(message)) {
             // Message display aborted by the host app
             Timber.tag(TAG).d("message display cancelled by the host app")
@@ -99,7 +113,7 @@ internal class DisplayMessageJobIntentService : JobIntentService() {
             return
         }
 
-        handler.post(DisplayMessageRunnable(message, hostActivity))
+        handler.post(DisplayMessageRunnable(message, hostActivity, imageWidth, imageHeight))
     }
 
     /**
@@ -111,19 +125,26 @@ internal class DisplayMessageJobIntentService : JobIntentService() {
             return true
         }
 
-        return InAppMessaging.instance().onVerifyContext(campaignContexts, message.getMessagePayload().title)
+        return InAppMessaging.instance()
+            .onVerifyContext(campaignContexts, message.getMessagePayload().title)
     }
 
     companion object {
         private const val DISPLAY_MESSAGE_JOB_ID = 3210
         private const val TAG = "IAM_JobIntentService"
+        private var target: Target? = null
 
-        /**
+        /** w22``QWW  NJN  ZAXZ E
          * This method enqueues work in to this service.
          */
         fun enqueueWork(work: Intent) {
             val context: Context = InAppMessaging.instance().getHostAppContext() ?: return
-            enqueueWork(context, DisplayMessageJobIntentService::class.java, DISPLAY_MESSAGE_JOB_ID, work)
+            enqueueWork(
+                context,
+                DisplayMessageJobIntentService::class.java,
+                DISPLAY_MESSAGE_JOB_ID,
+                work
+            )
         }
     }
 }

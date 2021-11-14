@@ -54,7 +54,7 @@ class BaseViewSpec : BaseTest() {
     @Test
     fun `should set default when invalid header color`() {
         `when`(mockPayload.headerColor).thenReturn("invalid")
-        view?.populateViewData(mockMessage)
+        view?.populateViewData(mockMessage, 0, 0)
 
         verifyDefault()
     }

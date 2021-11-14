@@ -1,7 +1,6 @@
 package com.rakuten.tech.mobile.inappmessaging.runtime.view
 
 import android.annotation.SuppressLint
-import android.app.Activity
 import android.content.Context
 import android.content.res.ColorStateList
 import android.graphics.Color
@@ -14,15 +13,14 @@ import android.widget.LinearLayout
 import android.widget.TextView
 import android.widget.ImageView
 import androidx.core.widget.NestedScrollView
-import com.squareup.picasso.Picasso
 import com.google.android.material.button.MaterialButton
 import com.rakuten.tech.mobile.inappmessaging.runtime.R
 import com.rakuten.tech.mobile.inappmessaging.runtime.data.models.messages.Message
 import com.rakuten.tech.mobile.inappmessaging.runtime.data.responses.ping.MessageButton
 import com.squareup.picasso.Callback
+import com.squareup.picasso.Picasso
 import timber.log.Timber
 import java.lang.Exception
-import java.util.*
 
 /**
  * Base class of all custom views.
@@ -34,7 +32,10 @@ internal open class InAppMessageBaseView(context: Context, attrs: AttributeSet?)
         id = R.id.in_app_message_base_view
     }
 
+    private var imageWidth = 0
+    private var imageHeight = 0
     protected var bgColor = 0
+
     protected var imageUrl: String? = null
     protected var listener: InAppMessageViewListener? = null
     private var headerColor = 0
@@ -48,11 +49,13 @@ internal open class InAppMessageBaseView(context: Context, attrs: AttributeSet?)
      * Sets campaign message data onto the view.
      */
     @SuppressWarnings("LongMethod")
-    override fun populateViewData(message: Message) {
+    override fun populateViewData(message: Message, imageWidth: Int, imageHeight: Int) {
         try {
             this.headerColor = Color.parseColor(message.getMessagePayload().headerColor)
             this.messageBodyColor = Color.parseColor(message.getMessagePayload().messageBodyColor)
             this.bgColor = Color.parseColor(message.getMessagePayload().backgroundColor)
+            this.imageWidth = imageWidth
+            this.imageHeight = imageHeight
         } catch (e: IllegalArgumentException) {
             // values are from backend
             Timber.tag(TAG).e(e)
@@ -68,6 +71,11 @@ internal open class InAppMessageBaseView(context: Context, attrs: AttributeSet?)
         this.imageUrl = message.getMessagePayload().resource.imageUrl
         this.listener = InAppMessageViewListener(message)
         this.displayOptOut = message.getMessagePayload().messageSettings.displaySettings.optOut
+        if (!imageUrl.isNullOrBlank()) {
+
+            // load the image then display the view
+            this@InAppMessageBaseView.visibility = GONE
+        }
         bindViewData()
         this.tag = message.getCampaignId()
     }
@@ -126,22 +134,30 @@ internal open class InAppMessageBaseView(context: Context, attrs: AttributeSet?)
     /**
      * This method binds image to view.
      */
-    @SuppressLint("ClickableViewAccessibility")
+    @SuppressLint("ClickableViewAccessibility", "TooGenericExceptionCaught")
     private fun bindImage() { // Display image.
         if (!this.imageUrl.isNullOrEmpty()) {
             findViewById<ImageView>(R.id.message_image_view)?.let {
                 it.setOnTouchListener(this.listener)
-                Picasso.get().load(this@InAppMessageBaseView.imageUrl)
-                    .priority(Picasso.Priority.HIGH)
-                    .into(it, object : Callback {
-                        override fun onSuccess() {
-                            it.visibility = VISIBLE
-                        }
+                try {
+                    Picasso.get().load(this.imageUrl)
+                        .priority(Picasso.Priority.HIGH)
+                        .resize(this.imageWidth, this.imageHeight)
+                        .onlyScaleDown()
+                        .centerInside()
+                        .into(it, object : Callback {
+                            override fun onSuccess() {
+                                it.visibility = VISIBLE
+                                this@InAppMessageBaseView.visibility = VISIBLE
+                            }
 
-                        override fun onError(e: Exception?) {
-                            Timber.tag(TAG).d("Error on loading image")
-                        }
-                    })
+                            override fun onError(e: Exception?) {
+                                Timber.tag(TAG).d(e?.cause, "Image load failed $imageUrl")
+                            }
+                        })
+                } catch (ex: Exception) {
+                    Timber.tag(TAG).d(ex.cause, "Image load failed $imageUrl")
+                }
             }
         }
     }
