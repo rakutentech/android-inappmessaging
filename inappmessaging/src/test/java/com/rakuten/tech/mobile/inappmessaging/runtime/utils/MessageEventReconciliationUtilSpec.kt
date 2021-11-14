@@ -39,7 +39,7 @@ open class MessageEventReconciliationUtilSpec : BaseTest() {
     val customEvent = CustomEvent("custom")
     internal val message1 = Mockito.mock(Message::class.java)
     internal val message2 = Mockito.mock(Message::class.java)
-    private val payload = Mockito.mock(MessagePayload::class.java)
+    internal val payload = Mockito.mock(MessagePayload::class.java)
     internal val testMessage = Mockito.mock(Message::class.java)
     internal val trigger1 = Mockito.mock(Trigger::class.java)
     private val trigger2 = Mockito.mock(Trigger::class.java)
@@ -395,6 +395,41 @@ class MessageEventReconciliationUtilReconcileSpec : MessageEventReconciliationUt
         outputMessageList = MessageEventReconciliationUtil.instance().reconcileMessagesAndEvents(inputMessageList)
         // Re-assert the output with qualifying event.
         outputMessageList.shouldHaveSize(0)
+    }
+
+    @Test
+    fun `should reconcile message with upper case from response`() {
+        confirmCustomEvent("EVENT", "ATTRIBUTE", "VALUE", "event", "attribute", "value")
+    }
+
+    @Test
+    fun `should reconcile message with lower case from response`() {
+        confirmCustomEvent("event", "attribute", "value", "EVENT", "ATTRIBUTE", "VALUE")
+    }
+
+    @SuppressWarnings("LongMethod")
+    private fun confirmCustomEvent(
+        triggerName: String,
+        triggerAttri: String,
+        triggerValue: String,
+        eventName: String,
+        eventAttri: String,
+        eventValue: String
+    ) {
+        val customAttribute = TriggerAttribute(triggerAttri, triggerValue, 1, 1)
+        val customTrigger = Trigger(1, 4, triggerName, mutableListOf(customAttribute))
+        val customMsg = Mockito.mock(Message::class.java)
+        `when`(customMsg.getCampaignId()).thenReturn("test-id")
+        `when`(customMsg.getMaxImpressions()).thenReturn(1)
+        `when`(customMsg.getTriggers()).thenReturn(listOf(customTrigger))
+        `when`(customMsg.isTest()).thenReturn(false)
+        `when`(customMsg.getMessagePayload()).thenReturn(payload)
+
+        LocalEventRepository.instance().addEvent(CustomEvent(eventName).addAttribute(eventAttri, eventValue))
+
+        val outputMessageList = MessageEventReconciliationUtil.instance()
+            .reconcileMessagesAndEvents(listOf(customMsg))
+        outputMessageList.shouldHaveSize(1)
     }
 
     private fun setupMessageTrigger(): ArrayList<Message> {
