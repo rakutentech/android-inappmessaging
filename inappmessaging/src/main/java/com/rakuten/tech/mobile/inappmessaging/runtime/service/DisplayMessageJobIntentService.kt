@@ -3,8 +3,6 @@ package com.rakuten.tech.mobile.inappmessaging.runtime.service
 import android.app.Activity
 import android.content.Context
 import android.content.Intent
-import android.graphics.Bitmap
-import android.graphics.drawable.Drawable
 import android.os.Handler
 import android.os.Looper
 import androidx.core.app.JobIntentService
@@ -15,7 +13,6 @@ import com.rakuten.tech.mobile.inappmessaging.runtime.data.repositories.ReadyFor
 import com.rakuten.tech.mobile.inappmessaging.runtime.manager.MessageReadinessManager
 import com.rakuten.tech.mobile.inappmessaging.runtime.runnable.DisplayMessageRunnable
 import com.squareup.picasso.Picasso
-import com.squareup.picasso.Target
 import timber.log.Timber
 import java.lang.Exception
 
@@ -48,8 +45,9 @@ internal class DisplayMessageJobIntentService : JobIntentService() {
         val imageUrl = message.getMessagePayload().resource.imageUrl
         if (hostActivity != null) {
             if (!imageUrl.isNullOrEmpty()) {
-                fetchImageThenDisplayMessage(message, hostActivity, imageUrl)
+               fetchImageThenDisplayMessage(message, hostActivity, imageUrl)
             } else {
+
                 // If no image, just display the message.
                 displayMessage(message, hostActivity)
             }
@@ -58,35 +56,21 @@ internal class DisplayMessageJobIntentService : JobIntentService() {
 
     /**
      * This method fetches image from network, then cache it in memory.
-     * Once image is fully downloaded, ImagePrefetchSubscriber will trigger to display the message.
+     * Once image is fully downloaded, display the message will be triggered   .
      */
+    @SuppressWarnings("TooGenericExceptionCaught")
     private fun fetchImageThenDisplayMessage(
         message: Message,
         hostActivity: Activity,
         imageUrl: String
     ) {
-        target = object : Target {
-            override fun onBitmapLoaded(bitmap: Bitmap?, from: Picasso.LoadedFrom?) {
-                bitmap?.let {
-                    displayMessage(message, hostActivity, getDisplayWidth(hostActivity),
-                        getDisplayHeight(hostActivity, bitmap.width, bitmap.height))
-                }
-                target = null
-            }
-
-            override fun onBitmapFailed(e: Exception?, errorDrawable: Drawable?) {
-                Timber.tag(TAG).d(e?.cause, "Image load failed $imageUrl")
-                target = null
-            }
-
-            override fun onPrepareLoad(placeHolderDrawable: Drawable?) = Unit
-        }
-
-        target?.let {
-            handler.post { Picasso.get()
-                .load(imageUrl)
-                .priority(Picasso.Priority.HIGH)
-                .into(target!!) }
+        try {
+            val bitmap = Picasso.get().load(imageUrl).priority(Picasso.Priority.HIGH).get()
+            val imageWidth = getDisplayWidth(hostActivity)
+            val imageHeight = getDisplayHeight(hostActivity, bitmap.width, bitmap.height)
+            displayMessage(message, hostActivity, imageWidth, imageHeight)
+        } catch (e: Exception) {
+            Timber.tag("TAG").d(e, "Image load failed $imageUrl")
         }
     }
 
@@ -135,7 +119,6 @@ internal class DisplayMessageJobIntentService : JobIntentService() {
     companion object {
         private const val DISPLAY_MESSAGE_JOB_ID = 3210
         private const val TAG = "IAM_JobIntentService"
-        internal var target: Target? = null
 
         /** w22``QWW  NJN  ZAXZ E
          * This method enqueues work in to this service.
