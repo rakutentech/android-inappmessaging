@@ -6,11 +6,13 @@ import android.content.res.ColorStateList
 import android.graphics.Color
 import android.os.Build
 import android.view.LayoutInflater
+import android.widget.ImageButton
 import android.widget.TextView
 import androidx.test.core.app.ApplicationProvider
 import com.facebook.drawee.backends.pipeline.Fresco
 import com.facebook.soloader.SoLoader
 import com.google.android.material.button.MaterialButton
+import com.nhaarman.mockitokotlin2.never
 import com.rakuten.tech.mobile.inappmessaging.runtime.BaseTest
 import com.rakuten.tech.mobile.inappmessaging.runtime.R
 import com.rakuten.tech.mobile.inappmessaging.runtime.data.models.messages.Message
@@ -21,6 +23,8 @@ import org.junit.Test
 import org.junit.runner.RunWith
 import org.mockito.Mockito
 import org.mockito.Mockito.`when`
+import org.mockito.Mockito.times
+import org.mockito.verification.VerificationMode
 import org.robolectric.RobolectricTestRunner
 import org.robolectric.annotation.Config
 
@@ -97,6 +101,26 @@ class BaseViewSpec : BaseTest() {
         button?.backgroundTintList shouldBeEqualTo ColorStateList.valueOf(Color.WHITE)
     }
 
+    @Test
+    fun `should set close button to black background`() {
+        verifyCloseButton(BLACK_HEX, times(1))
+    }
+
+    @Test
+    fun `should not set close button to black background`() {
+        verifyCloseButton(WHITE_HEX, never())
+    }
+
+    private fun verifyCloseButton(color: String, mode: VerificationMode) {
+        `when`(mockPayload.headerColor).thenReturn(color)
+        `when`(mockPayload.messageBodyColor).thenReturn(color)
+        `when`(mockPayload.backgroundColor).thenReturn(color)
+        view?.populateViewData(mockMessage, 1f)
+        val mockButton = Mockito.mock(ImageButton::class.java)
+        view?.setCloseButton(mockButton)
+        Mockito.verify(mockButton, mode).setImageResource(R.drawable.close_button_white)
+    }
+
     private fun verifyDefault() {
         view?.findViewById<TextView>(R.id.header_text)?.textColors shouldBeEqualTo ColorStateList.valueOf(Color.BLACK)
         view?.findViewById<TextView>(R.id.message_body)?.textColors shouldBeEqualTo ColorStateList.valueOf(Color.BLACK)
@@ -104,5 +128,6 @@ class BaseViewSpec : BaseTest() {
 
     companion object {
         private const val WHITE_HEX = "#FFFFFF"
+        private const val BLACK_HEX = "#000000"
     }
 }

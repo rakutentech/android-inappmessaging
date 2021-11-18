@@ -19,6 +19,7 @@ import com.rakuten.tech.mobile.inappmessaging.runtime.R
 import com.rakuten.tech.mobile.inappmessaging.runtime.data.models.messages.Message
 import com.rakuten.tech.mobile.inappmessaging.runtime.data.responses.ping.MessageButton
 import timber.log.Timber
+import kotlin.math.sqrt
 
 /**
  * Base class of all custom views.
@@ -30,8 +31,8 @@ internal open class InAppMessageBaseView(context: Context, attrs: AttributeSet?)
         id = R.id.in_app_message_base_view
     }
 
-    protected var bgColor = 0
-    protected var imageUrl: String? = null
+    private var bgColor = 0
+    private var imageUrl: String? = null
     protected var listener: InAppMessageViewListener? = null
     private var headerColor = 0
     private var messageBodyColor = 0
@@ -195,6 +196,21 @@ internal open class InAppMessageBaseView(context: Context, attrs: AttributeSet?)
                 it.setOnTouchListener(listener)
                 it.visibility = View.VISIBLE
             }
+        }
+    }
+
+    // Set close button to black background if the campaign background color is dark.
+    // Brightness is computed based on [Darel Rex Finley's HSP Colour Model](http://alienryderflex.com/hsp.html).
+    // Computed value is from 0 (black) to 255 (white), and is considered dark if less than 130.
+    @SuppressWarnings("MagicNumber")
+    internal fun setCloseButton(button: ImageButton? = null) {
+        val red = Color.red(bgColor)
+        val green = Color.green(bgColor)
+        val blue = Color.blue(bgColor)
+        val brightness = sqrt((red * red * .241) + (green * green * .691) + (blue * blue * .068)).toInt()
+        if (brightness < 130) {
+            (button ?: findViewById(R.id.message_close_button))
+                ?.setImageResource(R.drawable.close_button_white)
         }
     }
 

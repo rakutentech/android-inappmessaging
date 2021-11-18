@@ -7,8 +7,6 @@
   android:layout_height="0dp"
   android:layout_weight="0.25"
   android:layout_marginBottom="@dimen/modal_text_scroll_view_margin_bottom"
-  android:layout_marginStart="@dimen/modal_layout_margin_right"
-  android:layout_marginEnd="@dimen/modal_layout_margin_right"
   android:layout_marginLeft="@dimen/modal_layout_margin_right"
   android:layout_marginRight="@dimen/modal_layout_margin_right"
   android:fillViewport="true"

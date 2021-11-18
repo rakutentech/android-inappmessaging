@@ -23,11 +23,6 @@
     android:layout_marginBottom="@dimen/modal_layout_margin_top_bottom"
     android:orientation="vertical">
 
-    <ImageButton
-        android:id="@+id/message_close_button"
-        style="@style/InAppMessaging.CloseButton.Modal"
-        android:contentDescription="@string/close_button"/>
-
     <androidx.cardview.widget.CardView
       android:layout_width="match_parent"
       android:layout_height="wrap_content"
@@ -41,6 +36,12 @@
         android:layout_height="wrap_content"
         android:orientation="vertical"
         tools:visibility="visible">
+
+        <ImageButton
+          android:id="@+id/message_close_button"
+          style="@style/InAppMessaging.CloseButton.Modal"
+          android:contentDescription="@string/close_button" />
+
         <ScrollView
           android:layout_width="match_parent"
           android:layout_height="0dp"
@@ -55,7 +56,6 @@
             <include layout="@layout/message_scrollview" />
           </LinearLayout>
         </ScrollView>
-
 
         <LinearLayout
           android:layout_width="match_parent"

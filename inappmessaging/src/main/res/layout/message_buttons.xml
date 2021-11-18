@@ -5,8 +5,6 @@
   android:id="@+id/message_buttons"
   android:layout_width="match_parent"
   android:layout_height="wrap_content"
-  android:layout_marginStart="@dimen/modal_button_layout_margin_left_right"
-  android:layout_marginEnd="@dimen/modal_button_layout_margin_left_right"
   android:layout_marginLeft="@dimen/modal_button_layout_margin_left_right"
   android:layout_marginRight="@dimen/modal_button_layout_margin_left_right"
   android:visibility="gone"

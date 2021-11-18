@@ -20,6 +20,8 @@ internal class InAppMessageModalView(
      */
     override fun populateViewData(message: Message, imageAspectRatio: Float) {
         super.populateViewData(message, imageAspectRatio)
+
+        setCloseButton()
         findViewById<LinearLayout>(R.id.modal)?.setBackgroundColor(bgColor)
     }
 }

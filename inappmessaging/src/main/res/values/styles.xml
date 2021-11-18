@@ -15,25 +15,22 @@
 
   <style name="InAppMessaging.CloseButton.White">
     <!--Default background as white.-->
-    <item name="android:src">@drawable/close_button_white_background</item>
+    <item name="android:src">@drawable/close_button_black</item>
     <item name="android:padding">@dimen/modal_close_button_padding</item>
     <item name="android:layout_gravity">end</item>
   </style>
 
   <style name="InAppMessaging.CloseButton.Modal" >
     <!--Default background as white.-->
-    <item name="android:src">@drawable/close_button_white_background</item>
+    <item name="android:src">@drawable/close_button_black</item>
     <item name="android:layout_gravity">end</item>
-    <!--Padding to display the drawable background on the right edge-->
-    <item name="android:paddingStart">@dimen/modal_close_button_padding_start</item>
-    <item name="android:paddingTop">@dimen/modal_close_button_padding_top</item>
-    <item name="android:paddingEnd">@dimen/modal_close_button_padding_end</item>
-    <item name="android:paddingBottom">@dimen/modal_close_button_padding_bottom</item>
+    <item name="android:layout_width">@dimen/modal_close_button_width</item>
+    <item name="android:layout_height">@dimen/modal_close_button_height</item>
   </style>
 
   <style name="InAppMessaging.CloseButton.FullScreen">
     <!--Default background as white.-->
-    <item name="android:src">@drawable/close_button_white_background</item>
+    <item name="android:src">@drawable/close_button_black</item>
     <item name="android:layout_gravity">top|end</item>
   </style>
 
@@ -45,12 +42,13 @@
   <style name="InAppMessaging.Button">
     <item name="android:paddingLeft">@dimen/modal_button_padding_left_right</item>
     <item name="android:paddingRight">@dimen/modal_button_padding_left_right</item>
+    <item name="android:paddingTop">@dimen/modal_button_padding_top_bottom</item>
+    <item name="android:paddingBottom">@dimen/modal_button_padding_top_bottom</item>
     <item name="android:maxLines">2</item>
     <item name="android:ellipsize">end</item>
     <item name="android:stateListAnimator">@null</item>
-    <item name="android:textAppearance">@style/TextAppearance.AppCompat.Button</item>
+    <item name="android:fontFamily">@font/m_1r_medium</item>
     <item name="android:textSize">@dimen/modal_button_text_size</item>
-    <item name="android:textStyle">bold</item>
     <item name="android:visibility">gone</item>
     <item name="backgroundTint">@android:color/holo_orange_light</item>
     <item name="backgroundTintMode">src_over</item>
@@ -77,6 +75,7 @@
   </style>
 
   <style name="InAppMessaging.Text">
+    <item name="android:fontFamily">@font/m_1r_medium</item>
     <item name="android:layout_gravity">center</item>
     <item name="android:gravity">center_vertical</item>
     <item name="android:layout_height">wrap_content</item>

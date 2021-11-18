@@ -2,9 +2,6 @@ package com.rakuten.tech.mobile.inappmessaging.runtime.view
 
 import android.content.Context
 import android.util.AttributeSet
-import android.view.View
-import android.widget.ImageButton
-import com.rakuten.tech.mobile.inappmessaging.runtime.R
 import com.rakuten.tech.mobile.inappmessaging.runtime.data.models.messages.Message
 
 /**
@@ -21,14 +18,8 @@ internal class InAppMessageFullScreenView(
      */
     override fun populateViewData(message: Message, imageAspectRatio: Float) {
         super.populateViewData(message, imageAspectRatio)
-        if (imageUrl.isNullOrEmpty()) {
-            // If no image, use @drawable/close_button_black_background.
-            findViewById<ImageButton>(R.id.message_close_button)
-                ?.setImageResource(R.drawable.close_button_black_background)
 
-            // If no image, add empty text spacer on top.
-            findViewById<View>(R.id.view_spacer)?.visibility = View.VISIBLE
-        }
+        setCloseButton()
         setBackgroundColor(bgColor)
     }
 }
