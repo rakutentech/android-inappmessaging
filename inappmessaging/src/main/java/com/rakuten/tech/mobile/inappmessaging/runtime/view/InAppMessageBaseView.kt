@@ -31,7 +31,7 @@ internal open class InAppMessageBaseView(context: Context, attrs: AttributeSet?)
         id = R.id.in_app_message_base_view
     }
 
-    private var bgColor = 0
+    protected var bgColor = 0
     private var imageUrl: String? = null
     protected var listener: InAppMessageViewListener? = null
     private var headerColor = 0
