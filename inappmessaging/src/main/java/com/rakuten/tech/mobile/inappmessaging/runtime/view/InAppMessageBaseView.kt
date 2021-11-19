@@ -11,6 +11,7 @@ import android.widget.FrameLayout
 import android.widget.ImageButton
 import android.widget.LinearLayout
 import android.widget.TextView
+import androidx.core.content.res.ResourcesCompat
 import androidx.core.widget.NestedScrollView
 import com.facebook.drawee.backends.pipeline.Fresco
 import com.facebook.drawee.view.SimpleDraweeView
@@ -18,6 +19,7 @@ import com.google.android.material.button.MaterialButton
 import com.rakuten.tech.mobile.inappmessaging.runtime.R
 import com.rakuten.tech.mobile.inappmessaging.runtime.data.models.messages.Message
 import com.rakuten.tech.mobile.inappmessaging.runtime.data.responses.ping.MessageButton
+import com.rakuten.tech.mobile.inappmessaging.runtime.utils.BuildVersionChecker
 import timber.log.Timber
 import kotlin.math.sqrt
 
@@ -168,6 +170,10 @@ internal open class InAppMessageBaseView(context: Context, attrs: AttributeSet?)
         // Button stroke color equals to button text color.
         buttonView.strokeColor = ColorStateList.valueOf(textColor)
         buttonView.setOnClickListener(this.listener)
+
+        val fontId = context.resources.getIdentifier("iam_custom_font_button", "font", context.packageName)
+        val font = retrieveFontTypeFace(fontId)
+        font?.let { buttonView.typeface = it }
         buttonView.visibility = View.VISIBLE
         findViewById<LinearLayout>(R.id.message_buttons)?.visibility = View.VISIBLE
     }
@@ -181,12 +187,15 @@ internal open class InAppMessageBaseView(context: Context, attrs: AttributeSet?)
         if (!header.isNullOrEmpty() || !messageBody.isNullOrEmpty()) {
             findViewById<NestedScrollView>(R.id.message_scrollview)?.visibility = View.VISIBLE
         }
+        val fontId = context.resources.getIdentifier("iam_custom_font_text", "font", context.packageName)
+        val font = retrieveFontTypeFace(fontId)
         if (!header.isNullOrEmpty()) {
             findViewById<TextView>(R.id.header_text)?.let {
                 it.text = header
                 it.setTextColor(headerColor)
                 it.setOnTouchListener(listener)
                 it.visibility = View.VISIBLE
+                font?.let { font -> it.typeface = font }
             }
         }
         if (!messageBody.isNullOrEmpty()) {
@@ -195,6 +204,9 @@ internal open class InAppMessageBaseView(context: Context, attrs: AttributeSet?)
                 it.setTextColor(messageBodyColor)
                 it.setOnTouchListener(listener)
                 it.visibility = View.VISIBLE
+                font?.let { font ->
+                    it.typeface = font
+                }
             }
         }
     }
@@ -212,6 +224,13 @@ internal open class InAppMessageBaseView(context: Context, attrs: AttributeSet?)
             (button ?: findViewById(R.id.message_close_button))
                 ?.setImageResource(R.drawable.close_button_white)
         }
+    }
+
+    @SuppressLint("NewApi")
+    private fun retrieveFontTypeFace(fontId: Int) = when {
+        fontId <= 0 -> null
+        BuildVersionChecker.instance().isAndroidOAndAbove() -> context.resources.getFont(fontId)
+        else -> ResourcesCompat.getFont(context, fontId)
     }
 
     companion object {

@@ -182,6 +182,8 @@ Host app can log events to InAppMessaging anywhere in your app.
 
 These events will trigger messages with the same event based trigger. Upon receiving logged event, InAppMessaging SDK will start matching it with current campaigns immediately. After a campaign message's trigger events are matched by the logged events, this message will be displayed in the current registered activity. If no activity is registered, it will be displayed in the next registered activity.
 
+### #9 See [advanced features](#advanced) for optional behavior
+
 ### Pre-defined event classes:<br/>
 ### `AppStartEvent`
 Host app should log this event on app launch from terminated state. Recommended to log this event in host app's main activity's `Activity#onStart()`.
@@ -279,6 +281,25 @@ InAppMessaging.instance().closeMessage(true)
 
 **<font color="red">Note:</font> Calling this API will not increment the campaign's impression (i.e not counted as displayed).**
 
+### <a name="custom-font"></a> #3 Custom fonts for campaigns
+
+The SDK will optionally use custom fonts on campaign texts and button texts if set. The default Android system font is used if custom fonts are not added.
+
+To use custom fonts:
+1. Add the font files, `ttf` or `otf` format, to the `font` resource folder of your app.
+2. To use custom font for campaign header and body texts, set the filename to `iam_custom_font_text`.
+3. To use custom font for button texts, set the filename to `iam_custom_font_button`.
+
+Note: If you want to use custom fonts for both campaign and button texts, app should set to font files.
+
+```bash
+...
+├── res
+     ├── font
+          ├── iam_custom_font_text.otf // or ttf format
+          ├── iam_custom_font_button.otf // or ttf format
+```
+
 ## <a name="troubleshooting"></a> Troubleshooting
 ### Proguard ParseException
 ```kotlin
@@ -364,6 +385,7 @@ Documents targeting Product Managers:
 * SDKCF-4190: Updated Kluent dependency version due to deprecated mocking feature.
 * SDKCF-4427: Updated compile and target SDK to API 31 (Android 12).
 * SDKCF-3978: Updated endpoint response models to fix optional and required parameters.
+* SDKCF-4470: Updated the layout for close and campaign buttons. Added feature to customize text and button fonts, please see [custom font section](#custom-font) for details.
 
 ### 5.0.0 (2021-09-10)
 * SDKCF-4071: **Breaking Change:** Added new method for providing id tracking identifier in `UserInfoProvider` interface class.
