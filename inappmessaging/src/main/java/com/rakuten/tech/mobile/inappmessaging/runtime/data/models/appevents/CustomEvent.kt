@@ -10,9 +10,11 @@ import com.rakuten.tech.mobile.inappmessaging.runtime.data.models.rat.RatAttribu
 import com.rakuten.tech.mobile.inappmessaging.runtime.utils.InAppMessagingConstants
 import org.jetbrains.annotations.NotNull
 import org.jetbrains.annotations.Nullable
-import kotlin.collections.HashMap
-import java.util.Date
 import java.util.Collections
+import java.util.Date
+import java.util.Locale
+import kotlin.collections.ArrayList
+import kotlin.collections.HashMap
 
 /**
  * Logging custom event for client to use.
@@ -29,7 +31,7 @@ class CustomEvent(@NonNull eventName: String) : BaseEvent(EventType.CUSTOM, even
      */
     @NotNull
     fun addAttribute(@NotNull key: String, @NotNull value: Int): CustomEvent {
-        attributesMap[key] = Attribute(key, value.toString(), ValueType.INTEGER)
+        attributesMap[key.toLowerCase(Locale.getDefault())] = Attribute(key, value.toString(), ValueType.INTEGER)
         return this
     }
 
@@ -38,7 +40,7 @@ class CustomEvent(@NonNull eventName: String) : BaseEvent(EventType.CUSTOM, even
      */
     @NotNull
     fun addAttribute(@NotNull key: String, @NotNull value: Double): CustomEvent {
-        attributesMap[key] = Attribute(key, value.toString(), ValueType.DOUBLE)
+        attributesMap[key.toLowerCase(Locale.getDefault())] = Attribute(key, value.toString(), ValueType.DOUBLE)
         return this
     }
 
@@ -47,7 +49,7 @@ class CustomEvent(@NonNull eventName: String) : BaseEvent(EventType.CUSTOM, even
      */
     @NotNull
     fun addAttribute(@NotNull key: String, @NotNull value: String): CustomEvent {
-        attributesMap[key] = Attribute(key, value, ValueType.STRING)
+        attributesMap[key.toLowerCase(Locale.getDefault())] = Attribute(key, value, ValueType.STRING)
         return this
     }
 
@@ -56,7 +58,7 @@ class CustomEvent(@NonNull eventName: String) : BaseEvent(EventType.CUSTOM, even
      */
     @NotNull
     fun addAttribute(@NotNull key: String, @NotNull value: Boolean): CustomEvent {
-        attributesMap[key] = Attribute(key, value.toString(), ValueType.BOOLEAN)
+        attributesMap[key.toLowerCase(Locale.getDefault())] = Attribute(key, value.toString(), ValueType.BOOLEAN)
         return this
     }
 
@@ -65,7 +67,8 @@ class CustomEvent(@NonNull eventName: String) : BaseEvent(EventType.CUSTOM, even
      */
     @NotNull
     fun addAttribute(@NotNull key: String, @NotNull value: Date): CustomEvent {
-        attributesMap[key] = Attribute(key, value.time.toString(), ValueType.TIME_IN_MILLI)
+        attributesMap[key.toLowerCase(Locale.getDefault())] =
+            Attribute(key, value.time.toString(), ValueType.TIME_IN_MILLI)
         return this
     }
 

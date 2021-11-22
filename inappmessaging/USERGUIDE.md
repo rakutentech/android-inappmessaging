@@ -46,18 +46,18 @@ dependencies {
 ```
 Please refer to [Changelog](#changelog) section for the latest version.
 
-### #3 Target and compile SDK version to 30 or above.
-Note: It is required to target and compile to SDK version 30 or above.
+### #3 Target and compile SDK version to 31 or above.
+Note: It is required to target and compile to SDK version 31 or above.
 
 ```groovy
 android {
-    compileSdkVersion 30
+    compileSdkVersion 31
 
     defaultConfig {
     // Defines the minimum API level required to run the app.
     minSdkVersion 23
     // Specifies the API level used to test the app.
-    targetSdkVersion 30
+    targetSdkVersion 31
     }
 }
 ```
@@ -359,6 +359,11 @@ Documents targeting Product Managers:
   - Renamed method for providing access token in `UserInfoProvider` interface class from `provideRaeToken` to `provideAccessToken`.
   - Removed `provideRakutenId` method for Rakuten Id in `UserInfoProvider` interface class. Please use `provideUserId` for specific user targeting.
   - All the methods in `UserInfoProvider` class are optional for Kotlin class implementing the interface.
+* SDKCF-4530: Fixed handling for case-sensitivity update for custom event and attribute name
+* SDKCF-4196: Updated dependencies due to JCenter shutdown.
+* SDKCF-4190: Updated Kluent dependency version due to deprecated mocking feature.
+* SDKCF-4427: Updated compile and target SDK to API 31 (Android 12).
+* SDKCF-3978: Updated endpoint response models to fix optional and required parameters.
 
 ### 5.0.0 (2021-09-10)
 * SDKCF-4071: **Breaking Change:** Added new method for providing id tracking identifier in `UserInfoProvider` interface class.
