@@ -108,14 +108,6 @@ open class InAppMessagingSpec : BaseTest() {
     }
 
     @Test
-    // For code coverage. will be deleted when updateSession() is removed
-    fun `should not crash update session when using uninitialized instance`() {
-        InAppMessaging.setUninitializedInstance()
-        InAppMessaging.instance().registerPreference(TestUserInfoProvider())
-        InAppMessaging.instance().updateSession()
-    }
-
-    @Test
     fun `should display message using initialized instance`() {
         val inApp = initializeMockInstance(100)
         inApp.registerMessageDisplayActivity(activity)
@@ -139,19 +131,6 @@ open class InAppMessagingSpec : BaseTest() {
 
         try {
             InAppMessaging.instance().logEvent(AppStartEvent())
-        } catch (e: Exception) {
-            Assert.fail(EXCEPTION_MSG)
-        }
-    }
-
-    @Test
-    @SuppressWarnings("SwallowedException")
-    // For code coverage. will be deleted when updateSession() is removed
-    fun `should not crash update session for initialized instance`() {
-        initializeInstance()
-
-        try {
-            InAppMessaging.instance().updateSession()
         } catch (e: Exception) {
             Assert.fail(EXCEPTION_MSG)
         }
@@ -487,20 +466,6 @@ class InAppMessagingExceptionSpec : InAppMessagingSpec() {
     fun `should trigger callback when log event failed due to forced exception`() {
         InApp.errorCallback = mockCallback
         instance.logEvent(AppStartEvent())
-
-        Mockito.verify(mockCallback).invoke(captor.capture())
-        captor.firstValue shouldBeInstanceOf InAppMessagingException::class.java
-    }
-
-    @Test
-    fun `should not crash when update session failed due to forced exception`() {
-        instance.updateSession()
-    }
-
-    @Test
-    fun `should trigger callback when update session failed due to forced exception`() {
-        InApp.errorCallback = mockCallback
-        instance.updateSession()
 
         Mockito.verify(mockCallback).invoke(captor.capture())
         captor.firstValue shouldBeInstanceOf InAppMessagingException::class.java

@@ -111,19 +111,6 @@ internal class InApp(
         }
     }
 
-    override fun updateSession() {
-        try {
-            if (ConfigResponseRepository.instance().isConfigEnabled()) {
-                // Updates the current session to update all locally stored messages
-                sessionManager.onSessionUpdate()
-            }
-        } catch (ex: Exception) {
-            errorCallback?.let {
-                it(InAppMessagingException("In-App Messaging session update failed", ex))
-            }
-        }
-    }
-
     override fun closeMessage(clearQueuedCampaigns: Boolean) {
         try {
             if (ConfigResponseRepository.instance().isConfigEnabled()) {
