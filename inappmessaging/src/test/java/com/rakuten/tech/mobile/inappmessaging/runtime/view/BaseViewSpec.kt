@@ -99,7 +99,7 @@ class BaseViewSpec : BaseTest() {
     @Test
     fun `should display image`() {
         val imageUrl =
-            "https://iamprodjpefiles.blob.core.windows.net/campaign-images/e16c43ba-c4e2-491c-95d0-9444a6d63c91"
+            "https://en.wikipedia.org/wiki/Android_(operating_system)#/media/File:Android-robot-googleplex-2008.jpg"
         `when`(mockResource.imageUrl).thenReturn(imageUrl)
         `when`(mockPayload.headerColor).thenReturn("#")
         view?.populateViewData(mockMessage, 100, 100)

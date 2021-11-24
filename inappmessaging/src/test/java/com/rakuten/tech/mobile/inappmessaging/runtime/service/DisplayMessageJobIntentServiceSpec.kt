@@ -218,11 +218,11 @@ class DisplayMessageJobIntentServiceSpec : BaseTest() {
     @Test
     fun `should display message with image`() {
 
-        val imageUrl =
-        "https://iamprodjpefiles.blob.core.windows.net/campaign-images/e16c43ba-c4e2-491c-95d0-9444a6d63c91"
-        val message = setupMessageWithImage(imageUrl)
-        `when`(mockMessageManager.getNextDisplayMessage()).thenReturn(message)
-        displayMessageJobIntentService?.onHandleWork(intent)
+            val imageUrl =
+                "https://en.wikipedia.org/wiki/Android_(operating_system)#/media/File:Android-robot-googleplex-2008.jpg"
+            val message = setupMessageWithImage(imageUrl)
+            `when`(mockMessageManager.getNextDisplayMessage()).thenReturn(message)
+            displayMessageJobIntentService?.onHandleWork(intent)
 
         Mockito.verify(handler).post(ArgumentMatchers.any(DisplayMessageRunnable::class.java))
     }
