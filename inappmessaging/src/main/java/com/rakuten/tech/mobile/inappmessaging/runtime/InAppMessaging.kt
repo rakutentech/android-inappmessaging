@@ -52,14 +52,6 @@ abstract class InAppMessaging internal constructor() {
     abstract fun logEvent(@NonNull event: Event)
 
     /**
-     * This methods updates the host app's session. This allows InAppMessaging to update the locally stored
-     * messages which can be dependent on user information.
-     */
-    @Deprecated("This method is no longer needs to be called when updating user info because session updates" +
-            "are handled internally by the sdk.")
-    abstract fun updateSession()
-
-    /**
      * This method returns registered activity of the host app.
      */
     @RestrictTo(RestrictTo.Scope.LIBRARY)
@@ -172,8 +164,6 @@ abstract class InAppMessaging internal constructor() {
         override fun unregisterMessageDisplayActivity() {}
 
         override fun logEvent(event: Event) {}
-
-        override fun updateSession() {}
 
         override fun getRegisteredActivity(): Activity? = null
 
