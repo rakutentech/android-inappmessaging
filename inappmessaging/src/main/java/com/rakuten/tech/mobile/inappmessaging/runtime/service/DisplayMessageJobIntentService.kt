@@ -47,11 +47,11 @@ internal class DisplayMessageJobIntentService : JobIntentService() {
         val imageUrl = message.getMessagePayload().resource.imageUrl
         if (hostActivity != null) {
             if (!imageUrl.isNullOrEmpty()) {
-               fetchImageThenDisplayMessage(message, hostActivity, imageUrl)
+                    fetchImageThenDisplayMessage(message, hostActivity, imageUrl)
             } else {
 
-                // If no image, just display the message.
-                displayMessage(message, hostActivity)
+                    // If no image, just display the message.
+                    displayMessage(message, hostActivity)
             }
         }
     }
@@ -66,9 +66,9 @@ internal class DisplayMessageJobIntentService : JobIntentService() {
         hostActivity: Activity,
         imageUrl: String
     ) {
-            val bitmap: Bitmap? = imageLoader.fetch(imageUrl)
-            bitmap?.let {
-                displayMessage(message, hostActivity, it.width, it.height)
+        val bitmap: Bitmap? = imageLoader.fetch(imageUrl)
+        bitmap?.let {
+            displayMessage(message, hostActivity, it.width, it.height)
         }
     }
 

@@ -31,6 +31,7 @@ import org.robolectric.android.controller.ServiceController
 import org.robolectric.annotation.Config
 import androidx.test.core.app.ApplicationProvider.getApplicationContext
 import com.nhaarman.mockitokotlin2.*
+import com.rakuten.tech.mobile.inappmessaging.runtime.coroutine.ImageLoaderCoroutine
 import com.rakuten.tech.mobile.inappmessaging.runtime.runnable.DisplayMessageRunnable
 import org.mockito.Mockito.`when`
 
@@ -217,12 +218,12 @@ class DisplayMessageJobIntentServiceSpec : BaseTest() {
 
     @Test
     fun `should display message with image`() {
-
-            val imageUrl =
-                "https://en.wikipedia.org/wiki/Android_(operating_system)#/media/File:Android-robot-googleplex-2008.jpg"
-            val message = setupMessageWithImage(imageUrl)
-            `when`(mockMessageManager.getNextDisplayMessage()).thenReturn(message)
-            displayMessageJobIntentService?.onHandleWork(intent)
+        val imageUrl =
+            "https://en.wikipedia.org/wiki/Android_(operating_system)#/media/File:Android-robot-googleplex-2008.jpg"
+        val message = setupMessageWithImage(imageUrl)
+        `when`(mockMessageManager.getNextDisplayMessage()).thenReturn(message)
+        displayMessageJobIntentService?.imageLoader = ImageLoaderCoroutine(isTest = true)
+        displayMessageJobIntentService?.onHandleWork(intent)
 
         Mockito.verify(handler).post(ArgumentMatchers.any(DisplayMessageRunnable::class.java))
     }
@@ -231,6 +232,7 @@ class DisplayMessageJobIntentServiceSpec : BaseTest() {
     fun `should not display the message on invalid image url`() {
         val message = setupMessageWithImage("invalid_url")
         `when`(mockMessageManager.getNextDisplayMessage()).thenReturn(message)
+        displayMessageJobIntentService?.imageLoader = ImageLoaderCoroutine(isTest = true)
         displayMessageJobIntentService?.onHandleWork(intent)
 
         Mockito.verify(handler, never()).post(ArgumentMatchers.any(DisplayMessageRunnable::class.java))

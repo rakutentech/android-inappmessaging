@@ -9,12 +9,22 @@ import java.lang.Exception
 import kotlin.coroutines.CoroutineContext
 
 internal class ImageLoaderCoroutine(
-    private val coroutineContext: CoroutineContext = Dispatchers.IO
+    private val coroutineContext: CoroutineContext = Dispatchers.IO,
+    private val isTest: Boolean = false
 ) {
-
     @SuppressWarnings("TooGenericExceptionCaught")
-    fun fetch(imageUrl: String): Bitmap? = runBlocking(coroutineContext) {
-        try {
+    fun fetch(imageUrl: String): Bitmap? {
+        return if (isTest) {
+            runBlocking(coroutineContext) {
+                fetchBitmap(imageUrl)
+            }
+        } else {
+            fetchBitmap(imageUrl)
+        }
+    }
+
+    private fun fetchBitmap(imageUrl: String): Bitmap? {
+        return try {
             Picasso.get().load(imageUrl).priority(Picasso.Priority.HIGH).get()
         } catch (e: Exception) {
             Timber.tag(TAG).d(e, "Error on loading image $imageUrl")
