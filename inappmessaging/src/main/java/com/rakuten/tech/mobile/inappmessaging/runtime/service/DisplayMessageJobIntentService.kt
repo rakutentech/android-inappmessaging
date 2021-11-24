@@ -3,18 +3,18 @@ package com.rakuten.tech.mobile.inappmessaging.runtime.service
 import android.app.Activity
 import android.content.Context
 import android.content.Intent
+import android.graphics.Bitmap
 import android.os.Handler
 import android.os.Looper
 import androidx.core.app.JobIntentService
 import com.rakuten.tech.mobile.inappmessaging.runtime.InAppMessaging
+import com.rakuten.tech.mobile.inappmessaging.runtime.coroutine.ImageLoaderCoroutine
 import com.rakuten.tech.mobile.inappmessaging.runtime.data.models.messages.Message
 import com.rakuten.tech.mobile.inappmessaging.runtime.data.repositories.LocalDisplayedMessageRepository
 import com.rakuten.tech.mobile.inappmessaging.runtime.data.repositories.ReadyForDisplayMessageRepository
 import com.rakuten.tech.mobile.inappmessaging.runtime.manager.MessageReadinessManager
 import com.rakuten.tech.mobile.inappmessaging.runtime.runnable.DisplayMessageRunnable
-import com.squareup.picasso.Picasso
 import timber.log.Timber
-import java.lang.Exception
 
 /**
  * Since one service is essentially one worker thread, so there's no chance multiple worker threads
@@ -25,6 +25,7 @@ internal class DisplayMessageJobIntentService : JobIntentService() {
     var readyMessagesRepo = ReadyForDisplayMessageRepository.instance()
     var messageReadinessManager = MessageReadinessManager.instance()
     var handler = Handler(Looper.getMainLooper())
+    var imageLoader = ImageLoaderCoroutine()
 
     /**
      * This method starts displaying message runnable.
@@ -39,8 +40,9 @@ internal class DisplayMessageJobIntentService : JobIntentService() {
      * This method checks if there is a message to be displayed and proceeds if found.
      */
     private fun prepareNextMessage() {
+
         // Retrieving the next ready message, and its display permission been checked.
-        val message: Message = messageReadinessManager.getNextDisplayMessage() ?: return
+        val message = messageReadinessManager.getNextDisplayMessage() ?: return
         val hostActivity = InAppMessaging.instance().getRegisteredActivity()
         val imageUrl = message.getMessagePayload().resource.imageUrl
         if (hostActivity != null) {
@@ -56,7 +58,7 @@ internal class DisplayMessageJobIntentService : JobIntentService() {
 
     /**
      * This method fetches image from network, then cache it in memory.
-     * Once image is fully downloaded, display the message will be triggered   .
+     * Once image is fully downloaded, the message will be displayed.
      */
     @SuppressWarnings("TooGenericExceptionCaught")
     private fun fetchImageThenDisplayMessage(
@@ -64,13 +66,9 @@ internal class DisplayMessageJobIntentService : JobIntentService() {
         hostActivity: Activity,
         imageUrl: String
     ) {
-        try {
-            val bitmap = Picasso.get().load(imageUrl).priority(Picasso.Priority.HIGH).get()
-            val imageWidth = getDisplayWidth(hostActivity)
-            val imageHeight = getDisplayHeight(hostActivity, bitmap.width, bitmap.height)
-            displayMessage(message, hostActivity, imageWidth, imageHeight)
-        } catch (e: Exception) {
-            Timber.tag("TAG").d(e, "Image load failed $imageUrl")
+            val bitmap: Bitmap? = imageLoader.fetch(imageUrl)
+            bitmap?.let {
+                displayMessage(message, hostActivity, it.width, it.height)
         }
     }
 
@@ -105,22 +103,11 @@ internal class DisplayMessageJobIntentService : JobIntentService() {
             .onVerifyContext(campaignContexts, message.getMessagePayload().title)
     }
 
-    private fun getDisplayWidth(context: Context): Int {
-        val displayMetrics = context.resources.displayMetrics
-        return displayMetrics.widthPixels + 1
-    }
-
-    private fun getDisplayHeight(context: Context, width: Int, height: Int): Int {
-        val displayWidth = getDisplayWidth(context)
-        val aspectRationFactor = displayWidth / width.toFloat()
-        return (height * aspectRationFactor).toInt()
-    }
-
     companion object {
         private const val DISPLAY_MESSAGE_JOB_ID = 3210
         private const val TAG = "IAM_JobIntentService"
 
-        /** w22``QWW  NJN  ZAXZ E
+        /**
          * This method enqueues work in to this service.
          */
         fun enqueueWork(work: Intent) {

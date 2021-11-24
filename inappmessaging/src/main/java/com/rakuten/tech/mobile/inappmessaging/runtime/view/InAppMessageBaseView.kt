@@ -17,6 +17,8 @@ import com.google.android.material.button.MaterialButton
 import com.rakuten.tech.mobile.inappmessaging.runtime.R
 import com.rakuten.tech.mobile.inappmessaging.runtime.data.models.messages.Message
 import com.rakuten.tech.mobile.inappmessaging.runtime.data.responses.ping.MessageButton
+import com.rakuten.tech.mobile.inappmessaging.runtime.utils.ViewUtil.getDisplayHeight
+import com.rakuten.tech.mobile.inappmessaging.runtime.utils.ViewUtil.getDisplayWidth
 import com.squareup.picasso.Callback
 import com.squareup.picasso.Picasso
 import timber.log.Timber
@@ -53,8 +55,6 @@ internal open class InAppMessageBaseView(context: Context, attrs: AttributeSet?)
             this.headerColor = Color.parseColor(message.getMessagePayload().headerColor)
             this.messageBodyColor = Color.parseColor(message.getMessagePayload().messageBodyColor)
             this.bgColor = Color.parseColor(message.getMessagePayload().backgroundColor)
-            this.imageWidth = imageWidth
-            this.imageHeight = imageHeight
         } catch (e: IllegalArgumentException) {
             // values are from backend
             Timber.tag(TAG).e(e)
@@ -63,7 +63,8 @@ internal open class InAppMessageBaseView(context: Context, attrs: AttributeSet?)
             this.messageBodyColor = Color.BLACK
             this.bgColor = Color.WHITE
         }
-
+        this.imageWidth = getDisplayWidth(context)
+        this.imageHeight = getDisplayHeight(context, imageWidth, imageHeight)
         this.header = message.getMessagePayload().header
         this.messageBody = message.getMessagePayload().messageBody
         this.buttons = message.getMessagePayload().messageSettings.controlSettings.buttons
@@ -71,7 +72,6 @@ internal open class InAppMessageBaseView(context: Context, attrs: AttributeSet?)
         this.listener = InAppMessageViewListener(message)
         this.displayOptOut = message.getMessagePayload().messageSettings.displaySettings.optOut
         bindViewData()
-        this.tag = message.getCampaignId()
     }
 
     /**
@@ -133,27 +133,28 @@ internal open class InAppMessageBaseView(context: Context, attrs: AttributeSet?)
         if (!this.imageUrl.isNullOrEmpty()) {
 
             // load the image then display the view
-            this@InAppMessageBaseView.visibility = GONE
+            this.visibility = GONE
             findViewById<ImageView>(R.id.message_image_view)?.let {
                 it.setOnTouchListener(this.listener)
                 try {
+                    val callback = object : Callback {
+                        override fun onSuccess() {
+                            it.visibility = VISIBLE
+                            this@InAppMessageBaseView.visibility = VISIBLE
+                        }
+
+                        override fun onError(e: Exception?) {
+                            Timber.tag(TAG).d(e?.cause, "Downloading image failed $imageUrl")
+                        }
+                    }
                     Picasso.get().load(this.imageUrl)
                         .priority(Picasso.Priority.HIGH)
                         .resize(this.imageWidth, this.imageHeight)
                         .onlyScaleDown()
                         .centerInside()
-                        .into(it, object : Callback {
-                            override fun onSuccess() {
-                                it.visibility = VISIBLE
-                                this@InAppMessageBaseView.visibility = VISIBLE
-                            }
-
-                            override fun onError(e: Exception?) {
-                                Timber.tag(TAG).d(e?.cause, "Image load failed $imageUrl")
-                            }
-                        })
+                        .into(it, callback)
                 } catch (ex: Exception) {
-                    Timber.tag(TAG).d(ex.cause, "Image load failed $imageUrl")
+                    Timber.tag(TAG).d(ex, "Downloading image failed $imageUrl")
                 }
             }
         }

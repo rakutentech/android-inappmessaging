@@ -32,8 +32,6 @@ import org.robolectric.annotation.Config
 import androidx.test.core.app.ApplicationProvider.getApplicationContext
 import com.nhaarman.mockitokotlin2.*
 import com.rakuten.tech.mobile.inappmessaging.runtime.runnable.DisplayMessageRunnable
-import kotlinx.coroutines.ExperimentalCoroutinesApi
-import org.junit.Ignore
 import org.mockito.Mockito.`when`
 
 /**
@@ -218,10 +216,19 @@ class DisplayMessageJobIntentServiceSpec : BaseTest() {
     }
 
     @Test
-    fun `should not display the message on invalid image url`() {
-        `when`(onVerifyContexts.invoke(any(), any())).thenReturn(true)
-        InAppMessaging.instance().onVerifyContext = onVerifyContexts
+    fun `should display message with image`() {
 
+        val imageUrl =
+        "https://iamprodjpefiles.blob.core.windows.net/campaign-images/e16c43ba-c4e2-491c-95d0-9444a6d63c91"
+        val message = setupMessageWithImage(imageUrl)
+        `when`(mockMessageManager.getNextDisplayMessage()).thenReturn(message)
+        displayMessageJobIntentService?.onHandleWork(intent)
+
+        Mockito.verify(handler).post(ArgumentMatchers.any(DisplayMessageRunnable::class.java))
+    }
+
+    @Test
+    fun `should not display the message on invalid image url`() {
         val message = setupMessageWithImage("invalid_url")
         `when`(mockMessageManager.getNextDisplayMessage()).thenReturn(message)
         displayMessageJobIntentService?.onHandleWork(intent)
@@ -229,14 +236,13 @@ class DisplayMessageJobIntentServiceSpec : BaseTest() {
         Mockito.verify(handler, never()).post(ArgumentMatchers.any(DisplayMessageRunnable::class.java))
     }
 
-    @ExperimentalCoroutinesApi
     @Test
-    @Ignore
-    fun `should display message with image`() {
-        val message = setupMessageWithImage(
-            "https://upload.wikimedia.org/wikipedia/commons/3/3f/Walking_tiger_female.jpg")
+    fun `should display the message if empty image url`() {
+        val message = setupMessageWithImage("")
         `when`(mockMessageManager.getNextDisplayMessage()).thenReturn(message)
         displayMessageJobIntentService?.onHandleWork(intent)
+
+        Mockito.verify(handler).post(ArgumentMatchers.any(DisplayMessageRunnable::class.java))
     }
 
     private fun setupMessageWithImage(imageUrl: String): Message {
@@ -248,7 +254,7 @@ class DisplayMessageJobIntentServiceSpec : BaseTest() {
         `when`(payload.resource).thenReturn(resource)
         `when`(message.getMessagePayload()).thenReturn(payload)
         `when`(message.getCampaignId()).thenReturn("1")
-        `when`(message.isTest()).thenReturn(false)
+        `when`(message.isTest()).thenReturn(true)
         `when`(message.getMaxImpressions()).thenReturn(1)
         `when`(message.getMessagePayload()).thenReturn(payload)
         `when`(message.getContexts()).thenReturn(listOf("ctx"))

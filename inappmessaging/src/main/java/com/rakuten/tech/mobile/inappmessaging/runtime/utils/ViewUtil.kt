@@ -33,4 +33,15 @@ internal object ViewUtil {
             null
         }
     }
+
+    fun getDisplayWidth(context: Context): Int {
+        val displayMetrics = context.resources.displayMetrics
+        return displayMetrics.widthPixels + 1
+    }
+
+    fun getDisplayHeight(context: Context, width: Int, height: Int): Int {
+        val displayWidth = getDisplayWidth(context)
+        val aspectRationFactor = displayWidth / width.toFloat()
+        return (height * aspectRationFactor).toInt()
+    }
 }

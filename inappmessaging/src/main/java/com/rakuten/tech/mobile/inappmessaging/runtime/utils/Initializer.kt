@@ -20,7 +20,6 @@ import java.util.Locale
 import java.util.UUID
 import com.squareup.picasso.OkHttp3Downloader
 import okhttp3.Cache
-
 import okhttp3.OkHttpClient
 import java.io.File
 import java.util.concurrent.TimeUnit
@@ -131,7 +130,6 @@ internal object Initializer {
             val picasso = Picasso.Builder(context)
                 .downloader(OkHttp3Downloader(client))
                 .build()
-
             Picasso.setSingletonInstance(picasso)
         } catch (ignored: IllegalStateException) {
             // Picasso instance was already initialized
