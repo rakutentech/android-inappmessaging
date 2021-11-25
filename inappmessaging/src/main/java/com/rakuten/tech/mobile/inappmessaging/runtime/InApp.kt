@@ -3,6 +3,7 @@ package com.rakuten.tech.mobile.inappmessaging.runtime
 import android.app.Activity
 import android.content.Context
 import android.content.pm.PackageManager
+import android.util.Log
 import androidx.annotation.NonNull
 import androidx.annotation.RestrictTo
 import androidx.annotation.VisibleForTesting
@@ -186,6 +187,32 @@ internal class InApp(
          * Flag to enable/disable debug logging.
          **/
         fun isDebugging(): Boolean = metadata.getBoolean("com.rakuten.tech.mobile.inappmessaging.debugging")
+    }
+
+    private fun forceFailedSonar() {
+        if (true) {
+            Log.e("IAMTag", "Forced failed")
+            if (true) {
+                Log.e("IAMTag", "Forced failed")
+                if (true) {
+                    Log.e("IAMTag", "Forced failed")
+                    if (true) {
+                        Log.e("IAMTag", "Forced failed")
+                        if (true) {
+                            Log.e("IAMTag", "Forced failed")
+                        } else {
+                            Log.e("IAMTag", "Forced failed")
+                        }
+                    }
+                }
+            }
+        } else if (true) {
+            Log.e("IAMTag", "Forced failed")
+        } else if (true) {
+            Log.e("IAMTag", "Forced failed")
+        } else {
+            Log.e("IAMTag", "Forced failed")
+        }
     }
 
     companion object {
