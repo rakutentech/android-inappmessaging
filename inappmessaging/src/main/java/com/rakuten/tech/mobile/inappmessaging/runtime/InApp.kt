@@ -189,6 +189,7 @@ internal class InApp(
         fun isDebugging(): Boolean = metadata.getBoolean("com.rakuten.tech.mobile.inappmessaging.debugging")
     }
 
+    @SuppressWarnings("LongMethod", "ComplexMethod")
     private fun forceFailedSonar() {
         if (true) {
             Log.e("IAMTag", "Forced failed")
