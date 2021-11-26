@@ -9,12 +9,13 @@ import android.os.Looper
 import androidx.annotation.VisibleForTesting
 import androidx.core.app.JobIntentService
 import com.rakuten.tech.mobile.inappmessaging.runtime.InAppMessaging
-import com.rakuten.tech.mobile.inappmessaging.runtime.coroutine.ImageLoaderCoroutine
+import com.rakuten.tech.mobile.inappmessaging.runtime.utils.ImageUtil
 import com.rakuten.tech.mobile.inappmessaging.runtime.data.models.messages.Message
 import com.rakuten.tech.mobile.inappmessaging.runtime.data.repositories.LocalDisplayedMessageRepository
 import com.rakuten.tech.mobile.inappmessaging.runtime.data.repositories.ReadyForDisplayMessageRepository
 import com.rakuten.tech.mobile.inappmessaging.runtime.manager.MessageReadinessManager
 import com.rakuten.tech.mobile.inappmessaging.runtime.runnable.DisplayMessageRunnable
+import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
@@ -30,8 +31,7 @@ internal class DisplayMessageJobIntentService : JobIntentService() {
     var readyMessagesRepo = ReadyForDisplayMessageRepository.instance()
     var messageReadinessManager = MessageReadinessManager.instance()
     var handler = Handler(Looper.getMainLooper())
-    var imageLoader = ImageLoaderCoroutine()
-    private val coroutineContext: CoroutineContext = Dispatchers.IO
+    private val dispatcher: CoroutineDispatcher = Dispatchers.IO
 
     /**
      * This method starts displaying message runnable.
@@ -65,13 +65,12 @@ internal class DisplayMessageJobIntentService : JobIntentService() {
      * This method fetches image from network, then cache it in memory.
      * Once image is fully downloaded, the message will be displayed.
      */
-    @VisibleForTesting
-    internal fun fetchImageThenDisplayMessage(
+    private fun fetchImageThenDisplayMessage(
         message: Message,
         hostActivity: Activity,
         imageUrl: String
-    ) = CoroutineScope(coroutineContext).launch {
-            val bitmap: Bitmap? = imageLoader.fetch(imageUrl)
+    ) = CoroutineScope(dispatcher).launch {
+            val bitmap: Bitmap? = ImageUtil.fetchBitmap(imageUrl)
             bitmap?.let {
                 displayMessage(message, hostActivity, it.width, it.height)
             }

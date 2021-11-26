@@ -31,13 +31,8 @@ import org.robolectric.android.controller.ServiceController
 import org.robolectric.annotation.Config
 import androidx.test.core.app.ApplicationProvider.getApplicationContext
 import com.nhaarman.mockitokotlin2.*
-import com.rakuten.tech.mobile.inappmessaging.runtime.coroutine.ImageLoaderCoroutine
 import com.rakuten.tech.mobile.inappmessaging.runtime.runnable.DisplayMessageRunnable
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.ExperimentalCoroutinesApi
-import kotlinx.coroutines.runBlocking
-import kotlinx.coroutines.test.runBlockingTest
-import org.junit.Ignore
+import com.rakuten.tech.mobile.inappmessaging.runtime.utils.ImageUtilSpec
 import org.mockito.Mockito.`when`
 
 /**
@@ -60,7 +55,6 @@ class DisplayMessageJobIntentServiceSpec : BaseTest() {
     private val payload = MessageMixerResponseSpec.response.data[0].campaignData.getMessagePayload()
     private val handler = Mockito.mock(Handler::class.java)
     private val context = getApplicationContext<Context>()
-    private val mockImageLoaderCoroutine = spy(ImageLoaderCoroutine(Dispatchers.IO))
 
     @SuppressWarnings("LongMethod")
     @Before
@@ -72,7 +66,6 @@ class DisplayMessageJobIntentServiceSpec : BaseTest() {
         displayMessageJobIntentService!!.localDisplayRepo = mockLocalDisplayRepo
         displayMessageJobIntentService!!.readyMessagesRepo = mockReadyForDisplayRepo
         displayMessageJobIntentService!!.handler = handler
-        displayMessageJobIntentService!!.imageLoader = mockImageLoaderCoroutine
         `when`(activity.layoutInflater).thenReturn(LayoutInflater.from(context))
         WorkManagerTestInitHelper.initializeTestWorkManager(context)
         `when`(configResponseData.rollOutPercentage).thenReturn(100)
