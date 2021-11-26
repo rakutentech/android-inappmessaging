@@ -3,28 +3,18 @@ package com.rakuten.tech.mobile.inappmessaging.runtime.coroutine
 import android.graphics.Bitmap
 import com.squareup.picasso.Picasso
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.runBlocking
+import kotlinx.coroutines.withContext
 import timber.log.Timber
 import java.lang.Exception
 import kotlin.coroutines.CoroutineContext
 
 internal class ImageLoaderCoroutine(
-    private val coroutineContext: CoroutineContext = Dispatchers.IO,
-    private val isTest: Boolean = false
+    private val coroutineContext: CoroutineContext = Dispatchers.IO
 ) {
-    @SuppressWarnings("TooGenericExceptionCaught")
-    fun fetch(imageUrl: String): Bitmap? {
-        return if (isTest) {
-            runBlocking(coroutineContext) {
-                fetchBitmap(imageUrl)
-            }
-        } else {
-            fetchBitmap(imageUrl)
-        }
-    }
 
-    private fun fetchBitmap(imageUrl: String): Bitmap? {
-        return try {
+    @SuppressWarnings("TooGenericExceptionCaught")
+    suspend fun fetch(imageUrl: String): Bitmap? = withContext(coroutineContext) {
+        try {
             Picasso.get().load(imageUrl).priority(Picasso.Priority.HIGH).get()
         } catch (e: Exception) {
             Timber.tag(TAG).d(e, "Error on loading image $imageUrl")

@@ -6,6 +6,7 @@ import android.content.Intent
 import android.graphics.Bitmap
 import android.os.Handler
 import android.os.Looper
+import androidx.annotation.VisibleForTesting
 import androidx.core.app.JobIntentService
 import com.rakuten.tech.mobile.inappmessaging.runtime.InAppMessaging
 import com.rakuten.tech.mobile.inappmessaging.runtime.coroutine.ImageLoaderCoroutine
@@ -14,7 +15,11 @@ import com.rakuten.tech.mobile.inappmessaging.runtime.data.repositories.LocalDis
 import com.rakuten.tech.mobile.inappmessaging.runtime.data.repositories.ReadyForDisplayMessageRepository
 import com.rakuten.tech.mobile.inappmessaging.runtime.manager.MessageReadinessManager
 import com.rakuten.tech.mobile.inappmessaging.runtime.runnable.DisplayMessageRunnable
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
 import timber.log.Timber
+import kotlin.coroutines.CoroutineContext
 
 /**
  * Since one service is essentially one worker thread, so there's no chance multiple worker threads
@@ -26,6 +31,7 @@ internal class DisplayMessageJobIntentService : JobIntentService() {
     var messageReadinessManager = MessageReadinessManager.instance()
     var handler = Handler(Looper.getMainLooper())
     var imageLoader = ImageLoaderCoroutine()
+    private val coroutineContext: CoroutineContext = Dispatchers.IO
 
     /**
      * This method starts displaying message runnable.
@@ -40,7 +46,6 @@ internal class DisplayMessageJobIntentService : JobIntentService() {
      * This method checks if there is a message to be displayed and proceeds if found.
      */
     private fun prepareNextMessage() {
-
         // Retrieving the next ready message, and its display permission been checked.
         val message = messageReadinessManager.getNextDisplayMessage() ?: return
         val hostActivity = InAppMessaging.instance().getRegisteredActivity()
@@ -60,16 +65,16 @@ internal class DisplayMessageJobIntentService : JobIntentService() {
      * This method fetches image from network, then cache it in memory.
      * Once image is fully downloaded, the message will be displayed.
      */
-    @SuppressWarnings("TooGenericExceptionCaught")
-    private fun fetchImageThenDisplayMessage(
+    @VisibleForTesting
+    internal fun fetchImageThenDisplayMessage(
         message: Message,
         hostActivity: Activity,
         imageUrl: String
-    ) {
-        val bitmap: Bitmap? = imageLoader.fetch(imageUrl)
-        bitmap?.let {
-            displayMessage(message, hostActivity, it.width, it.height)
-        }
+    ) = CoroutineScope(coroutineContext).launch {
+            val bitmap: Bitmap? = imageLoader.fetch(imageUrl)
+            bitmap?.let {
+                displayMessage(message, hostActivity, it.width, it.height)
+            }
     }
 
     /**

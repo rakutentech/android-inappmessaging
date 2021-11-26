@@ -33,6 +33,11 @@ import androidx.test.core.app.ApplicationProvider.getApplicationContext
 import com.nhaarman.mockitokotlin2.*
 import com.rakuten.tech.mobile.inappmessaging.runtime.coroutine.ImageLoaderCoroutine
 import com.rakuten.tech.mobile.inappmessaging.runtime.runnable.DisplayMessageRunnable
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.runBlocking
+import kotlinx.coroutines.test.runBlockingTest
+import org.junit.Ignore
 import org.mockito.Mockito.`when`
 
 /**
@@ -55,6 +60,7 @@ class DisplayMessageJobIntentServiceSpec : BaseTest() {
     private val payload = MessageMixerResponseSpec.response.data[0].campaignData.getMessagePayload()
     private val handler = Mockito.mock(Handler::class.java)
     private val context = getApplicationContext<Context>()
+    private val mockImageLoaderCoroutine = spy(ImageLoaderCoroutine(Dispatchers.IO))
 
     @SuppressWarnings("LongMethod")
     @Before
@@ -66,6 +72,7 @@ class DisplayMessageJobIntentServiceSpec : BaseTest() {
         displayMessageJobIntentService!!.localDisplayRepo = mockLocalDisplayRepo
         displayMessageJobIntentService!!.readyMessagesRepo = mockReadyForDisplayRepo
         displayMessageJobIntentService!!.handler = handler
+        displayMessageJobIntentService!!.imageLoader = mockImageLoaderCoroutine
         `when`(activity.layoutInflater).thenReturn(LayoutInflater.from(context))
         WorkManagerTestInitHelper.initializeTestWorkManager(context)
         `when`(configResponseData.rollOutPercentage).thenReturn(100)
@@ -217,22 +224,9 @@ class DisplayMessageJobIntentServiceSpec : BaseTest() {
     }
 
     @Test
-    fun `should display message with image`() {
-        val imageUrl =
-            "https://en.wikipedia.org/wiki/Android_(operating_system)#/media/File:Android-robot-googleplex-2008.jpg"
-        val message = setupMessageWithImage(imageUrl)
-        `when`(mockMessageManager.getNextDisplayMessage()).thenReturn(message)
-        displayMessageJobIntentService?.imageLoader = ImageLoaderCoroutine(isTest = true)
-        displayMessageJobIntentService?.onHandleWork(intent)
-
-        Mockito.verify(handler).post(ArgumentMatchers.any(DisplayMessageRunnable::class.java))
-    }
-
-    @Test
     fun `should not display the message on invalid image url`() {
         val message = setupMessageWithImage("invalid_url")
         `when`(mockMessageManager.getNextDisplayMessage()).thenReturn(message)
-        displayMessageJobIntentService?.imageLoader = ImageLoaderCoroutine(isTest = true)
         displayMessageJobIntentService?.onHandleWork(intent)
 
         Mockito.verify(handler, never()).post(ArgumentMatchers.any(DisplayMessageRunnable::class.java))
