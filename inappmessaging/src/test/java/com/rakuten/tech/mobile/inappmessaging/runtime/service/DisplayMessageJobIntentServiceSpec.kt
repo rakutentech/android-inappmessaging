@@ -32,7 +32,6 @@ import org.robolectric.annotation.Config
 import androidx.test.core.app.ApplicationProvider.getApplicationContext
 import com.nhaarman.mockitokotlin2.*
 import com.rakuten.tech.mobile.inappmessaging.runtime.runnable.DisplayMessageRunnable
-import com.rakuten.tech.mobile.inappmessaging.runtime.utils.ImageUtilSpec
 import org.mockito.Mockito.`when`
 
 /**
