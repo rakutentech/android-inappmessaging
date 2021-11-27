@@ -34,11 +34,25 @@ internal object ViewUtil {
         }
     }
 
+    /**
+     * Returns the width of the available display size.
+     * @param context
+     * @return Width of the available display size in pixel.
+     */
     fun getDisplayWidth(context: Context): Int {
         val displayMetrics = context.resources.displayMetrics
+
+        // add 1 pixel to fill the entire space into the message's ImageView
         return displayMetrics.widthPixels + 1
     }
 
+    /**
+     * Returns the corresponding height to the available display size while keeping the aspect ratio
+     * @param context
+     * @param width The given view's width.
+     * @param height The given view's height.
+     * @return The height of the available display size in pixels.
+     */
     fun getDisplayHeight(context: Context, width: Int, height: Int): Int {
         val displayWidth = getDisplayWidth(context)
         val aspectRationFactor = displayWidth / width.toFloat()

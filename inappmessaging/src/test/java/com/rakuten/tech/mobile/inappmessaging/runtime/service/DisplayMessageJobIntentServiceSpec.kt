@@ -3,6 +3,7 @@ package com.rakuten.tech.mobile.inappmessaging.runtime.service
 import android.app.Activity
 import android.content.Context
 import android.content.Intent
+import android.graphics.Bitmap
 import android.os.Build
 import android.os.Handler
 import android.provider.Settings
@@ -33,6 +34,7 @@ import androidx.test.core.app.ApplicationProvider.getApplicationContext
 import com.nhaarman.mockitokotlin2.*
 import com.rakuten.tech.mobile.inappmessaging.runtime.runnable.DisplayMessageRunnable
 import org.mockito.Mockito.`when`
+import org.mockito.Mockito.anyString
 
 /**
  * Test class for DisplayMessageJobIntentService.
@@ -60,7 +62,7 @@ class DisplayMessageJobIntentServiceSpec : BaseTest() {
     override fun setup() {
         super.setup()
         serviceController = Robolectric.buildService(DisplayMessageJobIntentService::class.java)
-        displayMessageJobIntentService = serviceController?.bind()?.create()?.get()
+        displayMessageJobIntentService = spy(serviceController?.bind()?.create()?.get())
         displayMessageJobIntentService!!.messageReadinessManager = mockMessageManager
         displayMessageJobIntentService!!.localDisplayRepo = mockLocalDisplayRepo
         displayMessageJobIntentService!!.readyMessagesRepo = mockReadyForDisplayRepo
@@ -216,10 +218,21 @@ class DisplayMessageJobIntentServiceSpec : BaseTest() {
     }
 
     @Test
-    fun `should not display the message on invalid image url`() {
-        val message = setupMessageWithImage("invalid_url")
+    fun `should display message with image`() {
+        val message = setupMessageWithImage("https://imageurl.jpg")
+        `when`(displayMessageJobIntentService?.getImage(anyString())).thenReturn(Mockito.mock(Bitmap::class.java))
         `when`(mockMessageManager.getNextDisplayMessage()).thenReturn(message)
         displayMessageJobIntentService?.onHandleWork(intent)
+
+        Mockito.verify(handler).post(ArgumentMatchers.any(DisplayMessageRunnable::class.java))
+    }
+
+    @Test
+    fun `should not display the message if image is null`() {
+        val message = setupMessageWithImage("https://imageurl.jpg")
+        `when`(displayMessageJobIntentService?.getImage(anyString())).thenReturn(null)
+        `when`(mockMessageManager.getNextDisplayMessage()).thenReturn(message)
+        displayMessageJobIntentService?.onHandleWork(intent!!)
 
         Mockito.verify(handler, never()).post(ArgumentMatchers.any(DisplayMessageRunnable::class.java))
     }
@@ -228,12 +241,22 @@ class DisplayMessageJobIntentServiceSpec : BaseTest() {
     fun `should display the message if empty image url`() {
         val message = setupMessageWithImage("")
         `when`(mockMessageManager.getNextDisplayMessage()).thenReturn(message)
+        `when`(displayMessageJobIntentService?.getImage(anyString())).thenReturn(Mockito.mock(Bitmap::class.java))
+        displayMessageJobIntentService?.onHandleWork(intent!!)
+
+        Mockito.verify(handler).post(ArgumentMatchers.any(DisplayMessageRunnable::class.java))
+    }
+
+    @Test
+    fun `should display the message if null image url`() {
+        val message = setupMessageWithImage(null)
+        `when`(mockMessageManager.getNextDisplayMessage()).thenReturn(message)
         displayMessageJobIntentService?.onHandleWork(intent)
 
         Mockito.verify(handler).post(ArgumentMatchers.any(DisplayMessageRunnable::class.java))
     }
 
-    private fun setupMessageWithImage(imageUrl: String): Message {
+    private fun setupMessageWithImage(imageUrl: String?): Message {
         val message = Mockito.mock(Message::class.java)
         val payload = Mockito.mock(MessagePayload::class.java)
         val resource = Mockito.mock(Resource::class.java)

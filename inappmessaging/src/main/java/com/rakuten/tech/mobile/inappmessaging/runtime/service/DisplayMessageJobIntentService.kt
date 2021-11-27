@@ -6,6 +6,7 @@ import android.content.Intent
 import android.graphics.Bitmap
 import android.os.Handler
 import android.os.Looper
+import androidx.annotation.VisibleForTesting
 import androidx.core.app.JobIntentService
 import com.rakuten.tech.mobile.inappmessaging.runtime.InAppMessaging
 import com.rakuten.tech.mobile.inappmessaging.runtime.utils.ImageUtil
@@ -14,10 +15,6 @@ import com.rakuten.tech.mobile.inappmessaging.runtime.data.repositories.LocalDis
 import com.rakuten.tech.mobile.inappmessaging.runtime.data.repositories.ReadyForDisplayMessageRepository
 import com.rakuten.tech.mobile.inappmessaging.runtime.manager.MessageReadinessManager
 import com.rakuten.tech.mobile.inappmessaging.runtime.runnable.DisplayMessageRunnable
-import kotlinx.coroutines.CoroutineDispatcher
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.launch
 import timber.log.Timber
 
 /**
@@ -29,7 +26,6 @@ internal class DisplayMessageJobIntentService : JobIntentService() {
     var readyMessagesRepo = ReadyForDisplayMessageRepository.instance()
     var messageReadinessManager = MessageReadinessManager.instance()
     var handler = Handler(Looper.getMainLooper())
-    private val dispatcher: CoroutineDispatcher = Dispatchers.IO
 
     /**
      * This method starts displaying message runnable.
@@ -67,12 +63,15 @@ internal class DisplayMessageJobIntentService : JobIntentService() {
         message: Message,
         hostActivity: Activity,
         imageUrl: String
-    ) = CoroutineScope(dispatcher).launch {
-            val bitmap: Bitmap? = ImageUtil.fetchBitmap(imageUrl)
-            bitmap?.let {
-                displayMessage(message, hostActivity, it.width, it.height)
-            }
+    ) {
+        val bitmap: Bitmap? = getImage(imageUrl)
+        bitmap?.let {
+            displayMessage(message, hostActivity, it.width, it.height)
+        }
     }
+
+    @VisibleForTesting
+    internal fun getImage(imageUrl: String): Bitmap? = ImageUtil.fetchBitmap(imageUrl)
 
     /**
      * This method displays message on UI thread.
