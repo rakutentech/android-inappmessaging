@@ -18,8 +18,8 @@ internal class InAppMessageModalView(
     /**
      * Sets campaign message data onto the view.
      */
-    override fun populateViewData(message: Message, imageAspectRatio: Float) {
-        super.populateViewData(message, imageAspectRatio)
+    override fun populateViewData(message: Message, imageWidth: Int, imageHeight: Int) {
+        super.populateViewData(message, imageWidth, imageHeight)
         findViewById<LinearLayout>(R.id.modal)?.setBackgroundColor(bgColor)
     }
 }

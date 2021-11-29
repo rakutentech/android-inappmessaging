@@ -9,7 +9,6 @@ import android.view.View
 import android.view.Window
 import androidx.test.core.app.ApplicationProvider
 import androidx.work.testing.WorkManagerTestInitHelper
-import com.facebook.soloader.SoLoader
 import com.rakuten.tech.mobile.inappmessaging.runtime.BaseTest
 import com.rakuten.tech.mobile.inappmessaging.runtime.InAppMessaging
 import com.rakuten.tech.mobile.inappmessaging.runtime.data.enums.InAppMessageType
@@ -39,7 +38,6 @@ class DisplayMessageRunnableSpec : BaseTest() {
     @Before
     override fun setup() {
         super.setup()
-        SoLoader.setInTestMode()
         `when`(view!!.id).thenReturn(12343254)
         `when`(hostAppActivity.window).thenReturn(window)
     }
@@ -47,25 +45,25 @@ class DisplayMessageRunnableSpec : BaseTest() {
     @Test
     fun `should not throw exception fo invalid message type`() {
         `when`(message.getType()).thenReturn(0)
-        DisplayMessageRunnable(message, hostAppActivity, IMAGE_ASPECT_RATIO).run()
+        DisplayMessageRunnable(message, hostAppActivity).run()
     }
 
     @Test
     fun `should not throw exception fo invalid does not exist`() {
         `when`(message.getType()).thenReturn(100)
-        DisplayMessageRunnable(message, hostAppActivity, IMAGE_ASPECT_RATIO).run()
+        DisplayMessageRunnable(message, hostAppActivity).run()
     }
 
     @Test(expected = NullPointerException::class)
     fun `should throw null pointer exception when modal`() {
         `when`(message.getType()).thenReturn(InAppMessageType.MODAL.typeId)
-        DisplayMessageRunnable(message, hostAppActivity, IMAGE_ASPECT_RATIO).run()
+        DisplayMessageRunnable(message, hostAppActivity).run()
     }
 
     @Test(expected = NullPointerException::class)
     fun `should throw null pointer exception when fullscreen`() {
         `when`(message.getType()).thenReturn(InAppMessageType.FULL.typeId)
-        DisplayMessageRunnable(message, hostAppActivity, IMAGE_ASPECT_RATIO).run()
+        DisplayMessageRunnable(message, hostAppActivity).run()
     }
 
     @Test
@@ -80,7 +78,7 @@ class DisplayMessageRunnableSpec : BaseTest() {
         `when`(message.getMessagePayload()).thenReturn(payload)
         `when`(hostAppActivity
                 .layoutInflater).thenReturn(LayoutInflater.from(ApplicationProvider.getApplicationContext()))
-        DisplayMessageRunnable(message, hostAppActivity, IMAGE_ASPECT_RATIO).run()
+        DisplayMessageRunnable(message, hostAppActivity).run()
     }
 
     @Test
@@ -95,7 +93,7 @@ class DisplayMessageRunnableSpec : BaseTest() {
         `when`(message.getMessagePayload()).thenReturn(payload)
         `when`(hostAppActivity
                 .layoutInflater).thenReturn(LayoutInflater.from(ApplicationProvider.getApplicationContext()))
-        DisplayMessageRunnable(message, hostAppActivity, IMAGE_ASPECT_RATIO).run()
+        DisplayMessageRunnable(message, hostAppActivity).run()
     }
 
     @Test
@@ -110,10 +108,6 @@ class DisplayMessageRunnableSpec : BaseTest() {
         `when`(message.getMessagePayload()).thenReturn(payload)
         `when`(hostAppActivity
                 .layoutInflater).thenReturn(LayoutInflater.from(ApplicationProvider.getApplicationContext()))
-        DisplayMessageRunnable(message, hostAppActivity, IMAGE_ASPECT_RATIO).run()
-    }
-
-    companion object {
-        private const val IMAGE_ASPECT_RATIO = 0.75f
+        DisplayMessageRunnable(message, hostAppActivity).run()
     }
 }

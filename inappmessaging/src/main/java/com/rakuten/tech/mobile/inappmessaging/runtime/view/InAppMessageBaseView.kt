@@ -11,14 +11,18 @@ import android.widget.FrameLayout
 import android.widget.ImageButton
 import android.widget.LinearLayout
 import android.widget.TextView
+import android.widget.ImageView
 import androidx.core.widget.NestedScrollView
-import com.facebook.drawee.backends.pipeline.Fresco
-import com.facebook.drawee.view.SimpleDraweeView
 import com.google.android.material.button.MaterialButton
 import com.rakuten.tech.mobile.inappmessaging.runtime.R
 import com.rakuten.tech.mobile.inappmessaging.runtime.data.models.messages.Message
 import com.rakuten.tech.mobile.inappmessaging.runtime.data.responses.ping.MessageButton
+import com.rakuten.tech.mobile.inappmessaging.runtime.utils.ViewUtil.getDisplayHeight
+import com.rakuten.tech.mobile.inappmessaging.runtime.utils.ViewUtil.getDisplayWidth
+import com.squareup.picasso.Callback
+import com.squareup.picasso.Picasso
 import timber.log.Timber
+import java.lang.Exception
 
 /**
  * Base class of all custom views.
@@ -38,14 +42,15 @@ internal open class InAppMessageBaseView(context: Context, attrs: AttributeSet?)
     private var header: String? = null
     private var messageBody: String? = null
     private var buttons: List<MessageButton>? = null
-    private var imageAspectRatio = 0f
     private var displayOptOut = false
+    private var imageWidth = 0
+    private var imageHeight = 0
 
     /**
      * Sets campaign message data onto the view.
      */
     @SuppressWarnings("LongMethod")
-    override fun populateViewData(message: Message, imageAspectRatio: Float) {
+    override fun populateViewData(message: Message, imageWidth: Int, imageHeight: Int) {
         try {
             this.headerColor = Color.parseColor(message.getMessagePayload().headerColor)
             this.messageBodyColor = Color.parseColor(message.getMessagePayload().messageBodyColor)
@@ -58,16 +63,15 @@ internal open class InAppMessageBaseView(context: Context, attrs: AttributeSet?)
             this.messageBodyColor = Color.BLACK
             this.bgColor = Color.WHITE
         }
-
+        this.imageWidth = getDisplayWidth(context)
+        this.imageHeight = getDisplayHeight(context, imageWidth, imageHeight)
         this.header = message.getMessagePayload().header
         this.messageBody = message.getMessagePayload().messageBody
         this.buttons = message.getMessagePayload().messageSettings.controlSettings.buttons
         this.imageUrl = message.getMessagePayload().resource.imageUrl
         this.listener = InAppMessageViewListener(message)
-        this.imageAspectRatio = imageAspectRatio
         this.displayOptOut = message.getMessagePayload().messageSettings.displaySettings.optOut
         bindViewData()
-        this.tag = message.getCampaignId()
     }
 
     /**
@@ -93,15 +97,19 @@ internal open class InAppMessageBaseView(context: Context, attrs: AttributeSet?)
         // Set onClick listener to close button.
         val closeButton = findViewById<ImageButton>(R.id.message_close_button)
         closeButton?.setOnClickListener(this.listener)
-        if (this.buttons?.size == 1) {
-            // Set bigger layout_margin if there's only one button.
-            findViewById<MaterialButton>(R.id.message_single_button)?.let {
-                setButtonInfo(it, this.buttons!![0])
+        when (this.buttons?.size) {
+            1 -> {
+                // Set bigger layout_margin if there's only one button.
+                findViewById<MaterialButton>(R.id.message_single_button)?.let {
+                    setButtonInfo(it, this.buttons!![0])
+                }
             }
-        } else if (buttons?.size == 2) {
-            // Set bigger layout_margin if there's only one button.
-            findViewById<MaterialButton>(R.id.message_button_left)?.let { setButtonInfo(it, this.buttons!![0]) }
-            findViewById<MaterialButton>(R.id.message_button_right)?.let { setButtonInfo(it, this.buttons!![1]) }
+            2 -> {
+                // Set bigger layout_margin if there's only one button.
+                findViewById<MaterialButton>(R.id.message_button_left)?.let { setButtonInfo(it, this.buttons!![0]) }
+                findViewById<MaterialButton>(R.id.message_button_right)?.let { setButtonInfo(it, this.buttons!![1]) }
+            }
+            else -> Any()
         }
     }
 
@@ -120,20 +128,34 @@ internal open class InAppMessageBaseView(context: Context, attrs: AttributeSet?)
     /**
      * This method binds image to view.
      */
-    @SuppressLint("ClickableViewAccessibility")
+    @Suppress("ClickableViewAccessibility", "TooGenericExceptionCaught", "LongMethod")
     private fun bindImage() { // Display image.
         if (!this.imageUrl.isNullOrEmpty()) {
-            findViewById<SimpleDraweeView>(R.id.message_image_view)?.let {
+
+            // load the image then display the view
+            this.visibility = GONE
+            findViewById<ImageView>(R.id.message_image_view)?.let {
                 it.setOnTouchListener(this.listener)
-                // Building a DraweeController to handle animations.
-                // Image should be already downloaded and cached in memory. Fresco library will look for the
-                // cached image by URI.
-                it.controller = Fresco.newDraweeControllerBuilder()
-                        .setUri(this.imageUrl)
-                        .setAutoPlayAnimations(true)
-                        .build()
-                it.aspectRatio = this.imageAspectRatio
-                it.visibility = View.VISIBLE
+                try {
+                    val callback = object : Callback {
+                        override fun onSuccess() {
+                            it.visibility = VISIBLE
+                            this@InAppMessageBaseView.visibility = VISIBLE
+                        }
+
+                        override fun onError(e: Exception?) {
+                            Timber.tag(TAG).d(e?.cause, "Downloading image failed $imageUrl")
+                        }
+                    }
+                    Picasso.get().load(this.imageUrl)
+                        .priority(Picasso.Priority.HIGH)
+                        .resize(this.imageWidth, this.imageHeight)
+                        .onlyScaleDown()
+                        .centerInside()
+                        .into(it, callback)
+                } catch (ex: Exception) {
+                    Timber.tag(TAG).d(ex, "Downloading image failed $imageUrl")
+                }
             }
         }
     }

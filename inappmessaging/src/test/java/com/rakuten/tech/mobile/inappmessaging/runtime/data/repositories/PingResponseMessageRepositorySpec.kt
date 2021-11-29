@@ -207,8 +207,7 @@ class PingResponseMessageRepositorySpec : BaseTest() {
         WorkManagerTestInitHelper.initializeTestWorkManager(ApplicationProvider.getApplicationContext())
         Settings.Secure.putString(ApplicationProvider.getApplicationContext<Context>().contentResolver,
                 Settings.Secure.ANDROID_ID, "test_device_id")
-        InAppMessaging.initialize(ApplicationProvider.getApplicationContext(), isForTesting = true,
-                isCacheHandling = isCache)
+        InAppMessaging.initialize(ApplicationProvider.getApplicationContext(), isCache)
         InAppMessaging.instance().registerPreference(infoProvider)
     }
 }
