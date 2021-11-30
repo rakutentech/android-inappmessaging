@@ -12,6 +12,7 @@ import com.google.gson.Gson
 import com.rakuten.tech.mobile.inappmessaging.runtime.data.models.HostAppInfo
 import com.rakuten.tech.mobile.inappmessaging.runtime.data.repositories.HostAppInfoRepository
 import com.rakuten.tech.mobile.inappmessaging.runtime.exception.InAppMessagingException
+import com.rakuten.tech.mobile.inappmessaging.runtime.utils.CacheUtil.getMemoryCacheSize
 import com.squareup.picasso.LruCache
 import com.squareup.picasso.Picasso
 import timber.log.Timber
@@ -132,21 +133,11 @@ internal object Initializer {
                 .downloader(OkHttp3Downloader(client))
                 .memoryCache(LruCache(getMemoryCacheSize()))
                 .build()
+            picasso.isLoggingEnabled = true
+            picasso.setIndicatorsEnabled(true)
             Picasso.setSingletonInstance(picasso)
         } catch (ignored: IllegalStateException) {
             // Picasso instance was already initialized
         }
-    }
-
-    /**
-     * @return 1/8th of the available VM memory in byte.
-     */
-    private fun getMemoryCacheSize(): Int {
-
-        // Get max available VM memory, exceeding this amount will throw an
-        // OutOfMemory exception.
-        val maxMemory = (Runtime.getRuntime().maxMemory()).toInt()
-
-        return maxMemory / 8
     }
 }
