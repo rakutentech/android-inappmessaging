@@ -114,7 +114,7 @@ class BaseViewSpec : BaseTest() {
         `when`(mockPayload.headerColor).thenReturn(color)
         `when`(mockPayload.messageBodyColor).thenReturn(color)
         `when`(mockPayload.backgroundColor).thenReturn(color)
-        view?.populateViewData(mockMessage, 1f)
+        view?.populateViewData(mockMessage, IMG_SIZE, IMG_SIZE)
         val mockButton = Mockito.mock(ImageButton::class.java)
         view?.setCloseButton(mockButton)
         Mockito.verify(mockButton, mode).setImageResource(R.drawable.close_button_white)
@@ -125,7 +125,7 @@ class BaseViewSpec : BaseTest() {
             "https://en.wikipedia.org/wiki/Android_(operating_system)#/media/File:Android-robot-googleplex-2008.jpg"
         `when`(mockResource.imageUrl).thenReturn(imageUrl)
         `when`(mockPayload.headerColor).thenReturn("#")
-        view?.populateViewData(mockMessage, 100, 100)
+        view?.populateViewData(mockMessage, IMG_SIZE, IMG_SIZE)
 
         // val imageView = view?.findViewById<ImageView>(R.id.message_image_view)
         // imageView?.visibility shouldBeEqualTo View.VISIBLE
@@ -159,5 +159,6 @@ class BaseViewSpec : BaseTest() {
     companion object {
         private const val WHITE_HEX = "#FFFFFF"
         private const val BLACK_HEX = "#000000"
+        private const val IMG_SIZE = 100
     }
 }
