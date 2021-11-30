@@ -72,6 +72,7 @@ internal open class InAppMessageBaseView(context: Context, attrs: AttributeSet?)
         this.listener = InAppMessageViewListener(message)
         this.displayOptOut = message.getMessagePayload().messageSettings.displaySettings.optOut
         bindViewData()
+        this.tag = message.getCampaignId()
     }
 
     /**
