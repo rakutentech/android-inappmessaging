@@ -119,7 +119,7 @@ class BaseViewSpec : BaseTest() {
         view?.setCloseButton(mockButton)
         Mockito.verify(mockButton, mode).setImageResource(R.drawable.close_button_white)
     }
-    
+
     fun `should display image`() {
         val imageUrl =
             "https://en.wikipedia.org/wiki/Android_(operating_system)#/media/File:Android-robot-googleplex-2008.jpg"

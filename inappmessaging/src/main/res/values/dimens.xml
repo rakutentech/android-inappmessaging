@@ -26,11 +26,11 @@
   <dimen name="modal_button_padding_top_bottom">8dp</dimen>
   <dimen name="modal_button_single_margin_left_right">8dp</dimen>
   <dimen name="modal_button_text_size">18sp</dimen>
-  <dimen name="modal_corner_radius">10dp</dimen>
+  <dimen name="modal_corner_radius">4dp</dimen>
 
   <!--Modal Close Button-->
-  <dimen name="modal_close_button_height">44dp</dimen>
-  <dimen name="modal_close_button_width">44dp</dimen>
+  <dimen name="modal_close_button_height">48dp</dimen>
+  <dimen name="modal_close_button_width">48dp</dimen>
   <dimen name="modal_close_button_padding">24dp</dimen>
   <dimen name="modal_close_button_padding_start">24dp</dimen>
   <dimen name="modal_close_button_padding_top">18dp</dimen>

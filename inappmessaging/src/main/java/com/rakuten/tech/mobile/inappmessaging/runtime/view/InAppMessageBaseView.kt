@@ -30,6 +30,7 @@ import java.lang.Exception
 /**
  * Base class of all custom views.
  */
+@SuppressWarnings("LargeClass")
 internal open class InAppMessageBaseView(context: Context, attrs: AttributeSet?) :
         FrameLayout(context, attrs), InAppMessageView {
 
