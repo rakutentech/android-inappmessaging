@@ -42,7 +42,7 @@ internal object EventTrackerHelper {
             Class.forName(className)
             true
         } catch (e: ClassNotFoundException) {
-            Timber.tag(TAG).e(e)
+            Timber.tag(TAG).i(e)
             false
         }
     }
