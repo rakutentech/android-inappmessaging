@@ -380,6 +380,7 @@ Documents targeting Product Managers:
   - Renamed method for providing access token in `UserInfoProvider` interface class from `provideRaeToken` to `provideAccessToken`.
   - Removed `provideRakutenId` method for Rakuten Id in `UserInfoProvider` interface class. Please use `provideUserId` for specific user targeting.
   - All the methods in `UserInfoProvider` class are optional for Kotlin class implementing the interface.
+* SDKCF-4468: **Breaking Change:** Removed deprecated updateSession() API.
 * SDKCF-4530: Fixed handling for case-sensitivity update for custom event and attribute name
 * SDKCF-4196: Updated dependencies due to JCenter shutdown.
 * SDKCF-4190: Updated Kluent dependency version due to deprecated mocking feature.

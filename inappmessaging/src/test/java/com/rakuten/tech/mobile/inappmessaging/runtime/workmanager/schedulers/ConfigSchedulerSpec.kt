@@ -80,7 +80,7 @@ class ConfigSchedulerSpec : BaseTest() {
                 "test_device_id")
         val mockConfigScheduler = Mockito.mock(ConfigScheduler::class.java)
 
-        InAppMessaging.initialize(ApplicationProvider.getApplicationContext(), isForTesting = true,
+        InAppMessaging.initialize(ApplicationProvider.getApplicationContext(),
                 configScheduler = mockConfigScheduler)
 
         Mockito.verify(mockConfigScheduler).startConfig()

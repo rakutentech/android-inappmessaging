@@ -8,15 +8,21 @@ import android.content.pm.PackageManager.NameNotFoundException
 import android.os.Build
 import android.provider.Settings
 import androidx.core.content.pm.PackageInfoCompat
-import com.facebook.drawee.backends.pipeline.Fresco
 import com.google.gson.Gson
 import com.rakuten.tech.mobile.inappmessaging.runtime.data.models.HostAppInfo
 import com.rakuten.tech.mobile.inappmessaging.runtime.data.repositories.HostAppInfoRepository
 import com.rakuten.tech.mobile.inappmessaging.runtime.exception.InAppMessagingException
+import com.squareup.picasso.Picasso
 import timber.log.Timber
 import java.lang.ClassCastException
+import java.lang.IllegalStateException
 import java.util.Locale
 import java.util.UUID
+import com.squareup.picasso.OkHttp3Downloader
+import okhttp3.Cache
+import okhttp3.OkHttpClient
+import java.io.File
+import java.util.concurrent.TimeUnit
 
 /**
  * IAM SDK initialization class.
@@ -76,7 +82,6 @@ internal object Initializer {
         context: Context,
         subscriptionKey: String?,
         configUrl: String?,
-        isForTesting: Boolean = false,
         sharedUtil: SharedPreferencesUtil = SharedPreferencesUtil
     ) {
         val hostAppInfo = HostAppInfo(getHostAppPackageName(context), getDeviceId(context, sharedUtil),
@@ -85,10 +90,8 @@ internal object Initializer {
         // Store hostAppInfo in repository.
         HostAppInfoRepository.instance().addHostInfo(hostAppInfo)
 
-        // Initialize Fresco library if it's not initialized already.
-        if (!Fresco.hasBeenInitialized() && !isForTesting) {
-            Fresco.initialize(context)
-        }
+        initializePicassoInstance(context)
+
         Timber.tag(TAG).d(Gson().toJson(hostAppInfo))
     }
 
@@ -109,5 +112,27 @@ internal object Initializer {
         val id = UUID.randomUUID().toString()
         sharedPref.edit().putString(ID_KEY, id).apply()
         return id
+    }
+
+    private const val IMAGE_REQUEST_TIMEOUT_SECONDS = 20L
+    private const val IMAGE_RESOURCE_TIMEOUT_SECONDS = 300L
+    private const val CACHE_MAX_SIZE = 50L * 1024L * 1024L // 50 MiB
+
+    private fun initializePicassoInstance(context: Context) {
+        try {
+            val cacheDirectory = File(context.cacheDir, "http_cache")
+            val client = OkHttpClient.Builder()
+                .readTimeout(IMAGE_REQUEST_TIMEOUT_SECONDS, TimeUnit.SECONDS)
+                .callTimeout(IMAGE_RESOURCE_TIMEOUT_SECONDS, TimeUnit.SECONDS)
+                .cache(Cache(cacheDirectory, CACHE_MAX_SIZE))
+                .build()
+
+            val picasso = Picasso.Builder(context)
+                .downloader(OkHttp3Downloader(client))
+                .build()
+            Picasso.setSingletonInstance(picasso)
+        } catch (ignored: IllegalStateException) {
+            // Picasso instance was already initialized
+        }
     }
 }

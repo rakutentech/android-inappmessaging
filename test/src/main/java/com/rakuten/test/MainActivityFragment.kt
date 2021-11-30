@@ -61,8 +61,7 @@ class MainActivityFragment : Fragment(), View.OnClickListener {
             R.id.close_message -> {
                 InAppMessaging.instance().closeMessage()
             }
-            else -> {
-            }
+            else -> Any()
         }
     }
 

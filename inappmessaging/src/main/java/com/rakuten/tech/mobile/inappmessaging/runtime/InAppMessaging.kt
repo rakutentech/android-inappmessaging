@@ -52,14 +52,6 @@ abstract class InAppMessaging internal constructor() {
     abstract fun logEvent(@NonNull event: Event)
 
     /**
-     * This methods updates the host app's session. This allows InAppMessaging to update the locally stored
-     * messages which can be dependent on user information.
-     */
-    @Deprecated("This method is no longer needs to be called when updating user info because session updates" +
-            "are handled internally by the sdk.")
-    abstract fun updateSession()
-
-    /**
      * This method returns registered activity of the host app.
      */
     @RestrictTo(RestrictTo.Scope.LIBRARY)
@@ -136,7 +128,6 @@ abstract class InAppMessaging internal constructor() {
         @Throws(InAppMessagingException::class)
         internal fun initialize(
             context: Context,
-            isForTesting: Boolean = false,
             isCacheHandling: Boolean = false,
             configScheduler: ConfigScheduler = ConfigScheduler.instance()
         ) {
@@ -146,8 +137,7 @@ abstract class InAppMessaging internal constructor() {
             // Note: All InAppMessaging SDK logs' tags begins with "IAM_".
             instance = InApp(context, manifestConfig.isDebugging(), isCacheHandling = isCacheHandling)
 
-            Initializer.initializeSdk(context, manifestConfig.subscriptionKey(), manifestConfig.configUrl(),
-                    isForTesting)
+            Initializer.initializeSdk(context, manifestConfig.subscriptionKey(), manifestConfig.configUrl())
 
             // inform repositories that it is initial launch to display app launch campaign at least once
             PingResponseMessageRepository.isInitialLaunch = true
@@ -164,16 +154,14 @@ abstract class InAppMessaging internal constructor() {
     internal class NotInitializedInAppMessaging : InAppMessaging() {
         override var onVerifyContext: (contexts: List<String>, campaignTitle: String) -> Boolean = { _, _ -> true }
 
-        override fun registerPreference(userInfoProvider: UserInfoProvider) {}
+        override fun registerPreference(userInfoProvider: UserInfoProvider) = Unit
 
-        override fun registerMessageDisplayActivity(activity: Activity) {}
+        override fun registerMessageDisplayActivity(activity: Activity) = Unit
 
         @SuppressWarnings("FunctionMaxLength")
-        override fun unregisterMessageDisplayActivity() {}
+        override fun unregisterMessageDisplayActivity() = Unit
 
-        override fun logEvent(event: Event) {}
-
-        override fun updateSession() {}
+        override fun logEvent(event: Event) = Unit
 
         override fun getRegisteredActivity(): Activity? = null
 
@@ -183,8 +171,8 @@ abstract class InAppMessaging internal constructor() {
 
         override fun getSharedPref(): SharedPreferences? = null
 
-        override fun closeMessage(clearQueuedCampaigns: Boolean) {}
+        override fun closeMessage(clearQueuedCampaigns: Boolean) = Unit
 
-        override fun saveTempData() {}
+        override fun saveTempData() = Unit
     }
 }

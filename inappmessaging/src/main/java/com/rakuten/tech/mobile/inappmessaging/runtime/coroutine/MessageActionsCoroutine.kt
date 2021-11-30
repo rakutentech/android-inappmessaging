@@ -218,8 +218,7 @@ internal class MessageActionsCoroutine(
                 ValueType.DOUBLE -> customEvent.addAttribute(attribute.name, attribute.value.toDouble())
                 ValueType.BOOLEAN -> customEvent.addAttribute(attribute.name, attribute.value.toBoolean())
                 ValueType.TIME_IN_MILLI -> customEvent.addAttribute(attribute.name, Date(attribute.value.toLong()))
-                else -> {
-                }
+                else -> Unit
             }
         }
         return customEvent
