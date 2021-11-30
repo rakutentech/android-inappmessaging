@@ -290,7 +290,7 @@ To use custom fonts:
 2. To use custom font for campaign header and body texts, set the filename to `iam_custom_font_text`.
 3. To use custom font for button texts, set the filename to `iam_custom_font_button`.
 
-Note: If you want to use custom fonts for both campaign and button texts, app should set to font files.
+Note: If you want to use custom fonts for both campaign and button texts, app should set two font files.
 
 ```bash
 ...
