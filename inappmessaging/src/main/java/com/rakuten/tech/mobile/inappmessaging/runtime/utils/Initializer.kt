@@ -133,8 +133,6 @@ internal object Initializer {
                 .downloader(OkHttp3Downloader(client))
                 .memoryCache(LruCache(getMemoryCacheSize()))
                 .build()
-            picasso.isLoggingEnabled = true
-            picasso.setIndicatorsEnabled(true)
             Picasso.setSingletonInstance(picasso)
         } catch (ignored: IllegalStateException) {
             // Picasso instance was already initialized
