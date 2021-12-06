@@ -375,18 +375,24 @@ Documents targeting Product Managers:
 
 ## <a name="changelog"></a> Changelog
 
-### 6.0.0 (in-progress)
+### 6.1.0 (in-progress)
+* SDKCF-4470: Updated the layout for close and campaign buttons. Added feature to customize text and button fonts, please see [custom font section](#custom-font) for details.
+
+### 6.0.0 (2021-12-03)
 * SDKCF-4151: **Breaking Changes:**
   - Renamed method for providing access token in `UserInfoProvider` interface class from `provideRaeToken` to `provideAccessToken`.
   - Removed `provideRakutenId` method for Rakuten Id in `UserInfoProvider` interface class. Please use `provideUserId` for specific user targeting.
   - All the methods in `UserInfoProvider` class are optional for Kotlin class implementing the interface.
 * SDKCF-4468: **Breaking Change:** Removed deprecated updateSession() API.
-* SDKCF-4530: Fixed handling for case-sensitivity update for custom event and attribute name
+* SDKCF-4530: Fixed handling for case-sensitivity update for custom event and attribute name.
 * SDKCF-4196: Updated dependencies due to JCenter shutdown.
 * SDKCF-4190: Updated Kluent dependency version due to deprecated mocking feature.
 * SDKCF-4427: Updated compile and target SDK to API 31 (Android 12).
 * SDKCF-3978: Updated endpoint response models to fix optional and required parameters.
-* SDKCF-4470: Updated the layout for close and campaign buttons. Added feature to customize text and button fonts, please see [custom font section](#custom-font) for details.
+* SDKCF-4440: Changed image downloader dependency from Fresco to Picasso.
+* SDKCF-3979: Added displaying delay between campaign messages.
+* SDKCF-3826: Removed deprecated kotlin-android-extensions plugin.
+* SDKCF-4117: Added handling for send IAM events to analytics backend if the dependency exists.
 
 ### 5.0.0 (2021-09-10)
 * SDKCF-4071: **Breaking Change:** Added new method for providing id tracking identifier in `UserInfoProvider` interface class.

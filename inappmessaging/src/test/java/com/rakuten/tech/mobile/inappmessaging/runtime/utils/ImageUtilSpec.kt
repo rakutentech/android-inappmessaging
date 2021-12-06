@@ -43,7 +43,6 @@ class ImageUtilSpec {
     private fun initializePicassoInstance() {
         try {
             val picasso = Picasso.Builder(context).build()
-            picasso.isLoggingEnabled = true
             Picasso.setSingletonInstance(picasso)
         } catch (ignored: IllegalStateException) {
             // Picasso instance was already initialized
