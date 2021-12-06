@@ -1,6 +1,0 @@
-<?xml version="1.0" encoding="utf-8"?>
-<ImageButton
-  xmlns:android="http://schemas.android.com/apk/res/android"
-  android:id="@+id/message_close_button"
-  style="@style/InAppMessaging.CloseButton.White"
-  android:contentDescription="@string/close_button"/>

@@ -8,34 +8,22 @@
   </style>
 
   <style name="InAppMessaging.CloseButton">
+    <!--Default button is black.-->
+    <item name="android:src">@drawable/close_button_black</item>
     <item name="android:layout_height">@dimen/modal_close_button_height</item>
     <item name="android:layout_width">@dimen/modal_close_button_width</item>
     <item name="android:background">@android:color/transparent</item>
   </style>
 
-  <style name="InAppMessaging.CloseButton.White">
-    <!--Default background as white.-->
-    <item name="android:src">@drawable/close_button_black</item>
-    <item name="android:padding">@dimen/modal_close_button_padding</item>
-    <item name="android:layout_gravity">end</item>
-  </style>
-
   <style name="InAppMessaging.CloseButton.Modal" >
-    <!--Default background as white.-->
-    <item name="android:src">@drawable/close_button_black</item>
     <item name="android:layout_gravity">end</item>
-    <item name="android:layout_width">@dimen/modal_close_button_width</item>
-    <item name="android:layout_height">@dimen/modal_close_button_height</item>
   </style>
 
   <style name="InAppMessaging.CloseButton.FullScreen">
-    <!--Default background as white.-->
-    <item name="android:src">@drawable/close_button_black</item>
     <item name="android:layout_gravity">top|end</item>
   </style>
 
   <style name="InAppMessaging.CloseButton.SlideUp">
-    <!--Default background as white.-->
     <item name="android:layout_gravity">top|end</item>
   </style>
 

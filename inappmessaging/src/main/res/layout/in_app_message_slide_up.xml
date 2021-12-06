@@ -41,13 +41,14 @@
       tools:text="@string/example_body_text"
       tools:visibility="visible" />
 
-    <include
+    <ImageButton
+      android:id="@+id/message_close_button"
       style="@style/InAppMessaging.CloseButton.SlideUp"
-      layout="@layout/close_button"
       app:layout_constraintEnd_toEndOf="parent"
       app:layout_constraintHorizontal_bias="1.0"
       app:layout_constraintStart_toStartOf="parent"
-      app:layout_constraintTop_toTopOf="parent" />
+      app:layout_constraintTop_toTopOf="parent"
+      android:contentDescription="@string/close_button" />
 
   </androidx.constraintlayout.widget.ConstraintLayout>
 

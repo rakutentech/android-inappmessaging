@@ -12,9 +12,10 @@
     android:layout_height="match_parent"
     android:orientation="vertical">
 
-    <include
+    <ImageButton
+      android:id="@+id/message_close_button"
       style="@style/InAppMessaging.CloseButton.FullScreen"
-      layout="@layout/close_button" />
+      android:contentDescription="@string/close_button" />
 
     <ScrollView
       android:layout_width="match_parent"
