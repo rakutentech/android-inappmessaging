@@ -47,7 +47,7 @@ internal object ViewUtil {
     }
 
     /**
-     * Returns the corresponding height to the available display size while keeping the aspect ratio
+     * Returns the corresponding height to the available display size while keeping the aspect ratio.
      * @param context
      * @param width The given view's width.
      * @param height The given view's height.

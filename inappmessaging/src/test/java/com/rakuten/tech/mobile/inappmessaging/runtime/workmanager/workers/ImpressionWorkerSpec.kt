@@ -19,18 +19,24 @@ import com.rakuten.tech.mobile.inappmessaging.runtime.data.repositories.ConfigRe
 import com.rakuten.tech.mobile.inappmessaging.runtime.data.repositories.HostAppInfoRepository
 import com.rakuten.tech.mobile.inappmessaging.runtime.data.requests.ImpressionRequest
 import com.rakuten.tech.mobile.inappmessaging.runtime.data.responses.config.ConfigResponse
+import com.rakuten.tech.mobile.inappmessaging.runtime.data.responses.ping.MessageMixerResponse
 import com.rakuten.tech.mobile.inappmessaging.runtime.utils.RuntimeUtil
 import com.rakuten.tech.mobile.inappmessaging.runtime.workmanager.schedulers.MessageMixerPingScheduler
 import okhttp3.ResponseBody
 import org.amshove.kluent.shouldBeEqualTo
+import org.amshove.kluent.shouldBeInstanceOf
 import org.junit.Before
 import org.junit.Test
 import org.junit.runner.RunWith
+import org.mockito.Mock
 import org.mockito.Mockito
 import org.mockito.Mockito.`when`
+import org.mockito.MockitoAnnotations
 import org.robolectric.RobolectricTestRunner
 import org.robolectric.annotation.Config
 import retrofit2.Call
+import retrofit2.Response
+import java.net.HttpURLConnection
 import java.util.*
 
 /**
@@ -48,9 +54,13 @@ class ImpressionWorkerSpec : BaseTest() {
 
     private var responseBodyCall: Call<ResponseBody>? = null
 
+    @Mock
+    private val mockResponse: Response<ResponseBody>? = null
+
     @Before
     override fun setup() {
         super.setup()
+        MockitoAnnotations.initMocks(this)
         AccountRepository.instance().userInfoProvider = TestUserInfoProvider()
         HostAppInfoRepository.instance().addHostInfo(HostAppInfo(InAppMessagingTestConstants.APP_ID,
                 InAppMessagingTestConstants.DEVICE_ID, InAppMessagingTestConstants.APP_VERSION,
@@ -70,6 +80,8 @@ class ImpressionWorkerSpec : BaseTest() {
         Settings.Secure.putString(ApplicationProvider.getApplicationContext<Context>().contentResolver,
                 Settings.Secure.ANDROID_ID, "test_device_id")
         InAppMessaging.initialize(ApplicationProvider.getApplicationContext(), true)
+
+        ImpressionWorker.serverErrorCounter.set(0)
     }
 
     @Test
@@ -211,6 +223,43 @@ class ImpressionWorkerSpec : BaseTest() {
         workManager.enqueue(request).result.get()
         val workInfo = workManager.getWorkInfoById(request.id).get()
         workInfo.state shouldBeEqualTo WorkInfo.State.FAILED
+    }
+
+    @Test
+    fun `should return retry if server fail less than 3 times`() {
+        val worker = setupWorker(HttpURLConnection.HTTP_INTERNAL_ERROR)
+
+        worker.onResponse(mockResponse!!) shouldBeEqualTo ListenableWorker.Result.retry()
+    }
+
+    @Test
+    fun `should return failure if server fail more than 3 times`() {
+        val worker = setupWorker(HttpURLConnection.HTTP_INTERNAL_ERROR)
+
+        repeat(3) {
+            worker.onResponse(mockResponse!!) shouldBeEqualTo ListenableWorker.Result.retry()
+        }
+        worker.onResponse(mockResponse!!) shouldBeEqualTo ListenableWorker.Result.failure()
+    }
+
+    @Test
+    fun `should return failure if bad request`() {
+        val worker = setupWorker(HttpURLConnection.HTTP_BAD_REQUEST)
+
+        worker.onResponse(mockResponse!!) shouldBeEqualTo ListenableWorker.Result.failure()
+    }
+
+    @Test
+    fun `should return success if ok`() {
+        val worker = setupWorker(HttpURLConnection.HTTP_OK)
+
+        worker.onResponse(mockResponse!!) shouldBeEqualTo ListenableWorker.Result.success()
+    }
+
+    private fun setupWorker(code: Int): ImpressionWorker {
+        `when`(mockResponse?.isSuccessful).thenReturn(false)
+        `when`(mockResponse?.code()).thenReturn(code)
+        return ImpressionWorker(context, workerParameters)
     }
 
     private fun retrieveValidConfig() {

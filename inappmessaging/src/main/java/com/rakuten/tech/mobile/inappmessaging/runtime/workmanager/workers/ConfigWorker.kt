@@ -13,11 +13,13 @@ import com.rakuten.tech.mobile.inappmessaging.runtime.data.requests.ConfigQueryP
 import com.rakuten.tech.mobile.inappmessaging.runtime.data.responses.config.ConfigResponse
 import com.rakuten.tech.mobile.inappmessaging.runtime.utils.RetryDelayUtil
 import com.rakuten.tech.mobile.inappmessaging.runtime.utils.RuntimeUtil
+import com.rakuten.tech.mobile.inappmessaging.runtime.utils.WorkerUtils
 import com.rakuten.tech.mobile.inappmessaging.runtime.workmanager.schedulers.ConfigScheduler
 import com.rakuten.tech.mobile.inappmessaging.runtime.workmanager.schedulers.MessageMixerPingScheduler
 import retrofit2.Response
 import timber.log.Timber
 import java.net.HttpURLConnection
+import java.util.concurrent.atomic.AtomicInteger
 
 /**
  * This class contains the actual work to communicate with Config Service. It extends Worker class,
@@ -69,7 +71,7 @@ internal class ConfigWorker(
             // Executing the API network call.
             onResponse(configServiceCall.execute())
         } catch (e: Exception) {
-            Timber.tag(TAG).d(e)
+            Timber.tag(TAG).e(e)
             // RETRY by default has exponential backoff baked in.
             Result.retry()
         }
@@ -84,6 +86,7 @@ internal class ConfigWorker(
     @Throws(IllegalArgumentException::class)
     fun onResponse(response: Response<ConfigResponse?>): Result {
         if (response.isSuccessful && response.body() != null) {
+            serverErrorCounter.set(0) // reset server error counter
             // Adding config data to its repo.
             configRepo.addConfigResponse(response.body()?.data)
             // Schedule a ping request to message mixer. Initial delay is 0
@@ -102,22 +105,34 @@ internal class ConfigWorker(
             }
         } else return when {
             response.code() == RetryDelayUtil.RETRY_ERROR_CODE -> {
-                configScheduler.startConfig(ConfigScheduler.currDelay)
-                ConfigScheduler.currDelay = retryUtil.getNextDelay(ConfigScheduler.currDelay)
-                // set previous worker as success to avoid logging
-                Result.success()
+                serverErrorCounter.set(0) // reset server error counter
+                WorkerUtils.reportSilentError(TAG, response.code(), response.errorBody()?.string())
+                retryConfigRequest()
             }
-            response.code() >= HttpURLConnection.HTTP_INTERNAL_ERROR -> Result.retry() // Retry if server has error.
+            response.code() >= HttpURLConnection.HTTP_INTERNAL_ERROR -> {
+                WorkerUtils.reportError(TAG, response.code(), response.errorBody()?.string())
+                WorkerUtils.checkRetry(serverErrorCounter.getAndIncrement()) { retryConfigRequest() }
+            }
             else -> {
+                serverErrorCounter.set(0) // reset server error counter
                 // clear temp data (ignore all temp data stored during config request)
                 InAppMessaging.setUninitializedInstance()
+                WorkerUtils.reportError(TAG, response.code(), response.errorBody()?.string())
                 Result.failure()
             }
         }
         return Result.success()
     }
 
+    private fun retryConfigRequest(): Result {
+        configScheduler.startConfig(ConfigScheduler.currDelay)
+        ConfigScheduler.currDelay = retryUtil.getNextDelay(ConfigScheduler.currDelay)
+        // set previous worker as success to avoid logging
+        return Result.success()
+    }
+
     companion object {
         private const val TAG = "IAM_ConfigWorker"
+        internal val serverErrorCounter = AtomicInteger(0)
     }
 }
