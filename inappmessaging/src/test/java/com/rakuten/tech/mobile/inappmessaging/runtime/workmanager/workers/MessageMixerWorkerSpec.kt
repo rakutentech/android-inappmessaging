@@ -23,7 +23,6 @@ import com.rakuten.tech.mobile.inappmessaging.runtime.data.responses.ping.Messag
 import com.rakuten.tech.mobile.inappmessaging.runtime.utils.RetryDelayUtil
 import com.rakuten.tech.mobile.inappmessaging.runtime.workmanager.schedulers.EventMessageReconciliationScheduler
 import com.rakuten.tech.mobile.inappmessaging.runtime.workmanager.schedulers.MessageMixerPingScheduler
-import okhttp3.MediaType
 import okhttp3.ResponseBody
 import okio.Buffer
 import org.amshove.kluent.*
@@ -45,6 +44,7 @@ import java.net.HttpURLConnection
  */
 @RunWith(RobolectricTestRunner::class)
 @Config(sdk = [Build.VERSION_CODES.O_MR1])
+@SuppressWarnings("LargeClass")
 class MessageMixerWorkerSpec : BaseTest() {
     @Mock
     private val mockResponse: Response<MessageMixerResponse>? = null

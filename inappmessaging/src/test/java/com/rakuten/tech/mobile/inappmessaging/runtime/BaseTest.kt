@@ -1,7 +1,6 @@
 package com.rakuten.tech.mobile.inappmessaging.runtime
 
 import android.os.Build
-import okhttp3.ResponseBody
 import org.junit.After
 import org.junit.Before
 import org.mockito.Mockito
