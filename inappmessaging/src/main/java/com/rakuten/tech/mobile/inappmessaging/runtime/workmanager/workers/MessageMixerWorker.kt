@@ -123,16 +123,16 @@ internal class MessageMixerWorker(
         } else return when {
             response.code() == RetryDelayUtil.RETRY_ERROR_CODE -> {
                 serverErrorCounter.set(0) // reset server error counter
-                WorkerUtils.reportSilentError(TAG, response.code(), response.errorBody()?.string())
+                WorkerUtils.logSilentRequestError(TAG, response.code(), response.errorBody()?.string())
                 retryPingRequest()
             }
             response.code() >= HttpURLConnection.HTTP_INTERNAL_ERROR -> {
-                WorkerUtils.reportError(TAG, response.code(), response.errorBody()?.string())
+                WorkerUtils.logRequestError(TAG, response.code(), response.errorBody()?.string())
                 WorkerUtils.checkRetry(serverErrorCounter.getAndIncrement()) { retryPingRequest() }
             }
             else -> {
                 serverErrorCounter.set(0) // reset server error counter
-                WorkerUtils.reportError(TAG, response.code(), response.errorBody()?.string())
+                WorkerUtils.logRequestError(TAG, response.code(), response.errorBody()?.string())
                 Result.failure()
             }
         }
