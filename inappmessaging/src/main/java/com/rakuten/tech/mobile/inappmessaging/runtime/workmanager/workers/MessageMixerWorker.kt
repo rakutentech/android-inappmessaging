@@ -15,12 +15,14 @@ import com.rakuten.tech.mobile.inappmessaging.runtime.data.requests.PingRequest
 import com.rakuten.tech.mobile.inappmessaging.runtime.data.responses.ping.MessageMixerResponse
 import com.rakuten.tech.mobile.inappmessaging.runtime.utils.RetryDelayUtil
 import com.rakuten.tech.mobile.inappmessaging.runtime.utils.RuntimeUtil
+import com.rakuten.tech.mobile.inappmessaging.runtime.utils.WorkerUtils
 import com.rakuten.tech.mobile.inappmessaging.runtime.workmanager.schedulers.EventMessageReconciliationScheduler
 import com.rakuten.tech.mobile.inappmessaging.runtime.workmanager.schedulers.MessageMixerPingScheduler
 import retrofit2.Call
 import retrofit2.Response
 import timber.log.Timber
 import java.net.HttpURLConnection
+import java.util.concurrent.atomic.AtomicInteger
 import kotlin.collections.ArrayList
 
 /**
@@ -76,8 +78,8 @@ internal class MessageMixerWorker(
             // Execute a thread blocking API network call, and handle response.
             onResponse(responseCall!!.execute())
         } catch (e: Exception) {
-            Timber.tag(TAG).d(e)
-            Result.failure()
+            Timber.tag(TAG).e(e)
+            Result.retry()
         }
     }
 
@@ -94,6 +96,7 @@ internal class MessageMixerWorker(
     @SuppressWarnings("LongMethod")
     fun onResponse(response: Response<MessageMixerResponse>): Result {
         if (response.isSuccessful) {
+            serverErrorCounter.set(0) // reset server error counter
             val messageMixerResponse = response.body()
             if (messageMixerResponse != null) {
                 // Add time data.
@@ -119,14 +122,27 @@ internal class MessageMixerWorker(
             }
         } else return when {
             response.code() == RetryDelayUtil.RETRY_ERROR_CODE -> {
-                messageMixerScheduler.pingMessageMixerService(MessageMixerPingScheduler.currDelay)
-                MessageMixerPingScheduler.currDelay = retryUtil.getNextDelay(MessageMixerPingScheduler.currDelay)
-                // set previous worker as success to avoid logging
-                Result.success()
+                serverErrorCounter.set(0) // reset server error counter
+                WorkerUtils.logSilentRequestError(TAG, response.code(), response.errorBody()?.string())
+                retryPingRequest()
             }
-            response.code() >= HttpURLConnection.HTTP_INTERNAL_ERROR -> Result.retry() // Retry if server has error.
-            else -> Result.failure()
+            response.code() >= HttpURLConnection.HTTP_INTERNAL_ERROR -> {
+                WorkerUtils.logRequestError(TAG, response.code(), response.errorBody()?.string())
+                WorkerUtils.checkRetry(serverErrorCounter.getAndIncrement()) { retryPingRequest() }
+            }
+            else -> {
+                serverErrorCounter.set(0) // reset server error counter
+                WorkerUtils.logRequestError(TAG, response.code(), response.errorBody()?.string())
+                Result.failure()
+            }
         }
+        return Result.success()
+    }
+
+    private fun retryPingRequest(): Result {
+        messageMixerScheduler.pingMessageMixerService(MessageMixerPingScheduler.currDelay)
+        MessageMixerPingScheduler.currDelay = retryUtil.getNextDelay(MessageMixerPingScheduler.currDelay)
+        // set previous worker as success to avoid logging
         return Result.success()
     }
 
@@ -156,5 +172,6 @@ internal class MessageMixerWorker(
 
     companion object {
         private const val TAG = "IAM_MessageMixerWorker"
+        internal val serverErrorCounter = AtomicInteger(0)
     }
 }

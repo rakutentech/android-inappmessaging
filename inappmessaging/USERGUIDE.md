@@ -354,6 +354,9 @@ Documents targeting Product Managers:
 
 ## <a name="changelog"></a> Changelog
 
+### 6.1.0 (in-progress)
+* SDKCF-4650: Refactored handling for different responses from endpoint requests for consistency and better logging.
+
 ### 6.0.0 (2021-12-03)
 * SDKCF-4151: **Breaking Changes:**
   - Renamed method for providing access token in `UserInfoProvider` interface class from `provideRaeToken` to `provideAccessToken`.

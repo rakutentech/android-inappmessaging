@@ -26,6 +26,7 @@ import com.rakuten.tech.mobile.inappmessaging.runtime.data.responses.config.Conf
 import com.rakuten.tech.mobile.inappmessaging.runtime.utils.RetryDelayUtil
 import com.rakuten.tech.mobile.inappmessaging.runtime.workmanager.schedulers.ConfigScheduler
 import com.rakuten.tech.mobile.inappmessaging.runtime.workmanager.schedulers.MessageMixerPingScheduler
+import okhttp3.ResponseBody
 import org.amshove.kluent.*
 import org.junit.Before
 import org.junit.Ignore
@@ -36,6 +37,7 @@ import org.mockito.Mockito.`when`
 import org.robolectric.RobolectricTestRunner
 import org.robolectric.annotation.Config
 import retrofit2.Response
+import java.net.HttpURLConnection
 
 /**
  * Test class for ConfigWorker.
@@ -62,6 +64,7 @@ open class ConfigWorkerSpec : BaseTest() {
         ConfigScheduler.currDelay = RetryDelayUtil.INITIAL_BACKOFF_DELAY
         LocalEventRepository.instance().clearEvents()
         ConfigResponseRepository.resetInstance()
+        ConfigWorker.serverErrorCounter.set(0)
     }
 
     internal fun initializeInstance() {
@@ -85,6 +88,12 @@ open class ConfigWorkerSpec : BaseTest() {
         `when`(mockResponse?.body()).thenReturn(mockConfig)
         `when`(mockConfig.data).thenReturn(mockData)
         `when`(mockData.rollOutPercentage).thenReturn(rollout)
+    }
+
+    internal fun setupErrorBody() {
+        val errorBody = Mockito.mock(ResponseBody::class.java)
+        `when`(mockResponse?.errorBody()).thenReturn(errorBody)
+        `when`(errorBody.string()).thenReturn("error")
     }
 
     companion object {
@@ -141,20 +150,14 @@ class ConfigWorkerSuccessSpec : ConfigWorkerSpec() {
         `when`(mockResponse?.code()).thenReturn(RetryDelayUtil.RETRY_ERROR_CODE)
         val worker = ConfigWorker(context, workerParameters, HostAppInfoRepository.instance(),
                 ConfigResponseRepository.instance(), MessageMixerPingScheduler.instance(), mockConfigScheduler)
-        worker.onResponse(mockResponse!!) shouldBeEqualTo ListenableWorker.Result.Success()
-        Mockito.verify(mockConfigScheduler).startConfig(eq(RetryDelayUtil.INITIAL_BACKOFF_DELAY), anyOrNull())
-        ConfigScheduler.currDelay shouldBeGreaterThan (RetryDelayUtil.INITIAL_BACKOFF_DELAY * 2)
-
-        worker.onResponse(mockResponse) shouldBeEqualTo ListenableWorker.Result.Success()
-        Mockito.verify(mockConfigScheduler).startConfig(
-                AdditionalMatchers.gt(RetryDelayUtil.INITIAL_BACKOFF_DELAY * 2), anyOrNull())
-        ConfigScheduler.currDelay shouldBeGreaterThan (RetryDelayUtil.INITIAL_BACKOFF_DELAY * 4)
+        verifyBackoff(worker)
     }
 
     @Test
     fun `should reset initial delay`() {
         `when`(mockResponse?.isSuccessful).thenReturn(false)
         `when`(mockResponse?.code()).thenReturn(RetryDelayUtil.RETRY_ERROR_CODE)
+        setupErrorBody()
         val worker = ConfigWorker(context, workerParameters, mockHostRepository,
                 mockConfigRepository, mockMessageScheduler, mockConfigScheduler)
         worker.onResponse(mockResponse!!) shouldBeEqualTo ListenableWorker.Result.Success()
@@ -201,18 +204,50 @@ class ConfigWorkerSuccessSpec : ConfigWorkerSpec() {
         LocalEventRepository.instance().getEvents().shouldBeEmpty()
         Mockito.verify(mockMessageScheduler, never()).pingMessageMixerService(0)
     }
+
+    @Test
+    fun `should use correct backoff delay if server fail less than 3 times`() {
+        initializeInstance()
+        InAppMessaging.instance() shouldBeInstanceOf InApp::class.java
+        `when`(mockResponse?.isSuccessful).thenReturn(false)
+        `when`(mockResponse?.code()).thenReturn(HttpURLConnection.HTTP_INTERNAL_ERROR)
+        setupErrorBody()
+        val worker = ConfigWorker(context, workerParameters, HostAppInfoRepository.instance(),
+            ConfigResponseRepository.instance(), MessageMixerPingScheduler.instance(), mockConfigScheduler)
+
+        verifyBackoff(worker)
+
+        // should not reset instance
+        InAppMessaging.instance() shouldBeInstanceOf InApp::class.java
+    }
+
+    private fun verifyBackoff(worker: ConfigWorker) {
+        worker.onResponse(mockResponse!!) shouldBeEqualTo ListenableWorker.Result.Success()
+        Mockito.verify(mockConfigScheduler).startConfig(eq(RetryDelayUtil.INITIAL_BACKOFF_DELAY), anyOrNull())
+        ConfigScheduler.currDelay shouldBeGreaterThan (RetryDelayUtil.INITIAL_BACKOFF_DELAY * 2)
+
+        worker.onResponse(mockResponse) shouldBeEqualTo ListenableWorker.Result.Success()
+        Mockito.verify(mockConfigScheduler).startConfig(
+            AdditionalMatchers.gt(RetryDelayUtil.INITIAL_BACKOFF_DELAY * 2), anyOrNull()
+        )
+        ConfigScheduler.currDelay shouldBeGreaterThan (RetryDelayUtil.INITIAL_BACKOFF_DELAY * 4)
+    }
 }
 
 class ConfigWorkerFailSpec : ConfigWorkerSpec() {
     @Test
-    fun `should retry if server fail`() {
+    fun `should fail if server fail more than 3 times`() {
         initializeInstance()
         InAppMessaging.instance() shouldBeInstanceOf InApp::class.java
         `when`(mockResponse?.isSuccessful).thenReturn(false)
-        `when`(mockResponse?.code()).thenReturn(500)
+        `when`(mockResponse?.code()).thenReturn(HttpURLConnection.HTTP_INTERNAL_ERROR)
         `when`(mockResponse?.body()).thenReturn(null)
-        ConfigWorker(context,
-                workerParameters).onResponse(mockResponse!!) shouldBeEqualTo ListenableWorker.Result.retry()
+        val worker = ConfigWorker(context, workerParameters, HostAppInfoRepository.instance(),
+            ConfigResponseRepository.instance(), MessageMixerPingScheduler.instance(), mockConfigScheduler)
+        repeat(3) {
+            worker.onResponse(mockResponse!!) shouldBeEqualTo ListenableWorker.Result.success()
+        }
+        worker.onResponse(mockResponse!!) shouldBeEqualTo ListenableWorker.Result.failure()
 
         // should not reset instance
         InAppMessaging.instance() shouldBeInstanceOf InApp::class.java
@@ -223,8 +258,11 @@ class ConfigWorkerFailSpec : ConfigWorkerSpec() {
         initializeInstance()
         InAppMessaging.instance() shouldBeInstanceOf InApp::class.java
         `when`(mockResponse?.isSuccessful).thenReturn(false)
-        `when`(mockResponse?.code()).thenReturn(400)
+        `when`(mockResponse?.code()).thenReturn(HttpURLConnection.HTTP_BAD_REQUEST)
         val worker = ConfigWorker(context, workerParameters)
+        worker.onResponse(mockResponse!!) shouldBeEqualTo ListenableWorker.Result.failure()
+
+        setupErrorBody()
         worker.onResponse(mockResponse!!) shouldBeEqualTo ListenableWorker.Result.failure()
 
         // should reset instance
