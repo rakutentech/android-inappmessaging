@@ -17,7 +17,7 @@ Please include unit tests where necessary to cover any functionality that is int
 * All Java code must follow [Google's Java Code style](https://google.github.io/styleguide/javaguide.html), the only exception being that annotations on members or classes may be on the same line (no forced line break).
 
 ## Commit messages
-Each commit message consists of a header, and an optional body and footer. The header has a special format that includes a type, a subject and a optional ticket number:
+Each commit message consists of a header, and an optional body and footer. The header has a special format that includes a type, a subject and an optional ticket number:
 
 ```
 <type>: <subject> (<ticket-no>)
@@ -75,7 +75,7 @@ The footer should reference GitHub issues that this commit **Closes**.
 * _**Revert "refactor user data handling"**_
 <br>Revert should start with `revert:` followed by exact original commit message of reverted commit (without quotes).
  
-* fix: _**fix crash on iOS 15**_ (SDKCF-0000)
+* fix: _**fix crash on Android 12**_ (SDKCF-0000)
 <br>Commit message should contain some context. In this case - a cause of the crash.
  
 * feat: _**add new build configuration for users that require user data to be stored in another directory and add migration logic with exception of users migration from SDK version 1.0.0**_
@@ -84,13 +84,12 @@ The footer should reference GitHub issues that this commit **Closes**.
 #### Good examples:
 * improve: refactor user data handling (SDKCF-3970)
 * improve: refine URL session configuration, add timeouts (SDKCF-0000)
-* docs: update README with SPM information (SDKCF-4388)
+* docs: update README with gradle information (SDKCF-4388)
 * chore: bump RSDKUtils to 2.1.0 (SDKCF-4392)
 * chore: prepare 5.0.0 release (SDKCF-4160)
 * revert: improve: refine URL session configuration, add timeouts (SDKCF-0000)
 <br>This reverts commit 6608beb114610ec0a5e96b77e62a5590753e247e.
 * feat: add support for id tracking (SDKCF-4072)
-* feat: [iOS][Analytics] add "Delete user data" button (SDKCF-4072)
 * ci: add mobsfscan config (SDKCF-0000)
 * tests: add UI tests (SDKCF-2246)
 * tests: fix and refactor integration tests (SDKCF-0000)
