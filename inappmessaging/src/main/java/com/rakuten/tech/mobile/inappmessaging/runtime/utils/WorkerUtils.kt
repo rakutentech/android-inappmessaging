@@ -5,11 +5,11 @@ import timber.log.Timber
 
 internal object WorkerUtils {
     fun logRequestError(tag: String, code: Int, message: String?) {
-        Timber.tag(tag).e("Response Code $code: ${message ?: "null message"}")
+        Timber.tag(tag).e("Response Code $code: ${message ?: "no error message"}")
     }
 
     fun logSilentRequestError(tag: String, code: Int, message: String?) {
-        Timber.tag(tag).d("Response Code $code: ${message ?: "null message"}")
+        Timber.tag(tag).d("Response Code $code: ${message ?: "no error message"}")
     }
 
     fun checkRetry(counter: Int, retryFunc: () -> ListenableWorker.Result): ListenableWorker.Result {
