@@ -19,8 +19,8 @@ internal class InAppMessageFullScreenView(
     /**
      * Populating view data.
      */
-    override fun populateViewData(message: Message, imageWidth: Int, imageHeight: Int) {
-        super.populateViewData(message, imageWidth, imageHeight)
+    override fun populateViewData(message: Message) {
+        super.populateViewData(message)
         if (imageUrl.isNullOrEmpty()) {
             // If no image, use @drawable/close_button_black_background.
             findViewById<ImageButton>(R.id.message_close_button)

@@ -12,13 +12,13 @@ import android.widget.ImageButton
 import android.widget.LinearLayout
 import android.widget.TextView
 import android.widget.ImageView
+import androidx.annotation.VisibleForTesting
 import androidx.core.widget.NestedScrollView
 import com.google.android.material.button.MaterialButton
 import com.rakuten.tech.mobile.inappmessaging.runtime.R
 import com.rakuten.tech.mobile.inappmessaging.runtime.data.models.messages.Message
 import com.rakuten.tech.mobile.inappmessaging.runtime.data.responses.ping.MessageButton
-import com.rakuten.tech.mobile.inappmessaging.runtime.utils.ViewUtil.getDisplayHeight
-import com.rakuten.tech.mobile.inappmessaging.runtime.utils.ViewUtil.getDisplayWidth
+import com.rakuten.tech.mobile.inappmessaging.runtime.utils.ViewUtil
 import com.squareup.picasso.Callback
 import com.squareup.picasso.Picasso
 import timber.log.Timber
@@ -43,14 +43,14 @@ internal open class InAppMessageBaseView(context: Context, attrs: AttributeSet?)
     private var messageBody: String? = null
     private var buttons: List<MessageButton>? = null
     private var displayOptOut = false
-    private var imageWidth = 0
-    private var imageHeight = 0
+    @VisibleForTesting
+    internal var picasso: Picasso? = null
 
     /**
      * Sets campaign message data onto the view.
      */
     @SuppressWarnings("LongMethod")
-    override fun populateViewData(message: Message, imageWidth: Int, imageHeight: Int) {
+    override fun populateViewData(message: Message) {
         try {
             this.headerColor = Color.parseColor(message.getMessagePayload().headerColor)
             this.messageBodyColor = Color.parseColor(message.getMessagePayload().messageBodyColor)
@@ -63,8 +63,6 @@ internal open class InAppMessageBaseView(context: Context, attrs: AttributeSet?)
             this.messageBodyColor = Color.BLACK
             this.bgColor = Color.WHITE
         }
-        this.imageWidth = getDisplayWidth(context)
-        this.imageHeight = getDisplayHeight(context, imageWidth, imageHeight)
         this.header = message.getMessagePayload().header
         this.messageBody = message.getMessagePayload().messageBody
         this.buttons = message.getMessagePayload().messageSettings.controlSettings.buttons
@@ -148,9 +146,9 @@ internal open class InAppMessageBaseView(context: Context, attrs: AttributeSet?)
                             Timber.tag(TAG).d(e?.cause, "Downloading image failed $imageUrl")
                         }
                     }
-                    Picasso.get().load(this.imageUrl)
+                    (picasso ?: Picasso.get()).load(this.imageUrl)
                         .priority(Picasso.Priority.HIGH)
-                        .resize(this.imageWidth, this.imageHeight)
+                        .resize(ViewUtil.getDisplayWidth(context), 0)
                         .onlyScaleDown()
                         .centerInside()
                         .into(it, callback)
