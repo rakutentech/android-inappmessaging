@@ -3,15 +3,17 @@ package com.rakuten.tech.mobile.inappmessaging.runtime.utils
 import android.content.Context
 import android.os.Build
 import androidx.test.core.app.ApplicationProvider
+import com.nhaarman.mockitokotlin2.any
+import com.nhaarman.mockitokotlin2.anyOrNull
+import com.squareup.picasso.Callback
 import com.squareup.picasso.Picasso
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.runBlocking
-import kotlinx.coroutines.withContext
-import org.amshove.kluent.shouldBeNull
-import org.amshove.kluent.shouldNotBeNull
-import org.junit.Before
+import com.squareup.picasso.RequestCreator
 import org.junit.Test
 import org.junit.runner.RunWith
+import org.mockito.ArgumentMatchers
+import org.mockito.Mockito
+import org.mockito.Mockito.`when`
+import org.mockito.Mockito.doAnswer
 import org.robolectric.RobolectricTestRunner
 import org.robolectric.annotation.Config
 
@@ -20,37 +22,85 @@ import org.robolectric.annotation.Config
 class ImageUtilSpec {
 
     private val context = ApplicationProvider.getApplicationContext<Context>()
+    private val callback = Mockito.mock(Callback::class.java)
 
-    @Before
-    fun before() {
-        initializePicassoInstance()
+    @Test
+    fun `should call error for invalid url`() {
+        IS_VALID = false
+        verifyFetch(false)
     }
 
     @Test
-    fun `should not load an image from invalid url`() = runBlocking {
-        withContext(Dispatchers.IO) {
-            ImageUtil.fetchBitmap("invalid-url")
-        }.shouldBeNull()
+    fun `should call error will null exception for invalid url`() {
+        IS_VALID = false
+        IS_NULL = true
+        verifyFetch(false)
     }
 
     @Test
-    fun `should load an image`(): Unit = runBlocking {
-        withContext(Dispatchers.IO) {
-            ImageUtil.fetchBitmap(VALID_URL)
-        }.shouldNotBeNull()
+    fun `should call success for valid url`() {
+        IS_VALID = true
+        verifyFetch(true)
     }
 
-    private fun initializePicassoInstance() {
-        try {
-            val picasso = Picasso.Builder(context).build()
-            Picasso.setSingletonInstance(picasso)
-        } catch (ignored: IllegalStateException) {
-            // Picasso instance was already initialized
+    @Test
+    fun `should not throw exception when using valid picasso`() {
+        setupValidPicasso()
+        ImageUtil.fetchImage("any url", callback, context)
+    }
+
+    private fun verifyFetch(isValid: Boolean) {
+        ImageUtil.fetchImage("any url", callback, context, setupMockPicasso())
+        if (isValid) {
+            Mockito.verify(callback).onSuccess()
+        } else {
+            Mockito.verify(callback).onError(anyOrNull())
         }
     }
 
     companion object {
-        internal const val VALID_URL =
-            "https://en.wikipedia.org/wiki/Android_(operating_system)#/media/File:Android-robot-googleplex-2008.jpg"
+        internal var IS_VALID = false
+        internal var IS_NULL = false
+
+        @SuppressWarnings("SwallowedException")
+        internal fun setupValidPicasso() {
+            val picasso = Picasso.Builder(ApplicationProvider.getApplicationContext()).build()
+            try {
+                Picasso.setSingletonInstance(picasso)
+            } catch (ex: Exception) {
+                // ignore
+            }
+        }
+
+        @SuppressWarnings("LongMethod")
+        internal fun setupMockPicasso(isException: Boolean = false): Picasso {
+            val picasso = Mockito.mock(Picasso::class.java)
+            val requestCreator = Mockito.mock(RequestCreator::class.java)
+            `when`(picasso.load(ArgumentMatchers.anyString())).thenReturn(requestCreator)
+            `when`(requestCreator.priority(any())).thenReturn(requestCreator)
+            `when`(requestCreator.resize(any(), any())).thenReturn(requestCreator)
+            `when`(requestCreator.onlyScaleDown()).thenReturn(requestCreator)
+            `when`(requestCreator.centerInside()).thenReturn(requestCreator)
+            if (isException) {
+                `when`(requestCreator.into(any(), any())).thenThrow(NullPointerException("test error"))
+            } else {
+                doAnswer {
+                    setCallback(it.getArgument(0))
+                }.`when`(requestCreator).fetch(any())
+                doAnswer {
+                    setCallback(it.getArgument(1))
+                }.`when`(requestCreator).into(any(), any())
+            }
+
+            return picasso
+        }
+
+        private fun setCallback(callback: Callback) {
+            when {
+                IS_VALID -> callback.onSuccess()
+                IS_NULL -> callback.onError(null)
+                else -> callback.onError(IllegalArgumentException("error test"))
+            }
+        }
     }
 }

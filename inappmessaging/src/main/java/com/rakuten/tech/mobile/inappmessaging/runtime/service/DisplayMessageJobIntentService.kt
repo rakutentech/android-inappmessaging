@@ -3,10 +3,8 @@ package com.rakuten.tech.mobile.inappmessaging.runtime.service
 import android.app.Activity
 import android.content.Context
 import android.content.Intent
-import android.graphics.Bitmap
 import android.os.Handler
 import android.os.Looper
-import androidx.annotation.VisibleForTesting
 import androidx.core.app.JobIntentService
 import com.rakuten.tech.mobile.inappmessaging.runtime.InAppMessaging
 import com.rakuten.tech.mobile.inappmessaging.runtime.utils.ImageUtil
@@ -15,7 +13,10 @@ import com.rakuten.tech.mobile.inappmessaging.runtime.data.repositories.LocalDis
 import com.rakuten.tech.mobile.inappmessaging.runtime.data.repositories.ReadyForDisplayMessageRepository
 import com.rakuten.tech.mobile.inappmessaging.runtime.manager.MessageReadinessManager
 import com.rakuten.tech.mobile.inappmessaging.runtime.runnable.DisplayMessageRunnable
+import com.squareup.picasso.Callback
+import com.squareup.picasso.Picasso
 import timber.log.Timber
+import java.lang.Exception
 
 /**
  * Since one service is essentially one worker thread, so there's no chance multiple worker threads
@@ -26,6 +27,7 @@ internal class DisplayMessageJobIntentService : JobIntentService() {
     var readyMessagesRepo = ReadyForDisplayMessageRepository.instance()
     var messageReadinessManager = MessageReadinessManager.instance()
     var handler = Handler(Looper.getMainLooper())
+    var picasso: Picasso? = null
 
     /**
      * This method starts displaying message runnable.
@@ -48,7 +50,6 @@ internal class DisplayMessageJobIntentService : JobIntentService() {
             if (!imageUrl.isNullOrEmpty()) {
                     fetchImageThenDisplayMessage(message, hostActivity, imageUrl)
             } else {
-
                     // If no image, just display the message.
                     displayMessage(message, hostActivity)
             }
@@ -64,19 +65,21 @@ internal class DisplayMessageJobIntentService : JobIntentService() {
         hostActivity: Activity,
         imageUrl: String
     ) {
-        val bitmap: Bitmap? = getImage(imageUrl)
-        bitmap?.let {
-            displayMessage(message, hostActivity, it.width, it.height)
-        }
-    }
+        ImageUtil.fetchImage(imageUrl, object : Callback {
+            override fun onSuccess() {
+                displayMessage(message, hostActivity)
+            }
 
-    @VisibleForTesting
-    internal fun getImage(imageUrl: String): Bitmap? = ImageUtil.fetchBitmap(imageUrl)
+            override fun onError(e: Exception?) {
+                Timber.tag(TAG).d("Downloading image failed")
+            }
+        }, hostActivity, picasso)
+    }
 
     /**
      * This method displays message on UI thread.
      */
-    private fun displayMessage(message: Message, hostActivity: Activity, imageWidth: Int = 0, imageHeight: Int = 0) {
+    private fun displayMessage(message: Message, hostActivity: Activity) {
         if (!verifyContexts(message)) {
             // Message display aborted by the host app
             Timber.tag(TAG).d("message display cancelled by the host app")
@@ -88,7 +91,7 @@ internal class DisplayMessageJobIntentService : JobIntentService() {
             return
         }
 
-        handler.post(DisplayMessageRunnable(message, hostActivity, imageWidth, imageHeight))
+        handler.post(DisplayMessageRunnable(message, hostActivity))
     }
 
     /**
