@@ -6,7 +6,6 @@ import com.squareup.picasso.Picasso
 
 internal object ImageUtil {
 
-    @SuppressWarnings("TooGenericExceptionCaught")
     fun fetchImage(imageUrl: String, callback: Callback, context: Context, picasso: Picasso? = null) {
         (picasso ?: Picasso.get()).load(imageUrl).priority(Picasso.Priority.HIGH)
             .resize(ViewUtil.getDisplayWidth(context), 0).fetch(callback)
