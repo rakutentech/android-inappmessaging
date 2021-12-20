@@ -4,6 +4,7 @@ import android.annotation.SuppressLint
 import android.content.Context
 import android.content.res.ColorStateList
 import android.graphics.Color
+import android.graphics.Typeface
 import android.util.AttributeSet
 import android.view.View
 import android.widget.CheckBox
@@ -219,7 +220,7 @@ internal open class InAppMessageBaseView(context: Context, attrs: AttributeSet?)
                 it.setTextColor(headerColor)
                 it.setOnTouchListener(listener)
                 it.visibility = View.VISIBLE
-                font?.let { font -> it.typeface = font }
+                font?.let { font -> it.setTypeface(font, Typeface.BOLD) }
             }
         }
         if (!messageBody.isNullOrEmpty()) {

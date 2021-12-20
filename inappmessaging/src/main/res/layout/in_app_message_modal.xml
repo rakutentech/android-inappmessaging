@@ -10,10 +10,10 @@
   android:clipChildren="false"
   android:focusable="true"
   android:theme="@style/InAppMessaging">
-
+  
   <LinearLayout
     android:id="@+id/modal_layout"
-    android:layout_width="@dimen/modal_layout_width"
+    android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:layout_centerInParent="true"
     android:layout_gravity="center"
@@ -51,9 +51,10 @@
             android:layout_height="wrap_content"
             android:orientation="vertical">
 
+            <include layout="@layout/message_scrollview" />
+
             <include layout="@layout/message_image_view" />
 
-            <include layout="@layout/message_scrollview" />
           </LinearLayout>
         </ScrollView>
 
