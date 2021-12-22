@@ -153,7 +153,9 @@ internal interface MessageEventReconciliationUtil {
             // satisfied by unique events. Therefore, if any trigger was not satisfied by unique events,
             // or the number of reconciliation needed is not reached, then this whole trigger list is not
             // satisfied.
-            return if (numTriggersSatisfied < required) false else null
+            if (numTriggersSatisfied < required) return false
+            
+            return null
         }
 
         /**
