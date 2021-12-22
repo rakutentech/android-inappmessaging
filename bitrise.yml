@@ -1,7 +1,11 @@
 format_version: 11
 default_step_lib_source: https://github.com/bitrise-io/bitrise-steplib.git
 project_type: android
-
+trigger_map:
+- push_branch: "*"
+  workflow: build-and-release
+- pull_request_source_branch: "*"
+  workflow: build-and-release
 workflows:
   build-and-release:
     before_run:
@@ -24,7 +28,6 @@ workflows:
         inputs:
         - content: ./gradlew currentVersion
     - cache-push@2: {}
-
   setup_env:
     steps:
     - set-java-version@1:
@@ -34,14 +37,7 @@ workflows:
         inputs:
         - update_submodules: 'yes'
     - cache-pull@2: {}
-
 meta:
   bitrise.io:
     stack: linux-docker-android-20.04
     machine_type_id: elite
-
-trigger_map:
-- push_branch: "*"
-  workflow: build-and-release
-- pull_request_source_branch: "*"
-  workflow: build-and-release
