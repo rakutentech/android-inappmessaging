@@ -128,35 +128,62 @@ class ValueMatchingUtilSpec : BaseTest() {
     }
 
     @Test
-    fun `should compare non time long yield correct result`() {
+    fun `should compare non time long yield true`() {
         ValueMatchingUtil.isOperatorConditionSatisfied(
-                100001L, OperatorType.EQUALS, 100001L, false).shouldBeTrue()
+            LONG_VALUE, OperatorType.EQUALS, LONG_VALUE, false).shouldBeTrue()
         ValueMatchingUtil.isOperatorConditionSatisfied(
-                100001L, OperatorType.DOES_NOT_EQUAL, 100001L, false).shouldBeFalse()
+            LONG_VALUE, OperatorType.DOES_NOT_EQUAL, LONG_OTHER_VALUE, false).shouldBeTrue()
         ValueMatchingUtil.isOperatorConditionSatisfied(
-                100001L, OperatorType.GREATER_THAN, 100001L, false).shouldBeFalse()
+            LONG_OTHER_VALUE, OperatorType.GREATER_THAN, LONG_VALUE, false).shouldBeTrue()
         ValueMatchingUtil.isOperatorConditionSatisfied(
-                100001L, OperatorType.LESS_THAN, 100001L, false).shouldBeFalse()
+            LONG_VALUE, OperatorType.LESS_THAN, LONG_OTHER_VALUE, false).shouldBeTrue()
     }
 
     @Test
-    fun `should compare time long yield correct result`() {
+    fun `should compare non time long yield false`() {
         ValueMatchingUtil.isOperatorConditionSatisfied(
-                TIME_IN_MILLIS, OperatorType.EQUALS, TIME_IN_MILLIS - TIME_IN_MILLIS_TOLERANCE,
+            LONG_VALUE, OperatorType.EQUALS, LONG_OTHER_VALUE, false).shouldBeFalse()
+        ValueMatchingUtil.isOperatorConditionSatisfied(
+            LONG_VALUE, OperatorType.DOES_NOT_EQUAL, LONG_VALUE, false).shouldBeFalse()
+        ValueMatchingUtil.isOperatorConditionSatisfied(
+            LONG_VALUE, OperatorType.GREATER_THAN, LONG_VALUE, false).shouldBeFalse()
+        ValueMatchingUtil.isOperatorConditionSatisfied(
+            LONG_VALUE, OperatorType.LESS_THAN, LONG_VALUE, false).shouldBeFalse()
+    }
+
+    @Test
+    fun `should compare time long yield true`() {
+        ValueMatchingUtil.isOperatorConditionSatisfied(
+                TIME_IN_MILLIS, OperatorType.EQUALS, TIME_DIFF,
                 true).shouldBeTrue()
         ValueMatchingUtil.isOperatorConditionSatisfied(
-                TIME_IN_MILLIS, OperatorType.DOES_NOT_EQUAL, TIME_IN_MILLIS - TIME_IN_MILLIS_TOLERANCE,
-                true).shouldBeFalse()
+            TIME_IN_MILLIS, OperatorType.DOES_NOT_EQUAL, TIME_IN_MILLIS - 2 * TIME_IN_MILLIS_TOLERANCE,
+            true).shouldBeTrue()
         ValueMatchingUtil.isOperatorConditionSatisfied(
-                TIME_IN_MILLIS, OperatorType.GREATER_THAN, TIME_IN_MILLIS - TIME_IN_MILLIS_TOLERANCE,
-                true).shouldBeFalse()
+            TIME_IN_MILLIS * 2, OperatorType.GREATER_THAN, TIME_DIFF,
+            true).shouldBeTrue()
         ValueMatchingUtil.isOperatorConditionSatisfied(
-                TIME_IN_MILLIS, OperatorType.LESS_THAN, TIME_IN_MILLIS - TIME_IN_MILLIS_TOLERANCE,
-                true).shouldBeFalse()
+            TIME_IN_MILLIS / 2, OperatorType.LESS_THAN, TIME_DIFF,
+            true).shouldBeTrue()
+    }
+
+    @Test
+    fun `should compare time long yield false`() {
         ValueMatchingUtil.isOperatorConditionSatisfied(
-                TIME_IN_MILLIS, OperatorType.GREATER_THAN, TIME_IN_MILLIS, true).shouldBeFalse()
+            TIME_IN_MILLIS, OperatorType.EQUALS, TIME_IN_MILLIS - 2 * TIME_IN_MILLIS_TOLERANCE,
+            true).shouldBeFalse()
         ValueMatchingUtil.isOperatorConditionSatisfied(
-                TIME_IN_MILLIS, OperatorType.LESS_THAN, TIME_IN_MILLIS, true).shouldBeFalse()
+            TIME_IN_MILLIS, OperatorType.DOES_NOT_EQUAL, TIME_DIFF, true).shouldBeFalse()
+        ValueMatchingUtil.isOperatorConditionSatisfied(
+            TIME_IN_MILLIS, OperatorType.GREATER_THAN, TIME_DIFF, true).shouldBeFalse()
+        ValueMatchingUtil.isOperatorConditionSatisfied(
+            TIME_IN_MILLIS, OperatorType.LESS_THAN, TIME_DIFF, true).shouldBeFalse()
+        ValueMatchingUtil.isOperatorConditionSatisfied(
+            TIME_IN_MILLIS, OperatorType.GREATER_THAN, TIME_IN_MILLIS, true).shouldBeFalse()
+        ValueMatchingUtil.isOperatorConditionSatisfied(
+            TIME_IN_MILLIS, OperatorType.LESS_THAN, TIME_IN_MILLIS, true).shouldBeFalse()
+        ValueMatchingUtil.isOperatorConditionSatisfied(
+            TIME_IN_MILLIS, OperatorType.IS_BLANK, TIME_DIFF, true).shouldBeFalse()
     }
 
     @Test
@@ -278,5 +305,8 @@ class ValueMatchingUtilSpec : BaseTest() {
         private const val TEST_STRING_REGEX = "(.*)b(.*)"
         private const val TIME_IN_MILLIS = 1553293167L
         private const val TIME_IN_MILLIS_TOLERANCE = 1000
+        private const val TIME_DIFF = TIME_IN_MILLIS - TIME_IN_MILLIS_TOLERANCE
+        private const val LONG_VALUE = 100001L
+        private const val LONG_OTHER_VALUE = 100002L
     }
 }

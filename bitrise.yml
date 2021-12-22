@@ -1,0 +1,166 @@
+format_version: 11
+default_step_lib_source: https://github.com/bitrise-io/bitrise-steplib.git
+project_type: android
+trigger_map:
+- push_branch: "master"
+  workflow: build-and-test
+- pull_request_source_branch: "*"
+  workflow: build-and-test
+- tag: "v*.*.*"
+  workflow: release
+workflows:
+  build-and-test:
+    before_run:
+    - _setup-env
+    steps:
+    - cache-pull@2: {}
+    - script@1:
+        title: Download Dependencies
+        inputs:
+        - content: ./gradlew androidDependencies
+    - script@1:
+        title: Run Check
+        inputs:
+        - content: ./gradlew check
+    - script@1:
+        title: Assemble
+        inputs:
+        - content: ./gradlew assemble
+    - script@1:
+        title: Current Version
+        inputs:
+        - content: ./gradlew currentVersion
+    - script@1:
+        title: Upload Code Coverage
+        inputs:
+        - content: bash <(curl -s https://codecov.io/bash)
+    - custom-test-results-export@0:
+        # this add-on should export test artifacts as well, but currently not displayed.
+        inputs:
+        - test_name: Unit Tests (Debug)
+        - base_path: "$SDK_PATH/build/test-results/testDebugUnitTest/"
+        - search_pattern: "*"
+    - custom-test-results-export@0:
+        inputs:
+        - test_name: Unit Tests (Release)
+        - base_path: "$SDK_PATH/build/test-results/testReleaseUnitTest/"
+        - search_pattern: "*"
+    - deploy-to-bitrise-io@2:
+        inputs:
+        - deploy_path: $SDK_PATH/build/outputs/aar
+        - is_enable_public_page: 'false'
+    - cache-push@2:
+        inputs:
+        - cache_paths: |-
+            $HOME/.gradle
+            ./.gradle
+            $HOME/.m2
+        - ignore_check_on_paths: |-
+            $HOME/.gradle/caches/*.lock
+            ./.gradle/*.lock
+            ./.gradle/*.bin
+  integration-test:
+    before_run:
+    - _setup-env
+    steps:
+    - script@1:
+        title: Download Dependencies
+        inputs:
+        - content: ./gradlew androidDependencies
+    - script@1:
+        title: Run Tests
+        inputs:
+        - content: ./gradlew clean testRelease --tests com.rakuten.tech.mobile.inappmessaging.runtime.integration.IntegrationSpec
+    - custom-test-results-export@0:
+        inputs:
+        - test_name: Integration Tests
+        - base_path: "$SDK_PATH/build/test-results/testReleaseUnitTest/"
+        - search_pattern: "*"
+    - deploy-to-bitrise-io@2:
+        inputs:
+        - deploy_path: "$SDK_PATH/build/test-results/testReleaseUnitTest/"
+        - is_enable_public_page: 'false'
+    - slack@3:
+        inputs:
+        - channel: ''
+        - webhook_url: "$SLACK_CHANNEL_WEBHOOK"
+        - text: ''
+        - title: ''
+        - author_name: ''
+        - channel_on_error: ''
+        - pretext: ''
+        - pretext_on_error: ''
+        - message_on_error: |+
+            $BITRISE_APP_TITLE » $BITRISE_TRIGGERED_WORKFLOW_TITLE - #$BITRISE_BUILD_NUMBER *Failure*
+            <$BITRISE_BUILD_URL|Open>
+        - message: |+
+            $BITRISE_APP_TITLE » $BITRISE_TRIGGERED_WORKFLOW_TITLE - #$BITRISE_BUILD_NUMBER *Success*
+            <$BITRISE_BUILD_URL|Open>
+        - fields: ''
+        - buttons: ''
+        - footer: ''
+        - footer_icon: ''
+        - timestamp: 'no'
+        - icon_url_on_error: ''
+        - from_username_on_error: ''
+        - color_on_error: "#d10b20"
+  release:
+    before_run:
+    - build-and-test
+    after_run:
+    - _publish-doc
+    steps:
+    - script@1:
+        title: Retrieve Base64 PGP Key and save to file
+        inputs:
+        - content: |-
+            if [[ "$RELEASE_PGP_KEY_BASE64" != "" ]]; then
+              base64 -d <<< "$RELEASE_PGP_KEY_BASE64" > ./maven-central-key.gpg
+            fi
+    - script@1:
+        title: Publish Artifacts
+        inputs:
+        - content: ./gradlew publish
+  _setup-env:
+    steps:
+    - set-java-version@1:
+        inputs:
+        - set_java_version: '8'
+    - git-clone@6:
+        inputs:
+        - update_submodules: 'yes'
+    - script@1:
+        title: Get Tags
+        inputs:
+        - content: git fetch --tags
+  _publish-doc:
+    steps:
+    - script@1:
+        title: Publish Documentation
+        inputs:
+        - content: |-
+            #!/bin/bash
+            set -e
+            ./gradlew generatePublishableDocs
+            if [[ ! $BITRISE_GIT_TAG == *"-"* ]]; then
+              git checkout gh-pages
+              cp -R inappmessaging/build/publishableDocs/docs/. ./docs
+              cp -R inappmessaging/build/publishableDocs/_versions/. ./_versions
+              git add docs _versions
+              git config user.name "CI Publisher"
+              git config user.email "dev-opensource@mail.rakuten.com"
+              git commit -m "Publish documentation for $BITRISE_GIT_TAG"
+              git config url."https://x-token-auth:$PUBLISHER_GITHUB_API_TOKEN@github.com".insteadOf https://github.com
+              git push origin gh-pages
+            else
+             echo "Documentation not published for snapshot version"
+            fi
+meta:
+  bitrise.io:
+    stack: linux-docker-android-20.04
+    machine_type_id: elite
+app:
+  envs:
+  - opts:
+      is_expand: false
+    SDK_PATH: inappmessaging

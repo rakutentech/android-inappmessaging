@@ -41,8 +41,8 @@ internal object SessionManager {
             }
         }
 
-        // TODO: possibly add checking if the last ping is within a certain threshold before executing the request
         // reset current delay to initial
+        // future update: possibly add checking if last ping is within a certain threshold before executing the request
         MessageMixerPingScheduler.currDelay = RetryDelayUtil.INITIAL_BACKOFF_DELAY
         MessageMixerPingScheduler.instance().pingMessageMixerService(0)
     }
