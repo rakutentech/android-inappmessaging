@@ -11,6 +11,7 @@ workflows:
     before_run:
     - setup_env
     steps:
+    - cache-pull@2: {}
     - script@1:
         title: Download Dependencies
         inputs:
@@ -40,7 +41,6 @@ workflows:
     - git-clone@6:
         inputs:
         - update_submodules: 'yes'
-    - cache-pull@2: {}
 meta:
   bitrise.io:
     stack: linux-docker-android-20.04
