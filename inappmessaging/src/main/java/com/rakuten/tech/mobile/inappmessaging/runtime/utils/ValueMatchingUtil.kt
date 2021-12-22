@@ -66,29 +66,29 @@ internal object ValueMatchingUtil {
     ): Boolean {
         return if (eventValue == null || operatorType == null || triggerValue == null) {
             false
-        } else when (operatorType) {
-            OperatorType.EQUALS -> if (isTime) {
-                abs(eventValue - triggerValue) <= TIME_IN_MILLIS_TOLERANCE
-            } else {
-                eventValue.compareTo(triggerValue) == 0
-            }
-            OperatorType.DOES_NOT_EQUAL -> if (isTime) {
-                abs(eventValue - triggerValue) > TIME_IN_MILLIS_TOLERANCE
-            } else {
-                eventValue.compareTo(triggerValue) != 0
-            }
-            OperatorType.GREATER_THAN -> if (isTime) {
-                eventValue - triggerValue > TIME_IN_MILLIS_TOLERANCE
-            } else {
-                eventValue > triggerValue
-            }
-            OperatorType.LESS_THAN -> if (isTime) {
-                eventValue - triggerValue < -TIME_IN_MILLIS_TOLERANCE
-            } else {
-                eventValue < triggerValue
-            }
-            OperatorType.IS_BLANK, OperatorType.IS_NOT_BLANK,
-            OperatorType.MATCHES_REGEX, OperatorType.DOES_NOT_MATCH_REGEX -> false
+        } else if (isTime) {
+            compareTime(eventValue, operatorType, triggerValue)
+        } else {
+            compareNonTime(eventValue, operatorType, triggerValue)
+        }
+    }
+
+    private fun compareNonTime(eventValue: Long, operatorType: OperatorType, triggerValue: Long): Boolean {
+        return when (operatorType) {
+            OperatorType.EQUALS -> eventValue.compareTo(triggerValue) == 0
+            OperatorType.DOES_NOT_EQUAL -> eventValue.compareTo(triggerValue) != 0
+            OperatorType.GREATER_THAN -> eventValue > triggerValue
+            OperatorType.LESS_THAN -> eventValue < triggerValue
+            else -> false
+        }
+    }
+
+    private fun compareTime(eventValue: Long, operatorType: OperatorType, triggerValue: Long): Boolean {
+        return when (operatorType) {
+            OperatorType.EQUALS -> abs(eventValue - triggerValue) <= TIME_IN_MILLIS_TOLERANCE
+            OperatorType.DOES_NOT_EQUAL -> abs(eventValue - triggerValue) > TIME_IN_MILLIS_TOLERANCE
+            OperatorType.GREATER_THAN -> eventValue - triggerValue > TIME_IN_MILLIS_TOLERANCE
+            OperatorType.LESS_THAN -> eventValue - triggerValue < -TIME_IN_MILLIS_TOLERANCE
             else -> false
         }
     }
