@@ -32,6 +32,18 @@ workflows:
         title: Upload Code Coverage
         inputs:
         - content: bash <(curl -s https://codecov.io/bash)
+    - deploy-to-bitrise-io@2:
+        inputs:
+        - deploy_path: $SDK_PATH/build/reports
+        - is_enable_public_page: 'false'
+    - deploy-to-bitrise-io@2:
+        inputs:
+        - deploy_path: $SDK_PATH/build/test-results
+        - is_enable_public_page: 'false'
+    - deploy-to-bitrise-io@2:
+        inputs:
+        - deploy_path: $SDK_PATH/build/outputs/aar
+        - is_enable_public_page: 'false'
     - cache-push@2: {}
   setup_env:
     steps:
@@ -45,3 +57,8 @@ meta:
   bitrise.io:
     stack: linux-docker-android-20.04
     machine_type_id: elite
+app:
+  envs:
+  - opts:
+      is_expand: false
+    SDK_PATH: inappmessaging
