@@ -43,6 +43,7 @@ workflows:
         - base_path: "$SDK_PATH/build/test-results/testReleaseUnitTest/"
         - search_pattern: "*"
     - deploy-to-bitrise-io@2:
+        run_if: false # disabled
         inputs:
         - deploy_path: $SDK_PATH/build/reports
         - is_enable_public_page: 'false'
