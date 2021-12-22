@@ -37,15 +37,20 @@ workflows:
         - test_name: Unit Tests (Debug)
         - base_path: "$SDK_PATH/build/test-results/testDebugUnitTest/"
         - search_pattern: "*"
+    - custom-test-results-export@0:
+        inputs:
+        - test_name: Unit Tests (Release)
+        - base_path: "$SDK_PATH/build/test-results/testReleaseUnitTest/"
+        - search_pattern: "*"
     - deploy-to-bitrise-io@2:
         inputs:
         - deploy_path: $SDK_PATH/build/reports
         - is_enable_public_page: 'false'
-    # - deploy-to-bitrise-io@2:
-    #     run_if: false # disabled, not working
-    #     inputs:
-    #     - deploy_path: $SDK_PATH/build/test-results
-    #     - is_enable_public_page: 'false'
+    - deploy-to-bitrise-io@2:
+        run_if: false # disabled, not working
+        inputs:
+        - deploy_path: $SDK_PATH/build/test-results
+        - is_enable_public_page: 'false'
     - deploy-to-bitrise-io@2:
         inputs:
         - deploy_path: $SDK_PATH/build/outputs/aar
