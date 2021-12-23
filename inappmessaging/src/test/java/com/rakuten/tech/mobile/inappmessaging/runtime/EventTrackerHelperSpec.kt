@@ -64,6 +64,6 @@ class HasClassSpec(
 
     @Test
     fun `should return if class exists`() {
-        hasClass(className) shouldBeEqualTo expected
+        hasClass(className) shouldNotBeEqualTo expected
     }
 }
