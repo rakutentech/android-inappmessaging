@@ -57,6 +57,23 @@ workflows:
             $HOME/.gradle/caches/*.lock
             ./.gradle/*.lock
             ./.gradle/*.bin
+  integration-test:
+    before_run:
+    - setup_env
+    steps:
+    - script@1:
+        title: Download Dependencies
+        inputs:
+        - content: ./gradlew androidDependencies
+    - script@1:
+        title: Run Tests
+        inputs:
+        - content: ./gradlew clean testRelease --tests com.rakuten.tech.mobile.inappmessaging.runtime.integration.IntegrationSpec
+    - custom-test-results-export@0:
+        inputs:
+        - test_name: Integration Tests
+        - base_path: "$SDK_PATH/build/test-results/testReleaseUnitTest/"
+        - search_pattern: "*"
   setup_env:
     steps:
     - set-java-version@1:
