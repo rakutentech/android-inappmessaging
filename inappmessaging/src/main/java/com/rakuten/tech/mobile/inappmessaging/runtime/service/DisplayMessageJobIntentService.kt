@@ -1,7 +1,6 @@
 package com.rakuten.tech.mobile.inappmessaging.runtime.service
 
 import android.app.Activity
-import android.content.Context
 import android.content.Intent
 import android.os.Handler
 import android.os.Looper
@@ -115,13 +114,9 @@ internal class DisplayMessageJobIntentService : JobIntentService() {
          * This method enqueues work in to this service.
          */
         fun enqueueWork(work: Intent) {
-            val context: Context = InAppMessaging.instance().getHostAppContext() ?: return
-            enqueueWork(
-                context,
-                DisplayMessageJobIntentService::class.java,
-                DISPLAY_MESSAGE_JOB_ID,
-                work
-            )
+            InAppMessaging.instance().getHostAppContext()?.let {
+                enqueueWork(it, DisplayMessageJobIntentService::class.java, DISPLAY_MESSAGE_JOB_ID, work)
+            }
         }
     }
 }
