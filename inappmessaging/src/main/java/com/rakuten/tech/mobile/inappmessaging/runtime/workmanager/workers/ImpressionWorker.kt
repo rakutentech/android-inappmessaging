@@ -51,11 +51,10 @@ internal class ImpressionWorker(
             return Result.failure()
         }
 
-        val impressionServiceCall = createReportImpressionCall(impressionEndpoint, impressionRequest)
         AccountRepository.instance().logWarningForUserInfo(TAG)
         return try {
             // Execute Retrofit API call and handle response.
-            onResponse(impressionServiceCall.execute())
+            onResponse(createReportImpressionCall(impressionEndpoint, impressionRequest).execute())
         } catch (e: Exception) {
             Timber.tag(TAG).d(e)
             Result.retry()

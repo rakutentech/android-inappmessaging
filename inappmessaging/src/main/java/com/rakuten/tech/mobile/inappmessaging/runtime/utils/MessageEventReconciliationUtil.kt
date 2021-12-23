@@ -84,72 +84,78 @@ internal interface MessageEventReconciliationUtil {
          * Note: once the event has been reconciled with the message, it will be removed from the
          * argument eventMap. Because each event can only be used once against a message.
          */
-        @SuppressWarnings("LongMethod", "ComplexMethod", "NestedBlockDepth", "ReturnCount")
+        @SuppressWarnings("ReturnCount")
         private fun isMessageReconciled(message: Message, eventMap: Map<String, MutableList<Event>>): Boolean {
             // Getting the number of reconciliations are needed in order to reconcile this message.
-            val requiredSetsOfSatisfiedTriggersToDisplayMessage = getNumTimesToSatisfyTriggersForDisplay(message)
+            val requiredSetsToSatisfy = getNumTimesToSatisfyTriggersForDisplay(message)
 
-            // If requiredSetsOfSatisfiedTriggersToDisplayMessage <= 0, it's impossible to reconcile this
+            // If requiredSetsToSatisfy <= 0, it's impossible to reconcile this
             // message. Because this message had been displayed equal or more than its max impressions.
-            if (requiredSetsOfSatisfiedTriggersToDisplayMessage <= 0) {
+            if (requiredSetsToSatisfy <= 0) {
                 return false
             }
 
             val triggerList = message.getTriggers() ?: listOf()
-            triggers@ for (trigger in triggerList) {
-                // Make a copy of only relevant events to the argument trigger.
-                val relevantEventsCopy = copyEventsForTrigger(trigger, eventMap)
-                // If there are no relevant events, this trigger can't ever be satisfied.
-                if (relevantEventsCopy.isNullOrEmpty()) return false
-
-                // Reset numTriggersSatisfied in each outer loop. Because all triggers must be reach
-                // requiredSetsOfSatisfiedTriggersToDisplayMessage times.
-                var numTriggersSatisfied = 0
-                // Create an empty list which will contain reconciled events. They will be removed
-                // from the relevantEventsCopy iff Trigger is reconciled.
-                val eventsToBeRemoved = ArrayList<Event>()
-                // Reconcile each trigger with all relevant events.
-                for (event in relevantEventsCopy) {
-                    if (isTriggerReconciled(trigger, event)) {
-                        // Add this event to eventsToBeRemoved list because it can't be used again
-                        // to satisfy any more triggers.
-                        if (event.isPersistentType()) {
-                            if (triggerList.size > 1 || PingResponseMessageRepository.instance()
-                                            .shouldDisplayAppLaunchCampaign(message.getCampaignId())) {
-                                // If campaign depends on other events other than a persistent type (i.e. App Launch)
-                                // or should at least be displayed once,
-                                // no need to check the required number for satisfied triggers
-                                continue@triggers
-                            }
-                        } else {
-                            eventsToBeRemoved.add(event)
-                        }
-
-                        // Add numTriggersSatisfied by 1, and check the number against
-                        // requiredSetsOfSatisfiedTriggersToDisplayMessage.
-                        ++numTriggersSatisfied
-
-                        if (numTriggersSatisfied >= requiredSetsOfSatisfiedTriggersToDisplayMessage) {
-                            // Break the inner loop after numTriggersSatisfied has reached to
-                            // requiredSetsOfSatisfiedTriggersToDisplayMessage.
-                            break
-                        }
-                    }
+            for (trigger in triggerList) {
+                checkTrigger(trigger, eventMap, triggerList.size, message.getCampaignId(), requiredSetsToSatisfy)?.let {
+                    return it
                 }
-
-                // InAppMessaging's matching logic only support `AND` logic, meaning all triggers must be
-                // satisfied by unique events. Therefore, if any trigger was not satisfied by unique events,
-                // or the number of reconciliation needed is not reached, then this whole trigger list is not
-                // satisfied.
-                if (numTriggersSatisfied < requiredSetsOfSatisfiedTriggersToDisplayMessage) return false
-
-                // At the end of the inner loop, remove all events used for reconciliation. Since this
-                // relevantEventsCopy is only a copy, it's OK to remove event from it.
-                relevantEventsCopy.removeAll(eventsToBeRemoved)
             }
             // At this point, all triggers had been reconciled
             // ${requiredSetsOfSatisfiedTriggersToDisplayMessage} times.
             return true
+        }
+
+        @SuppressWarnings("LongMethod", "ReturnCount")
+        private fun checkTrigger(
+            trigger: Trigger,
+            eventMap: Map<String, MutableList<Event>>,
+            size: Int,
+            id: String,
+            required: Int
+        ): Boolean? {
+            // Make a copy of only relevant events to the argument trigger.
+            val relevantEventsCopy = copyEventsForTrigger(trigger, eventMap)
+            // If there are no relevant events, this trigger can't ever be satisfied.
+            if (relevantEventsCopy.isNullOrEmpty()) return false
+
+            // Reset numTriggersSatisfied in each outer loop. Because all triggers must be reach
+            // requiredSetsOfSatisfiedTriggersToDisplayMessage times.
+            var numTriggersSatisfied = 0
+
+            // Reconcile each trigger with all relevant events.
+            for (event in relevantEventsCopy) {
+                if (isTriggerReconciled(trigger, event)) {
+                    // Add this event to eventsToBeRemoved list because it can't be used again
+                    // to satisfy any more triggers.
+                    if (event.isPersistentType() && (size > 1 || PingResponseMessageRepository
+                            .instance().shouldDisplayAppLaunchCampaign(id))
+                    ) {
+                        // If campaign depends on other events other than a persistent type (i.e. App Launch)
+                        // or should at least be displayed once,
+                        // no need to check the required number for satisfied triggers
+                        return null
+                    }
+
+                    // Add numTriggersSatisfied by 1, and check the number against
+                    // requiredSetsOfSatisfiedTriggersToDisplayMessage.
+                    ++numTriggersSatisfied
+
+                    if (numTriggersSatisfied >= required) {
+                        // Break the inner loop after numTriggersSatisfied has reached to
+                        // requiredSetsOfSatisfiedTriggersToDisplayMessage.
+                        break
+                    }
+                }
+            }
+
+            // InAppMessaging's matching logic only support `AND` logic, meaning all triggers must be
+            // satisfied by unique events. Therefore, if any trigger was not satisfied by unique events,
+            // or the number of reconciliation needed is not reached, then this whole trigger list is not
+            // satisfied.
+            if (numTriggersSatisfied < required) return false
+
+            return null
         }
 
         /**
