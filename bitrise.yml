@@ -74,6 +74,10 @@ workflows:
         - test_name: Integration Tests
         - base_path: "$SDK_PATH/build/test-results/testReleaseUnitTest/"
         - search_pattern: "*"
+    - deploy-to-bitrise-io@2:
+        inputs:
+        - deploy_path: "$SDK_PATH/build/test-results/testReleaseUnitTest/"
+        - is_enable_public_page: 'false'
   setup_env:
     steps:
     - set-java-version@1:
