@@ -47,7 +47,16 @@ workflows:
         inputs:
         - deploy_path: $SDK_PATH/build/outputs/aar
         - is_enable_public_page: 'false'
-    - cache-push@2: {}
+    - cache-push@2:
+        inputs:
+        - cache_paths: |-
+            $HOME/.gradle
+            ./.gradle
+            $HOME/.m2
+        - ignore_check_on_paths: |-
+            $HOME/.gradle/caches/*.lock
+            ./.gradle/*.lock
+            ./.gradle/*.bin
   setup_env:
     steps:
     - set-java-version@1:
