@@ -32,14 +32,13 @@ workflows:
         title: Upload Code Coverage
         inputs:
         - content: bash <(curl -s https://codecov.io/bash)
+        is_always_run: true
     - custom-test-results-export@0:
         # this add-on should export test artifacts as well, but currently not displayed.
         inputs:
         - test_name: Unit Tests (Debug)
         - base_path: "$SDK_PATH/build/test-results/testDebugUnitTest/"
         - search_pattern: "*"
-        # when `check` fails, always run this step to know which tests are failing.
-        is_always_run: true
     - custom-test-results-export@0:
         inputs:
         - test_name: Unit Tests (Release)
