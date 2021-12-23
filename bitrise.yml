@@ -36,10 +36,11 @@ workflows:
     - custom-test-results-export@0:
         # this add-on should export test artifacts as well, but currently not displayed.
         inputs:
-        - test_name: Unit Tests (Debug)
-        - base_path: "$SDK_PATH/build/test-results/testDebugUnitTest/"
+        - test_name: Unit Tests
+        - base_path: "$SDK_PATH/build/test-results/"
         - search_pattern: "*"
     - custom-test-results-export@0:
+        run_if: false
         inputs:
         - test_name: Unit Tests (Release)
         - base_path: "$SDK_PATH/build/test-results/testReleaseUnitTest/"
