@@ -162,10 +162,10 @@ app:
     SDK_PATH: inappmessaging
   - opts:
       is_expand: false
-    JVM_OPTS: -Xmx1024m -XX:+PrintFlagsFinal -XX:+PrintGCDetails
+    JVM_OPTS: "-Xmx1024m -XX:+PrintFlagsFinal -XX:+PrintGCDetails"
   - opts:
       is_expand: false
-    _JAVA_OPTIONS: -Xmx1024m
+    _JAVA_OPTIONS: "-Xmx1024m"
   - opts:
       is_expand: false
-    GRADLE_OPTS: -Dorg.gradle.daemon=false -Dorg.gradle.workers.max=1 -Dorg.gradle.parallel=false
+    GRADLE_OPTS: "-Dorg.gradle.daemon=false -Dorg.gradle.workers.max=1 -Dorg.gradle.parallel=false"
