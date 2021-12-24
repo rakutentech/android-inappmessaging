@@ -106,7 +106,7 @@ workflows:
         - color_on_error: "#d10b20"
   release:
     before_run:
-    - _setup-env
+    - _build-and-test
     after_run:
     - _publish-doc
     steps:
@@ -122,6 +122,7 @@ workflows:
         inputs:
         - content: ./gradlew currentVersion
     - script@1:
+        run_if: false
         title: Publish Artifacts
         inputs:
         - content: ./gradlew publish
