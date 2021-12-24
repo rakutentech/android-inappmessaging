@@ -115,7 +115,7 @@ workflows:
         inputs:
         - content: |-
             if [[ "$RELEASE_PGP_KEY_BASE64" != "" ]]; then
-              base64 -d <<< "$RELEASE_PGP_KEY_BASE64" > /bitrise/src/validatetor/maven-central-key.gpg
+              base64 -d <<< "$RELEASE_PGP_KEY_BASE64" > /bitrise/src/inappmessaging/maven-central-key.gpg
             fi
     - script@1:
         run_if: false
