@@ -78,6 +78,30 @@ workflows:
         inputs:
         - deploy_path: "$SDK_PATH/build/test-results/testReleaseUnitTest/"
         - is_enable_public_page: 'false'
+    - slack@3:
+        inputs:
+        - channel: ''
+        - webhook_url: "$SLACK_CHANNEL_WEBHOOK"
+        - text: ''
+        - title: ''
+        - author_name: ''
+        - channel_on_error: ''
+        - pretext: ''
+        - pretext_on_error: ''
+        - message_on_error: |+
+            $BITRISE_APP_TITLE » $BITRISE_TRIGGERED_WORKFLOW_TITLE - #$BITRISE_BUILD_NUMBER *Failure*
+            <$BITRISE_BUILD_URL|Open>
+        - message: |+
+            $BITRISE_APP_TITLE » $BITRISE_TRIGGERED_WORKFLOW_TITLE - #$BITRISE_BUILD_NUMBER *Success*
+            <$BITRISE_BUILD_URL|Open>
+        - fields: ''
+        - buttons: ''
+        - footer: ''
+        - footer_icon: ''
+        - timestamp: 'no'
+        - icon_url_on_error: ''
+        - from_username_on_error: ''
+        - color_on_error: "#d10b20"
   setup_env:
     steps:
     - set-java-version@1:
