@@ -3,13 +3,15 @@ default_step_lib_source: https://github.com/bitrise-io/bitrise-steplib.git
 project_type: android
 trigger_map:
 - push_branch: "*"
-  workflow: build-and-release
+  workflow: build-and-test
 - pull_request_source_branch: "*"
-  workflow: build-and-release
+  workflow: build-and-test
+- tag: "v*.*.*"
+  workflow: release
 workflows:
-  build-and-release:
+  build-and-test:
     before_run:
-    - setup_env
+    - _setup-env
     steps:
     - cache-pull@2: {}
     - script@1:
@@ -59,7 +61,7 @@ workflows:
             ./.gradle/*.bin
   integration-test:
     before_run:
-    - setup_env
+    - _setup-env
     steps:
     - script@1:
         title: Download Dependencies
@@ -102,7 +104,28 @@ workflows:
         - icon_url_on_error: ''
         - from_username_on_error: ''
         - color_on_error: "#d10b20"
-  setup_env:
+  release:
+    before_run:
+    - _setup-env
+    after_run:
+    - _publish-doc
+    steps:
+    - script@1:
+        title: Retrieve Base64 PGP Key and save to file
+        inputs:
+        - content: |-
+            if [[ "$RELEASE_PGP_KEY_BASE64" != "" ]]; then
+              base64 -d <<< "$RELEASE_PGP_KEY_BASE64" > /bitrise/src/validatetor/maven-central-key.gpg
+            fi
+    - script@1:
+        title: Current Version
+        inputs:
+        - content: ./gradlew currentVersion
+    - script@1:
+        title: Publish Artifacts
+        inputs:
+        - content: ./gradlew publish
+  _setup-env:
     steps:
     - set-java-version@1:
         inputs:
@@ -110,6 +133,27 @@ workflows:
     - git-clone@6:
         inputs:
         - update_submodules: 'yes'
+  _publish-doc:
+    steps:
+    - script@1:
+        title: Publish Documentation
+        inputs:
+        - content: |-
+            #!/bin/bash
+            set -e
+            ./gradlew generatePublishableDocs
+            if [[ ! $BITRISE_GIT_TAG == *"-"* ]]; then
+              git checkout gh-pages
+              cp -R inappmessaging/build/publishableDocs/docs/. ./docs
+              cp -R inappmessaging/build/publishableDocs/_versions/. ./_versions
+              git add docs _versions
+              git config user.name "CI Publisher"
+              git config user.email "dev-opensource@mail.rakuten.com"
+              git commit -m "Publish documentation for $BITRISE_GIT_TAG"
+              git push origin gh-pages
+            else
+              echo "Documentation not published for snapshot version"
+            fi
 meta:
   bitrise.io:
     stack: linux-docker-android-20.04
