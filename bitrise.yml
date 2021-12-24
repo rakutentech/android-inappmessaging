@@ -106,7 +106,7 @@ workflows:
         - color_on_error: "#d10b20"
   release:
     before_run:
-    - _build-and-test
+    - build-and-test
     after_run:
     - _publish-doc
     steps:
@@ -117,10 +117,6 @@ workflows:
             if [[ "$RELEASE_PGP_KEY_BASE64" != "" ]]; then
               base64 -d <<< "$RELEASE_PGP_KEY_BASE64" > /bitrise/src/validatetor/maven-central-key.gpg
             fi
-    - script@1:
-        title: Current Version
-        inputs:
-        - content: ./gradlew currentVersion
     - script@1:
         run_if: false
         title: Publish Artifacts
