@@ -106,9 +106,7 @@ workflows:
         - color_on_error: "#d10b20"
   release:
     before_run:
-    #- build-and-test
-    # todo: revert this.
-    - _setup-env
+    - build-and-test
     after_run:
     - _publish-doc
     steps:
