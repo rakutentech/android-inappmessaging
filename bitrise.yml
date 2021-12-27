@@ -151,7 +151,7 @@ workflows:
               git config user.name "CI Publisher"
               git config user.email "dev-opensource@mail.rakuten.com"
               git commit -m "Publish documentation for $BITRISE_GIT_TAG"
-              git config url."https://x-token-auth:$PUBLISHER_GITHUB_API_TOKEN@$GIT_REPOSITORY_URL".insteadOf "https://github.com"
+              git config url."https://x-token-auth:$PUBLISHER_GITHUB_API_TOKEN@$GIT_REPOSITORY_URL".insteadOf $GIT_REPOSITORY_URL
               git push origin gh-pages
             else
              echo "Documentation not published for snapshot version"
