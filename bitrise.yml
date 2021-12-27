@@ -108,9 +108,9 @@ workflows:
     before_run:
     #- build-and-test
     # todo: revert this.
+    - _setup_env
+    after_run:
     - _publish-doc
-    #after_run:
-    #- _publish-doc
     steps:
     - script@1:
         title: Retrieve Base64 PGP Key and save to file
