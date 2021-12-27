@@ -143,9 +143,9 @@ workflows:
             #if [[ ! $BITRISE_GIT_TAG == *"-"* ]]; then
               git fetch
               git checkout gh-pages
-              #cp -R inappmessaging/build/publishableDocs/docs/. ./docs
-              #cp -R inappmessaging/build/publishableDocs/_versions/. ./_versions
-              #git add docs _versions
+              cp -R inappmessaging/build/publishableDocs/docs/. ./docs
+              cp -R inappmessaging/build/publishableDocs/_versions/. ./_versions
+              git add docs _versions
               git config user.name "CI Publisher"
               git config user.email "dev-opensource@mail.rakuten.com"
               git commit -m "Publish documentation for $BITRISE_GIT_TAG"
