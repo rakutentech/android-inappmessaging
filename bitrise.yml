@@ -134,6 +134,10 @@ workflows:
     - git-clone@6:
         inputs:
         - update_submodules: 'yes'
+    - script@1:
+        title: Get Tags
+        inputs:
+        - content: git fetch --tags
   _publish-doc:
     steps:
     # todo: replace username in remote set-url
