@@ -106,9 +106,11 @@ workflows:
         - color_on_error: "#d10b20"
   release:
     before_run:
-    - build-and-test
-    after_run:
+    #- build-and-test
+    # todo: revert this.
     - _publish-doc
+    #after_run:
+    #- _publish-doc
     steps:
     - script@1:
         title: Retrieve Base64 PGP Key and save to file
@@ -117,6 +119,11 @@ workflows:
             if [[ "$RELEASE_PGP_KEY_BASE64" != "" ]]; then
               base64 -d <<< "$RELEASE_PGP_KEY_BASE64" > /bitrise/src/inappmessaging/maven-central-key.gpg
             fi
+    # todo: remove this.
+    - script@1:
+        title: Echo bitrise git tag
+        inputs:
+        - content: echo $BITRISE_GIT_TAG
     - script@1:
         run_if: false
         title: Publish Artifacts
@@ -139,7 +146,7 @@ workflows:
             #!/bin/bash
             set -e
             ./gradlew generatePublishableDocs
-            if [[ ! $BITRISE_GIT_TAG == *"-"* ]]; then
+            #if [[ ! $BITRISE_GIT_TAG == *"-"* ]]; then
               git checkout gh-pages
               cp -R inappmessaging/build/publishableDocs/docs/. ./docs
               cp -R inappmessaging/build/publishableDocs/_versions/. ./_versions
@@ -148,9 +155,9 @@ workflows:
               git config user.email "dev-opensource@mail.rakuten.com"
               git commit -m "Publish documentation for $BITRISE_GIT_TAG"
               git push origin gh-pages
-            else
-              echo "Documentation not published for snapshot version"
-            fi
+            #else
+            #  echo "Documentation not published for snapshot version"
+            #fi
 meta:
   bitrise.io:
     stack: linux-docker-android-20.04
