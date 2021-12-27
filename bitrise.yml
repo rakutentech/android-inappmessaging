@@ -136,7 +136,6 @@ workflows:
         - content: git fetch --tags
   _publish-doc:
     steps:
-    # todo: replace username in remote set-url
     - script@1:
         title: Publish Documentation
         inputs:
@@ -152,7 +151,7 @@ workflows:
               git config user.name "CI Publisher"
               git config user.email "dev-opensource@mail.rakuten.com"
               git commit -m "Publish documentation for $BITRISE_GIT_TAG"
-              git remote set-url origin "https://$PUBLISHER_GITHUB_API_TOKEN@github.com/maureenorea-clores/android-inappmessaging.git"
+              git config url."https://x-token-auth:$PUBLISHER_GITHUB_API_TOKEN@GIT_REPOSITORY_URL".insteadOf "https://github.com"
               git push origin gh-pages
             else
              echo "Documentation not published for snapshot version"
