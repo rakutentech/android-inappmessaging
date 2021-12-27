@@ -118,10 +118,6 @@ workflows:
               base64 -d <<< "$RELEASE_PGP_KEY_BASE64" > /bitrise/src/inappmessaging/maven-central-key.gpg
             fi
     - script@1:
-        title: Current Version
-        inputs:
-        - content: ./gradlew cV
-    - script@1:
         run_if: false
         title: Publish Artifacts
         inputs:
