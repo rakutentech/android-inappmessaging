@@ -140,8 +140,7 @@ workflows:
             #!/bin/bash
             set -e
             ./gradlew generatePublishableDocs
-            #if [[ ! $BITRISE_GIT_TAG == *"-"* ]]; then
-              git fetch
+            if [[ ! $BITRISE_GIT_TAG == *"-"* ]]; then
               git checkout gh-pages
               cp -R inappmessaging/build/publishableDocs/docs/. ./docs
               cp -R inappmessaging/build/publishableDocs/_versions/. ./_versions
@@ -151,9 +150,9 @@ workflows:
               git commit -m "Publish documentation for $BITRISE_GIT_TAG"
               git remote set-url origin "https://$PUBLISHER_GITHUB_API_TOKEN@github.com/maureenorea-clores/android-inappmessaging.git"
               git push origin gh-pages
-            #else
-            #  echo "Documentation not published for snapshot version"
-            #fi
+            else
+             echo "Documentation not published for snapshot version"
+            fi
 meta:
   bitrise.io:
     stack: linux-docker-android-20.04
