@@ -108,7 +108,7 @@ workflows:
     before_run:
     #- build-and-test
     # todo: revert this.
-    - _setup_env
+    - _setup-env
     after_run:
     - _publish-doc
     steps:
