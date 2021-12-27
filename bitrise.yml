@@ -108,7 +108,7 @@ workflows:
     before_run:
     - build-and-test
     after_run:
-    - _publish-doc
+    - publish-doc
     steps:
     - script@1:
         title: Retrieve Base64 PGP Key and save to file
@@ -117,11 +117,6 @@ workflows:
             if [[ "$RELEASE_PGP_KEY_BASE64" != "" ]]; then
               base64 -d <<< "$RELEASE_PGP_KEY_BASE64" > /bitrise/src/inappmessaging/maven-central-key.gpg
             fi
-    # todo: remove this.
-    - script@1:
-        title: Echo bitrise git tag
-        inputs:
-        - content: echo $BITRISE_GIT_TAG
     - script@1:
         run_if: false
         title: Publish Artifacts
@@ -135,7 +130,7 @@ workflows:
     - git-clone@6:
         inputs:
         - update_submodules: 'yes'
-  _publish-doc:
+  publish-doc:
     steps:
     - script@1:
         title: Publish Documentation
@@ -143,15 +138,18 @@ workflows:
         - content: |-
             #!/bin/bash
             set -e
-            ./gradlew generatePublishableDocs
+            #./gradlew generatePublishableDocs
             #if [[ ! $BITRISE_GIT_TAG == *"-"* ]]; then
               git checkout gh-pages
-              cp -R inappmessaging/build/publishableDocs/docs/. ./docs
-              cp -R inappmessaging/build/publishableDocs/_versions/. ./_versions
-              git add docs _versions
+              #cp -R inappmessaging/build/publishableDocs/docs/. ./docs
+              #cp -R inappmessaging/build/publishableDocs/_versions/. ./_versions
+              #git add docs _versions
               git config user.name "CI Publisher"
               git config user.email "dev-opensource@mail.rakuten.com"
+              echo $(date -u) > index.html
+              git add index.html
               git commit -m "Publish documentation for $BITRISE_GIT_TAG"
+              git remote set-url origin "https://$PUBLISHER_GITHUB_API_TOKEN@github.com/maureenorea-clores/$GIT_REPOSITORY_URL"
               git push origin gh-pages
             #else
             #  echo "Documentation not published for snapshot version"
