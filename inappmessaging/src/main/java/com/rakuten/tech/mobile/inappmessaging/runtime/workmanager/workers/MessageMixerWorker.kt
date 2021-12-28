@@ -27,8 +27,7 @@ import kotlin.collections.ArrayList
 
 /**
  * This class contains the actual work to communicate with Message Mixer Service. It extends Worker
- * class, and uses synchronized network call to make request to Message Mixer Service. Note: If
- * return RETRY, WorkerManager will make exponential backoff retries by itself.
+ * class, and uses synchronized network call to make request to Message Mixer Service.
  */
 @SuppressWarnings("TooGenericExceptionCaught")
 internal class MessageMixerWorker(
@@ -51,12 +50,8 @@ internal class MessageMixerWorker(
     internal var responseCall: Call<MessageMixerResponse>? = null
 
     /**
-     * This is the main method to do the work. Making Message Mixer network call is the main work.
-     * If response is successful(200-300) from the Service, `WorkerResult.Success` should always be returned.
-     * If response was not successful(4xx), RETRY will be returned, then WorkManager will start
-     * exponential backoff by itself. If there are trouble making the network request, then return
-     * FAILURE. Note: This worker should be a periodic worker, meaning it will reschedule itself to
-     * make the request in x amount of time.
+     * Main method to do the work. Make Message Mixer network call is the main work.
+     * Retries sending the request with default backoff when network error is encountered.
      */
     override fun doWork(): Result {
         // Create a retrofit API.
@@ -84,13 +79,10 @@ internal class MessageMixerWorker(
     }
 
     /**
-     * This method process returned response from Message Mixer Service if connection was successful.
-     * And return RETRY if response code is 500 because server could be busy for the moment.
-     *
-     * Note: An HTTP response may still indicate an application-level failure such as a 404 or 500. Invoke
-     * MessageMixerResponse.isSuccessful() to determine if the response indicates success. If response
-     * wasn't successful, return RETRY to let WorkManger retry with exponential backoff. If response
-     * is 400, return FAILURE.
+     * This method handles the response from Config Service.
+     * if response code is 429 -> retries sending of request with random exponential back off
+     * if response code is 5xx -> retries at most 3 times with random exponential back off
+     * else -> returns failure
      */
     @VisibleForTesting
     @SuppressWarnings("LongMethod")
