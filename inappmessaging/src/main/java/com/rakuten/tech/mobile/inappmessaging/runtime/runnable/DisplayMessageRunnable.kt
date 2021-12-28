@@ -1,7 +1,9 @@
 package com.rakuten.tech.mobile.inappmessaging.runtime.runnable
 
 import android.app.Activity
+import android.view.Gravity
 import android.view.View
+import android.widget.FrameLayout
 import androidx.annotation.UiThread
 import com.rakuten.tech.mobile.inappmessaging.runtime.R
 import com.rakuten.tech.mobile.inappmessaging.runtime.data.enums.InAppMessageType
@@ -9,6 +11,7 @@ import com.rakuten.tech.mobile.inappmessaging.runtime.data.models.messages.Messa
 import com.rakuten.tech.mobile.inappmessaging.runtime.view.InAppMessageFullScreenView
 import com.rakuten.tech.mobile.inappmessaging.runtime.view.InAppMessageModalView
 import com.rakuten.tech.mobile.inappmessaging.runtime.view.InAppMessageSlideUpView
+import com.rakuten.tech.mobile.inappmessaging.runtime.view.InAppMessagingTooltipView
 import kotlinx.coroutines.Runnable
 
 /**
@@ -38,8 +41,8 @@ internal class DisplayMessageRunnable(
             when (messageType) {
                 InAppMessageType.MODAL -> {
                     val modalView = hostActivity
-                            .layoutInflater
-                            .inflate(R.layout.in_app_message_modal, null) as InAppMessageModalView
+                        .layoutInflater
+                        .inflate(R.layout.in_app_message_modal, null) as InAppMessageModalView
                     modalView.populateViewData(message)
                     hostActivity.addContentView(modalView, hostActivity.window.attributes)
                 }
@@ -60,6 +63,20 @@ internal class DisplayMessageRunnable(
                                     null) as InAppMessageSlideUpView
                     slideUpView.populateViewData(message)
                     hostActivity.addContentView(slideUpView, hostActivity.window.attributes)
+                }
+                InAppMessageType.TOOLTIP -> {
+                    val toolTipView = hostActivity
+                        .layoutInflater
+                        .inflate(
+                            R.layout.in_app_message_tooltip,
+                            null) as InAppMessagingTooltipView
+                    toolTipView.populateViewData(message)
+                    val params = FrameLayout.LayoutParams(
+                        FrameLayout.LayoutParams.WRAP_CONTENT,
+                        FrameLayout.LayoutParams.WRAP_CONTENT
+                    )
+                    params.gravity = Gravity.CENTER
+                    hostActivity.addContentView(toolTipView, params)
                 }
                 else -> Any()
             }

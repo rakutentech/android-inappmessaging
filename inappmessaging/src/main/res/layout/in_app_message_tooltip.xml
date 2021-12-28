@@ -1,0 +1,53 @@
+<?xml version="1.0" encoding="utf-8"?>
+<com.rakuten.tech.mobile.inappmessaging.runtime.view.InAppMessagingTooltipView xmlns:android="http://schemas.android.com/apk/res/android"
+  android:layout_width="wrap_content"
+  android:layout_height="wrap_content"
+  android:clickable="true"
+  android:clipChildren="false"
+  android:focusable="true"
+  android:theme="@style/InAppMessaging">
+
+  <LinearLayout
+    android:id="@+id/modal_layout"
+    android:layout_width="wrap_content"
+    android:layout_height="wrap_content"
+    android:layout_centerInParent="true"
+    android:layout_gravity="center"
+    android:orientation="vertical">
+
+    <!--TODO need to adjust when tip is on the right sides-->
+    <ImageButton
+      android:id="@+id/message_close_button"
+      style="@style/InAppMessaging.CloseButton.Modal"
+      android:contentDescription="@string/close_button" />
+
+    <FrameLayout
+      android:layout_width="wrap_content"
+      android:layout_height="wrap_content">
+      <ImageView
+        android:id="@+id/message_tip"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:adjustViewBounds="false"
+        android:scaleType="fitCenter" />
+
+      <ImageView
+        android:id="@+id/message_background"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:adjustViewBounds="false"
+        android:scaleType="fitCenter" />
+
+      <ImageView
+        android:id="@+id/message_tooltip_image_view"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center"
+        android:adjustViewBounds="false"
+        android:contentDescription="@string/in_app_message_image"
+        android:visibility="gone" />
+    </FrameLayout>
+
+  </LinearLayout>
+
+</com.rakuten.tech.mobile.inappmessaging.runtime.view.InAppMessagingTooltipView>

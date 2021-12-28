@@ -1,6 +1,7 @@
 package com.rakuten.tech.mobile.inappmessaging.runtime.data.models.messages
 
 import com.rakuten.tech.mobile.inappmessaging.runtime.data.enums.InAppMessageType
+import com.rakuten.tech.mobile.inappmessaging.runtime.data.models.Tooltip
 import com.rakuten.tech.mobile.inappmessaging.runtime.data.responses.ping.*
 
 internal class ValidTestMessage(
@@ -36,6 +37,8 @@ internal class ValidTestMessage(
     }
 
     override fun getContexts(): List<String> = listOf()
+
+    override fun getTooltipConfig(): Tooltip? = null
 
     override fun getNumberOfTimesClosed() = timesClosed
 

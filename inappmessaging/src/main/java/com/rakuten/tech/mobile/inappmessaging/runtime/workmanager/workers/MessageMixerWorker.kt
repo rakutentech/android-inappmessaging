@@ -165,6 +165,7 @@ internal class MessageMixerWorker(
         val parsedMessages = ArrayList<Message>()
         for (data in response.data) {
             val message: Message = data.campaignData
+            message.getTooltipConfig()
             parsedMessages.add(message)
         }
         return parsedMessages

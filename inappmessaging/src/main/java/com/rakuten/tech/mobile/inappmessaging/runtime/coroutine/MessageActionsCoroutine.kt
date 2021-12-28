@@ -41,14 +41,20 @@ internal class MessageActionsCoroutine(
         // First, update data repositories.
         updateRepositories(message, optOut)
 
-        // Getting ImpressionType, which represents which button was pressed:
-        val buttonType = getOnClickBehaviorType(viewResourceId)
-        // Add event in the button if exist.
-        addEmbeddedEvent(buttonType, message)
-        // Handling onclick action for deep link, redirect, etc.
-        handleDeepLink(getOnClickBehavior(buttonType, message))
+        val type = if (viewResourceId == R.id.in_app_message_tooltip_view) {
+            handleDeepLink(OnClickBehavior(2, message.getTooltipConfig()?.url))
+            ImpressionType.CLICK_CONTENT
+        } else {
+            // Getting ImpressionType, which represents which button was pressed:
+            val buttonType = getOnClickBehaviorType(viewResourceId)
+            // Add event in the button if exist.
+            addEmbeddedEvent(buttonType, message)
+            // Handling onclick action for deep link, redirect, etc.
+            handleDeepLink(getOnClickBehavior(buttonType, message))
+            buttonType
+        }
         // Schedule to report impression.
-        scheduleReportImpression(message, getImpressionTypes(optOut, buttonType))
+        scheduleReportImpression(message, getImpressionTypes(optOut, type))
 
         return true
     }

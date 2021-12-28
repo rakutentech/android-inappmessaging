@@ -1,5 +1,6 @@
 package com.rakuten.tech.mobile.inappmessaging.runtime.data.models.messages
 
+import com.rakuten.tech.mobile.inappmessaging.runtime.data.models.Tooltip
 import com.rakuten.tech.mobile.inappmessaging.runtime.data.responses.ping.MessagePayload
 import com.rakuten.tech.mobile.inappmessaging.runtime.data.responses.ping.Trigger
 
@@ -7,7 +8,7 @@ import com.rakuten.tech.mobile.inappmessaging.runtime.data.responses.ping.Trigge
  * Interface for an InApp campaign message.
  * All in-app messages must implement this interface.
  */
-@SuppressWarnings("ComplexInterface")
+@SuppressWarnings("ComplexInterface", "TooManyFunctions")
 internal interface Message {
     /**
      * This method returns the message type.
@@ -45,6 +46,8 @@ internal interface Message {
     fun setMaxImpression(maxImpression: Int)
 
     fun getContexts(): List<String>
+
+    fun getTooltipConfig(): Tooltip?
 
     /**
      * Returns the number of times this message has been queued (ready for display) but was removed
