@@ -236,6 +236,14 @@ class MessageReadinessManagerRequestSpec : BaseTest() {
     }
 
     @Test
+    fun `should retry on network error`() {
+        InApp.errorCallback = {
+            // ignore
+        }
+        verifyFailedResponse(false)
+    }
+
+    @Test
     fun `should retry once for 500 response code`() {
         InApp.errorCallback = {
             // ignore
