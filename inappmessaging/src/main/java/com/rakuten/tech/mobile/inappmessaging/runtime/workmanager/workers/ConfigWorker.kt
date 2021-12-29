@@ -44,9 +44,8 @@ internal class ConfigWorker(
                 MessageMixerPingScheduler.instance())
 
     /**
-     * Main method to do the work. Make Config Service network call is the main work. Regardless of
-     * the response(200/400) returned from Config Service, `WorkerResult.Success` should always be
-     * returned. Because this work(network call to config service) was scheduled and executed.
+     * Main method to do the work. Make Config Service network call is the main work.
+     * Retries sending the request with default backoff when network error is encountered.
      */
     @SuppressWarnings("LongMethod", "TooGenericExceptionCaught")
     override fun doWork(): Result {
@@ -78,8 +77,10 @@ internal class ConfigWorker(
     }
 
     /**
-     * This method handles the response from Config Service. Returns RETRY if response code is 500
-     * because server could be busy for the moment. Returns FAILURE if response code is 400.
+     * This method handles the response from Config Service.
+     * if response code is 429 -> retries sending of request with random exponential back off
+     * if response code is 5xx -> retries at most 3 times with random exponential back off
+     * else -> returns failure
      */
     @VisibleForTesting
     @SuppressWarnings("LongMethod")
