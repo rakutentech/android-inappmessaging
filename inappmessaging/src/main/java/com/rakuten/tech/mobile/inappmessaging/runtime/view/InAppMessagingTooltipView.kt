@@ -118,9 +118,11 @@ internal class InAppMessagingTooltipView(
     }
 
     private fun setTip(width: Int, height: Int) {
-
+        var adjustedWidth = width
+        var adjustedHeight = height
         val ptArray = when (type) {
             PositionType.BOTTOM_CENTER -> {
+                adjustedHeight += PADDING
                 findViewById<ImageView>(R.id.message_tooltip_image_view)?.setPadding(0, 0, 0, 2 * TRI_SIZE)
                 findViewById<ImageView>(R.id.message_background)?.setPadding(0, 0, 0, 2 * TRI_SIZE)
                 val posY = height + TRI_SIZE / 2
@@ -131,6 +133,7 @@ internal class InAppMessagingTooltipView(
                 )
             }
             PositionType.TOP_CENTER -> {
+                adjustedHeight += PADDING
                 findViewById<ImageView>(R.id.message_tooltip_image_view)?.setPadding(0, 2 * TRI_SIZE, 0, 0)
                 findViewById<ImageView>(R.id.message_background)?.setPadding(0, 2 * TRI_SIZE, 0, 0)
                 arrayOf(
@@ -140,6 +143,7 @@ internal class InAppMessagingTooltipView(
                 )
             }
             PositionType.LEFT -> {
+                adjustedWidth += PADDING
                 findViewById<ImageView>(R.id.message_tooltip_image_view)?.setPadding(2 * TRI_SIZE, 0, 0, 0)
                 findViewById<ImageView>(R.id.message_background)?.setPadding(2 * TRI_SIZE, 0, 0, 0)
                 arrayOf(
@@ -149,6 +153,7 @@ internal class InAppMessagingTooltipView(
                 )
             }
             PositionType.RIGHT -> {
+                adjustedWidth += PADDING
                 findViewById<ImageView>(R.id.message_tooltip_image_view)?.setPadding(0, 0, 2 * TRI_SIZE, 0)
                 findViewById<ImageView>(R.id.message_background)?.setPadding(0, 0, 2 * TRI_SIZE, 0)
                 arrayOf(
@@ -172,12 +177,12 @@ internal class InAppMessagingTooltipView(
         paint.color = Color.parseColor(bgColor)
         paint.style = Paint.Style.FILL_AND_STROKE
         paint.isAntiAlias = true
-        val bg = Bitmap.createBitmap(width + PADDING, height, Bitmap.Config.ARGB_8888)
+        val bg = Bitmap.createBitmap(adjustedWidth, adjustedHeight, Bitmap.Config.ARGB_8888)
         val canvas = Canvas(bg)
         canvas.drawPath(path, paint)
 
         val imageView = findViewById<ImageView>(R.id.message_tip)
-        imageView.setBackgroundColor(Color.parseColor("#A5000000"))
+//        imageView.setBackgroundColor(Color.parseColor("#A5000000"))
         imageView.setImageBitmap(bg)
     }
 

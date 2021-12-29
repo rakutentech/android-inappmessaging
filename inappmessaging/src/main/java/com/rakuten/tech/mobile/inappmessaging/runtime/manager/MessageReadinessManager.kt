@@ -12,6 +12,7 @@ import com.rakuten.tech.mobile.inappmessaging.runtime.data.repositories.LocalDis
 import com.rakuten.tech.mobile.inappmessaging.runtime.data.repositories.LocalOptedOutMessageRepository
 import com.rakuten.tech.mobile.inappmessaging.runtime.data.repositories.PingResponseMessageRepository
 import com.rakuten.tech.mobile.inappmessaging.runtime.data.repositories.ReadyForDisplayMessageRepository
+import com.rakuten.tech.mobile.inappmessaging.runtime.data.repositories.TooltipMessageRepository
 import com.rakuten.tech.mobile.inappmessaging.runtime.data.requests.DisplayPermissionRequest
 import com.rakuten.tech.mobile.inappmessaging.runtime.data.responses.displaypermission.DisplayPermissionResponse
 import com.rakuten.tech.mobile.inappmessaging.runtime.utils.RetryDelayUtil
@@ -57,7 +58,9 @@ internal interface MessageReadinessManager {
         @WorkerThread
         @SuppressWarnings("LongMethod", "ReturnCount")
         override fun getNextDisplayMessage(): Message? {
-            val messageList: List<Message> = ReadyForDisplayMessageRepository.instance().getAllMessagesCopy()
+            val messageList = mutableListOf<Message>()
+            messageList.addAll(TooltipMessageRepository.instance().getAllMessagesCopy())
+            messageList.addAll(ReadyForDisplayMessageRepository.instance().getAllMessagesCopy())
             for (message in messageList) {
                 Timber.tag(TAG).d("checking permission for message: %s", message.getCampaignId())
 

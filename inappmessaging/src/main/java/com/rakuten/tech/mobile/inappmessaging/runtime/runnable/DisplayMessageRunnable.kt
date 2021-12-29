@@ -8,6 +8,7 @@ import androidx.annotation.UiThread
 import com.rakuten.tech.mobile.inappmessaging.runtime.R
 import com.rakuten.tech.mobile.inappmessaging.runtime.data.enums.InAppMessageType
 import com.rakuten.tech.mobile.inappmessaging.runtime.data.models.messages.Message
+import com.rakuten.tech.mobile.inappmessaging.runtime.utils.ContextExtension.findViewByName
 import com.rakuten.tech.mobile.inappmessaging.runtime.view.InAppMessageFullScreenView
 import com.rakuten.tech.mobile.inappmessaging.runtime.view.InAppMessageModalView
 import com.rakuten.tech.mobile.inappmessaging.runtime.view.InAppMessageSlideUpView
@@ -76,7 +77,16 @@ internal class DisplayMessageRunnable(
                         FrameLayout.LayoutParams.WRAP_CONTENT
                     )
                     params.gravity = Gravity.CENTER
-                    hostActivity.addContentView(toolTipView, params)
+
+                    val view = message.getTooltipConfig()?.id?.let { hostActivity.findViewByName<View>(it) }
+                    view?.let {
+                        val location = IntArray(2)
+                        it.getLocationOnScreen(location)
+                    }
+                    val location = IntArray(2)
+                    view?.getLocationOnScreen(location)
+                    val x = location[0]
+                    val y = location[1]
                 }
                 else -> Any()
             }
