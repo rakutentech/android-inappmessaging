@@ -356,6 +356,7 @@ Documents targeting Product Managers:
 
 ### 6.1.0 (in-progress)
 * SDKCF-4650: Refactored handling for different responses from endpoint requests for consistency and better logging.
+* SDKCF-4729: Added error handling for display permission request.
 
 ### 6.0.0 (2021-12-03)
 * SDKCF-4151: **Breaking Changes:**

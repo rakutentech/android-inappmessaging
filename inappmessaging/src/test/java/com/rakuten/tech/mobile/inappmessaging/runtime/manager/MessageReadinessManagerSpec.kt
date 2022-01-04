@@ -17,7 +17,10 @@ import com.rakuten.tech.mobile.inappmessaging.runtime.data.responses.config.Conf
 import com.rakuten.tech.mobile.inappmessaging.runtime.data.responses.config.ConfigResponseData
 import com.rakuten.tech.mobile.inappmessaging.runtime.data.responses.config.ConfigResponseEndpoints
 import com.rakuten.tech.mobile.inappmessaging.runtime.data.responses.displaypermission.DisplayPermissionResponse
+import okhttp3.mockwebserver.MockResponse
+import okhttp3.mockwebserver.MockWebServer
 import org.amshove.kluent.*
+import org.junit.After
 import org.junit.Before
 import org.junit.Test
 import org.junit.runner.RunWith
@@ -34,7 +37,7 @@ import kotlin.collections.ArrayList
  */
 @RunWith(RobolectricTestRunner::class)
 @Config(sdk = [Build.VERSION_CODES.O_MR1])
-class MessageReadinessManagerSpec : BaseTest() {
+open class MessageReadinessManagerSpec : BaseTest() {
 
     private var mockRequest = Mockito.mock(DisplayPermissionRequest::class.java)
     private var testMessage = Mockito.mock(Message::class.java)
@@ -67,11 +70,7 @@ class MessageReadinessManagerSpec : BaseTest() {
 
     @Test
     fun `should next ready message be null when no events`() {
-        val messageList = ArrayList<Message>()
-        messageList.add(ValidTestMessage("1", false))
-        messageList.add(ValidTestMessage("2", false))
-        messageList.add(ValidTestMessage("3", false))
-        ReadyForDisplayMessageRepository.instance().replaceAllMessages(messageList)
+        createMessageList()
         MessageReadinessManager.instance().getNextDisplayMessage().shouldBeNull()
     }
 
@@ -129,18 +128,13 @@ class MessageReadinessManagerSpec : BaseTest() {
         ReadyForDisplayMessageRepository.instance().replaceAllMessages(messageList)
         LocalOptedOutMessageRepository.instance().addMessage(message)
         MessageReadinessManager.instance().getNextDisplayMessage().shouldBeNull()
+        MessageReadinessManager.shouldRetry.get().shouldBeFalse()
     }
 
     @Test
     fun `should next ready message be null with ping required`() {
         initializeInApp()
-
-        val messageList = ArrayList<Message>()
-        // will not be displayed when campaign expires)
-        messageList.add(ValidTestMessage("1", false))
-        messageList.add(ValidTestMessage("2", false))
-        messageList.add(ValidTestMessage("3", false))
-        ReadyForDisplayMessageRepository.instance().replaceAllMessages(messageList)
+        createMessageList()
         ConfigResponseRepository.instance().addConfigResponse(
                 Gson().fromJson(CONFIG_RESPONSE.trimIndent(), ConfigResponse::class.java).data)
         HostAppInfoRepository.instance().addHostInfo(HostAppInfo("rakuten.com.tech.mobile.test",
@@ -153,17 +147,29 @@ class MessageReadinessManagerSpec : BaseTest() {
     fun `should next ready message be null with empty display impression`() {
         initializeInApp()
 
-        val messageList = ArrayList<Message>()
-        // will not be displayed when campaign expires)
-        messageList.add(ValidTestMessage("1", false))
-        messageList.add(ValidTestMessage("2", false))
-        messageList.add(ValidTestMessage("3", false))
-        ReadyForDisplayMessageRepository.instance().replaceAllMessages(messageList)
+        createMessageList()
         ConfigResponseRepository.instance().addConfigResponse(
                 Gson().fromJson(CONFIG_RESPONSE_EMPTY.trimIndent(), ConfigResponse::class.java).data)
         HostAppInfoRepository.instance().addHostInfo(HostAppInfo("rakuten.com.tech.mobile.test",
                 InAppMessagingTestConstants.DEVICE_ID, InAppMessagingTestConstants.APP_VERSION,
                 "2", InAppMessagingTestConstants.LOCALE))
+        MessageReadinessManager.instance().getNextDisplayMessage().shouldBeNull()
+    }
+
+    private fun createMessageList() {
+        val messageList = ArrayList<Message>()
+        messageList.add(ValidTestMessage("1", false))
+        messageList.add(ValidTestMessage("2", false))
+        messageList.add(ValidTestMessage("3", false))
+        ReadyForDisplayMessageRepository.instance().replaceAllMessages(messageList)
+    }
+
+    @Test
+    fun `should return null for valid message when max impression`() {
+        val message = ValidTestMessage("10", false)
+        message.setMaxImpression(0)
+        ReadyForDisplayMessageRepository.instance().replaceAllMessages(
+            arrayListOf(message))
         MessageReadinessManager.instance().getNextDisplayMessage().shouldBeNull()
     }
 
@@ -197,5 +203,107 @@ class MessageReadinessManagerSpec : BaseTest() {
                 }
             }
         }"""
+    }
+}
+
+class MessageReadinessManagerRequestSpec : BaseTest() {
+    private val server = MockWebServer()
+    private var data = Mockito.mock(ConfigResponseData::class.java)
+    private var endpoint = Mockito.mock(ConfigResponseEndpoints::class.java)
+
+    @Before
+    override fun setup() {
+        super.setup()
+        AccountRepository.instance().userInfoProvider = TestUserInfoProvider()
+        HostAppInfoRepository.instance().addHostInfo(HostAppInfo(
+            InAppMessagingTestConstants.APP_ID,
+            InAppMessagingTestConstants.DEVICE_ID,
+            InAppMessagingTestConstants.APP_VERSION,
+            InAppMessagingTestConstants.SUB_KEY,
+            InAppMessagingTestConstants.LOCALE))
+        ConfigResponseRepository.instance().addConfigResponse(data)
+        ReadyForDisplayMessageRepository.instance().replaceAllMessages(
+            arrayListOf(ValidTestMessage(CAMPAIGN_ID, false)))
+        server.start()
+        `when`(data.endpoints).thenReturn(endpoint)
+        `when`(endpoint.displayPermission).thenReturn(server.url("client").toString())
+        InApp.errorCallback = null
+    }
+
+    @After
+    fun teardown() {
+        server.shutdown()
+    }
+
+    @Test
+    fun `should retry on network error`() {
+        InApp.errorCallback = {
+            // ignore
+        }
+        verifyFailedResponse(false)
+    }
+
+    @Test
+    fun `should retry once for 500 response code`() {
+        InApp.errorCallback = {
+            // ignore
+        }
+        val mockResponse = MockResponse().setResponseCode(500)
+        server.enqueue(mockResponse)
+        server.enqueue(mockResponse)
+        verifyFailedResponse(false)
+    }
+
+    @Test
+    fun `should return valid on retry after first 500 response code`() {
+        server.enqueue(MockResponse().setResponseCode(500))
+        server.enqueue(MockResponse().setResponseCode(200).setBody(DISPLAY_RESPONSE))
+        verifyValidResponse(MessageReadinessManager.instance().getNextDisplayMessage())
+    }
+
+    @Test
+    fun `should not retry for 4xx response code`() {
+        val mockResponse = MockResponse().setResponseCode(400)
+        server.enqueue(mockResponse)
+        verifyFailedResponse(true)
+    }
+
+    @Test
+    fun `should return valid message`() {
+        val mockResponse = MockResponse().setResponseCode(200).setBody(DISPLAY_RESPONSE)
+        server.enqueue(mockResponse)
+        verifyValidResponse(MessageReadinessManager.instance().getNextDisplayMessage())
+    }
+
+    @Test
+    fun `should return null if display not allowed`() {
+        val mockResponse = MockResponse().setResponseCode(200).setBody(NOT_DISPLAY_RESPONSE)
+        server.enqueue(mockResponse)
+        verifyFailedResponse(true)
+    }
+
+    @Test
+    fun `should return null on valid response but need ping`() {
+        val mockResponse = MockResponse().setResponseCode(200).setBody(DISPLAY_PING_RESPONSE)
+        server.enqueue(mockResponse)
+        val message = MessageReadinessManager.instance().getNextDisplayMessage()
+        message.shouldBeNull()
+    }
+
+    private fun verifyFailedResponse(isRetry: Boolean) {
+        MessageReadinessManager.instance().getNextDisplayMessage().shouldBeNull()
+        MessageReadinessManager.shouldRetry.get() shouldBeEqualTo isRetry
+    }
+
+    private fun verifyValidResponse(message: Message?) {
+        message.shouldNotBeNull()
+        message.getCampaignId() shouldBeEqualTo CAMPAIGN_ID
+    }
+
+    companion object {
+        private const val DISPLAY_RESPONSE = "{\"display\":true, \"performPing\":false}"
+        private const val NOT_DISPLAY_RESPONSE = "{\"display\":false, \"performPing\":false}"
+        private const val DISPLAY_PING_RESPONSE = "{\"display\":true, \"performPing\":true}"
+        private const val CAMPAIGN_ID = "1"
     }
 }
