@@ -148,7 +148,6 @@ workflows:
               cp -R inappmessaging/build/publishableDocs/_versions/. ./_versions
               git add docs _versions
               git config user.name "CI Publisher"
-              git config user.email "dev-opensource@mail.rakuten.com"
               git commit -m "Publish documentation for $BITRISE_GIT_TAG"
               git config url."https://x-token-auth:$PUBLISHER_GITHUB_API_TOKEN@github.com".insteadOf https://github.com
               git push origin gh-pages
