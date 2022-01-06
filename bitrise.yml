@@ -12,6 +12,8 @@ workflows:
   build-and-test:
     before_run:
     - _setup-env
+    after_run:
+    - _run_sonarqube_scanner
     steps:
     - cache-pull@2: {}
     - script@1:
@@ -155,6 +157,14 @@ workflows:
             else
              echo "Documentation not published for snapshot version"
             fi
+  _run_sonarqube_scanner:
+    steps:
+    - script@1:
+        # todo: change branch to master
+        run_if: '{{getenv "SONAR_API_TOKEN" | ne "" | and enveq "BITRISE_GIT_BRANCH" "ci/SDKCF-4694"}}'
+        title: Run SonarQube Scanner
+        inputs:
+        - content: ./gradlew sonarqube
 meta:
   bitrise.io:
     stack: linux-docker-android-20.04
