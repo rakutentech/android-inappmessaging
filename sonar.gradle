@@ -8,18 +8,15 @@ sonarqube {
         property 'sonar.projectName', 'Android In-App Messaging SDK'
         property 'sonar.host.url', System.getenv("SONARQUBE_HOST_URL")
         property 'sonar.login', System.getenv("SONARQUBE_TOKEN")
-        property 'sonar.projectKey', 'android-inappmessaging'
+        property 'sonar.projectKey', System.getenv("SONARQUBE_PROJ_KEY")
         property 'sonar.projectVersion', scmVersion.version
-        // todo: change to master
-        if (branch == "ci/SDKCF-4694") {
+        if (branch == "master") {
             property 'sonar.branch.name', branch
+        } else {
+            property 'sonar.pullrequest.key', System.getenv("BITRISE_PULL_REQUEST").findAll(/\d+/)*.toInteger().last()
+            property 'sonar.pullrequest.branch', branch
+            property 'sonar.pullrequest.base', 'master'
         }
-        // Disabled since the SonarQube API token is currently not exposed for Pull Requests.
-        // else {
-        //     property 'sonar.pullrequest.key', System.getenv("BITRISE_PULL_REQUEST").findAll(/\d+/)*.toInteger().last()
-        //     property 'sonar.pullrequest.branch', branch
-        //     property 'sonar.pullrequest.base', 'master'
-        // }
         property 'sonar.qualitygate.wait', true
     }
 }
@@ -42,7 +39,6 @@ subprojects { subproject ->
         }
     }
 }
-
 
 // test module is a sample app to test inappmessaging library,
 // and should be excluded from analysis
