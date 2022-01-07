@@ -141,7 +141,7 @@ workflows:
         - content: |-
             #!/bin/bash
             set -e
-            dig +short myip.opendns.com @resolver1.opendns.com
+            curl ifconfig.me
   _publish-doc:
     steps:
     - script@1:
