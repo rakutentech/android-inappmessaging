@@ -6,8 +6,8 @@ sonarqube {
     properties {
         property 'sonar.sourceEncoding', 'UTF-8'
         property 'sonar.projectName', 'Android In-App Messaging SDK'
-        property 'sonar.host.url', System.getenv("SONAR_HOST_URL")
-        property 'sonar.login', System.getenv("SONAR_API_TOKEN")
+        property 'sonar.host.url', System.getenv("SONARQUBE_HOST_URL")
+        property 'sonar.login', System.getenv("SONARQUBE_TOKEN")
         property 'sonar.projectKey', 'android-inappmessaging'
         property 'sonar.projectVersion', scmVersion.version
         // todo: change to master
