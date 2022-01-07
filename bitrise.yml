@@ -160,8 +160,7 @@ workflows:
   _run_sonarqube_scanner:
     steps:
     - script@1:
-        # todo: change branch to master
-        run_if: '{{getenv "SONARQUBE_TOKEN" | ne "" | and (enveq "BITRISE_GIT_BRANCH" "ci/SDKCF-4694")}}'
+        run_if: '{{getenv "SONARQUBE_TOKEN" | ne ""}}'
         title: Run SonarQube Scanner
         inputs:
         - content: ./gradlew sonarqube
