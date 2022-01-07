@@ -12,55 +12,55 @@ workflows:
   build-and-test:
     before_run:
     - _setup-env
-    after_run:
-    - _run_sonarqube_scanner
+    # after_run:
+    # - _run_sonarqube_scanner
     steps:
     - cache-pull@2: {}
-    - script@1:
-        title: Download Dependencies
-        inputs:
-        - content: ./gradlew androidDependencies
-    - script@1:
-        title: Run Check
-        inputs:
-        - content: ./gradlew check
-    - script@1:
-        title: Assemble
-        inputs:
-        - content: ./gradlew assemble
-    - script@1:
-        title: Current Version
-        inputs:
-        - content: ./gradlew currentVersion
-    - script@1:
-        title: Upload Code Coverage
-        inputs:
-        - content: bash <(curl -s https://codecov.io/bash)
-    - custom-test-results-export@0:
-        # this add-on should export test artifacts as well, but currently not displayed.
-        inputs:
-        - test_name: Unit Tests (Debug)
-        - base_path: "$SDK_PATH/build/test-results/testDebugUnitTest/"
-        - search_pattern: "*"
-    - custom-test-results-export@0:
-        inputs:
-        - test_name: Unit Tests (Release)
-        - base_path: "$SDK_PATH/build/test-results/testReleaseUnitTest/"
-        - search_pattern: "*"
-    - deploy-to-bitrise-io@2:
-        inputs:
-        - deploy_path: $SDK_PATH/build/outputs/aar
-        - is_enable_public_page: 'false'
-    - cache-push@2:
-        inputs:
-        - cache_paths: |-
-            $HOME/.gradle
-            ./.gradle
-            $HOME/.m2
-        - ignore_check_on_paths: |-
-            $HOME/.gradle/caches/*.lock
-            ./.gradle/*.lock
-            ./.gradle/*.bin
+    # - script@1:
+    #     title: Download Dependencies
+    #     inputs:
+    #     - content: ./gradlew androidDependencies
+    # - script@1:
+    #     title: Run Check
+    #     inputs:
+    #     - content: ./gradlew check
+    # - script@1:
+    #     title: Assemble
+    #     inputs:
+    #     - content: ./gradlew assemble
+    # - script@1:
+    #     title: Current Version
+    #     inputs:
+    #     - content: ./gradlew currentVersion
+    # - script@1:
+    #     title: Upload Code Coverage
+    #     inputs:
+    #     - content: bash <(curl -s https://codecov.io/bash)
+    # - custom-test-results-export@0:
+    #     # this add-on should export test artifacts as well, but currently not displayed.
+    #     inputs:
+    #     - test_name: Unit Tests (Debug)
+    #     - base_path: "$SDK_PATH/build/test-results/testDebugUnitTest/"
+    #     - search_pattern: "*"
+    # - custom-test-results-export@0:
+    #     inputs:
+    #     - test_name: Unit Tests (Release)
+    #     - base_path: "$SDK_PATH/build/test-results/testReleaseUnitTest/"
+    #     - search_pattern: "*"
+    # - deploy-to-bitrise-io@2:
+    #     inputs:
+    #     - deploy_path: $SDK_PATH/build/outputs/aar
+    #     - is_enable_public_page: 'false'
+    # - cache-push@2:
+    #     inputs:
+    #     - cache_paths: |-
+    #         $HOME/.gradle
+    #         ./.gradle
+    #         $HOME/.m2
+    #     - ignore_check_on_paths: |-
+    #         $HOME/.gradle/caches/*.lock
+    #         ./.gradle/*.lock
+    #         ./.gradle/*.bin
   integration-test:
     before_run:
     - _setup-env
@@ -135,6 +135,13 @@ workflows:
         title: Get Tags
         inputs:
         - content: git fetch --tags
+    - script@1:
+        title: Show Public IP
+        inputs:
+        - content: |-
+            #!/bin/bash
+            set -e
+            dig +short myip.opendns.com @resolver1.opendns.com
   _publish-doc:
     steps:
     - script@1:
