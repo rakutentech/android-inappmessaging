@@ -36,9 +36,9 @@ workflows:
         title: Upload Code Coverage
         inputs:
         - content: bash <(curl -s https://codecov.io/bash)
-    - script@1:
+    - danger@2:
         inputs:
-        - content: bundle install && bundle exec danger --verbose
+        - github_api_token: "$DANGER_GITHUB_API_TOKEN"
     - custom-test-results-export@0:
         # this add-on should export test artifacts as well, but currently not displayed.
         inputs:
