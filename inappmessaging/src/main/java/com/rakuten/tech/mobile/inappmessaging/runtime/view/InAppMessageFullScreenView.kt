@@ -16,8 +16,8 @@ internal class InAppMessageFullScreenView(
     /**
      * Populating view data.
      */
-    override fun populateViewData(message: Message, imageWidth: Int, imageHeight: Int) {
-        super.populateViewData(message, imageWidth, imageHeight)
+    override fun populateViewData(message: Message) {
+        super.populateViewData(message)
 
         setCloseButton()
         setBackgroundColor(bgColor)

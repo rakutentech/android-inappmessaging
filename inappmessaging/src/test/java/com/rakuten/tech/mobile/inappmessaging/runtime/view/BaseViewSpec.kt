@@ -16,8 +16,8 @@ import com.rakuten.tech.mobile.inappmessaging.runtime.BaseTest
 import com.rakuten.tech.mobile.inappmessaging.runtime.R
 import com.rakuten.tech.mobile.inappmessaging.runtime.data.models.messages.Message
 import com.rakuten.tech.mobile.inappmessaging.runtime.data.responses.ping.*
-import com.squareup.picasso.Picasso
-import org.amshove.kluent.*
+import com.rakuten.tech.mobile.inappmessaging.runtime.utils.ImageUtilSpec
+import org.amshove.kluent.shouldBeEqualTo
 import org.junit.Before
 import org.junit.Test
 import org.junit.runner.RunWith
@@ -27,10 +27,13 @@ import org.mockito.Mockito.times
 import org.mockito.verification.VerificationMode
 import org.robolectric.RobolectricTestRunner
 import org.robolectric.annotation.Config
-import java.lang.IllegalStateException
 
-@RunWith(RobolectricTestRunner::class)
+import android.R.attr.button
+import android.widget.CheckBox
+import android.R.attr.button
+
 @Config(sdk = [Build.VERSION_CODES.O_MR1])
+@RunWith(RobolectricTestRunner::class)
 class BaseViewSpec : BaseTest() {
     private val hostAppActivity = Mockito.mock(Activity::class.java)
     private val mockMessage = Mockito.mock(Message::class.java)
@@ -45,9 +48,10 @@ class BaseViewSpec : BaseTest() {
     @Before
     override fun setup() {
         super.setup()
-        initializePicassoInstance()
-        `when`(hostAppActivity
-                .layoutInflater).thenReturn(LayoutInflater.from(ApplicationProvider.getApplicationContext()))
+        `when`(
+            hostAppActivity
+                .layoutInflater
+        ).thenReturn(LayoutInflater.from(ApplicationProvider.getApplicationContext()))
         `when`(mockMessage.getMessagePayload()).thenReturn(mockPayload)
         `when`(mockPayload.header).thenReturn("test")
         `when`(mockPayload.messageBody).thenReturn("test")
@@ -56,8 +60,8 @@ class BaseViewSpec : BaseTest() {
         `when`(mockSettings.displaySettings).thenReturn(mockDisplaySettings)
         `when`(mockPayload.resource).thenReturn(mockResource)
         view = hostAppActivity
-                .layoutInflater
-                .inflate(R.layout.in_app_message_full_screen, null) as InAppMessageBaseView
+            .layoutInflater
+            .inflate(R.layout.in_app_message_full_screen, null) as InAppMessageBaseView
     }
 
     @Test
@@ -114,32 +118,63 @@ class BaseViewSpec : BaseTest() {
         `when`(mockPayload.headerColor).thenReturn(color)
         `when`(mockPayload.messageBodyColor).thenReturn(color)
         `when`(mockPayload.backgroundColor).thenReturn(color)
-        view?.populateViewData(mockMessage, IMG_SIZE, IMG_SIZE)
+        view?.populateViewData(mockMessage)
         val mockButton = Mockito.mock(ImageButton::class.java)
         view?.setCloseButton(mockButton)
         Mockito.verify(mockButton, mode).setImageResource(R.drawable.close_button_white)
     }
 
-    fun `should display image`() {
-        val imageUrl =
-            "https://en.wikipedia.org/wiki/Android_(operating_system)#/media/File:Android-robot-googleplex-2008.jpg"
-        `when`(mockResource.imageUrl).thenReturn(imageUrl)
+    @Test
+    fun `should set checkbox to visible`() {
         `when`(mockPayload.headerColor).thenReturn("#")
-        view?.populateViewData(mockMessage, IMG_SIZE, IMG_SIZE)
+        `when`(mockDisplaySettings.optOut).thenReturn(true)
+        view?.populateViewData(mockMessage)
 
-        // val imageView = view?.findViewById<ImageView>(R.id.message_image_view)
-        // imageView?.visibility shouldBeEqualTo View.VISIBLE
+        view?.findViewById<CheckBox>(R.id.opt_out_checkbox)?.visibility shouldBeEqualTo View.VISIBLE
+    }
+
+    @Test
+    fun `should display image`() {
+        verifyImageFetch(true)
     }
 
     @Test
     fun `should not display image with invalid url`() {
-        val imageUrl = "invalid_url"
-        `when`(mockResource.imageUrl).thenReturn(imageUrl)
+        verifyImageFetch(false)
+    }
+
+    @Test
+    fun `should not display image with invalid url with null error`() {
+        verifyImageFetch(false, isNull = true)
+    }
+
+    @Test
+    fun `should not throw null pointer`() {
+        verifyImageFetch(isValid = false, isException = true)
+    }
+
+    @Test
+    fun `should not throw exception when valid picasso`() {
+        `when`(mockResource.imageUrl).thenReturn("test valid URL")
         `when`(mockPayload.headerColor).thenReturn("#")
+        ImageUtilSpec.setupValidPicasso()
+        view?.populateViewData(mockMessage)
+    }
+
+    private fun verifyImageFetch(isValid: Boolean, isException: Boolean = false, isNull: Boolean = false) {
+        ImageUtilSpec.IS_VALID = isValid
+        ImageUtilSpec.IS_NULL = isNull
+        `when`(mockResource.imageUrl).thenReturn("any url")
+        `when`(mockPayload.headerColor).thenReturn("#")
+        view?.picasso = ImageUtilSpec.setupMockPicasso(isException)
         view?.populateViewData(mockMessage)
         val imageView = view?.findViewById<ImageView>(R.id.message_image_view)
 
-        imageView?.visibility shouldBeEqualTo View.GONE
+        if (isValid) {
+            imageView?.visibility shouldBeEqualTo View.VISIBLE
+        } else {
+            imageView?.visibility shouldBeEqualTo View.GONE
+        }
     }
 
     private fun verifyDefault() {
@@ -147,18 +182,8 @@ class BaseViewSpec : BaseTest() {
         view?.findViewById<TextView>(R.id.message_body)?.textColors shouldBeEqualTo ColorStateList.valueOf(Color.BLACK)
     }
 
-    private fun initializePicassoInstance() {
-        try {
-            val picasso = Picasso.Builder(ApplicationProvider.getApplicationContext()).build()
-            Picasso.setSingletonInstance(picasso)
-        } catch (ignored: IllegalStateException) {
-            // Picasso instance was already initialized
-        }
-    }
-
     companion object {
         private const val WHITE_HEX = "#FFFFFF"
         private const val BLACK_HEX = "#000000"
-        private const val IMG_SIZE = 100
     }
 }

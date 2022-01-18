@@ -10,5 +10,5 @@ internal interface InAppMessageView {
      * This method sets campaign message data int the custom view classes.
      * Message must not be null.
      */
-    fun populateViewData(message: Message, imageWidth: Int = 0, imageHeight: Int = 0)
+    fun populateViewData(message: Message)
 }

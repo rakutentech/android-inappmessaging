@@ -377,6 +377,8 @@ Documents targeting Product Managers:
 
 ### 6.1.0 (in-progress)
 * SDKCF-4470: Updated the layout for close and campaign buttons. Added feature to customize text and button fonts, please see [custom font section](#custom-font) for details.
+* SDKCF-4650: Refactored handling for different responses from endpoint requests for consistency and better logging.
+* SDKCF-4729: Added error handling for display permission request.
 
 ### 6.0.0 (2021-12-03)
 * SDKCF-4151: **Breaking Changes:**

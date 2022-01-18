@@ -15,18 +15,19 @@ import com.rakuten.tech.mobile.inappmessaging.runtime.data.requests.PingRequest
 import com.rakuten.tech.mobile.inappmessaging.runtime.data.responses.ping.MessageMixerResponse
 import com.rakuten.tech.mobile.inappmessaging.runtime.utils.RetryDelayUtil
 import com.rakuten.tech.mobile.inappmessaging.runtime.utils.RuntimeUtil
+import com.rakuten.tech.mobile.inappmessaging.runtime.utils.WorkerUtils
 import com.rakuten.tech.mobile.inappmessaging.runtime.workmanager.schedulers.EventMessageReconciliationScheduler
 import com.rakuten.tech.mobile.inappmessaging.runtime.workmanager.schedulers.MessageMixerPingScheduler
 import retrofit2.Call
 import retrofit2.Response
 import timber.log.Timber
 import java.net.HttpURLConnection
+import java.util.concurrent.atomic.AtomicInteger
 import kotlin.collections.ArrayList
 
 /**
  * This class contains the actual work to communicate with Message Mixer Service. It extends Worker
- * class, and uses synchronized network call to make request to Message Mixer Service. Note: If
- * return RETRY, WorkerManager will make exponential backoff retries by itself.
+ * class, and uses synchronized network call to make request to Message Mixer Service.
  */
 @SuppressWarnings("TooGenericExceptionCaught")
 internal class MessageMixerWorker(
@@ -49,12 +50,8 @@ internal class MessageMixerWorker(
     internal var responseCall: Call<MessageMixerResponse>? = null
 
     /**
-     * This is the main method to do the work. Making Message Mixer network call is the main work.
-     * If response is successful(200-300) from the Service, `WorkerResult.Success` should always be returned.
-     * If response was not successful(4xx), RETRY will be returned, then WorkManager will start
-     * exponential backoff by itself. If there are trouble making the network request, then return
-     * FAILURE. Note: This worker should be a periodic worker, meaning it will reschedule itself to
-     * make the request in x amount of time.
+     * Main method to do the work. Make Message Mixer network call is the main work.
+     * Retries sending the request with default backoff when network error is encountered.
      */
     override fun doWork(): Result {
         // Create a retrofit API.
@@ -76,24 +73,22 @@ internal class MessageMixerWorker(
             // Execute a thread blocking API network call, and handle response.
             onResponse(responseCall!!.execute())
         } catch (e: Exception) {
-            Timber.tag(TAG).d(e)
-            Result.failure()
+            Timber.tag(TAG).e(e)
+            Result.retry()
         }
     }
 
     /**
-     * This method process returned response from Message Mixer Service if connection was successful.
-     * And return RETRY if response code is 500 because server could be busy for the moment.
-     *
-     * Note: An HTTP response may still indicate an application-level failure such as a 404 or 500. Invoke
-     * MessageMixerResponse.isSuccessful() to determine if the response indicates success. If response
-     * wasn't successful, return RETRY to let WorkManger retry with exponential backoff. If response
-     * is 400, return FAILURE.
+     * This method handles the response from Config Service.
+     * if response code is 429 -> retries sending of request with random exponential back off
+     * if response code is 5xx -> retries at most 3 times with random exponential back off
+     * else -> returns failure
      */
     @VisibleForTesting
     @SuppressWarnings("LongMethod")
     fun onResponse(response: Response<MessageMixerResponse>): Result {
         if (response.isSuccessful) {
+            serverErrorCounter.set(0) // reset server error counter
             val messageMixerResponse = response.body()
             if (messageMixerResponse != null) {
                 // Add time data.
@@ -119,14 +114,27 @@ internal class MessageMixerWorker(
             }
         } else return when {
             response.code() == RetryDelayUtil.RETRY_ERROR_CODE -> {
-                messageMixerScheduler.pingMessageMixerService(MessageMixerPingScheduler.currDelay)
-                MessageMixerPingScheduler.currDelay = retryUtil.getNextDelay(MessageMixerPingScheduler.currDelay)
-                // set previous worker as success to avoid logging
-                Result.success()
+                serverErrorCounter.set(0) // reset server error counter
+                WorkerUtils.logSilentRequestError(TAG, response.code(), response.errorBody()?.string())
+                retryPingRequest()
             }
-            response.code() >= HttpURLConnection.HTTP_INTERNAL_ERROR -> Result.retry() // Retry if server has error.
-            else -> Result.failure()
+            response.code() >= HttpURLConnection.HTTP_INTERNAL_ERROR -> {
+                WorkerUtils.logRequestError(TAG, response.code(), response.errorBody()?.string())
+                WorkerUtils.checkRetry(serverErrorCounter.getAndIncrement()) { retryPingRequest() }
+            }
+            else -> {
+                serverErrorCounter.set(0) // reset server error counter
+                WorkerUtils.logRequestError(TAG, response.code(), response.errorBody()?.string())
+                Result.failure()
+            }
         }
+        return Result.success()
+    }
+
+    private fun retryPingRequest(): Result {
+        messageMixerScheduler.pingMessageMixerService(MessageMixerPingScheduler.currDelay)
+        MessageMixerPingScheduler.currDelay = retryUtil.getNextDelay(MessageMixerPingScheduler.currDelay)
+        // set previous worker as success to avoid logging
         return Result.success()
     }
 
@@ -156,5 +164,6 @@ internal class MessageMixerWorker(
 
     companion object {
         private const val TAG = "IAM_MessageMixerWorker"
+        internal val serverErrorCounter = AtomicInteger(0)
     }
 }

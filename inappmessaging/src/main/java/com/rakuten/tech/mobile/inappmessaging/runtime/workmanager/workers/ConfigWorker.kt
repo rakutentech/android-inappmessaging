@@ -13,11 +13,13 @@ import com.rakuten.tech.mobile.inappmessaging.runtime.data.requests.ConfigQueryP
 import com.rakuten.tech.mobile.inappmessaging.runtime.data.responses.config.ConfigResponse
 import com.rakuten.tech.mobile.inappmessaging.runtime.utils.RetryDelayUtil
 import com.rakuten.tech.mobile.inappmessaging.runtime.utils.RuntimeUtil
+import com.rakuten.tech.mobile.inappmessaging.runtime.utils.WorkerUtils
 import com.rakuten.tech.mobile.inappmessaging.runtime.workmanager.schedulers.ConfigScheduler
 import com.rakuten.tech.mobile.inappmessaging.runtime.workmanager.schedulers.MessageMixerPingScheduler
 import retrofit2.Response
 import timber.log.Timber
 import java.net.HttpURLConnection
+import java.util.concurrent.atomic.AtomicInteger
 
 /**
  * This class contains the actual work to communicate with Config Service. It extends Worker class,
@@ -42,9 +44,8 @@ internal class ConfigWorker(
                 MessageMixerPingScheduler.instance())
 
     /**
-     * Main method to do the work. Make Config Service network call is the main work. Regardless of
-     * the response(200/400) returned from Config Service, `WorkerResult.Success` should always be
-     * returned. Because this work(network call to config service) was scheduled and executed.
+     * Main method to do the work. Make Config Service network call is the main work.
+     * Retries sending the request with default backoff when network error is encountered.
      */
     @SuppressWarnings("LongMethod", "TooGenericExceptionCaught")
     override fun doWork(): Result {
@@ -69,21 +70,24 @@ internal class ConfigWorker(
             // Executing the API network call.
             onResponse(configServiceCall.execute())
         } catch (e: Exception) {
-            Timber.tag(TAG).d(e)
+            Timber.tag(TAG).e(e)
             // RETRY by default has exponential backoff baked in.
             Result.retry()
         }
     }
 
     /**
-     * This method handles the response from Config Service. Returns RETRY if response code is 500
-     * because server could be busy for the moment. Returns FAILURE if response code is 400.
+     * This method handles the response from Config Service.
+     * if response code is 429 -> retries sending of request with random exponential back off
+     * if response code is 5xx -> retries at most 3 times with random exponential back off
+     * else -> returns failure
      */
     @VisibleForTesting
     @SuppressWarnings("LongMethod")
     @Throws(IllegalArgumentException::class)
     fun onResponse(response: Response<ConfigResponse?>): Result {
         if (response.isSuccessful && response.body() != null) {
+            serverErrorCounter.set(0) // reset server error counter
             // Adding config data to its repo.
             configRepo.addConfigResponse(response.body()?.data)
             // Schedule a ping request to message mixer. Initial delay is 0
@@ -102,22 +106,34 @@ internal class ConfigWorker(
             }
         } else return when {
             response.code() == RetryDelayUtil.RETRY_ERROR_CODE -> {
-                configScheduler.startConfig(ConfigScheduler.currDelay)
-                ConfigScheduler.currDelay = retryUtil.getNextDelay(ConfigScheduler.currDelay)
-                // set previous worker as success to avoid logging
-                Result.success()
+                serverErrorCounter.set(0) // reset server error counter
+                WorkerUtils.logSilentRequestError(TAG, response.code(), response.errorBody()?.string())
+                retryConfigRequest()
             }
-            response.code() >= HttpURLConnection.HTTP_INTERNAL_ERROR -> Result.retry() // Retry if server has error.
+            response.code() >= HttpURLConnection.HTTP_INTERNAL_ERROR -> {
+                WorkerUtils.logRequestError(TAG, response.code(), response.errorBody()?.string())
+                WorkerUtils.checkRetry(serverErrorCounter.getAndIncrement()) { retryConfigRequest() }
+            }
             else -> {
+                serverErrorCounter.set(0) // reset server error counter
                 // clear temp data (ignore all temp data stored during config request)
                 InAppMessaging.setUninitializedInstance()
+                WorkerUtils.logRequestError(TAG, response.code(), response.errorBody()?.string())
                 Result.failure()
             }
         }
         return Result.success()
     }
 
+    private fun retryConfigRequest(): Result {
+        configScheduler.startConfig(ConfigScheduler.currDelay)
+        ConfigScheduler.currDelay = retryUtil.getNextDelay(ConfigScheduler.currDelay)
+        // set previous worker as success to avoid logging
+        return Result.success()
+    }
+
     companion object {
         private const val TAG = "IAM_ConfigWorker"
+        internal val serverErrorCounter = AtomicInteger(0)
     }
 }

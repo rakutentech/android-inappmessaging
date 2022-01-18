@@ -20,8 +20,8 @@ internal class InAppMessageSlideUpView(
     /**
      * Populating view data according to Slide Up view.
      */
-    override fun populateViewData(message: Message, imageWidth: Int, imageHeight: Int) {
-        super.populateViewData(message, imageWidth, imageHeight)
+    override fun populateViewData(message: Message) {
+        super.populateViewData(message)
 
         setCloseButton()
         val constraintLayout = findViewById<ConstraintLayout>(R.id.slide_up)
