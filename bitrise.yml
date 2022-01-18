@@ -159,6 +159,9 @@ workflows:
             fi
   _run-sonarqube-scanner:
     steps:
+    - set-java-version@1:
+        inputs:
+        - set_java_version: '11'
     - script@1:
         run_if: '{{getenv "SONARQUBE_TOKEN" | ne ""}}'
         title: Run SonarQube Scanner
