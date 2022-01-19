@@ -1,10 +1,14 @@
-package com.rakuten.tech.mobile.inappmessaging.runtime.service
+package com.rakuten.tech.mobile.inappmessaging.runtime.workmanager.workers
 
 import android.app.Activity
+import android.content.Context
 import android.content.Intent
 import android.os.Handler
 import android.os.Looper
-import androidx.core.app.JobIntentService
+import androidx.work.CoroutineWorker
+import androidx.work.OneTimeWorkRequest
+import androidx.work.WorkerParameters
+import androidx.work.WorkManager
 import com.rakuten.tech.mobile.inappmessaging.runtime.InAppMessaging
 import com.rakuten.tech.mobile.inappmessaging.runtime.utils.ImageUtil
 import com.rakuten.tech.mobile.inappmessaging.runtime.data.models.messages.Message
@@ -12,6 +16,7 @@ import com.rakuten.tech.mobile.inappmessaging.runtime.data.repositories.LocalDis
 import com.rakuten.tech.mobile.inappmessaging.runtime.data.repositories.ReadyForDisplayMessageRepository
 import com.rakuten.tech.mobile.inappmessaging.runtime.manager.MessageReadinessManager
 import com.rakuten.tech.mobile.inappmessaging.runtime.runnable.DisplayMessageRunnable
+import com.rakuten.tech.mobile.inappmessaging.runtime.utils.WorkManagerUtil
 import com.squareup.picasso.Callback
 import com.squareup.picasso.Picasso
 import timber.log.Timber
@@ -21,7 +26,10 @@ import java.lang.Exception
  * Since one service is essentially one worker thread, so there's no chance multiple worker threads
  * can dispatch Runnables to Android's message queue. Only one at a time.
  */
-internal class DisplayMessageJobIntentService : JobIntentService() {
+internal class DisplayMessageWorker(
+    context: Context,
+    params: WorkerParameters
+) : CoroutineWorker(context, params) {
     var localDisplayRepo = LocalDisplayedMessageRepository.instance()
     var readyMessagesRepo = ReadyForDisplayMessageRepository.instance()
     var messageReadinessManager = MessageReadinessManager.instance()
@@ -31,10 +39,11 @@ internal class DisplayMessageJobIntentService : JobIntentService() {
     /**
      * This method starts displaying message runnable.
      */
-    public override fun onHandleWork(intent: Intent) {
+    override suspend fun doWork(): Result {
         Timber.tag(TAG).d("onHandleWork() started on thread: %s", Thread.currentThread().name)
         prepareNextMessage()
         Timber.tag(TAG).d("onHandleWork() ended")
+        return Result.success()
     }
 
     /**
@@ -109,13 +118,18 @@ internal class DisplayMessageJobIntentService : JobIntentService() {
     companion object {
         private const val DISPLAY_MESSAGE_JOB_ID = 3210
         private const val TAG = "IAM_JobIntentService"
+        private const val DISPLAY_WORKER = "iam_message_display_worker"
 
         /**
          * This method enqueues work in to this service.
          */
         fun enqueueWork(work: Intent) {
             InAppMessaging.instance().getHostAppContext()?.let {
-                enqueueWork(it, DisplayMessageJobIntentService::class.java, DISPLAY_MESSAGE_JOB_ID, work)
+                val displayRequest = OneTimeWorkRequest.Builder(DisplayMessageWorker::class.java)
+                    .setConstraints(WorkManagerUtil.getNetworkConnectedConstraint())
+                    .addTag(DISPLAY_WORKER)
+                    .build()
+                WorkManager.getInstance(it).enqueue(displayRequest)
             }
         }
     }

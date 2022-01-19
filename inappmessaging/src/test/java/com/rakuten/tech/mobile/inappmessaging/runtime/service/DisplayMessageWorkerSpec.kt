@@ -2,15 +2,18 @@ package com.rakuten.tech.mobile.inappmessaging.runtime.service
 
 import android.app.Activity
 import android.content.Context
-import android.content.Intent
 import android.content.res.Resources
 import android.os.Build
 import android.os.Handler
-import android.provider.Settings
 import android.util.DisplayMetrics
-import android.view.LayoutInflater
 import android.view.View
-import androidx.work.testing.WorkManagerTestInitHelper
+import androidx.test.core.app.ApplicationProvider.getApplicationContext
+import androidx.work.ListenableWorker
+import androidx.work.WorkerParameters
+import androidx.work.impl.utils.SerialExecutor
+import androidx.work.impl.utils.taskexecutor.TaskExecutor
+import androidx.work.testing.TestListenableWorkerBuilder
+import com.nhaarman.mockitokotlin2.*
 import com.rakuten.tech.mobile.inappmessaging.runtime.BaseTest
 import com.rakuten.tech.mobile.inappmessaging.runtime.InAppMessaging
 import com.rakuten.tech.mobile.inappmessaging.runtime.data.models.messages.Message
@@ -18,25 +21,25 @@ import com.rakuten.tech.mobile.inappmessaging.runtime.data.repositories.ConfigRe
 import com.rakuten.tech.mobile.inappmessaging.runtime.data.repositories.LocalDisplayedMessageRepository
 import com.rakuten.tech.mobile.inappmessaging.runtime.data.repositories.ReadyForDisplayMessageRepository
 import com.rakuten.tech.mobile.inappmessaging.runtime.data.responses.config.ConfigResponseData
-import com.rakuten.tech.mobile.inappmessaging.runtime.data.responses.ping.*
+import com.rakuten.tech.mobile.inappmessaging.runtime.data.responses.ping.MessageMixerResponseSpec
+import com.rakuten.tech.mobile.inappmessaging.runtime.data.responses.ping.MessagePayload
+import com.rakuten.tech.mobile.inappmessaging.runtime.data.responses.ping.Resource
 import com.rakuten.tech.mobile.inappmessaging.runtime.manager.MessageReadinessManager
-import org.amshove.kluent.*
+import com.rakuten.tech.mobile.inappmessaging.runtime.runnable.DisplayMessageRunnable
+import com.rakuten.tech.mobile.inappmessaging.runtime.utils.ImageUtilSpec
+import com.rakuten.tech.mobile.inappmessaging.runtime.workmanager.workers.DisplayMessageWorker
+import kotlinx.coroutines.runBlocking
+import org.amshove.kluent.shouldBeEqualTo
 import org.junit.After
 import org.junit.Before
 import org.junit.Test
 import org.junit.runner.RunWith
 import org.mockito.ArgumentMatchers
 import org.mockito.Mockito
-import org.robolectric.Robolectric
-import org.robolectric.RobolectricTestRunner
-import org.robolectric.android.controller.ServiceController
-import org.robolectric.annotation.Config
-import androidx.test.core.app.ApplicationProvider.getApplicationContext
-import com.nhaarman.mockitokotlin2.*
-import com.rakuten.tech.mobile.inappmessaging.runtime.runnable.DisplayMessageRunnable
-import com.rakuten.tech.mobile.inappmessaging.runtime.utils.ImageUtilSpec
 import org.mockito.Mockito.`when`
 import org.mockito.verification.VerificationMode
+import org.robolectric.RobolectricTestRunner
+import org.robolectric.annotation.Config
 
 /**
  * Test class for DisplayMessageJobIntentService.
@@ -44,12 +47,10 @@ import org.mockito.verification.VerificationMode
 @SuppressWarnings("LargeClass")
 @RunWith(RobolectricTestRunner::class)
 @Config(sdk = [Build.VERSION_CODES.O_MR1])
-class DisplayMessageJobIntentServiceSpec : BaseTest() {
+class DisplayMessageWorkerSpec : BaseTest() {
 
-    private val intent = Mockito.mock(Intent::class.java)
     private val activity = Mockito.mock(Activity::class.java)
-    private var serviceController: ServiceController<DisplayMessageJobIntentService>? = null
-    private var displayMessageJobIntentService: DisplayMessageJobIntentService? = null
+    private val displayWorker = TestListenableWorkerBuilder<DisplayMessageWorker>(getApplicationContext()).build()
     private val mockMessageManager = Mockito.mock(MessageReadinessManager::class.java)
     private var mockLocalDisplayRepo = Mockito.mock(LocalDisplayedMessageRepository::class.java)
     private var mockReadyForDisplayRepo = Mockito.mock(ReadyForDisplayMessageRepository::class.java)
@@ -57,27 +58,17 @@ class DisplayMessageJobIntentServiceSpec : BaseTest() {
     private val configResponseData = Mockito.mock(ConfigResponseData::class.java)
     private val payload = MessageMixerResponseSpec.response.data[0].campaignData.getMessagePayload()
     private val handler = Mockito.mock(Handler::class.java)
-    private val context = getApplicationContext<Context>()
 
-    @SuppressWarnings("LongMethod")
     @Before
     override fun setup() {
         super.setup()
-        serviceController = Robolectric.buildService(DisplayMessageJobIntentService::class.java)
-        displayMessageJobIntentService = spy(serviceController?.bind()?.create()?.get())
-        displayMessageJobIntentService!!.messageReadinessManager = mockMessageManager
-        displayMessageJobIntentService!!.localDisplayRepo = mockLocalDisplayRepo
-        displayMessageJobIntentService!!.readyMessagesRepo = mockReadyForDisplayRepo
-        displayMessageJobIntentService!!.handler = handler
-        `when`(activity.layoutInflater).thenReturn(LayoutInflater.from(context))
-        WorkManagerTestInitHelper.initializeTestWorkManager(context)
+        displayWorker.messageReadinessManager = mockMessageManager
+        displayWorker.localDisplayRepo = mockLocalDisplayRepo
+        displayWorker.readyMessagesRepo = mockReadyForDisplayRepo
+        displayWorker.handler = handler
         `when`(configResponseData.rollOutPercentage).thenReturn(100)
         ConfigResponseRepository.instance().addConfigResponse(configResponseData)
-
-        Settings.Secure.putString(
-            context.contentResolver,
-            Settings.Secure.ANDROID_ID, "test_device_id")
-        InAppMessaging.initialize(context)
+        InAppMessaging.initialize(getApplicationContext(), true)
         InAppMessaging.instance().registerMessageDisplayActivity(activity)
     }
 
@@ -85,36 +76,51 @@ class DisplayMessageJobIntentServiceSpec : BaseTest() {
     override fun tearDown() {
         super.tearDown()
         ConfigResponseRepository.resetInstance()
-        serviceController!!.destroy()
-        validateMockitoUsage()
     }
 
     @Test
-    fun `should post message not throw exception`() {
-        displayMessageJobIntentService!!.onHandleWork(intent!!)
+    fun `should return successful if no message`() {
+        runBlocking {
+            displayWorker.doWork() shouldBeEqualTo ListenableWorker.Result.success()
+        }
+        Mockito.verify(handler, never()).post(any())
     }
 
     @Test
-    fun `should not throw exception with valid message`() {
-        val message = Mockito.mock(Message::class.java)
-        ReadyForDisplayMessageRepository.instance().replaceAllMessages(listOf(message))
+    fun `should not throw exception with mock parameters`() {
+        val mockParams = Mockito.mock(WorkerParameters::class.java)
+        val mockExecutor = Mockito.mock(TaskExecutor::class.java)
+        `when`(mockParams.taskExecutor).thenReturn(mockExecutor)
+        `when`(mockExecutor.backgroundExecutor).thenReturn(Mockito.mock(SerialExecutor::class.java))
+        val worker = DisplayMessageWorker(Mockito.mock(Context::class.java), mockParams)
+        runBlocking {
+            worker.doWork() shouldBeEqualTo ListenableWorker.Result.success()
+        }
+        Mockito.verify(handler, never()).post(any())
+    }
 
-        `when`(message.getCampaignId()).thenReturn("1")
-        `when`(message.isTest()).thenReturn(true)
-        `when`(message.getMaxImpressions()).thenReturn(10)
+    @Test
+    fun `should return successful with valid message with empty string url`() {
+        val message = setupValidMessage()
+        val mockPayload = Mockito.mock(MessagePayload::class.java)
+        val mockResource = Mockito.mock(Resource::class.java)
+        `when`(message.getMessagePayload()).thenReturn(mockPayload)
+        `when`(mockPayload.resource).thenReturn(mockResource)
+        `when`(mockResource.imageUrl).thenReturn("")
+        runBlocking {
+            displayWorker.doWork() shouldBeEqualTo ListenableWorker.Result.success()
+        }
+        Mockito.verify(handler).post(any())
+    }
+
+    @Test
+    fun `should return successful with valid message and null url`() {
+        val message = setupValidMessage()
         `when`(message.getMessagePayload()).thenReturn(payload)
-        displayMessageJobIntentService!!.onHandleWork(intent!!)
-    }
-
-    @Test
-    fun `should not throw exception with valid message no url`() {
-        val message = Mockito.mock(Message::class.java)
-        ReadyForDisplayMessageRepository.instance().replaceAllMessages(listOf(message))
-
-        `when`(message.getCampaignId()).thenReturn("1")
-        `when`(message.isTest()).thenReturn(true)
-        `when`(message.getMaxImpressions()).thenReturn(10)
-        displayMessageJobIntentService!!.onHandleWork(intent!!)
+        runBlocking {
+            displayWorker.doWork() shouldBeEqualTo ListenableWorker.Result.success()
+        }
+        Mockito.verify(handler).post(any())
     }
 
     @Test
@@ -137,7 +143,9 @@ class DisplayMessageJobIntentServiceSpec : BaseTest() {
         `when`(message.getMessagePayload()).thenReturn(payload)
         `when`(message.getContexts()).thenReturn(listOf())
         `when`(mockMessageManager.getNextDisplayMessage()).thenReturn(message)
-        displayMessageJobIntentService!!.onHandleWork(intent!!)
+        runBlocking {
+            displayWorker.doWork() shouldBeEqualTo ListenableWorker.Result.success()
+        }
 
         Mockito.verify(onVerifyContexts, never()).invoke(any(), any())
     }
@@ -155,12 +163,13 @@ class DisplayMessageJobIntentServiceSpec : BaseTest() {
         `when`(message.getMessagePayload()).thenReturn(payload)
         `when`(message.getContexts()).thenReturn(listOf("ctx"))
         `when`(mockMessageManager.getNextDisplayMessage()).thenReturn(message)
-        displayMessageJobIntentService!!.onHandleWork(intent!!)
+        runBlocking {
+            displayWorker.doWork() shouldBeEqualTo ListenableWorker.Result.success()
+        }
 
         Mockito.verify(onVerifyContexts, never()).invoke(any(), any())
     }
 
-    @SuppressWarnings("LongMethod")
     @Test
     fun `should call onVerifyContext with proper parameters`() {
         setupCampaign()
@@ -214,7 +223,9 @@ class DisplayMessageJobIntentServiceSpec : BaseTest() {
     @Test
     fun `should not display campaign if payload is null`() {
         `when`(mockMessageManager.getNextDisplayMessage()).thenReturn(null)
-        displayMessageJobIntentService!!.onHandleWork(intent!!)
+        runBlocking {
+            displayWorker.doWork() shouldBeEqualTo ListenableWorker.Result.success()
+        }
 
         Mockito.verify(activity, never()).findViewById<View?>(ArgumentMatchers.anyInt())
     }
@@ -230,8 +241,8 @@ class DisplayMessageJobIntentServiceSpec : BaseTest() {
     }
 
     private fun verifyFetchImage(isValid: Boolean, mode: VerificationMode) {
-        val service = DisplayMessageJobIntentService()
-        service.messageReadinessManager = mockMessageManager
+        val worker = TestListenableWorkerBuilder<DisplayMessageWorker>(getApplicationContext()).build()
+        worker.messageReadinessManager = mockMessageManager
         val message = setupMessageWithImage("https://imageurl.jpg")
         `when`(mockMessageManager.getNextDisplayMessage()).thenReturn(message).thenReturn(null)
         `when`(mockMessageManager.getNextDisplayMessage()).thenReturn(message)
@@ -239,9 +250,11 @@ class DisplayMessageJobIntentServiceSpec : BaseTest() {
         `when`(activity.resources).thenReturn(mockResource)
         `when`(mockResource.displayMetrics).thenReturn(Mockito.mock(DisplayMetrics::class.java))
         ImageUtilSpec.IS_VALID = isValid
-        service.picasso = ImageUtilSpec.setupMockPicasso()
-        service.handler = handler
-        service.onHandleWork(intent)
+        worker.picasso = ImageUtilSpec.setupMockPicasso()
+        worker.handler = handler
+        runBlocking {
+            worker.doWork() shouldBeEqualTo ListenableWorker.Result.success()
+        }
 
         Mockito.verify(handler, mode).post(ArgumentMatchers.any(DisplayMessageRunnable::class.java))
     }
@@ -250,7 +263,9 @@ class DisplayMessageJobIntentServiceSpec : BaseTest() {
     fun `should display the message if null image url`() {
         val message = setupMessageWithImage(null)
         `when`(mockMessageManager.getNextDisplayMessage()).thenReturn(message)
-        displayMessageJobIntentService?.onHandleWork(intent)
+        runBlocking {
+            displayWorker.doWork() shouldBeEqualTo ListenableWorker.Result.success()
+        }
 
         Mockito.verify(handler).post(ArgumentMatchers.any(DisplayMessageRunnable::class.java))
     }
@@ -271,6 +286,15 @@ class DisplayMessageJobIntentServiceSpec : BaseTest() {
         return message
     }
 
+    private fun setupValidMessage(): Message {
+        val message = Mockito.mock(Message::class.java)
+        `when`(mockMessageManager.getNextDisplayMessage()).thenReturn(message)
+        `when`(message.getCampaignId()).thenReturn("1")
+        `when`(message.isTest()).thenReturn(true)
+        `when`(message.getMaxImpressions()).thenReturn(10)
+        return message
+    }
+
     private fun setupCampaign() {
         val message = Mockito.mock(Message::class.java)
 
@@ -278,7 +302,9 @@ class DisplayMessageJobIntentServiceSpec : BaseTest() {
         InAppMessaging.instance().onVerifyContext = onVerifyContexts
 
         setupMocking(message)
-        displayMessageJobIntentService!!.onHandleWork(intent!!)
+        runBlocking {
+            displayWorker.doWork() shouldBeEqualTo ListenableWorker.Result.success()
+        }
     }
 
     private fun setupNextCampaign(): Message {
@@ -288,7 +314,9 @@ class DisplayMessageJobIntentServiceSpec : BaseTest() {
         InAppMessaging.instance().onVerifyContext = onVerifyContexts
 
         setupMocking(message)
-        displayMessageJobIntentService!!.onHandleWork(intent!!)
+        runBlocking {
+            displayWorker.doWork() shouldBeEqualTo ListenableWorker.Result.success()
+        }
 
         return message
     }
@@ -297,7 +325,9 @@ class DisplayMessageJobIntentServiceSpec : BaseTest() {
         val message = Mockito.mock(Message::class.java)
 
         setupMocking(message)
-        displayMessageJobIntentService!!.onHandleWork(intent!!)
+        runBlocking {
+            displayWorker.doWork() shouldBeEqualTo ListenableWorker.Result.success()
+        }
 
         if (shouldCall) {
             Mockito.verify(handler).post(any())
