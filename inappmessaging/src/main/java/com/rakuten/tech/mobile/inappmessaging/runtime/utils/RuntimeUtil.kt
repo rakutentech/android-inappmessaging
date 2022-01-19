@@ -7,12 +7,13 @@ import com.rakuten.tech.mobile.inappmessaging.runtime.api.MessageMixerRetrofitSe
 import com.rakuten.tech.mobile.inappmessaging.runtime.data.enums.UserIdentifierType
 import com.rakuten.tech.mobile.inappmessaging.runtime.data.models.UserIdentifier
 import com.rakuten.tech.mobile.inappmessaging.runtime.data.repositories.AccountRepository
+import com.rakuten.tech.mobile.sdkutils.logger.Logger
+import com.rakuten.tech.mobile.sdkutils.network.build
 import okhttp3.OkHttpClient
 import okhttp3.ResponseBody
 import retrofit2.Call
 import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory
-import timber.log.Timber
 import java.util.Calendar
 import java.util.concurrent.Executors
 import java.util.concurrent.TimeUnit
@@ -37,12 +38,12 @@ internal object RuntimeUtil {
      * Adding GsonConverterFactory for parsing returned JSON. Adding OkHttp to handle the main network requests.
      */
     fun getRetrofit(): Retrofit {
-        return Retrofit.Builder()
-                .baseUrl(InAppMessagingConstants.TEMPLATE_BASE_URL)
-                .addConverterFactory(GSON_CONVERTER_FACTORY)
-                .client(OK_HTTP_CLIENT)
-                .callbackExecutor(EXECUTOR)
-                .build()
+        return Retrofit.Builder().build(
+            InAppMessagingConstants.TEMPLATE_BASE_URL,
+            OK_HTTP_CLIENT,
+            GSON_CONVERTER_FACTORY,
+            EXECUTOR
+        )
     }
 
     /**
@@ -63,7 +64,7 @@ internal object RuntimeUtil {
                     return BitmapFactory.decodeByteArray(bytes, 0, bytes.size)
                 }
             } catch (ex: Exception) {
-                Timber.tag(TAG).d(ex)
+                Logger(TAG).debug(ex.message)
             }
         }
         return null

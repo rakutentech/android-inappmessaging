@@ -91,7 +91,6 @@ open class InAppMessagingSpec : BaseTest() {
         InAppMessaging.instance().logEvent(AppStartEvent())
         InAppMessaging.instance().closeMessage()
         InAppMessaging.instance().isLocalCachingEnabled().shouldBeFalse()
-        InAppMessaging.instance().getSharedPref().shouldBeNull()
         InAppMessaging.instance().saveTempData()
     }
 

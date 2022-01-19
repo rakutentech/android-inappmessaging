@@ -5,8 +5,9 @@ import com.google.gson.Gson
 import com.rakuten.tech.mobile.inappmessaging.runtime.InAppMessaging
 import com.rakuten.tech.mobile.inappmessaging.runtime.data.models.messages.Message
 import com.rakuten.tech.mobile.inappmessaging.runtime.data.responses.ping.CampaignData
+import com.rakuten.tech.mobile.sdkutils.PreferencesUtil
+import com.rakuten.tech.mobile.sdkutils.logger.Logger
 import org.json.JSONObject
-import timber.log.Timber
 import java.lang.ClassCastException
 import java.util.concurrent.ConcurrentHashMap
 
@@ -96,9 +97,16 @@ internal abstract class PingResponseMessageRepository : MessageRepository {
                 user = AccountRepository.instance().userInfoHash
                 // reset message list from cached using updated user info
                 val listString = try {
-                    InAppMessaging.instance().getSharedPref()?.getString(PING_RESPONSE_KEY, "") ?: ""
+                    InAppMessaging.instance().getHostAppContext()?.let {
+                        PreferencesUtil.getString(
+                            it,
+                            "internal_shared_prefs_" + AccountRepository.instance().userInfoHash,
+                            PING_RESPONSE_KEY,
+                            ""
+                        ) ?: ""
+                    }
                 } catch (ex: ClassCastException) {
-                    Timber.tag(TAG).d(ex.cause, "Incorrect type for $PING_RESPONSE_KEY data")
+                    Logger(TAG).debug(ex.cause, "Incorrect type for $PING_RESPONSE_KEY data")
                     ""
                 }
                 messages.clear()
@@ -112,7 +120,7 @@ internal abstract class PingResponseMessageRepository : MessageRepository {
                         messages[key] = campaign
                     }
                 } catch (ex: Exception) {
-                    Timber.tag(TAG).d(ex.cause, "Invalid JSON format for $PING_RESPONSE_KEY data")
+                    Logger(TAG).debug(ex.cause, "Invalid JSON format for $PING_RESPONSE_KEY data")
                 }
             }
         }
@@ -121,8 +129,14 @@ internal abstract class PingResponseMessageRepository : MessageRepository {
             // check if caching is enabled to update persistent data
             if (InAppMessaging.instance().isLocalCachingEnabled()) {
                 // save updated message list
-                InAppMessaging.instance().getSharedPref()?.edit()?.putString(PING_RESPONSE_KEY,
-                        Gson().toJson(messages))?.apply() ?: Timber.tag(TAG).d("failed saving response data")
+                InAppMessaging.instance().getHostAppContext()?.let {
+                    PreferencesUtil.putString(
+                        it,
+                        "internal_shared_prefs_" + AccountRepository.instance().userInfoHash,
+                        PING_RESPONSE_KEY,
+                        Gson().toJson(messages)
+                    )
+                } ?: Logger(TAG).debug("failed saving response data")
             }
         }
     }

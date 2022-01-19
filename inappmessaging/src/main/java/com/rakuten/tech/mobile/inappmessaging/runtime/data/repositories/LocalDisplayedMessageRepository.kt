@@ -1,6 +1,5 @@
 package com.rakuten.tech.mobile.inappmessaging.runtime.data.repositories
 
-import android.content.SharedPreferences
 import androidx.annotation.VisibleForTesting
 import com.google.gson.Gson
 import com.google.gson.reflect.TypeToken
@@ -8,7 +7,8 @@ import com.rakuten.tech.mobile.inappmessaging.runtime.InApp
 import com.rakuten.tech.mobile.inappmessaging.runtime.InAppMessaging
 import com.rakuten.tech.mobile.inappmessaging.runtime.data.models.messages.Message
 import com.rakuten.tech.mobile.inappmessaging.runtime.exception.InAppMessagingException
-import timber.log.Timber
+import com.rakuten.tech.mobile.sdkutils.PreferencesUtil
+import com.rakuten.tech.mobile.sdkutils.logger.Logger
 import java.lang.ClassCastException
 import java.util.Calendar
 import java.util.concurrent.ConcurrentHashMap
@@ -134,18 +134,23 @@ internal interface LocalDisplayedMessageRepository {
                     (onLaunch || user != AccountRepository.instance().userInfoHash)) {
                 user = AccountRepository.instance().userInfoHash
                 // reset message list from cached using updated user info
-                val sharedPref = InAppMessaging.instance().getSharedPref()
-
-                resetDisplayed(sharedPref)
+                resetDisplayed()
             }
         }
 
         @SuppressWarnings("TooGenericExceptionCaught")
-        private fun resetDisplayed(sharedPref: SharedPreferences?) {
+        private fun resetDisplayed() {
             val listString = try {
-                sharedPref?.getString(LOCAL_DISPLAYED_KEY, "") ?: ""
+                InAppMessaging.instance().getHostAppContext()?.let { it ->
+                    PreferencesUtil.getString(
+                        it,
+                        "internal_shared_prefs_" + AccountRepository.instance().userInfoHash,
+                        LOCAL_DISPLAYED_KEY,
+                        ""
+                    ) ?: ""
+                } ?: ""
             } catch (ex: ClassCastException) {
-                Timber.tag(TAG).d(ex.cause, "Incorrect type for $LOCAL_DISPLAYED_KEY data")
+                Logger(TAG).debug(ex.cause, "Incorrect type for $LOCAL_DISPLAYED_KEY data")
                 ""
             }
             messages.clear()
@@ -154,7 +159,7 @@ internal interface LocalDisplayedMessageRepository {
                 try {
                     messages.putAll(Gson().fromJson(listString, type))
                 } catch (ex: Exception) {
-                    Timber.tag(TAG).d(ex.cause, "Incorrect JSON format for $LOCAL_DISPLAYED_KEY data")
+                    Logger(TAG).debug(ex.cause, "Incorrect JSON format for $LOCAL_DISPLAYED_KEY data")
                 }
             }
         }
@@ -163,9 +168,14 @@ internal interface LocalDisplayedMessageRepository {
             // check if caching is enabled to update persistent data
             if (InAppMessaging.instance().isLocalCachingEnabled()) {
                 // reset message list from cached using updated user info
-                val editor = InAppMessaging.instance().getSharedPref()?.edit()
-                editor?.putString(LOCAL_DISPLAYED_KEY, Gson().toJson(messages))
-                        ?.apply() ?: Timber.tag(TAG).d("failed saving displayed data")
+                InAppMessaging.instance().getHostAppContext()?.let {
+                    PreferencesUtil.putString(
+                        it,
+                        "internal_shared_prefs_" + AccountRepository.instance().userInfoHash,
+                        LOCAL_DISPLAYED_KEY,
+                        Gson().toJson(messages)
+                    )
+                } ?: Logger(TAG).debug("failed saving displayed data")
             }
         }
     }

@@ -3,7 +3,8 @@ package com.rakuten.tech.mobile.inappmessaging.runtime.data.repositories
 import androidx.annotation.VisibleForTesting
 import com.rakuten.tech.mobile.inappmessaging.runtime.InAppMessaging
 import com.rakuten.tech.mobile.inappmessaging.runtime.data.models.messages.Message
-import timber.log.Timber
+import com.rakuten.tech.mobile.sdkutils.PreferencesUtil
+import com.rakuten.tech.mobile.sdkutils.logger.Logger
 import java.lang.ClassCastException
 
 /**
@@ -77,12 +78,18 @@ internal interface LocalOptedOutMessageRepository {
                 optedOutMessages.clear()
                 // reset id list from cached using updated user info
                 try {
-                    InAppMessaging.instance().getSharedPref()?.getStringSet(
-                            LOCAL_OPTED_OUT_KEY, HashSet<String?>())?.let {
-                        optedOutMessages.addAll(it)
+                    InAppMessaging.instance().getHostAppContext()?.let { it ->
+                        PreferencesUtil.getStringSet(
+                            it,
+                            "internal_shared_prefs_" + AccountRepository.instance().userInfoHash,
+                            LOCAL_OPTED_OUT_KEY,
+                            HashSet()
+                        )?.let { hashSet ->
+                            optedOutMessages.addAll(hashSet)
+                        }
                     }
                 } catch (ex: ClassCastException) {
-                    Timber.tag(TAG).d(ex.cause, "Incorrect type for $LOCAL_OPTED_OUT_KEY data")
+                    Logger(TAG).debug(ex.cause, "Incorrect type for $LOCAL_OPTED_OUT_KEY data")
                 }
             }
         }
@@ -91,8 +98,14 @@ internal interface LocalOptedOutMessageRepository {
             // check if caching is enabled to update persistent data
             if (InAppMessaging.instance().isLocalCachingEnabled()) {
                 // save updated id list
-                InAppMessaging.instance().getSharedPref()?.edit()?.putStringSet(LOCAL_OPTED_OUT_KEY,
-                        optedOutMessages)?.apply() ?: Timber.tag(TAG).d("failed saving opted out data")
+                InAppMessaging.instance().getHostAppContext()?.let {
+                    PreferencesUtil.putStringSet(
+                        it,
+                        "internal_shared_prefs_" + AccountRepository.instance().userInfoHash,
+                        LOCAL_OPTED_OUT_KEY,
+                        optedOutMessages
+                    )
+                } ?: Logger(TAG).debug("failed saving opted out data")
             }
         }
     }

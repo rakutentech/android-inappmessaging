@@ -13,9 +13,9 @@ import com.rakuten.tech.mobile.inappmessaging.runtime.data.models.HostAppInfo
 import com.rakuten.tech.mobile.inappmessaging.runtime.data.repositories.HostAppInfoRepository
 import com.rakuten.tech.mobile.inappmessaging.runtime.exception.InAppMessagingException
 import com.rakuten.tech.mobile.inappmessaging.runtime.utils.CacheUtil.getMemoryCacheSize
+import com.rakuten.tech.mobile.sdkutils.logger.Logger
 import com.squareup.picasso.LruCache
 import com.squareup.picasso.Picasso
-import timber.log.Timber
 import java.lang.ClassCastException
 import java.lang.IllegalStateException
 import java.util.Locale
@@ -64,7 +64,7 @@ internal object Initializer {
         val packageInfo: PackageInfo = try {
             context.packageManager.getPackageInfo(hostPackageName, 0)
         } catch (e: NameNotFoundException) {
-            Timber.tag(TAG).d(e)
+            Logger(TAG).debug(e.message)
             return ""
         }
 
@@ -94,7 +94,7 @@ internal object Initializer {
 
         initializePicassoInstance(context)
 
-        Timber.tag(TAG).d(Gson().toJson(hostAppInfo))
+        Logger(TAG).debug(Gson().toJson(hostAppInfo))
     }
 
     /**
@@ -108,7 +108,7 @@ internal object Initializer {
             try {
                 return sharedPref.getString(ID_KEY, "").toString()
             } catch (ex: ClassCastException) {
-                Timber.tag(TAG).d(ex.cause, "Incorrect type for $ID_KEY data")
+                Logger(TAG).debug(ex.cause, "Incorrect type for $ID_KEY data")
             }
         }
         val id = UUID.randomUUID().toString()

@@ -34,6 +34,7 @@ allprojects { proj ->
         google()
         mavenCentral()
         jitpack()
+        maven { url 'https://artifactory.rakuten-it.com/mobile-libs-mvn-release' }
     }
 
     gradle.projectsEvaluated {
