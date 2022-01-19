@@ -24,6 +24,9 @@ workflows:
         title: Run Check
         inputs:
         - content: ./gradlew check
+    - danger@2:
+        inputs:
+        - github_api_token: "$DANGER_GITHUB_API_TOKEN"
     - script@1:
         title: Assemble
         inputs:
