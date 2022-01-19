@@ -6,7 +6,7 @@ buildscript {
     CONFIG.versions.android.sdk.min = 23
     CONFIG.versions.android.sdk.target = 31
     CONFIG.versions.android.sdk.compile = 31
-    CONFIG.versions.kotlin = '1.4.31'
+    CONFIG.versions.kotlin = '1.5.20'
 
     repositories {
         google()

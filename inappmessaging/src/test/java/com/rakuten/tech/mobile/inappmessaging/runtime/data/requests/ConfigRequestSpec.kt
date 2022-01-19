@@ -30,17 +30,17 @@ class ConfigRequestSpec {
 
     companion object {
 
-        private const val REQUEST = "{\"platform\":2," +
+        private const val REQUEST = "{\"appId\":\"com.package.test\"," +
+                "\"locale\":\"jp\"," +
+                "\"appVersion\":\"0.0.1\"," +
+                "\"sdkVersion\":\"1.6.0-SNAPSHOT\"," +
+                "\"platform\":2," +
                 "\"queryParams\":" +
                     "{" +
                     "\"platform\":2," +
                     "\"appId\":\"com.package.test\"," +
                     "\"sdkVersion\":\"1.6.0-SNAPSHOT\"," +
                     "\"appVersion\":\"0.0.1\",\"locale\":\"jp\"" +
-                    "}," +
-                "\"appId\":\"com.package.test\"," +
-                "\"locale\":\"jp\"," +
-                "\"appVersion\":\"0.0.1\"," +
-                "\"sdkVersion\":\"1.6.0-SNAPSHOT\"}"
+                    "}}"
     }
 }
