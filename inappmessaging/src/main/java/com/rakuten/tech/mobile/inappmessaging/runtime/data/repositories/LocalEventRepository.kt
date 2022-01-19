@@ -16,8 +16,6 @@ import timber.log.Timber
 import java.lang.ClassCastException
 import java.util.Collections
 import kotlin.collections.ArrayList
-import kotlin.collections.component1
-import kotlin.collections.component2
 
 /**
  * LocalEventRepository will store all incoming events from host app.
