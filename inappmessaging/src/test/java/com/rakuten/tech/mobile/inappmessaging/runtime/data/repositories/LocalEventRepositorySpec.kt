@@ -13,6 +13,7 @@ import com.rakuten.tech.mobile.inappmessaging.runtime.exception.InAppMessagingEx
 import com.rakuten.tech.mobile.inappmessaging.runtime.manager.EventsManager
 import com.rakuten.tech.mobile.inappmessaging.runtime.utils.InAppMessagingConstants
 import com.rakuten.tech.mobile.inappmessaging.runtime.workmanager.schedulers.EventMessageReconciliationScheduler
+import com.rakuten.tech.mobile.sdkutils.PreferencesUtil
 import org.amshove.kluent.shouldBeEqualTo
 import org.amshove.kluent.shouldBeFalse
 import org.amshove.kluent.shouldBeInstanceOf
@@ -238,8 +239,12 @@ class LocalEventRepositoryExceptionSpec : LocalEventRepositorySpec() {
     @Test
     fun `should not crash and clear previous when parsing invalid format`() {
         setupAndTestMultipleUser()
-        val editor = InAppMessaging.instance().getSharedPref()?.edit()
-        editor?.putString(LocalEventRepository.LOCAL_EVENT_KEY, "[{eve")?.apply()
+        PreferencesUtil.putString(
+            ApplicationProvider.getApplicationContext(),
+            "internal_shared_prefs_" + AccountRepository.instance().userInfoHash,
+            LocalEventRepository.LOCAL_EVENT_KEY,
+            "[{eve"
+        )
 
         LocalEventRepository.instance().addEvent(LoginSuccessfulEvent())
         LocalEventRepository.instance().getEvents().shouldHaveSize(1) // clear all due to invalid data
@@ -258,8 +263,12 @@ class LocalEventRepositoryExceptionSpec : LocalEventRepositorySpec() {
     @Test
     fun `should not crash and clear previous when forced cast exception`() {
         setupAndTestMultipleUser()
-        val editor = InAppMessaging.instance().getSharedPref()?.edit()
-        editor?.putInt(LocalEventRepository.LOCAL_EVENT_KEY, 1)?.apply()
+        PreferencesUtil.putInt(
+            ApplicationProvider.getApplicationContext(),
+            "internal_shared_prefs_" + AccountRepository.instance().userInfoHash,
+            LocalEventRepository.LOCAL_EVENT_KEY,
+            1
+        )
 
         LocalEventRepository.instance().addEvent(LoginSuccessfulEvent())
         LocalEventRepository.instance().getEvents().shouldHaveSize(2) // including persistent type
@@ -268,8 +277,12 @@ class LocalEventRepositoryExceptionSpec : LocalEventRepositorySpec() {
     @Test
     fun `should not crash and clear previous when parsing invalid type`() {
         setupAndTestMultipleUser()
-        val editor = InAppMessaging.instance().getSharedPref()?.edit()
-        editor?.putString(LocalEventRepository.LOCAL_EVENT_KEY, "[{eventType:\"invalid\"}]")?.apply()
+        PreferencesUtil.putString(
+            ApplicationProvider.getApplicationContext(),
+            "internal_shared_prefs_" + AccountRepository.instance().userInfoHash,
+            LocalEventRepository.LOCAL_EVENT_KEY,
+            "[{eventType:\"invalid\"}]"
+        )
 
         LocalEventRepository.instance().addEvent(LoginSuccessfulEvent())
         LocalEventRepository.instance().getEvents().shouldHaveSize(1) // clear all due to invalid data

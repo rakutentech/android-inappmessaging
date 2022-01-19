@@ -2,7 +2,6 @@ package com.rakuten.tech.mobile.inappmessaging.runtime
 
 import android.app.Activity
 import android.content.Context
-import android.content.SharedPreferences
 import androidx.annotation.NonNull
 import androidx.annotation.Nullable
 import androidx.annotation.RestrictTo
@@ -70,12 +69,6 @@ abstract class InAppMessaging internal constructor() {
      */
     @RestrictTo(RestrictTo.Scope.LIBRARY)
     internal abstract fun isLocalCachingEnabled(): Boolean
-
-    /**
-     * This method returns the encrypted shared preference.
-     */
-    @RestrictTo(RestrictTo.Scope.LIBRARY)
-    internal abstract fun getSharedPref(): SharedPreferences?
 
     /**
      * This method moves temp data to persistent cache.
@@ -168,8 +161,6 @@ abstract class InAppMessaging internal constructor() {
         override fun getHostAppContext(): Context? = null
 
         override fun isLocalCachingEnabled() = false
-
-        override fun getSharedPref(): SharedPreferences? = null
 
         override fun closeMessage(clearQueuedCampaigns: Boolean) = Unit
 

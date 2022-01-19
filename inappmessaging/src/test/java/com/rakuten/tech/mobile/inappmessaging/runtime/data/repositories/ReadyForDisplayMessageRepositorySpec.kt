@@ -10,6 +10,7 @@ import com.rakuten.tech.mobile.inappmessaging.runtime.TestUserInfoProvider
 import com.rakuten.tech.mobile.inappmessaging.runtime.UserInfoProvider
 import com.rakuten.tech.mobile.inappmessaging.runtime.data.models.messages.Message
 import com.rakuten.tech.mobile.inappmessaging.runtime.data.models.messages.ValidTestMessage
+import com.rakuten.tech.mobile.sdkutils.PreferencesUtil
 import org.amshove.kluent.*
 import org.junit.Before
 import org.junit.Test
@@ -131,8 +132,12 @@ class ReadyForDisplayMessageRepositorySpec : BaseTest() {
     @Test
     fun `should not crash and clear previous when forced cast exception`() {
         setupAndTestMultipleUser()
-        val editor = InAppMessaging.instance().getSharedPref()?.edit()
-        editor?.putInt(ReadyForDisplayMessageRepository.READY_DISPLAY_KEY, 1)?.apply()
+        PreferencesUtil.putInt(
+            ApplicationProvider.getApplicationContext(),
+            "internal_shared_prefs_" + AccountRepository.instance().userInfoHash,
+            ReadyForDisplayMessageRepository.READY_DISPLAY_KEY,
+            1
+        )
         ReadyForDisplayMessageRepository.instance().getAllMessagesCopy().shouldBeEmpty()
     }
 

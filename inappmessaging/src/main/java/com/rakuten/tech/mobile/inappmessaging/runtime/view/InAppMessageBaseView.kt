@@ -22,9 +22,9 @@ import com.rakuten.tech.mobile.inappmessaging.runtime.data.models.messages.Messa
 import com.rakuten.tech.mobile.inappmessaging.runtime.data.responses.ping.MessageButton
 import com.rakuten.tech.mobile.inappmessaging.runtime.utils.ResourceUtils
 import com.rakuten.tech.mobile.inappmessaging.runtime.utils.ViewUtil
+import com.rakuten.tech.mobile.sdkutils.logger.Logger
 import com.squareup.picasso.Callback
 import com.squareup.picasso.Picasso
-import timber.log.Timber
 import kotlin.math.sqrt
 import java.lang.Exception
 
@@ -65,7 +65,7 @@ internal open class InAppMessageBaseView(context: Context, attrs: AttributeSet?)
             this.bgColor = Color.parseColor(message.getMessagePayload().backgroundColor)
         } catch (e: IllegalArgumentException) {
             // values are from backend
-            Timber.tag(TAG).e(e)
+            Logger(TAG).error(e.message)
             // change to default
             this.headerColor = Color.BLACK
             this.messageBodyColor = Color.BLACK
@@ -151,7 +151,7 @@ internal open class InAppMessageBaseView(context: Context, attrs: AttributeSet?)
                         }
 
                         override fun onError(e: Exception?) {
-                            Timber.tag(TAG).d(e?.cause, "Downloading image failed $imageUrl")
+                            Logger(TAG).debug(e?.cause, "Downloading image failed $imageUrl")
                         }
                     }
                     (picasso ?: Picasso.get()).load(this.imageUrl)
@@ -161,7 +161,7 @@ internal open class InAppMessageBaseView(context: Context, attrs: AttributeSet?)
                         .centerInside()
                         .into(it, callback)
                 } catch (ex: Exception) {
-                    Timber.tag(TAG).d(ex, "Downloading image failed $imageUrl")
+                    Logger(TAG).debug(ex, "Downloading image failed $imageUrl")
                 }
             }
         }
@@ -177,7 +177,7 @@ internal open class InAppMessageBaseView(context: Context, attrs: AttributeSet?)
             Color.parseColor(button.buttonTextColor)
         } catch (e: IllegalArgumentException) {
             // values are from backend
-            Timber.tag(TAG).e(e)
+            Logger(TAG).error(e.message)
             // set to default color
             Color.parseColor("#1D1D1D")
         }
@@ -187,7 +187,7 @@ internal open class InAppMessageBaseView(context: Context, attrs: AttributeSet?)
             Color.parseColor(button.buttonBackgroundColor)
         } catch (e: IllegalArgumentException) {
             // values are from backend
-            Timber.tag(TAG).e(e)
+            Logger(TAG).error(e.message)
             // set to default color
             Color.WHITE
         }
@@ -258,7 +258,7 @@ internal open class InAppMessageBaseView(context: Context, attrs: AttributeSet?)
                 return ResourceUtils.getFont(ctx,
                     ResourceUtils.getResourceIdentifier(ctx, ctx.getString(strId), "font"))
             } catch (rex: Resources.NotFoundException) {
-                Timber.tag(TAG).d(rex.cause, "Font file is not found. Will revert to default font.")
+                Logger(TAG).debug(rex.cause, "Font file is not found. Will revert to default font.")
             }
         }
 
