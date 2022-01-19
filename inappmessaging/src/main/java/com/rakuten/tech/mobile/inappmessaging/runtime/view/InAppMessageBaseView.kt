@@ -4,7 +4,6 @@ import android.annotation.SuppressLint
 import android.content.Context
 import android.content.res.ColorStateList
 import android.graphics.Color
-import android.graphics.Typeface
 import android.util.AttributeSet
 import android.view.View
 import android.widget.CheckBox
@@ -197,7 +196,6 @@ internal open class InAppMessageBaseView(context: Context, attrs: AttributeSet?)
         val fontId = context.resources.getIdentifier("iam_custom_font_button", "font", context.packageName)
         val font = retrieveFontTypeFace(fontId)
         font?.let { buttonView.typeface = it }
-        buttonView.textSize = 16/context.resources.displayMetrics.scaledDensity
         buttonView.visibility = View.VISIBLE
         findViewById<LinearLayout>(R.id.message_buttons)?.visibility = View.VISIBLE
     }

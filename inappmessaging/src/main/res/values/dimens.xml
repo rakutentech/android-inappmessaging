@@ -16,7 +16,7 @@
   <dimen name="modal_text_scroll_view_margin_bottom">24dp</dimen>
 
   <!--Modal Button-->
-  <dimen name="modal_button_height">40dp</dimen>
+  <dimen name="modal_button_height">53dp</dimen>
   <dimen name="modal_button_boarder_stroke_width">1dp</dimen>
   <dimen name="modal_button_corner_radius">4dp</dimen>
   <dimen name="modal_button_double_margin_left_right">8dp</dimen>
