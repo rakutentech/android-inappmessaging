@@ -197,6 +197,7 @@ internal open class InAppMessageBaseView(context: Context, attrs: AttributeSet?)
         val fontId = context.resources.getIdentifier("iam_custom_font_button", "font", context.packageName)
         val font = retrieveFontTypeFace(fontId)
         font?.let { buttonView.typeface = it }
+        buttonView.textSize = 16/context.resources.displayMetrics.scaledDensity
         buttonView.visibility = View.VISIBLE
         findViewById<LinearLayout>(R.id.message_buttons)?.visibility = View.VISIBLE
     }
@@ -210,15 +211,16 @@ internal open class InAppMessageBaseView(context: Context, attrs: AttributeSet?)
         if (!header.isNullOrEmpty() || !messageBody.isNullOrEmpty()) {
             findViewById<NestedScrollView>(R.id.message_scrollview)?.visibility = View.VISIBLE
         }
-        val fontId = context.resources.getIdentifier("iam_custom_font_text", "font", context.packageName)
-        val font = retrieveFontTypeFace(fontId)
         if (!header.isNullOrEmpty()) {
             findViewById<TextView>(R.id.header_text)?.let {
                 it.text = header
                 it.setTextColor(headerColor)
                 it.setOnTouchListener(listener)
                 it.visibility = View.VISIBLE
-                font?.let { font -> it.setTypeface(font, Typeface.BOLD) }
+                retrieveFontTypeFace(context.resources.getIdentifier(
+                    "iam_custom_font_title", "font", context.packageName))?.let { font ->
+                    it.typeface = font
+                }
             }
         }
         if (!messageBody.isNullOrEmpty()) {
@@ -227,7 +229,8 @@ internal open class InAppMessageBaseView(context: Context, attrs: AttributeSet?)
                 it.setTextColor(messageBodyColor)
                 it.setOnTouchListener(listener)
                 it.visibility = View.VISIBLE
-                font?.let { font ->
+                retrieveFontTypeFace(context.resources.getIdentifier(
+                    "iam_custom_font_desc", "font", context.packageName))?.let { font ->
                     it.typeface = font
                 }
             }

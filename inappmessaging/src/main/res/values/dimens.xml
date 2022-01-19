@@ -16,13 +16,14 @@
   <dimen name="modal_text_scroll_view_margin_bottom">24dp</dimen>
 
   <!--Modal Button-->
+  <dimen name="modal_button_height">40dp</dimen>
   <dimen name="modal_button_boarder_stroke_width">1dp</dimen>
-  <dimen name="modal_button_corner_radius">8dp</dimen>
+  <dimen name="modal_button_corner_radius">4dp</dimen>
   <dimen name="modal_button_double_margin_left_right">8dp</dimen>
   <dimen name="modal_button_double_margin_top_bottom">24dp</dimen>
   <dimen name="modal_button_padding_left_right">5dp</dimen>
-  <dimen name="modal_button_padding_top">8dp</dimen>
-  <dimen name="modal_button_padding_bottom">11dp</dimen>
+  <dimen name="modal_button_padding_top">0dp</dimen>
+  <dimen name="modal_button_padding_bottom">0dp</dimen>
   <dimen name="modal_button_single_margin_left_right">16dp</dimen>
   <dimen name="modal_button_text_size">16sp</dimen>
   <dimen name="modal_corner_radius">4dp</dimen>
