@@ -87,11 +87,10 @@ internal interface LocalEventRepository : EventRepository {
 
         private fun debugLog(event: Event) {
             Timber.tag(TAG).d(event.getEventName())
-            event.getAttributeMap().forEach { (key, value) ->
+            for ((key, value) in event.getAttributeMap()) {
                 Timber.tag(TAG).d("Key: %s", key)
                 Timber.tag(TAG).d(
-                        "Value name: %s, Value Type: %d, Value data: %s", value?.name, value?.valueType,
-                        value?.value)
+                    "Value name: ${value?.name}, Value Type: ${value?.valueType}, Value data: ${value?.value}")
             }
         }
 
