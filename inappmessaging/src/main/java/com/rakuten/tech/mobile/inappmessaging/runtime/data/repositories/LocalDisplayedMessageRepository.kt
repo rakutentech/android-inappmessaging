@@ -138,7 +138,7 @@ internal interface LocalDisplayedMessageRepository {
             }
         }
 
-        @SuppressWarnings("TooGenericExceptionCaught")
+        @SuppressWarnings("TooGenericExceptionCaught", "LongMethod")
         private fun resetDisplayed() {
             val listString = try {
                 InAppMessaging.instance().getHostAppContext()?.let { it ->

@@ -129,7 +129,8 @@ class LocalDisplayedMessageRepositorySpec : BaseTest() {
     fun `should not crash and clear previous when forced cast exception`() {
         val message = setupAndTestMultipleUser()
         PreferencesUtil.putInt(
-            ApplicationProvider.getApplicationContext(), "internal_shared_prefs_" + AccountRepository.instance().userInfoHash,
+            ApplicationProvider.getApplicationContext(),
+            "internal_shared_prefs_" + AccountRepository.instance().userInfoHash,
             LocalDisplayedMessageRepository.LOCAL_DISPLAYED_KEY, 1
         )
 
@@ -140,7 +141,8 @@ class LocalDisplayedMessageRepositorySpec : BaseTest() {
     fun `should not crash and clear previous when invalid format`() {
         val message = setupAndTestMultipleUser()
         PreferencesUtil.putString(
-            ApplicationProvider.getApplicationContext(), "internal_shared_prefs_" + AccountRepository.instance().userInfoHash,
+            ApplicationProvider.getApplicationContext(), "internal_shared_prefs_"
+                    + AccountRepository.instance().userInfoHash,
             LocalDisplayedMessageRepository.LOCAL_DISPLAYED_KEY, "invalid"
         )
         LocalDisplayedMessageRepository.instance().numberOfTimesDisplayed(message) shouldBeEqualTo 0
