@@ -88,7 +88,7 @@ internal interface LocalEventRepository : EventRepository {
 
         private fun debugLog(event: Event) {
             Logger(TAG).debug(event.getEventName())
-            event.getAttributeMap().forEach { (key, value) ->
+            for ((key, value) in event.getAttributeMap()) {
                 Logger(TAG).debug("Key: %s", key)
                 Logger(TAG).debug(
                         "Value name: %s, Value Type: %d, Value data: %s", value?.name, value?.valueType,
