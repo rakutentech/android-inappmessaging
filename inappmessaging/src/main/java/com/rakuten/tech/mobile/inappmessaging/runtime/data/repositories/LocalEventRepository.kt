@@ -155,6 +155,7 @@ internal interface LocalEventRepository : EventRepository {
             return false
         }
 
+        @SuppressWarnings("LongMethod")
         private fun checkAndResetList(onLaunch: Boolean = false) {
             // check if caching is enabled and if there are changes in user info
             if (InAppMessaging.instance().isLocalCachingEnabled() &&

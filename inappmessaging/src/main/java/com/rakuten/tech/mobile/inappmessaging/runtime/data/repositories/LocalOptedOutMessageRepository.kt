@@ -70,6 +70,7 @@ internal interface LocalOptedOutMessageRepository {
             }
         }
 
+        @SuppressWarnings("LongMethod")
         private fun checkAndResetSet(onLaunch: Boolean = false) {
             // check if caching is enabled and if there are changes in user info
             if (InAppMessaging.instance().isLocalCachingEnabled() &&
