@@ -3,7 +3,9 @@ package com.rakuten.tech.mobile.inappmessaging.runtime.view
 import android.annotation.SuppressLint
 import android.content.Context
 import android.content.res.ColorStateList
+import android.content.res.Resources
 import android.graphics.Color
+import android.graphics.Typeface
 import android.util.AttributeSet
 import android.view.View
 import android.widget.CheckBox
@@ -12,14 +14,13 @@ import android.widget.ImageButton
 import android.widget.LinearLayout
 import android.widget.TextView
 import android.widget.ImageView
-import androidx.core.content.res.ResourcesCompat
 import androidx.annotation.VisibleForTesting
 import androidx.core.widget.NestedScrollView
 import com.google.android.material.button.MaterialButton
 import com.rakuten.tech.mobile.inappmessaging.runtime.R
 import com.rakuten.tech.mobile.inappmessaging.runtime.data.models.messages.Message
 import com.rakuten.tech.mobile.inappmessaging.runtime.data.responses.ping.MessageButton
-import com.rakuten.tech.mobile.inappmessaging.runtime.utils.BuildVersionChecker
+import com.rakuten.tech.mobile.inappmessaging.runtime.utils.ResourceUtils
 import com.rakuten.tech.mobile.inappmessaging.runtime.utils.ViewUtil
 import com.squareup.picasso.Callback
 import com.squareup.picasso.Picasso
@@ -49,6 +50,9 @@ internal open class InAppMessageBaseView(context: Context, attrs: AttributeSet?)
     private var displayOptOut = false
     @VisibleForTesting
     internal var picasso: Picasso? = null
+
+    @VisibleForTesting
+    internal var mockContext: Context? = null
 
     /**
      * Sets campaign message data onto the view.
@@ -193,9 +197,7 @@ internal open class InAppMessageBaseView(context: Context, attrs: AttributeSet?)
         buttonView.strokeColor = ColorStateList.valueOf(textColor)
         buttonView.setOnClickListener(this.listener)
 
-        val fontId = context.resources.getIdentifier("iam_custom_font_button", "font", context.packageName)
-        val font = retrieveFontTypeFace(fontId)
-        font?.let { buttonView.typeface = it }
+        getFont(BUTTON_FONT)?.let { buttonView.typeface = it }
         buttonView.visibility = View.VISIBLE
         findViewById<LinearLayout>(R.id.message_buttons)?.visibility = View.VISIBLE
     }
@@ -215,8 +217,7 @@ internal open class InAppMessageBaseView(context: Context, attrs: AttributeSet?)
                 it.setTextColor(headerColor)
                 it.setOnTouchListener(listener)
                 it.visibility = View.VISIBLE
-                retrieveFontTypeFace(context.resources.getIdentifier(
-                    "iam_custom_font_title", "font", context.packageName))?.let { font ->
+                getFont(HEADER_FONT)?.let { font ->
                     it.typeface = font
                 }
             }
@@ -227,8 +228,7 @@ internal open class InAppMessageBaseView(context: Context, attrs: AttributeSet?)
                 it.setTextColor(messageBodyColor)
                 it.setOnTouchListener(listener)
                 it.visibility = View.VISIBLE
-                retrieveFontTypeFace(context.resources.getIdentifier(
-                    "iam_custom_font_desc", "font", context.packageName))?.let { font ->
+                getFont(BODY_FONT)?.let { font ->
                     it.typeface = font
                 }
             }
@@ -250,14 +250,25 @@ internal open class InAppMessageBaseView(context: Context, attrs: AttributeSet?)
         }
     }
 
-    @SuppressLint("NewApi")
-    private fun retrieveFontTypeFace(fontId: Int) = when {
-        fontId <= 0 -> null
-        BuildVersionChecker.instance().isAndroidOAndAbove() -> context.resources.getFont(fontId)
-        else -> ResourcesCompat.getFont(context, fontId)
+    private fun getFont(name: String): Typeface? {
+        val ctx = mockContext ?: context
+        val strId = ResourceUtils.getResourceIdentifier(ctx, name, "string")
+        if (strId > 0) {
+            try {
+                return ResourceUtils.getFont(ctx,
+                    ResourceUtils.getResourceIdentifier(ctx, ctx.getString(strId), "font"))
+            } catch (rex: Resources.NotFoundException) {
+                Timber.tag(TAG).d(rex.cause, "Font file is not found. Will revert to default font.")
+            }
+        }
+
+        return null
     }
 
     companion object {
         private const val TAG = "IAM_BaseView"
+        private const val BUTTON_FONT = "iam_custom_font_button"
+        private const val HEADER_FONT = "iam_custom_font_header"
+        private const val BODY_FONT = "iam_custom_font_body"
     }
 }

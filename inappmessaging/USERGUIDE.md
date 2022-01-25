@@ -283,21 +283,30 @@ InAppMessaging.instance().closeMessage(true)
 
 ### <a name="custom-font"></a> #3 Custom fonts for campaigns
 
-The SDK will optionally use custom fonts on campaign texts and button texts if set. The default Android system font is used if custom fonts are not added.
+The SDK will optionally use custom fonts on campaign header and body texts, and button texts if set. The default Android system font is used if custom fonts are not added.
 
 To use custom fonts:
 1. Add the font files, `ttf` or `otf` format, to the `font` resource folder of your app.
-2. To use custom font for campaign header and body texts, set the filename to `iam_custom_font_text`.
-3. To use custom font for button texts, set the filename to `iam_custom_font_button`.
+2. To use custom font for the following campaign parts, define a string resource in the app's `res/values/string.xml`:
+* for campaign header texts, set font filename to `iam_custom_font_header` resource name
+* for campaign body texts, set font filename to `iam_custom_font_body` resource name
+* for campaign button texts, set font filename to `iam_custom_font_button` resource name
 
-Note: If you want to use custom fonts for both campaign and button texts, app should set two font files.
+Note: You can set the same font filename for the different string resources to use the same font.
 
 ```bash
 ...
 ├── res
      ├── font
-          ├── iam_custom_font_text.otf // or ttf format
-          ├── iam_custom_font_button.otf // or ttf format
+          ├── your_app_font.otf // or ttf format
+          ├── your_app_other_font.otf // or ttf format
+```
+
+in strings.xml:
+```xml
+    <string name="iam_custom_font_header">your_app_font</string>
+    <string name="iam_custom_font_body">your_app_font</string>
+    <string name="iam_custom_font_button">your_app_other_font</string>
 ```
 
 ## <a name="troubleshooting"></a> Troubleshooting

@@ -17,23 +17,27 @@ import com.rakuten.tech.mobile.inappmessaging.runtime.R
 import com.rakuten.tech.mobile.inappmessaging.runtime.data.models.messages.Message
 import com.rakuten.tech.mobile.inappmessaging.runtime.data.responses.ping.*
 import com.rakuten.tech.mobile.inappmessaging.runtime.utils.ImageUtilSpec
-import org.amshove.kluent.shouldBeEqualTo
 import org.junit.Before
 import org.junit.Test
 import org.junit.runner.RunWith
-import org.mockito.Mockito
-import org.mockito.Mockito.`when`
-import org.mockito.Mockito.times
 import org.mockito.verification.VerificationMode
 import org.robolectric.RobolectricTestRunner
 import org.robolectric.annotation.Config
 
-import android.R.attr.button
 import android.widget.CheckBox
-import android.R.attr.button
+import android.content.Context
+import android.content.res.Resources
+import android.graphics.Typeface
+import com.nhaarman.mockitokotlin2.any
+import com.nhaarman.mockitokotlin2.eq
+import com.nhaarman.mockitokotlin2.times
+import org.amshove.kluent.*
+import org.mockito.Mockito
+import org.mockito.Mockito.`when`
 
 @Config(sdk = [Build.VERSION_CODES.O_MR1])
 @RunWith(RobolectricTestRunner::class)
+@SuppressWarnings("LargeClass")
 class BaseViewSpec : BaseTest() {
     private val hostAppActivity = Mockito.mock(Activity::class.java)
     private val mockMessage = Mockito.mock(Message::class.java)
@@ -159,6 +163,49 @@ class BaseViewSpec : BaseTest() {
         `when`(mockPayload.headerColor).thenReturn("#")
         ImageUtilSpec.setupValidPicasso()
         view?.populateViewData(mockMessage)
+    }
+
+    @Test
+    fun `should set correct font typeface`() {
+        val mockTypeface = setupMockContext()
+
+        view?.findViewById<TextView>(R.id.header_text)?.typeface shouldBeEqualTo mockTypeface
+        view?.findViewById<TextView>(R.id.message_body)?.typeface shouldBeEqualTo mockTypeface
+        view?.findViewById<MaterialButton>(R.id.message_single_button)?.typeface shouldBeEqualTo mockTypeface
+    }
+
+    @Test
+    fun `should not crash if get string failed`() {
+        setupMockContext(true)
+
+        view?.findViewById<TextView>(R.id.header_text)?.typeface.shouldNotBeNull()
+        view?.findViewById<TextView>(R.id.message_body)?.typeface.shouldNotBeNull()
+        view?.findViewById<MaterialButton>(R.id.message_single_button)?.typeface.shouldNotBeNull()
+    }
+
+    @SuppressWarnings("LongMethod")
+    private fun setupMockContext(isInvalid: Boolean = false): Typeface? {
+        `when`(mockPayload.headerColor).thenReturn("#")
+        val mockContext = Mockito.mock(Context::class.java)
+        val mockResource = Mockito.mock(Resources::class.java)
+        val mockTypeface = Mockito.mock(Typeface::class.java)
+        val mockButton = Mockito.mock(MessageButton::class.java)
+        view?.mockContext = mockContext
+        `when`(mockContext.resources).thenReturn(mockResource)
+        `when`(mockContext.packageName).thenReturn("test")
+        `when`(mockResource.getIdentifier(any(), any(), any())).thenReturn(1)
+        if (isInvalid) {
+            `when`(mockContext.getString(eq(1))).thenThrow(Resources.NotFoundException())
+        } else {
+            `when`(mockContext.getString(eq(1))).thenReturn("testfont")
+        }
+
+        `when`(mockResource.getFont(any())).thenReturn(mockTypeface)
+        `when`(mockCtrlSettings.buttons).thenReturn(listOf(mockButton))
+        `when`(mockButton.buttonTextColor).thenReturn("#")
+        `when`(mockButton.buttonBackgroundColor).thenReturn("#")
+        view?.populateViewData(mockMessage)
+        return mockTypeface
     }
 
     private fun verifyImageFetch(isValid: Boolean, isException: Boolean = false, isNull: Boolean = false) {
