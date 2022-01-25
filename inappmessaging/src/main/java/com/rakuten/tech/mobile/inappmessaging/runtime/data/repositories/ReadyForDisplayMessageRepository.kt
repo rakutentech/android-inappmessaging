@@ -93,8 +93,8 @@ internal abstract class ReadyForDisplayMessageRepository : ReadyMessageRepositor
                             "internal_shared_prefs_" + AccountRepository.instance().userInfoHash,
                             READY_DISPLAY_KEY,
                             ""
-                        ) ?: ""
-                    }
+                        )
+                    } ?: ""
                 } catch (ex: ClassCastException) {
                     Logger(TAG).debug(ex.cause, "Incorrect type for $READY_DISPLAY_KEY data")
                     ""

@@ -169,20 +169,18 @@ internal interface LocalEventRepository : EventRepository {
                             "internal_shared_prefs_" + AccountRepository.instance().userInfoHash,
                             LOCAL_EVENT_KEY,
                             ""
-                        ) ?: ""
-                    }
+                        )
+                    } ?: ""
                 } catch (ex: ClassCastException) {
                     Logger(TAG).debug(ex.cause, "Incorrect type for $LOCAL_EVENT_KEY data")
                     ""
                 }
-                if (listString != null) {
-                    if (listString.isNotEmpty()) {
-                        events.clear()
-                        deserializeLocalEvents(listString)
-                    } else if (events.isNotEmpty()) {
-                        // retain persistent event for user with no stored data
-                        events.removeAll { ev -> !ev.isPersistentType() }
-                    }
+                if (listString.isNotEmpty()) {
+                    events.clear()
+                    deserializeLocalEvents(listString)
+                } else if (events.isNotEmpty()) {
+                    // retain persistent event for user with no stored data
+                    events.removeAll { ev -> !ev.isPersistentType() }
                 }
             }
         }

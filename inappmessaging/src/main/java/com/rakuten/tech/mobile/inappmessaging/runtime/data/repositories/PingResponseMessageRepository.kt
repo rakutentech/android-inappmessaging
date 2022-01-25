@@ -103,8 +103,8 @@ internal abstract class PingResponseMessageRepository : MessageRepository {
                             "internal_shared_prefs_" + AccountRepository.instance().userInfoHash,
                             PING_RESPONSE_KEY,
                             ""
-                        ) ?: ""
-                    }
+                        )
+                    } ?: ""
                 } catch (ex: ClassCastException) {
                     Logger(TAG).debug(ex.cause, "Incorrect type for $PING_RESPONSE_KEY data")
                     ""

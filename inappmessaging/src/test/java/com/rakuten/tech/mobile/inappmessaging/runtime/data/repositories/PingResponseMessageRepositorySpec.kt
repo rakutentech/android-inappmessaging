@@ -192,6 +192,13 @@ class PingResponseMessageRepositorySpec : BaseTest() {
         PingResponseMessageRepository.instance().getAllMessagesCopy().shouldBeEmpty()
     }
 
+    @Test
+    fun `should not crash and reset map`() {
+        setupAndTestMultipleUser()
+        InAppMessaging.setUninitializedInstance(true)
+        PingResponseMessageRepository.instance().getAllMessagesCopy().shouldBeEmpty()
+    }
+
     private fun setupAndTestMultipleUser() {
         val infoProvider = TestUserInfoProvider()
         initializeInstance(infoProvider)
