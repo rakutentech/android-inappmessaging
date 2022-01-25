@@ -172,13 +172,13 @@ internal interface MessageEventReconciliationUtil {
             // Validate argument event is for the argument trigger and
             // if different custom events share the same eventType.
             if (trigger.eventType != event.getEventType() || (trigger.eventType == EventType.CUSTOM.typeId &&
-                            trigger.eventName.toLowerCase(Locale.getDefault()) != event.getEventName())) return false
+                            trigger.eventName.lowercase(Locale.getDefault()) != event.getEventName())) return false
 
             for (triggerAttribute in trigger.triggerAttributes) {
                 // Get attribute from event by triggerAttribute's name.
                 // Attribute's name should be in lower case.
                 val eventAttribute =
-                    event.getAttributeMap()[triggerAttribute.name.toLowerCase(Locale.getDefault())] ?: return false
+                    event.getAttributeMap()[triggerAttribute.name.lowercase(Locale.getDefault())] ?: return false
                 // If no such attribute in the event, this trigger's attribute can't be satisfied.
                 // Compare trigger attribute with the found event attribute. If attribute value can be
                 // satisfied by event's attribute, continue with the next attribute.
@@ -199,7 +199,7 @@ internal interface MessageEventReconciliationUtil {
          * Attribute's value.
          */
         private fun isAttributeReconciled(triggerAttribute: TriggerAttribute, eventAttribute: Attribute): Boolean {
-            if (triggerAttribute.name.toLowerCase(Locale.getDefault()) != eventAttribute.name) {
+            if (triggerAttribute.name.lowercase(Locale.getDefault()) != eventAttribute.name) {
                 return false
             }
 
@@ -327,10 +327,10 @@ internal interface MessageEventReconciliationUtil {
             val eventName = if (eventType == EventType.CUSTOM) {
                 // Custom event's name should go by the eventName variable in trigger.
                 // Explicitly user lowercase to handle case-sensitive name on ping response
-                trigger.eventName.toLowerCase(Locale.getDefault())
+                trigger.eventName.lowercase(Locale.getDefault())
             } else {
                 // Global event's name should go by its enum name, and it should be in lower case.
-                eventType.name.toLowerCase(Locale.getDefault())
+                eventType.name.lowercase(Locale.getDefault())
             }
 
             // Only retrieve a list of events according to trigger's event type. Since this list of events

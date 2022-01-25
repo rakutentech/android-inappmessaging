@@ -31,7 +31,7 @@ class CustomEvent(@NonNull eventName: String) : BaseEvent(EventType.CUSTOM, even
      */
     @NotNull
     fun addAttribute(@NotNull key: String, @NotNull value: Int): CustomEvent {
-        attributesMap[key.toLowerCase(Locale.getDefault())] = Attribute(key, value.toString(), ValueType.INTEGER)
+        attributesMap[key.lowercase(Locale.getDefault())] = Attribute(key, value.toString(), ValueType.INTEGER)
         return this
     }
 
@@ -40,7 +40,7 @@ class CustomEvent(@NonNull eventName: String) : BaseEvent(EventType.CUSTOM, even
      */
     @NotNull
     fun addAttribute(@NotNull key: String, @NotNull value: Double): CustomEvent {
-        attributesMap[key.toLowerCase(Locale.getDefault())] = Attribute(key, value.toString(), ValueType.DOUBLE)
+        attributesMap[key.lowercase(Locale.getDefault())] = Attribute(key, value.toString(), ValueType.DOUBLE)
         return this
     }
 
@@ -49,7 +49,7 @@ class CustomEvent(@NonNull eventName: String) : BaseEvent(EventType.CUSTOM, even
      */
     @NotNull
     fun addAttribute(@NotNull key: String, @NotNull value: String): CustomEvent {
-        attributesMap[key.toLowerCase(Locale.getDefault())] = Attribute(key, value, ValueType.STRING)
+        attributesMap[key.lowercase(Locale.getDefault())] = Attribute(key, value, ValueType.STRING)
         return this
     }
 
@@ -58,7 +58,7 @@ class CustomEvent(@NonNull eventName: String) : BaseEvent(EventType.CUSTOM, even
      */
     @NotNull
     fun addAttribute(@NotNull key: String, @NotNull value: Boolean): CustomEvent {
-        attributesMap[key.toLowerCase(Locale.getDefault())] = Attribute(key, value.toString(), ValueType.BOOLEAN)
+        attributesMap[key.lowercase(Locale.getDefault())] = Attribute(key, value.toString(), ValueType.BOOLEAN)
         return this
     }
 
@@ -67,7 +67,7 @@ class CustomEvent(@NonNull eventName: String) : BaseEvent(EventType.CUSTOM, even
      */
     @NotNull
     fun addAttribute(@NotNull key: String, @NotNull value: Date): CustomEvent {
-        attributesMap[key.toLowerCase(Locale.getDefault())] =
+        attributesMap[key.lowercase(Locale.getDefault())] =
             Attribute(key, value.time.toString(), ValueType.TIME_IN_MILLI)
         return this
     }

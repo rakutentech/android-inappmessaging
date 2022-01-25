@@ -15,6 +15,7 @@ import com.rakuten.tech.mobile.inappmessaging.runtime.data.models.messages.Messa
 import com.rakuten.tech.mobile.inappmessaging.runtime.manager.DisplayManager
 import com.rakuten.tech.mobile.inappmessaging.runtime.utils.BuildVersionChecker
 import com.rakuten.tech.mobile.inappmessaging.runtime.workmanager.schedulers.EventMessageReconciliationScheduler
+import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
@@ -86,10 +87,10 @@ internal class InAppMessageViewListener(
         return false
     }
 
-    private fun handleClick(id: Int) {
+    private fun handleClick(id: Int, dispatcher: CoroutineDispatcher = Dispatchers.Default) {
         CoroutineScope(Dispatchers.Main).launch {
             displayManager.removeMessage(inApp.getRegisteredActivity())
-            withContext(Dispatchers.Default) {
+            withContext(dispatcher) {
                 handleMessage(id)
             }
         }

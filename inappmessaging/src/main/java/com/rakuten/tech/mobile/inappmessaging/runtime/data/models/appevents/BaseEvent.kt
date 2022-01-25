@@ -38,7 +38,7 @@ abstract class BaseEvent(
         }
 
         // Use lower case eventName only.
-        this.eventName = this.eventName.toLowerCase(Locale.getDefault())
+        this.eventName = this.eventName.lowercase(Locale.getDefault())
         this.timestamp = Calendar.getInstance().timeInMillis
     }
 

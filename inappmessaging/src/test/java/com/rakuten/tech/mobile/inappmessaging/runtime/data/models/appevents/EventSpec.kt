@@ -30,17 +30,17 @@ class EventSpec(
         fun data(): Collection<Array<Any>> {
             return listOf(
                     arrayOf("AppStart", AppStartEvent(), EventType.APP_START,
-                            EventType.APP_START.name.toLowerCase(Locale.getDefault()), true),
+                            EventType.APP_START.name.lowercase(Locale.getDefault()), true),
                     arrayOf("Custom", CustomEvent("custom"), EventType.CUSTOM, "custom", false),
                     arrayOf("Custom UpperCase", CustomEvent("CuStOm"), EventType.CUSTOM, "custom", false),
                     arrayOf("LoginSuccessful",
                             LoginSuccessfulEvent(), EventType.LOGIN_SUCCESSFUL,
-                            EventType.LOGIN_SUCCESSFUL.name.toLowerCase(Locale.getDefault()),
+                            EventType.LOGIN_SUCCESSFUL.name.lowercase(Locale.getDefault()),
                             false),
                     arrayOf("PurchaseSuccessful",
                             PurchaseSuccessfulEvent(),
                             EventType.PURCHASE_SUCCESSFUL,
-                            EventType.PURCHASE_SUCCESSFUL.name.toLowerCase(Locale.getDefault()),
+                            EventType.PURCHASE_SUCCESSFUL.name.lowercase(Locale.getDefault()),
                             false)
             )
         }
