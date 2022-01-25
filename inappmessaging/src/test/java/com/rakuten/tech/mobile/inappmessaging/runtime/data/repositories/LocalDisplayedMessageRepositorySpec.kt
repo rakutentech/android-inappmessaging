@@ -138,6 +138,18 @@ class LocalDisplayedMessageRepositorySpec : BaseTest() {
     }
 
     @Test
+    fun `should not crash and clear previous when forced cast exception for boolean cache`() {
+        val message = setupAndTestMultipleUser()
+        PreferencesUtil.putBoolean(
+            ApplicationProvider.getApplicationContext(),
+            "internal_shared_prefs_" + AccountRepository.instance().userInfoHash,
+            LocalDisplayedMessageRepository.LOCAL_DISPLAYED_KEY, true
+        )
+
+        LocalDisplayedMessageRepository.instance().numberOfTimesDisplayed(message) shouldBeEqualTo 0
+    }
+
+    @Test
     fun `should not crash and clear previous when invalid format`() {
         val message = setupAndTestMultipleUser()
         PreferencesUtil.putString(

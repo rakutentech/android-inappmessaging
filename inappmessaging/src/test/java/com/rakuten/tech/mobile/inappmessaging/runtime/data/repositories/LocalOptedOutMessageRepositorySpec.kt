@@ -70,6 +70,18 @@ class LocalOptedOutMessageRepositorySpec : BaseTest() {
         LocalOptedOutMessageRepository.instance().hasMessage(message.getCampaignId()).shouldBeFalse()
     }
 
+    @Test
+    fun `should not crash and clear previous when forced cast exception for boolean cache`() {
+        val message = setupAndTestMultipleUser()
+        PreferencesUtil.putBoolean(
+            ApplicationProvider.getApplicationContext(),
+            "internal_shared_prefs_" + AccountRepository.instance().userInfoHash,
+            LocalOptedOutMessageRepository.LOCAL_OPTED_OUT_KEY,
+            true
+        )
+        LocalOptedOutMessageRepository.instance().hasMessage(message.getCampaignId()).shouldBeFalse()
+    }
+
     private fun setupAndTestMultipleUser(): ValidTestMessage {
         val infoProvider = TestUserInfoProvider()
         initializeInstance(infoProvider)

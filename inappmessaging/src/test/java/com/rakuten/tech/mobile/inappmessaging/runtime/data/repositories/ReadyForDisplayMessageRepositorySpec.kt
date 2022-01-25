@@ -142,6 +142,18 @@ class ReadyForDisplayMessageRepositorySpec : BaseTest() {
     }
 
     @Test
+    fun `should not crash and clear previous when forced cast exception for floating cache`() {
+        setupAndTestMultipleUser()
+        PreferencesUtil.putFloat(
+            ApplicationProvider.getApplicationContext(),
+            "internal_shared_prefs_" + AccountRepository.instance().userInfoHash,
+            ReadyForDisplayMessageRepository.READY_DISPLAY_KEY,
+            1.0f
+        )
+        ReadyForDisplayMessageRepository.instance().getAllMessagesCopy().shouldBeEmpty()
+    }
+
+    @Test
     fun `should not crash and reset map`() {
         setupAndTestMultipleUser()
         InAppMessaging.setUninitializedInstance(true)
