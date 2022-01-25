@@ -218,7 +218,11 @@ class BaseViewSpec : BaseTest() {
 
     @SuppressWarnings("LongMethod")
     private fun setupMockContext(
-        isInvalid: Boolean = false, fontId: Int = 1, isLower: Boolean = false, mockFont: Typeface? = null): Typeface? {
+        isInvalid: Boolean = false,
+        fontId: Int = 1,
+        isLower: Boolean = false,
+        mockFont: Typeface? = null
+    ): Typeface? {
         `when`(mockPayload.headerColor).thenReturn("#")
         val mockContext = Mockito.mock(Context::class.java)
         val mockResource = Mockito.mock(Resources::class.java)
