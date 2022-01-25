@@ -23,6 +23,7 @@ import org.mockito.Mockito
 import org.mockito.Mockito.`when`
 import org.robolectric.RobolectricTestRunner
 import java.util.*
+import kotlin.collections.HashSet
 
 /**
  * Test class for LocalDisplayedMessageRepository.
@@ -133,7 +134,6 @@ class LocalDisplayedMessageRepositorySpec : BaseTest() {
             "internal_shared_prefs_" + AccountRepository.instance().userInfoHash,
             LocalDisplayedMessageRepository.LOCAL_DISPLAYED_KEY, 1
         )
-
         LocalDisplayedMessageRepository.instance().numberOfTimesDisplayed(message) shouldBeEqualTo 0
     }
 
@@ -145,7 +145,39 @@ class LocalDisplayedMessageRepositorySpec : BaseTest() {
             "internal_shared_prefs_" + AccountRepository.instance().userInfoHash,
             LocalDisplayedMessageRepository.LOCAL_DISPLAYED_KEY, true
         )
+        LocalDisplayedMessageRepository.instance().numberOfTimesDisplayed(message) shouldBeEqualTo 0
+    }
 
+    @Test
+    fun `should not crash and clear previous when forced cast exception for floating cache`() {
+        val message = setupAndTestMultipleUser()
+        PreferencesUtil.putFloat(
+            ApplicationProvider.getApplicationContext(),
+            "internal_shared_prefs_" + AccountRepository.instance().userInfoHash,
+            LocalDisplayedMessageRepository.LOCAL_DISPLAYED_KEY, 10.0F
+        )
+        LocalDisplayedMessageRepository.instance().numberOfTimesDisplayed(message) shouldBeEqualTo 0
+    }
+
+    @Test
+    fun `should not crash and clear previous when forced cast exception for long cache`() {
+        val message = setupAndTestMultipleUser()
+        PreferencesUtil.putLong(
+            ApplicationProvider.getApplicationContext(),
+            "internal_shared_prefs_" + AccountRepository.instance().userInfoHash,
+            LocalDisplayedMessageRepository.LOCAL_DISPLAYED_KEY, 10L
+        )
+        LocalDisplayedMessageRepository.instance().numberOfTimesDisplayed(message) shouldBeEqualTo 0
+    }
+
+    @Test
+    fun `should not crash and clear previous when forced cast exception for string set cache`() {
+        val message = setupAndTestMultipleUser()
+        PreferencesUtil.putStringSet(
+            ApplicationProvider.getApplicationContext(),
+            "internal_shared_prefs_" + AccountRepository.instance().userInfoHash,
+            LocalDisplayedMessageRepository.LOCAL_DISPLAYED_KEY, HashSet()
+        )
         LocalDisplayedMessageRepository.instance().numberOfTimesDisplayed(message) shouldBeEqualTo 0
     }
 
