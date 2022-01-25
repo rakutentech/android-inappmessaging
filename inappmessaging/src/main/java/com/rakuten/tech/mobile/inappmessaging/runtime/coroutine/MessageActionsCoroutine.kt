@@ -154,7 +154,7 @@ internal class MessageActionsCoroutine(
             val uri = onClickBehavior.uri
             if (!uri.isNullOrEmpty() && activityContext != null) {
                 // Build an implicit intent.
-                val intent = Intent(Intent.ACTION_DEFAULT, Uri.parse(uri))
+                val intent = Intent(Intent.ACTION_DEFAULT)
 
                 try {
                     activityContext.startActivity(intent)

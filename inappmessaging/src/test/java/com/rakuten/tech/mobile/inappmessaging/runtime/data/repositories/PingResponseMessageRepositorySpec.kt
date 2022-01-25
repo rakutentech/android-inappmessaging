@@ -193,6 +193,18 @@ class PingResponseMessageRepositorySpec : BaseTest() {
     }
 
     @Test
+    fun `should not crash and clear previous when forced cast exception for boolean cache`() {
+        setupAndTestMultipleUser()
+        PreferencesUtil.putBoolean(
+            ApplicationProvider.getApplicationContext(),
+            "internal_shared_prefs_" + AccountRepository.instance().userInfoHash,
+            PingResponseMessageRepository.PING_RESPONSE_KEY,
+            true
+        )
+        PingResponseMessageRepository.instance().getAllMessagesCopy().shouldBeEmpty()
+    }
+
+    @Test
     fun `should not crash and reset map`() {
         setupAndTestMultipleUser()
         InAppMessaging.setUninitializedInstance(true)

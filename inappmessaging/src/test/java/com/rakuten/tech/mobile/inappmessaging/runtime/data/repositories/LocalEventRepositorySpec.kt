@@ -173,6 +173,20 @@ open class LocalEventRepositorySpec : BaseTest() {
     }
 
     @Test
+    fun `should not crash when forced cast exception for boolean cache`() {
+        setupAndTestMultipleUser()
+        PreferencesUtil.putBoolean(
+            ApplicationProvider.getApplicationContext(),
+            "internal_shared_prefs_" + AccountRepository.instance().userInfoHash,
+            LocalEventRepository.LOCAL_EVENT_KEY,
+            true
+        )
+
+        LocalEventRepository.instance().addEvent(LoginSuccessfulEvent())
+        LocalEventRepository.instance().getEvents().shouldHaveSize(2)
+    }
+
+    @Test
     fun `should check and reset list during event handling`() {
         setupAndTestMultipleUser()
         InAppMessaging.setUninitializedInstance(true)
