@@ -31,6 +31,7 @@ import android.graphics.Typeface
 import com.nhaarman.mockitokotlin2.any
 import com.nhaarman.mockitokotlin2.eq
 import com.nhaarman.mockitokotlin2.times
+import com.rakuten.tech.mobile.inappmessaging.runtime.utils.ResourceUtils
 import org.amshove.kluent.*
 import org.mockito.Mockito
 import org.mockito.Mockito.`when`
@@ -175,6 +176,29 @@ class BaseViewSpec : BaseTest() {
     }
 
     @Test
+    @Config(sdk = [Build.VERSION_CODES.N])
+    fun `should set correct font for lower API`() {
+        val mockFont = Mockito.mock(Typeface::class.java)
+        setupMockContext(isLower = true, mockFont = mockFont)
+
+        view?.findViewById<TextView>(R.id.header_text)?.typeface shouldBeEqualTo mockFont
+        view?.findViewById<TextView>(R.id.message_body)?.typeface shouldBeEqualTo mockFont
+        view?.findViewById<MaterialButton>(R.id.message_single_button)?.typeface shouldBeEqualTo mockFont
+
+        ResourceUtils.mockFont = null
+    }
+
+    @Test
+    @Config(sdk = [Build.VERSION_CODES.N])
+    fun `should not crash for lower API with no mock`() {
+        setupMockContext(isLower = true)
+
+        view?.findViewById<TextView>(R.id.header_text)?.typeface.shouldNotBeNull()
+        view?.findViewById<TextView>(R.id.message_body)?.typeface.shouldNotBeNull()
+        view?.findViewById<MaterialButton>(R.id.message_single_button)?.typeface.shouldNotBeNull()
+    }
+
+    @Test
     fun `should not crash if get string failed`() {
         setupMockContext(true)
 
@@ -183,8 +207,18 @@ class BaseViewSpec : BaseTest() {
         view?.findViewById<MaterialButton>(R.id.message_single_button)?.typeface.shouldNotBeNull()
     }
 
+    @Test
+    fun `should not crash if font id is invalid`() {
+        setupMockContext(fontId = 0)
+
+        view?.findViewById<TextView>(R.id.header_text)?.typeface.shouldNotBeNull()
+        view?.findViewById<TextView>(R.id.message_body)?.typeface.shouldNotBeNull()
+        view?.findViewById<MaterialButton>(R.id.message_single_button)?.typeface.shouldNotBeNull()
+    }
+
     @SuppressWarnings("LongMethod")
-    private fun setupMockContext(isInvalid: Boolean = false): Typeface? {
+    private fun setupMockContext(
+        isInvalid: Boolean = false, fontId: Int = 1, isLower: Boolean = false, mockFont: Typeface? = null): Typeface? {
         `when`(mockPayload.headerColor).thenReturn("#")
         val mockContext = Mockito.mock(Context::class.java)
         val mockResource = Mockito.mock(Resources::class.java)
@@ -193,14 +227,18 @@ class BaseViewSpec : BaseTest() {
         view?.mockContext = mockContext
         `when`(mockContext.resources).thenReturn(mockResource)
         `when`(mockContext.packageName).thenReturn("test")
-        `when`(mockResource.getIdentifier(any(), any(), any())).thenReturn(1)
+        `when`(mockResource.getIdentifier(any(), eq("string"), any())).thenReturn(1)
+        `when`(mockResource.getIdentifier(any(), eq("font"), any())).thenReturn(fontId)
         if (isInvalid) {
-            `when`(mockContext.getString(eq(1))).thenThrow(Resources.NotFoundException())
+            `when`(mockContext.getString(any())).thenThrow(Resources.NotFoundException())
         } else {
-            `when`(mockContext.getString(eq(1))).thenReturn("testfont")
+            `when`(mockContext.getString(any())).thenReturn("testfont")
         }
-
-        `when`(mockResource.getFont(any())).thenReturn(mockTypeface)
+        if (isLower) {
+            ResourceUtils.mockFont = mockFont
+        } else {
+            `when`(mockResource.getFont(any())).thenReturn(mockTypeface)
+        }
         `when`(mockCtrlSettings.buttons).thenReturn(listOf(mockButton))
         `when`(mockButton.buttonTextColor).thenReturn("#")
         `when`(mockButton.buttonBackgroundColor).thenReturn("#")
