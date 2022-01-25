@@ -49,4 +49,8 @@
   <dimen name="opt_out_text_size">12sp</dimen>
   <dimen name="opt_out_checkbox_margin_top">3dp</dimen>
   <dimen name="opt_out_checkbox_margin_bottom">5dp</dimen>
+
+  <!--Message OptOut checkbox-->
+  <dimen name="tooltip_close_button_margin_left">-10dp</dimen>
+  <dimen name="tooltip_close_button_margin_bottom">-10dp</dimen>
 </resources>

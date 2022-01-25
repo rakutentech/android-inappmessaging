@@ -88,7 +88,7 @@ internal class InAppMessageViewListener(
 
     private fun handleClick(id: Int) {
         CoroutineScope(Dispatchers.Main).launch {
-            displayManager.removeMessage(inApp.getRegisteredActivity(), message?.getTooltipConfig()?.autoFade ?: 0)
+            displayManager.removeMessage(inApp.getRegisteredActivity(), message?.getTooltipConfig()?.autoDisappear ?: 0)
             withContext(Dispatchers.Default) {
                 handleMessage(id)
             }

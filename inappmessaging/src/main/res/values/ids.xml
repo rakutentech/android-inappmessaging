@@ -2,4 +2,5 @@
 <resources>
   <item name="in_app_message_base_view" type="id"/>
   <item name="in_app_message_tooltip_view" type="id"/>
+  <item name="in_app_message_tooltip_layout" type="id"/>
 </resources>

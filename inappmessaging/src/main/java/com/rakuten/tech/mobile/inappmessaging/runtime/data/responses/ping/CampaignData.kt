@@ -56,6 +56,7 @@ internal data class CampaignData(
             type = 5 // change type to tool tip (this will be fixed once the backend supports tooltip)
             maxImpressions = 1 // current design will only display tooltip once
             tooltip = Gson().fromJson(messagePayload.messageBody, Tooltip::class.java)
+//            tooltip?.id = "target"
         }
         return tooltip
     }

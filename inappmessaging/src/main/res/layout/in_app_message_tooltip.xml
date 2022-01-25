@@ -1,53 +1,41 @@
 <?xml version="1.0" encoding="utf-8"?>
 <com.rakuten.tech.mobile.inappmessaging.runtime.view.InAppMessagingTooltipView xmlns:android="http://schemas.android.com/apk/res/android"
+  xmlns:app="http://schemas.android.com/apk/res-auto"
   android:layout_width="wrap_content"
   android:layout_height="wrap_content"
   android:clickable="true"
   android:clipChildren="false"
+  android:clipToPadding="false"
   android:focusable="true"
   android:theme="@style/InAppMessaging">
 
-  <LinearLayout
-    android:id="@+id/modal_layout"
+  <ImageButton
+    android:id="@+id/message_close_button"
+    style="@style/InAppMessaging.TooltipButton"
+    android:contentDescription="@string/close_button"
+    android:elevation="10dp"
+    android:translationZ="10dp"
+    android:stateListAnimator="@null"
+    android:layout_toEndOf="@id/message_tooltip_image_view"
+    android:layout_above="@id/message_tooltip_image_view"/>
+
+  <com.google.android.material.imageview.ShapeableImageView
+    android:id="@+id/message_tooltip_image_view"
     android:layout_width="wrap_content"
     android:layout_height="wrap_content"
-    android:layout_centerInParent="true"
-    android:layout_gravity="center"
-    android:orientation="vertical">
+    android:scaleType="center"
+    android:elevation="10dp"
+    android:translationZ="10dp"
+    android:stateListAnimator="@null"
+    android:contentDescription="@null" />
 
-    <!--TODO need to adjust when tip is on the right sides-->
-    <ImageButton
-      android:id="@+id/message_close_button"
-      style="@style/InAppMessaging.CloseButton.Modal"
-      android:contentDescription="@string/close_button" />
-
-    <FrameLayout
-      android:layout_width="wrap_content"
-      android:layout_height="wrap_content">
-      <ImageView
-        android:id="@+id/message_tip"
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:adjustViewBounds="false"
-        android:scaleType="fitCenter" />
-
-      <ImageView
-        android:id="@+id/message_background"
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:adjustViewBounds="false"
-        android:scaleType="fitCenter" />
-
-      <ImageView
-        android:id="@+id/message_tooltip_image_view"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_gravity="center"
-        android:adjustViewBounds="false"
-        android:contentDescription="@string/in_app_message_image"
-        android:visibility="gone" />
-    </FrameLayout>
-
-  </LinearLayout>
+  <ImageView
+    android:id="@+id/message_tip"
+    android:layout_width="wrap_content"
+    android:layout_height="wrap_content"
+    android:elevation="10dp"
+    android:translationZ="10dp"
+    android:stateListAnimator="@null"
+    android:contentDescription="@null"/>
 
 </com.rakuten.tech.mobile.inappmessaging.runtime.view.InAppMessagingTooltipView>

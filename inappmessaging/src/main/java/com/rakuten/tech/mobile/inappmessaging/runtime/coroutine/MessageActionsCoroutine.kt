@@ -16,6 +16,7 @@ import com.rakuten.tech.mobile.inappmessaging.runtime.data.models.messages.Messa
 import com.rakuten.tech.mobile.inappmessaging.runtime.data.repositories.LocalDisplayedMessageRepository
 import com.rakuten.tech.mobile.inappmessaging.runtime.data.repositories.LocalOptedOutMessageRepository
 import com.rakuten.tech.mobile.inappmessaging.runtime.data.repositories.ReadyForDisplayMessageRepository
+import com.rakuten.tech.mobile.inappmessaging.runtime.data.repositories.TooltipMessageRepository
 import com.rakuten.tech.mobile.inappmessaging.runtime.data.responses.ping.OnClickBehavior
 import com.rakuten.tech.mobile.inappmessaging.runtime.data.responses.ping.Trigger
 import com.rakuten.tech.mobile.inappmessaging.runtime.manager.EventsManager
@@ -69,7 +70,11 @@ internal class MessageActionsCoroutine(
         optOut: Boolean
     ) {
         // Remove message from ReadyForDisplayMessageRepository.
-        ReadyForDisplayMessageRepository.instance().removeMessage(message.getCampaignId())
+        if (message.getTooltipConfig() != null) {
+            TooltipMessageRepository.instance().removeMessage(message.getCampaignId())
+        } else {
+            ReadyForDisplayMessageRepository.instance().removeMessage(message.getCampaignId())
+        }
 
         // Adding message to LocalDisplayedMessageRepository.
         localDisplayRepo.addMessage(message)

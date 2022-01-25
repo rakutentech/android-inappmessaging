@@ -4,13 +4,11 @@ import com.google.gson.annotations.SerializedName
 
 internal data class Tooltip(
     @SerializedName("UIElement")
-    val id: String,
+    var id: String,
     @SerializedName("position")
     val position: String,
-    @SerializedName("color")
-    val color: String,
     @SerializedName("redirectURL")
     val url: String?,
-    @SerializedName("auto-fade")
-    val autoFade: Int?
+    @SerializedName("auto-disappear")
+    val autoDisappear: Int?
 )

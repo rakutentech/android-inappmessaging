@@ -1,14 +1,20 @@
 package com.rakuten.tech.mobile.inappmessaging.runtime.runnable
 
 import android.app.Activity
+import android.util.Log
 import android.view.Gravity
 import android.view.View
+import android.view.ViewGroup
 import android.widget.FrameLayout
+import android.widget.LinearLayout
+import android.widget.ScrollView
 import androidx.annotation.UiThread
+import com.rakuten.tech.mobile.inappmessaging.runtime.InAppMessaging
 import com.rakuten.tech.mobile.inappmessaging.runtime.R
 import com.rakuten.tech.mobile.inappmessaging.runtime.data.enums.InAppMessageType
 import com.rakuten.tech.mobile.inappmessaging.runtime.data.models.messages.Message
 import com.rakuten.tech.mobile.inappmessaging.runtime.utils.ContextExtension.findViewByName
+import com.rakuten.tech.mobile.inappmessaging.runtime.utils.ViewUtil
 import com.rakuten.tech.mobile.inappmessaging.runtime.view.InAppMessageFullScreenView
 import com.rakuten.tech.mobile.inappmessaging.runtime.view.InAppMessageModalView
 import com.rakuten.tech.mobile.inappmessaging.runtime.view.InAppMessageSlideUpView
@@ -66,27 +72,33 @@ internal class DisplayMessageRunnable(
                     hostActivity.addContentView(slideUpView, hostActivity.window.attributes)
                 }
                 InAppMessageType.TOOLTIP -> {
+//                    return
                     val toolTipView = hostActivity
                         .layoutInflater
                         .inflate(
                             R.layout.in_app_message_tooltip,
                             null) as InAppMessagingTooltipView
                     toolTipView.populateViewData(message)
-                    val params = FrameLayout.LayoutParams(
-                        FrameLayout.LayoutParams.WRAP_CONTENT,
-                        FrameLayout.LayoutParams.WRAP_CONTENT
-                    )
-                    params.gravity = Gravity.CENTER
-
-                    val view = message.getTooltipConfig()?.id?.let { hostActivity.findViewByName<View>(it) }
-                    view?.let {
-                        val location = IntArray(2)
-                        it.getLocationOnScreen(location)
+                    message.getTooltipConfig()?.let {
+                        InAppMessaging.instance().getRegisteredActivity()?.findViewByName<View>(it.id)?.let { target ->
+                            if (ViewUtil.isInScrollView(target)) {
+                                val frame = FrameLayout(hostActivity)
+                                frame.id = R.id.in_app_message_tooltip_layout
+                                frame.layoutParams = FrameLayout.LayoutParams(FrameLayout.LayoutParams.MATCH_PARENT, FrameLayout.LayoutParams.MATCH_PARENT)
+                                // TODO need to check which view is the scrollview
+                                val parent = target.parent
+                                val scroll = parent.parent
+                                (scroll as ScrollView).removeView(parent as ViewGroup)
+                                frame.addView(parent)
+                                frame.addView(toolTipView)
+                                scroll.addView(frame)
+                            } else {
+                                val params = ViewGroup.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT)
+                                hostActivity.addContentView(toolTipView, params)
+                            }
+                        }
                     }
-                    val location = IntArray(2)
-                    view?.getLocationOnScreen(location)
-                    val x = location[0]
-                    val y = location[1]
+
                 }
                 else -> Any()
             }

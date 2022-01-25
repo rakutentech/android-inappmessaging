@@ -10,6 +10,7 @@ import com.rakuten.tech.mobile.inappmessaging.runtime.utils.ImageUtil
 import com.rakuten.tech.mobile.inappmessaging.runtime.data.models.messages.Message
 import com.rakuten.tech.mobile.inappmessaging.runtime.data.repositories.LocalDisplayedMessageRepository
 import com.rakuten.tech.mobile.inappmessaging.runtime.data.repositories.ReadyForDisplayMessageRepository
+import com.rakuten.tech.mobile.inappmessaging.runtime.data.repositories.TooltipMessageRepository
 import com.rakuten.tech.mobile.inappmessaging.runtime.manager.MessageReadinessManager
 import com.rakuten.tech.mobile.inappmessaging.runtime.runnable.DisplayMessageRunnable
 import com.squareup.picasso.Callback
@@ -85,6 +86,7 @@ internal class DisplayMessageJobIntentService : JobIntentService() {
 
             // increment time closed to handle required number of events to be triggered
             readyMessagesRepo.removeMessage(message.getCampaignId(), true)
+            TooltipMessageRepository.instance().removeMessage(message.getCampaignId(), true)
 
             prepareNextMessage()
             return
