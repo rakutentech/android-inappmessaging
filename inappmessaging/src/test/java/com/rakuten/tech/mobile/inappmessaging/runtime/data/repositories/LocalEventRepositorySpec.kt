@@ -167,7 +167,6 @@ open class LocalEventRepositorySpec : BaseTest() {
             LocalEventRepository.LOCAL_EVENT_KEY,
             1
         )
-
         LocalEventRepository.instance().addEvent(LoginSuccessfulEvent())
         LocalEventRepository.instance().getEvents().shouldHaveSize(2)
     }
@@ -181,7 +180,45 @@ open class LocalEventRepositorySpec : BaseTest() {
             LocalEventRepository.LOCAL_EVENT_KEY,
             true
         )
+        LocalEventRepository.instance().addEvent(LoginSuccessfulEvent())
+        LocalEventRepository.instance().getEvents().shouldHaveSize(2)
+    }
 
+    @Test
+    fun `should not crash when forced cast exception for long cache`() {
+        setupAndTestMultipleUser()
+        PreferencesUtil.putLong(
+            ApplicationProvider.getApplicationContext(),
+            "internal_shared_prefs_" + AccountRepository.instance().userInfoHash,
+            LocalEventRepository.LOCAL_EVENT_KEY,
+            10L
+        )
+        LocalEventRepository.instance().addEvent(LoginSuccessfulEvent())
+        LocalEventRepository.instance().getEvents().shouldHaveSize(2)
+    }
+
+    @Test
+    fun `should not crash when forced cast exception for floating cache`() {
+        setupAndTestMultipleUser()
+        PreferencesUtil.putFloat(
+            ApplicationProvider.getApplicationContext(),
+            "internal_shared_prefs_" + AccountRepository.instance().userInfoHash,
+            LocalEventRepository.LOCAL_EVENT_KEY,
+            10.0F
+        )
+        LocalEventRepository.instance().addEvent(LoginSuccessfulEvent())
+        LocalEventRepository.instance().getEvents().shouldHaveSize(2)
+    }
+
+    @Test
+    fun `should not crash when forced cast exception for string set cache`() {
+        setupAndTestMultipleUser()
+        PreferencesUtil.putStringSet(
+            ApplicationProvider.getApplicationContext(),
+            "internal_shared_prefs_" + AccountRepository.instance().userInfoHash,
+            LocalEventRepository.LOCAL_EVENT_KEY,
+            HashSet()
+        )
         LocalEventRepository.instance().addEvent(LoginSuccessfulEvent())
         LocalEventRepository.instance().getEvents().shouldHaveSize(2)
     }
