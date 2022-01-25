@@ -159,6 +159,27 @@ open class LocalEventRepositorySpec : BaseTest() {
     }
 
     @Test
+    fun `should not crash when forced cast exception`() {
+        setupAndTestMultipleUser()
+        PreferencesUtil.putInt(
+            ApplicationProvider.getApplicationContext(),
+            "internal_shared_prefs_" + AccountRepository.instance().userInfoHash,
+            LocalEventRepository.LOCAL_EVENT_KEY,
+            1
+        )
+
+        LocalEventRepository.instance().addEvent(LoginSuccessfulEvent())
+        LocalEventRepository.instance().getEvents().shouldHaveSize(2)
+    }
+
+    @Test
+    fun `should check and reset list during event handling`() {
+        setupAndTestMultipleUser()
+        InAppMessaging.setUninitializedInstance(true)
+        LocalEventRepository.instance().getEvents().shouldHaveSize(1)
+    }
+
+    @Test
     fun `should save and restore values for different users`() {
         setupAndTestMultipleUser()
         LocalEventRepository.instance().getEvents().shouldHaveSize(4)

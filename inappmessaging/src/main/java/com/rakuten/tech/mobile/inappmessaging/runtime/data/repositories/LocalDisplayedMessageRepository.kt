@@ -147,7 +147,7 @@ internal interface LocalDisplayedMessageRepository {
                         "internal_shared_prefs_" + AccountRepository.instance().userInfoHash,
                         LOCAL_DISPLAYED_KEY,
                         ""
-                    ) ?: ""
+                    )
                 } ?: ""
             } catch (ex: ClassCastException) {
                 Logger(TAG).debug(ex.cause, "Incorrect type for $LOCAL_DISPLAYED_KEY data")

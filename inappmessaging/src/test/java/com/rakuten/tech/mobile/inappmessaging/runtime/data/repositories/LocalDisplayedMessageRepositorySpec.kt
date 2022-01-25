@@ -149,6 +149,13 @@ class LocalDisplayedMessageRepositorySpec : BaseTest() {
     }
 
     @Test
+    fun `should not crash and reset displayed map`() {
+        val message = setupAndTestMultipleUser()
+        InAppMessaging.setUninitializedInstance(true)
+        LocalDisplayedMessageRepository.instance().numberOfTimesDisplayed(message) shouldBeEqualTo 0
+    }
+
+    @Test
     @Synchronized
     fun `should return valid timestamp list after last ping`() {
         val message = ValidTestMessage()
