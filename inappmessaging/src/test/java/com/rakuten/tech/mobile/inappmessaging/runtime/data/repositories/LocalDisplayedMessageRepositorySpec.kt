@@ -161,13 +161,14 @@ class LocalDisplayedMessageRepositorySpec : BaseTest() {
 
     @Test
     fun `should not crash and clear previous when forced cast exception for long cache`() {
-        val message = setupAndTestMultipleUser()
+        val infoProvider = TestUserInfoProvider()
+        initializeInstance(infoProvider)
         PreferencesUtil.putLong(
             ApplicationProvider.getApplicationContext(),
             "internal_shared_prefs_" + AccountRepository.instance().userInfoHash,
             LocalDisplayedMessageRepository.LOCAL_DISPLAYED_KEY, 10L
         )
-        LocalDisplayedMessageRepository.instance().numberOfTimesDisplayed(message) shouldBeEqualTo 0
+        LocalDisplayedMessageRepository.instance().numberOfTimesDisplayed(ValidTestMessage()) shouldBeEqualTo 0
     }
 
     @Test
