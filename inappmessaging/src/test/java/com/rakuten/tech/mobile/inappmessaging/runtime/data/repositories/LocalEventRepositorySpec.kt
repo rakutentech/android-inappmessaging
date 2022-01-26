@@ -53,11 +53,15 @@ open class LocalEventRepositorySpec : BaseTest() {
     @Test
     fun `should be called once`() {
         val mockRepo = Mockito.mock(LocalEventRepository::class.java)
-        val mockSched = Mockito.mock(EventMessageReconciliationScheduler::class.java)
+        val mockScheduler = Mockito.mock(EventMessageReconciliationScheduler::class.java)
 
         val mockEvent = Mockito.mock(Event::class.java)
 
-        EventsManager.onEventReceived(mockEvent, localEventRepo = mockRepo, eventScheduler = mockSched)
+        EventsManager.onEventReceived(
+            mockEvent,
+            localEventRepo = mockRepo,
+            eventScheduler = mockScheduler
+        )
 
         Mockito.verify(mockRepo).addEvent(mockEvent)
     }
@@ -160,7 +164,8 @@ open class LocalEventRepositorySpec : BaseTest() {
 
     @Test
     fun `should not crash when forced cast exception`() {
-        setupAndTestMultipleUser()
+        val infoProvider = TestUserInfoProvider()
+        initializeInstance(infoProvider)
         PreferencesUtil.putInt(
             ApplicationProvider.getApplicationContext(),
             "internal_shared_prefs_" + AccountRepository.instance().userInfoHash,
@@ -168,59 +173,7 @@ open class LocalEventRepositorySpec : BaseTest() {
             1
         )
         LocalEventRepository.instance().addEvent(LoginSuccessfulEvent())
-        LocalEventRepository.instance().getEvents().shouldHaveSize(2)
-    }
-
-    @Test
-    fun `should not crash when forced cast exception for boolean cache`() {
-        setupAndTestMultipleUser()
-        PreferencesUtil.putBoolean(
-            ApplicationProvider.getApplicationContext(),
-            "internal_shared_prefs_" + AccountRepository.instance().userInfoHash,
-            LocalEventRepository.LOCAL_EVENT_KEY,
-            true
-        )
-        LocalEventRepository.instance().addEvent(LoginSuccessfulEvent())
-        LocalEventRepository.instance().getEvents().shouldHaveSize(2)
-    }
-
-    @Test
-    fun `should not crash when forced cast exception for long cache`() {
-        setupAndTestMultipleUser()
-        PreferencesUtil.putLong(
-            ApplicationProvider.getApplicationContext(),
-            "internal_shared_prefs_" + AccountRepository.instance().userInfoHash,
-            LocalEventRepository.LOCAL_EVENT_KEY,
-            10L
-        )
-        LocalEventRepository.instance().addEvent(LoginSuccessfulEvent())
-        LocalEventRepository.instance().getEvents().shouldHaveSize(2)
-    }
-
-    @Test
-    fun `should not crash when forced cast exception for floating cache`() {
-        setupAndTestMultipleUser()
-        PreferencesUtil.putFloat(
-            ApplicationProvider.getApplicationContext(),
-            "internal_shared_prefs_" + AccountRepository.instance().userInfoHash,
-            LocalEventRepository.LOCAL_EVENT_KEY,
-            10.0F
-        )
-        LocalEventRepository.instance().addEvent(LoginSuccessfulEvent())
-        LocalEventRepository.instance().getEvents().shouldHaveSize(2)
-    }
-
-    @Test
-    fun `should not crash when forced cast exception for string set cache`() {
-        setupAndTestMultipleUser()
-        PreferencesUtil.putStringSet(
-            ApplicationProvider.getApplicationContext(),
-            "internal_shared_prefs_" + AccountRepository.instance().userInfoHash,
-            LocalEventRepository.LOCAL_EVENT_KEY,
-            HashSet()
-        )
-        LocalEventRepository.instance().addEvent(LoginSuccessfulEvent())
-        LocalEventRepository.instance().getEvents().shouldHaveSize(2)
+        LocalEventRepository.instance().getEvents().shouldHaveSize(1)
     }
 
     @Test

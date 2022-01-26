@@ -7,13 +7,13 @@ import com.rakuten.tech.mobile.inappmessaging.runtime.api.MessageMixerRetrofitSe
 import com.rakuten.tech.mobile.inappmessaging.runtime.data.enums.UserIdentifierType
 import com.rakuten.tech.mobile.inappmessaging.runtime.data.models.UserIdentifier
 import com.rakuten.tech.mobile.inappmessaging.runtime.data.repositories.AccountRepository
-import com.rakuten.tech.mobile.sdkutils.logger.Logger
 import com.rakuten.tech.mobile.sdkutils.network.build
 import okhttp3.OkHttpClient
 import okhttp3.ResponseBody
 import retrofit2.Call
 import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory
+import timber.log.Timber
 import java.util.Calendar
 import java.util.concurrent.Executors
 import java.util.concurrent.TimeUnit
@@ -64,7 +64,7 @@ internal object RuntimeUtil {
                     return BitmapFactory.decodeByteArray(bytes, 0, bytes.size)
                 }
             } catch (ex: Exception) {
-                Logger(TAG).debug(ex.message)
+                Timber.tag(TAG).d(ex)
             }
         }
         return null

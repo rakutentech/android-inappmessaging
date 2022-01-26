@@ -182,60 +182,13 @@ class PingResponseMessageRepositorySpec : BaseTest() {
 
     @Test
     fun `should not crash and clear previous when forced cast exception`() {
-        setupAndTestMultipleUser()
+        val infoProvider = TestUserInfoProvider()
+        initializeInstance(infoProvider)
         PreferencesUtil.putInt(
             ApplicationProvider.getApplicationContext(),
             "internal_shared_prefs_" + AccountRepository.instance().userInfoHash,
             PingResponseMessageRepository.PING_RESPONSE_KEY,
             1
-        )
-        PingResponseMessageRepository.instance().getAllMessagesCopy().shouldBeEmpty()
-    }
-
-    @Test
-    fun `should not crash and clear previous when forced cast exception for boolean cache`() {
-        setupAndTestMultipleUser()
-        PreferencesUtil.putBoolean(
-            ApplicationProvider.getApplicationContext(),
-            "internal_shared_prefs_" + AccountRepository.instance().userInfoHash,
-            PingResponseMessageRepository.PING_RESPONSE_KEY,
-            true
-        )
-        PingResponseMessageRepository.instance().getAllMessagesCopy().shouldBeEmpty()
-    }
-
-    @Test
-    fun `should not crash and clear previous when forced cast exception for long cache`() {
-        setupAndTestMultipleUser()
-        PreferencesUtil.putLong(
-            ApplicationProvider.getApplicationContext(),
-            "internal_shared_prefs_" + AccountRepository.instance().userInfoHash,
-            PingResponseMessageRepository.PING_RESPONSE_KEY,
-            10L
-        )
-        PingResponseMessageRepository.instance().getAllMessagesCopy().shouldBeEmpty()
-    }
-
-    @Test
-    fun `should not crash and clear previous when forced cast exception for floating cache`() {
-        setupAndTestMultipleUser()
-        PreferencesUtil.putFloat(
-            ApplicationProvider.getApplicationContext(),
-            "internal_shared_prefs_" + AccountRepository.instance().userInfoHash,
-            PingResponseMessageRepository.PING_RESPONSE_KEY,
-            1.0F
-        )
-        PingResponseMessageRepository.instance().getAllMessagesCopy().shouldBeEmpty()
-    }
-
-    @Test
-    fun `should not crash and clear previous when forced cast exception for string set cache`() {
-        setupAndTestMultipleUser()
-        PreferencesUtil.putStringSet(
-            ApplicationProvider.getApplicationContext(),
-            "internal_shared_prefs_" + AccountRepository.instance().userInfoHash,
-            PingResponseMessageRepository.PING_RESPONSE_KEY,
-            HashSet()
         )
         PingResponseMessageRepository.instance().getAllMessagesCopy().shouldBeEmpty()
     }
