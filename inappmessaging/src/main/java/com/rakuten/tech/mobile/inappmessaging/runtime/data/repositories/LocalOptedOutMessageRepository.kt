@@ -80,14 +80,16 @@ internal interface LocalOptedOutMessageRepository {
                 optedOutMessages.clear()
                 // reset id list from cached using updated user info
                 try {
-                    InAppMessaging.instance().getHostAppContext()?.let { it ->
-                        PreferencesUtil.getStringSet(
-                            it,
+                    val context = InAppMessaging.instance().getHostAppContext()
+                    if (context != null) {
+                        val stringSet = PreferencesUtil.getStringSet(
+                            context,
                             "internal_shared_prefs_" + AccountRepository.instance().userInfoHash,
                             LOCAL_OPTED_OUT_KEY,
                             HashSet()
-                        )?.let { hashSet ->
-                            optedOutMessages.addAll(hashSet)
+                        )
+                        if (stringSet != null) {
+                            optedOutMessages.addAll(stringSet)
                         }
                     }
                 } catch (ex: ClassCastException) {

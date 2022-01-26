@@ -88,14 +88,17 @@ internal abstract class ReadyForDisplayMessageRepository : ReadyMessageRepositor
                 user = AccountRepository.instance().userInfoHash
                 // reset message list from cached using updated user info
                 val listString = try {
-                    InAppMessaging.instance().getHostAppContext()?.let { it ->
+                    val context = InAppMessaging.instance().getHostAppContext()
+                    if (context != null) {
                         PreferencesUtil.getString(
-                            it,
+                            context,
                             "internal_shared_prefs_" + AccountRepository.instance().userInfoHash,
                             READY_DISPLAY_KEY,
                             ""
                         )
-                    } ?: ""
+                    } else {
+                        ""
+                    }
                 } catch (ex: ClassCastException) {
                     Timber.tag(TAG).d(ex.cause, "Incorrect type for $READY_DISPLAY_KEY data")
                     ""

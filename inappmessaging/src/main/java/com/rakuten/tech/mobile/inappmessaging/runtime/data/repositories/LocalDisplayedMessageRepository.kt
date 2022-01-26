@@ -142,25 +142,30 @@ internal interface LocalDisplayedMessageRepository {
         @SuppressWarnings("TooGenericExceptionCaught", "LongMethod")
         private fun resetDisplayed() {
             val listString = try {
-                InAppMessaging.instance().getHostAppContext()?.let { it ->
+                val context = InAppMessaging.instance().getHostAppContext()
+                if (context != null) {
                     PreferencesUtil.getString(
-                        it,
+                        context,
                         "internal_shared_prefs_" + AccountRepository.instance().userInfoHash,
                         LOCAL_DISPLAYED_KEY,
                         ""
                     )
-                } ?: ""
+                } else {
+                    ""
+                }
             } catch (ex: ClassCastException) {
                 Timber.tag(TAG).d(ex.cause, "Incorrect type for $LOCAL_DISPLAYED_KEY data")
                 ""
             }
             messages.clear()
-            if (listString.isNotEmpty()) {
-                val type = object : TypeToken<HashMap<String, List<Long>>>() {}.type
-                try {
-                    messages.putAll(Gson().fromJson(listString, type))
-                } catch (ex: Exception) {
-                    Logger(TAG).debug(ex.cause, "Incorrect JSON format for $LOCAL_DISPLAYED_KEY data")
+            if (listString != null) {
+                if (listString.isNotEmpty()) {
+                    val type = object : TypeToken<HashMap<String, List<Long>>>() {}.type
+                    try {
+                        messages.putAll(Gson().fromJson(listString, type))
+                    } catch (ex: Exception) {
+                        Logger(TAG).debug(ex.cause, "Incorrect JSON format for $LOCAL_DISPLAYED_KEY data")
+                    }
                 }
             }
         }

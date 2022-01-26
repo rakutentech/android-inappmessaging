@@ -164,24 +164,29 @@ internal interface LocalEventRepository : EventRepository {
                 user = AccountRepository.instance().userInfoHash
                 // reset event list from cached using updated user info
                 val listString = try {
-                    InAppMessaging.instance().getHostAppContext()?.let { it ->
+                    val context = InAppMessaging.instance().getHostAppContext()
+                    if (context != null) {
                         PreferencesUtil.getString(
-                            it,
+                            context,
                             "internal_shared_prefs_" + AccountRepository.instance().userInfoHash,
                             LOCAL_EVENT_KEY,
                             ""
                         )
-                    } ?: ""
+                    } else {
+                        ""
+                    }
                 } catch (ex: ClassCastException) {
                     Timber.tag(TAG).d(ex.cause, "Incorrect type for $LOCAL_EVENT_KEY data")
                     ""
                 }
-                if (listString.isNotEmpty()) {
-                    events.clear()
-                    deserializeLocalEvents(listString)
-                } else if (events.isNotEmpty()) {
-                    // retain persistent event for user with no stored data
-                    events.removeAll { ev -> !ev.isPersistentType() }
+                if (listString != null) {
+                    if (listString.isNotEmpty()) {
+                        events.clear()
+                        deserializeLocalEvents(listString)
+                    } else if (events.isNotEmpty()) {
+                        // retain persistent event for user with no stored data
+                        events.removeAll { ev -> !ev.isPersistentType() }
+                    }
                 }
             }
         }
