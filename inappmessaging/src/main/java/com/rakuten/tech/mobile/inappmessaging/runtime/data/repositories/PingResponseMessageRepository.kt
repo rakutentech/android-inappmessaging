@@ -98,21 +98,24 @@ internal abstract class PingResponseMessageRepository : MessageRepository {
                 user = AccountRepository.instance().userInfoHash
                 // reset message list from cached using updated user info
                 val listString = try {
-                    InAppMessaging.instance().getHostAppContext()?.let {
+                    val context = InAppMessaging.instance().getHostAppContext()
+                    if (context != null) {
                         PreferencesUtil.getString(
-                            it,
+                            context,
                             "internal_shared_prefs_" + AccountRepository.instance().userInfoHash,
                             PING_RESPONSE_KEY,
                             ""
                         )
-                    } ?: ""
+                    } else {
+                        ""
+                    }
                 } catch (ex: ClassCastException) {
                     Timber.tag(TAG).d(ex.cause, "Incorrect type for $PING_RESPONSE_KEY data")
                     ""
                 }
                 messages.clear()
                 try {
-                    val jsonObject = JSONObject(listString)
+                    val jsonObject = JSONObject(listString!!)
                     for (key in jsonObject.keys()) {
                         val campaign = Gson().fromJson(
                                 jsonObject.getJSONObject(key).toString(), CampaignData::class.java)
