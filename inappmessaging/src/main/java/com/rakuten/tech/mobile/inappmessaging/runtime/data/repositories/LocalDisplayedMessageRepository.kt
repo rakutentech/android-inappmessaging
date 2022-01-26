@@ -9,6 +9,7 @@ import com.rakuten.tech.mobile.inappmessaging.runtime.data.models.messages.Messa
 import com.rakuten.tech.mobile.inappmessaging.runtime.exception.InAppMessagingException
 import com.rakuten.tech.mobile.sdkutils.PreferencesUtil
 import com.rakuten.tech.mobile.sdkutils.logger.Logger
+import timber.log.Timber
 import java.lang.ClassCastException
 import java.util.Calendar
 import java.util.concurrent.ConcurrentHashMap
@@ -150,7 +151,7 @@ internal interface LocalDisplayedMessageRepository {
                     )
                 } ?: ""
             } catch (ex: ClassCastException) {
-                Logger(TAG).debug(ex.cause, "Incorrect JSON format for $LOCAL_DISPLAYED_KEY data")
+                Timber.tag(TAG).d(ex.cause, "Incorrect type for $LOCAL_DISPLAYED_KEY data")
                 ""
             }
             messages.clear()
