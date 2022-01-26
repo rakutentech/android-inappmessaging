@@ -23,7 +23,6 @@ import org.mockito.Mockito
 import org.mockito.Mockito.`when`
 import org.robolectric.RobolectricTestRunner
 import java.util.*
-import kotlin.collections.HashSet
 
 /**
  * Test class for LocalDisplayedMessageRepository.
@@ -127,7 +126,7 @@ class LocalDisplayedMessageRepositorySpec : BaseTest() {
     }
 
     @Test
-    fun `should not crash and clear previous when forced cast exception for long cache`() {
+    fun `should not crash and clear previous when forced cast exception`() {
         val infoProvider = TestUserInfoProvider()
         initializeInstance(infoProvider)
         PreferencesUtil.putLong(

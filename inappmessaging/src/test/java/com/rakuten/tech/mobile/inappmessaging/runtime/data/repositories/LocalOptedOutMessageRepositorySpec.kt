@@ -60,62 +60,15 @@ class LocalOptedOutMessageRepositorySpec : BaseTest() {
 
     @Test
     fun `should not crash and clear previous when forced cast exception`() {
-        val message = setupAndTestMultipleUser()
+        val infoProvider = TestUserInfoProvider()
+        initializeInstance(infoProvider)
         PreferencesUtil.putInt(
             ApplicationProvider.getApplicationContext(),
             "internal_shared_prefs_" + AccountRepository.instance().userInfoHash,
             LocalOptedOutMessageRepository.LOCAL_OPTED_OUT_KEY,
             1
         )
-        LocalOptedOutMessageRepository.instance().hasMessage(message.getCampaignId()).shouldBeFalse()
-    }
-
-    @Test
-    fun `should not crash and clear previous when forced cast exception for boolean cache`() {
-        val message = setupAndTestMultipleUser()
-        PreferencesUtil.putBoolean(
-            ApplicationProvider.getApplicationContext(),
-            "internal_shared_prefs_" + AccountRepository.instance().userInfoHash,
-            LocalOptedOutMessageRepository.LOCAL_OPTED_OUT_KEY,
-            true
-        )
-        LocalOptedOutMessageRepository.instance().hasMessage(message.getCampaignId()).shouldBeFalse()
-    }
-
-    @Test
-    fun `should not crash and clear previous when forced cast exception for long cache`() {
-        val message = setupAndTestMultipleUser()
-        PreferencesUtil.putLong(
-            ApplicationProvider.getApplicationContext(),
-            "internal_shared_prefs_" + AccountRepository.instance().userInfoHash,
-            LocalOptedOutMessageRepository.LOCAL_OPTED_OUT_KEY,
-            10L
-        )
-        LocalOptedOutMessageRepository.instance().hasMessage(message.getCampaignId()).shouldBeFalse()
-    }
-
-    @Test
-    fun `should not crash and clear previous when forced cast exception for floating cache`() {
-        val message = setupAndTestMultipleUser()
-        PreferencesUtil.putFloat(
-            ApplicationProvider.getApplicationContext(),
-            "internal_shared_prefs_" + AccountRepository.instance().userInfoHash,
-            LocalOptedOutMessageRepository.LOCAL_OPTED_OUT_KEY,
-            1.0F
-        )
-        LocalOptedOutMessageRepository.instance().hasMessage(message.getCampaignId()).shouldBeFalse()
-    }
-
-    @Test
-    fun `should not crash and clear previous when forced cast exception for string set cache`() {
-        val message = setupAndTestMultipleUser()
-        PreferencesUtil.putStringSet(
-            ApplicationProvider.getApplicationContext(),
-            "internal_shared_prefs_" + AccountRepository.instance().userInfoHash,
-            LocalOptedOutMessageRepository.LOCAL_OPTED_OUT_KEY,
-            HashSet()
-        )
-        LocalOptedOutMessageRepository.instance().hasMessage(message.getCampaignId()).shouldBeFalse()
+        LocalOptedOutMessageRepository.instance().hasMessage(ValidTestMessage().getCampaignId()).shouldBeFalse()
     }
 
     private fun setupAndTestMultipleUser(): ValidTestMessage {

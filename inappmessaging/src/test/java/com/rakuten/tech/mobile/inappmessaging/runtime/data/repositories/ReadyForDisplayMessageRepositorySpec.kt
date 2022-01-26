@@ -131,60 +131,13 @@ class ReadyForDisplayMessageRepositorySpec : BaseTest() {
 
     @Test
     fun `should not crash and clear previous when forced cast exception`() {
-        setupAndTestMultipleUser()
-        PreferencesUtil.putInt(
-            ApplicationProvider.getApplicationContext(),
-            "internal_shared_prefs_" + AccountRepository.instance().userInfoHash,
-            ReadyForDisplayMessageRepository.READY_DISPLAY_KEY,
-            1
-        )
-        ReadyForDisplayMessageRepository.instance().getAllMessagesCopy().shouldBeEmpty()
-    }
-
-    @Test
-    fun `should not crash and clear previous when forced cast exception for floating cache`() {
-        setupAndTestMultipleUser()
+        val infoProvider = TestUserInfoProvider()
+        initializeInstance(infoProvider)
         PreferencesUtil.putFloat(
             ApplicationProvider.getApplicationContext(),
             "internal_shared_prefs_" + AccountRepository.instance().userInfoHash,
             ReadyForDisplayMessageRepository.READY_DISPLAY_KEY,
             1.0f
-        )
-        ReadyForDisplayMessageRepository.instance().getAllMessagesCopy().shouldBeEmpty()
-    }
-
-    @Test
-    fun `should not crash and clear previous when forced cast exception for long cache`() {
-        setupAndTestMultipleUser()
-        PreferencesUtil.putLong(
-            ApplicationProvider.getApplicationContext(),
-            "internal_shared_prefs_" + AccountRepository.instance().userInfoHash,
-            ReadyForDisplayMessageRepository.READY_DISPLAY_KEY,
-            10L
-        )
-        ReadyForDisplayMessageRepository.instance().getAllMessagesCopy().shouldBeEmpty()
-    }
-
-    @Test
-    fun `should not crash and clear previous when forced cast exception for boolean cache`() {
-        setupAndTestMultipleUser()
-        PreferencesUtil.putBoolean(
-            ApplicationProvider.getApplicationContext(),
-            "internal_shared_prefs_" + AccountRepository.instance().userInfoHash,
-            ReadyForDisplayMessageRepository.READY_DISPLAY_KEY,
-            true
-        )
-        ReadyForDisplayMessageRepository.instance().getAllMessagesCopy().shouldBeEmpty()
-    }
-
-    @Test
-    fun `should not crash and clear previous when forced cast exception for string set cache`() {
-        setupAndTestMultipleUser()
-        PreferencesUtil.putStringSet(
-            ApplicationProvider.getApplicationContext(),
-            "internal_shared_prefs_" + AccountRepository.instance().userInfoHash,
-            ReadyForDisplayMessageRepository.READY_DISPLAY_KEY,
-            HashSet()
         )
         ReadyForDisplayMessageRepository.instance().getAllMessagesCopy().shouldBeEmpty()
     }
