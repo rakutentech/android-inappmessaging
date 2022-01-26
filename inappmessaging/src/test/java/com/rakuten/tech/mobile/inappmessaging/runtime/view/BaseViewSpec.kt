@@ -6,30 +6,39 @@ import android.graphics.Color
 import android.os.Build
 import android.view.LayoutInflater
 import android.view.View
+import android.widget.ImageButton
 import android.widget.ImageView
 import android.widget.TextView
 import androidx.test.core.app.ApplicationProvider
 import com.google.android.material.button.MaterialButton
+import com.nhaarman.mockitokotlin2.never
 import com.rakuten.tech.mobile.inappmessaging.runtime.BaseTest
 import com.rakuten.tech.mobile.inappmessaging.runtime.R
 import com.rakuten.tech.mobile.inappmessaging.runtime.data.models.messages.Message
 import com.rakuten.tech.mobile.inappmessaging.runtime.data.responses.ping.*
 import com.rakuten.tech.mobile.inappmessaging.runtime.utils.ImageUtilSpec
-import org.amshove.kluent.shouldBeEqualTo
 import org.junit.Before
 import org.junit.Test
 import org.junit.runner.RunWith
-import org.mockito.Mockito
-import org.mockito.Mockito.`when`
+import org.mockito.verification.VerificationMode
 import org.robolectric.RobolectricTestRunner
 import org.robolectric.annotation.Config
 
-import android.R.attr.button
 import android.widget.CheckBox
-import android.R.attr.button
+import android.content.Context
+import android.content.res.Resources
+import android.graphics.Typeface
+import com.nhaarman.mockitokotlin2.any
+import com.nhaarman.mockitokotlin2.eq
+import com.nhaarman.mockitokotlin2.times
+import com.rakuten.tech.mobile.inappmessaging.runtime.utils.ResourceUtils
+import org.amshove.kluent.*
+import org.mockito.Mockito
+import org.mockito.Mockito.`when`
 
 @Config(sdk = [Build.VERSION_CODES.O_MR1])
 @RunWith(RobolectricTestRunner::class)
+@SuppressWarnings("LargeClass")
 class BaseViewSpec : BaseTest() {
     private val hostAppActivity = Mockito.mock(Activity::class.java)
     private val mockMessage = Mockito.mock(Message::class.java)
@@ -101,6 +110,26 @@ class BaseViewSpec : BaseTest() {
     }
 
     @Test
+    fun `should set close button to black background`() {
+        verifyCloseButton(BLACK_HEX, times(1))
+    }
+
+    @Test
+    fun `should not set close button to black background`() {
+        verifyCloseButton(WHITE_HEX, never())
+    }
+
+    private fun verifyCloseButton(color: String, mode: VerificationMode) {
+        `when`(mockPayload.headerColor).thenReturn(color)
+        `when`(mockPayload.messageBodyColor).thenReturn(color)
+        `when`(mockPayload.backgroundColor).thenReturn(color)
+        view?.populateViewData(mockMessage)
+        val mockButton = Mockito.mock(ImageButton::class.java)
+        view?.setCloseButton(mockButton)
+        Mockito.verify(mockButton, mode).setImageResource(R.drawable.close_button_white)
+    }
+
+    @Test
     fun `should set checkbox to visible`() {
         `when`(mockPayload.headerColor).thenReturn("#")
         `when`(mockDisplaySettings.optOut).thenReturn(true)
@@ -137,6 +166,90 @@ class BaseViewSpec : BaseTest() {
         view?.populateViewData(mockMessage)
     }
 
+    @Test
+    fun `should set correct font typeface`() {
+        val mockTypeface = setupMockContext()
+
+        view?.findViewById<TextView>(R.id.header_text)?.typeface shouldBeEqualTo mockTypeface
+        view?.findViewById<TextView>(R.id.message_body)?.typeface shouldBeEqualTo mockTypeface
+        view?.findViewById<MaterialButton>(R.id.message_single_button)?.typeface shouldBeEqualTo mockTypeface
+    }
+
+    @Test
+    @Config(sdk = [Build.VERSION_CODES.N])
+    fun `should set correct font for lower API`() {
+        val mockFont = Mockito.mock(Typeface::class.java)
+        setupMockContext(isLower = true, mockFont = mockFont)
+
+        view?.findViewById<TextView>(R.id.header_text)?.typeface shouldBeEqualTo mockFont
+        view?.findViewById<TextView>(R.id.message_body)?.typeface shouldBeEqualTo mockFont
+        view?.findViewById<MaterialButton>(R.id.message_single_button)?.typeface shouldBeEqualTo mockFont
+
+        ResourceUtils.mockFont = null
+    }
+
+    @Test
+    @Config(sdk = [Build.VERSION_CODES.N])
+    fun `should not crash for lower API with no mock`() {
+        setupMockContext(isLower = true)
+
+        view?.findViewById<TextView>(R.id.header_text)?.typeface.shouldNotBeNull()
+        view?.findViewById<TextView>(R.id.message_body)?.typeface.shouldNotBeNull()
+        view?.findViewById<MaterialButton>(R.id.message_single_button)?.typeface.shouldNotBeNull()
+    }
+
+    @Test
+    fun `should not crash if get string failed`() {
+        setupMockContext(true)
+
+        view?.findViewById<TextView>(R.id.header_text)?.typeface.shouldNotBeNull()
+        view?.findViewById<TextView>(R.id.message_body)?.typeface.shouldNotBeNull()
+        view?.findViewById<MaterialButton>(R.id.message_single_button)?.typeface.shouldNotBeNull()
+    }
+
+    @Test
+    fun `should not crash if font id is invalid`() {
+        setupMockContext(fontId = 0)
+
+        view?.findViewById<TextView>(R.id.header_text)?.typeface.shouldNotBeNull()
+        view?.findViewById<TextView>(R.id.message_body)?.typeface.shouldNotBeNull()
+        view?.findViewById<MaterialButton>(R.id.message_single_button)?.typeface.shouldNotBeNull()
+    }
+
+    @SuppressWarnings("LongMethod")
+    private fun setupMockContext(
+        isInvalid: Boolean = false,
+        fontId: Int = 1,
+        isLower: Boolean = false,
+        mockFont: Typeface? = null
+    ): Typeface? {
+        `when`(mockPayload.headerColor).thenReturn("#")
+        val mockContext = Mockito.mock(Context::class.java)
+        val mockResource = Mockito.mock(Resources::class.java)
+        val mockTypeface = Mockito.mock(Typeface::class.java)
+        val mockButton = Mockito.mock(MessageButton::class.java)
+        view?.mockContext = mockContext
+        `when`(mockContext.resources).thenReturn(mockResource)
+        `when`(mockContext.packageName).thenReturn("test")
+        `when`(mockResource.getIdentifier(any(), eq("string"), any())).thenReturn(1)
+        `when`(mockResource.getIdentifier(any(), eq("font"), any())).thenReturn(fontId)
+        if (isInvalid) {
+            `when`(mockContext.getString(any())).thenThrow(Resources.NotFoundException())
+        } else {
+            `when`(mockContext.getString(any())).thenReturn("testfont")
+        }
+        if (isLower) {
+            ResourceUtils.mockFont = mockFont
+        } else {
+            `when`(mockResource.getFont(any())).thenReturn(mockTypeface)
+        }
+        `when`(mockCtrlSettings.buttons).thenReturn(listOf(mockButton))
+        `when`(mockButton.buttonTextColor).thenReturn("#")
+        `when`(mockButton.buttonBackgroundColor).thenReturn("#")
+        view?.populateViewData(mockMessage)
+        return mockTypeface
+    }
+
     private fun verifyImageFetch(isValid: Boolean, isException: Boolean = false, isNull: Boolean = false) {
         ImageUtilSpec.IS_VALID = isValid
         ImageUtilSpec.IS_NULL = isNull
@@ -160,5 +273,6 @@ class BaseViewSpec : BaseTest() {
 
     companion object {
         private const val WHITE_HEX = "#FFFFFF"
+        private const val BLACK_HEX = "#000000"
     }
 }

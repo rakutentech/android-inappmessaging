@@ -7,8 +7,6 @@
   android:layout_height="0dp"
   android:layout_weight="0.25"
   android:layout_marginBottom="@dimen/modal_text_scroll_view_margin_bottom"
-  android:layout_marginStart="@dimen/modal_layout_margin_right"
-  android:layout_marginEnd="@dimen/modal_layout_margin_right"
   android:layout_marginLeft="@dimen/modal_layout_margin_right"
   android:layout_marginRight="@dimen/modal_layout_margin_right"
   android:fillViewport="true"
@@ -24,11 +22,10 @@
     <TextView
       android:id="@+id/header_text"
       style="@style/InAppMessaging.Text.Modal"
-      android:textStyle="bold"
       android:layout_marginTop="@dimen/modal_text_header_margin_top"
       android:lineSpacingExtra="@dimen/modal_text_header_line_spacing_extra"
       android:textSize="@dimen/modal_text_header_text_size"
-      android:textAlignment="center"
+      android:textStyle="bold"
       android:gravity="center"
       tools:text="@string/example_header_text"
       tools:visibility="visible"/>
@@ -36,6 +33,7 @@
     <TextView
       android:id="@+id/message_body"
       style="@style/InAppMessaging.Text.Modal"
+      android:layout_marginTop="@dimen/modal_text_body_margin_top"
       tools:text="@string/example_body_text"
       tools:visibility="visible"/>
 

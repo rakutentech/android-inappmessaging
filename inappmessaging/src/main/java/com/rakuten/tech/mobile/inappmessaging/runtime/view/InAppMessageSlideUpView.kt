@@ -2,7 +2,6 @@ package com.rakuten.tech.mobile.inappmessaging.runtime.view
 
 import android.content.Context
 import android.util.AttributeSet
-import android.widget.ImageButton
 import androidx.constraintlayout.widget.ConstraintLayout
 import com.rakuten.tech.mobile.inappmessaging.runtime.R
 import com.rakuten.tech.mobile.inappmessaging.runtime.data.enums.SlideFromDirectionType
@@ -24,10 +23,7 @@ internal class InAppMessageSlideUpView(
     override fun populateViewData(message: Message) {
         super.populateViewData(message)
 
-        // Override image from white background to black background.
-        findViewById<ImageButton>(R.id.message_close_button)
-            ?.setImageResource(R.drawable.close_button_black_background)
-
+        setCloseButton()
         val constraintLayout = findViewById<ConstraintLayout>(R.id.slide_up)
 
         // Setting background color.

@@ -8,6 +8,7 @@ import android.os.Build
 internal interface BuildVersionChecker {
     fun isNougatAndAbove(): Boolean
     fun isAndroidQAndAbove(): Boolean
+    fun isAndroidOAndAbove(): Boolean
 
     companion object {
         private var instance: BuildVersionChecker = BuildVersionCheckerImpl()
@@ -18,5 +19,6 @@ internal interface BuildVersionChecker {
     private class BuildVersionCheckerImpl : BuildVersionChecker {
         override fun isNougatAndAbove() = Build.VERSION.SDK_INT >= Build.VERSION_CODES.N
         override fun isAndroidQAndAbove() = Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q
+        override fun isAndroidOAndAbove() = Build.VERSION.SDK_INT >= Build.VERSION_CODES.O
     }
 }
