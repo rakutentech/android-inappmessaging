@@ -92,7 +92,7 @@ open class MessageReadinessManagerSpec : BaseTest() {
         request.sdkVersion shouldBeEqualTo BuildConfig.VERSION_NAME
         request.lastPingInMillis shouldBeEqualTo LAST_PING_MILLIS
         request.locale shouldBeEqualTo InAppMessagingTestConstants.LOCALE.toString()
-                .replace("_", "-").toLowerCase(Locale.getDefault())
+                .replace("_", "-").lowercase(Locale.getDefault())
     }
 
     @Test

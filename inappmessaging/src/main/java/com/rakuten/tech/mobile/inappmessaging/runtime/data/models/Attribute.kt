@@ -15,6 +15,6 @@ data class Attribute(
     @NotNull val value: String,
     @NotNull private val type: ValueType
 ) {
-    val name = nm.toLowerCase(Locale.getDefault())
+    val name = nm.lowercase(Locale.getDefault())
     val valueType = type.typeId
 }

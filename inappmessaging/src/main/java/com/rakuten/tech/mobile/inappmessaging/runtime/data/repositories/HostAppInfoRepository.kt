@@ -95,7 +95,7 @@ internal interface HostAppInfoRepository {
 
         override fun getDeviceLocale(): String {
             val locale = hostAppInfo?.locale ?: Locale.getDefault()
-            return locale.toString().replace("_", "-").toLowerCase(Locale.getDefault())
+            return locale.toString().replace("_", "-").lowercase(Locale.getDefault())
         }
 
         @SuppressWarnings("FunctionMaxLength")

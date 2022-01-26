@@ -7,7 +7,7 @@ import android.os.Looper
 import android.util.Log
 import android.view.ViewGroup
 import com.rakuten.tech.mobile.inappmessaging.runtime.R
-import com.rakuten.tech.mobile.inappmessaging.runtime.service.DisplayMessageJobIntentService
+import com.rakuten.tech.mobile.inappmessaging.runtime.workmanager.workers.DisplayMessageWorker
 import timber.log.Timber
 
 /**
@@ -37,7 +37,7 @@ internal interface DisplayManager {
     private class DisplayManagerImpl : DisplayManager {
 
         override fun displayMessage() {
-            DisplayMessageJobIntentService.enqueueWork(Intent())
+            DisplayMessageWorker.enqueueWork(Intent())
         }
 
         override fun removeMessage(activity: Activity?, delay: Int): Any? {

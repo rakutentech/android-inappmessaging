@@ -46,7 +46,7 @@ internal object Initializer {
     /**
      * This method gets device's locale based on API level.
      */
-    @SuppressWarnings("DEPRECATION")
+    @SuppressWarnings("DEPRECATION", "kotlin:S1874")
     @TargetApi(Build.VERSION_CODES.N)
     private fun getLocale(context: Context): Locale? =
             if (BuildVersionChecker.instance().isNougatAndAbove()) {

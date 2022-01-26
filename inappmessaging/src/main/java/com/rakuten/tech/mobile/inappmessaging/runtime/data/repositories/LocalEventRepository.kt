@@ -16,8 +16,6 @@ import timber.log.Timber
 import java.lang.ClassCastException
 import java.util.Collections
 import kotlin.collections.ArrayList
-import kotlin.collections.component1
-import kotlin.collections.component2
 
 /**
  * LocalEventRepository will store all incoming events from host app.
@@ -89,11 +87,10 @@ internal interface LocalEventRepository : EventRepository {
 
         private fun debugLog(event: Event) {
             Timber.tag(TAG).d(event.getEventName())
-            event.getAttributeMap().forEach { (key, value) ->
+            for ((key, value) in event.getAttributeMap()) {
                 Timber.tag(TAG).d("Key: %s", key)
                 Timber.tag(TAG).d(
-                        "Value name: %s, Value Type: %d, Value data: %s", value?.name, value?.valueType,
-                        value?.value)
+                    "Value name: ${value?.name}, Value Type: ${value?.valueType}, Value data: ${value?.value}")
             }
         }
 
