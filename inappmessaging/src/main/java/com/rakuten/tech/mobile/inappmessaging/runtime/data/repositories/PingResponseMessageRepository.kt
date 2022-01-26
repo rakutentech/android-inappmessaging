@@ -8,6 +8,7 @@ import com.rakuten.tech.mobile.inappmessaging.runtime.data.responses.ping.Campai
 import com.rakuten.tech.mobile.sdkutils.PreferencesUtil
 import com.rakuten.tech.mobile.sdkutils.logger.Logger
 import org.json.JSONObject
+import timber.log.Timber
 import java.lang.ClassCastException
 import java.util.concurrent.ConcurrentHashMap
 
@@ -106,7 +107,7 @@ internal abstract class PingResponseMessageRepository : MessageRepository {
                         )
                     } ?: ""
                 } catch (ex: ClassCastException) {
-                    Logger(TAG).debug(ex.cause, "Incorrect type for $PING_RESPONSE_KEY data")
+                    Timber.tag(TAG).d(ex.cause, "Incorrect type for $PING_RESPONSE_KEY data")
                     ""
                 }
                 messages.clear()

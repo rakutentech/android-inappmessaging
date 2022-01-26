@@ -150,7 +150,7 @@ internal interface LocalDisplayedMessageRepository {
                     )
                 } ?: ""
             } catch (ex: ClassCastException) {
-                Logger(TAG).debug(ex.cause, "Incorrect type for $LOCAL_DISPLAYED_KEY data")
+                Logger(TAG).debug(ex.cause, "Incorrect JSON format for $LOCAL_DISPLAYED_KEY data")
                 ""
             }
             messages.clear()

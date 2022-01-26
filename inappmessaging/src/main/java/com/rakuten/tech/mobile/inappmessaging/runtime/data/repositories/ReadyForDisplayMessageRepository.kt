@@ -8,6 +8,7 @@ import com.rakuten.tech.mobile.inappmessaging.runtime.data.responses.ping.Campai
 import com.rakuten.tech.mobile.sdkutils.PreferencesUtil
 import com.rakuten.tech.mobile.sdkutils.logger.Logger
 import org.json.JSONArray
+import timber.log.Timber
 import java.lang.ClassCastException
 
 /**
@@ -96,7 +97,7 @@ internal abstract class ReadyForDisplayMessageRepository : ReadyMessageRepositor
                         )
                     } ?: ""
                 } catch (ex: ClassCastException) {
-                    Logger(TAG).debug(ex.cause, "Incorrect type for $READY_DISPLAY_KEY data")
+                    Timber.tag(TAG).d(ex.cause, "Incorrect type for $READY_DISPLAY_KEY data")
                     ""
                 }
 
