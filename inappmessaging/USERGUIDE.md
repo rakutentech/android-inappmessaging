@@ -283,7 +283,7 @@ InAppMessaging.instance().closeMessage(true)
 
 ### <a name="custom-font"></a> #3 Custom fonts for campaigns
 
-The SDK will optionally use custom fonts on campaign header and body texts, and button texts if set. The default Android system font is used if custom fonts are not added.
+The SDK can optionally use custom fonts on campaign header and body texts, and button texts. The default Android system font will be used if custom fonts are not added.
 
 To use custom fonts:
 1. Add the font files, `ttf` or `otf` format, to the `font` resource folder of your app.
