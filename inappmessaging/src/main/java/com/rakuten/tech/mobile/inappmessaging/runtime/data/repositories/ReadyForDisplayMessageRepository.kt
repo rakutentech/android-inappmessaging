@@ -8,7 +8,6 @@ import com.rakuten.tech.mobile.inappmessaging.runtime.data.responses.ping.Campai
 import com.rakuten.tech.mobile.sdkutils.PreferencesUtil
 import com.rakuten.tech.mobile.sdkutils.logger.Logger
 import org.json.JSONArray
-import timber.log.Timber
 import java.lang.ClassCastException
 
 /**
@@ -88,19 +87,16 @@ internal abstract class ReadyForDisplayMessageRepository : ReadyMessageRepositor
                 user = AccountRepository.instance().userInfoHash
                 // reset message list from cached using updated user info
                 val listString = try {
-                    val context = InAppMessaging.instance().getHostAppContext()
-                    if (context != null) {
+                    InAppMessaging.instance().getHostAppContext()?.let { it ->
                         PreferencesUtil.getString(
-                            context,
+                            it,
                             "internal_shared_prefs_" + AccountRepository.instance().userInfoHash,
                             READY_DISPLAY_KEY,
                             ""
                         )
-                    } else {
-                        ""
-                    }
+                    } ?: ""
                 } catch (ex: ClassCastException) {
-                    Timber.tag(TAG).d(ex.cause, "Incorrect type for $READY_DISPLAY_KEY data")
+                    Logger(TAG).debug(ex.cause, "Incorrect type for $READY_DISPLAY_KEY data")
                     ""
                 }
 

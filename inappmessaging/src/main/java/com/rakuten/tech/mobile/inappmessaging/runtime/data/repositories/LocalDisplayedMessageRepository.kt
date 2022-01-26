@@ -9,7 +9,6 @@ import com.rakuten.tech.mobile.inappmessaging.runtime.data.models.messages.Messa
 import com.rakuten.tech.mobile.inappmessaging.runtime.exception.InAppMessagingException
 import com.rakuten.tech.mobile.sdkutils.PreferencesUtil
 import com.rakuten.tech.mobile.sdkutils.logger.Logger
-import timber.log.Timber
 import java.lang.ClassCastException
 import java.util.Calendar
 import java.util.concurrent.ConcurrentHashMap
@@ -142,30 +141,25 @@ internal interface LocalDisplayedMessageRepository {
         @SuppressWarnings("TooGenericExceptionCaught", "LongMethod")
         private fun resetDisplayed() {
             val listString = try {
-                val context = InAppMessaging.instance().getHostAppContext()
-                if (context != null) {
+                InAppMessaging.instance().getHostAppContext()?.let { it ->
                     PreferencesUtil.getString(
-                        context,
+                        it,
                         "internal_shared_prefs_" + AccountRepository.instance().userInfoHash,
                         LOCAL_DISPLAYED_KEY,
                         ""
                     )
-                } else {
-                    ""
-                }
+                } ?: ""
             } catch (ex: ClassCastException) {
-                Timber.tag(TAG).d(ex.cause, "Incorrect type for $LOCAL_DISPLAYED_KEY data")
+                Logger(TAG).debug(ex.cause, "Incorrect JSON format for $LOCAL_DISPLAYED_KEY data")
                 ""
             }
             messages.clear()
-            if (listString != null) {
-                if (listString.isNotEmpty()) {
-                    val type = object : TypeToken<HashMap<String, List<Long>>>() {}.type
-                    try {
-                        messages.putAll(Gson().fromJson(listString, type))
-                    } catch (ex: Exception) {
-                        Logger(TAG).debug(ex.cause, "Incorrect JSON format for $LOCAL_DISPLAYED_KEY data")
-                    }
+            if (listString.isNotEmpty()) {
+                val type = object : TypeToken<HashMap<String, List<Long>>>() {}.type
+                try {
+                    messages.putAll(Gson().fromJson(listString, type))
+                } catch (ex: Exception) {
+                    Logger(TAG).debug(ex.cause, "Incorrect JSON format for $LOCAL_DISPLAYED_KEY data")
                 }
             }
         }
