@@ -157,6 +157,14 @@ open class LocalEventRepositorySpec : BaseTest() {
     }
 
     @Test
+    fun `should not throw exception when caching updating list for a given time`() {
+        InAppMessaging.setUninitializedInstance(true)
+        val timeMillis = Calendar.getInstance().timeInMillis
+        LocalEventRepository.instance().clearNonPersistentEvents(timeMillis)
+        LocalEventRepository.instance().getEvents().shouldHaveSize(0)
+    }
+
+    @Test
     fun `should not throw exception when clearing with empty events`() {
         LocalEventRepository.instance().clearNonPersistentEvents()
         LocalEventRepository.instance().getEvents().shouldHaveSize(0)

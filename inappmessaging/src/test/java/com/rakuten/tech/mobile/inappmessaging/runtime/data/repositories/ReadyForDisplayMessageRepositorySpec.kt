@@ -48,6 +48,13 @@ class ReadyForDisplayMessageRepositorySpec : BaseTest() {
     }
 
     @Test
+    fun `should not crash while clearing messages`() {
+        InAppMessaging.setUninitializedInstance(true)
+        ReadyForDisplayMessageRepository.instance().clearMessages()
+        ReadyForDisplayMessageRepository.instance().getAllMessagesCopy().shouldHaveSize(0)
+    }
+
+    @Test
     fun `should contain correct messages after clearing then adding`() {
         ReadyForDisplayMessageRepository.instance().replaceAllMessages(messageList)
         ReadyForDisplayMessageRepository.instance().getAllMessagesCopy().shouldHaveSize(2)
