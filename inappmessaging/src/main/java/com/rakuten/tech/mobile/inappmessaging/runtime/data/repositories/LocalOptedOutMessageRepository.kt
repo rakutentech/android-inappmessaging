@@ -5,7 +5,6 @@ import com.rakuten.tech.mobile.inappmessaging.runtime.InAppMessaging
 import com.rakuten.tech.mobile.inappmessaging.runtime.data.models.messages.Message
 import com.rakuten.tech.mobile.sdkutils.PreferencesUtil
 import com.rakuten.tech.mobile.sdkutils.logger.Logger
-import timber.log.Timber
 import java.lang.ClassCastException
 
 /**
@@ -71,7 +70,7 @@ internal interface LocalOptedOutMessageRepository {
             }
         }
 
-        @SuppressWarnings("LongMethod", "NestedBlockDepth")
+        @SuppressWarnings("LongMethod")
         private fun checkAndResetSet(onLaunch: Boolean = false) {
             // check if caching is enabled and if there are changes in user info
             if (InAppMessaging.instance().isLocalCachingEnabled() &&
@@ -80,20 +79,19 @@ internal interface LocalOptedOutMessageRepository {
                 optedOutMessages.clear()
                 // reset id list from cached using updated user info
                 try {
-                    val context = InAppMessaging.instance().getHostAppContext()
-                    if (context != null) {
-                        val stringSet = PreferencesUtil.getStringSet(
-                            context,
+                    InAppMessaging.instance().getHostAppContext()?.let { it ->
+                        val sas = PreferencesUtil.getStringSet(
+                            it,
                             "internal_shared_prefs_" + AccountRepository.instance().userInfoHash,
                             LOCAL_OPTED_OUT_KEY,
                             HashSet()
                         )
-                        if (stringSet != null) {
-                            optedOutMessages.addAll(stringSet)
+                            sas?.let { hashSet ->
+                            optedOutMessages.addAll(hashSet)
                         }
                     }
                 } catch (ex: ClassCastException) {
-                    Timber.tag(TAG).d(ex.cause, "Incorrect type for $LOCAL_OPTED_OUT_KEY data")
+                    Logger(TAG).debug(ex.cause, "Incorrect type for $LOCAL_OPTED_OUT_KEY data")
                 }
             }
         }

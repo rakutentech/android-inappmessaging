@@ -14,7 +14,6 @@ import com.rakuten.tech.mobile.inappmessaging.runtime.exception.InAppMessagingEx
 import com.rakuten.tech.mobile.sdkutils.PreferencesUtil
 import com.rakuten.tech.mobile.sdkutils.logger.Logger
 import org.json.JSONArray
-import timber.log.Timber
 import java.lang.ClassCastException
 import java.util.Collections
 import kotlin.collections.ArrayList
@@ -164,29 +163,24 @@ internal interface LocalEventRepository : EventRepository {
                 user = AccountRepository.instance().userInfoHash
                 // reset event list from cached using updated user info
                 val listString = try {
-                    val context = InAppMessaging.instance().getHostAppContext()
-                    if (context != null) {
+                    InAppMessaging.instance().getHostAppContext()?.let { it ->
                         PreferencesUtil.getString(
-                            context,
+                            it,
                             "internal_shared_prefs_" + AccountRepository.instance().userInfoHash,
                             LOCAL_EVENT_KEY,
                             ""
                         )
-                    } else {
-                        ""
-                    }
+                    } ?: ""
                 } catch (ex: ClassCastException) {
-                    Timber.tag(TAG).d(ex.cause, "Incorrect type for $LOCAL_EVENT_KEY data")
+                    Logger(TAG).debug(ex.cause, "Incorrect type for $LOCAL_EVENT_KEY data")
                     ""
                 }
-                if (listString != null) {
-                    if (listString.isNotEmpty()) {
-                        events.clear()
-                        deserializeLocalEvents(listString)
-                    } else if (events.isNotEmpty()) {
-                        // retain persistent event for user with no stored data
-                        events.removeAll { ev -> !ev.isPersistentType() }
-                    }
+                if (listString.isNotEmpty()) {
+                    events.clear()
+                    deserializeLocalEvents(listString)
+                } else if (events.isNotEmpty()) {
+                    // retain persistent event for user with no stored data
+                    events.removeAll { ev -> !ev.isPersistentType() }
                 }
             }
         }

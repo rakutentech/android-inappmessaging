@@ -8,7 +8,6 @@ import com.rakuten.tech.mobile.inappmessaging.runtime.data.responses.ping.Campai
 import com.rakuten.tech.mobile.sdkutils.PreferencesUtil
 import com.rakuten.tech.mobile.sdkutils.logger.Logger
 import org.json.JSONObject
-import timber.log.Timber
 import java.lang.ClassCastException
 import java.util.concurrent.ConcurrentHashMap
 
@@ -98,24 +97,21 @@ internal abstract class PingResponseMessageRepository : MessageRepository {
                 user = AccountRepository.instance().userInfoHash
                 // reset message list from cached using updated user info
                 val listString = try {
-                    val context = InAppMessaging.instance().getHostAppContext()
-                    if (context != null) {
+                    InAppMessaging.instance().getHostAppContext()?.let {
                         PreferencesUtil.getString(
-                            context,
+                            it,
                             "internal_shared_prefs_" + AccountRepository.instance().userInfoHash,
                             PING_RESPONSE_KEY,
                             ""
                         )
-                    } else {
-                        ""
-                    }
+                    } ?: ""
                 } catch (ex: ClassCastException) {
-                    Timber.tag(TAG).d(ex.cause, "Incorrect type for $PING_RESPONSE_KEY data")
+                    Logger(TAG).debug(ex.cause, "Incorrect type for $PING_RESPONSE_KEY data")
                     ""
                 }
                 messages.clear()
                 try {
-                    val jsonObject = JSONObject(listString!!)
+                    val jsonObject = JSONObject(listString)
                     for (key in jsonObject.keys()) {
                         val campaign = Gson().fromJson(
                                 jsonObject.getJSONObject(key).toString(), CampaignData::class.java)
