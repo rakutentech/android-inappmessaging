@@ -40,6 +40,14 @@ class LocalOptedOutMessageRepositorySpec : BaseTest() {
     }
 
     @Test
+    fun `should not crash while clearing message`() {
+        val message = ValidTestMessage()
+        InAppMessaging.setUninitializedInstance(true)
+        LocalOptedOutMessageRepository.instance().clearMessages()
+        LocalOptedOutMessageRepository.instance().hasMessage(message.getCampaignId()).shouldBeFalse()
+    }
+
+    @Test
     fun `should return true after clearing then adding`() {
         val message = ValidTestMessage()
         LocalOptedOutMessageRepository.instance().addMessage(message)

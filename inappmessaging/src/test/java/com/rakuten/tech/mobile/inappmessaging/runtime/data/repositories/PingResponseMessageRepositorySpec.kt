@@ -70,6 +70,13 @@ class PingResponseMessageRepositorySpec : BaseTest() {
     }
 
     @Test
+    fun `should not crash while clearing messages`() {
+        InAppMessaging.setUninitializedInstance(true)
+        PingResponseMessageRepository.instance().clearMessages()
+        PingResponseMessageRepository.instance().getAllMessagesCopy().shouldHaveSize(0)
+    }
+
+    @Test
     fun `should contain correct messages after clearing then adding`() {
         PingResponseMessageRepository.instance().replaceAllMessages(messageList)
         PingResponseMessageRepository.instance().getAllMessagesCopy().shouldHaveSize(2)

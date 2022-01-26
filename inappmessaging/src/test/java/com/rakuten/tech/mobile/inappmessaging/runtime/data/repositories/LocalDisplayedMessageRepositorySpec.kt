@@ -107,6 +107,14 @@ class LocalDisplayedMessageRepositorySpec : BaseTest() {
     }
 
     @Test
+    fun `should not crash while clearing messages`() {
+        val message = ValidTestMessage()
+        InAppMessaging.setUninitializedInstance(true)
+        LocalDisplayedMessageRepository.instance().clearMessages()
+        LocalDisplayedMessageRepository.instance().numberOfTimesDisplayed(message) shouldBeEqualTo 0
+    }
+
+    @Test
     fun `should return one after clearing then adding`() {
         val message = ValidTestMessage()
         LocalDisplayedMessageRepository.instance().addMessage(message)
