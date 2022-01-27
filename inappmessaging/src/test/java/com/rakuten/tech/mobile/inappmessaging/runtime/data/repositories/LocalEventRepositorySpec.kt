@@ -12,6 +12,7 @@ import com.rakuten.tech.mobile.inappmessaging.runtime.data.models.appevents.*
 import com.rakuten.tech.mobile.inappmessaging.runtime.exception.InAppMessagingException
 import com.rakuten.tech.mobile.inappmessaging.runtime.manager.EventsManager
 import com.rakuten.tech.mobile.inappmessaging.runtime.utils.InAppMessagingConstants
+import com.rakuten.tech.mobile.inappmessaging.runtime.utils.SharedPreferencesUtil.getPreferencesFile
 import com.rakuten.tech.mobile.inappmessaging.runtime.workmanager.schedulers.EventMessageReconciliationScheduler
 import com.rakuten.tech.mobile.sdkutils.PreferencesUtil
 import org.amshove.kluent.shouldBeEqualTo
@@ -176,7 +177,7 @@ open class LocalEventRepositorySpec : BaseTest() {
         initializeInstance(infoProvider)
         PreferencesUtil.putInt(
             ApplicationProvider.getApplicationContext(),
-            "internal_shared_prefs_" + AccountRepository.instance().userInfoHash,
+            getPreferencesFile(),
             LocalEventRepository.LOCAL_EVENT_KEY,
             1
         )
@@ -274,7 +275,7 @@ class LocalEventRepositoryExceptionSpec : LocalEventRepositorySpec() {
         setupAndTestMultipleUser()
         PreferencesUtil.putString(
             ApplicationProvider.getApplicationContext(),
-            "internal_shared_prefs_" + AccountRepository.instance().userInfoHash,
+            getPreferencesFile(),
             LocalEventRepository.LOCAL_EVENT_KEY,
             "[{eve"
         )
@@ -298,7 +299,7 @@ class LocalEventRepositoryExceptionSpec : LocalEventRepositorySpec() {
         setupAndTestMultipleUser()
         PreferencesUtil.putInt(
             ApplicationProvider.getApplicationContext(),
-            "internal_shared_prefs_" + AccountRepository.instance().userInfoHash,
+            getPreferencesFile(),
             LocalEventRepository.LOCAL_EVENT_KEY,
             1
         )
@@ -312,7 +313,7 @@ class LocalEventRepositoryExceptionSpec : LocalEventRepositorySpec() {
         setupAndTestMultipleUser()
         PreferencesUtil.putString(
             ApplicationProvider.getApplicationContext(),
-            "internal_shared_prefs_" + AccountRepository.instance().userInfoHash,
+            getPreferencesFile(),
             LocalEventRepository.LOCAL_EVENT_KEY,
             "[{eventType:\"invalid\"}]"
         )

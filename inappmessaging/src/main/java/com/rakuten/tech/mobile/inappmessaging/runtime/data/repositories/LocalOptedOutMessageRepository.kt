@@ -3,6 +3,7 @@ package com.rakuten.tech.mobile.inappmessaging.runtime.data.repositories
 import androidx.annotation.VisibleForTesting
 import com.rakuten.tech.mobile.inappmessaging.runtime.InAppMessaging
 import com.rakuten.tech.mobile.inappmessaging.runtime.data.models.messages.Message
+import com.rakuten.tech.mobile.inappmessaging.runtime.utils.SharedPreferencesUtil.getPreferencesFile
 import com.rakuten.tech.mobile.sdkutils.PreferencesUtil
 import com.rakuten.tech.mobile.sdkutils.logger.Logger
 import java.lang.ClassCastException
@@ -82,7 +83,7 @@ internal interface LocalOptedOutMessageRepository {
                     InAppMessaging.instance().getHostAppContext()?.let { it ->
                         val sas = PreferencesUtil.getStringSet(
                             it,
-                            "internal_shared_prefs_" + AccountRepository.instance().userInfoHash,
+                            getPreferencesFile(),
                             LOCAL_OPTED_OUT_KEY,
                             HashSet()
                         )
@@ -103,7 +104,7 @@ internal interface LocalOptedOutMessageRepository {
                 InAppMessaging.instance().getHostAppContext()?.let {
                     PreferencesUtil.putStringSet(
                         it,
-                        "internal_shared_prefs_" + AccountRepository.instance().userInfoHash,
+                        getPreferencesFile(),
                         LOCAL_OPTED_OUT_KEY,
                         optedOutMessages
                     )

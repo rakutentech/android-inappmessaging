@@ -18,7 +18,6 @@ import com.rakuten.tech.mobile.inappmessaging.runtime.workmanager.schedulers.Con
 import com.rakuten.tech.mobile.inappmessaging.runtime.workmanager.schedulers.MessageMixerPingScheduler
 import com.rakuten.tech.mobile.sdkutils.logger.Logger
 import retrofit2.Response
-import timber.log.Timber
 import java.net.HttpURLConnection
 import java.util.concurrent.atomic.AtomicInteger
 
@@ -94,7 +93,7 @@ internal class ConfigWorker(
             // Schedule a ping request to message mixer. Initial delay is 0
             // reset current delay to initial
             ConfigScheduler.currDelay = RetryDelayUtil.INITIAL_BACKOFF_DELAY
-            Timber.tag(TAG).d("Config Response: %d (%b)",
+            Logger(TAG).debug("Config Response: %d (%b)",
                     response.body()?.data?.rollOutPercentage, configRepo.isConfigEnabled())
             if (configRepo.isConfigEnabled()) {
                 // move temp data to persistent cache

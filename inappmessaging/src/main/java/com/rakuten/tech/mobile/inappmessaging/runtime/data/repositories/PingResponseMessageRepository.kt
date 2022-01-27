@@ -5,6 +5,7 @@ import com.google.gson.Gson
 import com.rakuten.tech.mobile.inappmessaging.runtime.InAppMessaging
 import com.rakuten.tech.mobile.inappmessaging.runtime.data.models.messages.Message
 import com.rakuten.tech.mobile.inappmessaging.runtime.data.responses.ping.CampaignData
+import com.rakuten.tech.mobile.inappmessaging.runtime.utils.SharedPreferencesUtil.getPreferencesFile
 import com.rakuten.tech.mobile.sdkutils.PreferencesUtil
 import com.rakuten.tech.mobile.sdkutils.logger.Logger
 import org.json.JSONObject
@@ -100,7 +101,7 @@ internal abstract class PingResponseMessageRepository : MessageRepository {
                     InAppMessaging.instance().getHostAppContext()?.let {
                         PreferencesUtil.getString(
                             it,
-                            "internal_shared_prefs_" + AccountRepository.instance().userInfoHash,
+                            getPreferencesFile(),
                             PING_RESPONSE_KEY,
                             ""
                         )
@@ -132,7 +133,7 @@ internal abstract class PingResponseMessageRepository : MessageRepository {
                 InAppMessaging.instance().getHostAppContext()?.let {
                     PreferencesUtil.putString(
                         it,
-                        "internal_shared_prefs_" + AccountRepository.instance().userInfoHash,
+                        getPreferencesFile(),
                         PING_RESPONSE_KEY,
                         Gson().toJson(messages)
                     )

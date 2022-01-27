@@ -14,6 +14,7 @@ import com.rakuten.tech.mobile.inappmessaging.runtime.data.responses.ping.Contro
 import com.rakuten.tech.mobile.inappmessaging.runtime.data.responses.ping.MessagePayload
 import com.rakuten.tech.mobile.inappmessaging.runtime.data.responses.ping.MessageSettings
 import com.rakuten.tech.mobile.inappmessaging.runtime.exception.InAppMessagingException
+import com.rakuten.tech.mobile.inappmessaging.runtime.utils.SharedPreferencesUtil.getPreferencesFile
 import com.rakuten.tech.mobile.sdkutils.PreferencesUtil
 import org.amshove.kluent.*
 import org.junit.Before
@@ -139,7 +140,7 @@ class LocalDisplayedMessageRepositorySpec : BaseTest() {
         initializeInstance(infoProvider)
         PreferencesUtil.putLong(
             ApplicationProvider.getApplicationContext(),
-            "internal_shared_prefs_" + AccountRepository.instance().userInfoHash,
+            getPreferencesFile(),
             LocalDisplayedMessageRepository.LOCAL_DISPLAYED_KEY, 10L
         )
         LocalDisplayedMessageRepository.instance().numberOfTimesDisplayed(ValidTestMessage()) shouldBeEqualTo 0
@@ -149,8 +150,7 @@ class LocalDisplayedMessageRepositorySpec : BaseTest() {
     fun `should not crash and clear previous when invalid format`() {
         val message = setupAndTestMultipleUser()
         PreferencesUtil.putString(
-            ApplicationProvider.getApplicationContext(), "internal_shared_prefs_"
-                    + AccountRepository.instance().userInfoHash,
+            ApplicationProvider.getApplicationContext(), getPreferencesFile(),
             LocalDisplayedMessageRepository.LOCAL_DISPLAYED_KEY, "invalid"
         )
         LocalDisplayedMessageRepository.instance().numberOfTimesDisplayed(message) shouldBeEqualTo 0
