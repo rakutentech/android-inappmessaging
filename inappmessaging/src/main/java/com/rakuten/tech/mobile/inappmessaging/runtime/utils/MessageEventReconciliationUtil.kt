@@ -1,6 +1,7 @@
 package com.rakuten.tech.mobile.inappmessaging.runtime.utils
 
 import com.rakuten.tech.mobile.inappmessaging.runtime.data.enums.EventType
+import com.rakuten.tech.mobile.inappmessaging.runtime.data.enums.InAppMessageType
 import com.rakuten.tech.mobile.inappmessaging.runtime.data.enums.OperatorType
 import com.rakuten.tech.mobile.inappmessaging.runtime.data.enums.ValueType
 import com.rakuten.tech.mobile.inappmessaging.runtime.data.models.Attribute
@@ -11,7 +12,6 @@ import com.rakuten.tech.mobile.inappmessaging.runtime.data.repositories.LocalEve
 import com.rakuten.tech.mobile.inappmessaging.runtime.data.repositories.PingResponseMessageRepository
 import com.rakuten.tech.mobile.inappmessaging.runtime.data.responses.ping.Trigger
 import com.rakuten.tech.mobile.inappmessaging.runtime.data.responses.ping.TriggerAttribute
-import com.rakuten.tech.mobile.inappmessaging.runtime.workmanager.workers.MessageEventReconciliationWorker
 import timber.log.Timber
 import java.util.Collections
 import java.util.Locale
@@ -35,7 +35,7 @@ internal interface MessageEventReconciliationUtil {
      * This method reconciles a list of messages with local events, return a list of reconciled ready messages
      * and list of tooltip campaigns. No repeating messages will be added.
      */
-    fun reconcileMessagesAndEvents(messages: List<Message>): Pair<MutableList<Message>,MutableList<Message>>
+    fun reconcileMessagesAndEvents(messages: List<Message>): Pair<MutableList<Message>, MutableList<Message>>
 
     companion object {
         private const val TAG = "IAM_MsgReconcileUtil"
@@ -57,22 +57,23 @@ internal interface MessageEventReconciliationUtil {
 //            return testMessages
 //        }
 
-        override fun reconcileMessagesAndEvents(messages: List<Message>): Pair<MutableList<Message>,MutableList<Message>> {
+        override fun reconcileMessagesAndEvents(messages: List<Message>): Pair<MutableList<Message>, MutableList<Message>> {
             // Make an empty list of message, later add reconciled messages to it.
             val reconciledMessages = ArrayList<Message>()
             val toolTipMessages = ArrayList<Message>()
             // Make a map of events for easy matching.
             val localEvents = aggregateLocalEvents()
             for (message in messages) {
-                if (message.getTooltipConfig() != null) {
-                    // Skip test messages and tooltip campaigns
-                    toolTipMessages.add(message)
-                } else if (message.isTest() || isMessageReconciled(message, localEvents)) {
+                if (message.isTest() || isMessageReconciled(message, localEvents)) {
                     // test messages are automatically added
                     // Check if message is reconciled.
                     // Add this message only once regardless of its max impressions.
                     Timber.tag(TAG).d("Ready Messages: %s", message.getMessagePayload().header)
-                    reconciledMessages.add(message)
+                    if (message.getType() == InAppMessageType.TOOLTIP.typeId) {
+                        toolTipMessages.add(message)
+                    } else {
+                        reconciledMessages.add(message)
+                    }
                 }
             }
             return Pair(Collections.unmodifiableList(reconciledMessages), Collections.unmodifiableList(toolTipMessages))

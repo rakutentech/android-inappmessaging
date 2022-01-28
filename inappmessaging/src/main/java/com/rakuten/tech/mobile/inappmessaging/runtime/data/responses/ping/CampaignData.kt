@@ -54,7 +54,6 @@ internal data class CampaignData(
         val result = messagePayload.title.contains(TOOLTIP_TAG, true)
         if (result && tooltip == null) {
             type = 5 // change type to tool tip (this will be fixed once the backend supports tooltip)
-            maxImpressions = 1 // current design will only display tooltip once
             tooltip = Gson().fromJson(messagePayload.messageBody, Tooltip::class.java)
 //            tooltip?.id = "target"
         }

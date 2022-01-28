@@ -33,7 +33,7 @@ internal abstract class TooltipMessageRepository : ReadyMessageRepository {
             synchronized(messages) {
                 val activity = InAppMessaging.instance().getRegisteredActivity()
                 return ArrayList(messages.filter { message ->
-                    val view = message.getTooltipConfig()?.id?.let { activity?.findViewByName<View>(it)}
+                    val view = message.getTooltipConfig()?.id?.let { activity?.findViewByName<View>(it) }
                     view != null
                 })
             }

@@ -3,7 +3,6 @@ package com.rakuten.tech.mobile.inappmessaging.runtime.utils
 import android.content.Context
 import android.content.res.Resources
 import android.graphics.Rect
-import android.util.Log
 import android.view.View
 import android.view.ViewGroup
 import android.view.animation.Animation
@@ -54,35 +53,42 @@ internal object ViewUtil {
         return displayMetrics.widthPixels + 1
     }
 
-    fun getLayoutPosition(view: View, posType: PositionType, width: Int, height: Int, marginHorizontal: Int, marginVertical: Int): Pair<Int, Int>? {
+    fun getLayoutPosition(
+        view: View,
+        posType: PositionType,
+        width: Int,
+        height: Int,
+        marginHorizontal: Int,
+        marginVertical: Int
+    ): Pair<Int, Int>? {
 //        val location = IntArray(2)
 //        view.getLocationOnScreen(location)
         val rect = Rect()
         view.getHitRect(rect)
         return when (posType) {
             PositionType.TOP_RIGHT -> {
-                Pair(rect.left + view.width + InAppMessagingTooltipView.PADDING/4, rect.top - height)
+                Pair(rect.left + view.width + InAppMessagingTooltipView.PADDING / 4, rect.top - height)
             }
             PositionType.TOP_CENTER -> {
-                Pair(rect.left + view.width/2 - width/2, rect.top - height)
+                Pair(rect.left + view.width / 2 - width / 2, rect.top - height)
             }
             PositionType.TOP_LEFT -> {
                 Pair(rect.left - width, rect.top - height)
             }
             PositionType.BOTTOM_RIGHT -> {
-                Pair(rect.left + view.width + InAppMessagingTooltipView.PADDING/4, rect.top + view.height)
+                Pair(rect.left + view.width + InAppMessagingTooltipView.PADDING / 4, rect.top + view.height)
             }
             PositionType.BOTTOM_CENTER -> {
-                Pair(rect.left + view.width/2 - width/2, rect.top + view.height - InAppMessagingTooltipView.TRI_SIZE/2)
+                Pair(rect.left + view.width / 2 - width / 2, rect.top + view.height - InAppMessagingTooltipView.TRI_SIZE / 2)
             }
             PositionType.BOTTOM_LEFT -> {
                 Pair(rect.left - width, rect.top + view.height)
             }
             PositionType.RIGHT -> {
-                Pair(rect.left + view.width - InAppMessagingTooltipView.TRI_SIZE/2, rect.top - height/2 + marginVertical/2 + InAppMessagingTooltipView.PADDING/2)
+                Pair(rect.left + view.width - InAppMessagingTooltipView.TRI_SIZE / 2, rect.top - height / 2 + marginVertical / 2 + InAppMessagingTooltipView.PADDING / 2)
             }
             PositionType.LEFT -> {
-                Pair(rect.left - width - InAppMessagingTooltipView.TRI_SIZE/2, rect.top - height/2 + marginVertical/2 + InAppMessagingTooltipView.PADDING/2)
+                Pair(rect.left - width - InAppMessagingTooltipView.TRI_SIZE / 2, rect.top - height / 2 + marginVertical / 2 + InAppMessagingTooltipView.PADDING / 2)
             }
         }
     }

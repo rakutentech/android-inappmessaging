@@ -52,9 +52,9 @@
     <item name="android:layout_height">@dimen/modal_close_button_height</item>
     <item name="android:layout_width">@dimen/modal_close_button_width</item>
     <item name="android:background">@android:color/transparent</item>
-    <item name="android:src">@drawable/close_button_black_background</item>
+    <item name="android:src">@drawable/close_button_white_background</item>
     <item name="android:layout_marginLeft">@dimen/tooltip_close_button_margin_left</item>
-    <item name="android:layout_marginTop">@dimen/tooltip_close_button_margin_bottom</item>
+    <item name="android:layout_marginTop">@dimen/tooltip_close_button_margin_top</item>
   </style>
 
   <style name="InAppMessaging.Button">

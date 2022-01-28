@@ -1,12 +1,9 @@
 package com.rakuten.tech.mobile.inappmessaging.runtime.runnable
 
 import android.app.Activity
-import android.util.Log
-import android.view.Gravity
 import android.view.View
 import android.view.ViewGroup
 import android.widget.FrameLayout
-import android.widget.LinearLayout
 import android.widget.ScrollView
 import androidx.annotation.UiThread
 import com.rakuten.tech.mobile.inappmessaging.runtime.InAppMessaging
@@ -40,6 +37,8 @@ internal class DisplayMessageRunnable(
     override fun run() {
         // If there's already a message found, don't display another message.
         if (hostActivity.findViewById<View?>(R.id.in_app_message_base_view) != null) {
+            return
+        } else if (hostActivity.findViewById<View?>(R.id.in_app_message_tooltip_view)?.tag == message.getCampaignId()) {
             return
         }
 
@@ -98,7 +97,6 @@ internal class DisplayMessageRunnable(
                             }
                         }
                     }
-
                 }
                 else -> Any()
             }

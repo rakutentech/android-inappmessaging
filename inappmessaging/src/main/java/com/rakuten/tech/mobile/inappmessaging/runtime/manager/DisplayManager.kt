@@ -4,7 +4,6 @@ import android.app.Activity
 import android.content.Intent
 import android.os.Handler
 import android.os.Looper
-import android.util.Log
 import android.view.ViewGroup
 import com.rakuten.tech.mobile.inappmessaging.runtime.R
 import com.rakuten.tech.mobile.inappmessaging.runtime.workmanager.workers.DisplayMessageWorker
@@ -47,15 +46,25 @@ internal interface DisplayManager {
             val inAppMessageBaseView = activity.findViewById<ViewGroup>(R.id.in_app_message_base_view)
                 ?: activity.findViewById(R.id.in_app_message_tooltip_view)
             if (inAppMessageBaseView != null) {
-                Handler(Looper.getMainLooper()).postDelayed(
-                    { removeCampaign(inAppMessageBaseView) }, delay * MS_MULTIPLIER
-                )
+                if (delay > 0) {
+                    Handler(Looper.getMainLooper()).postDelayed(
+                        { removeCampaign(inAppMessageBaseView) }, delay * MS_MULTIPLIER
+                    )
+                } else {
+                    // to avoid crashing when redirect from tooltip view
+                    removeCampaign(inAppMessageBaseView)
+                }
             }
             return inAppMessageBaseView?.tag
         }
 
         private fun removeCampaign(inAppMessageBaseView: ViewGroup) {
             // Removing just the InApp Message from the view hierarchy.
+            if (inAppMessageBaseView.parent !is ViewGroup) {
+                // avoid crash
+                return
+            }
+
             val parent = inAppMessageBaseView.parent as ViewGroup
             if (parent.id == R.id.in_app_message_tooltip_layout) {
                 val gp = parent.parent
