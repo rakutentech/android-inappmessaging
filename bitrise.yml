@@ -12,8 +12,8 @@ workflows:
   build-and-test:
     before_run:
     - _setup-env
-    #after_run:
-    #- _run-sonarqube-scanner
+    after_run:
+    - _run-sonarqube-scanner
     steps:
     - cache-pull@2: {}
     - script@1:
@@ -39,29 +39,21 @@ workflows:
         title: Upload Code Coverage
         inputs:
         - content: bash <(curl -s https://codecov.io/bash)
-    - set-java-version@1:
+    - custom-test-results-export@0:
+        # this add-on should export test artifacts as well, but currently not displayed.
         inputs:
-        - set_java_version: '11'
-    - script@1:
-        run_if: '{{getenv "SONARQUBE_TOKEN" | ne ""}}'
-        title: Run SonarQube Scanner
+        - test_name: Unit Tests (Debug)
+        - base_path: "$SDK_PATH/build/test-results/testDebugUnitTest/"
+        - search_pattern: "*"
+    - custom-test-results-export@0:
         inputs:
-        - content: ./gradlew sonarqube
-    # - custom-test-results-export@0:
-    #     # this add-on should export test artifacts as well, but currently not displayed.
-    #     inputs:
-    #     - test_name: Unit Tests (Debug)
-    #     - base_path: "$SDK_PATH/build/test-results/testDebugUnitTest/"
-    #     - search_pattern: "*"
-    # - custom-test-results-export@0:
-    #     inputs:
-    #     - test_name: Unit Tests (Release)
-    #     - base_path: "$SDK_PATH/build/test-results/testReleaseUnitTest/"
-    #     - search_pattern: "*"
-    # - deploy-to-bitrise-io@2:
-    #     inputs:
-    #     - deploy_path: $SDK_PATH/build/outputs/aar
-    #     - is_enable_public_page: 'false'
+        - test_name: Unit Tests (Release)
+        - base_path: "$SDK_PATH/build/test-results/testReleaseUnitTest/"
+        - search_pattern: "*"
+    - deploy-to-bitrise-io@2:
+        inputs:
+        - deploy_path: $SDK_PATH/build/outputs/aar
+        - is_enable_public_page: 'false'
     - cache-push@2:
         inputs:
         - cache_paths: |-
@@ -173,6 +165,10 @@ workflows:
     - set-java-version@1:
         inputs:
         - set_java_version: '11'
+    - script@1:
+        title: Fetch base branch
+        inputs:
+        - content: git fetch --no-tags origin master
     - script@1:
         run_if: '{{getenv "SONARQUBE_TOKEN" | ne ""}}'
         title: Run SonarQube Scanner
