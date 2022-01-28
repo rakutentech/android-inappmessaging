@@ -2,7 +2,7 @@ package com.rakuten.tech.mobile.inappmessaging.runtime
 
 import android.text.TextUtils
 import androidx.annotation.VisibleForTesting
-import timber.log.Timber
+import com.rakuten.tech.mobile.sdkutils.logger.Logger
 
 internal object EventTrackerHelper {
 
@@ -42,7 +42,7 @@ internal object EventTrackerHelper {
             Class.forName(className)
             true
         } catch (e: ClassNotFoundException) {
-            Timber.tag(TAG).i(e)
+            Logger(TAG).info(e.message)
             false
         }
     }
