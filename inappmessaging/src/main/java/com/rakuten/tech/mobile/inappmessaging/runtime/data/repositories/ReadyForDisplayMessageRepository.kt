@@ -5,8 +5,11 @@ import com.google.gson.Gson
 import com.rakuten.tech.mobile.inappmessaging.runtime.InAppMessaging
 import com.rakuten.tech.mobile.inappmessaging.runtime.data.models.messages.Message
 import com.rakuten.tech.mobile.inappmessaging.runtime.data.responses.ping.CampaignData
+import com.rakuten.tech.mobile.inappmessaging.runtime.utils.SharedPreferencesUtil
+import com.rakuten.tech.mobile.inappmessaging.runtime.utils.SharedPreferencesUtil.getPreferencesFile
+import com.rakuten.tech.mobile.sdkutils.PreferencesUtil
+import com.rakuten.tech.mobile.sdkutils.logger.Logger
 import org.json.JSONArray
-import timber.log.Timber
 import java.lang.ClassCastException
 
 /**
@@ -86,9 +89,16 @@ internal abstract class ReadyForDisplayMessageRepository : ReadyMessageRepositor
                 user = AccountRepository.instance().userInfoHash
                 // reset message list from cached using updated user info
                 val listString = try {
-                    InAppMessaging.instance().getSharedPref()?.getString(READY_DISPLAY_KEY, "") ?: ""
+                    InAppMessaging.instance().getHostAppContext()?.let { it ->
+                        PreferencesUtil.getString(
+                            it,
+                            getPreferencesFile(),
+                            READY_DISPLAY_KEY,
+                            ""
+                        )
+                    } ?: ""
                 } catch (ex: ClassCastException) {
-                    Timber.tag(TAG).d(ex.cause, "Incorrect type for $READY_DISPLAY_KEY data")
+                    Logger(TAG).debug(ex.cause, "Incorrect type for $READY_DISPLAY_KEY data")
                     ""
                 }
 
@@ -99,7 +109,7 @@ internal abstract class ReadyForDisplayMessageRepository : ReadyMessageRepositor
                         messages.add(Gson().fromJson(jsonArray.getJSONObject(i).toString(), CampaignData::class.java))
                     }
                 } catch (ex: Exception) {
-                    Timber.tag(TAG).d(ex.cause, "Invalid JSON format for $READY_DISPLAY_KEY data")
+                    Logger(TAG).debug(ex.cause, "Invalid JSON format for $READY_DISPLAY_KEY data")
                 }
             }
         }
@@ -108,8 +118,14 @@ internal abstract class ReadyForDisplayMessageRepository : ReadyMessageRepositor
             // check if caching is enabled to update persistent data
             if (InAppMessaging.instance().isLocalCachingEnabled()) {
                 // reset updated message list
-                InAppMessaging.instance().getSharedPref()?.edit()?.putString(READY_DISPLAY_KEY,
-                        Gson().toJson(messages))?.apply() ?: Timber.tag(TAG).d("failed saving ready data")
+                InAppMessaging.instance().getHostAppContext()?.let {
+                    PreferencesUtil.putString(
+                        it,
+                        getPreferencesFile(),
+                        READY_DISPLAY_KEY,
+                        Gson().toJson(messages)
+                    )
+                } ?: Logger(TAG).debug("failed saving ready data")
             }
         }
     }

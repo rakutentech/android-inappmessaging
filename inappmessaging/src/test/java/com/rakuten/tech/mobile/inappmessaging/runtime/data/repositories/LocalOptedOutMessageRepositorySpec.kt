@@ -9,6 +9,8 @@ import com.rakuten.tech.mobile.inappmessaging.runtime.InAppMessaging
 import com.rakuten.tech.mobile.inappmessaging.runtime.TestUserInfoProvider
 import com.rakuten.tech.mobile.inappmessaging.runtime.UserInfoProvider
 import com.rakuten.tech.mobile.inappmessaging.runtime.data.models.messages.ValidTestMessage
+import com.rakuten.tech.mobile.inappmessaging.runtime.utils.SharedPreferencesUtil.getPreferencesFile
+import com.rakuten.tech.mobile.sdkutils.PreferencesUtil
 import org.amshove.kluent.shouldBeFalse
 import org.amshove.kluent.shouldBeTrue
 import org.junit.Test
@@ -39,6 +41,14 @@ class LocalOptedOutMessageRepositorySpec : BaseTest() {
     }
 
     @Test
+    fun `should not crash while clearing message`() {
+        val message = ValidTestMessage()
+        InAppMessaging.setUninitializedInstance(true)
+        LocalOptedOutMessageRepository.instance().clearMessages()
+        LocalOptedOutMessageRepository.instance().hasMessage(message.getCampaignId()).shouldBeFalse()
+    }
+
+    @Test
     fun `should return true after clearing then adding`() {
         val message = ValidTestMessage()
         LocalOptedOutMessageRepository.instance().addMessage(message)
@@ -59,10 +69,15 @@ class LocalOptedOutMessageRepositorySpec : BaseTest() {
 
     @Test
     fun `should not crash and clear previous when forced cast exception`() {
-        val message = setupAndTestMultipleUser()
-        val editor = InAppMessaging.instance().getSharedPref()?.edit()
-        editor?.putInt(LocalOptedOutMessageRepository.LOCAL_OPTED_OUT_KEY, 1)?.apply()
-        LocalOptedOutMessageRepository.instance().hasMessage(message.getCampaignId()).shouldBeFalse()
+        val infoProvider = TestUserInfoProvider()
+        initializeInstance(infoProvider)
+        PreferencesUtil.putInt(
+            ApplicationProvider.getApplicationContext(),
+            getPreferencesFile(),
+            LocalOptedOutMessageRepository.LOCAL_OPTED_OUT_KEY,
+            1
+        )
+        LocalOptedOutMessageRepository.instance().hasMessage(ValidTestMessage().getCampaignId()).shouldBeFalse()
     }
 
     private fun setupAndTestMultipleUser(): ValidTestMessage {

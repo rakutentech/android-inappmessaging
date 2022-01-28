@@ -4,7 +4,6 @@ import androidx.annotation.RestrictTo
 import androidx.annotation.RestrictTo.Scope.LIBRARY
 import com.rakuten.tech.mobile.inappmessaging.runtime.data.models.Attribute
 import org.jetbrains.annotations.NotNull
-import org.jetbrains.annotations.Nullable
 
 /**
  * Interface of local events.
@@ -42,14 +41,14 @@ interface Event {
      */
     @RestrictTo(LIBRARY)
     @NotNull
-    fun getRatEventMap(): Map<@NotNull String, @NotNull Any>
+    fun getRatEventMap(): Map<String, Any>
 
     /**
      * This method returns event attribute map.
      */
     @RestrictTo(LIBRARY)
     @NotNull
-    fun getAttributeMap(): Map<@NotNull String, @Nullable Attribute?>
+    fun getAttributeMap(): Map<String, Attribute?>
 
     /**
      * This method returns true if the event was logged when user info was updated, or before/during ping request.

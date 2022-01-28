@@ -9,6 +9,7 @@ import com.rakuten.tech.mobile.inappmessaging.runtime.data.models.HostAppInfo
 import com.rakuten.tech.mobile.inappmessaging.runtime.data.requests.ImpressionRequest
 import com.rakuten.tech.mobile.inappmessaging.runtime.utils.RuntimeUtil
 import com.rakuten.tech.mobile.inappmessaging.runtime.workmanager.workers.ImpressionWorker
+import com.rakuten.tech.mobile.sdkutils.logger.Logger
 import org.amshove.kluent.*
 import org.junit.Assert
 import org.junit.Before
@@ -16,7 +17,6 @@ import org.junit.Ignore
 import org.junit.Test
 import org.mockito.Mockito
 import org.mockito.Mockito.`when`
-import timber.log.Timber
 
 /**
  * Test class for AccountRepository class.
@@ -97,7 +97,7 @@ class AccountRepositoryNullSpec : AccountRepositorySpec() {
 @SuppressWarnings("LargeClass")
 class AccountRepositoryUsageSpec : AccountRepositorySpec() {
 
-    private val mockLogger = Mockito.mock(Timber.Tree::class.java)
+    private val mockLogger = Mockito.mock(Logger::class.java)
     private val captor = argumentCaptor<String>()
 
     @Test
@@ -218,7 +218,7 @@ class AccountRepositoryUsageSpec : AccountRepositorySpec() {
             e.localizedMessage shouldBeEqualTo AccountRepository.ID_TRACKING_ERR_MSG
         }
 
-        Mockito.verify(mockLogger).w(captor.capture())
+        Mockito.verify(mockLogger).warn(captor.capture())
         captor.firstValue shouldBeInstanceOf String::class.java
     }
 
@@ -231,7 +231,7 @@ class AccountRepositoryUsageSpec : AccountRepositorySpec() {
         }
         AccountRepository.instance().logWarningForUserInfo("test", mockLogger)
 
-        Mockito.verify(mockLogger, never()).w(captor.capture())
+        Mockito.verify(mockLogger, never()).warn(captor.capture())
     }
 
     @Test
@@ -245,7 +245,7 @@ class AccountRepositoryUsageSpec : AccountRepositorySpec() {
         }
         AccountRepository.instance().logWarningForUserInfo("test", mockLogger)
 
-        Mockito.verify(mockLogger, never()).w(captor.capture())
+        Mockito.verify(mockLogger, never()).warn(captor.capture())
     }
 
     @Test
@@ -257,7 +257,7 @@ class AccountRepositoryUsageSpec : AccountRepositorySpec() {
         }
         AccountRepository.instance().logWarningForUserInfo("test", mockLogger)
 
-        Mockito.verify(mockLogger, never()).w(captor.capture())
+        Mockito.verify(mockLogger, never()).warn(captor.capture())
     }
 
     @Test
@@ -271,7 +271,7 @@ class AccountRepositoryUsageSpec : AccountRepositorySpec() {
         }
         AccountRepository.instance().logWarningForUserInfo("test", mockLogger)
 
-        Mockito.verify(mockLogger, never()).w(captor.capture())
+        Mockito.verify(mockLogger, never()).warn(captor.capture())
     }
 
     @Test
@@ -289,7 +289,7 @@ class AccountRepositoryUsageSpec : AccountRepositorySpec() {
         } catch (e: IllegalStateException) {
             e.localizedMessage shouldBeEqualTo AccountRepository.TOKEN_USER_ERR_MSG
         }
-        Mockito.verify(mockLogger).w(captor.capture())
+        Mockito.verify(mockLogger).warn(captor.capture())
         captor.firstValue shouldBeInstanceOf String::class.java
     }
 }

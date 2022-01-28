@@ -11,7 +11,7 @@ import com.rakuten.tech.mobile.inappmessaging.runtime.data.repositories.LocalEve
 import com.rakuten.tech.mobile.inappmessaging.runtime.data.repositories.PingResponseMessageRepository
 import com.rakuten.tech.mobile.inappmessaging.runtime.data.responses.ping.Trigger
 import com.rakuten.tech.mobile.inappmessaging.runtime.data.responses.ping.TriggerAttribute
-import timber.log.Timber
+import com.rakuten.tech.mobile.sdkutils.logger.Logger
 import java.util.Collections
 import java.util.Locale
 import kotlin.collections.ArrayList
@@ -319,7 +319,7 @@ internal interface MessageEventReconciliationUtil {
             // Reconcile by trigger's type.
             val eventType = EventType.getById(trigger.eventType)
             if (eventType == null || eventType == EventType.INVALID) {
-                Timber.tag(TAG).d("null or INVALID EventType.")
+                Logger(TAG).debug("null or INVALID EventType.")
                 // Trigger is null or INVALID, therefore, it can't be reconciled.
                 return null
             }

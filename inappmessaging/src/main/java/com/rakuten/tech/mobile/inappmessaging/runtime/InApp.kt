@@ -16,11 +16,10 @@ import com.rakuten.tech.mobile.inappmessaging.runtime.exception.InAppMessagingEx
 import com.rakuten.tech.mobile.inappmessaging.runtime.manager.DisplayManager
 import com.rakuten.tech.mobile.inappmessaging.runtime.manager.EventsManager
 import com.rakuten.tech.mobile.inappmessaging.runtime.manager.SessionManager
-import com.rakuten.tech.mobile.inappmessaging.runtime.utils.SharedPreferencesUtil
+import com.rakuten.tech.mobile.sdkutils.logger.Logger
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
-import timber.log.Timber
 import java.lang.ref.WeakReference
 
 @SuppressWarnings("TooManyFunctions", "TooGenericExceptionCaught")
@@ -40,10 +39,8 @@ internal class InApp(
     internal var tempEventList = ArrayList<Event>()
 
     init {
-        if (isDebugLogging) {
-            // Start logging for debug builds.
-            Timber.plant(Timber.DebugTree())
-        }
+        // Start logging for debug builds.
+        Logger.setDebug(isDebugLogging)
     }
 
     // ------------------------------------Public APIs-----------------------------------------------
@@ -86,8 +83,7 @@ internal class InApp(
             }
             activityWeakReference?.clear()
 
-            Timber.tag(TAG)
-            Timber.d("unregisterMessageDisplayActivity()")
+            Logger(TAG).debug("unregisterMessageDisplayActivity()")
         } catch (ex: Exception) {
             errorCallback?.let {
                 it(InAppMessagingException("In-App Messaging unregister activity failed", ex))
@@ -134,9 +130,6 @@ internal class InApp(
     override fun getHostAppContext() = context
 
     override fun isLocalCachingEnabled() = isCacheHandling
-
-    override fun getSharedPref() = SharedPreferencesUtil.createSharedPreference(context,
-            AccountRepository.instance().userInfoHash)
 
     override fun saveTempData() {
         try {

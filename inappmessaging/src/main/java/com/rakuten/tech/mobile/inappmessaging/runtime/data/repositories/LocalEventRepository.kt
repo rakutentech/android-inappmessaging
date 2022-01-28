@@ -11,8 +11,10 @@ import com.rakuten.tech.mobile.inappmessaging.runtime.data.models.appevents.Logi
 import com.rakuten.tech.mobile.inappmessaging.runtime.data.models.appevents.PurchaseSuccessfulEvent
 import com.rakuten.tech.mobile.inappmessaging.runtime.data.models.appevents.Event
 import com.rakuten.tech.mobile.inappmessaging.runtime.exception.InAppMessagingException
+import com.rakuten.tech.mobile.inappmessaging.runtime.utils.SharedPreferencesUtil.getPreferencesFile
+import com.rakuten.tech.mobile.sdkutils.PreferencesUtil
+import com.rakuten.tech.mobile.sdkutils.logger.Logger
 import org.json.JSONArray
-import timber.log.Timber
 import java.lang.ClassCastException
 import java.util.Collections
 import kotlin.collections.ArrayList
@@ -86,11 +88,12 @@ internal interface LocalEventRepository : EventRepository {
         }
 
         private fun debugLog(event: Event) {
-            Timber.tag(TAG).d(event.getEventName())
+            Logger(TAG).debug(event.getEventName())
             for ((key, value) in event.getAttributeMap()) {
-                Timber.tag(TAG).d("Key: %s", key)
-                Timber.tag(TAG).d(
-                    "Value name: ${value?.name}, Value Type: ${value?.valueType}, Value data: ${value?.value}")
+                Logger(TAG).debug("Key: %s", key)
+                Logger(TAG).debug(
+                        "Value name: %s, Value Type: %d, Value data: %s", value?.name, value?.valueType,
+                        value?.value)
             }
         }
 
@@ -153,6 +156,7 @@ internal interface LocalEventRepository : EventRepository {
             return false
         }
 
+        @SuppressWarnings("LongMethod")
         private fun checkAndResetList(onLaunch: Boolean = false) {
             // check if caching is enabled and if there are changes in user info
             if (InAppMessaging.instance().isLocalCachingEnabled() &&
@@ -160,9 +164,16 @@ internal interface LocalEventRepository : EventRepository {
                 user = AccountRepository.instance().userInfoHash
                 // reset event list from cached using updated user info
                 val listString = try {
-                    InAppMessaging.instance().getSharedPref()?.getString(LOCAL_EVENT_KEY, "") ?: ""
+                    InAppMessaging.instance().getHostAppContext()?.let { it ->
+                        PreferencesUtil.getString(
+                            it,
+                            getPreferencesFile(),
+                            LOCAL_EVENT_KEY,
+                            ""
+                        )
+                    } ?: ""
                 } catch (ex: ClassCastException) {
-                    Timber.tag(TAG).d(ex.cause, "Incorrect type for $LOCAL_EVENT_KEY data")
+                    Logger(TAG).debug(ex.cause, "Incorrect type for $LOCAL_EVENT_KEY data")
                     ""
                 }
                 if (listString.isNotEmpty()) {
@@ -192,15 +203,21 @@ internal interface LocalEventRepository : EventRepository {
                     }
                     event?.let { events.add(it) }
                 }
-            } catch (ex: Exception) { Timber.tag(TAG).d(ex.cause, "Invalid JSON format for $LOCAL_EVENT_KEY data") }
+            } catch (ex: Exception) { Logger(TAG).debug(ex.cause, "Invalid JSON format for $LOCAL_EVENT_KEY data") }
         }
 
         private fun saveUpdatedList() {
             // check if caching is enabled to update persistent data
             if (InAppMessaging.instance().isLocalCachingEnabled()) {
                 // save updated event list
-                InAppMessaging.instance().getSharedPref()?.edit()?.putString(LOCAL_EVENT_KEY,
-                        Gson().toJson(events))?.apply() ?: Timber.tag(TAG).d("failed saving event data")
+                InAppMessaging.instance().getHostAppContext()?.let {
+                    PreferencesUtil.putString(
+                        it,
+                        getPreferencesFile(),
+                        LOCAL_EVENT_KEY,
+                        Gson().toJson(events)
+                    )
+                } ?: Logger(TAG).debug("failed saving event data")
             }
         }
     }
