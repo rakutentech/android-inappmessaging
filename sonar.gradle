@@ -2,6 +2,8 @@ apply plugin: 'org.sonarqube'
 
 def branch = System.getenv("BITRISE_GIT_BRANCH")
 
+println "Working on branch: ${branch}"
+
 sonarqube {
     properties {
         property 'sonar.sourceEncoding', 'UTF-8'
@@ -14,7 +16,7 @@ sonarqube {
             property 'sonar.branch.name', branch
         } else {
             property 'sonar.pullrequest.key', System.getenv("BITRISE_PULL_REQUEST").findAll(/\d+/)*.toInteger().last()
-            property 'sonar.pullrequest.branch', branch
+            property 'sonar.pullrequest.branch', 'ci/SDKCF-4827'
             property 'sonar.pullrequest.base', 'master'
         }
         property 'sonar.qualitygate.wait', true
