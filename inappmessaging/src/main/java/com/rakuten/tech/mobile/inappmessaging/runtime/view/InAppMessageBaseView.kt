@@ -3,7 +3,9 @@ package com.rakuten.tech.mobile.inappmessaging.runtime.view
 import android.annotation.SuppressLint
 import android.content.Context
 import android.content.res.ColorStateList
+import android.content.res.Resources
 import android.graphics.Color
+import android.graphics.Typeface
 import android.util.AttributeSet
 import android.view.View
 import android.widget.CheckBox
@@ -18,15 +20,18 @@ import com.google.android.material.button.MaterialButton
 import com.rakuten.tech.mobile.inappmessaging.runtime.R
 import com.rakuten.tech.mobile.inappmessaging.runtime.data.models.messages.Message
 import com.rakuten.tech.mobile.inappmessaging.runtime.data.responses.ping.MessageButton
+import com.rakuten.tech.mobile.inappmessaging.runtime.utils.ResourceUtils
 import com.rakuten.tech.mobile.inappmessaging.runtime.utils.ViewUtil
 import com.squareup.picasso.Callback
 import com.squareup.picasso.Picasso
 import timber.log.Timber
+import kotlin.math.sqrt
 import java.lang.Exception
 
 /**
  * Base class of all custom views.
  */
+@SuppressWarnings("LargeClass")
 internal open class InAppMessageBaseView(context: Context, attrs: AttributeSet?) :
         FrameLayout(context, attrs), InAppMessageView {
 
@@ -35,7 +40,7 @@ internal open class InAppMessageBaseView(context: Context, attrs: AttributeSet?)
     }
 
     protected var bgColor = 0
-    protected var imageUrl: String? = null
+    private var imageUrl: String? = null
     protected var listener: InAppMessageViewListener? = null
     private var headerColor = 0
     private var messageBodyColor = 0
@@ -45,6 +50,9 @@ internal open class InAppMessageBaseView(context: Context, attrs: AttributeSet?)
     private var displayOptOut = false
     @VisibleForTesting
     internal var picasso: Picasso? = null
+
+    @VisibleForTesting
+    internal var mockContext: Context? = null
 
     /**
      * Sets campaign message data onto the view.
@@ -188,6 +196,8 @@ internal open class InAppMessageBaseView(context: Context, attrs: AttributeSet?)
         // Button stroke color equals to button text color.
         buttonView.strokeColor = ColorStateList.valueOf(textColor)
         buttonView.setOnClickListener(this.listener)
+
+        getFont(BUTTON_FONT)?.let { buttonView.typeface = it }
         buttonView.visibility = View.VISIBLE
         findViewById<LinearLayout>(R.id.message_buttons)?.visibility = View.VISIBLE
     }
@@ -207,6 +217,9 @@ internal open class InAppMessageBaseView(context: Context, attrs: AttributeSet?)
                 it.setTextColor(headerColor)
                 it.setOnTouchListener(listener)
                 it.visibility = View.VISIBLE
+                getFont(HEADER_FONT)?.let { font ->
+                    it.typeface = font
+                }
             }
         }
         if (!messageBody.isNullOrEmpty()) {
@@ -215,11 +228,47 @@ internal open class InAppMessageBaseView(context: Context, attrs: AttributeSet?)
                 it.setTextColor(messageBodyColor)
                 it.setOnTouchListener(listener)
                 it.visibility = View.VISIBLE
+                getFont(BODY_FONT)?.let { font ->
+                    it.typeface = font
+                }
             }
         }
     }
 
+    // Set close button to black background if the campaign background color is dark.
+    // Brightness is computed based on [Darel Rex Finley's HSP Colour Model](http://alienryderflex.com/hsp.html).
+    // Computed value is from 0 (black) to 255 (white), and is considered dark if less than 130.
+    @SuppressWarnings("MagicNumber")
+    internal fun setCloseButton(button: ImageButton? = null) {
+        val red = Color.red(bgColor)
+        val green = Color.green(bgColor)
+        val blue = Color.blue(bgColor)
+        val brightness = sqrt((red * red * .241) + (green * green * .691) + (blue * blue * .068)).toInt()
+        if (brightness < 130) {
+            (button ?: findViewById(R.id.message_close_button))
+                ?.setImageResource(R.drawable.close_button_white)
+        }
+    }
+
+    private fun getFont(name: String): Typeface? {
+        val ctx = mockContext ?: context
+        val strId = ResourceUtils.getResourceIdentifier(ctx, name, "string")
+        if (strId > 0) {
+            try {
+                return ResourceUtils.getFont(ctx,
+                    ResourceUtils.getResourceIdentifier(ctx, ctx.getString(strId), "font"))
+            } catch (rex: Resources.NotFoundException) {
+                Timber.tag(TAG).d(rex.cause, "Font file is not found. Will revert to default font.")
+            }
+        }
+
+        return null
+    }
+
     companion object {
         private const val TAG = "IAM_BaseView"
+        private const val BUTTON_FONT = "iam_custom_font_button"
+        private const val HEADER_FONT = "iam_custom_font_header"
+        private const val BODY_FONT = "iam_custom_font_body"
     }
 }

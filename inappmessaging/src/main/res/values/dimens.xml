@@ -3,29 +3,30 @@
   <!--UI components dimensions, pixel densities-->
 
   <!--Modal Layout-->
-  <dimen name="modal_button_layout_margin_left_right">16dp</dimen>
-  <dimen name="modal_layout_margin_left_right">20dp</dimen>
-  <dimen name="modal_layout_margin_right">20dp</dimen>
+  <dimen name="modal_layout_margin_left_right">40dp</dimen>
+  <dimen name="modal_layout_margin_right">32dp</dimen>
   <dimen name="modal_layout_width">280dp</dimen>
   <dimen name="modal_layout_margin_top_bottom">20dp</dimen>
   <dimen name="modal_text_body_line_spacing_extra">5sp</dimen>
-  <dimen name="modal_text_body_margin_top">13dp</dimen>
-  <dimen name="modal_text_body_text_size">14sp</dimen>
+  <dimen name="modal_text_body_margin_top">8dp</dimen>
+  <dimen name="modal_text_body_text_size">15sp</dimen>
   <dimen name="modal_text_header_line_spacing_extra">3sp</dimen>
-  <dimen name="modal_text_header_margin_top">16dp</dimen>
-  <dimen name="modal_text_header_text_size">16sp</dimen>
-  <dimen name="modal_text_scroll_view_margin_bottom">20dp</dimen>
+  <dimen name="modal_text_header_margin_top">4dp</dimen>
+  <dimen name="modal_text_header_text_size">22sp</dimen>
+  <dimen name="modal_text_scroll_view_margin_bottom">24dp</dimen>
 
   <!--Modal Button-->
+  <dimen name="modal_button_height">53dp</dimen>
   <dimen name="modal_button_boarder_stroke_width">1dp</dimen>
   <dimen name="modal_button_corner_radius">4dp</dimen>
-  <dimen name="modal_button_double_margin_left_right">4dp</dimen>
-  <dimen name="modal_button_double_margin_top">5dp</dimen>
-  <dimen name="modal_button_double_margin_bottom">12dp</dimen>
+  <dimen name="modal_button_double_margin_left_right">8dp</dimen>
+  <dimen name="modal_button_double_margin_top_bottom">24dp</dimen>
   <dimen name="modal_button_padding_left_right">5dp</dimen>
-  <dimen name="modal_button_single_margin_left_right">40dp</dimen>
-  <dimen name="modal_button_text_size">10sp</dimen>
-  <dimen name="modal_corner_radius">8dp</dimen>
+  <dimen name="modal_button_padding_top">0dp</dimen>
+  <dimen name="modal_button_padding_bottom">0dp</dimen>
+  <dimen name="modal_button_single_margin_left_right">16dp</dimen>
+  <dimen name="modal_button_text_size">16sp</dimen>
+  <dimen name="modal_corner_radius">4dp</dimen>
 
   <!--Modal Close Button-->
   <dimen name="modal_close_button_height">48dp</dimen>

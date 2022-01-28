@@ -12,6 +12,11 @@
     android:layout_height="match_parent"
     android:orientation="vertical">
 
+    <ImageButton
+      android:id="@+id/message_close_button"
+      style="@style/InAppMessaging.CloseButton.FullScreen"
+      android:contentDescription="@string/close_button" />
+
     <ScrollView
       android:layout_width="match_parent"
       android:layout_height="0dp"
@@ -20,15 +25,15 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:orientation="vertical">
-    <include layout="@layout/message_image_view" />
+        <include layout="@layout/message_scrollview" />
 
-    <View
-      android:id="@+id/view_spacer"
-      android:layout_width="match_parent"
-      android:layout_height="@dimen/full_screen_gone_margin_top"
-      android:visibility="gone" />
+        <View
+          android:id="@+id/view_spacer"
+          android:layout_width="match_parent"
+          android:layout_height="@dimen/full_screen_gone_margin_top"
+          android:visibility="gone" />
 
-    <include layout="@layout/message_scrollview" />
+        <include layout="@layout/message_image_view" />
       </LinearLayout>
     </ScrollView>
 
@@ -45,10 +50,5 @@
 
     </LinearLayout>
 
-
   </LinearLayout>
-  <include
-    style="@style/InAppMessaging.CloseButton.FullScreen"
-    layout="@layout/close_button" />
-
 </com.rakuten.tech.mobile.inappmessaging.runtime.view.InAppMessageFullScreenView>

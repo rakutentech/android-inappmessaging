@@ -182,6 +182,8 @@ Host app can log events to InAppMessaging anywhere in your app.
 
 These events will trigger messages with the same event based trigger. Upon receiving logged event, InAppMessaging SDK will start matching it with current campaigns immediately. After a campaign message's trigger events are matched by the logged events, this message will be displayed in the current registered activity. If no activity is registered, it will be displayed in the next registered activity.
 
+### #9 See [advanced features](#advanced) for optional behavior
+
 ### Pre-defined event classes:<br/>
 ### `AppStartEvent`
 Host app should log this event on app launch from terminated state. Recommended to log this event in host app's main activity's `Activity#onStart()`.
@@ -279,6 +281,34 @@ InAppMessaging.instance().closeMessage(true)
 
 **<font color="red">Note:</font> Calling this API will not increment the campaign's impression (i.e not counted as displayed).**
 
+### <a name="custom-font"></a> #3 Custom fonts for campaigns
+
+The SDK can optionally use custom fonts on campaign header and body texts, and button texts. The default Android system font will be used if custom fonts are not added.
+
+To use custom fonts:
+1. Add the font files, `ttf` or `otf` format, to the `font` resource folder of your app.
+2. To use custom font for the following campaign parts, define a string resource in the app's `res/values/string.xml`:
+* for campaign header texts, set font filename to `iam_custom_font_header` resource name
+* for campaign body texts, set font filename to `iam_custom_font_body` resource name
+* for campaign button texts, set font filename to `iam_custom_font_button` resource name
+
+Note: You can set the same font filename for the different string resources to use the same font.
+
+```bash
+...
+├── res
+     ├── font
+          ├── your_app_font.otf // or ttf format
+          ├── your_app_other_font.otf // or ttf format
+```
+
+in strings.xml:
+```xml
+    <string name="iam_custom_font_header">your_app_font</string>
+    <string name="iam_custom_font_body">your_app_font</string>
+    <string name="iam_custom_font_button">your_app_other_font</string>
+```
+
 ## <a name="troubleshooting"></a> Troubleshooting
 ### Proguard ParseException
 ```kotlin
@@ -355,6 +385,7 @@ Documents targeting Product Managers:
 ## <a name="changelog"></a> Changelog
 
 ### 6.1.0 (in-progress)
+* SDKCF-4470: Updated the layout for close and campaign buttons. Added feature to customize text and button fonts, please see [custom font section](#custom-font) for details.
 * SDKCF-4650: Refactored handling for different responses from endpoint requests for consistency and better logging.
 * SDKCF-4729: Added error handling for display permission request.
 
