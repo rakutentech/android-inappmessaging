@@ -9,7 +9,6 @@ import com.rakuten.tech.mobile.inappmessaging.runtime.InAppMessaging
 import com.rakuten.tech.mobile.inappmessaging.runtime.TestUserInfoProvider
 import com.rakuten.tech.mobile.inappmessaging.runtime.UserInfoProvider
 import com.rakuten.tech.mobile.inappmessaging.runtime.data.models.messages.ValidTestMessage
-import com.rakuten.tech.mobile.inappmessaging.runtime.utils.SharedPreferencesUtil.getPreferencesFile
 import com.rakuten.tech.mobile.sdkutils.PreferencesUtil
 import org.amshove.kluent.shouldBeFalse
 import org.amshove.kluent.shouldBeTrue
@@ -73,7 +72,7 @@ class LocalOptedOutMessageRepositorySpec : BaseTest() {
         initializeInstance(infoProvider)
         PreferencesUtil.putInt(
             ApplicationProvider.getApplicationContext(),
-            getPreferencesFile(),
+            InAppMessaging.getPreferencesFile(),
             LocalOptedOutMessageRepository.LOCAL_OPTED_OUT_KEY,
             1
         )

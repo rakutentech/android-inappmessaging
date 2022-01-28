@@ -10,7 +10,6 @@ import com.rakuten.tech.mobile.inappmessaging.runtime.TestUserInfoProvider
 import com.rakuten.tech.mobile.inappmessaging.runtime.UserInfoProvider
 import com.rakuten.tech.mobile.inappmessaging.runtime.data.models.messages.Message
 import com.rakuten.tech.mobile.inappmessaging.runtime.data.models.messages.ValidTestMessage
-import com.rakuten.tech.mobile.inappmessaging.runtime.utils.SharedPreferencesUtil
 import com.rakuten.tech.mobile.sdkutils.PreferencesUtil
 import org.amshove.kluent.*
 import org.junit.Before
@@ -143,7 +142,7 @@ class ReadyForDisplayMessageRepositorySpec : BaseTest() {
         initializeInstance(infoProvider)
         PreferencesUtil.putFloat(
             ApplicationProvider.getApplicationContext(),
-            SharedPreferencesUtil.getPreferencesFile(),
+            InAppMessaging.getPreferencesFile(),
             ReadyForDisplayMessageRepository.READY_DISPLAY_KEY,
             1.0f
         )

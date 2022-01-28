@@ -6,6 +6,7 @@ import androidx.annotation.NonNull
 import androidx.annotation.Nullable
 import androidx.annotation.RestrictTo
 import com.rakuten.tech.mobile.inappmessaging.runtime.data.models.appevents.Event
+import com.rakuten.tech.mobile.inappmessaging.runtime.data.repositories.AccountRepository
 import com.rakuten.tech.mobile.inappmessaging.runtime.data.repositories.PingResponseMessageRepository
 import com.rakuten.tech.mobile.inappmessaging.runtime.exception.InAppMessagingException
 import com.rakuten.tech.mobile.inappmessaging.runtime.utils.Initializer
@@ -141,6 +142,8 @@ abstract class InAppMessaging internal constructor() {
         internal fun setUninitializedInstance(isCacheHandling: Boolean = false) {
             instance = NotInitializedInAppMessaging(isCacheHandling)
         }
+
+        internal fun getPreferencesFile() = "internal_shared_prefs_" + AccountRepository.instance().userInfoHash
     }
 
     @SuppressWarnings("EmptyFunctionBlock", "TooManyFunctions")

@@ -5,8 +5,6 @@ import com.google.gson.Gson
 import com.rakuten.tech.mobile.inappmessaging.runtime.InAppMessaging
 import com.rakuten.tech.mobile.inappmessaging.runtime.data.models.messages.Message
 import com.rakuten.tech.mobile.inappmessaging.runtime.data.responses.ping.CampaignData
-import com.rakuten.tech.mobile.inappmessaging.runtime.utils.SharedPreferencesUtil
-import com.rakuten.tech.mobile.inappmessaging.runtime.utils.SharedPreferencesUtil.getPreferencesFile
 import com.rakuten.tech.mobile.sdkutils.PreferencesUtil
 import com.rakuten.tech.mobile.sdkutils.logger.Logger
 import org.json.JSONArray
@@ -92,7 +90,7 @@ internal abstract class ReadyForDisplayMessageRepository : ReadyMessageRepositor
                     InAppMessaging.instance().getHostAppContext()?.let { it ->
                         PreferencesUtil.getString(
                             it,
-                            getPreferencesFile(),
+                            InAppMessaging.getPreferencesFile(),
                             READY_DISPLAY_KEY,
                             ""
                         )
@@ -121,7 +119,7 @@ internal abstract class ReadyForDisplayMessageRepository : ReadyMessageRepositor
                 InAppMessaging.instance().getHostAppContext()?.let {
                     PreferencesUtil.putString(
                         it,
-                        getPreferencesFile(),
+                        InAppMessaging.getPreferencesFile(),
                         READY_DISPLAY_KEY,
                         Gson().toJson(messages)
                     )

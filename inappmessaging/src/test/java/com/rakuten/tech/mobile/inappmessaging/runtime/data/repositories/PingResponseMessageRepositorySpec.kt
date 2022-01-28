@@ -12,7 +12,6 @@ import com.rakuten.tech.mobile.inappmessaging.runtime.data.models.messages.Inval
 import com.rakuten.tech.mobile.inappmessaging.runtime.data.models.messages.Message
 import com.rakuten.tech.mobile.inappmessaging.runtime.data.models.messages.ValidTestMessage
 import com.rakuten.tech.mobile.inappmessaging.runtime.data.responses.ping.Trigger
-import com.rakuten.tech.mobile.inappmessaging.runtime.utils.SharedPreferencesUtil
 import com.rakuten.tech.mobile.sdkutils.PreferencesUtil
 import org.amshove.kluent.*
 import org.junit.Before
@@ -194,7 +193,7 @@ class PingResponseMessageRepositorySpec : BaseTest() {
         initializeInstance(infoProvider)
         PreferencesUtil.putInt(
             ApplicationProvider.getApplicationContext(),
-            SharedPreferencesUtil.getPreferencesFile(),
+            InAppMessaging.getPreferencesFile(),
             PingResponseMessageRepository.PING_RESPONSE_KEY,
             1
         )

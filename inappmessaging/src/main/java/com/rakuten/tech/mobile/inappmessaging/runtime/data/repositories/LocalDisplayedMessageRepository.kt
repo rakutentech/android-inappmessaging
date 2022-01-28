@@ -7,7 +7,6 @@ import com.rakuten.tech.mobile.inappmessaging.runtime.InApp
 import com.rakuten.tech.mobile.inappmessaging.runtime.InAppMessaging
 import com.rakuten.tech.mobile.inappmessaging.runtime.data.models.messages.Message
 import com.rakuten.tech.mobile.inappmessaging.runtime.exception.InAppMessagingException
-import com.rakuten.tech.mobile.inappmessaging.runtime.utils.SharedPreferencesUtil.getPreferencesFile
 import com.rakuten.tech.mobile.sdkutils.PreferencesUtil
 import com.rakuten.tech.mobile.sdkutils.logger.Logger
 import java.lang.ClassCastException
@@ -145,7 +144,7 @@ internal interface LocalDisplayedMessageRepository {
                 InAppMessaging.instance().getHostAppContext()?.let { it ->
                     PreferencesUtil.getString(
                         it,
-                        getPreferencesFile(),
+                        InAppMessaging.getPreferencesFile(),
                         LOCAL_DISPLAYED_KEY,
                         ""
                     )
@@ -172,7 +171,7 @@ internal interface LocalDisplayedMessageRepository {
                 InAppMessaging.instance().getHostAppContext()?.let {
                     PreferencesUtil.putString(
                         it,
-                        getPreferencesFile(),
+                        InAppMessaging.getPreferencesFile(),
                         LOCAL_DISPLAYED_KEY,
                         Gson().toJson(messages)
                     )

@@ -11,7 +11,6 @@ import com.rakuten.tech.mobile.inappmessaging.runtime.data.models.appevents.Logi
 import com.rakuten.tech.mobile.inappmessaging.runtime.data.models.appevents.PurchaseSuccessfulEvent
 import com.rakuten.tech.mobile.inappmessaging.runtime.data.models.appevents.Event
 import com.rakuten.tech.mobile.inappmessaging.runtime.exception.InAppMessagingException
-import com.rakuten.tech.mobile.inappmessaging.runtime.utils.SharedPreferencesUtil.getPreferencesFile
 import com.rakuten.tech.mobile.sdkutils.PreferencesUtil
 import com.rakuten.tech.mobile.sdkutils.logger.Logger
 import org.json.JSONArray
@@ -167,7 +166,7 @@ internal interface LocalEventRepository : EventRepository {
                     InAppMessaging.instance().getHostAppContext()?.let { it ->
                         PreferencesUtil.getString(
                             it,
-                            getPreferencesFile(),
+                            InAppMessaging.getPreferencesFile(),
                             LOCAL_EVENT_KEY,
                             ""
                         )
@@ -213,7 +212,7 @@ internal interface LocalEventRepository : EventRepository {
                 InAppMessaging.instance().getHostAppContext()?.let {
                     PreferencesUtil.putString(
                         it,
-                        getPreferencesFile(),
+                        InAppMessaging.getPreferencesFile(),
                         LOCAL_EVENT_KEY,
                         Gson().toJson(events)
                     )
