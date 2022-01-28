@@ -1,9 +1,6 @@
 apply plugin: 'org.sonarqube'
 
-def pr_repo_url = System.getenv("BITRISEIO_PULL_REQUEST_REPOSITORY_URL")
-def is_fork = pr_repo_url != "" && System.getenv("GIT_REPOSITORY_URL") != pr_repo_url
-
-def branch = is_fork ? "fork/" + System.getenv("BITRISE_GIT_BRANCH") : System.getenv("BITRISE_GIT_BRANCH")
+def branch = System.getenv("BITRISE_GIT_BRANCH")
 
 sonarqube {
     properties {
@@ -14,7 +11,7 @@ sonarqube {
         property 'sonar.projectKey', System.getenv("SONARQUBE_PROJ_KEY")
         property 'sonar.projectVersion', scmVersion.version
         if (branch == "master") {
-            property 'sonar.branch.name', 'master'
+            property 'sonar.branch.name', branch
         } else {
             property 'sonar.pullrequest.key', System.getenv("BITRISE_PULL_REQUEST").findAll(/\d+/)*.toInteger().last()
             property 'sonar.pullrequest.branch', branch
