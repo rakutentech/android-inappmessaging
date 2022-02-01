@@ -133,9 +133,17 @@ workflows:
         - set_java_version: '8'
     - git-clone@6:
         inputs:
+<<<<<<< HEAD
         - fetch_tags: 'yes'
         - merge_pr: 'no'
         - update_submodules: 'yes'
+=======
+        - update_submodules: 'yes'
+    - script@1:
+        title: Get Tags
+        inputs:
+        - content: git fetch --tags
+>>>>>>> fa22dc42bc043dffa2ba762ce5a96c57525f2bf4
   _publish-doc:
     steps:
     - script@1:
@@ -164,6 +172,7 @@ workflows:
         inputs:
         - set_java_version: '11'
     - script@1:
+<<<<<<< HEAD
         title: Prepare branches to feed in sonar.gradle
         inputs:
         - content: |-
@@ -181,6 +190,11 @@ workflows:
             else
                 echo "This is a PR from the repo, branch is already fetched by git-clone"
             fi
+=======
+        title: Fetch base branch
+        inputs:
+        - content: git fetch --no-tags origin master
+>>>>>>> fa22dc42bc043dffa2ba762ce5a96c57525f2bf4
     - script@1:
         run_if: '{{getenv "SONARQUBE_TOKEN" | ne ""}}'
         title: Run SonarQube Scanner
