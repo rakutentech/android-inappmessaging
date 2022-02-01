@@ -3,6 +3,7 @@ package com.rakuten.tech.mobile.inappmessaging.runtime.utils
 import android.os.Build
 import org.amshove.kluent.shouldBeEqualTo
 import org.amshove.kluent.shouldBePositive
+import org.amshove.kluent.shouldBeTrue
 import org.junit.Test
 import org.junit.runner.RunWith
 import org.robolectric.RobolectricTestRunner
@@ -25,5 +26,10 @@ class CacheUtilSpec {
     @Test
     fun `should return positive cache size`() {
         CacheUtil.getMemoryCacheSize().shouldBePositive()
+    }
+
+    @Test
+    fun `should return true`() {
+        CacheUtil.returnTrue().shouldBeTrue()
     }
 }
