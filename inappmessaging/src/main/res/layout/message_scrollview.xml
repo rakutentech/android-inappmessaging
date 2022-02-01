@@ -33,6 +33,7 @@
     <TextView
       android:id="@+id/message_body"
       style="@style/InAppMessaging.Text.Modal"
+      android:gravity="center"
       android:layout_marginTop="@dimen/modal_text_body_margin_top"
       tools:text="@string/example_body_text"
       tools:visibility="visible"/>
