@@ -36,7 +36,7 @@ internal interface MessageReadinessManager {
      */
     @WorkerThread
     @SuppressWarnings("LongMethod", "ReturnCount")
-    fun getNextDisplayMessage(): Message?
+    fun getNextDisplayMessage(isTooltip: Boolean): List<Message>
 
     /**
      * This method returns a DisplayPermissionRequest object.
@@ -63,11 +63,14 @@ internal interface MessageReadinessManager {
     private class MessageReadinessManagerImpl : MessageReadinessManager {
         @WorkerThread
         @SuppressWarnings("LongMethod", "ReturnCount")
-        override fun getNextDisplayMessage(): Message? {
+        override fun getNextDisplayMessage(isTooltip: Boolean): List<Message> {
             shouldRetry.set(true)
-            val messageList = mutableListOf<Message>()
-            messageList.addAll(TooltipMessageRepository.instance().getAllMessagesCopy())
-            messageList.addAll(ReadyForDisplayMessageRepository.instance().getAllMessagesCopy())
+            val result = mutableListOf<Message>()
+            val messageList = if (isTooltip) {
+                TooltipMessageRepository.instance().getAllMessagesCopy()
+            } else {
+                ReadyForDisplayMessageRepository.instance().getAllMessagesCopy()
+            }
             for (message in messageList) {
                 Timber.tag(TAG).d("checking permission for message: %s", message.getCampaignId())
 
@@ -81,7 +84,8 @@ internal interface MessageReadinessManager {
                 // If message is test message, no need to do more checks.
                 if (message.isTest()) {
                     Timber.tag(TAG).d("skipping test message: %s", message.getCampaignId())
-                    return message
+                    result.add(message)
+                    if (!isTooltip) return result
                 }
 
                 // Check message display permission with server.
@@ -93,10 +97,11 @@ internal interface MessageReadinessManager {
                     MessageMixerPingScheduler.instance().pingMessageMixerService(0)
                     break
                 } else if (isMessagePermissibleToDisplay(displayPermissionResponse)) {
-                    return message
+                    result.add(message)
+                    if (!isTooltip) return result
                 }
             }
-            return null
+            return result
         }
 
         @VisibleForTesting

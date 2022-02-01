@@ -98,7 +98,7 @@ internal class InAppMessageViewListener(
             } else {
                 0
             }
-            displayManager.removeMessage(inApp.getRegisteredActivity(), delay)
+            displayManager.removeMessage(inApp.getRegisteredActivity(), delay = delay, id = if (message?.getType() == InAppMessageType.TOOLTIP.typeId) message.getCampaignId() else null)
             withContext(dispatcher) {
                 handleMessage(type)
             }

@@ -27,6 +27,10 @@ internal interface LocalDisplayedMessageRepository {
      */
     fun addMessage(message: Message)
 
+    fun addTooltipMessage(id: String)
+
+    fun isTooltipDisplayed(id: String): Boolean
+
     /**
      * Return the number of times this message has been displayed in this session.
      * When message is null or message's campaignId is empty, return 0.
@@ -65,6 +69,9 @@ internal interface LocalDisplayedMessageRepository {
         // Such as:
         // {5bf41c52-e4c0-4cb2-9183-df429e84d681, [1537309879557,1537309879557,1537309879557]}
         private val messages = ConcurrentHashMap<String, List<Long>>()
+
+        // to handle tooltip messages that were already displayed this session
+        private val sessionMessages = HashSet<String>()
         private var user = ""
 
         init {
@@ -98,6 +105,16 @@ internal interface LocalDisplayedMessageRepository {
                 }
                 saveUpdatedMap()
             }
+        }
+
+        override fun addTooltipMessage(id: String) {
+            synchronized(sessionMessages) {
+                sessionMessages.add(id)
+            }
+        }
+
+        override fun isTooltipDisplayed(id: String) = synchronized(sessionMessages) {
+            sessionMessages.contains(id)
         }
 
         override fun numberOfTimesDisplayed(message: Message): Int {

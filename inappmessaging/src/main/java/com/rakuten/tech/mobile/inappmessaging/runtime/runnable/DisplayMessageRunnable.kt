@@ -10,6 +10,7 @@ import com.rakuten.tech.mobile.inappmessaging.runtime.InAppMessaging
 import com.rakuten.tech.mobile.inappmessaging.runtime.R
 import com.rakuten.tech.mobile.inappmessaging.runtime.data.enums.InAppMessageType
 import com.rakuten.tech.mobile.inappmessaging.runtime.data.models.messages.Message
+import com.rakuten.tech.mobile.inappmessaging.runtime.data.repositories.LocalDisplayedMessageRepository
 import com.rakuten.tech.mobile.inappmessaging.runtime.utils.ContextExtension.findViewByName
 import com.rakuten.tech.mobile.inappmessaging.runtime.utils.ViewUtil
 import com.rakuten.tech.mobile.inappmessaging.runtime.view.InAppMessageFullScreenView
@@ -71,7 +72,6 @@ internal class DisplayMessageRunnable(
                     hostActivity.addContentView(slideUpView, hostActivity.window.attributes)
                 }
                 InAppMessageType.TOOLTIP -> {
-//                    return
                     val toolTipView = hostActivity
                         .layoutInflater
                         .inflate(
@@ -95,6 +95,7 @@ internal class DisplayMessageRunnable(
                                 val params = ViewGroup.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT)
                                 hostActivity.addContentView(toolTipView, params)
                             }
+                            LocalDisplayedMessageRepository.instance().addTooltipMessage(message.getCampaignId())
                         }
                     }
                 }

@@ -108,6 +108,11 @@ internal interface MessageEventReconciliationUtil {
             }
             // At this point, all triggers had been reconciled
             // ${requiredSetsOfSatisfiedTriggersToDisplayMessage} times.
+
+            if (message.getType() == InAppMessageType.TOOLTIP.typeId && LocalDisplayedMessageRepository.instance().isTooltipDisplayed(message.getCampaignId())) {
+                // tooltip message is already displayed in this session
+                return false
+            }
             return true
         }
 
@@ -278,7 +283,7 @@ internal interface MessageEventReconciliationUtil {
 
             // Only check for message has been displayed less than its max impressions.
             // The number of times the message was removed from ready for display repository is considered since local
-            // event list was not cleared and the triggers should  all be satisfied again.
+            // event list was not cleared and the triggers should all be satisfied again.
             return if (displayedImpression < maxImpression) {
                 displayedImpressionAfterLastPing + 1 + message.getNumberOfTimesClosed()
             } else 0

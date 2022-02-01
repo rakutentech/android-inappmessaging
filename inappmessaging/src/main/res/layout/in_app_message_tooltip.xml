@@ -12,11 +12,17 @@
     android:id="@+id/message_close_button"
     style="@style/InAppMessaging.TooltipButton"
     android:contentDescription="@string/close_button"
+    android:scaleType="center"
     android:elevation="10dp"
     android:translationZ="10dp"
     android:stateListAnimator="@null"
-    android:layout_toEndOf="@id/message_tooltip_image_view"/>
+    android:layout_toEndOf="@id/image_layout"/>
 
+  <RelativeLayout
+    android:id="@+id/image_layout"
+    android:layout_width="wrap_content"
+    android:layout_below="@id/message_close_button"
+    android:layout_height="wrap_content">
   <com.google.android.material.imageview.ShapeableImageView
     android:id="@+id/message_tooltip_image_view"
     android:layout_width="wrap_content"
@@ -36,5 +42,6 @@
     android:translationZ="10dp"
     android:stateListAnimator="@null"
     android:contentDescription="@null"/>
+  </RelativeLayout>
 
 </com.rakuten.tech.mobile.inappmessaging.runtime.view.InAppMessagingTooltipView>
