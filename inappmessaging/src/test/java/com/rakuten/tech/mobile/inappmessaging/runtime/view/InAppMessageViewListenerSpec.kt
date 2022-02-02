@@ -15,6 +15,7 @@ import com.rakuten.tech.mobile.inappmessaging.runtime.BaseTest
 import com.rakuten.tech.mobile.inappmessaging.runtime.InAppMessaging
 import com.rakuten.tech.mobile.inappmessaging.runtime.R
 import com.rakuten.tech.mobile.inappmessaging.runtime.coroutine.MessageActionsCoroutine
+import com.rakuten.tech.mobile.inappmessaging.runtime.data.enums.ImpressionType
 import com.rakuten.tech.mobile.inappmessaging.runtime.data.models.messages.Message
 import com.rakuten.tech.mobile.inappmessaging.runtime.data.models.messages.ValidTestMessage
 import com.rakuten.tech.mobile.inappmessaging.runtime.data.responses.ping.DisplaySettings
@@ -98,7 +99,7 @@ class InAppMessageViewListenerOnClickSpec : InAppMessageViewListenerSpec() {
         val listener = createMockListener(message)
         val mockView = Mockito.mock(CheckBox::class.java)
         `when`(mockView.id).thenReturn(R.id.message_close_button)
-        `when`(mockCoroutine.executeTask(message, R.id.message_close_button, false)).thenReturn(true)
+        `when`(mockCoroutine.executeTask(message, ImpressionType.EXIT, false)).thenReturn(true)
         `when`(mockInApp.getRegisteredActivity()).thenReturn(mockActivity)
 
         listener.onClick(mockView)
@@ -106,30 +107,30 @@ class InAppMessageViewListenerOnClickSpec : InAppMessageViewListenerSpec() {
 
     @Test
     fun `should start worker with zero delay due to null values`() {
-        `when`(mockCoroutine.executeTask(mockMessage, R.id.message_close_button, false)).thenReturn(true)
+        `when`(mockCoroutine.executeTask(mockMessage, ImpressionType.EXIT, false)).thenReturn(true)
         `when`(mockMessage.getMessagePayload()).thenReturn(null)
-        instance.handleMessage(R.id.message_close_button)
+        instance.handleMessage(ImpressionType.EXIT)
         Mockito.verify(mockEventScheduler).startEventMessageReconciliationWorker(anyOrNull(), eq(0L))
 
         `when`(mockMessage.getMessagePayload()).thenReturn(mockPayload)
         `when`(mockPayload.messageSettings).thenReturn(null)
-        instance.handleMessage(R.id.message_close_button)
+        instance.handleMessage(ImpressionType.EXIT)
         Mockito.verify(mockEventScheduler, times(2)).startEventMessageReconciliationWorker(anyOrNull(), eq(0L))
 
         `when`(mockPayload.messageSettings).thenReturn(mockSettings)
         `when`(mockSettings.displaySettings).thenReturn(Mockito.mock(DisplaySettings::class.java))
-        instance.handleMessage(R.id.message_close_button)
+        instance.handleMessage(ImpressionType.EXIT)
         Mockito.verify(mockEventScheduler, times(3)).startEventMessageReconciliationWorker(anyOrNull(), eq(0L))
     }
 
     @Test
     fun `should start worker with valid delay due to null values`() {
-        `when`(mockCoroutine.executeTask(mockMessage, R.id.message_close_button, false)).thenReturn(true)
+        `when`(mockCoroutine.executeTask(mockMessage, ImpressionType.EXIT, false)).thenReturn(true)
         `when`(mockMessage.getMessagePayload()).thenReturn(mockPayload)
         `when`(mockPayload.messageSettings).thenReturn(mockSettings)
         `when`(mockSettings.displaySettings).thenReturn(mockDispSettings)
         `when`(mockDispSettings.delay).thenReturn(3000)
-        instance.handleMessage(R.id.message_close_button)
+        instance.handleMessage(ImpressionType.EXIT)
         Mockito.verify(mockEventScheduler).startEventMessageReconciliationWorker(anyOrNull(), eq(3000L))
     }
 
@@ -378,7 +379,7 @@ class InAppMessageViewListenerOnKeySpec : InAppMessageViewListenerSpec() {
         `when`(keyEvent.action).thenReturn(KeyEvent.ACTION_UP)
         `when`(mockView.id).thenReturn(R.id.message_close_button)
         `when`(mockCoroutine.executeTask(message,
-                MessageActionsCoroutine.BACK_BUTTON, false)).thenReturn(true)
+                ImpressionType.EXIT, false)).thenReturn(true)
 
         listener.onKey(mockView, KeyEvent.KEYCODE_BACK, keyEvent).shouldBeTrue()
     }
@@ -391,7 +392,7 @@ class InAppMessageViewListenerOnKeySpec : InAppMessageViewListenerSpec() {
         `when`(keyEvent.action).thenReturn(KeyEvent.ACTION_DOWN)
         `when`(mockView.id).thenReturn(R.id.message_close_button)
         `when`(mockCoroutine.executeTask(message,
-                MessageActionsCoroutine.BACK_BUTTON, false)).thenReturn(true)
+                ImpressionType.EXIT, false)).thenReturn(true)
 
         listener.onKey(mockView, KeyEvent.KEYCODE_BACK, keyEvent).shouldBeFalse()
     }
@@ -442,7 +443,7 @@ class InAppMessageViewListenerOnKeySpec : InAppMessageViewListenerSpec() {
         `when`(keyEvent.action).thenReturn(KeyEvent.ACTION_UP)
         `when`(mockView.id).thenReturn(R.id.message_close_button)
         `when`(mockCoroutine.executeTask(message,
-                MessageActionsCoroutine.BACK_BUTTON, false)).thenReturn(false)
+                ImpressionType.EXIT, false)).thenReturn(false)
         `when`(mockInApp.getRegisteredActivity()).thenReturn(mockActivity)
 
         listener.onKey(mockView, KeyEvent.KEYCODE_BACK, keyEvent).shouldBeTrue()

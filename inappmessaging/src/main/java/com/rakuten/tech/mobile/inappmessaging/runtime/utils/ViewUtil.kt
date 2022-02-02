@@ -4,7 +4,6 @@ import android.content.Context
 import android.content.res.Resources
 import android.graphics.Rect
 import android.view.View
-import android.view.ViewGroup
 import android.view.animation.Animation
 import android.view.animation.AnimationUtils
 import android.widget.ScrollView
@@ -12,7 +11,8 @@ import androidx.core.widget.NestedScrollView
 import com.rakuten.tech.mobile.inappmessaging.runtime.R
 import com.rakuten.tech.mobile.inappmessaging.runtime.data.enums.PositionType
 import com.rakuten.tech.mobile.inappmessaging.runtime.data.enums.SlideFromDirectionType
-import com.rakuten.tech.mobile.inappmessaging.runtime.view.InAppMessagingTooltipView
+import com.rakuten.tech.mobile.inappmessaging.runtime.view.InAppMessagingTooltipView.Companion.PADDING
+import com.rakuten.tech.mobile.inappmessaging.runtime.view.InAppMessagingTooltipView.Companion.TRI_SIZE
 
 /**
  * Utility methods for views.
@@ -53,62 +53,36 @@ internal object ViewUtil {
         return displayMetrics.widthPixels + 1
     }
 
-    fun getLayoutPosition(
-        view: View,
-        posType: PositionType,
-        width: Int,
-        height: Int,
-        marginHorizontal: Int,
-        marginVertical: Int
-    ): Pair<Int, Int>? {
-//        val location = IntArray(2)
-//        view.getLocationOnScreen(location)
+    @SuppressWarnings("LongParameterList", "MagicNumber")
+    fun getPosition(view: View, type: PositionType, width: Int, height: Int, marginH: Int, marginV: Int):
+            Pair<Int, Int> {
         val rect = Rect()
         view.getHitRect(rect)
-        return when (posType) {
-            PositionType.TOP_RIGHT -> {
-                Pair(rect.left + view.width + InAppMessagingTooltipView.PADDING / 4, rect.top - height)
-            }
-            PositionType.TOP_CENTER -> {
-                Pair(rect.left + view.width / 2 - width / 2, rect.top - height)
-            }
-            PositionType.TOP_LEFT -> {
-                Pair(rect.left - width, rect.top - height)
-            }
-            PositionType.BOTTOM_RIGHT -> {
-                Pair(rect.left + view.width + InAppMessagingTooltipView.PADDING / 4, rect.top + view.height)
-            }
-            PositionType.BOTTOM_CENTER -> {
-                Pair(rect.left + view.width / 2 - width / 2, rect.top + view.height - InAppMessagingTooltipView.TRI_SIZE / 2)
-            }
-            PositionType.BOTTOM_LEFT -> {
-                Pair(rect.left - width, rect.top + view.height)
-            }
-            PositionType.RIGHT -> {
-                Pair(rect.left + view.width - InAppMessagingTooltipView.TRI_SIZE / 2, rect.top - height / 2 + marginVertical / 2 + InAppMessagingTooltipView.PADDING / 2)
-            }
-            PositionType.LEFT -> {
-                Pair(rect.left - width - InAppMessagingTooltipView.TRI_SIZE / 2, rect.top - height / 2 + marginVertical / 2 + InAppMessagingTooltipView.PADDING / 2)
-            }
+        return when (type) {
+            PositionType.TOP_RIGHT -> Pair(rect.left + view.width + PADDING / 4, rect.top - height - marginV)
+            PositionType.TOP_CENTER -> Pair(rect.left + view.width / 2 - width / 2, rect.top - height - marginV)
+            PositionType.TOP_LEFT -> Pair(rect.left - width - marginH, rect.top - height - marginV)
+            PositionType.BOTTOM_RIGHT -> Pair(rect.left + view.width + PADDING / 4, rect.top + view.height - marginV)
+            PositionType.BOTTOM_CENTER -> Pair(rect.left + view.width / 2 - width / 2,
+                rect.top + view.height - TRI_SIZE / 2)
+            PositionType.BOTTOM_LEFT -> Pair(rect.left - width - marginH, rect.top + view.height - marginV)
+            PositionType.RIGHT -> Pair(rect.left + view.width - TRI_SIZE / 2,
+                rect.top - (height - marginV + PADDING) / 2)
+            PositionType.LEFT -> Pair(rect.left - width - marginH - TRI_SIZE / 2,
+                rect.top - (height - marginV + PADDING) / 2)
         }
     }
 
-    fun isInScrollView(view: View): Boolean {
+    @SuppressWarnings("SwallowedException")
+    fun getScrollView(view: View): ScrollView? {
         var currView = view.parent
         while (currView != null) {
-            val group = try {
-                currView as ViewGroup
-            } catch (ex: ClassCastException) {
-                null
-            }
-            group?.clipToPadding = false
-            group?.clipChildren = false
             if (currView is ScrollView || currView is NestedScrollView) {
-                return true
+                return currView as ScrollView
             }
             currView = currView.parent
         }
-        return false
+        return null
     }
 
 //    /**

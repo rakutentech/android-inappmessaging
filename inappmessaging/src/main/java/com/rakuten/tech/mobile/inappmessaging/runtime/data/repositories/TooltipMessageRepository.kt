@@ -1,14 +1,18 @@
 package com.rakuten.tech.mobile.inappmessaging.runtime.data.repositories
 
+import android.graphics.Rect
 import android.view.View
 import com.rakuten.tech.mobile.inappmessaging.runtime.InAppMessaging
 import com.rakuten.tech.mobile.inappmessaging.runtime.data.models.messages.Message
 import com.rakuten.tech.mobile.inappmessaging.runtime.utils.ContextExtension.findViewByName
+import com.rakuten.tech.mobile.inappmessaging.runtime.utils.ViewUtil
 
 /**
  * Contains all tooltip messages that are ready for display, but not yet displayed.
  */
 internal abstract class TooltipMessageRepository : ReadyMessageRepository {
+
+    abstract fun getCampaign(id: String): Message?
 
     companion object {
         private var instance: TooltipMessageRepository = TooltipMessageRepositoryImpl()
@@ -34,9 +38,22 @@ internal abstract class TooltipMessageRepository : ReadyMessageRepository {
                 val activity = InAppMessaging.instance().getRegisteredActivity()
                 return ArrayList(messages.filter { message ->
                     val view = message.getTooltipConfig()?.id?.let { activity?.findViewByName<View>(it) }
-                    view != null
+                    shouldRemove(view)
                 })
             }
+        }
+
+        private fun shouldRemove(view: View?) = if (view != null) {
+            val scrollView = ViewUtil.getScrollView(view)
+            if (scrollView != null) {
+                val scrollBounds = Rect()
+                scrollView.getHitRect(scrollBounds)
+                view.getLocalVisibleRect(scrollBounds)
+            } else {
+                true
+            }
+        } else {
+            false
         }
 
         override fun removeMessage(campaignId: String, shouldIncrementTimesClosed: Boolean) {
@@ -60,5 +77,7 @@ internal abstract class TooltipMessageRepository : ReadyMessageRepository {
                 messages.clear()
             }
         }
+
+        override fun getCampaign(id: String): Message? = messages.firstOrNull { it.getCampaignId() == id }
     }
 }

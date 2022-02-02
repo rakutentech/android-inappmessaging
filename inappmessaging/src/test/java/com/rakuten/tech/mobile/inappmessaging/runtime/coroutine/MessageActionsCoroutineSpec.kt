@@ -63,6 +63,7 @@ internal class MessageActionsCoroutineSpec(
 
     private val message = MessageMixerResponseSpec.response.data[0].campaignData
     private val activity = Mockito.mock(Activity::class.java)
+    private val type = MessageActionsCoroutine.getOnClickBehaviorType(resourceId)
 
     @Before
     override fun setup() {
@@ -82,21 +83,21 @@ internal class MessageActionsCoroutineSpec(
     @Test
     fun `should return false when message is null`() {
         DisplayManager.instance().removeMessage(InAppMessaging.instance().getRegisteredActivity())
-        val result = MessageActionsCoroutine().executeTask(null, resourceId, isOpt)
+        val result = MessageActionsCoroutine().executeTask(null, type, isOpt)
         result.shouldBeFalse()
     }
 
     @Test
     fun `should return false when campaign id is null`() {
         DisplayManager.instance().removeMessage(InAppMessaging.instance().getRegisteredActivity())
-        val result = MessageActionsCoroutine().executeTask(InvalidTestMessage(), resourceId, isOpt)
+        val result = MessageActionsCoroutine().executeTask(InvalidTestMessage(), type, isOpt)
         result.shouldBeFalse()
     }
 
     @Test
     fun `should return false when campaign id is empty`() {
         DisplayManager.instance().removeMessage(InAppMessaging.instance().getRegisteredActivity())
-        val result = MessageActionsCoroutine().executeTask(ValidTestMessage(""), resourceId, isOpt)
+        val result = MessageActionsCoroutine().executeTask(ValidTestMessage(""), type, isOpt)
         result.shouldBeFalse()
     }
 
@@ -104,7 +105,7 @@ internal class MessageActionsCoroutineSpec(
     fun `should add message to display repo`() {
         val numberOfTimesDisplayed: Int = LocalDisplayedMessageRepository.instance().numberOfTimesDisplayed(message)
         DisplayManager.instance().removeMessage(InAppMessaging.instance().getRegisteredActivity())
-        val result = MessageActionsCoroutine().executeTask(message, resourceId, isOpt)
+        val result = MessageActionsCoroutine().executeTask(message, type, isOpt)
         result.shouldBeTrue()
         LocalDisplayedMessageRepository.instance()
                 .numberOfTimesDisplayed(message) shouldBeEqualTo numberOfTimesDisplayed + 1
@@ -118,7 +119,7 @@ internal class MessageActionsCoroutineSpec(
         ReadyForDisplayMessageRepository.instance().getAllMessagesCopy().shouldHaveSize(1)
 
         DisplayManager.instance().removeMessage(InAppMessaging.instance().getRegisteredActivity())
-        val result = MessageActionsCoroutine().executeTask(message, resourceId, isOpt)
+        val result = MessageActionsCoroutine().executeTask(message, type, isOpt)
         if (result) {
             DisplayManager.instance().displayMessage()
         }

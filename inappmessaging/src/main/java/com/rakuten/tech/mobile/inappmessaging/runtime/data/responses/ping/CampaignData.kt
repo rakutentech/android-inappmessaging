@@ -2,6 +2,7 @@ package com.rakuten.tech.mobile.inappmessaging.runtime.data.responses.ping
 
 import com.google.gson.Gson
 import com.google.gson.annotations.SerializedName
+import com.rakuten.tech.mobile.inappmessaging.runtime.data.enums.InAppMessageType
 import com.rakuten.tech.mobile.inappmessaging.runtime.data.models.Tooltip
 import com.rakuten.tech.mobile.inappmessaging.runtime.data.models.messages.Message
 
@@ -53,9 +54,9 @@ internal data class CampaignData(
     override fun getTooltipConfig(): Tooltip? {
         val result = messagePayload.title.contains(TOOLTIP_TAG, true)
         if (result && tooltip == null) {
-            type = 5 // change type to tool tip (this will be fixed once the backend supports tooltip)
+            // change type to tool tip (this will be fixed once the backend supports tooltip)
+            type = InAppMessageType.TOOLTIP.typeId
             tooltip = Gson().fromJson(messagePayload.messageBody, Tooltip::class.java)
-//            tooltip?.id = "target"
         }
         return tooltip
     }

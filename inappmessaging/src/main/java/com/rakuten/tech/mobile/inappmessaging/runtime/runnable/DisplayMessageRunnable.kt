@@ -6,9 +6,9 @@ import android.view.ViewGroup
 import android.widget.FrameLayout
 import android.widget.ScrollView
 import androidx.annotation.UiThread
-import com.rakuten.tech.mobile.inappmessaging.runtime.InAppMessaging
 import com.rakuten.tech.mobile.inappmessaging.runtime.R
 import com.rakuten.tech.mobile.inappmessaging.runtime.data.enums.InAppMessageType
+import com.rakuten.tech.mobile.inappmessaging.runtime.data.models.Tooltip
 import com.rakuten.tech.mobile.inappmessaging.runtime.data.models.messages.Message
 import com.rakuten.tech.mobile.inappmessaging.runtime.data.repositories.LocalDisplayedMessageRepository
 import com.rakuten.tech.mobile.inappmessaging.runtime.utils.ContextExtension.findViewByName
@@ -36,71 +36,111 @@ internal class DisplayMessageRunnable(
     @UiThread
     @SuppressWarnings("LongMethod")
     override fun run() {
-        // If there's already a message found, don't display another message.
-        if (hostActivity.findViewById<View?>(R.id.in_app_message_base_view) != null) {
-            return
-        } else if (hostActivity.findViewById<View?>(R.id.in_app_message_tooltip_view)?.tag == message.getCampaignId()) {
-            return
-        }
-
         val messageType = InAppMessageType.getById(message.getType())
-        if (messageType != null) {
-            when (messageType) {
-                InAppMessageType.MODAL -> {
-                    val modalView = hostActivity
-                        .layoutInflater
-                        .inflate(R.layout.in_app_message_modal, null) as InAppMessageModalView
-                    modalView.populateViewData(message)
-                    hostActivity.addContentView(modalView, hostActivity.window.attributes)
+        if (shouldNotDisplay(messageType)) return
+
+        when (messageType) {
+            InAppMessageType.MODAL -> {
+                val modalView = hostActivity
+                    .layoutInflater
+                    .inflate(R.layout.in_app_message_modal, null) as InAppMessageModalView
+                modalView.populateViewData(message)
+                hostActivity.addContentView(modalView, hostActivity.window.attributes)
+            }
+            InAppMessageType.FULL -> {
+                val fullScreenView = hostActivity
+                    .layoutInflater
+                    .inflate(
+                        R.layout.in_app_message_full_screen,
+                        null) as InAppMessageFullScreenView
+                fullScreenView.populateViewData(message)
+                hostActivity.addContentView(fullScreenView, hostActivity.window.attributes)
+            }
+            InAppMessageType.SLIDE -> {
+                val slideUpView = hostActivity
+                    .layoutInflater
+                    .inflate(
+                        R.layout.in_app_message_slide_up,
+                        null) as InAppMessageSlideUpView
+                slideUpView.populateViewData(message)
+                hostActivity.addContentView(slideUpView, hostActivity.window.attributes)
+            }
+            InAppMessageType.TOOLTIP -> {
+                val toolTipView = hostActivity
+                    .layoutInflater
+                    .inflate(
+                        R.layout.in_app_message_tooltip,
+                        null) as InAppMessagingTooltipView
+                toolTipView.populateViewData(message)
+                message.getTooltipConfig()?.let {
+                    displayTooltip(it, toolTipView)
                 }
-                InAppMessageType.FULL -> {
-                    val fullScreenView = hostActivity
-                            .layoutInflater
-                            .inflate(
-                                    R.layout.in_app_message_full_screen,
-                                    null) as InAppMessageFullScreenView
-                    fullScreenView.populateViewData(message)
-                    hostActivity.addContentView(fullScreenView, hostActivity.window.attributes)
+            }
+            else -> Any()
+        }
+    }
+
+    private fun displayTooltip(
+        it: Tooltip,
+        toolTipView: InAppMessagingTooltipView
+    ) {
+        hostActivity.findViewByName<View>(it.id)?.let { target ->
+            val scroll = ViewUtil.getScrollView(target)
+            if (scroll != null) {
+                displayInScrollView(scroll, toolTipView)
+            } else {
+                val params = ViewGroup.LayoutParams(
+                    ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT
+                )
+                hostActivity.addContentView(toolTipView, params)
+            }
+            LocalDisplayedMessageRepository.instance().addTooltipMessage(message.getCampaignId())
+        }
+    }
+
+    private fun displayInScrollView(scroll: ScrollView, toolTipView: InAppMessagingTooltipView) {
+        var frame = hostActivity.findViewById<FrameLayout>(R.id.in_app_message_tooltip_layout)
+        // use existing tooltip layout if already available
+        if (frame == null) {
+            frame = FrameLayout(hostActivity)
+            frame.id = R.id.in_app_message_tooltip_layout
+            frame.layoutParams = FrameLayout.LayoutParams(
+                FrameLayout.LayoutParams.MATCH_PARENT,
+                FrameLayout.LayoutParams.MATCH_PARENT
+            )
+            // scrollview only have one child
+            val parent = scroll.getChildAt(0)
+            scroll.removeView(parent as ViewGroup)
+            frame.addView(parent)
+            frame.addView(toolTipView)
+            scroll.addView(frame)
+        } else {
+            frame.addView(toolTipView)
+        }
+    }
+
+    private fun shouldNotDisplay(messageType: InAppMessageType?): Boolean {
+        val normalCampaign = hostActivity.findViewById<View?>(R.id.in_app_message_base_view)
+        if (messageType == InAppMessageType.TOOLTIP) {
+            // if normal non-slide-up campaign is displayed, don't display tooltip on top of normal campaign
+            if (normalCampaign != null && normalCampaign !is InAppMessageSlideUpView) {
+                return true
+            }
+            if (checkTooltipDisplay()) return true
+        }
+        return normalCampaign != null
+    }
+
+    private fun checkTooltipDisplay(): Boolean {
+        hostActivity.findViewById<View?>(R.id.in_app_message_tooltip_view)?.parent?.let {
+            for (i in 0..(it as ViewGroup).childCount) {
+                val child = it.getChildAt(i)
+                if (child?.id == R.id.in_app_message_tooltip_view && child.tag == message.getCampaignId()) {
+                    // tool campaign is already displayed, no need to display again
+                    return true
                 }
-                InAppMessageType.SLIDE -> {
-                    val slideUpView = hostActivity
-                            .layoutInflater
-                            .inflate(
-                                    R.layout.in_app_message_slide_up,
-                                    null) as InAppMessageSlideUpView
-                    slideUpView.populateViewData(message)
-                    hostActivity.addContentView(slideUpView, hostActivity.window.attributes)
-                }
-                InAppMessageType.TOOLTIP -> {
-                    val toolTipView = hostActivity
-                        .layoutInflater
-                        .inflate(
-                            R.layout.in_app_message_tooltip,
-                            null) as InAppMessagingTooltipView
-                    toolTipView.populateViewData(message)
-                    message.getTooltipConfig()?.let {
-                        InAppMessaging.instance().getRegisteredActivity()?.findViewByName<View>(it.id)?.let { target ->
-                            if (ViewUtil.isInScrollView(target)) {
-                                val frame = FrameLayout(hostActivity)
-                                frame.id = R.id.in_app_message_tooltip_layout
-                                frame.layoutParams = FrameLayout.LayoutParams(FrameLayout.LayoutParams.MATCH_PARENT, FrameLayout.LayoutParams.MATCH_PARENT)
-                                // TODO need to check which view is the scrollview
-                                val parent = target.parent
-                                val scroll = parent.parent
-                                (scroll as ScrollView).removeView(parent as ViewGroup)
-                                frame.addView(parent)
-                                frame.addView(toolTipView)
-                                scroll.addView(frame)
-                            } else {
-                                val params = ViewGroup.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT)
-                                hostActivity.addContentView(toolTipView, params)
-                            }
-                            LocalDisplayedMessageRepository.instance().addTooltipMessage(message.getCampaignId())
-                        }
-                    }
-                }
-                else -> Any()
             }
         }
+        return false
     }
 }

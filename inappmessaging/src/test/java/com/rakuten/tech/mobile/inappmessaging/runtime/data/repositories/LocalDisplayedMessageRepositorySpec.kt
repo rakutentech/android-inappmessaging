@@ -7,6 +7,7 @@ import androidx.work.testing.WorkManagerTestInitHelper
 import com.nhaarman.mockitokotlin2.argumentCaptor
 import com.rakuten.tech.mobile.inappmessaging.runtime.*
 import com.rakuten.tech.mobile.inappmessaging.runtime.coroutine.MessageActionsCoroutine
+import com.rakuten.tech.mobile.inappmessaging.runtime.data.enums.ImpressionType
 import com.rakuten.tech.mobile.inappmessaging.runtime.data.models.messages.InvalidTestMessage
 import com.rakuten.tech.mobile.inappmessaging.runtime.data.models.messages.Message
 import com.rakuten.tech.mobile.inappmessaging.runtime.data.models.messages.ValidTestMessage
@@ -90,7 +91,7 @@ class LocalDisplayedMessageRepositorySpec : BaseTest() {
         `when`(payload.messageSettings).thenReturn(msgSettings)
         `when`(msgSettings.controlSettings).thenReturn(settings)
         `when`(settings.buttons).thenReturn(listOf())
-        MessageActionsCoroutine(mockRepo).executeTask(message, R.id.message_close_button, true)
+        MessageActionsCoroutine(mockRepo).executeTask(message, ImpressionType.EXIT, true)
 
         Mockito.verify(mockRepo).addMessage(message)
     }

@@ -46,18 +46,8 @@ internal interface MessageEventReconciliationUtil {
 
     private class MessageEventReconciliationUtilImpl : MessageEventReconciliationUtil {
 
-//        override fun extractTestMessages(messageList: List<Message>): List<Message> {
-//            val testMessages = ArrayList<Message>()
-//            // Add all test messages first.
-//            for (message in messageList) {
-//                if (message.isTest() && message.getTooltipConfig() == null) {
-//                    testMessages.add(message)
-//                }
-//            }
-//            return testMessages
-//        }
-
-        override fun reconcileMessagesAndEvents(messages: List<Message>): Pair<MutableList<Message>, MutableList<Message>> {
+        override fun reconcileMessagesAndEvents(messages: List<Message>):
+        Pair<MutableList<Message>, MutableList<Message>> {
             // Make an empty list of message, later add reconciled messages to it.
             val reconciledMessages = ArrayList<Message>()
             val toolTipMessages = ArrayList<Message>()
@@ -109,7 +99,8 @@ internal interface MessageEventReconciliationUtil {
             // At this point, all triggers had been reconciled
             // ${requiredSetsOfSatisfiedTriggersToDisplayMessage} times.
 
-            if (message.getType() == InAppMessageType.TOOLTIP.typeId && LocalDisplayedMessageRepository.instance().isTooltipDisplayed(message.getCampaignId())) {
+            if (message.getType() == InAppMessageType.TOOLTIP.typeId &&
+                LocalDisplayedMessageRepository.instance().isTooltipDisplayed(message.getCampaignId())) {
                 // tooltip message is already displayed in this session
                 return false
             }

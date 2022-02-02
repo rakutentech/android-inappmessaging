@@ -142,7 +142,7 @@ class DisplayMessageWorkerSpec : BaseTest() {
         `when`(message.getMaxImpressions()).thenReturn(1)
         `when`(message.getMessagePayload()).thenReturn(payload)
         `when`(message.getContexts()).thenReturn(listOf())
-        `when`(mockMessageManager.getNextDisplayMessage()).thenReturn(message)
+        `when`(mockMessageManager.getNextDisplayMessage(false)).thenReturn(listOf(message))
         runBlocking {
             displayWorker.doWork() shouldBeEqualTo ListenableWorker.Result.success()
         }
@@ -162,7 +162,7 @@ class DisplayMessageWorkerSpec : BaseTest() {
         `when`(message.getMaxImpressions()).thenReturn(1)
         `when`(message.getMessagePayload()).thenReturn(payload)
         `when`(message.getContexts()).thenReturn(listOf("ctx"))
-        `when`(mockMessageManager.getNextDisplayMessage()).thenReturn(message)
+        `when`(mockMessageManager.getNextDisplayMessage(false)).thenReturn(listOf(message))
         runBlocking {
             displayWorker.doWork() shouldBeEqualTo ListenableWorker.Result.success()
         }
@@ -188,7 +188,7 @@ class DisplayMessageWorkerSpec : BaseTest() {
     fun `should call getMessagePayload again when message's context was rejected`() {
         setupNextCampaign()
 
-        Mockito.verify(mockMessageManager, Mockito.times(2)).getNextDisplayMessage()
+        Mockito.verify(mockMessageManager, Mockito.times(2)).getNextDisplayMessage(false)
     }
 
     @Test
@@ -222,7 +222,7 @@ class DisplayMessageWorkerSpec : BaseTest() {
 
     @Test
     fun `should not display campaign if payload is null`() {
-        `when`(mockMessageManager.getNextDisplayMessage()).thenReturn(null)
+        `when`(mockMessageManager.getNextDisplayMessage(false)).thenReturn(null)
         runBlocking {
             displayWorker.doWork() shouldBeEqualTo ListenableWorker.Result.success()
         }
@@ -244,8 +244,8 @@ class DisplayMessageWorkerSpec : BaseTest() {
         val worker = TestListenableWorkerBuilder<DisplayMessageWorker>(getApplicationContext()).build()
         worker.messageReadinessManager = mockMessageManager
         val message = setupMessageWithImage("https://imageurl.jpg")
-        `when`(mockMessageManager.getNextDisplayMessage()).thenReturn(message).thenReturn(null)
-        `when`(mockMessageManager.getNextDisplayMessage()).thenReturn(message)
+        `when`(mockMessageManager.getNextDisplayMessage(false)).thenReturn(listOf(message)).thenReturn(listOf())
+        `when`(mockMessageManager.getNextDisplayMessage(false)).thenReturn(listOf(message))
         val mockResource = Mockito.mock(Resources::class.java)
         `when`(activity.resources).thenReturn(mockResource)
         `when`(mockResource.displayMetrics).thenReturn(Mockito.mock(DisplayMetrics::class.java))
@@ -262,7 +262,7 @@ class DisplayMessageWorkerSpec : BaseTest() {
     @Test
     fun `should display the message if null image url`() {
         val message = setupMessageWithImage(null)
-        `when`(mockMessageManager.getNextDisplayMessage()).thenReturn(message)
+        `when`(mockMessageManager.getNextDisplayMessage(false)).thenReturn(listOf(message))
         runBlocking {
             displayWorker.doWork() shouldBeEqualTo ListenableWorker.Result.success()
         }
@@ -288,7 +288,7 @@ class DisplayMessageWorkerSpec : BaseTest() {
 
     private fun setupValidMessage(): Message {
         val message = Mockito.mock(Message::class.java)
-        `when`(mockMessageManager.getNextDisplayMessage()).thenReturn(message)
+        `when`(mockMessageManager.getNextDisplayMessage(false)).thenReturn(listOf(message))
         `when`(message.getCampaignId()).thenReturn("1")
         `when`(message.isTest()).thenReturn(true)
         `when`(message.getMaxImpressions()).thenReturn(10)
@@ -342,6 +342,6 @@ class DisplayMessageWorkerSpec : BaseTest() {
         `when`(message.getMaxImpressions()).thenReturn(1)
         `when`(message.getMessagePayload()).thenReturn(payload)
         `when`(message.getContexts()).thenReturn(listOf("ctx"))
-        `when`(mockMessageManager.getNextDisplayMessage()).thenReturn(message).thenReturn(null)
+        `when`(mockMessageManager.getNextDisplayMessage(false)).thenReturn(listOf(message)).thenReturn(listOf())
     }
 }

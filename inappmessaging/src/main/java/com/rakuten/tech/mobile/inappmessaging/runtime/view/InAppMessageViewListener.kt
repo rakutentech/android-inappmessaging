@@ -92,13 +92,15 @@ internal class InAppMessageViewListener(
     private fun handleClick(id: Int, dispatcher: CoroutineDispatcher = Dispatchers.Default) {
         CoroutineScope(Dispatchers.Main).launch {
             val type = MessageActionsCoroutine.getOnClickBehaviorType(id)
-            val delay = if (message?.getType() == InAppMessageType.TOOLTIP.typeId && (type != ImpressionType.CLICK_CONTENT || message.getTooltipConfig()?.url == null)) {
+            val delay = if (message?.getType() == InAppMessageType.TOOLTIP.typeId &&
+                (type != ImpressionType.CLICK_CONTENT || message.getTooltipConfig()?.url == null)) {
                 // should only add delay if set and not redirect (i.e. close button or content + no url)
                     message.getTooltipConfig()?.autoDisappear ?: 0
             } else {
                 0
             }
-            displayManager.removeMessage(inApp.getRegisteredActivity(), delay = delay, id = if (message?.getType() == InAppMessageType.TOOLTIP.typeId) message.getCampaignId() else null)
+            displayManager.removeMessage(inApp.getRegisteredActivity(), delay = delay,
+                id = if (message?.getType() == InAppMessageType.TOOLTIP.typeId) message.getCampaignId() else null)
             withContext(dispatcher) {
                 handleMessage(type)
             }

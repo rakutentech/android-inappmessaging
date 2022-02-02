@@ -2,13 +2,25 @@ package com.rakuten.tech.mobile.inappmessaging.runtime.view
 
 import android.content.Context
 import android.content.res.ColorStateList
-import android.graphics.*
+import android.graphics.Bitmap
+import android.graphics.Canvas
+import android.graphics.Color
+import android.graphics.Paint
+import android.graphics.Path
+import android.graphics.Point
+import android.graphics.drawable.ScaleDrawable
 import android.util.AttributeSet
 import android.view.View
 import android.view.ViewGroup
 import android.view.ViewTreeObserver
-import android.widget.*
+import android.widget.ImageButton
+import android.widget.ImageView
+import android.widget.RelativeLayout
 import androidx.annotation.VisibleForTesting
+import com.google.android.material.imageview.ShapeableImageView
+import com.google.android.material.shape.CornerFamily
+import com.google.android.material.shape.MaterialShapeDrawable
+import com.google.android.material.shape.ShapeAppearanceModel
 import com.rakuten.tech.mobile.inappmessaging.runtime.InAppMessaging
 import com.rakuten.tech.mobile.inappmessaging.runtime.R
 import com.rakuten.tech.mobile.inappmessaging.runtime.data.enums.PositionType
@@ -18,13 +30,8 @@ import com.rakuten.tech.mobile.inappmessaging.runtime.utils.ViewUtil
 import com.squareup.picasso.Callback
 import com.squareup.picasso.Picasso
 import timber.log.Timber
-import kotlin.math.abs
-import com.google.android.material.imageview.ShapeableImageView
-import com.google.android.material.shape.CornerFamily
-import com.google.android.material.shape.MaterialShapeDrawable
-import com.google.android.material.shape.ShapeAppearanceModel
-import android.graphics.drawable.ScaleDrawable
 
+@SuppressWarnings("LargeClass", "LongMethod")
 internal class InAppMessagingTooltipView(
     context: Context,
     attrs: AttributeSet?
@@ -91,7 +98,7 @@ internal class InAppMessagingTooltipView(
                                 handler.postDelayed({
                                     it.visibility = VISIBLE
                                     this@InAppMessagingTooltipView.visibility = VISIBLE
-                                }, 100)
+                                }, DELAY)
                             }
                         }
                     })
@@ -115,7 +122,7 @@ internal class InAppMessagingTooltipView(
         imageView.layoutParams.height = height + PADDING
 
         val shapePathModel = ShapeAppearanceModel.builder()
-            .setAllCorners(CornerFamily.ROUNDED, 15.toFloat())
+            .setAllCorners(CornerFamily.ROUNDED, RADIUS)
             .build()
 
         val backgroundDrawable = MaterialShapeDrawable(shapePathModel).apply {
@@ -125,6 +132,7 @@ internal class InAppMessagingTooltipView(
         imageView.background = backgroundDrawable
     }
 
+    @SuppressWarnings("MagicNumber", "ComplexMethod")
     private fun setTip() {
         val tip = findViewById<ImageView>(R.id.message_tip)
         tip.layoutParams.height = TRI_SIZE
@@ -172,7 +180,10 @@ internal class InAppMessagingTooltipView(
                 (close?.layoutParams as LayoutParams?)?.removeRule(END_OF)
                 (close?.layoutParams as LayoutParams?)?.removeRule(ABOVE)
                 (close?.layoutParams as LayoutParams?)?.removeRule(RIGHT_OF)
-                (findViewById<RelativeLayout>(R.id.image_layout)?.layoutParams as LayoutParams?)?.addRule(END_OF, R.id.message_close_button)
+                (findViewById<RelativeLayout>(R.id.image_layout)?.layoutParams as LayoutParams?)?.addRule(
+                    END_OF,
+                    R.id.message_close_button
+                )
                 adjustedHeight = PADDING
                 adjustedWidth = PADDING
                 tip.layoutParams.height = PADDING
@@ -218,7 +229,10 @@ internal class InAppMessagingTooltipView(
                 (close?.layoutParams as LayoutParams?)?.removeRule(END_OF)
                 (close?.layoutParams as LayoutParams?)?.removeRule(ABOVE)
                 (close?.layoutParams as LayoutParams?)?.removeRule(RIGHT_OF)
-                (findViewById<RelativeLayout>(R.id.image_layout)?.layoutParams as LayoutParams?)?.addRule(END_OF, R.id.message_close_button)
+                (findViewById<RelativeLayout>(R.id.image_layout)?.layoutParams as LayoutParams?)?.addRule(
+                    END_OF,
+                    R.id.message_close_button
+                )
                 adjustedHeight = PADDING
                 adjustedWidth = PADDING
                 tip.layoutParams.height = PADDING
@@ -246,7 +260,8 @@ internal class InAppMessagingTooltipView(
                 (close?.layoutParams as LayoutParams?)?.removeRule(END_OF)
                 (close?.layoutParams as LayoutParams?)?.removeRule(ABOVE)
                 (close?.layoutParams as LayoutParams?)?.removeRule(RIGHT_OF)
-                (findViewById<RelativeLayout>(R.id.image_layout)?.layoutParams as LayoutParams?)?.addRule(END_OF, R.id.message_close_button)
+                (findViewById<RelativeLayout>(R.id.image_layout)?.layoutParams as LayoutParams?)
+                    ?.addRule(END_OF, R.id.message_close_button)
                 (tip?.layoutParams as LayoutParams?)?.addRule(CENTER_VERTICAL)
                 (tip?.layoutParams as LayoutParams?)?.addRule(RIGHT_OF, R.id.message_tooltip_image_view)
                 arrayOf(
@@ -285,14 +300,14 @@ internal class InAppMessagingTooltipView(
         val imageView = findViewById<ImageView>(R.id.message_tooltip_image_view)
         viewId?.let {
             InAppMessaging.instance().getRegisteredActivity()?.findViewByName<View>(it)?.let { view ->
-                val horizontal = abs(context.resources.getDimension(R.dimen.tooltip_close_button_margin_left)).toInt()
-                val vertical = abs(context.resources.getDimension(R.dimen.tooltip_close_button_margin_top)).toInt()
-                val buttonSize = context.resources.getDimension(R.dimen.modal_close_button_height).toInt()
-                ViewUtil.isInScrollView(this)
-                ViewUtil.getLayoutPosition(view, type, imageView.layoutParams.width, imageView.layoutParams.height, buttonSize - horizontal, buttonSize - vertical)?.let { pos ->
-                    params.topMargin = pos.second
-                    params.leftMargin = pos.first
-                }
+                val buttonSize = findViewById<ImageButton>(R.id.message_close_button)?.layoutParams?.height ?: 0
+                ViewUtil.getPosition(
+                    view, type, imageView.layoutParams.width, imageView.layoutParams.height, buttonSize, buttonSize
+                )
+                    .let { pos ->
+                        params.topMargin = pos.second
+                        params.leftMargin = pos.first
+                    }
             }
         }
     }
@@ -301,7 +316,8 @@ internal class InAppMessagingTooltipView(
         private const val TAG = "IAM_ToolTipView"
         internal const val PADDING = 40
         internal const val TRI_SIZE = 20
-        private const val RADIUS = 20f
+        private const val RADIUS = 15f
         private const val MAX_SIZE = 600
+        private const val DELAY = 100L // in ms
     }
 }

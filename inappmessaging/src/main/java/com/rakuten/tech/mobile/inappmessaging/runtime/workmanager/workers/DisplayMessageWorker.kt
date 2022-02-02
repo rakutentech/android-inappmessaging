@@ -62,6 +62,10 @@ internal class DisplayMessageWorker(
                 }
             }
         }
+        if (isTooltip) {
+            // start normal campaign queue
+            enqueueWork(false)
+        }
     }
 
     /**

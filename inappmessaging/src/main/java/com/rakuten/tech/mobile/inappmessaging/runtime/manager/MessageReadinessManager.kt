@@ -62,7 +62,7 @@ internal interface MessageReadinessManager {
 
     private class MessageReadinessManagerImpl : MessageReadinessManager {
         @WorkerThread
-        @SuppressWarnings("LongMethod", "ReturnCount")
+        @SuppressWarnings("LongMethod", "ReturnCount", "ComplexMethod")
         override fun getNextDisplayMessage(isTooltip: Boolean): List<Message> {
             shouldRetry.set(true)
             val result = mutableListOf<Message>()
