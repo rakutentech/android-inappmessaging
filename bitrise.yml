@@ -180,6 +180,7 @@ workflows:
                 git switch -C $BITRISE_GIT_BRANCH
             else
                 echo "This is a PR from the repo, just making sure we are at the right branch"
+                git fetch --no-tags origin $BITRISE_GIT_BRANCH
                 git switch $BITRISE_GIT_BRANCH
             fi
     - script@1:
