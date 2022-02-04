@@ -10,6 +10,7 @@ sonarqube {
         property 'sonar.login', System.getenv("SONARQUBE_TOKEN")
         property 'sonar.projectKey', System.getenv("SONARQUBE_PROJ_KEY")
         property 'sonar.projectVersion', scmVersion.version
+        property 'sonar.scm.revision', System.getenv("BITRISE_SHA1")
         if (branch == "master") {
             property 'sonar.branch.name', branch
         } else {
