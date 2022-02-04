@@ -182,7 +182,7 @@ workflows:
             #     echo "This is a PR from the repo, just making sure we are at the right branch"
             #     git fetch --no-tags origin $BITRISE_GIT_BRANCH
             #     git switch $BITRISE_GIT_BRANCH
-            fi
+            #fi
     - script@1:
         run_if: '{{getenv "SONARQUBE_TOKEN" | ne ""}}'
         title: Run SonarQube Scanner
