@@ -170,8 +170,7 @@ workflows:
             #!/bin/bash
             set -e
             # Hash
-            hashNum=$(git log --pretty=format:'%h' -n 1)
-            envman add --key BITRISE_SHA1 --value $hashNum
+            envman add --key BITRISE_SHA1 --value $(git log --pretty=format:'%h' -n 1)
 
             # Destination branch
             git fetch --no-tags origin master
