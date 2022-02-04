@@ -164,7 +164,7 @@ workflows:
         inputs:
         - set_java_version: '11'
     - script@1:
-        title: Fetch base branch
+        title: Prepare branches to feed in sonar.gradle
         inputs:
         - content: |-
             #!/bin/bash
