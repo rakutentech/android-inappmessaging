@@ -169,20 +169,19 @@ workflows:
         - content: |-
             #!/bin/bash
             set -e
-            # Hash
-            envman add --key BITRISE_SHA1 --value "$(git log --pretty=format:'%h' -n 1)"
-
             # Destination branch
             git fetch --no-tags origin master
 
             # Source branch
             if [[ $BITRISEIO_PULL_REQUEST_REPOSITORY_URL != "" && \
                   $GIT_REPOSITORY_URL != $BITRISEIO_PULL_REQUEST_REPOSITORY_URL ]]; then
-                echo "This is a PR from a forked repo, will be creating temp branch with current hash: $BITRISE_SHA1"
+                echo "This is a PR from a forked repo, will be creating temp branch with current hash: $BITRISE_GIT_COMMIT"
+                envman add --key BITRISE_SHA1 --value $BITRISE_GIT_COMMIT
                 git switch -C $BITRISE_GIT_BRANCH
             else
                 echo "This is a PR from the repo, just making sure we are at the right branch"
                 git fetch --no-tags origin $BITRISE_GIT_BRANCH
+                #envman add --key BITRISE_SHA1 --value $BITRISE_GIT_COMMIT
                 git switch $BITRISE_GIT_BRANCH
             fi
     - script@1:
