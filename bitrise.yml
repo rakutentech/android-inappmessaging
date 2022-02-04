@@ -176,7 +176,7 @@ workflows:
             if [[ $BITRISEIO_PULL_REQUEST_REPOSITORY_URL != "" && \
                   $GIT_REPOSITORY_URL != $BITRISEIO_PULL_REQUEST_REPOSITORY_URL ]]; then
                 echo "This is a PR from a forked repo, will be creating temp branch with current hash: $BITRISE_GIT_COMMIT"
-                envman add --key BITRISE_SHA1 --value $BITRISE_GIT_COMMIT
+                #envman add --key BITRISE_SHA1 --value $BITRISE_GIT_COMMIT
                 git switch -C $BITRISE_GIT_BRANCH
             else
                 echo "This is a PR from the repo, just making sure we are at the right branch"
