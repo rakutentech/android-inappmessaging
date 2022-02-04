@@ -1,5 +1,7 @@
 package com.rakuten.tech.mobile.inappmessaging.runtime.utils
 
+import java.nio.charset.Charset
+
 internal object CacheUtil {
 
     /**
