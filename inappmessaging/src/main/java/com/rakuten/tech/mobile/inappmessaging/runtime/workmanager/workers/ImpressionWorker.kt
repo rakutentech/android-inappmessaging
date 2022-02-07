@@ -12,10 +12,10 @@ import com.rakuten.tech.mobile.inappmessaging.runtime.data.repositories.HostAppI
 import com.rakuten.tech.mobile.inappmessaging.runtime.data.requests.ImpressionRequest
 import com.rakuten.tech.mobile.inappmessaging.runtime.utils.RuntimeUtil
 import com.rakuten.tech.mobile.inappmessaging.runtime.utils.WorkerUtils
+import com.rakuten.tech.mobile.sdkutils.logger.Logger
 import okhttp3.ResponseBody
 import retrofit2.Call
 import retrofit2.Response
-import timber.log.Timber
 import java.net.HttpURLConnection
 import java.util.concurrent.atomic.AtomicInteger
 
@@ -47,7 +47,7 @@ internal class ImpressionWorker(
         val impressionRequest = try {
             Gson().fromJson(impressionRequestJsonRequest, ImpressionRequest::class.java)
         } catch (e: JsonParseException) {
-            Timber.tag(TAG).e(e)
+            Logger(TAG).error(e.message)
             return Result.failure()
         }
 
@@ -56,13 +56,13 @@ internal class ImpressionWorker(
             // Execute Retrofit API call and handle response.
             onResponse(createReportImpressionCall(impressionEndpoint, impressionRequest).execute())
         } catch (e: Exception) {
-            Timber.tag(TAG).d(e)
+            Logger(TAG).debug(e.message)
             Result.retry()
         }
     }
 
     fun onResponse(response: Response<ResponseBody>): Result {
-        Timber.tag(TAG).d("Impression Response:%d", response.code())
+        Logger(TAG).debug("Impression Response:%d", response.code())
 
         return when {
             response.code() >= HttpURLConnection.HTTP_INTERNAL_ERROR ->

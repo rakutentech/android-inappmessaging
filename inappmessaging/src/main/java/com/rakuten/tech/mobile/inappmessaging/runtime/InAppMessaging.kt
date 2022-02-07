@@ -2,11 +2,11 @@ package com.rakuten.tech.mobile.inappmessaging.runtime
 
 import android.app.Activity
 import android.content.Context
-import android.content.SharedPreferences
 import androidx.annotation.NonNull
 import androidx.annotation.Nullable
 import androidx.annotation.RestrictTo
 import com.rakuten.tech.mobile.inappmessaging.runtime.data.models.appevents.Event
+import com.rakuten.tech.mobile.inappmessaging.runtime.data.repositories.AccountRepository
 import com.rakuten.tech.mobile.inappmessaging.runtime.data.repositories.PingResponseMessageRepository
 import com.rakuten.tech.mobile.inappmessaging.runtime.exception.InAppMessagingException
 import com.rakuten.tech.mobile.inappmessaging.runtime.utils.Initializer
@@ -70,12 +70,6 @@ abstract class InAppMessaging internal constructor() {
      */
     @RestrictTo(RestrictTo.Scope.LIBRARY)
     internal abstract fun isLocalCachingEnabled(): Boolean
-
-    /**
-     * This method returns the encrypted shared preference.
-     */
-    @RestrictTo(RestrictTo.Scope.LIBRARY)
-    internal abstract fun getSharedPref(): SharedPreferences?
 
     /**
      * This method moves temp data to persistent cache.
@@ -145,13 +139,15 @@ abstract class InAppMessaging internal constructor() {
             configScheduler.startConfig()
         }
 
-        internal fun setUninitializedInstance() {
-            instance = NotInitializedInAppMessaging()
+        internal fun setUninitializedInstance(isCacheHandling: Boolean = false) {
+            instance = NotInitializedInAppMessaging(isCacheHandling)
         }
+
+        internal fun getPreferencesFile() = "internal_shared_prefs_" + AccountRepository.instance().userInfoHash
     }
 
     @SuppressWarnings("EmptyFunctionBlock", "TooManyFunctions")
-    internal class NotInitializedInAppMessaging : InAppMessaging() {
+    internal class NotInitializedInAppMessaging(private var isCacheHandling: Boolean = false) : InAppMessaging() {
         override var onVerifyContext: (contexts: List<String>, campaignTitle: String) -> Boolean = { _, _ -> true }
 
         override fun registerPreference(userInfoProvider: UserInfoProvider) = Unit
@@ -167,9 +163,7 @@ abstract class InAppMessaging internal constructor() {
 
         override fun getHostAppContext(): Context? = null
 
-        override fun isLocalCachingEnabled() = false
-
-        override fun getSharedPref(): SharedPreferences? = null
+        override fun isLocalCachingEnabled() = isCacheHandling
 
         override fun closeMessage(clearQueuedCampaigns: Boolean) = Unit
 

@@ -17,9 +17,9 @@ import com.rakuten.tech.mobile.inappmessaging.runtime.data.repositories.ReadyFor
 import com.rakuten.tech.mobile.inappmessaging.runtime.manager.MessageReadinessManager
 import com.rakuten.tech.mobile.inappmessaging.runtime.runnable.DisplayMessageRunnable
 import com.rakuten.tech.mobile.inappmessaging.runtime.utils.WorkManagerUtil
+import com.rakuten.tech.mobile.sdkutils.logger.Logger
 import com.squareup.picasso.Callback
 import com.squareup.picasso.Picasso
-import timber.log.Timber
 import java.lang.Exception
 
 /**
@@ -40,9 +40,9 @@ internal class DisplayMessageWorker(
      * This method starts displaying message runnable.
      */
     override suspend fun doWork(): Result {
-        Timber.tag(TAG).d("onHandleWork() started on thread: %s", Thread.currentThread().name)
+        Logger(TAG).debug("onHandleWork() started on thread: %s", Thread.currentThread().name)
         prepareNextMessage()
-        Timber.tag(TAG).d("onHandleWork() ended")
+        Logger(TAG).debug("onHandleWork() ended")
         return Result.success()
     }
 
@@ -79,7 +79,7 @@ internal class DisplayMessageWorker(
             }
 
             override fun onError(e: Exception?) {
-                Timber.tag(TAG).d("Downloading image failed")
+                Logger(TAG).debug("Downloading image failed")
             }
         }, hostActivity, picasso)
     }
@@ -90,7 +90,7 @@ internal class DisplayMessageWorker(
     private fun displayMessage(message: Message, hostActivity: Activity) {
         if (!verifyContexts(message)) {
             // Message display aborted by the host app
-            Timber.tag(TAG).d("message display cancelled by the host app")
+            Logger(TAG).debug("message display cancelled by the host app")
 
             // increment time closed to handle required number of events to be triggered
             readyMessagesRepo.removeMessage(message.getCampaignId(), true)

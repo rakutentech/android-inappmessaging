@@ -9,7 +9,6 @@ import com.rakuten.tech.mobile.inappmessaging.runtime.data.models.Attribute
 import com.rakuten.tech.mobile.inappmessaging.runtime.data.models.rat.RatAttribute
 import com.rakuten.tech.mobile.inappmessaging.runtime.utils.InAppMessagingConstants
 import org.jetbrains.annotations.NotNull
-import org.jetbrains.annotations.Nullable
 import java.util.Collections
 import java.util.Date
 import java.util.Locale
@@ -77,7 +76,7 @@ class CustomEvent(@NonNull eventName: String) : BaseEvent(EventType.CUSTOM, even
      */
     @RestrictTo(LIBRARY)
     @NotNull
-    override fun getAttributeMap(): Map<@NotNull String, @Nullable Attribute?> =
+    override fun getAttributeMap(): Map<String, Attribute?> =
             Collections.unmodifiableMap(attributesMap)
 
     /**
@@ -85,7 +84,7 @@ class CustomEvent(@NonNull eventName: String) : BaseEvent(EventType.CUSTOM, even
      */
     @RestrictTo(LIBRARY)
     @NotNull
-    override fun getRatEventMap(): Map<@NotNull String, @NotNull Any> {
+    override fun getRatEventMap(): Map<String, Any> {
         // Making a list of all custom attributes.
         val ratAttributeList = ArrayList<RatAttribute>()
         for (attribute in attributesMap.values) {

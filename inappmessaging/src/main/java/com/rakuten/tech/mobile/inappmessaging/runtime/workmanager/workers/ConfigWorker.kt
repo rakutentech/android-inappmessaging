@@ -16,8 +16,8 @@ import com.rakuten.tech.mobile.inappmessaging.runtime.utils.RuntimeUtil
 import com.rakuten.tech.mobile.inappmessaging.runtime.utils.WorkerUtils
 import com.rakuten.tech.mobile.inappmessaging.runtime.workmanager.schedulers.ConfigScheduler
 import com.rakuten.tech.mobile.inappmessaging.runtime.workmanager.schedulers.MessageMixerPingScheduler
+import com.rakuten.tech.mobile.sdkutils.logger.Logger
 import retrofit2.Response
-import timber.log.Timber
 import java.net.HttpURLConnection
 import java.util.concurrent.atomic.AtomicInteger
 
@@ -49,7 +49,7 @@ internal class ConfigWorker(
      */
     @SuppressWarnings("LongMethod", "TooGenericExceptionCaught")
     override fun doWork(): Result {
-        Timber.tag(TAG).d(hostRepo.getConfigUrl())
+        Logger(TAG).debug(hostRepo.getConfigUrl())
         val hostAppId = hostRepo.getPackageName()
         val locale = hostRepo.getDeviceLocale()
         val hostAppVersion = hostRepo.getVersion()
@@ -70,7 +70,7 @@ internal class ConfigWorker(
             // Executing the API network call.
             onResponse(configServiceCall.execute())
         } catch (e: Exception) {
-            Timber.tag(TAG).e(e)
+            Logger(TAG).error(e.message)
             // RETRY by default has exponential backoff baked in.
             Result.retry()
         }
@@ -93,7 +93,7 @@ internal class ConfigWorker(
             // Schedule a ping request to message mixer. Initial delay is 0
             // reset current delay to initial
             ConfigScheduler.currDelay = RetryDelayUtil.INITIAL_BACKOFF_DELAY
-            Timber.tag(TAG).d("Config Response: %d (%b)",
+            Logger(TAG).debug("Config Response: %d (%b)",
                     response.body()?.data?.rollOutPercentage, configRepo.isConfigEnabled())
             if (configRepo.isConfigEnabled()) {
                 // move temp data to persistent cache
