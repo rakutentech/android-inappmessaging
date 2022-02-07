@@ -60,7 +60,7 @@ internal abstract class TooltipMessageRepository : ReadyMessageRepository {
             synchronized(messages) {
                 messages.removeAll { message ->
                     if (message.getCampaignId() == campaignId) {
-                        // messages contain unique message (no two message have the same campaign id)
+                        // messages contain unique campaigns (no two campaigns have the same campaign id)
                         if (shouldIncrementTimesClosed) {
                             PingResponseMessageRepository.instance().incrementTimesClosed(listOf(message))
                         }

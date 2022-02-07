@@ -53,12 +53,18 @@ internal interface DisplayManager {
             // Find any displaying InApp Message view from the activity.
             return if (id != null) {
                 // id is not null if tooltip
-                activity.findViewById<ViewGroup>(R.id.in_app_message_tooltip_view)?.parent?.let {
-                    for (i in 0..(it as ViewGroup).childCount) {
-                        val child = it.getChildAt(i)
-                        if (child?.id == R.id.in_app_message_tooltip_view && child.tag == id) {
-                            scheduleRemoval(delay, child as ViewGroup, id, activity)
-                            break
+                activity.findViewById<ViewGroup>(R.id.in_app_message_tooltip_view)?.let {
+                    if (it.tag == id) {
+                        scheduleRemoval(delay, it, id, activity)
+                    } else {
+                        it.parent?.let { parent ->
+                            for (i in 0..(parent as ViewGroup).childCount) {
+                                val child = parent.getChildAt(i)
+                                if (child?.id == R.id.in_app_message_tooltip_view && child.tag == id) {
+                                    scheduleRemoval(delay, child as ViewGroup, id, activity)
+                                    break
+                                }
+                            }
                         }
                     }
                 }
