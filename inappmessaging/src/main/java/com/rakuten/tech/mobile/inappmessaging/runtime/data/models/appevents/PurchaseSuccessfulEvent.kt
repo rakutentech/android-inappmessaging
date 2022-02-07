@@ -8,7 +8,6 @@ import com.rakuten.tech.mobile.inappmessaging.runtime.data.models.Attribute
 import com.rakuten.tech.mobile.inappmessaging.runtime.data.models.rat.RatAttribute
 import com.rakuten.tech.mobile.inappmessaging.runtime.utils.InAppMessagingConstants
 import org.jetbrains.annotations.NotNull
-import org.jetbrains.annotations.Nullable
 import java.util.Collections
 import kotlin.collections.ArrayList
 import kotlin.collections.HashMap
@@ -64,7 +63,7 @@ class PurchaseSuccessfulEvent : BaseEvent(EventType.PURCHASE_SUCCESSFUL, EventTy
      * This method sets the list of purchased item IDs.
      */
     @NotNull
-    fun itemIdList(@NotNull itemIdList: List<@NotNull String>): PurchaseSuccessfulEvent {
+    fun itemIdList(@NotNull itemIdList: List<String>): PurchaseSuccessfulEvent {
         this.itemIdList = itemIdList
         return this
     }
@@ -74,7 +73,7 @@ class PurchaseSuccessfulEvent : BaseEvent(EventType.PURCHASE_SUCCESSFUL, EventTy
      */
     @RestrictTo(LIBRARY)
     @NotNull
-    override fun getRatEventMap(): Map<@NotNull String, @NotNull Any> {
+    override fun getRatEventMap(): Map<String, Any> {
         // Making a list of all custom attributes.
         val attributeList = ArrayList<RatAttribute>()
         attributeList.add(RatAttribute(PURCHASE_AMOUNT_MICROS_TAG, this.purchaseAmountMicros))
@@ -95,7 +94,7 @@ class PurchaseSuccessfulEvent : BaseEvent(EventType.PURCHASE_SUCCESSFUL, EventTy
      */
     @RestrictTo(LIBRARY)
     @NotNull
-    override fun getAttributeMap(): Map<@NotNull String, @Nullable Attribute?> {
+    override fun getAttributeMap(): Map<String, Attribute?> {
         val map = java.util.HashMap<String, Attribute>()
         map[PURCHASE_AMOUNT_MICROS_TAG] =
                 Attribute(PURCHASE_AMOUNT_MICROS_TAG, purchaseAmountMicros.toString(), ValueType.INTEGER)

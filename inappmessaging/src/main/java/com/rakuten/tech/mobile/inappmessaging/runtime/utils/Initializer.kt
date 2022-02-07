@@ -13,9 +13,10 @@ import com.rakuten.tech.mobile.inappmessaging.runtime.data.models.HostAppInfo
 import com.rakuten.tech.mobile.inappmessaging.runtime.data.repositories.HostAppInfoRepository
 import com.rakuten.tech.mobile.inappmessaging.runtime.exception.InAppMessagingException
 import com.rakuten.tech.mobile.inappmessaging.runtime.utils.CacheUtil.getMemoryCacheSize
+import com.rakuten.tech.mobile.sdkutils.PreferencesUtil
+import com.rakuten.tech.mobile.sdkutils.logger.Logger
 import com.squareup.picasso.LruCache
 import com.squareup.picasso.Picasso
-import timber.log.Timber
 import java.lang.ClassCastException
 import java.lang.IllegalStateException
 import java.util.Locale
@@ -39,7 +40,7 @@ internal object Initializer {
      * use HostAppInfoRepo.
      */
     @SuppressLint("HardwareIds") // Suppress lint check of using device id.
-    private fun getDeviceId(context: Context, sharedUtil: SharedPreferencesUtil) =
+    private fun getDeviceId(context: Context, sharedUtil: PreferencesUtil) =
             Settings.Secure.getString(context.contentResolver, Settings.Secure.ANDROID_ID)
                     ?: getUuid(context, sharedUtil)
 
@@ -64,7 +65,7 @@ internal object Initializer {
         val packageInfo: PackageInfo = try {
             context.packageManager.getPackageInfo(hostPackageName, 0)
         } catch (e: NameNotFoundException) {
-            Timber.tag(TAG).d(e)
+            Logger(TAG).debug(e.message)
             return ""
         }
 
@@ -84,7 +85,7 @@ internal object Initializer {
         context: Context,
         subscriptionKey: String?,
         configUrl: String?,
-        sharedUtil: SharedPreferencesUtil = SharedPreferencesUtil
+        sharedUtil: PreferencesUtil = PreferencesUtil
     ) {
         val hostAppInfo = HostAppInfo(getHostAppPackageName(context), getDeviceId(context, sharedUtil),
                 getHostAppVersion(context), subscriptionKey, getLocale(context), configUrl)
@@ -94,25 +95,23 @@ internal object Initializer {
 
         initializePicassoInstance(context)
 
-        Timber.tag(TAG).d(Gson().toJson(hostAppInfo))
+        Logger(TAG).debug(Gson().toJson(hostAppInfo))
     }
 
     /**
      * This method retrieves the stored UUID or generates a random ID if not available.
      * This value is only used if Settings.Secure.ANDROID_ID returns a null value.
      */
-    private fun getUuid(context: Context, sharedUtil: SharedPreferencesUtil): String {
-        val sharedPref = sharedUtil.createSharedPreference(context, "uuid")
-
-        if (sharedPref.contains(ID_KEY)) {
+    private fun getUuid(context: Context, sharedUtil: PreferencesUtil): String {
+        if (sharedUtil.contains(context, "uuid", ID_KEY)) {
             try {
-                return sharedPref.getString(ID_KEY, "").toString()
+                return sharedUtil.getString(context, "uuid", ID_KEY, "").toString()
             } catch (ex: ClassCastException) {
-                Timber.tag(TAG).d(ex.cause, "Incorrect type for $ID_KEY data")
+                Logger(TAG).debug(ex.cause, "Incorrect type for $ID_KEY data")
             }
         }
         val id = UUID.randomUUID().toString()
-        sharedPref.edit().putString(ID_KEY, id).apply()
+        sharedUtil.putString(context, "uuid", ID_KEY, id)
         return id
     }
 

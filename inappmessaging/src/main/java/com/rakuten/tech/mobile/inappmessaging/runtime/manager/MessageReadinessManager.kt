@@ -20,8 +20,8 @@ import com.rakuten.tech.mobile.inappmessaging.runtime.utils.RetryDelayUtil
 import com.rakuten.tech.mobile.inappmessaging.runtime.utils.RuntimeUtil
 import com.rakuten.tech.mobile.inappmessaging.runtime.utils.WorkerUtils
 import com.rakuten.tech.mobile.inappmessaging.runtime.workmanager.schedulers.MessageMixerPingScheduler
+import com.rakuten.tech.mobile.sdkutils.logger.Logger
 import retrofit2.Call
-import timber.log.Timber
 import java.net.HttpURLConnection
 import java.util.concurrent.atomic.AtomicBoolean
 
@@ -66,18 +66,18 @@ internal interface MessageReadinessManager {
             shouldRetry.set(true)
             val messageList: List<Message> = ReadyForDisplayMessageRepository.instance().getAllMessagesCopy()
             for (message in messageList) {
-                Timber.tag(TAG).d("checking permission for message: %s", message.getCampaignId())
+                Logger(TAG).debug("checking permission for message: %s", message.getCampaignId())
 
                 // First, check if this message should be displayed.
                 if (!shouldDisplayMessage(message)) {
-                    Timber.tag(TAG).d("skipping message: %s", message.getCampaignId())
+                    Logger(TAG).debug("skipping message: %s", message.getCampaignId())
                     // Skip to next message.
                     continue
                 }
 
                 // If message is test message, no need to do more checks.
                 if (message.isTest()) {
-                    Timber.tag(TAG).d("skipping test message: %s", message.getCampaignId())
+                    Logger(TAG).debug("skipping test message: %s", message.getCampaignId())
                     return message
                 }
 
@@ -170,7 +170,7 @@ internal interface MessageReadinessManager {
                 val response = call.execute()
                 return when {
                     response.isSuccessful -> {
-                        Timber.tag(DISP_TAG).d(
+                        Logger(DISP_TAG).debug(
                             "display: %b performPing: %b", response.body()?.display, response.body()?.performPing
                         )
                         response.body()
@@ -185,7 +185,7 @@ internal interface MessageReadinessManager {
                 }
             } catch (e: Exception) {
                 return checkAndRetry(call.clone()) {
-                    Timber.tag(DISP_TAG).e(e)
+                    Logger(DISP_TAG).error(e.message)
                     InApp.errorCallback?.let {
                         it(InAppMessagingException("In-App Messaging display permission request failed", e))
                     }

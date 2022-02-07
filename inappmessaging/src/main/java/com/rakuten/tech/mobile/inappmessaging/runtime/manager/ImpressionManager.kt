@@ -10,7 +10,7 @@ import com.rakuten.tech.mobile.inappmessaging.runtime.data.requests.ImpressionRe
 import com.rakuten.tech.mobile.inappmessaging.runtime.utils.InAppMessagingConstants
 import com.rakuten.tech.mobile.inappmessaging.runtime.utils.RuntimeUtil
 import com.rakuten.tech.mobile.inappmessaging.runtime.workmanager.schedulers.ImpressionScheduler
-import timber.log.Timber
+import com.rakuten.tech.mobile.sdkutils.logger.Logger
 import java.util.Collections
 import java.util.Date
 import kotlin.collections.ArrayList
@@ -72,7 +72,7 @@ internal class ImpressionManager {
             }
 
             impressionList.add(Impression(impressionType, currentTimeInMillis))
-            Timber.tag(TAG).d("impression %s, time: %d", impressionType.name, currentTimeInMillis)
+            Logger(TAG).debug("impression %s, time: %d", impressionType.name, currentTimeInMillis)
         }
         return impressionList
     }

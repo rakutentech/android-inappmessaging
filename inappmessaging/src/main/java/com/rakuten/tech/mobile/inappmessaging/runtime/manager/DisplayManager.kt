@@ -5,7 +5,7 @@ import android.content.Intent
 import android.view.ViewGroup
 import com.rakuten.tech.mobile.inappmessaging.runtime.R
 import com.rakuten.tech.mobile.inappmessaging.runtime.workmanager.workers.DisplayMessageWorker
-import timber.log.Timber
+import com.rakuten.tech.mobile.sdkutils.logger.Logger
 
 /**
  * Display manager, which controls displaying message, or removing message from the screen.
@@ -47,7 +47,7 @@ internal interface DisplayManager {
                 parent.isFocusableInTouchMode = true
                 parent.requestFocus()
                 parent.removeView(inAppMessageBaseView)
-                Timber.tag(TAG).d("View removed")
+                Logger(TAG).debug("View removed")
             }
             return inAppMessageBaseView?.tag
         }

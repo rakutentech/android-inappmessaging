@@ -8,7 +8,7 @@ import com.rakuten.tech.mobile.inappmessaging.runtime.utils.InAppMessagingConsta
 import com.rakuten.tech.mobile.inappmessaging.runtime.utils.InAppMessagingConstants.Companion.PACKAGE_NAME_IS_EMPTY_EXCEPTION
 import com.rakuten.tech.mobile.inappmessaging.runtime.utils.InAppMessagingConstants.Companion.SUBSCRIPTION_KEY_IS_EMPTY_EXCEPTION
 import com.rakuten.tech.mobile.inappmessaging.runtime.utils.InAppMessagingConstants.Companion.VERSION_IS_EMPTY_EXCEPTION
-import timber.log.Timber
+import com.rakuten.tech.mobile.sdkutils.logger.Logger
 import java.util.Locale
 
 /**
@@ -77,10 +77,10 @@ internal interface HostAppInfoRepository {
                     hostAppInfo.packageName.isNullOrEmpty() -> message = PACKAGE_NAME_IS_EMPTY_EXCEPTION
                     hostAppInfo.subscriptionKey.isNullOrEmpty() -> message = SUBSCRIPTION_KEY_IS_EMPTY_EXCEPTION
                     hostAppInfo.locale == null ->
-                        Timber.tag(TAG).e(LOCALE_IS_EMPTY_EXCEPTION)
+                        Logger(TAG).error(LOCALE_IS_EMPTY_EXCEPTION)
                     hostAppInfo.deviceId.isNullOrEmpty() ->
                         // Should continue initialization without device id.
-                        Timber.tag(TAG).e(DEVICE_ID_IS_EMPTY_EXCEPTION)
+                        Logger(TAG).error(DEVICE_ID_IS_EMPTY_EXCEPTION)
                 }
                 if (message.isNotEmpty()) {
                     throw InAppMessagingException(message)

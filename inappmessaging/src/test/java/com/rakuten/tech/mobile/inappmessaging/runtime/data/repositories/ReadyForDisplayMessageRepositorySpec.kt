@@ -10,6 +10,7 @@ import com.rakuten.tech.mobile.inappmessaging.runtime.TestUserInfoProvider
 import com.rakuten.tech.mobile.inappmessaging.runtime.UserInfoProvider
 import com.rakuten.tech.mobile.inappmessaging.runtime.data.models.messages.Message
 import com.rakuten.tech.mobile.inappmessaging.runtime.data.models.messages.ValidTestMessage
+import com.rakuten.tech.mobile.sdkutils.PreferencesUtil
 import org.amshove.kluent.*
 import org.junit.Before
 import org.junit.Test
@@ -42,6 +43,13 @@ class ReadyForDisplayMessageRepositorySpec : BaseTest() {
         ReadyForDisplayMessageRepository.instance().replaceAllMessages(messageList)
         ReadyForDisplayMessageRepository.instance().getAllMessagesCopy().shouldHaveSize(2)
 
+        ReadyForDisplayMessageRepository.instance().clearMessages()
+        ReadyForDisplayMessageRepository.instance().getAllMessagesCopy().shouldHaveSize(0)
+    }
+
+    @Test
+    fun `should not crash while clearing messages`() {
+        InAppMessaging.setUninitializedInstance(true)
         ReadyForDisplayMessageRepository.instance().clearMessages()
         ReadyForDisplayMessageRepository.instance().getAllMessagesCopy().shouldHaveSize(0)
     }
@@ -130,9 +138,21 @@ class ReadyForDisplayMessageRepositorySpec : BaseTest() {
 
     @Test
     fun `should not crash and clear previous when forced cast exception`() {
+        val infoProvider = TestUserInfoProvider()
+        initializeInstance(infoProvider)
+        PreferencesUtil.putFloat(
+            ApplicationProvider.getApplicationContext(),
+            InAppMessaging.getPreferencesFile(),
+            ReadyForDisplayMessageRepository.READY_DISPLAY_KEY,
+            1.0f
+        )
+        ReadyForDisplayMessageRepository.instance().getAllMessagesCopy().shouldBeEmpty()
+    }
+
+    @Test
+    fun `should not crash and reset map`() {
         setupAndTestMultipleUser()
-        val editor = InAppMessaging.instance().getSharedPref()?.edit()
-        editor?.putInt(ReadyForDisplayMessageRepository.READY_DISPLAY_KEY, 1)?.apply()
+        InAppMessaging.setUninitializedInstance(true)
         ReadyForDisplayMessageRepository.instance().getAllMessagesCopy().shouldBeEmpty()
     }
 

@@ -6,7 +6,6 @@ import com.rakuten.tech.mobile.inappmessaging.runtime.data.enums.EventType
 import com.rakuten.tech.mobile.inappmessaging.runtime.data.models.Attribute
 import com.rakuten.tech.mobile.inappmessaging.runtime.utils.InAppMessagingConstants
 import org.jetbrains.annotations.NotNull
-import org.jetbrains.annotations.Nullable
 import java.util.Locale
 import java.util.Calendar
 import java.util.Collections
@@ -71,7 +70,7 @@ abstract class BaseEvent(
      */
     @RestrictTo(LIBRARY)
     @NotNull
-    override fun getRatEventMap(): Map<@NotNull String, @NotNull Any> {
+    override fun getRatEventMap(): Map<String, Any> {
         val map = HashMap<String, Any>()
         map[InAppMessagingConstants.RAT_EVENT_KEY_EVENT_NAME] = eventName
         map[InAppMessagingConstants.RAT_EVENT_KEY_EVENT_TIMESTAMP] = timestamp
@@ -84,7 +83,7 @@ abstract class BaseEvent(
      */
     @RestrictTo(LIBRARY)
     @NotNull
-    override fun getAttributeMap(): Map<@NotNull String, @Nullable Attribute?> = HashMap()
+    override fun getAttributeMap(): Map<String, Attribute?> = HashMap()
 
     override fun shouldNotClear() = shouldNotClear
 
