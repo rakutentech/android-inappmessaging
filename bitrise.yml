@@ -180,6 +180,7 @@ workflows:
                 git switch -C $BITRISE_GIT_BRANCH
             elif [[ ! $BITRISE_GIT_TAG == *"-"* ]]; then
                 echo "This is a release step, just making sure we are at master"
+                git fetch --no-tags origin master
                 git switch master
             else
                 echo "This is a PR from the repo, just making sure we are at the right branch"
