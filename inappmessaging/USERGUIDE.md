@@ -384,9 +384,13 @@ Documents targeting Product Managers:
 
 ## <a name="changelog"></a> Changelog
 
-### 6.1.0 (in-progress)
+### 6.1.0 (2022-02-09)
 * SDKCF-4470: Updated the layout for close and campaign buttons. Added feature to customize text and button fonts, please see [custom font section](#custom-font) for details.
+* SDKCF-4684: Fixed Picasso bitmap retrieval to avoid crash on large images.
 * SDKCF-4650: Refactored handling for different responses from endpoint requests for consistency and better logging.
+* SDKCF-4690: Changed common code to use SDK Utils: Logger and SharedPreferences
+* SDKCF-4799: Fixed reported issues due to version update of SonarQube
+* SDKCF-4636: Refactored handling for different responses from endpoint requests for consistency and better logging.
 * SDKCF-4729: Added error handling for display permission request.
 
 ### 6.0.0 (2021-12-03)
