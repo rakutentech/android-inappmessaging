@@ -1,7 +1,7 @@
 apply plugin: 'org.sonarqube'
 
 def branch = System.getenv("BITRISE_GIT_BRANCH")
-def baseBranch = 'master'
+def baseBranch = 'ci/dependency-check'
 
 sonarqube {
     properties {
