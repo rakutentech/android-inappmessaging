@@ -1,0 +1,27 @@
+allprojects {
+    apply plugin: 'org.owasp.dependencycheck'
+    dependencyCheck {
+        skipProjects = [':test']
+        // set the Common Vulnerability Scoring System value
+        // https://nvd.nist.gov/vuln-metrics/cvsshttps://nvd.nist.gov/vuln-metrics/cvss
+        failBuildOnCVSS = Integer.valueOf(DEPENDENCY_CHECK_FAILBUID_CVSS)
+        outputDirectory = 'build/reports/dependency-check'
+        formats = ['JSON', 'HTML']
+        showSummary true
+    }
+}
+
+subprojects { subproject ->
+    // skip dependencyCheck scan for sample apps
+    if( ['test']
+            .contains(subproject.name)
+    ) {
+        dependencyCheck {
+            skip true
+        }
+    } else {
+        afterEvaluate {
+            tasks.check.dependsOn 'dependencyCheckAggregate'
+        }
+    }
+}
