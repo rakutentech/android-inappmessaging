@@ -320,6 +320,34 @@ class MessageEventReconciliationUtilReconcileSpec : MessageEventReconciliationUt
     }
 
     @Test
+    fun `should not reconcile message with invalid event`() {
+        val inputMessageList = ArrayList<Message>()
+        inputMessageList.add(message2)
+        val attrList = ArrayList<TriggerAttribute>()
+        `when`(trigger1.triggerAttributes).thenReturn(attrList)
+        `when`(trigger1.eventType).thenReturn(EventType.INVALID.typeId)
+        `when`(trigger1.eventName).thenReturn(EventType.APP_START.name)
+
+        val outputMessageList = MessageEventReconciliationUtil.instance()
+            .reconcileMessagesAndEvents(inputMessageList)
+        outputMessageList.shouldHaveSize(0)
+    }
+
+    @Test
+    fun `should not reconcile message with invalid event type`() {
+        val inputMessageList = ArrayList<Message>()
+        inputMessageList.add(message2)
+        val attrList = ArrayList<TriggerAttribute>()
+        `when`(trigger1.triggerAttributes).thenReturn(attrList)
+        `when`(trigger1.eventType).thenReturn(10)
+        `when`(trigger1.eventName).thenReturn(EventType.APP_START.name)
+
+        val outputMessageList = MessageEventReconciliationUtil.instance()
+            .reconcileMessagesAndEvents(inputMessageList)
+        outputMessageList.shouldHaveSize(0)
+    }
+
+    @Test
     fun `should consider required set of satisfied triggers for non-persistent type (login)`() {
         val inputMessageList = ArrayList<Message>()
         inputMessageList.add(message2)

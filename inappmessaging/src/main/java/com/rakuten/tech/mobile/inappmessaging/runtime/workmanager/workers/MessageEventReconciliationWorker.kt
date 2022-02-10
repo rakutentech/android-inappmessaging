@@ -10,7 +10,7 @@ import com.rakuten.tech.mobile.inappmessaging.runtime.data.repositories.TooltipM
 import com.rakuten.tech.mobile.inappmessaging.runtime.manager.DisplayManager
 import com.rakuten.tech.mobile.inappmessaging.runtime.utils.MessageEventReconciliationUtil
 import com.rakuten.tech.mobile.inappmessaging.runtime.utils.RuntimeUtil.getCurrentTimeMillis
-import timber.log.Timber
+import com.rakuten.tech.mobile.sdkutils.logger.Logger
 
 /**
  * This worker's main task is to reconcile messages with local events. This worker must be a unique
@@ -39,7 +39,7 @@ internal class MessageEventReconciliationWorker(
      */
     @SuppressWarnings("LongMethod")
     override fun doWork(): Result {
-        Timber.tag(TAG).d("doWork()")
+        Logger(TAG).debug("doWork()")
         var startTime: Long = 0
         if (BuildConfig.DEBUG) {
             startTime = getCurrentTimeMillis()
@@ -70,7 +70,7 @@ internal class MessageEventReconciliationWorker(
         if (BuildConfig.DEBUG) {
             endTime = getCurrentTimeMillis()
         }
-        Timber.tag(TAG).d("Time took to reconcile: %d milliseconds", endTime - startTime)
+        Logger(TAG).debug("Time took to reconcile: %d milliseconds", endTime - startTime)
         return Result.success()
     }
 

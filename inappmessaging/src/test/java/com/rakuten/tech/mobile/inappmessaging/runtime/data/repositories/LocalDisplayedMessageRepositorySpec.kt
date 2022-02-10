@@ -15,6 +15,7 @@ import com.rakuten.tech.mobile.inappmessaging.runtime.data.responses.ping.Contro
 import com.rakuten.tech.mobile.inappmessaging.runtime.data.responses.ping.MessagePayload
 import com.rakuten.tech.mobile.inappmessaging.runtime.data.responses.ping.MessageSettings
 import com.rakuten.tech.mobile.inappmessaging.runtime.exception.InAppMessagingException
+import com.rakuten.tech.mobile.sdkutils.PreferencesUtil
 import org.amshove.kluent.*
 import org.junit.Before
 import org.junit.Test
@@ -107,6 +108,14 @@ class LocalDisplayedMessageRepositorySpec : BaseTest() {
     }
 
     @Test
+    fun `should not crash while clearing messages`() {
+        val message = ValidTestMessage()
+        InAppMessaging.setUninitializedInstance(true)
+        LocalDisplayedMessageRepository.instance().clearMessages()
+        LocalDisplayedMessageRepository.instance().numberOfTimesDisplayed(message) shouldBeEqualTo 0
+    }
+
+    @Test
     fun `should return one after clearing then adding`() {
         val message = ValidTestMessage()
         LocalDisplayedMessageRepository.instance().addMessage(message)
@@ -127,19 +136,30 @@ class LocalDisplayedMessageRepositorySpec : BaseTest() {
 
     @Test
     fun `should not crash and clear previous when forced cast exception`() {
-        val message = setupAndTestMultipleUser()
-        val editor = InAppMessaging.instance().getSharedPref()?.edit()
-        editor?.putInt(LocalDisplayedMessageRepository.LOCAL_DISPLAYED_KEY, 1)?.apply()
-
-        LocalDisplayedMessageRepository.instance().numberOfTimesDisplayed(message) shouldBeEqualTo 0
+        val infoProvider = TestUserInfoProvider()
+        initializeInstance(infoProvider)
+        PreferencesUtil.putLong(
+            ApplicationProvider.getApplicationContext(),
+            InAppMessaging.getPreferencesFile(),
+            LocalDisplayedMessageRepository.LOCAL_DISPLAYED_KEY, 10L
+        )
+        LocalDisplayedMessageRepository.instance().numberOfTimesDisplayed(ValidTestMessage()) shouldBeEqualTo 0
     }
 
     @Test
     fun `should not crash and clear previous when invalid format`() {
         val message = setupAndTestMultipleUser()
-        val editor = InAppMessaging.instance().getSharedPref()?.edit()
-        editor?.putString(LocalDisplayedMessageRepository.LOCAL_DISPLAYED_KEY, "invalid")?.apply()
+        PreferencesUtil.putString(
+            ApplicationProvider.getApplicationContext(), InAppMessaging.getPreferencesFile(),
+            LocalDisplayedMessageRepository.LOCAL_DISPLAYED_KEY, "invalid"
+        )
+        LocalDisplayedMessageRepository.instance().numberOfTimesDisplayed(message) shouldBeEqualTo 0
+    }
 
+    @Test
+    fun `should not crash and reset displayed map`() {
+        val message = setupAndTestMultipleUser()
+        InAppMessaging.setUninitializedInstance(true)
         LocalDisplayedMessageRepository.instance().numberOfTimesDisplayed(message) shouldBeEqualTo 0
     }
 

@@ -22,7 +22,7 @@ import com.rakuten.tech.mobile.inappmessaging.runtime.data.responses.ping.OnClic
 import com.rakuten.tech.mobile.inappmessaging.runtime.data.responses.ping.Trigger
 import com.rakuten.tech.mobile.inappmessaging.runtime.manager.EventsManager
 import com.rakuten.tech.mobile.inappmessaging.runtime.manager.ImpressionManager
-import timber.log.Timber
+import com.rakuten.tech.mobile.sdkutils.logger.Logger
 import java.util.Date
 import kotlin.collections.ArrayList
 
@@ -153,7 +153,7 @@ internal class MessageActionsCoroutine(
                 try {
                     activityContext.startActivity(intent)
                 } catch (e: ActivityNotFoundException) {
-                    Timber.tag(TAG).d(e)
+                    Logger(TAG).debug(e.message)
                 }
             }
         }

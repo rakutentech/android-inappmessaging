@@ -54,6 +54,6 @@ class RuntimeUtilSpec : BaseTest() {
 
     @Test
     fun `should get null with invalid url`() {
-        RuntimeUtil.getImage("invalid").shouldBeNull()
+        RuntimeUtil.getImage("https://test.jpg").shouldBeNull()
     }
 }

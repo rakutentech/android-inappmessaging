@@ -18,9 +18,9 @@ import com.rakuten.tech.mobile.inappmessaging.runtime.utils.RuntimeUtil
 import com.rakuten.tech.mobile.inappmessaging.runtime.utils.WorkerUtils
 import com.rakuten.tech.mobile.inappmessaging.runtime.workmanager.schedulers.EventMessageReconciliationScheduler
 import com.rakuten.tech.mobile.inappmessaging.runtime.workmanager.schedulers.MessageMixerPingScheduler
+import com.rakuten.tech.mobile.sdkutils.logger.Logger
 import retrofit2.Call
 import retrofit2.Response
-import timber.log.Timber
 import java.net.HttpURLConnection
 import java.util.concurrent.atomic.AtomicInteger
 import kotlin.collections.ArrayList
@@ -73,7 +73,7 @@ internal class MessageMixerWorker(
             // Execute a thread blocking API network call, and handle response.
             onResponse(responseCall!!.execute())
         } catch (e: Exception) {
-            Timber.tag(TAG).e(e)
+            Logger(TAG).error(e.message)
             Result.retry()
         }
     }
@@ -110,7 +110,7 @@ internal class MessageMixerWorker(
 
                 // Schedule next ping.
                 scheduleNextPing(messageMixerResponse.nextPingMillis)
-                Timber.tag(TAG).d("campaign size: %d", messageMixerResponse.data.size)
+                Logger(TAG).debug("campaign size: %d", messageMixerResponse.data.size)
             }
         } else return when {
             response.code() == RetryDelayUtil.RETRY_ERROR_CODE -> {
@@ -146,7 +146,7 @@ internal class MessageMixerWorker(
         // reset current delay to initial
         MessageMixerPingScheduler.currDelay = RetryDelayUtil.INITIAL_BACKOFF_DELAY
         messageMixerScheduler.pingMessageMixerService(nextPingMillis)
-        Timber.tag(TAG).d("Next ping scheduled in: %d", nextPingMillis)
+        Logger(TAG).debug("Next ping scheduled in: %d", nextPingMillis)
     }
 
     /**

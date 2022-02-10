@@ -3,19 +3,19 @@ package com.rakuten.tech.mobile.inappmessaging.runtime.utils
 import androidx.work.ListenableWorker
 import com.rakuten.tech.mobile.inappmessaging.runtime.InApp
 import com.rakuten.tech.mobile.inappmessaging.runtime.exception.InAppMessagingException
-import timber.log.Timber
+import com.rakuten.tech.mobile.sdkutils.logger.Logger
 
 internal object WorkerUtils {
     fun logRequestError(tag: String, code: Int, message: String?) {
         val errMsg = "Response Code $code: ${message ?: "no error message"}"
-        Timber.tag(tag).e(errMsg)
+        Logger(tag).error(errMsg)
         InApp.errorCallback?.let {
             it(InAppMessagingException("$tag: $errMsg"))
         }
     }
 
     fun logSilentRequestError(tag: String, code: Int, message: String?) {
-        Timber.tag(tag).d("Response Code $code: ${message ?: "no error message"}")
+        Logger(tag).debug("Response Code $code: ${message ?: "no error message"}")
     }
 
     fun checkRetry(counter: Int, retryFunc: () -> ListenableWorker.Result): ListenableWorker.Result {
