@@ -8,7 +8,7 @@ internal data class Tooltip(
     @SerializedName("position")
     val position: String,
     @SerializedName("redirectURL")
-    val url: String?,
+    val url: String? = null,
     @SerializedName("auto-disappear")
-    val autoDisappear: Int?
+    val autoDisappear: Int? = null
 )

@@ -6,12 +6,14 @@ import com.rakuten.tech.mobile.inappmessaging.runtime.data.responses.ping.*
 
 internal class ValidTestMessage(
     private val campaignId: String = DEFAULT_CAMPAIGN_ID,
-    private val isTest: Boolean = IS_TEST
+    private val isTest: Boolean = IS_TEST,
+    private val type: Int = InAppMessageType.MODAL.typeId,
+    private val tooltip: Tooltip? = null
 ) : Message {
     internal var timesClosed = 0
     private var max = 1
 
-    override fun getType(): Int = InAppMessageType.MODAL.typeId
+    override fun getType(): Int = type
 
     override fun getCampaignId() = campaignId
 
@@ -38,7 +40,7 @@ internal class ValidTestMessage(
 
     override fun getContexts(): List<String> = listOf()
 
-    override fun getTooltipConfig(): Tooltip? = null
+    override fun getTooltipConfig(): Tooltip? = tooltip
 
     override fun getNumberOfTimesClosed() = timesClosed
 
@@ -63,7 +65,7 @@ internal class ValidTestMessage(
     }
 
     companion object {
-        private const val DEFAULT_CAMPAIGN_ID = "5bf41c52-e4c0-4cb2-9183-df429e84d681"
+        internal const val DEFAULT_CAMPAIGN_ID = "5bf41c52-e4c0-4cb2-9183-df429e84d681"
         private const val IS_TEST = true
         private const val DEFAULT_COLOR = "#000000"
     }

@@ -57,6 +57,7 @@ internal data class CampaignData(
             // change type to tool tip (this will be fixed once the backend supports tooltip)
             type = InAppMessageType.TOOLTIP.typeId
             tooltip = Gson().fromJson(messagePayload.messageBody, Tooltip::class.java)
+            // TODO add exception handling
         }
         return tooltip
     }

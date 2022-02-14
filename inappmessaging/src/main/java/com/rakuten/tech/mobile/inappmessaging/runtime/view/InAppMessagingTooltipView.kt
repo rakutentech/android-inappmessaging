@@ -25,11 +25,11 @@ import com.rakuten.tech.mobile.inappmessaging.runtime.InAppMessaging
 import com.rakuten.tech.mobile.inappmessaging.runtime.R
 import com.rakuten.tech.mobile.inappmessaging.runtime.data.enums.PositionType
 import com.rakuten.tech.mobile.inappmessaging.runtime.data.models.messages.Message
-import com.rakuten.tech.mobile.inappmessaging.runtime.utils.ContextExtension.findViewByName
+import com.rakuten.tech.mobile.inappmessaging.runtime.utils.ResourceUtils
 import com.rakuten.tech.mobile.inappmessaging.runtime.utils.ViewUtil
+import com.rakuten.tech.mobile.sdkutils.logger.Logger
 import com.squareup.picasso.Callback
 import com.squareup.picasso.Picasso
-import timber.log.Timber
 
 @SuppressWarnings("LargeClass", "LongMethod")
 internal class InAppMessagingTooltipView(
@@ -83,7 +83,7 @@ internal class InAppMessagingTooltipView(
                         }
 
                         override fun onError(e: Exception?) {
-                            Timber.tag(TAG).d(e?.cause, "Downloading image failed $imageUrl")
+                            Logger(TAG).debug(e?.cause, "Downloading image failed $imageUrl")
                         }
                     }
 
@@ -109,7 +109,7 @@ internal class InAppMessagingTooltipView(
                         .centerInside()
                         .into(it, callback)
                 } catch (ex: Exception) {
-                    Timber.tag(TAG).d(ex, "Downloading image failed $imageUrl")
+                    Logger(TAG).debug(ex, "Downloading image failed $imageUrl")
                 }
             }
         }
@@ -299,7 +299,8 @@ internal class InAppMessagingTooltipView(
         (parent as ViewGroup).clipToPadding = false
         val imageView = findViewById<ImageView>(R.id.message_tooltip_image_view)
         viewId?.let {
-            InAppMessaging.instance().getRegisteredActivity()?.findViewByName<View>(it)?.let { view ->
+            val activity = InAppMessaging.instance().getRegisteredActivity() ?: return
+            ResourceUtils.findViewByName<View>(activity, it)?.let { view ->
                 val buttonSize = findViewById<ImageButton>(R.id.message_close_button)?.layoutParams?.height ?: 0
                 ViewUtil.getPosition(
                     view, type, imageView.layoutParams.width, imageView.layoutParams.height, buttonSize, buttonSize

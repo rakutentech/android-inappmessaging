@@ -171,20 +171,6 @@ open class LocalEventRepositorySpec : BaseTest() {
     }
 
     @Test
-    fun `should not crash when forced cast exception`() {
-        val infoProvider = TestUserInfoProvider()
-        initializeInstance(infoProvider)
-        PreferencesUtil.putInt(
-            ApplicationProvider.getApplicationContext(),
-            InAppMessaging.getPreferencesFile(),
-            LocalEventRepository.LOCAL_EVENT_KEY,
-            1
-        )
-        LocalEventRepository.instance().addEvent(LoginSuccessfulEvent())
-        LocalEventRepository.instance().getEvents().shouldHaveSize(1)
-    }
-
-    @Test
     fun `should check and reset list during event handling`() {
         setupAndTestMultipleUser()
         InAppMessaging.setUninitializedInstance(true)
@@ -291,20 +277,6 @@ class LocalEventRepositoryExceptionSpec : LocalEventRepositorySpec() {
         val captor = argumentCaptor<InAppMessagingException>()
         Mockito.verify(mockCallback, times(1)).invoke(captor.capture())
         captor.firstValue shouldBeInstanceOf InAppMessagingException::class.java
-    }
-
-    @Test
-    fun `should not crash and clear previous when forced cast exception`() {
-        setupAndTestMultipleUser()
-        PreferencesUtil.putInt(
-            ApplicationProvider.getApplicationContext(),
-            InAppMessaging.getPreferencesFile(),
-            LocalEventRepository.LOCAL_EVENT_KEY,
-            1
-        )
-
-        LocalEventRepository.instance().addEvent(LoginSuccessfulEvent())
-        LocalEventRepository.instance().getEvents().shouldHaveSize(2) // including persistent type
     }
 
     @Test

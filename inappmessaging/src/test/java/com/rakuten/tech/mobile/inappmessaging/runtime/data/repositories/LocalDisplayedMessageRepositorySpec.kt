@@ -135,18 +135,6 @@ class LocalDisplayedMessageRepositorySpec : BaseTest() {
     }
 
     @Test
-    fun `should not crash and clear previous when forced cast exception`() {
-        val infoProvider = TestUserInfoProvider()
-        initializeInstance(infoProvider)
-        PreferencesUtil.putLong(
-            ApplicationProvider.getApplicationContext(),
-            InAppMessaging.getPreferencesFile(),
-            LocalDisplayedMessageRepository.LOCAL_DISPLAYED_KEY, 10L
-        )
-        LocalDisplayedMessageRepository.instance().numberOfTimesDisplayed(ValidTestMessage()) shouldBeEqualTo 0
-    }
-
-    @Test
     fun `should not crash and clear previous when invalid format`() {
         val message = setupAndTestMultipleUser()
         PreferencesUtil.putString(
@@ -190,6 +178,13 @@ class LocalDisplayedMessageRepositorySpec : BaseTest() {
         PingResponseMessageRepository.instance().lastPingMillis = Calendar.getInstance().timeInMillis
         LocalDisplayedMessageRepository.instance().addMessage(message)
         LocalDisplayedMessageRepository.instance().numberOfDisplaysAfterPing(message) shouldBeEqualTo 1
+    }
+
+    @Test
+    fun `should return correct value if tooltip was already displayed`() {
+        LocalDisplayedMessageRepository.instance().addTooltipMessage("test")
+        LocalDisplayedMessageRepository.instance().isTooltipDisplayed("test").shouldBeTrue()
+        LocalDisplayedMessageRepository.instance().isTooltipDisplayed("not-test").shouldBeFalse()
     }
 
     private fun setupAndTestMultipleUser(): ValidTestMessage {

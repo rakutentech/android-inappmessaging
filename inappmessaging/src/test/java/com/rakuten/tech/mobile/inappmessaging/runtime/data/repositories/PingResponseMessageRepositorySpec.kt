@@ -12,7 +12,6 @@ import com.rakuten.tech.mobile.inappmessaging.runtime.data.models.messages.Inval
 import com.rakuten.tech.mobile.inappmessaging.runtime.data.models.messages.Message
 import com.rakuten.tech.mobile.inappmessaging.runtime.data.models.messages.ValidTestMessage
 import com.rakuten.tech.mobile.inappmessaging.runtime.data.responses.ping.Trigger
-import com.rakuten.tech.mobile.sdkutils.PreferencesUtil
 import org.amshove.kluent.*
 import org.junit.Before
 import org.junit.Test
@@ -185,19 +184,6 @@ class PingResponseMessageRepositorySpec : BaseTest() {
         for (msg in PingResponseMessageRepository.instance().getAllMessagesCopy()) {
             msg.getMaxImpressions() shouldBeEqualTo 3
         }
-    }
-
-    @Test
-    fun `should not crash and clear previous when forced cast exception`() {
-        val infoProvider = TestUserInfoProvider()
-        initializeInstance(infoProvider)
-        PreferencesUtil.putInt(
-            ApplicationProvider.getApplicationContext(),
-            InAppMessaging.getPreferencesFile(),
-            PingResponseMessageRepository.PING_RESPONSE_KEY,
-            1
-        )
-        PingResponseMessageRepository.instance().getAllMessagesCopy().shouldBeEmpty()
     }
 
     @Test

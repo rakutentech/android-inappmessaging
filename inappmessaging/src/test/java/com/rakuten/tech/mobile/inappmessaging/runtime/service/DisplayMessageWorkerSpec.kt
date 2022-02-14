@@ -216,13 +216,13 @@ class DisplayMessageWorkerSpec : BaseTest() {
     @Test
     fun `should not display campaign if activity is not registered`() {
         InAppMessaging.instance().unregisterMessageDisplayActivity()
-        Mockito.verify(activity).findViewById<View?>(ArgumentMatchers.anyInt())
+        Mockito.verify(activity, atLeast(2)).findViewById<View?>(ArgumentMatchers.anyInt())
         verifyHandlerCalled()
     }
 
     @Test
-    fun `should not display campaign if payload is null`() {
-        `when`(mockMessageManager.getNextDisplayMessage(false)).thenReturn(null)
+    fun `should not display campaign if payload is empty`() {
+        `when`(mockMessageManager.getNextDisplayMessage(false)).thenReturn(listOf())
         runBlocking {
             displayWorker.doWork() shouldBeEqualTo ListenableWorker.Result.success()
         }

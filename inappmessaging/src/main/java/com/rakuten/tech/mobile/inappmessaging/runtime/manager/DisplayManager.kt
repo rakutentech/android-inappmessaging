@@ -10,7 +10,7 @@ import android.widget.FrameLayout
 import com.rakuten.tech.mobile.inappmessaging.runtime.InAppMessaging
 import com.rakuten.tech.mobile.inappmessaging.runtime.R
 import com.rakuten.tech.mobile.inappmessaging.runtime.data.repositories.TooltipMessageRepository
-import com.rakuten.tech.mobile.inappmessaging.runtime.utils.ContextExtension.findViewByName
+import com.rakuten.tech.mobile.inappmessaging.runtime.utils.ResourceUtils
 import com.rakuten.tech.mobile.inappmessaging.runtime.workmanager.workers.DisplayMessageWorker
 import com.rakuten.tech.mobile.sdkutils.logger.Logger
 
@@ -53,21 +53,7 @@ internal interface DisplayManager {
             // Find any displaying InApp Message view from the activity.
             return if (id != null) {
                 // id is not null if tooltip
-                activity.findViewById<ViewGroup>(R.id.in_app_message_tooltip_view)?.let {
-                    if (it.tag == id) {
-                        scheduleRemoval(delay, it, id, activity)
-                    } else {
-                        it.parent?.let { parent ->
-                            for (i in 0..(parent as ViewGroup).childCount) {
-                                val child = parent.getChildAt(i)
-                                if (child?.id == R.id.in_app_message_tooltip_view && child.tag == id) {
-                                    scheduleRemoval(delay, child as ViewGroup, id, activity)
-                                    break
-                                }
-                            }
-                        }
-                    }
-                }
+                removeWithId(activity, id, delay)
                 null
             } else {
                 if (removeAll) {
@@ -75,8 +61,30 @@ internal interface DisplayManager {
                 }
                 // remove normal campaign
                 activity.findViewById<ViewGroup>(R.id.in_app_message_base_view)?.let {
-                    scheduleRemoval(delay, it)
+                    scheduleRemoval(delay, it, activity = activity)
                     it.tag
+                }
+            }
+        }
+
+        private fun removeWithId(activity: Activity, id: String?, delay: Int) {
+            activity.findViewById<ViewGroup>(R.id.in_app_message_tooltip_view)?.let {
+                if (it.tag == id) {
+                    scheduleRemoval(delay, it, id, activity)
+                } else {
+                    scheduleTargetChild(it, id, delay, activity)
+                }
+            }
+        }
+
+        private fun scheduleTargetChild(it: ViewGroup, id: String?, delay: Int, activity: Activity) {
+            it.parent?.let { parent ->
+                for (i in 0..(parent as ViewGroup).childCount) {
+                    val child = parent.getChildAt(i)
+                    if (child?.id == R.id.in_app_message_tooltip_view && child.tag == id) {
+                        scheduleRemoval(delay, child as ViewGroup, id, activity)
+                        break
+                    }
                 }
             }
         }
@@ -96,7 +104,7 @@ internal interface DisplayManager {
             }
         }
 
-        private fun scheduleRemoval(delay: Int, view: ViewGroup, id: String? = null, activity: Activity? = null) {
+        private fun scheduleRemoval(delay: Int, view: ViewGroup, id: String? = null, activity: Activity) {
             if (delay > 0) {
                 Handler(Looper.getMainLooper()).postDelayed(
                     { removeCampaign(view, id, activity) }, delay * MS_MULTIPLIER
@@ -107,7 +115,7 @@ internal interface DisplayManager {
             }
         }
 
-        private fun removeCampaign(inAppMessageBaseView: ViewGroup, id: String?, activity: Activity?) {
+        private fun removeCampaign(inAppMessageBaseView: ViewGroup, id: String?, activity: Activity) {
             // Removing just the InApp Message from the view hierarchy.
             if (inAppMessageBaseView.parent !is ViewGroup) {
                 // avoid crash
@@ -116,23 +124,7 @@ internal interface DisplayManager {
 
             val parent = inAppMessageBaseView.parent as ViewGroup
             if (parent.id == R.id.in_app_message_tooltip_layout) {
-                val gp = parent.parent
-                for (i in 0..parent.childCount) {
-                    val child = parent.getChildAt(i)
-                    if (child?.id == R.id.in_app_message_tooltip_view && child.tag == id) {
-                        // remove target tooltip view
-                        parent.removeView(child)
-                        break
-                    }
-                }
-                val tooltip = activity?.findViewById<ViewGroup>(R.id.in_app_message_tooltip_view)
-                if (tooltip == null && parent.childCount > 0) {
-                    val child = parent.getChildAt(0) // this is the scrollview
-                    // if there are no longer any tooltip existing, remove extra layout
-                    parent.removeView(child)
-                    (gp as ViewGroup).removeView(parent)
-                    gp.addView(child)
-                }
+                removeTooltip(parent, id, activity)
             } else {
                 parent.isFocusableInTouchMode = true
                 parent.requestFocus()
@@ -141,9 +133,29 @@ internal interface DisplayManager {
             Logger(TAG).debug("View removed")
         }
 
+        private fun removeTooltip(parent: ViewGroup, id: String?, activity: Activity) {
+            val gp = parent.parent
+            for (i in 0 until parent.childCount) {
+                val child = parent.getChildAt(i)
+                if (child?.id == R.id.in_app_message_tooltip_view && child.tag == id) {
+                    // remove target tooltip view
+                    parent.removeView(child)
+                    break
+                }
+            }
+            val tooltip = activity.findViewById<ViewGroup>(R.id.in_app_message_tooltip_view)
+            if (tooltip == null && parent.childCount > 0) {
+                val child = parent.getChildAt(0) // this is the scrollview
+                // if there are no longer any tooltip existing, remove extra layout
+                parent.removeView(child)
+                (gp as ViewGroup).removeView(parent)
+                gp.addView(child)
+            }
+        }
+
         override fun removeHiddenTargets(parent: ViewGroup) {
-            val activity = InAppMessaging.instance().getRegisteredActivity()
-            activity?.findViewById<FrameLayout>(R.id.in_app_message_tooltip_layout)?.let { it ->
+            val activity = InAppMessaging.instance().getRegisteredActivity() ?: return
+            activity.findViewById<FrameLayout>(R.id.in_app_message_tooltip_layout)?.let { it ->
                 val removeList = mutableListOf<View>()
                 for (i in 0..it.childCount) {
                     val child = it.getChildAt(i)
@@ -163,7 +175,7 @@ internal interface DisplayManager {
         private fun addToList(child: View, activity: Activity, parent: ViewGroup, removeList: MutableList<View>) {
             val message = TooltipMessageRepository.instance().getCampaign(child.tag as String)
             val target = message?.getTooltipConfig()?.id?.let {
-                activity.findViewByName<View>(it)
+                ResourceUtils.findViewByName<View>(activity, it)
             }
             val scrollBounds = Rect()
             parent.getHitRect(scrollBounds)

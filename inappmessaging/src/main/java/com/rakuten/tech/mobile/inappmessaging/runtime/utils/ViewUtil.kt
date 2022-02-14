@@ -6,6 +6,7 @@ import android.graphics.Rect
 import android.view.View
 import android.view.animation.Animation
 import android.view.animation.AnimationUtils
+import android.widget.FrameLayout
 import android.widget.ScrollView
 import androidx.core.widget.NestedScrollView
 import com.rakuten.tech.mobile.inappmessaging.runtime.R
@@ -74,27 +75,14 @@ internal object ViewUtil {
     }
 
     @SuppressWarnings("SwallowedException")
-    fun getScrollView(view: View): ScrollView? {
+    fun getScrollView(view: View): FrameLayout? {
         var currView = view.parent
         while (currView != null) {
             if (currView is ScrollView || currView is NestedScrollView) {
-                return currView as ScrollView
+                return currView as FrameLayout
             }
             currView = currView.parent
         }
         return null
     }
-
-//    /**
-//     * Returns the corresponding height to the available display size while keeping the aspect ratio.
-//     * @param context
-//     * @param width The given view's width.
-//     * @param height The given view's height.
-//     * @return The height of the available display size in pixels.
-//     */
-//    fun getDisplayHeight(context: Context, width: Int, height: Int): Int {
-//        val displayWidth = getDisplayWidth(context)
-//        val aspectRationFactor = displayWidth / width.toFloat()
-//        return (height * aspectRationFactor).toInt()
-//    }
 }

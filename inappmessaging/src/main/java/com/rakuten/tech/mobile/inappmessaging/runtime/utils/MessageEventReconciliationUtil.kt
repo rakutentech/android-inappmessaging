@@ -58,7 +58,7 @@ internal interface MessageEventReconciliationUtil {
                     // test messages are automatically added
                     // Check if message is reconciled.
                     // Add this message only once regardless of its max impressions.
-                    Timber.tag(TAG).d("Ready Messages: %s", message.getMessagePayload().header)
+                    Logger(TAG).debug("Ready Messages: %s", message.getMessagePayload().header)
                     if (message.getType() == InAppMessageType.TOOLTIP.typeId) {
                         toolTipMessages.add(message)
                     } else {

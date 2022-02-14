@@ -90,9 +90,9 @@ class InitializerSpec : BaseTest() {
         Settings.Secure.putString(appCtx.contentResolver, Settings.Secure.ANDROID_ID, null)
 
         // add test value
-        PreferencesUtil.putString(context, "uuid", Initializer.ID_KEY, "test_uuid")
+        PreferencesUtil.putString(appCtx, "uuid", Initializer.ID_KEY, "test_uuid")
 
-        Initializer.initializeSdk(appCtx, "test", "")
+        Initializer.initializeSdk(appCtx, "test", "", sharedUtil = PreferencesUtil)
 
         HostAppInfoRepository.instance().getDeviceId() shouldBeEqualTo "test_uuid"
     }

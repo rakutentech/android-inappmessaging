@@ -139,15 +139,18 @@ abstract class InAppMessaging internal constructor() {
             configScheduler.startConfig()
         }
 
-        internal fun setUninitializedInstance(isCacheHandling: Boolean = false) {
-            instance = NotInitializedInAppMessaging(isCacheHandling)
+        internal fun setUninitializedInstance(isCacheHandling: Boolean = false, act: Activity? = null) {
+            instance = NotInitializedInAppMessaging(isCacheHandling, act)
         }
 
         internal fun getPreferencesFile() = "internal_shared_prefs_" + AccountRepository.instance().userInfoHash
     }
 
     @SuppressWarnings("EmptyFunctionBlock", "TooManyFunctions")
-    internal class NotInitializedInAppMessaging(private var isCacheHandling: Boolean = false) : InAppMessaging() {
+    internal class NotInitializedInAppMessaging(
+        private var isCacheHandling: Boolean = false,
+        private val act: Activity? = null
+    ) : InAppMessaging() {
         override var onVerifyContext: (contexts: List<String>, campaignTitle: String) -> Boolean = { _, _ -> true }
 
         override fun registerPreference(userInfoProvider: UserInfoProvider) = Unit
@@ -159,7 +162,7 @@ abstract class InAppMessaging internal constructor() {
 
         override fun logEvent(event: Event) = Unit
 
-        override fun getRegisteredActivity(): Activity? = null
+        override fun getRegisteredActivity(): Activity? = act
 
         override fun getHostAppContext(): Context? = null
 

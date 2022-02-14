@@ -4,14 +4,13 @@ import android.app.Activity
 import android.view.View
 import android.view.ViewGroup
 import android.widget.FrameLayout
-import android.widget.ScrollView
 import androidx.annotation.UiThread
 import com.rakuten.tech.mobile.inappmessaging.runtime.R
 import com.rakuten.tech.mobile.inappmessaging.runtime.data.enums.InAppMessageType
 import com.rakuten.tech.mobile.inappmessaging.runtime.data.models.Tooltip
 import com.rakuten.tech.mobile.inappmessaging.runtime.data.models.messages.Message
 import com.rakuten.tech.mobile.inappmessaging.runtime.data.repositories.LocalDisplayedMessageRepository
-import com.rakuten.tech.mobile.inappmessaging.runtime.utils.ContextExtension.findViewByName
+import com.rakuten.tech.mobile.inappmessaging.runtime.utils.ResourceUtils
 import com.rakuten.tech.mobile.inappmessaging.runtime.utils.ViewUtil
 import com.rakuten.tech.mobile.inappmessaging.runtime.view.InAppMessageFullScreenView
 import com.rakuten.tech.mobile.inappmessaging.runtime.view.InAppMessageModalView
@@ -84,7 +83,7 @@ internal class DisplayMessageRunnable(
         it: Tooltip,
         toolTipView: InAppMessagingTooltipView
     ) {
-        hostActivity.findViewByName<View>(it.id)?.let { target ->
+        ResourceUtils.findViewByName<View>(hostActivity, it.id)?.let { target ->
             val scroll = ViewUtil.getScrollView(target)
             if (scroll != null) {
                 displayInScrollView(scroll, toolTipView)
@@ -98,11 +97,13 @@ internal class DisplayMessageRunnable(
         }
     }
 
-    private fun displayInScrollView(scroll: ScrollView, toolTipView: InAppMessagingTooltipView) {
+    internal var testLayout: FrameLayout? = null
+
+    private fun displayInScrollView(scroll: FrameLayout, toolTipView: InAppMessagingTooltipView) {
         var frame = hostActivity.findViewById<FrameLayout>(R.id.in_app_message_tooltip_layout)
         // use existing tooltip layout if already available
         if (frame == null) {
-            frame = FrameLayout(hostActivity)
+            frame = testLayout ?: FrameLayout(hostActivity)
             frame.id = R.id.in_app_message_tooltip_layout
             frame.layoutParams = FrameLayout.LayoutParams(
                 FrameLayout.LayoutParams.MATCH_PARENT,
@@ -121,19 +122,21 @@ internal class DisplayMessageRunnable(
 
     private fun shouldNotDisplay(messageType: InAppMessageType?): Boolean {
         val normalCampaign = hostActivity.findViewById<View?>(R.id.in_app_message_base_view)
-        if (messageType == InAppMessageType.TOOLTIP) {
+        return if (messageType == InAppMessageType.TOOLTIP) {
             // if normal non-slide-up campaign is displayed, don't display tooltip on top of normal campaign
             if (normalCampaign != null && normalCampaign !is InAppMessageSlideUpView) {
-                return true
+                true
+            } else {
+                checkTooltipDisplay()
             }
-            if (checkTooltipDisplay()) return true
+        } else {
+            normalCampaign != null
         }
-        return normalCampaign != null
     }
 
     private fun checkTooltipDisplay(): Boolean {
         hostActivity.findViewById<View?>(R.id.in_app_message_tooltip_view)?.parent?.let {
-            for (i in 0..(it as ViewGroup).childCount) {
+            for (i in 0 until (it as ViewGroup).childCount) {
                 val child = it.getChildAt(i)
                 if (child?.id == R.id.in_app_message_tooltip_view && child.tag == message.getCampaignId()) {
                     // tool campaign is already displayed, no need to display again

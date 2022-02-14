@@ -67,11 +67,11 @@ internal class MessageActionsCoroutine(
         message: Message,
         optOut: Boolean
     ) {
-        // Remove message from ReadyForDisplayMessageRepository.
         if (message.getType() != InAppMessageType.TOOLTIP.typeId) {
-            TooltipMessageRepository.instance().removeMessage(message.getCampaignId())
-        } else {
+            // Remove message from ReadyForDisplayMessageRepository.
             ReadyForDisplayMessageRepository.instance().removeMessage(message.getCampaignId())
+        } else {
+            TooltipMessageRepository.instance().removeMessage(message.getCampaignId())
         }
 
         // Adding message to LocalDisplayedMessageRepository.

@@ -8,7 +8,6 @@ import com.rakuten.tech.mobile.inappmessaging.runtime.data.responses.ping.Campai
 import com.rakuten.tech.mobile.sdkutils.PreferencesUtil
 import com.rakuten.tech.mobile.sdkutils.logger.Logger
 import org.json.JSONArray
-import java.lang.ClassCastException
 
 /**
  * Contains all messages are ready for display, but not yet displayed.
@@ -86,19 +85,14 @@ internal abstract class ReadyForDisplayMessageRepository : ReadyMessageRepositor
                     (onLaunch || user != AccountRepository.instance().userInfoHash)) {
                 user = AccountRepository.instance().userInfoHash
                 // reset message list from cached using updated user info
-                val listString = try {
-                    InAppMessaging.instance().getHostAppContext()?.let { it ->
-                        PreferencesUtil.getString(
-                            it,
-                            InAppMessaging.getPreferencesFile(),
-                            READY_DISPLAY_KEY,
-                            ""
-                        )
-                    } ?: ""
-                } catch (ex: ClassCastException) {
-                    Logger(TAG).debug(ex.cause, "Incorrect type for $READY_DISPLAY_KEY data")
-                    ""
-                }
+                val listString = InAppMessaging.instance().getHostAppContext()?.let { it ->
+                    PreferencesUtil.getString(
+                        it,
+                        InAppMessaging.getPreferencesFile(),
+                        READY_DISPLAY_KEY,
+                        ""
+                    )
+                } ?: ""
 
                 messages.clear()
                 try {

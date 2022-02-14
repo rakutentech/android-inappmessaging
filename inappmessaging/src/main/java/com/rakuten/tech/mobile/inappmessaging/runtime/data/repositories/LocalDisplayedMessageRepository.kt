@@ -9,11 +9,14 @@ import com.rakuten.tech.mobile.inappmessaging.runtime.data.models.messages.Messa
 import com.rakuten.tech.mobile.inappmessaging.runtime.exception.InAppMessagingException
 import com.rakuten.tech.mobile.sdkutils.PreferencesUtil
 import com.rakuten.tech.mobile.sdkutils.logger.Logger
-import java.lang.ClassCastException
 import java.util.Calendar
 import java.util.concurrent.ConcurrentHashMap
 import kotlin.collections.ArrayList
 import kotlin.collections.HashMap
+import kotlin.collections.HashSet
+import kotlin.collections.List
+import kotlin.collections.filter
+import kotlin.collections.mutableListOf
 import kotlin.collections.set
 
 /**
@@ -141,6 +144,7 @@ internal interface LocalDisplayedMessageRepository {
 
         override fun clearMessages() {
             messages.clear()
+            sessionMessages.clear()
             saveUpdatedMap()
         }
 
@@ -157,19 +161,14 @@ internal interface LocalDisplayedMessageRepository {
 
         @SuppressWarnings("TooGenericExceptionCaught", "LongMethod")
         private fun resetDisplayed() {
-            val listString = try {
-                InAppMessaging.instance().getHostAppContext()?.let { it ->
-                    PreferencesUtil.getString(
-                        it,
-                        InAppMessaging.getPreferencesFile(),
-                        LOCAL_DISPLAYED_KEY,
-                        ""
-                    )
-                } ?: ""
-            } catch (ex: ClassCastException) {
-                Logger(TAG).debug(ex.cause, "Incorrect JSON format for $LOCAL_DISPLAYED_KEY data")
-                ""
-            }
+            val listString = InAppMessaging.instance().getHostAppContext()?.let { it ->
+                PreferencesUtil.getString(
+                    it,
+                    InAppMessaging.getPreferencesFile(),
+                    LOCAL_DISPLAYED_KEY,
+                    ""
+                )
+            } ?: ""
             messages.clear()
             if (listString.isNotEmpty()) {
                 val type = object : TypeToken<HashMap<String, List<Long>>>() {}.type

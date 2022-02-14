@@ -4,7 +4,7 @@ import android.graphics.Rect
 import android.view.View
 import com.rakuten.tech.mobile.inappmessaging.runtime.InAppMessaging
 import com.rakuten.tech.mobile.inappmessaging.runtime.data.models.messages.Message
-import com.rakuten.tech.mobile.inappmessaging.runtime.utils.ContextExtension.findViewByName
+import com.rakuten.tech.mobile.inappmessaging.runtime.utils.ResourceUtils
 import com.rakuten.tech.mobile.inappmessaging.runtime.utils.ViewUtil
 
 /**
@@ -35,9 +35,9 @@ internal abstract class TooltipMessageRepository : ReadyMessageRepository {
 
         override fun getAllMessagesCopy(): List<Message> {
             synchronized(messages) {
-                val activity = InAppMessaging.instance().getRegisteredActivity()
+                val activity = InAppMessaging.instance().getRegisteredActivity() ?: return listOf()
                 return ArrayList(messages.filter { message ->
-                    val view = message.getTooltipConfig()?.id?.let { activity?.findViewByName<View>(it) }
+                    val view = message.getTooltipConfig()?.id?.let { ResourceUtils.findViewByName<View>(activity, it) }
                     shouldRemove(view)
                 })
             }
