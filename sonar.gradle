@@ -1,7 +1,7 @@
 apply plugin: 'org.sonarqube'
 
 def branch = System.getenv("BITRISE_GIT_BRANCH")
-def baseBranch = 'ci/dependency-check'
+def baseBranch = 'master'
 
 sonarqube {
     properties {
@@ -11,7 +11,7 @@ sonarqube {
         property 'sonar.login', System.getenv("SONARQUBE_TOKEN")
         property 'sonar.projectKey', System.getenv("SONARQUBE_PROJ_KEY")
         property 'sonar.projectVersion', scmVersion.version
-        if (branch == baseBranch) {
+        if (branch == baseBranch || branch == "") {
             property 'sonar.branch.name', branch
         } else {
             property 'sonar.pullrequest.key', System.getenv("BITRISE_PULL_REQUEST").findAll(/\d+/)*.toInteger().last()
@@ -21,7 +21,7 @@ sonarqube {
         property 'sonar.qualitygate.wait', true
 
         /* Dependency Check */
-        property 'sonar.dependencyCheck.skip', SONAR_DEPENDENCYCHECK_SKIP
+        property 'sonar.dependencyCheck.skip', System.getenv(SONAR_DEPENDENCYCHECK_SKIP)
         property 'sonar.dependencyCheck.jsonReportPath', 'build/reports/dependency-check/dependency-check-report.json'
         property 'sonar.dependencyCheck.htmlReportPath', 'build/reports/dependency-check/dependency-check-report.html'
     }
@@ -41,7 +41,6 @@ subprojects { subproject ->
             property 'sonar.test.inclusions', '**/test/**'
             property 'sonar.coverage.jacoco.xmlReportPaths', 'build/reports/jacoco/jacocoReleaseReport/jacocoReleaseReport.xml'
             property 'sonar.junit.reportPaths', 'build/test-results/testReleaseUnitTest'
-
         }
     }
 }
