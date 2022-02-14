@@ -3,25 +3,18 @@ allprojects {
     dependencyCheck {
         skipProjects = [':test']
         // set the Common Vulnerability Scoring System value
-        // https://nvd.nist.gov/vuln-metrics/cvsshttps://nvd.nist.gov/vuln-metrics/cvss
-        failBuildOnCVSS = Integer.valueOf(DEPENDENCY_CHECK_FAILBUID_CVSS)
+        // https://nvd.nist.gov/vuln-metrics/cvss
+        failBuildOnCVSS = System.getenv("DEPENDENCY_CHECK_FAILBUID_CVSS") as Integer
         outputDirectory = 'build/reports/dependency-check'
         formats = ['JSON', 'HTML']
-        showSummary true
     }
 }
 
 subprojects { subproject ->
-    // skip dependencyCheck scan for sample apps
-    if( ['test']
-            .contains(subproject.name)
-    ) {
+    // skip dependencyCheck scan for sample app
+    if( ['test'].contains(subproject.name)) {
         dependencyCheck {
             skip true
-        }
-    } else {
-        afterEvaluate {
-            tasks.check.dependsOn 'dependencyCheckAggregate'
         }
     }
 }
