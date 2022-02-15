@@ -79,7 +79,7 @@ internal interface DisplayManager {
 
         private fun scheduleTargetChild(it: ViewGroup, id: String?, delay: Int, activity: Activity) {
             it.parent?.let { parent ->
-                for (i in 0..(parent as ViewGroup).childCount) {
+                for (i in 0 until (parent as ViewGroup).childCount) {
                     val child = parent.getChildAt(i)
                     if (child?.id == R.id.in_app_message_tooltip_view && child.tag == id) {
                         scheduleRemoval(delay, child as ViewGroup, id, activity)
@@ -92,7 +92,7 @@ internal interface DisplayManager {
         private fun removeAllTooltip(activity: Activity, delay: Int) {
             activity.findViewById<ViewGroup>(R.id.in_app_message_tooltip_view)?.parent?.let {
                 val viewList = mutableListOf<View>()
-                for (i in 0..(it as ViewGroup).childCount) {
+                for (i in 0 until (it as ViewGroup).childCount) {
                     val child = it.getChildAt(i)
                     if (child?.id == R.id.in_app_message_tooltip_view) {
                         viewList.add(child)
@@ -157,7 +157,7 @@ internal interface DisplayManager {
             val activity = InAppMessaging.instance().getRegisteredActivity() ?: return
             activity.findViewById<FrameLayout>(R.id.in_app_message_tooltip_layout)?.let { it ->
                 val removeList = mutableListOf<View>()
-                for (i in 0..it.childCount) {
+                for (i in 0 until it.childCount) {
                     val child = it.getChildAt(i)
                     if (child?.id == R.id.in_app_message_tooltip_view) {
                         addToList(child, activity, parent, removeList)

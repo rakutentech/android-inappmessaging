@@ -7,15 +7,14 @@ import android.view.MotionEvent
 import android.view.View
 import android.widget.CheckBox
 import android.widget.Magnifier
-import com.nhaarman.mockitokotlin2.any
-import com.nhaarman.mockitokotlin2.anyOrNull
-import com.nhaarman.mockitokotlin2.eq
-import com.nhaarman.mockitokotlin2.times
+import com.nhaarman.mockitokotlin2.*
 import com.rakuten.tech.mobile.inappmessaging.runtime.BaseTest
 import com.rakuten.tech.mobile.inappmessaging.runtime.InAppMessaging
 import com.rakuten.tech.mobile.inappmessaging.runtime.R
 import com.rakuten.tech.mobile.inappmessaging.runtime.coroutine.MessageActionsCoroutine
 import com.rakuten.tech.mobile.inappmessaging.runtime.data.enums.ImpressionType
+import com.rakuten.tech.mobile.inappmessaging.runtime.data.enums.InAppMessageType
+import com.rakuten.tech.mobile.inappmessaging.runtime.data.models.Tooltip
 import com.rakuten.tech.mobile.inappmessaging.runtime.data.models.messages.Message
 import com.rakuten.tech.mobile.inappmessaging.runtime.data.models.messages.ValidTestMessage
 import com.rakuten.tech.mobile.inappmessaging.runtime.data.responses.ping.DisplaySettings
@@ -24,10 +23,7 @@ import com.rakuten.tech.mobile.inappmessaging.runtime.data.responses.ping.Messag
 import com.rakuten.tech.mobile.inappmessaging.runtime.manager.DisplayManager
 import com.rakuten.tech.mobile.inappmessaging.runtime.utils.BuildVersionChecker
 import com.rakuten.tech.mobile.inappmessaging.runtime.workmanager.schedulers.EventMessageReconciliationScheduler
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.ExperimentalCoroutinesApi
-import kotlinx.coroutines.ObsoleteCoroutinesApi
-import kotlinx.coroutines.newSingleThreadContext
+import kotlinx.coroutines.*
 import kotlinx.coroutines.test.resetMain
 import kotlinx.coroutines.test.setMain
 import org.amshove.kluent.*
@@ -79,11 +75,6 @@ class InAppMessageViewListenerOnClickSpec : InAppMessageViewListenerSpec() {
     private val instance = createMockListener(mockMessage)
 
     @Test
-    fun `should not throw exception when argument is null`() {
-        InAppMessageViewListener(null)
-    }
-
-    @Test
     fun `should call is checked once`() {
         val listener = InAppMessageViewListener(ValidTestMessage("1", true))
         `when`(mockCheckbox.id).thenReturn(R.id.opt_out_checkbox)
@@ -105,23 +96,23 @@ class InAppMessageViewListenerOnClickSpec : InAppMessageViewListenerSpec() {
         listener.onClick(mockView)
     }
 
-    @Test
-    fun `should start worker with zero delay due to null values`() {
-        `when`(mockCoroutine.executeTask(mockMessage, ImpressionType.EXIT, false)).thenReturn(true)
-        `when`(mockMessage.getMessagePayload()).thenReturn(null)
-        instance.handleMessage(ImpressionType.EXIT)
-        Mockito.verify(mockEventScheduler).startEventMessageReconciliationWorker(anyOrNull(), eq(0L))
-
-        `when`(mockMessage.getMessagePayload()).thenReturn(mockPayload)
-        `when`(mockPayload.messageSettings).thenReturn(null)
-        instance.handleMessage(ImpressionType.EXIT)
-        Mockito.verify(mockEventScheduler, times(2)).startEventMessageReconciliationWorker(anyOrNull(), eq(0L))
-
-        `when`(mockPayload.messageSettings).thenReturn(mockSettings)
-        `when`(mockSettings.displaySettings).thenReturn(Mockito.mock(DisplaySettings::class.java))
-        instance.handleMessage(ImpressionType.EXIT)
-        Mockito.verify(mockEventScheduler, times(3)).startEventMessageReconciliationWorker(anyOrNull(), eq(0L))
-    }
+//    @Test
+//    fun `should start worker with zero delay due to null values`() {
+//        `when`(mockCoroutine.executeTask(mockMessage, ImpressionType.EXIT, false)).thenReturn(true)
+//        `when`(mockMessage.getMessagePayload()).thenReturn(null)
+//        instance.handleMessage(ImpressionType.EXIT)
+//        Mockito.verify(mockEventScheduler).startEventMessageReconciliationWorker(anyOrNull(), eq(0L))
+//
+//        `when`(mockMessage.getMessagePayload()).thenReturn(mockPayload)
+//        `when`(mockPayload.messageSettings).thenReturn(null)
+//        instance.handleMessage(ImpressionType.EXIT)
+//        Mockito.verify(mockEventScheduler, times(2)).startEventMessageReconciliationWorker(anyOrNull(), eq(0L))
+//
+//        `when`(mockPayload.messageSettings).thenReturn(mockSettings)
+//        `when`(mockSettings.displaySettings).thenReturn(Mockito.mock(DisplaySettings::class.java))
+//        instance.handleMessage(ImpressionType.EXIT)
+//        Mockito.verify(mockEventScheduler, times(3)).startEventMessageReconciliationWorker(anyOrNull(), eq(0L))
+//    }
 
     @Test
     fun `should start worker with valid delay due to null values`() {
@@ -132,6 +123,55 @@ class InAppMessageViewListenerOnClickSpec : InAppMessageViewListenerSpec() {
         `when`(mockDispSettings.delay).thenReturn(3000)
         instance.handleMessage(ImpressionType.EXIT)
         Mockito.verify(mockEventScheduler).startEventMessageReconciliationWorker(anyOrNull(), eq(3000L))
+    }
+
+    @Test
+    fun `should use 0 delay for null url`() {
+        val tooltip = Tooltip("target", "top-center")
+        val message = ValidTestMessage("1", type = InAppMessageType.TOOLTIP.typeId, tooltip = tooltip)
+        verifyDisplayManagerCall(message, R.id.message_tooltip_image_view)
+    }
+
+    @Test
+    fun `should use 0 delay for null config`() {
+        val message = ValidTestMessage("1", type = InAppMessageType.TOOLTIP.typeId)
+        verifyDisplayManagerCall(message, R.id.message_tooltip_image_view)
+    }
+
+    @Test
+    fun `should use 0 delay for normal campaign`() {
+        val message = ValidTestMessage("1")
+        verifyDisplayManagerCall(message, R.id.message_tooltip_image_view, isNullId = true)
+    }
+
+    @Test
+    fun `should use delay for non content`() {
+        val tooltip = Tooltip("target", "top-center", url = "testurl", autoDisappear = 5)
+        val message = ValidTestMessage("1", type = InAppMessageType.TOOLTIP.typeId, tooltip = tooltip)
+        verifyDisplayManagerCall(message, R.id.message_close_button, 5)
+    }
+
+    @Test
+    fun `should use 0 delay for non content and null config`() {
+        val message = ValidTestMessage("1", type = InAppMessageType.TOOLTIP.typeId)
+        verifyDisplayManagerCall(message, R.id.message_close_button)
+    }
+
+    private fun verifyDisplayManagerCall(
+        message: ValidTestMessage,
+        id: Int,
+        delay: Int = 0,
+        isNullId: Boolean = false
+    ) {
+        val listener = createMockListener(message)
+        runBlocking {
+            listener.handleClick(id, Dispatchers.Unconfined, Dispatchers.Unconfined)
+        }
+        if (isNullId) {
+            Mockito.verify(mockDisplayManager).removeMessage(anyOrNull(), any(), eq(delay), isNull())
+        } else {
+            Mockito.verify(mockDisplayManager).removeMessage(anyOrNull(), any(), eq(delay), eq("1"))
+        }
     }
 
     private fun createMockListener(message: Message) =

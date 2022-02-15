@@ -7,12 +7,14 @@ import android.os.Build
 import android.os.Handler
 import android.util.DisplayMetrics
 import android.view.View
+import androidx.test.core.app.ApplicationProvider
 import androidx.test.core.app.ApplicationProvider.getApplicationContext
 import androidx.work.ListenableWorker
 import androidx.work.WorkerParameters
 import androidx.work.impl.utils.SerialExecutor
 import androidx.work.impl.utils.taskexecutor.TaskExecutor
 import androidx.work.testing.TestListenableWorkerBuilder
+import androidx.work.testing.WorkManagerTestInitHelper
 import com.nhaarman.mockitokotlin2.*
 import com.rakuten.tech.mobile.inappmessaging.runtime.BaseTest
 import com.rakuten.tech.mobile.inappmessaging.runtime.InAppMessaging
@@ -50,7 +52,7 @@ import org.robolectric.annotation.Config
 class DisplayMessageWorkerSpec : BaseTest() {
 
     private val activity = Mockito.mock(Activity::class.java)
-    private val displayWorker = TestListenableWorkerBuilder<DisplayMessageWorker>(getApplicationContext()).build()
+    private var displayWorker = TestListenableWorkerBuilder<DisplayMessageWorker>(getApplicationContext()).build()
     private val mockMessageManager = Mockito.mock(MessageReadinessManager::class.java)
     private var mockLocalDisplayRepo = Mockito.mock(LocalDisplayedMessageRepository::class.java)
     private var mockReadyForDisplayRepo = Mockito.mock(ReadyForDisplayMessageRepository::class.java)
@@ -62,10 +64,7 @@ class DisplayMessageWorkerSpec : BaseTest() {
     @Before
     override fun setup() {
         super.setup()
-        displayWorker.messageReadinessManager = mockMessageManager
-        displayWorker.localDisplayRepo = mockLocalDisplayRepo
-        displayWorker.readyMessagesRepo = mockReadyForDisplayRepo
-        displayWorker.handler = handler
+        setupWorker()
         `when`(configResponseData.rollOutPercentage).thenReturn(100)
         ConfigResponseRepository.instance().addConfigResponse(configResponseData)
         InAppMessaging.initialize(getApplicationContext(), true)
@@ -76,6 +75,13 @@ class DisplayMessageWorkerSpec : BaseTest() {
     override fun tearDown() {
         super.tearDown()
         ConfigResponseRepository.resetInstance()
+    }
+
+    private fun setupWorker() {
+        displayWorker.messageReadinessManager = mockMessageManager
+        displayWorker.localDisplayRepo = mockLocalDisplayRepo
+        displayWorker.readyMessagesRepo = mockReadyForDisplayRepo
+        displayWorker.handler = handler
     }
 
     @Test
@@ -264,6 +270,21 @@ class DisplayMessageWorkerSpec : BaseTest() {
         val message = setupMessageWithImage(null)
         `when`(mockMessageManager.getNextDisplayMessage(false)).thenReturn(listOf(message))
         runBlocking {
+            displayWorker.doWork() shouldBeEqualTo ListenableWorker.Result.success()
+        }
+
+        Mockito.verify(handler).post(ArgumentMatchers.any(DisplayMessageRunnable::class.java))
+    }
+
+    @Test
+    fun `should display the message for tooltip`() {
+        WorkManagerTestInitHelper.initializeTestWorkManager(ApplicationProvider.getApplicationContext())
+        val message = setupMessageWithImage(null)
+        `when`(mockMessageManager.getNextDisplayMessage(true)).thenReturn(listOf(message))
+        runBlocking {
+            displayWorker = TestListenableWorkerBuilder<DisplayMessageWorker>(getApplicationContext())
+                .setTags(listOf(DisplayMessageWorker.DISPLAY_TOOLTIP_WORKER)).build()
+            setupWorker()
             displayWorker.doWork() shouldBeEqualTo ListenableWorker.Result.success()
         }
 

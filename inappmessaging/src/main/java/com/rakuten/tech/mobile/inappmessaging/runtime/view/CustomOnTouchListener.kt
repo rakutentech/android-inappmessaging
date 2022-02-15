@@ -8,18 +8,21 @@ import com.rakuten.tech.mobile.inappmessaging.runtime.manager.DisplayManager
 /**
  * Custom on touch listener to handle displaying of tooltip campaign on scrollable views.
  */
-interface CustomOnTouchListener : View.OnTouchListener {
+class CustomOnTouchListener : View.OnTouchListener {
+
+    internal var displayManager = DisplayManager.instance()
+
     override fun onTouch(v: View, event: MotionEvent): Boolean {
-        when (event.action) {
+        when (event.actionMasked) {
             MotionEvent.ACTION_CANCEL, MotionEvent.ACTION_UP -> {
                 if (v is ScrollView) {
                     // remove tooltip if target was hidden
-                    DisplayManager.instance().removeHiddenTargets(v)
+                    displayManager.removeHiddenTargets(v)
                     // run another display image
-                    DisplayManager.instance().displayMessage()
+                    displayManager.displayMessage()
                 }
             }
         }
-        return false
+        return v.performClick()
     }
 }

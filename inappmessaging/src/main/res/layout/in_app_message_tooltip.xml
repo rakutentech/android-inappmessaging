@@ -32,7 +32,7 @@
     android:translationZ="10dp"
     android:stateListAnimator="@null"
     android:contentDescription="@null"
-    android:visibility="invisible"/>
+    android:visibility="gone"/>
 
   <ImageView
     android:id="@+id/message_tip"

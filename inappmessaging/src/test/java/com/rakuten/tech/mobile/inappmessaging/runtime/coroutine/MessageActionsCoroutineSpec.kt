@@ -11,6 +11,7 @@ import com.rakuten.tech.mobile.inappmessaging.runtime.InAppMessaging
 import com.rakuten.tech.mobile.inappmessaging.runtime.R
 import com.rakuten.tech.mobile.inappmessaging.runtime.TestUserInfoProvider
 import com.rakuten.tech.mobile.inappmessaging.runtime.data.enums.InAppMessageType
+import com.rakuten.tech.mobile.inappmessaging.runtime.data.models.Tooltip
 import com.rakuten.tech.mobile.inappmessaging.runtime.data.models.messages.InvalidTestMessage
 import com.rakuten.tech.mobile.inappmessaging.runtime.data.models.messages.Message
 import com.rakuten.tech.mobile.inappmessaging.runtime.data.models.messages.ValidTestMessage
@@ -126,7 +127,11 @@ internal class MessageActionsCoroutineSpec(
             message
         }
         messageList.add(msg)
+        val tooltipMsg = ValidTestMessage(campaignId = "test", type = InAppMessageType.TOOLTIP.typeId,
+            tooltip = Tooltip("target", "top-right", "testurl", 10)
+        )
         if (isTooltip) {
+            messageList.add(tooltipMsg)
             TooltipMessageRepository.instance().replaceAllMessages(messageList)
             TooltipMessageRepository.instance().getCampaign(ValidTestMessage.DEFAULT_CAMPAIGN_ID).shouldNotBeNull()
         } else {
@@ -141,6 +146,8 @@ internal class MessageActionsCoroutineSpec(
         }
         if (isTooltip) {
             TooltipMessageRepository.instance().getCampaign(ValidTestMessage.DEFAULT_CAMPAIGN_ID).shouldBeNull()
+            MessageActionsCoroutine().executeTask(tooltipMsg, type, isOpt)
+            TooltipMessageRepository.instance().getCampaign("test").shouldBeNull()
         } else {
             ReadyForDisplayMessageRepository.instance().getAllMessagesCopy().shouldHaveSize(0)
         }

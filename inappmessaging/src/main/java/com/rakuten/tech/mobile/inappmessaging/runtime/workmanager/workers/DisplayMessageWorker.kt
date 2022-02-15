@@ -123,7 +123,7 @@ internal class DisplayMessageWorker(
     companion object {
         private const val TAG = "IAM_JobIntentService"
         private const val DISPLAY_WORKER = "iam_message_display_worker"
-        private const val DISPLAY_TOOLTIP_WORKER = "iam_tooltip_display_worker"
+        internal const val DISPLAY_TOOLTIP_WORKER = "iam_tooltip_display_worker"
 
         /**
          * This method enqueues work in to this service.

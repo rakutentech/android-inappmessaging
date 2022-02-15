@@ -43,7 +43,7 @@ internal class InAppMessagingTooltipView(
 
     private var imageUrl: String? = null
     private var bgColor = "#FFFFFF" // default white
-    private var type: PositionType = PositionType.BOTTOM_CENTER
+    internal var type: PositionType = PositionType.BOTTOM_CENTER
     private var viewId: String? = null
     private var listener: InAppMessageViewListener? = null
 

@@ -27,7 +27,7 @@ import kotlinx.coroutines.withContext
  * Touch and clicker listener class for InAppMessageView.
  */
 internal class InAppMessageViewListener(
-    val message: Message?,
+    val message: Message,
     private val messageCoroutine: MessageActionsCoroutine = MessageActionsCoroutine(),
     private val displayManager: DisplayManager = DisplayManager.instance(),
     private val buildChecker: BuildVersionChecker = BuildVersionChecker.instance(),
@@ -89,18 +89,20 @@ internal class InAppMessageViewListener(
         return false
     }
 
-    private fun handleClick(id: Int, dispatcher: CoroutineDispatcher = Dispatchers.Default) {
-        CoroutineScope(Dispatchers.Main).launch {
+    internal fun handleClick(
+        id: Int,
+        mainDispatcher: CoroutineDispatcher = Dispatchers.Main,
+        dispatcher: CoroutineDispatcher = Dispatchers.Default
+    ) {
+        CoroutineScope(mainDispatcher).launch {
             val type = MessageActionsCoroutine.getOnClickBehaviorType(id)
-            val delay = if (message?.getType() == InAppMessageType.TOOLTIP.typeId &&
+            val delay = if (message.getType() == InAppMessageType.TOOLTIP.typeId &&
                 (type != ImpressionType.CLICK_CONTENT || message.getTooltipConfig()?.url == null)) {
                 // should only add delay if set and not redirect (i.e. close button or content + no url)
                     message.getTooltipConfig()?.autoDisappear ?: 0
-            } else {
-                0
-            }
+            } else { 0 }
             displayManager.removeMessage(inApp.getRegisteredActivity(), delay = delay,
-                id = if (message?.getType() == InAppMessageType.TOOLTIP.typeId) message.getCampaignId() else null)
+                id = if (message.getType() == InAppMessageType.TOOLTIP.typeId) message.getCampaignId() else null)
             withContext(dispatcher) {
                 handleMessage(type)
             }
@@ -111,7 +113,7 @@ internal class InAppMessageViewListener(
         val result = messageCoroutine.executeTask(message, type, isOptOutChecked)
         if (result) {
             eventScheduler.startEventMessageReconciliationWorker(
-                delay = (message?.getMessagePayload()?.messageSettings?.displaySettings?.delay ?: 0).toLong()
+                delay = (message.getMessagePayload().messageSettings.displaySettings.delay).toLong()
             )
         }
     }

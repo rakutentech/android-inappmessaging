@@ -54,12 +54,17 @@ internal data class CampaignData(
     }
 
     override fun getTooltipConfig(): Tooltip? {
-        val result = messagePayload.title.contains(TOOLTIP_TAG, true)
+        val result = messagePayload.title.startsWith(TOOLTIP_TAG, true)
         if (result && tooltip == null) {
             // change type to tool tip (this will be fixed once the backend supports tooltip)
             try {
                 tooltip = Gson().fromJson(messagePayload.messageBody, Tooltip::class.java)
-                type = InAppMessageType.TOOLTIP.typeId
+                if (tooltip?.isValid() == true) {
+                    type = InAppMessageType.TOOLTIP.typeId
+                } else {
+                    // missing required fields
+                    tooltip = null
+                }
             } catch (je: JsonParseException) {
                 Logger(TAG).debug("Invalid format for tooltip config.", je)
             }
@@ -78,7 +83,7 @@ internal data class CampaignData(
     }
 
     companion object {
-        private const val TOOLTIP_TAG = "[ToolTip]"
+        internal const val TOOLTIP_TAG = "[ToolTip]"
         private const val TAG = "IAM_Campaign"
     }
 }

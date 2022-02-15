@@ -68,10 +68,58 @@ class DisplayManagerSpec : BaseTest() {
     }
 
     @Test
+    fun `should remove tooltip with id and null parent`() {
+        setupTooltipView()
+        `when`(viewGroup.parent).thenReturn(null)
+        `when`(viewGroup.tag).thenReturn("invalid")
+        DisplayManager.instance().removeMessage(activity, id = ID, delay = 1).shouldBeNull()
+    }
+
+    @Test
+    fun `should remove tooltip with id and parent no child`() {
+        setupTooltipView()
+        `when`(parentViewGroup.childCount).thenReturn(0)
+        `when`(viewGroup.tag).thenReturn("invalid")
+        verifyViewGroup()
+    }
+
+    @Test
     fun `should remove tooltip all`() {
         setupTooltipView()
         DisplayManager.instance().removeMessage(activity, removeAll = true).shouldBeNull()
         Mockito.verify(parentViewGroup).removeView(any())
+    }
+
+    @Test
+    fun `should remove tooltip all with null view`() {
+        setupTooltipView()
+        `when`(activity.findViewById<ViewGroup>(R.id.in_app_message_tooltip_view)).thenReturn(null)
+        DisplayManager.instance().removeMessage(activity, removeAll = true).shouldBeNull()
+        Mockito.verify(parentViewGroup, never()).removeView(any())
+    }
+
+    @Test
+    fun `should remove tooltip all with null parent`() {
+        setupTooltipView()
+        `when`(viewGroup.parent).thenReturn(null)
+        DisplayManager.instance().removeMessage(activity, removeAll = true).shouldBeNull()
+        Mockito.verify(parentViewGroup, never()).removeView(any())
+    }
+
+    @Test
+    fun `should remove tooltip all with diff id`() {
+        setupTooltipView()
+        `when`(viewGroup.id).thenReturn(-1)
+        DisplayManager.instance().removeMessage(activity, removeAll = true).shouldBeNull()
+        Mockito.verify(parentViewGroup, never()).removeView(any())
+    }
+
+    @Test
+    fun `should remove tooltip all with no child`() {
+        setupTooltipView()
+        `when`(parentViewGroup.childCount).thenReturn(0)
+        DisplayManager.instance().removeMessage(activity, removeAll = true).shouldBeNull()
+        Mockito.verify(parentViewGroup, never()).removeView(any())
     }
 
     @Test
@@ -190,9 +238,24 @@ class DisplayManagerSpec : BaseTest() {
     }
 
     @Test
-    fun `should remove tooltip for visible target`() {
+    fun `should not remove tooltip for visible target`() {
         setupTooltipView()
         setupTargetToRemove()
+        verifyRemoveTarget()
+    }
+
+    @Test
+    fun `should not remove tooltip without child`() {
+        setupTooltipView()
+        setupTargetToRemove()
+        verifyRemoveTarget()
+    }
+
+    @Test
+    fun `should not remove tooltip with diff id`() {
+        setupTooltipView()
+        setupTargetToRemove()
+        `when`(viewGroup.id).thenReturn(-1)
         verifyRemoveTarget()
     }
 
