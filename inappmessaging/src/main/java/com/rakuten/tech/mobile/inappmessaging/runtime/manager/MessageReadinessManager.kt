@@ -71,6 +71,7 @@ internal interface MessageReadinessManager {
             } else {
                 ReadyForDisplayMessageRepository.instance().getAllMessagesCopy()
             }
+
             for (message in messageList) {
                 Logger(TAG).debug("checking permission for message: %s", message.getCampaignId())
 
@@ -82,26 +83,38 @@ internal interface MessageReadinessManager {
                 }
 
                 // If message is test message, no need to do more checks.
-                if (message.isTest()) {
-                    Logger(TAG).debug("skipping test message: %s", message.getCampaignId())
-                    result.add(message)
-                    if (!isTooltip) return result
-                }
+                if (shouldPing(message, result)) break
 
-                // Check message display permission with server.
-                val displayPermissionResponse = getMessagePermission(message)
-                // If server wants SDK to ping for updated messages, do a new ping request and break this loop.
-                if (isPingServerNeeded(displayPermissionResponse)) {
-                    // reset current delay to initial
-                    MessageMixerPingScheduler.currDelay = RetryDelayUtil.INITIAL_BACKOFF_DELAY
-                    MessageMixerPingScheduler.instance().pingMessageMixerService(0)
-                    break
-                } else if (isMessagePermissibleToDisplay(displayPermissionResponse)) {
-                    result.add(message)
-                    if (!isTooltip) return result
+                if (isTooltip) {
+                    continue
+                } else if (result.isNotEmpty()) {
+                    return result
                 }
             }
             return result
+        }
+
+        private fun shouldPing(message: Message, result: MutableList<Message>) = if (message.isTest()) {
+            Logger(TAG).debug("skipping test message: %s", message.getCampaignId())
+            result.add(message)
+            false
+        } else {
+            // Check message display permission with server.
+            val displayPermissionResponse = getMessagePermission(message)
+            // If server wants SDK to ping for updated messages, do a new ping request and break this loop.
+            when {
+                isPingServerNeeded(displayPermissionResponse) -> {
+                    // reset current delay to initial
+                    MessageMixerPingScheduler.currDelay = RetryDelayUtil.INITIAL_BACKOFF_DELAY
+                    MessageMixerPingScheduler.instance().pingMessageMixerService(0)
+                    true
+                }
+                isMessagePermissibleToDisplay(displayPermissionResponse) -> {
+                    result.add(message)
+                    false
+                }
+                else -> false
+            }
         }
 
         @VisibleForTesting

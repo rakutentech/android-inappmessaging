@@ -1,10 +1,12 @@
 package com.rakuten.tech.mobile.inappmessaging.runtime.data.responses.ping
 
 import com.google.gson.Gson
+import com.google.gson.JsonParseException
 import com.google.gson.annotations.SerializedName
 import com.rakuten.tech.mobile.inappmessaging.runtime.data.enums.InAppMessageType
 import com.rakuten.tech.mobile.inappmessaging.runtime.data.models.Tooltip
 import com.rakuten.tech.mobile.inappmessaging.runtime.data.models.messages.Message
+import com.rakuten.tech.mobile.sdkutils.logger.Logger
 
 /**
  * Class for parsing CampaignData, which is a response from MessageMixer.
@@ -55,9 +57,12 @@ internal data class CampaignData(
         val result = messagePayload.title.contains(TOOLTIP_TAG, true)
         if (result && tooltip == null) {
             // change type to tool tip (this will be fixed once the backend supports tooltip)
-            type = InAppMessageType.TOOLTIP.typeId
-            tooltip = Gson().fromJson(messagePayload.messageBody, Tooltip::class.java)
-            // TODO add exception handling
+            try {
+                tooltip = Gson().fromJson(messagePayload.messageBody, Tooltip::class.java)
+                type = InAppMessageType.TOOLTIP.typeId
+            } catch (je: JsonParseException) {
+                Logger(TAG).debug("Invalid format for tooltip config.", je)
+            }
         }
         return tooltip
     }
@@ -74,5 +79,6 @@ internal data class CampaignData(
 
     companion object {
         private const val TOOLTIP_TAG = "[ToolTip]"
+        private const val TAG = "IAM_Campaign"
     }
 }

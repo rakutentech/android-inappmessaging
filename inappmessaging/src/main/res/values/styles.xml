@@ -38,8 +38,6 @@
     <item name="android:layout_width">@dimen/tooltip__close_button_width</item>
     <item name="android:background">@drawable/close_button_background</item>
     <item name="android:src">@drawable/close_button</item>
-<!--    <item name="android:layout_marginLeft">@dimen/tooltip_close_button_margin_left</item>-->
-<!--    <item name="android:layout_marginBottom">@dimen/tooltip_close_button_margin_top</item>-->
   </style>
 
   <style name="InAppMessaging.Button">
