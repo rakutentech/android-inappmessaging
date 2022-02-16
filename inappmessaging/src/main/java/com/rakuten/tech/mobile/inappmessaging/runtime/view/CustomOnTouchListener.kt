@@ -8,7 +8,7 @@ import com.rakuten.tech.mobile.inappmessaging.runtime.manager.DisplayManager
 /**
  * Custom on touch listener to handle displaying of tooltip campaign on scrollable views.
  */
-class CustomOnTouchListener : View.OnTouchListener {
+abstract class CustomOnTouchListener : View.OnTouchListener {
 
     internal var displayManager = DisplayManager.instance()
 

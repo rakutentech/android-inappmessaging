@@ -22,7 +22,7 @@ class CustomOnTouchListenerSpec {
     private val mockDisplay = Mockito.mock(DisplayManager::class.java)
     private val mockView = Mockito.mock(View::class.java)
     private val mockScroll = Mockito.mock(ScrollView::class.java)
-    private val listener = CustomOnTouchListener()
+    private val listener = object : CustomOnTouchListener() {}
 
     @Test
     fun `should not call display manager when action down`() {
