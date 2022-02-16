@@ -10,7 +10,6 @@ import com.rakuten.tech.mobile.inappmessaging.runtime.TestUserInfoProvider
 import com.rakuten.tech.mobile.inappmessaging.runtime.UserInfoProvider
 import com.rakuten.tech.mobile.inappmessaging.runtime.data.models.messages.Message
 import com.rakuten.tech.mobile.inappmessaging.runtime.data.models.messages.ValidTestMessage
-import com.rakuten.tech.mobile.sdkutils.PreferencesUtil
 import org.amshove.kluent.*
 import org.junit.Before
 import org.junit.Test
@@ -134,19 +133,6 @@ class ReadyForDisplayMessageRepositorySpec : BaseTest() {
     fun `should save and restore values for different users`() {
         setupAndTestMultipleUser()
         ReadyForDisplayMessageRepository.instance().getAllMessagesCopy().shouldHaveSize(2)
-    }
-
-    @Test
-    fun `should not crash and clear previous when forced cast exception`() {
-        val infoProvider = TestUserInfoProvider()
-        initializeInstance(infoProvider)
-        PreferencesUtil.putFloat(
-            ApplicationProvider.getApplicationContext(),
-            InAppMessaging.getPreferencesFile(),
-            ReadyForDisplayMessageRepository.READY_DISPLAY_KEY,
-            1.0f
-        )
-        ReadyForDisplayMessageRepository.instance().getAllMessagesCopy().shouldBeEmpty()
     }
 
     @Test

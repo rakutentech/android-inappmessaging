@@ -21,7 +21,7 @@ class ButtonActionTypeSpec(private val id: Int, private val expected: Any?) {
                     arrayOf(1, ButtonActionType.REDIRECT),
                     arrayOf(2, ButtonActionType.DEEPLINK),
                     arrayOf(3, ButtonActionType.CLOSE),
-                    arrayOf(4, null)
+                    arrayOf(-1, null)
             )
         }
     }

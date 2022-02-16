@@ -10,11 +10,14 @@ import com.rakuten.tech.mobile.inappmessaging.runtime.BaseTest
 import com.rakuten.tech.mobile.inappmessaging.runtime.InAppMessaging
 import com.rakuten.tech.mobile.inappmessaging.runtime.R
 import com.rakuten.tech.mobile.inappmessaging.runtime.TestUserInfoProvider
+import com.rakuten.tech.mobile.inappmessaging.runtime.data.enums.InAppMessageType
+import com.rakuten.tech.mobile.inappmessaging.runtime.data.models.Tooltip
 import com.rakuten.tech.mobile.inappmessaging.runtime.data.models.messages.InvalidTestMessage
 import com.rakuten.tech.mobile.inappmessaging.runtime.data.models.messages.Message
 import com.rakuten.tech.mobile.inappmessaging.runtime.data.models.messages.ValidTestMessage
 import com.rakuten.tech.mobile.inappmessaging.runtime.data.repositories.LocalDisplayedMessageRepository
 import com.rakuten.tech.mobile.inappmessaging.runtime.data.repositories.ReadyForDisplayMessageRepository
+import com.rakuten.tech.mobile.inappmessaging.runtime.data.repositories.TooltipMessageRepository
 import com.rakuten.tech.mobile.inappmessaging.runtime.data.responses.ping.MessageMixerResponseSpec
 import com.rakuten.tech.mobile.inappmessaging.runtime.manager.DisplayManager
 import org.amshove.kluent.*
@@ -35,7 +38,8 @@ import org.robolectric.annotation.Config
 internal class MessageActionsCoroutineSpec(
     val testName: String,
     private val resourceId: Int,
-    private val isOpt: Boolean
+    private val isOpt: Boolean,
+    private val isTooltip: Boolean
 ) : BaseTest() {
 
     companion object {
@@ -45,24 +49,28 @@ internal class MessageActionsCoroutineSpec(
         )
         fun data(): Collection<Array<Any>> {
             return listOf(
-                    arrayOf("Close button - isOpt true", R.id.message_close_button, true),
-                    arrayOf("Close button - isOpt false", R.id.message_close_button, false),
-                    arrayOf("Single button - isOpt true", R.id.message_single_button, true),
-                    arrayOf("Single button - isOpt false", R.id.message_single_button, false),
-                    arrayOf("Right button - isOpt true", R.id.message_button_right, true),
-                    arrayOf("Right button - isOpt false", R.id.message_button_right, false),
-                    arrayOf("Left button - isOpt true", R.id.message_button_left, true),
-                    arrayOf("Left button - isOpt false", R.id.message_button_left, false),
-                    arrayOf("Content - isOpt true", R.id.slide_up, true),
-                    arrayOf("Content - isOpt false", R.id.slide_up, false),
-                    arrayOf("Back - isOpt true", MessageActionsCoroutine.BACK_BUTTON, true),
-                    arrayOf("Back - isOpt false", MessageActionsCoroutine.BACK_BUTTON, false)
+                    arrayOf("Close button - isOpt true", R.id.message_close_button, true, false),
+                    arrayOf("Close button - isOpt false", R.id.message_close_button, false, false),
+                    arrayOf("Single button - isOpt true", R.id.message_single_button, true, false),
+                    arrayOf("Single button - isOpt false", R.id.message_single_button, false, false),
+                    arrayOf("Right button - isOpt true", R.id.message_button_right, true, false),
+                    arrayOf("Right button - isOpt false", R.id.message_button_right, false, false),
+                    arrayOf("Left button - isOpt true", R.id.message_button_left, true, false),
+                    arrayOf("Left button - isOpt false", R.id.message_button_left, false, false),
+                    arrayOf("Content - isOpt true", R.id.slide_up, true, false),
+                    arrayOf("Content - isOpt false", R.id.slide_up, false, false),
+                    arrayOf("Back - isOpt true", MessageActionsCoroutine.BACK_BUTTON, true, false),
+                    arrayOf("Back - isOpt false", MessageActionsCoroutine.BACK_BUTTON, false, false),
+                    arrayOf("Tooltip View - content", R.id.message_tooltip_image_view, false, true),
+                    arrayOf("Tooltip Tip- content", R.id.message_tip, false, true),
+                    arrayOf("Tooltip Tip- content", -99, false, true)
             )
         }
     }
 
     private val message = MessageMixerResponseSpec.response.data[0].campaignData
     private val activity = Mockito.mock(Activity::class.java)
+    private val type = MessageActionsCoroutine.getOnClickBehaviorType(resourceId)
 
     @Before
     override fun setup() {
@@ -82,21 +90,21 @@ internal class MessageActionsCoroutineSpec(
     @Test
     fun `should return false when message is null`() {
         DisplayManager.instance().removeMessage(InAppMessaging.instance().getRegisteredActivity())
-        val result = MessageActionsCoroutine().executeTask(null, resourceId, isOpt)
+        val result = MessageActionsCoroutine().executeTask(null, type, isOpt)
         result.shouldBeFalse()
     }
 
     @Test
     fun `should return false when campaign id is null`() {
         DisplayManager.instance().removeMessage(InAppMessaging.instance().getRegisteredActivity())
-        val result = MessageActionsCoroutine().executeTask(InvalidTestMessage(), resourceId, isOpt)
+        val result = MessageActionsCoroutine().executeTask(InvalidTestMessage(), type, isOpt)
         result.shouldBeFalse()
     }
 
     @Test
     fun `should return false when campaign id is empty`() {
         DisplayManager.instance().removeMessage(InAppMessaging.instance().getRegisteredActivity())
-        val result = MessageActionsCoroutine().executeTask(ValidTestMessage(""), resourceId, isOpt)
+        val result = MessageActionsCoroutine().executeTask(ValidTestMessage(""), type, isOpt)
         result.shouldBeFalse()
     }
 
@@ -104,7 +112,7 @@ internal class MessageActionsCoroutineSpec(
     fun `should add message to display repo`() {
         val numberOfTimesDisplayed: Int = LocalDisplayedMessageRepository.instance().numberOfTimesDisplayed(message)
         DisplayManager.instance().removeMessage(InAppMessaging.instance().getRegisteredActivity())
-        val result = MessageActionsCoroutine().executeTask(message, resourceId, isOpt)
+        val result = MessageActionsCoroutine().executeTask(message, type, isOpt)
         result.shouldBeTrue()
         LocalDisplayedMessageRepository.instance()
                 .numberOfTimesDisplayed(message) shouldBeEqualTo numberOfTimesDisplayed + 1
@@ -113,15 +121,35 @@ internal class MessageActionsCoroutineSpec(
     @Test
     fun `should remove message from ready repo`() {
         val messageList = ArrayList<Message>()
-        messageList.add(message)
-        ReadyForDisplayMessageRepository.instance().replaceAllMessages(messageList)
-        ReadyForDisplayMessageRepository.instance().getAllMessagesCopy().shouldHaveSize(1)
+        val msg = if (isTooltip) {
+            ValidTestMessage(type = InAppMessageType.TOOLTIP.typeId)
+        } else {
+            message
+        }
+        messageList.add(msg)
+        val tooltipMsg = ValidTestMessage(campaignId = "test", type = InAppMessageType.TOOLTIP.typeId,
+            tooltip = Tooltip("target", "top-right", "testurl", 10)
+        )
+        if (isTooltip) {
+            messageList.add(tooltipMsg)
+            TooltipMessageRepository.instance().replaceAllMessages(messageList)
+            TooltipMessageRepository.instance().getCampaign(ValidTestMessage.DEFAULT_CAMPAIGN_ID).shouldNotBeNull()
+        } else {
+            ReadyForDisplayMessageRepository.instance().replaceAllMessages(messageList)
+            ReadyForDisplayMessageRepository.instance().getAllMessagesCopy().shouldHaveSize(1)
+        }
 
         DisplayManager.instance().removeMessage(InAppMessaging.instance().getRegisteredActivity())
-        val result = MessageActionsCoroutine().executeTask(message, resourceId, isOpt)
+        val result = MessageActionsCoroutine().executeTask(msg, type, isOpt)
         if (result) {
             DisplayManager.instance().displayMessage()
         }
-        ReadyForDisplayMessageRepository.instance().getAllMessagesCopy().shouldHaveSize(0)
+        if (isTooltip) {
+            TooltipMessageRepository.instance().getCampaign(ValidTestMessage.DEFAULT_CAMPAIGN_ID).shouldBeNull()
+            MessageActionsCoroutine().executeTask(tooltipMsg, type, isOpt)
+            TooltipMessageRepository.instance().getCampaign("test").shouldBeNull()
+        } else {
+            ReadyForDisplayMessageRepository.instance().getAllMessagesCopy().shouldHaveSize(0)
+        }
     }
 }

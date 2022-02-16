@@ -2,10 +2,18 @@ package com.rakuten.tech.mobile.inappmessaging.runtime.utils
 
 import android.content.Context
 import android.content.res.Resources
+import android.graphics.Rect
+import android.view.View
 import android.view.animation.Animation
 import android.view.animation.AnimationUtils
+import android.widget.FrameLayout
+import android.widget.ScrollView
+import androidx.core.widget.NestedScrollView
 import com.rakuten.tech.mobile.inappmessaging.runtime.R
+import com.rakuten.tech.mobile.inappmessaging.runtime.data.enums.PositionType
 import com.rakuten.tech.mobile.inappmessaging.runtime.data.enums.SlideFromDirectionType
+import com.rakuten.tech.mobile.inappmessaging.runtime.view.InAppMessagingTooltipView.Companion.PADDING
+import com.rakuten.tech.mobile.inappmessaging.runtime.view.InAppMessagingTooltipView.Companion.TRI_SIZE
 
 /**
  * Utility methods for views.
@@ -46,16 +54,35 @@ internal object ViewUtil {
         return displayMetrics.widthPixels + 1
     }
 
-    /**
-     * Returns the corresponding height to the available display size while keeping the aspect ratio.
-     * @param context
-     * @param width The given view's width.
-     * @param height The given view's height.
-     * @return The height of the available display size in pixels.
-     */
-    fun getDisplayHeight(context: Context, width: Int, height: Int): Int {
-        val displayWidth = getDisplayWidth(context)
-        val aspectRationFactor = displayWidth / width.toFloat()
-        return (height * aspectRationFactor).toInt()
+    @SuppressWarnings("LongParameterList", "MagicNumber")
+    fun getPosition(view: View, type: PositionType, width: Int, height: Int, marginH: Int, marginV: Int):
+            Pair<Int, Int> {
+        val rect = Rect()
+        view.getHitRect(rect)
+        return when (type) {
+            PositionType.TOP_RIGHT -> Pair(rect.left + view.width + PADDING / 4, rect.top - height - marginV)
+            PositionType.TOP_CENTER -> Pair(rect.left + view.width / 2 - width / 2, rect.top - height - marginV)
+            PositionType.TOP_LEFT -> Pair(rect.left - width - marginH, rect.top - height - marginV)
+            PositionType.BOTTOM_RIGHT -> Pair(rect.left + view.width + PADDING / 4, rect.top + view.height - marginV)
+            PositionType.BOTTOM_CENTER -> Pair(rect.left + view.width / 2 - width / 2,
+                rect.top + view.height - TRI_SIZE / 2)
+            PositionType.BOTTOM_LEFT -> Pair(rect.left - width - marginH, rect.top + view.height - marginV)
+            PositionType.RIGHT -> Pair(rect.left + view.width - TRI_SIZE / 2,
+                rect.top - (height - marginV + PADDING) / 2)
+            PositionType.LEFT -> Pair(rect.left - width - marginH - TRI_SIZE / 2,
+                rect.top - (height - marginV + PADDING) / 2)
+        }
+    }
+
+    @SuppressWarnings("SwallowedException")
+    fun getScrollView(view: View): FrameLayout? {
+        var currView = view.parent
+        while (currView != null) {
+            if (currView is ScrollView || currView is NestedScrollView) {
+                return currView as FrameLayout
+            }
+            currView = currView.parent
+        }
+        return null
     }
 }

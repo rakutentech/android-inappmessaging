@@ -9,11 +9,14 @@ import com.rakuten.tech.mobile.inappmessaging.runtime.data.models.messages.Messa
 import com.rakuten.tech.mobile.inappmessaging.runtime.exception.InAppMessagingException
 import com.rakuten.tech.mobile.sdkutils.PreferencesUtil
 import com.rakuten.tech.mobile.sdkutils.logger.Logger
-import java.lang.ClassCastException
 import java.util.Calendar
 import java.util.concurrent.ConcurrentHashMap
 import kotlin.collections.ArrayList
 import kotlin.collections.HashMap
+import kotlin.collections.HashSet
+import kotlin.collections.List
+import kotlin.collections.filter
+import kotlin.collections.mutableListOf
 import kotlin.collections.set
 
 /**
@@ -26,6 +29,10 @@ internal interface LocalDisplayedMessageRepository {
      * This method adds a message campaign ID with time stamp in the repository.
      */
     fun addMessage(message: Message)
+
+    fun addTooltipMessage(id: String)
+
+    fun isTooltipDisplayed(id: String): Boolean
 
     /**
      * Return the number of times this message has been displayed in this session.
@@ -65,6 +72,9 @@ internal interface LocalDisplayedMessageRepository {
         // Such as:
         // {5bf41c52-e4c0-4cb2-9183-df429e84d681, [1537309879557,1537309879557,1537309879557]}
         private val messages = ConcurrentHashMap<String, List<Long>>()
+
+        // to handle tooltip messages that were already displayed this session
+        private val sessionMessages = HashSet<String>()
         private var user = ""
 
         init {
@@ -100,6 +110,16 @@ internal interface LocalDisplayedMessageRepository {
             }
         }
 
+        override fun addTooltipMessage(id: String) {
+            synchronized(sessionMessages) {
+                sessionMessages.add(id)
+            }
+        }
+
+        override fun isTooltipDisplayed(id: String) = synchronized(sessionMessages) {
+            sessionMessages.contains(id)
+        }
+
         override fun numberOfTimesDisplayed(message: Message): Int {
             synchronized(messages) {
                 checkAndResetMap()
@@ -124,6 +144,7 @@ internal interface LocalDisplayedMessageRepository {
 
         override fun clearMessages() {
             messages.clear()
+            sessionMessages.clear()
             saveUpdatedMap()
         }
 
@@ -140,19 +161,14 @@ internal interface LocalDisplayedMessageRepository {
 
         @SuppressWarnings("TooGenericExceptionCaught", "LongMethod")
         private fun resetDisplayed() {
-            val listString = try {
-                InAppMessaging.instance().getHostAppContext()?.let { it ->
-                    PreferencesUtil.getString(
-                        it,
-                        InAppMessaging.getPreferencesFile(),
-                        LOCAL_DISPLAYED_KEY,
-                        ""
-                    )
-                } ?: ""
-            } catch (ex: ClassCastException) {
-                Logger(TAG).debug(ex.cause, "Incorrect JSON format for $LOCAL_DISPLAYED_KEY data")
-                ""
-            }
+            val listString = InAppMessaging.instance().getHostAppContext()?.let { it ->
+                PreferencesUtil.getString(
+                    it,
+                    InAppMessaging.getPreferencesFile(),
+                    LOCAL_DISPLAYED_KEY,
+                    ""
+                )
+            } ?: ""
             messages.clear()
             if (listString.isNotEmpty()) {
                 val type = object : TypeToken<HashMap<String, List<Long>>>() {}.type

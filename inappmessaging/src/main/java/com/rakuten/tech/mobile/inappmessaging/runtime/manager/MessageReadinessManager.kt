@@ -11,8 +11,9 @@ import com.rakuten.tech.mobile.inappmessaging.runtime.data.repositories.ConfigRe
 import com.rakuten.tech.mobile.inappmessaging.runtime.data.repositories.HostAppInfoRepository
 import com.rakuten.tech.mobile.inappmessaging.runtime.data.repositories.LocalDisplayedMessageRepository
 import com.rakuten.tech.mobile.inappmessaging.runtime.data.repositories.LocalOptedOutMessageRepository
-import com.rakuten.tech.mobile.inappmessaging.runtime.data.repositories.ReadyForDisplayMessageRepository
 import com.rakuten.tech.mobile.inappmessaging.runtime.data.repositories.PingResponseMessageRepository
+import com.rakuten.tech.mobile.inappmessaging.runtime.data.repositories.ReadyForDisplayMessageRepository
+import com.rakuten.tech.mobile.inappmessaging.runtime.data.repositories.TooltipMessageRepository
 import com.rakuten.tech.mobile.inappmessaging.runtime.data.requests.DisplayPermissionRequest
 import com.rakuten.tech.mobile.inappmessaging.runtime.data.responses.displaypermission.DisplayPermissionResponse
 import com.rakuten.tech.mobile.inappmessaging.runtime.exception.InAppMessagingException
@@ -35,7 +36,7 @@ internal interface MessageReadinessManager {
      */
     @WorkerThread
     @SuppressWarnings("LongMethod", "ReturnCount")
-    fun getNextDisplayMessage(): Message?
+    fun getNextDisplayMessage(isTooltip: Boolean): List<Message>
 
     /**
      * This method returns a DisplayPermissionRequest object.
@@ -61,10 +62,16 @@ internal interface MessageReadinessManager {
 
     private class MessageReadinessManagerImpl : MessageReadinessManager {
         @WorkerThread
-        @SuppressWarnings("LongMethod", "ReturnCount")
-        override fun getNextDisplayMessage(): Message? {
+        @SuppressWarnings("LongMethod", "ReturnCount", "ComplexMethod")
+        override fun getNextDisplayMessage(isTooltip: Boolean): List<Message> {
             shouldRetry.set(true)
-            val messageList: List<Message> = ReadyForDisplayMessageRepository.instance().getAllMessagesCopy()
+            val result = mutableListOf<Message>()
+            val messageList = if (isTooltip) {
+                TooltipMessageRepository.instance().getAllMessagesCopy()
+            } else {
+                ReadyForDisplayMessageRepository.instance().getAllMessagesCopy()
+            }
+
             for (message in messageList) {
                 Logger(TAG).debug("checking permission for message: %s", message.getCampaignId())
 
@@ -76,24 +83,38 @@ internal interface MessageReadinessManager {
                 }
 
                 // If message is test message, no need to do more checks.
-                if (message.isTest()) {
-                    Logger(TAG).debug("skipping test message: %s", message.getCampaignId())
-                    return message
-                }
+                if (shouldPing(message, result)) break
 
-                // Check message display permission with server.
-                val displayPermissionResponse = getMessagePermission(message)
-                // If server wants SDK to ping for updated messages, do a new ping request and break this loop.
-                if (isPingServerNeeded(displayPermissionResponse)) {
+                if (isTooltip) {
+                    continue
+                } else if (result.isNotEmpty()) {
+                    return result
+                }
+            }
+            return result
+        }
+
+        private fun shouldPing(message: Message, result: MutableList<Message>) = if (message.isTest()) {
+            Logger(TAG).debug("skipping test message: %s", message.getCampaignId())
+            result.add(message)
+            false
+        } else {
+            // Check message display permission with server.
+            val displayPermissionResponse = getMessagePermission(message)
+            // If server wants SDK to ping for updated messages, do a new ping request and break this loop.
+            when {
+                isPingServerNeeded(displayPermissionResponse) -> {
                     // reset current delay to initial
                     MessageMixerPingScheduler.currDelay = RetryDelayUtil.INITIAL_BACKOFF_DELAY
                     MessageMixerPingScheduler.instance().pingMessageMixerService(0)
-                    break
-                } else if (isMessagePermissibleToDisplay(displayPermissionResponse)) {
-                    return message
+                    true
                 }
+                isMessagePermissibleToDisplay(displayPermissionResponse) -> {
+                    result.add(message)
+                    false
+                }
+                else -> false
             }
-            return null
         }
 
         @VisibleForTesting

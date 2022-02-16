@@ -2,7 +2,6 @@ package com.rakuten.tech.mobile.inappmessaging.runtime.workmanager.workers
 
 import android.app.Activity
 import android.content.Context
-import android.content.Intent
 import android.os.Handler
 import android.os.Looper
 import androidx.work.CoroutineWorker
@@ -14,6 +13,7 @@ import com.rakuten.tech.mobile.inappmessaging.runtime.utils.ImageUtil
 import com.rakuten.tech.mobile.inappmessaging.runtime.data.models.messages.Message
 import com.rakuten.tech.mobile.inappmessaging.runtime.data.repositories.LocalDisplayedMessageRepository
 import com.rakuten.tech.mobile.inappmessaging.runtime.data.repositories.ReadyForDisplayMessageRepository
+import com.rakuten.tech.mobile.inappmessaging.runtime.data.repositories.TooltipMessageRepository
 import com.rakuten.tech.mobile.inappmessaging.runtime.manager.MessageReadinessManager
 import com.rakuten.tech.mobile.inappmessaging.runtime.runnable.DisplayMessageRunnable
 import com.rakuten.tech.mobile.inappmessaging.runtime.utils.WorkManagerUtil
@@ -22,10 +22,6 @@ import com.squareup.picasso.Callback
 import com.squareup.picasso.Picasso
 import java.lang.Exception
 
-/**
- * Since one service is essentially one worker thread, so there's no chance multiple worker threads
- * can dispatch Runnables to Android's message queue. Only one at a time.
- */
 internal class DisplayMessageWorker(
     context: Context,
     params: WorkerParameters
@@ -35,12 +31,14 @@ internal class DisplayMessageWorker(
     var messageReadinessManager = MessageReadinessManager.instance()
     var handler = Handler(Looper.getMainLooper())
     var picasso: Picasso? = null
+    private var isTooltip = false
 
     /**
      * This method starts displaying message runnable.
      */
     override suspend fun doWork(): Result {
         Logger(TAG).debug("onHandleWork() started on thread: %s", Thread.currentThread().name)
+        isTooltip = tags.contains(DISPLAY_TOOLTIP_WORKER)
         prepareNextMessage()
         Logger(TAG).debug("onHandleWork() ended")
         return Result.success()
@@ -51,16 +49,22 @@ internal class DisplayMessageWorker(
      */
     private fun prepareNextMessage() {
         // Retrieving the next ready message, and its display permission been checked.
-        val message = messageReadinessManager.getNextDisplayMessage() ?: return
+        val messages = messageReadinessManager.getNextDisplayMessage(isTooltip)
         val hostActivity = InAppMessaging.instance().getRegisteredActivity()
-        val imageUrl = message.getMessagePayload().resource.imageUrl
         if (hostActivity != null) {
-            if (!imageUrl.isNullOrEmpty()) {
+            for (message in messages) {
+                val imageUrl = message.getMessagePayload().resource.imageUrl
+                if (!imageUrl.isNullOrEmpty()) {
                     fetchImageThenDisplayMessage(message, hostActivity, imageUrl)
-            } else {
+                } else {
                     // If no image, just display the message.
                     displayMessage(message, hostActivity)
+                }
             }
+        }
+        if (isTooltip) {
+            // start normal campaign queue
+            enqueueWork(false)
         }
     }
 
@@ -94,6 +98,7 @@ internal class DisplayMessageWorker(
 
             // increment time closed to handle required number of events to be triggered
             readyMessagesRepo.removeMessage(message.getCampaignId(), true)
+            TooltipMessageRepository.instance().removeMessage(message.getCampaignId(), true)
 
             prepareNextMessage()
             return
@@ -116,18 +121,18 @@ internal class DisplayMessageWorker(
     }
 
     companion object {
-        private const val DISPLAY_MESSAGE_JOB_ID = 3210
         private const val TAG = "IAM_JobIntentService"
         private const val DISPLAY_WORKER = "iam_message_display_worker"
+        internal const val DISPLAY_TOOLTIP_WORKER = "iam_tooltip_display_worker"
 
         /**
          * This method enqueues work in to this service.
          */
-        fun enqueueWork(work: Intent) {
+        fun enqueueWork(isTooltip: Boolean) {
             InAppMessaging.instance().getHostAppContext()?.let {
                 val displayRequest = OneTimeWorkRequest.Builder(DisplayMessageWorker::class.java)
                     .setConstraints(WorkManagerUtil.getNetworkConnectedConstraint())
-                    .addTag(DISPLAY_WORKER)
+                    .addTag(if (isTooltip) DISPLAY_TOOLTIP_WORKER else DISPLAY_WORKER)
                     .build()
                 WorkManager.getInstance(it).enqueue(displayRequest)
             }

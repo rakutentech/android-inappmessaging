@@ -1,5 +1,6 @@
 package com.rakuten.tech.mobile.inappmessaging.runtime.data.models.messages
 
+import com.rakuten.tech.mobile.inappmessaging.runtime.data.models.Tooltip
 import com.rakuten.tech.mobile.inappmessaging.runtime.data.responses.ping.*
 
 internal class InvalidTestMessage : Message {
@@ -23,6 +24,8 @@ internal class InvalidTestMessage : Message {
     override fun setMaxImpression(maxImpression: Int) {}
 
     override fun getContexts(): List<String> = listOf()
+
+    override fun getTooltipConfig(): Tooltip? = null
 
     override fun getNumberOfTimesClosed() = 0
 

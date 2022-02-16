@@ -7,6 +7,7 @@ import androidx.work.testing.WorkManagerTestInitHelper
 import com.nhaarman.mockitokotlin2.argumentCaptor
 import com.rakuten.tech.mobile.inappmessaging.runtime.*
 import com.rakuten.tech.mobile.inappmessaging.runtime.coroutine.MessageActionsCoroutine
+import com.rakuten.tech.mobile.inappmessaging.runtime.data.enums.ImpressionType
 import com.rakuten.tech.mobile.inappmessaging.runtime.data.models.messages.InvalidTestMessage
 import com.rakuten.tech.mobile.inappmessaging.runtime.data.models.messages.Message
 import com.rakuten.tech.mobile.inappmessaging.runtime.data.models.messages.ValidTestMessage
@@ -91,7 +92,7 @@ class LocalDisplayedMessageRepositorySpec : BaseTest() {
         `when`(payload.messageSettings).thenReturn(msgSettings)
         `when`(msgSettings.controlSettings).thenReturn(settings)
         `when`(settings.buttons).thenReturn(listOf())
-        MessageActionsCoroutine(mockRepo).executeTask(message, R.id.message_close_button, true)
+        MessageActionsCoroutine(mockRepo).executeTask(message, ImpressionType.EXIT, true)
 
         Mockito.verify(mockRepo).addMessage(message)
     }
@@ -131,18 +132,6 @@ class LocalDisplayedMessageRepositorySpec : BaseTest() {
     fun `should save and restore values for different users`() {
         val message = setupAndTestMultipleUser()
         LocalDisplayedMessageRepository.instance().numberOfTimesDisplayed(message) shouldBeEqualTo 1
-    }
-
-    @Test
-    fun `should not crash and clear previous when forced cast exception`() {
-        val infoProvider = TestUserInfoProvider()
-        initializeInstance(infoProvider)
-        PreferencesUtil.putLong(
-            ApplicationProvider.getApplicationContext(),
-            InAppMessaging.getPreferencesFile(),
-            LocalDisplayedMessageRepository.LOCAL_DISPLAYED_KEY, 10L
-        )
-        LocalDisplayedMessageRepository.instance().numberOfTimesDisplayed(ValidTestMessage()) shouldBeEqualTo 0
     }
 
     @Test
@@ -189,6 +178,13 @@ class LocalDisplayedMessageRepositorySpec : BaseTest() {
         PingResponseMessageRepository.instance().lastPingMillis = Calendar.getInstance().timeInMillis
         LocalDisplayedMessageRepository.instance().addMessage(message)
         LocalDisplayedMessageRepository.instance().numberOfDisplaysAfterPing(message) shouldBeEqualTo 1
+    }
+
+    @Test
+    fun `should return correct value if tooltip was already displayed`() {
+        LocalDisplayedMessageRepository.instance().addTooltipMessage("test")
+        LocalDisplayedMessageRepository.instance().isTooltipDisplayed("test").shouldBeTrue()
+        LocalDisplayedMessageRepository.instance().isTooltipDisplayed("not-test").shouldBeFalse()
     }
 
     private fun setupAndTestMultipleUser(): ValidTestMessage {

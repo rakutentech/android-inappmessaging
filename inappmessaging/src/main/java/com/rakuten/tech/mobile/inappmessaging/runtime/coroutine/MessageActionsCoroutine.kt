@@ -9,6 +9,7 @@ import com.rakuten.tech.mobile.inappmessaging.runtime.R
 import com.rakuten.tech.mobile.inappmessaging.runtime.data.enums.ButtonActionType
 import com.rakuten.tech.mobile.inappmessaging.runtime.data.enums.EventType
 import com.rakuten.tech.mobile.inappmessaging.runtime.data.enums.ImpressionType
+import com.rakuten.tech.mobile.inappmessaging.runtime.data.enums.InAppMessageType
 import com.rakuten.tech.mobile.inappmessaging.runtime.data.enums.ValueType
 import com.rakuten.tech.mobile.inappmessaging.runtime.data.models.appevents.CustomEvent
 import com.rakuten.tech.mobile.inappmessaging.runtime.data.models.appevents.Event
@@ -16,6 +17,7 @@ import com.rakuten.tech.mobile.inappmessaging.runtime.data.models.messages.Messa
 import com.rakuten.tech.mobile.inappmessaging.runtime.data.repositories.LocalDisplayedMessageRepository
 import com.rakuten.tech.mobile.inappmessaging.runtime.data.repositories.LocalOptedOutMessageRepository
 import com.rakuten.tech.mobile.inappmessaging.runtime.data.repositories.ReadyForDisplayMessageRepository
+import com.rakuten.tech.mobile.inappmessaging.runtime.data.repositories.TooltipMessageRepository
 import com.rakuten.tech.mobile.inappmessaging.runtime.data.responses.ping.OnClickBehavior
 import com.rakuten.tech.mobile.inappmessaging.runtime.data.responses.ping.Trigger
 import com.rakuten.tech.mobile.inappmessaging.runtime.manager.EventsManager
@@ -32,7 +34,7 @@ internal class MessageActionsCoroutine(
     private val localDisplayRepo: LocalDisplayedMessageRepository = LocalDisplayedMessageRepository.instance()
 ) {
 
-    fun executeTask(message: Message?, viewResourceId: Int, optOut: Boolean): Boolean {
+    fun executeTask(message: Message?, buttonType: ImpressionType, optOut: Boolean): Boolean {
 
         if (message == null || message.getCampaignId().isEmpty()) {
             return false
@@ -41,12 +43,15 @@ internal class MessageActionsCoroutine(
         // First, update data repositories.
         updateRepositories(message, optOut)
 
-        // Getting ImpressionType, which represents which button was pressed:
-        val buttonType = getOnClickBehaviorType(viewResourceId)
-        // Add event in the button if exist.
-        addEmbeddedEvent(buttonType, message)
-        // Handling onclick action for deep link, redirect, etc.
-        handleDeepLink(getOnClickBehavior(buttonType, message))
+        if (message.getType() != InAppMessageType.TOOLTIP.typeId) {
+            // Add event in the button if exist.
+            addEmbeddedEvent(buttonType, message)
+            // Handling onclick action for deep link, redirect, etc.
+            handleDeepLink(getOnClickBehavior(buttonType, message))
+        } else if (buttonType == ImpressionType.CLICK_CONTENT) {
+            handleDeepLink(OnClickBehavior(2, message.getTooltipConfig()?.url))
+        }
+
         // Schedule to report impression.
         scheduleReportImpression(message, getImpressionTypes(optOut, buttonType))
 
@@ -62,8 +67,12 @@ internal class MessageActionsCoroutine(
         message: Message,
         optOut: Boolean
     ) {
-        // Remove message from ReadyForDisplayMessageRepository.
-        ReadyForDisplayMessageRepository.instance().removeMessage(message.getCampaignId())
+        if (message.getType() != InAppMessageType.TOOLTIP.typeId) {
+            // Remove message from ReadyForDisplayMessageRepository.
+            ReadyForDisplayMessageRepository.instance().removeMessage(message.getCampaignId())
+        } else {
+            TooltipMessageRepository.instance().removeMessage(message.getCampaignId())
+        }
 
         // Adding message to LocalDisplayedMessageRepository.
         localDisplayRepo.addMessage(message)
@@ -86,21 +95,6 @@ internal class MessageActionsCoroutine(
         }
 
         return impressionTypes
-    }
-
-    /**
-     * This method returns which button was clicked which is represented by ImpressionType object.
-     */
-    @WorkerThread
-    private fun getOnClickBehaviorType(viewResourceId: Int): ImpressionType {
-        return when (viewResourceId) {
-            R.id.message_close_button -> ImpressionType.EXIT
-            R.id.message_single_button, R.id.message_button_left -> ImpressionType.ACTION_ONE
-            R.id.message_button_right -> ImpressionType.ACTION_TWO
-            R.id.slide_up -> ImpressionType.CLICK_CONTENT
-            BACK_BUTTON -> ImpressionType.EXIT
-            else -> ImpressionType.INVALID
-        }
     }
 
     /**
@@ -227,5 +221,18 @@ internal class MessageActionsCoroutine(
     companion object {
         const val BACK_BUTTON = -1
         private const val TAG = "IAM_MessageActions"
+
+        /**
+         * This method returns which button was clicked which is represented by ImpressionType object.
+         */
+        internal fun getOnClickBehaviorType(viewResourceId: Int): ImpressionType {
+            return when (viewResourceId) {
+                R.id.message_close_button, BACK_BUTTON -> ImpressionType.EXIT
+                R.id.message_single_button, R.id.message_button_left -> ImpressionType.ACTION_ONE
+                R.id.message_button_right -> ImpressionType.ACTION_TWO
+                R.id.slide_up, R.id.message_tooltip_image_view, R.id.message_tip -> ImpressionType.CLICK_CONTENT
+                else -> ImpressionType.INVALID
+            }
+        }
     }
 }

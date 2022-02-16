@@ -22,7 +22,7 @@ class EventTypeSpec(private val id: Int, private val expected: Any?) {
                     arrayOf(2, EventType.LOGIN_SUCCESSFUL),
                     arrayOf(3, EventType.PURCHASE_SUCCESSFUL),
                     arrayOf(4, EventType.CUSTOM),
-                    arrayOf(5, null)
+                    arrayOf(-1, null)
             )
         }
     }

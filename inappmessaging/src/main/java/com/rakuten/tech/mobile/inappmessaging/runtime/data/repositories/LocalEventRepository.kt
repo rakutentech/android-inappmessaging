@@ -14,7 +14,6 @@ import com.rakuten.tech.mobile.inappmessaging.runtime.exception.InAppMessagingEx
 import com.rakuten.tech.mobile.sdkutils.PreferencesUtil
 import com.rakuten.tech.mobile.sdkutils.logger.Logger
 import org.json.JSONArray
-import java.lang.ClassCastException
 import java.util.Collections
 import kotlin.collections.ArrayList
 
@@ -162,19 +161,14 @@ internal interface LocalEventRepository : EventRepository {
                     (onLaunch || user != AccountRepository.instance().userInfoHash)) {
                 user = AccountRepository.instance().userInfoHash
                 // reset event list from cached using updated user info
-                val listString = try {
-                    InAppMessaging.instance().getHostAppContext()?.let { it ->
-                        PreferencesUtil.getString(
-                            it,
-                            InAppMessaging.getPreferencesFile(),
-                            LOCAL_EVENT_KEY,
-                            ""
-                        )
-                    } ?: ""
-                } catch (ex: ClassCastException) {
-                    Logger(TAG).debug(ex.cause, "Incorrect type for $LOCAL_EVENT_KEY data")
-                    ""
-                }
+                val listString = InAppMessaging.instance().getHostAppContext()?.let { it ->
+                    PreferencesUtil.getString(
+                        it,
+                        InAppMessaging.getPreferencesFile(),
+                        LOCAL_EVENT_KEY,
+                        ""
+                    )
+                } ?: ""
                 if (listString.isNotEmpty()) {
                     events.clear()
                     deserializeLocalEvents(listString)

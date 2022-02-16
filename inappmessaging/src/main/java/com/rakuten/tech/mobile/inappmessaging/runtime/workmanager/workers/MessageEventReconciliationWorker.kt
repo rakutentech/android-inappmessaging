@@ -6,6 +6,7 @@ import androidx.work.WorkerParameters
 import com.rakuten.tech.mobile.inappmessaging.runtime.BuildConfig
 import com.rakuten.tech.mobile.inappmessaging.runtime.data.repositories.PingResponseMessageRepository
 import com.rakuten.tech.mobile.inappmessaging.runtime.data.repositories.ReadyForDisplayMessageRepository
+import com.rakuten.tech.mobile.inappmessaging.runtime.data.repositories.TooltipMessageRepository
 import com.rakuten.tech.mobile.inappmessaging.runtime.manager.DisplayManager
 import com.rakuten.tech.mobile.inappmessaging.runtime.utils.MessageEventReconciliationUtil
 import com.rakuten.tech.mobile.inappmessaging.runtime.utils.RuntimeUtil.getCurrentTimeMillis
@@ -52,19 +53,19 @@ internal class MessageEventReconciliationWorker(
         }
 
         // Move test messages(ready to display) from messageList to a new list readyMessageList.
-        val readyMessageList = ArrayList(messageUtil.extractTestMessages(messageListCopy))
+//        val readyMessageList = ArrayList(messageUtil.extractTestMessages(messageListCopy))
 
         // Add a list of ready messages reconciled messages' triggers with existing local events.
-        readyMessageList.addAll(messageUtil.reconcileMessagesAndEvents(messageListCopy))
+//        readyMessageList.addAll()
+
+        val messagesPair = messageUtil.reconcileMessagesAndEvents(messageListCopy)
 
         // Finally, add all ready messages into ReadyForDisplayMessageRepository.
-        ReadyForDisplayMessageRepository.instance().replaceAllMessages(readyMessageList)
+        ReadyForDisplayMessageRepository.instance().replaceAllMessages(messagesPair.first)
+        TooltipMessageRepository.instance().replaceAllMessages(messagesPair.second)
 
         // Schedule to display next message.
         DisplayManager.instance().displayMessage()
-        for (message in readyMessageList) {
-            Logger(TAG).debug("Ready Messages: %s", message.getMessagePayload().header)
-        }
         var endTime: Long = 0
         if (BuildConfig.DEBUG) {
             endTime = getCurrentTimeMillis()

@@ -26,7 +26,7 @@ class OperatorTypeSpec(private val id: Int, private val expected: Any?) {
                     arrayOf(6, OperatorType.IS_NOT_BLANK),
                     arrayOf(7, OperatorType.MATCHES_REGEX),
                     arrayOf(8, OperatorType.DOES_NOT_MATCH_REGEX),
-                    arrayOf(9, null)
+                    arrayOf(-1, null)
             )
         }
     }

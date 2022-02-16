@@ -190,7 +190,7 @@ open class InAppMessagingSpec : BaseTest() {
         setupDisplayedView(message)
         val instance = initializeMockInstance(100)
 
-        `when`(displayManager.removeMessage(anyOrNull())).thenReturn("1")
+        `when`(displayManager.removeMessage(anyOrNull(), anyOrNull(), any(), anyOrNull())).thenReturn("1")
 
         (instance as InApp).removeMessage(false)
         ReadyForDisplayMessageRepository.instance().getAllMessagesCopy().shouldHaveSize(1)
@@ -278,7 +278,7 @@ open class InAppMessagingSpec : BaseTest() {
         val instance = initializeMockInstance(0)
 
         instance.unregisterMessageDisplayActivity()
-        Mockito.verify(displayManager, never()).removeMessage(any())
+        Mockito.verify(displayManager, never()).removeMessage(anyOrNull(), anyOrNull(), any(), anyOrNull())
     }
 
     @Test
@@ -396,7 +396,7 @@ class InAppMessagingExceptionSpec : InAppMessagingSpec() {
         super.setup()
         InApp.errorCallback = null
         `when`(dispMgr.displayMessage()).thenThrow(NullPointerException())
-        `when`(dispMgr.removeMessage(anyOrNull())).thenThrow(NullPointerException())
+        `when`(dispMgr.removeMessage(anyOrNull(), anyOrNull(), any(), anyOrNull())).thenThrow(NullPointerException())
         `when`(eventsManager.onEventReceived(any(), any(), any(), any(), any())).thenThrow(NullPointerException())
         `when`(sessionManager.onSessionUpdate()).thenThrow(NullPointerException())
     }

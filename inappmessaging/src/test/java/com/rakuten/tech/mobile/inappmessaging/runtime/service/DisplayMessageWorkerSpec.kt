@@ -7,12 +7,14 @@ import android.os.Build
 import android.os.Handler
 import android.util.DisplayMetrics
 import android.view.View
+import androidx.test.core.app.ApplicationProvider
 import androidx.test.core.app.ApplicationProvider.getApplicationContext
 import androidx.work.ListenableWorker
 import androidx.work.WorkerParameters
 import androidx.work.impl.utils.SerialExecutor
 import androidx.work.impl.utils.taskexecutor.TaskExecutor
 import androidx.work.testing.TestListenableWorkerBuilder
+import androidx.work.testing.WorkManagerTestInitHelper
 import com.nhaarman.mockitokotlin2.*
 import com.rakuten.tech.mobile.inappmessaging.runtime.BaseTest
 import com.rakuten.tech.mobile.inappmessaging.runtime.InAppMessaging
@@ -50,7 +52,7 @@ import org.robolectric.annotation.Config
 class DisplayMessageWorkerSpec : BaseTest() {
 
     private val activity = Mockito.mock(Activity::class.java)
-    private val displayWorker = TestListenableWorkerBuilder<DisplayMessageWorker>(getApplicationContext()).build()
+    private var displayWorker = TestListenableWorkerBuilder<DisplayMessageWorker>(getApplicationContext()).build()
     private val mockMessageManager = Mockito.mock(MessageReadinessManager::class.java)
     private var mockLocalDisplayRepo = Mockito.mock(LocalDisplayedMessageRepository::class.java)
     private var mockReadyForDisplayRepo = Mockito.mock(ReadyForDisplayMessageRepository::class.java)
@@ -62,10 +64,7 @@ class DisplayMessageWorkerSpec : BaseTest() {
     @Before
     override fun setup() {
         super.setup()
-        displayWorker.messageReadinessManager = mockMessageManager
-        displayWorker.localDisplayRepo = mockLocalDisplayRepo
-        displayWorker.readyMessagesRepo = mockReadyForDisplayRepo
-        displayWorker.handler = handler
+        setupWorker()
         `when`(configResponseData.rollOutPercentage).thenReturn(100)
         ConfigResponseRepository.instance().addConfigResponse(configResponseData)
         InAppMessaging.initialize(getApplicationContext(), true)
@@ -76,6 +75,13 @@ class DisplayMessageWorkerSpec : BaseTest() {
     override fun tearDown() {
         super.tearDown()
         ConfigResponseRepository.resetInstance()
+    }
+
+    private fun setupWorker() {
+        displayWorker.messageReadinessManager = mockMessageManager
+        displayWorker.localDisplayRepo = mockLocalDisplayRepo
+        displayWorker.readyMessagesRepo = mockReadyForDisplayRepo
+        displayWorker.handler = handler
     }
 
     @Test
@@ -142,7 +148,7 @@ class DisplayMessageWorkerSpec : BaseTest() {
         `when`(message.getMaxImpressions()).thenReturn(1)
         `when`(message.getMessagePayload()).thenReturn(payload)
         `when`(message.getContexts()).thenReturn(listOf())
-        `when`(mockMessageManager.getNextDisplayMessage()).thenReturn(message)
+        `when`(mockMessageManager.getNextDisplayMessage(false)).thenReturn(listOf(message))
         runBlocking {
             displayWorker.doWork() shouldBeEqualTo ListenableWorker.Result.success()
         }
@@ -162,7 +168,7 @@ class DisplayMessageWorkerSpec : BaseTest() {
         `when`(message.getMaxImpressions()).thenReturn(1)
         `when`(message.getMessagePayload()).thenReturn(payload)
         `when`(message.getContexts()).thenReturn(listOf("ctx"))
-        `when`(mockMessageManager.getNextDisplayMessage()).thenReturn(message)
+        `when`(mockMessageManager.getNextDisplayMessage(false)).thenReturn(listOf(message))
         runBlocking {
             displayWorker.doWork() shouldBeEqualTo ListenableWorker.Result.success()
         }
@@ -188,7 +194,7 @@ class DisplayMessageWorkerSpec : BaseTest() {
     fun `should call getMessagePayload again when message's context was rejected`() {
         setupNextCampaign()
 
-        Mockito.verify(mockMessageManager, Mockito.times(2)).getNextDisplayMessage()
+        Mockito.verify(mockMessageManager, Mockito.times(2)).getNextDisplayMessage(false)
     }
 
     @Test
@@ -216,13 +222,13 @@ class DisplayMessageWorkerSpec : BaseTest() {
     @Test
     fun `should not display campaign if activity is not registered`() {
         InAppMessaging.instance().unregisterMessageDisplayActivity()
-        Mockito.verify(activity).findViewById<View?>(ArgumentMatchers.anyInt())
+        Mockito.verify(activity, atLeast(2)).findViewById<View?>(ArgumentMatchers.anyInt())
         verifyHandlerCalled()
     }
 
     @Test
-    fun `should not display campaign if payload is null`() {
-        `when`(mockMessageManager.getNextDisplayMessage()).thenReturn(null)
+    fun `should not display campaign if payload is empty`() {
+        `when`(mockMessageManager.getNextDisplayMessage(false)).thenReturn(listOf())
         runBlocking {
             displayWorker.doWork() shouldBeEqualTo ListenableWorker.Result.success()
         }
@@ -244,8 +250,8 @@ class DisplayMessageWorkerSpec : BaseTest() {
         val worker = TestListenableWorkerBuilder<DisplayMessageWorker>(getApplicationContext()).build()
         worker.messageReadinessManager = mockMessageManager
         val message = setupMessageWithImage("https://imageurl.jpg")
-        `when`(mockMessageManager.getNextDisplayMessage()).thenReturn(message).thenReturn(null)
-        `when`(mockMessageManager.getNextDisplayMessage()).thenReturn(message)
+        `when`(mockMessageManager.getNextDisplayMessage(false)).thenReturn(listOf(message)).thenReturn(listOf())
+        `when`(mockMessageManager.getNextDisplayMessage(false)).thenReturn(listOf(message))
         val mockResource = Mockito.mock(Resources::class.java)
         `when`(activity.resources).thenReturn(mockResource)
         `when`(mockResource.displayMetrics).thenReturn(Mockito.mock(DisplayMetrics::class.java))
@@ -262,8 +268,23 @@ class DisplayMessageWorkerSpec : BaseTest() {
     @Test
     fun `should display the message if null image url`() {
         val message = setupMessageWithImage(null)
-        `when`(mockMessageManager.getNextDisplayMessage()).thenReturn(message)
+        `when`(mockMessageManager.getNextDisplayMessage(false)).thenReturn(listOf(message))
         runBlocking {
+            displayWorker.doWork() shouldBeEqualTo ListenableWorker.Result.success()
+        }
+
+        Mockito.verify(handler).post(ArgumentMatchers.any(DisplayMessageRunnable::class.java))
+    }
+
+    @Test
+    fun `should display the message for tooltip`() {
+        WorkManagerTestInitHelper.initializeTestWorkManager(ApplicationProvider.getApplicationContext())
+        val message = setupMessageWithImage(null)
+        `when`(mockMessageManager.getNextDisplayMessage(true)).thenReturn(listOf(message))
+        runBlocking {
+            displayWorker = TestListenableWorkerBuilder<DisplayMessageWorker>(getApplicationContext())
+                .setTags(listOf(DisplayMessageWorker.DISPLAY_TOOLTIP_WORKER)).build()
+            setupWorker()
             displayWorker.doWork() shouldBeEqualTo ListenableWorker.Result.success()
         }
 
@@ -288,7 +309,7 @@ class DisplayMessageWorkerSpec : BaseTest() {
 
     private fun setupValidMessage(): Message {
         val message = Mockito.mock(Message::class.java)
-        `when`(mockMessageManager.getNextDisplayMessage()).thenReturn(message)
+        `when`(mockMessageManager.getNextDisplayMessage(false)).thenReturn(listOf(message))
         `when`(message.getCampaignId()).thenReturn("1")
         `when`(message.isTest()).thenReturn(true)
         `when`(message.getMaxImpressions()).thenReturn(10)
@@ -342,6 +363,6 @@ class DisplayMessageWorkerSpec : BaseTest() {
         `when`(message.getMaxImpressions()).thenReturn(1)
         `when`(message.getMessagePayload()).thenReturn(payload)
         `when`(message.getContexts()).thenReturn(listOf("ctx"))
-        `when`(mockMessageManager.getNextDisplayMessage()).thenReturn(message).thenReturn(null)
+        `when`(mockMessageManager.getNextDisplayMessage(false)).thenReturn(listOf(message)).thenReturn(listOf())
     }
 }

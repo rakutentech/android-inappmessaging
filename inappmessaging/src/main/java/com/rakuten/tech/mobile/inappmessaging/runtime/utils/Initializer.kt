@@ -17,7 +17,6 @@ import com.rakuten.tech.mobile.sdkutils.PreferencesUtil
 import com.rakuten.tech.mobile.sdkutils.logger.Logger
 import com.squareup.picasso.LruCache
 import com.squareup.picasso.Picasso
-import java.lang.ClassCastException
 import java.lang.IllegalStateException
 import java.util.Locale
 import java.util.UUID
@@ -104,11 +103,7 @@ internal object Initializer {
      */
     private fun getUuid(context: Context, sharedUtil: PreferencesUtil): String {
         if (sharedUtil.contains(context, "uuid", ID_KEY)) {
-            try {
-                return sharedUtil.getString(context, "uuid", ID_KEY, "").toString()
-            } catch (ex: ClassCastException) {
-                Logger(TAG).debug(ex.cause, "Incorrect type for $ID_KEY data")
-            }
+            return sharedUtil.getString(context, "uuid", ID_KEY, "").toString()
         }
         val id = UUID.randomUUID().toString()
         sharedUtil.putString(context, "uuid", ID_KEY, id)
