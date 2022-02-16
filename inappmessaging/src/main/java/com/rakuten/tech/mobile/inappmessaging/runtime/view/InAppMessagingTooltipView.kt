@@ -13,6 +13,7 @@ import android.os.Handler
 import android.os.Looper
 import android.util.AttributeSet
 import android.view.View
+import android.view.ViewGroup
 import android.view.ViewTreeObserver
 import android.widget.ImageButton
 import android.widget.ImageView
@@ -291,6 +292,8 @@ internal class InAppMessagingTooltipView(
 
     private fun showView() {
         val params = this.layoutParams as MarginLayoutParams
+        (parent as ViewGroup).clipChildren = false
+        (parent as ViewGroup).clipToPadding = false
         val imageView = findViewById<ImageView>(R.id.message_tooltip_image_view)
         viewId?.let {
             val activity = InAppMessaging.instance().getRegisteredActivity() ?: return
