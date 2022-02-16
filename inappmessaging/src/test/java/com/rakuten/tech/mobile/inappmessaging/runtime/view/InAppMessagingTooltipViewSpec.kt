@@ -7,6 +7,7 @@ import android.os.Handler
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.FrameLayout
 import android.widget.ImageView
 import androidx.test.core.app.ApplicationProvider
 import com.google.android.material.imageview.ShapeableImageView
@@ -58,6 +59,8 @@ class InAppMessagingTooltipViewSpec {
         view = hostAppActivity
             .layoutInflater
             .inflate(R.layout.in_app_message_tooltip, null) as InAppMessagingTooltipView
+        val group = FrameLayout(ApplicationProvider.getApplicationContext())
+        group.addView(view)
     }
 
     @Test
