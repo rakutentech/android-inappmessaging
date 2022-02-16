@@ -3,6 +3,7 @@ package com.rakuten.tech.mobile.inappmessaging.runtime.view
 import android.app.Activity
 import android.content.res.Resources
 import android.os.Build
+import android.os.Handler
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -26,6 +27,7 @@ import org.mockito.Mockito
 import org.robolectric.RobolectricTestRunner
 import org.robolectric.annotation.Config
 
+@SuppressWarnings("LargeClass")
 @Config(sdk = [Build.VERSION_CODES.O_MR1])
 @RunWith(RobolectricTestRunner::class)
 class InAppMessagingTooltipViewSpec {
@@ -63,6 +65,14 @@ class InAppMessagingTooltipViewSpec {
         Mockito.`when`(mockTooltip.position).thenReturn("invalid-pos")
         view?.populateViewData(mockMessage)
         view?.type shouldBeEqualTo PositionType.BOTTOM_CENTER
+    }
+
+    @Test
+    fun `should not display tooltip due to empty url`() {
+        Mockito.`when`(mockTooltip.position).thenReturn("top-center")
+        Mockito.`when`(mockResource.imageUrl).thenReturn("")
+        view?.populateViewData(mockMessage)
+        view?.findViewById<ShapeableImageView>(R.id.message_tooltip_image_view)?.visibility shouldBeEqualTo View.GONE
     }
 
     @Test
@@ -108,6 +118,19 @@ class InAppMessagingTooltipViewSpec {
     @Test
     fun `should show image for right`() {
         showImage(PositionType.RIGHT)
+    }
+
+    @Test
+    fun `should show image with mock handler`() {
+        val mockHandler = Mockito.mock(Handler::class.java)
+        view?.mainHandler = mockHandler
+        Mockito.`when`(mockHandler.postDelayed(any(), any())).thenAnswer {
+            it.getArgument<Runnable>(0).run()
+            true
+        }
+        showImage(PositionType.RIGHT)
+        Thread.sleep(1000)
+        view?.findViewById<ShapeableImageView>(R.id.message_tooltip_image_view)?.visibility shouldBeEqualTo View.VISIBLE
     }
 
     @Test

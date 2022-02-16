@@ -48,7 +48,7 @@ internal class InAppMessagingTooltipView(
     private var viewId: String? = null
     private var listener: InAppMessageViewListener? = null
     internal var isTest = false
-    private val mainHandler = Handler(Looper.getMainLooper())
+    internal var mainHandler = Handler(Looper.getMainLooper())
 
     @VisibleForTesting
     internal var picasso: Picasso? = null
@@ -144,7 +144,7 @@ internal class InAppMessagingTooltipView(
         var adjustedWidth = TRI_SIZE
         var adjustedHeight = TRI_SIZE
         val close = findViewById<ImageButton>(R.id.message_close_button)
-        if (close != null && close.drawable is ScaleDrawable) {
+        if (close.drawable is ScaleDrawable) {
             close.drawable.level = 1
         }
         val imageView = findViewById<ShapeableImageView>(R.id.message_tooltip_image_view)
@@ -180,21 +180,12 @@ internal class InAppMessagingTooltipView(
                 )
             }
             PositionType.TOP_LEFT -> {
-                (close.layoutParams as LayoutParams).removeRule(END_OF)
-                (close.layoutParams as LayoutParams).removeRule(ABOVE)
-                (close.layoutParams as LayoutParams).removeRule(RIGHT_OF)
-                (findViewById<RelativeLayout>(R.id.image_layout).layoutParams as LayoutParams).addRule(
-                    END_OF,
-                    R.id.message_close_button
-                )
-                adjustedHeight = PADDING
-                adjustedWidth = PADDING
-                tip.layoutParams.height = PADDING
-                tip.layoutParams.width = PADDING
-                (tip.layoutParams as LayoutParams).addRule(ALIGN_END, R.id.message_tooltip_image_view)
+                alignLeft(close, tip)
                 (tip.layoutParams as LayoutParams).addRule(ALIGN_BOTTOM, R.id.message_tooltip_image_view)
                 (tip.layoutParams as MarginLayoutParams).rightMargin = -PADDING / 2
                 (tip.layoutParams as MarginLayoutParams).bottomMargin = -PADDING / 2
+                adjustedHeight = PADDING
+                adjustedWidth = PADDING
                 arrayOf(
                     Point(PADDING * 1 / 3, 0),
                     Point(PADDING, PADDING),
@@ -229,18 +220,9 @@ internal class InAppMessagingTooltipView(
                 )
             }
             PositionType.BOTTOM_LEFT -> {
-                (close.layoutParams as LayoutParams).removeRule(END_OF)
-                (close.layoutParams as LayoutParams).removeRule(ABOVE)
-                (close.layoutParams as LayoutParams).removeRule(RIGHT_OF)
-                (findViewById<RelativeLayout>(R.id.image_layout).layoutParams as LayoutParams).addRule(
-                    END_OF,
-                    R.id.message_close_button
-                )
+                alignLeft(close, tip)
                 adjustedHeight = PADDING
                 adjustedWidth = PADDING
-                tip.layoutParams.height = PADDING
-                tip.layoutParams.width = PADDING
-                (tip.layoutParams as LayoutParams).addRule(ALIGN_END, R.id.message_tooltip_image_view)
                 (tip.layoutParams as LayoutParams).addRule(ALIGN_TOP, R.id.message_tooltip_image_view)
                 (tip.layoutParams as MarginLayoutParams).rightMargin = -PADDING / 2
                 (tip.layoutParams as MarginLayoutParams).topMargin = -PADDING / 2
@@ -292,6 +274,19 @@ internal class InAppMessagingTooltipView(
         canvas.drawPath(path, paint)
 
         tip.setImageBitmap(bg)
+    }
+
+    private fun alignLeft(close: ImageButton, tip: ImageView) {
+        (close.layoutParams as LayoutParams).removeRule(END_OF)
+        (close.layoutParams as LayoutParams).removeRule(ABOVE)
+        (close.layoutParams as LayoutParams).removeRule(RIGHT_OF)
+        (findViewById<RelativeLayout>(R.id.image_layout).layoutParams as LayoutParams).addRule(
+            END_OF,
+            R.id.message_close_button
+        )
+        tip.layoutParams.height = PADDING
+        tip.layoutParams.width = PADDING
+        (tip.layoutParams as LayoutParams).addRule(ALIGN_END, R.id.message_tooltip_image_view)
     }
 
     private fun showView() {
