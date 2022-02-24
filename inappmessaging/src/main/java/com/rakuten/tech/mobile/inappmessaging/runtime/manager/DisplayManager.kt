@@ -33,7 +33,7 @@ internal interface DisplayManager {
 
     companion object {
         private const val TAG = "IAM_DisplayManager"
-        private const val MS_MULTIPLIER = 1000L
+        private const val MS_MULTI = 1000L
 
         private var instance: DisplayManager = DisplayManagerImpl()
 
@@ -50,7 +50,6 @@ internal interface DisplayManager {
         override fun removeMessage(activity: Activity?, removeAll: Boolean, delay: Int, id: String?): Any? {
             if (activity == null) return null
 
-            // Find any displaying InApp Message view from the activity.
             return if (id != null) {
                 // id is not null if tooltip
                 removeWithId(activity, id, delay)
@@ -60,8 +59,9 @@ internal interface DisplayManager {
                     removeAllTooltip(activity, delay)
                 }
                 // remove normal campaign
+                // find any displaying InApp Message view from the activity.
                 activity.findViewById<ViewGroup>(R.id.in_app_message_base_view)?.let {
-                    scheduleRemoval(delay, it, activity = activity)
+                    scheduleRemoval(delay, it)
                     it.tag
                 }
             }
@@ -70,19 +70,19 @@ internal interface DisplayManager {
         private fun removeWithId(activity: Activity, id: String?, delay: Int) {
             activity.findViewById<ViewGroup>(R.id.in_app_message_tooltip_view)?.let {
                 if (it.tag == id) {
-                    scheduleRemoval(delay, it, id, activity)
+                    scheduleRemoval(delay, it, id)
                 } else {
-                    scheduleTargetChild(it, id, delay, activity)
+                    scheduleTargetChild(it, id, delay)
                 }
             }
         }
 
-        private fun scheduleTargetChild(it: ViewGroup, id: String?, delay: Int, activity: Activity) {
+        private fun scheduleTargetChild(it: ViewGroup, id: String?, delay: Int) {
             it.parent?.let { parent ->
                 for (i in 0 until (parent as ViewGroup).childCount) {
                     val child = parent.getChildAt(i)
                     if (child?.id == R.id.in_app_message_tooltip_view && child.tag == id) {
-                        scheduleRemoval(delay, child as ViewGroup, id, activity)
+                        scheduleRemoval(delay, child as ViewGroup, id)
                         break
                     }
                 }
@@ -99,23 +99,25 @@ internal interface DisplayManager {
                     }
                 }
                 for (view in viewList) {
-                    scheduleRemoval(delay, view as ViewGroup, view.tag as String?, activity)
+                    scheduleRemoval(delay, view as ViewGroup, view.tag as String?)
                 }
             }
         }
 
-        private fun scheduleRemoval(delay: Int, view: ViewGroup, id: String? = null, activity: Activity) {
+        private fun scheduleRemoval(delay: Int, view: ViewGroup, id: String? = null) {
             if (delay > 0) {
                 Handler(Looper.getMainLooper()).postDelayed(
-                    { removeCampaign(view, id, activity) }, delay * MS_MULTIPLIER
+                    { removeCampaign(view, id) }, delay * MS_MULTI
                 )
             } else {
                 // to avoid crashing when redirect from tooltip view
-                removeCampaign(view, id, activity)
+                removeCampaign(view, id)
             }
         }
 
-        private fun removeCampaign(inAppMessageBaseView: ViewGroup, id: String?, activity: Activity) {
+        private fun removeCampaign(inAppMessageBaseView: ViewGroup, id: String?) {
+//            if (activity == null) return
+
             // Removing just the InApp Message from the view hierarchy.
             if (inAppMessageBaseView.parent !is ViewGroup) {
                 // avoid crash
@@ -124,7 +126,7 @@ internal interface DisplayManager {
 
             val parent = inAppMessageBaseView.parent as ViewGroup
             if (parent.id == R.id.in_app_message_tooltip_layout) {
-                removeTooltip(parent, id, activity)
+                removeTooltip(parent, id)
             } else {
                 parent.isFocusableInTouchMode = true
                 parent.requestFocus()
@@ -133,7 +135,7 @@ internal interface DisplayManager {
             Logger(TAG).debug("View removed")
         }
 
-        private fun removeTooltip(parent: ViewGroup, id: String?, activity: Activity) {
+        private fun removeTooltip(parent: ViewGroup, id: String?) {
             val gp = parent.parent
             for (i in 0 until parent.childCount) {
                 val child = parent.getChildAt(i)
@@ -143,6 +145,8 @@ internal interface DisplayManager {
                     break
                 }
             }
+            val activity = InAppMessaging.instance().getRegisteredActivity() ?: return
+
             val tooltip = activity.findViewById<ViewGroup>(R.id.in_app_message_tooltip_view)
             if (tooltip == null && parent.childCount > 0) {
                 val child = parent.getChildAt(0) // this is the scrollview
@@ -166,7 +170,7 @@ internal interface DisplayManager {
                 for (view in removeList) {
                     (view.tag as String?)?.let {
                         TooltipMessageRepository.instance().removeMessage(it)
-                        scheduleRemoval(0, view as ViewGroup, it, activity)
+                        scheduleRemoval(0, view as ViewGroup, it)
                     }
                 }
             }

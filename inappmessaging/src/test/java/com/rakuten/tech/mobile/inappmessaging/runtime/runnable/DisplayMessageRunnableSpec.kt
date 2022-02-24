@@ -23,6 +23,7 @@ import com.rakuten.tech.mobile.inappmessaging.runtime.data.models.Tooltip
 import com.rakuten.tech.mobile.inappmessaging.runtime.data.repositories.LocalDisplayedMessageRepository
 import com.rakuten.tech.mobile.inappmessaging.runtime.data.responses.ping.CampaignData
 import com.rakuten.tech.mobile.inappmessaging.runtime.data.responses.ping.MessageMixerResponseSpec
+import com.rakuten.tech.mobile.inappmessaging.runtime.manager.DisplayManager
 import com.rakuten.tech.mobile.inappmessaging.runtime.view.InAppMessageModalView
 import com.rakuten.tech.mobile.inappmessaging.runtime.view.InAppMessageSlideUpView
 import org.amshove.kluent.shouldBeFalse
@@ -45,6 +46,7 @@ import org.robolectric.annotation.Config
 class DisplayMessageRunnableSpec : BaseTest() {
     private val message = mock(CampaignData::class.java)
     private var hostAppActivity = mock(Activity::class.java)
+    private var mockDisplay = mock(DisplayManager::class.java)
     private val view = mock(View::class.java)
     private val window = mock(Window::class.java)
     private val payload = MessageMixerResponseSpec.response.data[0].campaignData.getMessagePayload()
@@ -195,6 +197,29 @@ class DisplayMessageRunnableSpec : BaseTest() {
         verifyShouldDisplayTooltip()
         verify(hostAppActivity).addContentView(any(), any())
         LocalDisplayedMessageRepository.instance().isTooltipDisplayed("test").shouldBeTrue()
+        verify(mockDisplay).removeMessage(any(), any(), any(), any())
+    }
+
+    @Test
+    fun `should not call display manager for null auto-disappear`() {
+        setupActivity()
+        setupTooltip()
+        setupTooltipDetails(autoDisappear = null)
+        verifyShouldDisplayTooltip()
+        verify(hostAppActivity).addContentView(any(), any())
+        LocalDisplayedMessageRepository.instance().isTooltipDisplayed("test").shouldBeTrue()
+        verify(mockDisplay, never()).removeMessage(any(), any(), any(), any())
+    }
+
+    @Test
+    fun `should not call display manager for 0 auto-disappear`() {
+        setupActivity()
+        setupTooltip()
+        setupTooltipDetails(autoDisappear = 0)
+        verifyShouldDisplayTooltip()
+        verify(hostAppActivity).addContentView(any(), any())
+        LocalDisplayedMessageRepository.instance().isTooltipDisplayed("test").shouldBeTrue()
+        verify(mockDisplay, never()).removeMessage(any(), any(), any(), any())
     }
 
     @Test
@@ -232,8 +257,8 @@ class DisplayMessageRunnableSpec : BaseTest() {
     }
 
     @SuppressWarnings("LongMethod")
-    private fun setupTooltipDetails(isScroll: Boolean = false): ScrollView? {
-        val tooltip = Tooltip("target", "top-center", "testurl", 5)
+    private fun setupTooltipDetails(isScroll: Boolean = false, autoDisappear: Int? = 5): ScrollView? {
+        val tooltip = Tooltip("target", "top-center", "testurl", autoDisappear)
         val mockView = mock(View::class.java)
         val mockResource = mock(Resources::class.java)
         `when`(hostAppActivity.findViewById<View>(R.id.in_app_message_tooltip_view)).thenReturn(null)
@@ -304,7 +329,7 @@ class DisplayMessageRunnableSpec : BaseTest() {
     }
 
     private fun verifyShouldDisplayTooltip(mockLayout: FrameLayout? = null) {
-        val runner = DisplayMessageRunnable(message, hostAppActivity)
+        val runner = DisplayMessageRunnable(message, hostAppActivity, mockDisplay)
         runner.testLayout = mockLayout
         runner.run()
         verify(hostAppActivity).layoutInflater

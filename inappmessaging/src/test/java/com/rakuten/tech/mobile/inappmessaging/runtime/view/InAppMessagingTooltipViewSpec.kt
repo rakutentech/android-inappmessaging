@@ -44,10 +44,8 @@ class InAppMessagingTooltipViewSpec {
 
     @Before
     fun setup() {
-        Mockito.`when`(
-            hostAppActivity
-                .layoutInflater
-        ).thenReturn(LayoutInflater.from(ApplicationProvider.getApplicationContext()))
+        Mockito.`when`(hostAppActivity.layoutInflater).thenReturn(
+            LayoutInflater.from(ApplicationProvider.getApplicationContext()))
         Mockito.`when`(mockMessage.getMessagePayload()).thenReturn(mockPayload)
         Mockito.`when`(mockMessage.getTooltipConfig()).thenReturn(mockTooltip)
         Mockito.`when`(mockPayload.backgroundColor).thenReturn("#000000")

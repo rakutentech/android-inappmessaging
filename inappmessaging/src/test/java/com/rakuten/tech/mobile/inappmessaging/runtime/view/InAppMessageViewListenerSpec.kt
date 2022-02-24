@@ -14,7 +14,6 @@ import com.rakuten.tech.mobile.inappmessaging.runtime.R
 import com.rakuten.tech.mobile.inappmessaging.runtime.coroutine.MessageActionsCoroutine
 import com.rakuten.tech.mobile.inappmessaging.runtime.data.enums.ImpressionType
 import com.rakuten.tech.mobile.inappmessaging.runtime.data.enums.InAppMessageType
-import com.rakuten.tech.mobile.inappmessaging.runtime.data.models.Tooltip
 import com.rakuten.tech.mobile.inappmessaging.runtime.data.models.messages.Message
 import com.rakuten.tech.mobile.inappmessaging.runtime.data.models.messages.ValidTestMessage
 import com.rakuten.tech.mobile.inappmessaging.runtime.data.responses.ping.DisplaySettings
@@ -126,35 +125,15 @@ class InAppMessageViewListenerOnClickSpec : InAppMessageViewListenerSpec() {
     }
 
     @Test
-    fun `should use 0 delay for null url`() {
-        val tooltip = Tooltip("target", "top-center")
-        val message = ValidTestMessage("1", type = InAppMessageType.TOOLTIP.typeId, tooltip = tooltip)
-        verifyDisplayManagerCall(message, R.id.message_tooltip_image_view)
-    }
-
-    @Test
-    fun `should use 0 delay for null config`() {
+    fun `should use campaign id for tooltip`() {
         val message = ValidTestMessage("1", type = InAppMessageType.TOOLTIP.typeId)
         verifyDisplayManagerCall(message, R.id.message_tooltip_image_view)
     }
 
     @Test
-    fun `should use 0 delay for normal campaign`() {
+    fun `should use null id for normal campaign`() {
         val message = ValidTestMessage("1")
         verifyDisplayManagerCall(message, R.id.message_tooltip_image_view, isNullId = true)
-    }
-
-    @Test
-    fun `should use delay for non content`() {
-        val tooltip = Tooltip("target", "top-center", url = "testurl", autoDisappear = 5)
-        val message = ValidTestMessage("1", type = InAppMessageType.TOOLTIP.typeId, tooltip = tooltip)
-        verifyDisplayManagerCall(message, R.id.message_close_button, 5)
-    }
-
-    @Test
-    fun `should use 0 delay for non content and null config`() {
-        val message = ValidTestMessage("1", type = InAppMessageType.TOOLTIP.typeId)
-        verifyDisplayManagerCall(message, R.id.message_close_button)
     }
 
     private fun verifyDisplayManagerCall(

@@ -18,6 +18,7 @@ import com.rakuten.tech.mobile.inappmessaging.runtime.data.models.Tooltip
 import com.rakuten.tech.mobile.inappmessaging.runtime.data.models.messages.ValidTestMessage
 import com.rakuten.tech.mobile.inappmessaging.runtime.data.repositories.TooltipMessageRepository
 import org.amshove.kluent.shouldBeNull
+import org.junit.Before
 import org.junit.Test
 import org.junit.runner.RunWith
 import org.mockito.Mockito
@@ -35,6 +36,11 @@ class DisplayManagerSpec : BaseTest() {
     private val activity = Mockito.mock(Activity::class.java)
     private val viewGroup = Mockito.mock(ViewGroup::class.java)
     private val parentViewGroup = Mockito.mock(FrameLayout::class.java)
+
+    @Before
+    override fun setup() {
+        InAppMessaging.setUninitializedInstance(act = activity)
+    }
 
     @Test
     fun `should display message enqueue without exceptions`() {
@@ -135,6 +141,16 @@ class DisplayManagerSpec : BaseTest() {
         verifyViewGroup(times(2))
         Mockito.verify(gp).removeView(any())
         Mockito.verify(gp).addView(any())
+    }
+
+    @Test
+    fun `should remove tooltip with id and single child no delay in scroll but null activity`() {
+        InAppMessaging.setUninitializedInstance()
+        setupTooltipView()
+        val gp = setupTooltipInScroll()
+        verifyViewGroup(times(1))
+        Mockito.verify(gp, never()).removeView(any())
+        Mockito.verify(gp, never()).addView(any())
     }
 
     @Test
