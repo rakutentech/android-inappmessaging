@@ -10,6 +10,7 @@ import com.rakuten.tech.mobile.inappmessaging.runtime.data.enums.InAppMessageTyp
 import com.rakuten.tech.mobile.inappmessaging.runtime.data.models.Tooltip
 import com.rakuten.tech.mobile.inappmessaging.runtime.data.models.messages.Message
 import com.rakuten.tech.mobile.inappmessaging.runtime.data.repositories.LocalDisplayedMessageRepository
+import com.rakuten.tech.mobile.inappmessaging.runtime.manager.DisplayManager
 import com.rakuten.tech.mobile.inappmessaging.runtime.utils.ResourceUtils
 import com.rakuten.tech.mobile.inappmessaging.runtime.utils.ViewUtil
 import com.rakuten.tech.mobile.inappmessaging.runtime.view.InAppMessageFullScreenView
@@ -25,7 +26,8 @@ import kotlinx.coroutines.Runnable
 @UiThread
 internal class DisplayMessageRunnable(
     private val message: Message,
-    private val hostActivity: Activity
+    private val hostActivity: Activity,
+    private val displayManager: DisplayManager = DisplayManager.instance()
 ) : Runnable {
 
     /**
@@ -79,11 +81,8 @@ internal class DisplayMessageRunnable(
         }
     }
 
-    private fun displayTooltip(
-        it: Tooltip,
-        toolTipView: InAppMessagingTooltipView
-    ) {
-        ResourceUtils.findViewByName<View>(hostActivity, it.id)?.let { target ->
+    private fun displayTooltip(tooltip: Tooltip, toolTipView: InAppMessagingTooltipView) {
+        ResourceUtils.findViewByName<View>(hostActivity, tooltip.id)?.let { target ->
             val scroll = ViewUtil.getScrollView(target)
             if (scroll != null) {
                 displayInScrollView(scroll, toolTipView)
@@ -94,6 +93,11 @@ internal class DisplayMessageRunnable(
                 hostActivity.addContentView(toolTipView, params)
             }
             LocalDisplayedMessageRepository.instance().addTooltipMessage(message.getCampaignId())
+            tooltip.autoDisappear?.let {
+                if (it > 0) {
+                    displayManager.removeMessage(hostActivity, delay = it, id = message.getCampaignId())
+                }
+            }
         }
     }
 
