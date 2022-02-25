@@ -262,7 +262,7 @@ class BaseViewSpec : BaseTest() {
         if (isValid) {
             imageView?.visibility shouldBeEqualTo View.VISIBLE
         } else {
-            imageView?.visibility shouldBeEqualTo  8 // View.GONE
+            imageView?.visibility shouldBeEqualTo View.GONE
         }
     }
 
