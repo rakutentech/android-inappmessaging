@@ -9,6 +9,8 @@ import android.view.ViewGroup
 import android.widget.FrameLayout
 import com.rakuten.tech.mobile.inappmessaging.runtime.InAppMessaging
 import com.rakuten.tech.mobile.inappmessaging.runtime.R
+import com.rakuten.tech.mobile.inappmessaging.runtime.coroutine.MessageActionsCoroutine
+import com.rakuten.tech.mobile.inappmessaging.runtime.data.enums.ImpressionType
 import com.rakuten.tech.mobile.inappmessaging.runtime.data.repositories.TooltipMessageRepository
 import com.rakuten.tech.mobile.inappmessaging.runtime.utils.ResourceUtils
 import com.rakuten.tech.mobile.inappmessaging.runtime.workmanager.workers.DisplayMessageWorker
@@ -107,7 +109,15 @@ internal interface DisplayManager {
         private fun scheduleRemoval(delay: Int, view: ViewGroup, id: String? = null) {
             if (delay > 0) {
                 Handler(Looper.getMainLooper()).postDelayed(
-                    { removeCampaign(view, id) }, delay * MS_MULTI
+                    {
+                        removeCampaign(view, id)
+                        // to handle repo update and impression request for auto disappear
+                        MessageActionsCoroutine().executeTask(
+                            TooltipMessageRepository.instance().getCampaign(id ?: ""),
+                            ImpressionType.EXIT,
+                            false
+                        )
+                    }, delay * MS_MULTI
                 )
             } else {
                 // to avoid crashing when redirect from tooltip view
@@ -116,8 +126,6 @@ internal interface DisplayManager {
         }
 
         private fun removeCampaign(inAppMessageBaseView: ViewGroup, id: String?) {
-//            if (activity == null) return
-
             // Removing just the InApp Message from the view hierarchy.
             if (inAppMessageBaseView.parent !is ViewGroup) {
                 // avoid crash
