@@ -167,6 +167,20 @@ class ViewUtilSpec : BaseTest() {
         ViewUtil.getScrollView(mockView).shouldNotBeNull()
     }
 
+    @Test
+    fun `should return correct non-null right and bottom edge position`() {
+        val pos = ViewUtil.getEdgePosition(500, 500, POS)
+        pos.first.shouldNotBeNull()
+        pos.second.shouldNotBeNull()
+    }
+
+    @Test
+    fun `should return correct null right and bottom edge position`() {
+        val pos = ViewUtil.getEdgePosition(10, 10, POS)
+        pos.first.shouldBeNull()
+        pos.second.shouldBeNull()
+    }
+
     private fun setupPosition(type: PositionType): Pair<Int, Int> {
         val mockView = Mockito.mock(View::class.java)
         `when`(mockView.width).thenReturn(10)
@@ -184,5 +198,6 @@ class ViewUtilSpec : BaseTest() {
         private const val HEIGHT = 10
         private const val MARGIN_H = 10
         private const val MARGIN_V = 10
+        private val POS = Pair(100, 100)
     }
 }
