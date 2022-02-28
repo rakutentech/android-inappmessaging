@@ -74,6 +74,23 @@ internal object ViewUtil {
         }
     }
 
+    fun getEdgePosition(width: Int, height: Int, topPos: Pair<Int, Int>): Pair<Int?, Int?> {
+        val windowW = Resources.getSystem().displayMetrics.widthPixels
+        val windowH = Resources.getSystem().displayMetrics.heightPixels
+        val right = if (windowW < (topPos.first + width)) {
+            -(width - (windowW - topPos.first)) - PADDING - TRI_SIZE
+        } else {
+            null
+        }
+
+        val bottom = if (windowH < (topPos.second + height)) {
+            -(height - (windowH - topPos.second)) - PADDING - TRI_SIZE
+        } else {
+            null
+        }
+        return Pair(right, bottom)
+    }
+
     @SuppressWarnings("SwallowedException")
     fun getScrollView(view: View): FrameLayout? {
         var currView = view.parent

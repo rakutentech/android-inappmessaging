@@ -303,10 +303,21 @@ internal class InAppMessagingTooltipView(
                     view, type, imageView.layoutParams.width, imageView.layoutParams.height, buttonSize, buttonSize
                 )
                     .let { pos ->
-                        params.topMargin = pos.second
-                        params.leftMargin = pos.first
+                        setPosition(params, pos, imageView.layoutParams.width, imageView.layoutParams.height)
                     }
             }
+        }
+    }
+
+    internal fun setPosition(params: MarginLayoutParams, pos: Pair<Int, Int>, width: Int, height: Int) {
+        params.topMargin = pos.second
+        params.leftMargin = pos.first
+        val edgePos = ViewUtil.getEdgePosition(width, height, pos)
+        edgePos.first?.let { right ->
+            params.rightMargin = right
+        }
+        edgePos.second?.let { bottom ->
+            params.bottomMargin = bottom
         }
     }
 
