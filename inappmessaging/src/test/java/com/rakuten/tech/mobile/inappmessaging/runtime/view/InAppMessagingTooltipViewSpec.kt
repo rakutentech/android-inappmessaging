@@ -43,6 +43,7 @@ class InAppMessagingTooltipViewSpec {
     private val mockView = Mockito.mock(View::class.java)
 
     @Before
+    @SuppressWarnings("LongMethod")
     fun setup() {
         Mockito.`when`(hostAppActivity.layoutInflater).thenReturn(
             LayoutInflater.from(ApplicationProvider.getApplicationContext()))
@@ -54,6 +55,14 @@ class InAppMessagingTooltipViewSpec {
         Mockito.`when`(hostAppActivity.packageName).thenReturn("test")
         Mockito.`when`(mockResources.getIdentifier(eq("target"), eq("id"), any())).thenReturn(1)
         Mockito.`when`(hostAppActivity.findViewById<View>(1)).thenReturn(mockView)
+        val mockP = Mockito.mock(ViewGroup::class.java)
+        val mockGp = Mockito.mock(ViewGroup::class.java)
+        val mockRoot = Mockito.mock(ViewGroup::class.java)
+        Mockito.`when`(mockView.parent).thenReturn(mockP)
+        Mockito.`when`(mockP.parent).thenReturn(mockGp)
+        Mockito.`when`(mockGp.parent).thenReturn(mockRoot)
+        Mockito.`when`(mockView.rootView).thenReturn(mockRoot)
+        Mockito.`when`(mockView.findViewById<View>(1)).thenReturn(mockView)
         view = hostAppActivity
             .layoutInflater
             .inflate(R.layout.in_app_message_tooltip, null) as InAppMessagingTooltipView

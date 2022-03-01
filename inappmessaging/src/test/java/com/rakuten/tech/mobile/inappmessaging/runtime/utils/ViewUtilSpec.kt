@@ -5,9 +5,11 @@ import android.content.res.Resources
 import android.graphics.Rect
 import android.os.Build
 import android.view.View
+import android.view.ViewGroup
 import android.view.ViewParent
 import android.widget.ScrollView
 import androidx.core.widget.NestedScrollView
+import androidx.swiperefreshlayout.widget.SwipeRefreshLayout
 import androidx.test.core.app.ApplicationProvider
 import com.nhaarman.mockitokotlin2.any
 import com.rakuten.tech.mobile.inappmessaging.runtime.BaseTest
@@ -27,6 +29,7 @@ import org.robolectric.annotation.Config
  */
 @RunWith(RobolectricTestRunner::class)
 @Config(sdk = [Build.VERSION_CODES.O_MR1])
+@SuppressWarnings("LargeClass")
 class ViewUtilSpec : BaseTest() {
 
     @Test
@@ -75,56 +78,63 @@ class ViewUtilSpec : BaseTest() {
     fun `should return correct position for top-right`() {
         val pos = setupPosition(PositionType.TOP_RIGHT)
         pos.first shouldBeEqualTo 100 + WIDTH + InAppMessagingTooltipView.PADDING / 4
-        pos.second shouldBeEqualTo 100 - HEIGHT - MARGIN_V
+        pos.second shouldBeEqualTo 100 - HEIGHT - MARGIN_V - InAppMessagingTooltipView.TRI_SIZE / 2
     }
 
     @Test
     fun `should return correct position for top-center`() {
         val pos = setupPosition(PositionType.TOP_CENTER)
         pos.first shouldBeEqualTo 105 - WIDTH / 2
-        pos.second shouldBeEqualTo 100 - HEIGHT - MARGIN_V
+        pos.second shouldBeEqualTo 100 - HEIGHT - MARGIN_V - InAppMessagingTooltipView.TRI_SIZE / 2
     }
 
     @Test
     fun `should return correct position for top-left`() {
         val pos = setupPosition(PositionType.TOP_LEFT)
-        pos.first shouldBeEqualTo 100 - WIDTH - MARGIN_H
-        pos.second shouldBeEqualTo 100 - HEIGHT - MARGIN_V
+        pos.first shouldBeEqualTo 100 - WIDTH - MARGIN_H - InAppMessagingTooltipView.TRI_SIZE / 2
+        pos.second shouldBeEqualTo 100 - HEIGHT - MARGIN_V - InAppMessagingTooltipView.TRI_SIZE / 2
     }
 
     @Test
     fun `should return correct position for bottom-right`() {
         val pos = setupPosition(PositionType.BOTTOM_RIGHT)
         pos.first shouldBeEqualTo 110 + InAppMessagingTooltipView.PADDING / 4
-        pos.second shouldBeEqualTo 110 - MARGIN_V
+        pos.second shouldBeEqualTo 110 - MARGIN_V + InAppMessagingTooltipView.TRI_SIZE / 2
     }
 
     @Test
     fun `should return correct position for bottom-center`() {
         val pos = setupPosition(PositionType.BOTTOM_CENTER)
         pos.first shouldBeEqualTo 105 - WIDTH / 2
-        pos.second shouldBeEqualTo 110 - InAppMessagingTooltipView.TRI_SIZE / 2
+        pos.second shouldBeEqualTo 110
     }
 
     @Test
     fun `should return correct position for bottom-left`() {
         val pos = setupPosition(PositionType.BOTTOM_LEFT)
-        pos.first shouldBeEqualTo 100 - WIDTH - MARGIN_H
-        pos.second shouldBeEqualTo 110 - MARGIN_V
+        pos.first shouldBeEqualTo 100 - WIDTH - MARGIN_H - InAppMessagingTooltipView.TRI_SIZE / 2
+        pos.second shouldBeEqualTo 110 - MARGIN_V + InAppMessagingTooltipView.TRI_SIZE / 2
     }
 
     @Test
     fun `should return correct position for right`() {
         val pos = setupPosition(PositionType.RIGHT)
         pos.first shouldBeEqualTo 110 - InAppMessagingTooltipView.TRI_SIZE / 2
-        pos.second shouldBeEqualTo 100 - (HEIGHT - MARGIN_V + InAppMessagingTooltipView.PADDING) / 2
+        pos.second shouldBeEqualTo 100 - (HEIGHT - MARGIN_V + InAppMessagingTooltipView.TRI_SIZE) / 2
     }
 
     @Test
     fun `should return correct position for left`() {
         val pos = setupPosition(PositionType.LEFT)
         pos.first shouldBeEqualTo 100 - WIDTH - MARGIN_H - InAppMessagingTooltipView.TRI_SIZE / 2
-        pos.second shouldBeEqualTo 100 - (HEIGHT - MARGIN_V + InAppMessagingTooltipView.PADDING) / 2
+        pos.second shouldBeEqualTo 100 - (HEIGHT - MARGIN_V + InAppMessagingTooltipView.TRI_SIZE) / 2
+    }
+
+    @Test
+    fun `should return correct position for scroll parent`() {
+        val pos = setupPosition(PositionType.TOP_CENTER, true)
+        pos.first shouldBeEqualTo 105 - WIDTH / 2
+        pos.second shouldBeEqualTo 100 - HEIGHT - MARGIN_V - InAppMessagingTooltipView.TRI_SIZE / 2
     }
 
     @Test
@@ -181,11 +191,20 @@ class ViewUtilSpec : BaseTest() {
         pos.second.shouldBeNull()
     }
 
-    private fun setupPosition(type: PositionType): Pair<Int, Int> {
+    private fun setupPosition(type: PositionType, isScroll: Boolean = false): Pair<Int, Int> {
         val mockView = Mockito.mock(View::class.java)
         `when`(mockView.width).thenReturn(10)
         `when`(mockView.height).thenReturn(10)
-        `when`(mockView.getHitRect(any())).thenAnswer {
+        `when`(mockView.top).thenReturn(100)
+        `when`(mockView.left).thenReturn(100)
+        val mockP = if (isScroll) Mockito.mock(SwipeRefreshLayout::class.java) else Mockito.mock(ViewGroup::class.java)
+        val mockGp = Mockito.mock(ViewGroup::class.java)
+        val mockRoot = Mockito.mock(ViewGroup::class.java)
+        `when`(mockView.parent).thenReturn(mockP)
+        `when`(mockP.parent).thenReturn(mockGp)
+        `when`(mockGp.parent).thenReturn(mockRoot)
+        `when`(mockView.rootView).thenReturn(mockRoot)
+        `when`(mockView.getDrawingRect(any())).thenAnswer {
             val rect = it.getArgument<Rect>(0)
             rect.set(100, 100, 100, 100)
         }

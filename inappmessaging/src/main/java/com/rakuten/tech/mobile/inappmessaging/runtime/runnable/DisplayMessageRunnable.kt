@@ -103,7 +103,7 @@ internal class DisplayMessageRunnable(
 
     internal var testLayout: FrameLayout? = null
 
-    private fun displayInScrollView(scroll: FrameLayout, toolTipView: InAppMessagingTooltipView) {
+    private fun displayInScrollView(scroll: ViewGroup, toolTipView: InAppMessagingTooltipView) {
         var frame = hostActivity.findViewById<FrameLayout>(R.id.in_app_message_tooltip_layout)
         // use existing tooltip layout if already available
         if (frame == null) {
