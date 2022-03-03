@@ -87,7 +87,13 @@ abstract class InAppMessaging internal constructor() {
     abstract fun closeMessage(clearQueuedCampaigns: Boolean = false)
 
     companion object {
-        private var instance: InAppMessaging = NotInitializedInAppMessaging()
+        /**
+         * This optional callback function is for app to receive the exception that caused failed configuration
+         * and non-fatal failures in the SDK.
+         */
+        var errorCallback: ((ex: Exception) -> Unit)? = null
+
+        private var instance: InAppMessaging = NotConfiguredInAppMessaging()
 
         /**
          * Instance of [InAppMessaging].
@@ -98,22 +104,20 @@ abstract class InAppMessaging internal constructor() {
         fun instance(): InAppMessaging = instance
 
         /**
-         * Initializes the In-App Messaging SDK. [errorCallback] is an optional callback function for
-         * app to receive the exception that caused failed init.
+         * Configures the In-App Messaging SDK.
          *
-         * @return `true` if initialization is successful, and `false` otherwise.
+         * @return `true` if configuration is successful, and `false` otherwise.
          */
         @SuppressWarnings("TooGenericExceptionCaught")
-        fun init(context: Context, errorCallback: ((ex: Exception) -> Unit)? = null): Boolean {
-            InApp.errorCallback = errorCallback
+        fun configure(context: Context): Boolean {
             return try {
                 initialize(context, isCacheHandling = BuildConfig.IS_CACHE_HANDLING)
                 true
             } catch (ex: Exception) {
-                // reset instance when initialization failed
-                setUninitializedInstance()
+                // reset instance when configuration failed
+                setNotConfiguredInstance()
                 errorCallback?.let {
-                    it(InAppMessagingException("In-App Messaging initialization failed", ex))
+                    it(InAppMessagingException("In-App Messaging configuration failed", ex))
                 }
                 false
             }
@@ -139,15 +143,15 @@ abstract class InAppMessaging internal constructor() {
             configScheduler.startConfig()
         }
 
-        internal fun setUninitializedInstance(isCacheHandling: Boolean = false) {
-            instance = NotInitializedInAppMessaging(isCacheHandling)
+        internal fun setNotConfiguredInstance(isCacheHandling: Boolean = false) {
+            instance = NotConfiguredInAppMessaging(isCacheHandling)
         }
 
         internal fun getPreferencesFile() = "internal_shared_prefs_" + AccountRepository.instance().userInfoHash
     }
 
     @SuppressWarnings("EmptyFunctionBlock", "TooManyFunctions")
-    internal class NotInitializedInAppMessaging(private var isCacheHandling: Boolean = false) : InAppMessaging() {
+    internal class NotConfiguredInAppMessaging(private var isCacheHandling: Boolean = false) : InAppMessaging() {
         override var onVerifyContext: (contexts: List<String>, campaignTitle: String) -> Boolean = { _, _ -> true }
 
         override fun registerPreference(userInfoProvider: UserInfoProvider) = Unit

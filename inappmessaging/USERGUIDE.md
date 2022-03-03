@@ -132,18 +132,20 @@ After logout is complete, please ensure that all `UserInfoProvider` methods in t
 * **Only provide Access token if the user is logged in.**
 * **The internal IAM backend only supports production Access token.**
 
-### #6 Initializing In-App Messaging SDK.
-Host app should initialize the SDK, then register the provider containing the user information.
+### <a name="configure-sdk"></a> #6 Configuring In-App Messaging SDK.
+Host app should configure the SDK, then register the provider containing the user information.
 
 In your Application class' `onCreate()` method, add:
 
 ```kotlin
-// API: init(context: Context, errorCallback: ((ex: Exception) -> Unit)? = null): Boolean
-// `errorCallback` lambda function is optional,
-// and can be used for analytics and logging of encountered initialization issues.
-val iamFlag = InAppMessaging.init(this) {
+// set an optional lambda function callback to receive the exception that caused failed configuration and non-fatal failures in the SDK.
+// this can be used for analytics and logging of encountered configuration issues.
+InAppMessaging.errorCallback = {
     Log.e(TAG, it.localizedMessage, it.cause)
 }
+
+// Configure API: configure(context: Context): Boolean
+val iamFlag = InAppMessaging.configure(this)
 
 // use flag to enable/disable IAM feature in your app.
 if (iamFlag) {
@@ -156,9 +158,9 @@ The preference object can be set once per app session. IAM SDK will read object'
 Preferences are not persisted so this function needs to be called on every launch.
 
 **<font color="red">Notes:</font>**
-* Missing Subscription Key or other critical information are some of the possible issues that can be encountered during initialization.
-* You can move the `init()` call inside an `if (<enable IAM-SDK boolean value> == true)` block to control enabling/disabling the SDK.
-* If `init()` is not called, subsequent calls to other public API SDK functions have no effect.
+* Missing Subscription Key or other critical information are some of the possible issues that can be encountered during configuration.
+* You can move the `configure()` call inside an `if (<enable IAM-SDK boolean value> == true)` block to control enabling/disabling the SDK.
+* If `configure()` is not called, subsequent calls to other public API SDK functions have no effect.
 
 ### #7 Registering and unregistering activities.
 Only register activities that are allowed to display In-App messages. Your activities will be kept in a `WeakReference` object, so it will not cause any memory leaks. Don't forget to unregister your activities in `onPause()` method.
@@ -383,6 +385,12 @@ Documents targeting Product Managers:
 + In-App Messaging Dashboard Sign Up(page is coming soon.)
 
 ## <a name="changelog"></a> Changelog
+
+### 7.0.0 (in-progress)
+* SDKCF-4941: **Breaking Changes:** Updated configuration API to align with iOS.
+  - Renamed `init()` API to `configure()`.
+  - Removed optional `errorCallback` lambda function parameter in `configure()`, and set as static variable.
+  - Please see [Configuring In-App Messaging SDK section](#configure-sdk) for details and sample code.
 
 ### 6.1.0 (2022-02-09)
 * SDKCF-4470: Updated the layout for close and campaign buttons. Added feature to customize text and button fonts, please see [custom font section](#custom-font) for details.

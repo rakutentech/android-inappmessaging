@@ -13,8 +13,8 @@ import org.robolectric.annotation.Config
 open class BaseTest {
     @Before
     open fun setup() {
-        InApp.errorCallback = null
-        InAppMessaging.setUninitializedInstance()
+        InAppMessaging.errorCallback = null
+        InAppMessaging.setNotConfiguredInstance()
     }
 
     /**
@@ -23,7 +23,7 @@ open class BaseTest {
     @After
     open fun tearDown() {
         Mockito.framework().clearInlineMocks()
-        InApp.errorCallback = null
-        InAppMessaging.setUninitializedInstance()
+        InAppMessaging.errorCallback = null
+        InAppMessaging.setNotConfiguredInstance()
     }
 }

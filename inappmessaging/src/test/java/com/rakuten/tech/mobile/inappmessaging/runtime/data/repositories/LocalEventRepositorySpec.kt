@@ -4,7 +4,9 @@ import android.content.Context
 import android.provider.Settings
 import androidx.test.core.app.ApplicationProvider
 import androidx.work.testing.WorkManagerTestInitHelper
+import com.nhaarman.mockitokotlin2.any
 import com.nhaarman.mockitokotlin2.argumentCaptor
+import com.nhaarman.mockitokotlin2.never
 import com.nhaarman.mockitokotlin2.times
 import com.rakuten.tech.mobile.inappmessaging.runtime.*
 import com.rakuten.tech.mobile.inappmessaging.runtime.data.models.Attribute
@@ -23,6 +25,7 @@ import org.junit.Before
 import org.junit.Test
 import org.junit.runner.RunWith
 import org.mockito.Mockito
+import org.mockito.Mockito.`when`
 import org.robolectric.RobolectricTestRunner
 import java.util.Calendar
 
@@ -158,7 +161,7 @@ open class LocalEventRepositorySpec : BaseTest() {
 
     @Test
     fun `should not throw exception when caching updating list for a given time`() {
-        InAppMessaging.setUninitializedInstance(true)
+        InAppMessaging.setNotConfiguredInstance(true)
         val timeMillis = Calendar.getInstance().timeInMillis
         LocalEventRepository.instance().clearNonPersistentEvents(timeMillis)
         LocalEventRepository.instance().getEvents().shouldHaveSize(0)
@@ -187,7 +190,7 @@ open class LocalEventRepositorySpec : BaseTest() {
     @Test
     fun `should check and reset list during event handling`() {
         setupAndTestMultipleUser()
-        InAppMessaging.setUninitializedInstance(true)
+        InAppMessaging.setNotConfiguredInstance(true)
         LocalEventRepository.instance().getEvents().shouldHaveSize(1)
     }
 
@@ -270,6 +273,26 @@ class LocalEventRepositoryExceptionSpec : LocalEventRepositorySpec() {
     }
 
     @Test
+    fun `should return false for empty event name`() {
+        val function: (ex: Exception) -> Unit = {}
+        val mockCallback = Mockito.mock(function.javaClass)
+        val mockEvent = Mockito.mock(Event::class.java)
+        `when`(mockEvent.getEventName()).thenReturn("")
+
+        InAppMessaging.errorCallback = null
+        LocalEventRepository.instance().addEvent(mockEvent).shouldBeFalse()
+        Mockito.verify(mockCallback, never()).invoke(any())
+
+        InAppMessaging.errorCallback = mockCallback
+        LocalEventRepository.instance().addEvent(mockEvent).shouldBeFalse()
+
+        val captor = argumentCaptor<InAppMessagingException>()
+        Mockito.verify(mockCallback).invoke(captor.capture())
+        captor.firstValue shouldBeInstanceOf InAppMessagingException::class.java
+        InAppMessaging.errorCallback = null
+    }
+
+    @Test
     fun `should not crash and clear previous when parsing invalid format`() {
         setupAndTestMultipleUser()
         PreferencesUtil.putString(
@@ -285,7 +308,7 @@ class LocalEventRepositoryExceptionSpec : LocalEventRepositorySpec() {
 
     @Test
     fun `should throw exception with empty campaign id`() {
-        InApp.errorCallback = mockCallback
+        InAppMessaging.errorCallback = mockCallback
         LocalEventRepository.instance().addEvent(TestEvent("")).shouldBeFalse()
 
         val captor = argumentCaptor<InAppMessagingException>()

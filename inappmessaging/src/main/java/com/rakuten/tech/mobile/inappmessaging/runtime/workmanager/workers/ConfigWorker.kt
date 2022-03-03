@@ -102,7 +102,7 @@ internal class ConfigWorker(
                 messagePingScheduler.pingMessageMixerService(0)
             } else {
                 // reset IAM instance which will clear temp data
-                InAppMessaging.setUninitializedInstance()
+                InAppMessaging.setNotConfiguredInstance()
             }
         } else return when {
             response.code() == RetryDelayUtil.RETRY_ERROR_CODE -> {
@@ -117,7 +117,7 @@ internal class ConfigWorker(
             else -> {
                 serverErrorCounter.set(0) // reset server error counter
                 // clear temp data (ignore all temp data stored during config request)
-                InAppMessaging.setUninitializedInstance()
+                InAppMessaging.setNotConfiguredInstance()
                 WorkerUtils.logRequestError(TAG, response.code(), response.errorBody()?.string())
                 Result.failure()
             }

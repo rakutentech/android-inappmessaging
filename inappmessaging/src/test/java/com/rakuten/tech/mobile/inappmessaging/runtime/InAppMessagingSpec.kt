@@ -70,13 +70,13 @@ open class InAppMessagingSpec : BaseTest() {
 
     @Test
     fun `should unregister activity not crash when no activity is registered for uninitialized instance`() {
-        InAppMessaging.setUninitializedInstance()
+        InAppMessaging.setNotConfiguredInstance()
         InAppMessaging.instance().unregisterMessageDisplayActivity()
     }
 
     @Test
     fun `should not display message if config is true for uninitialized instance`() {
-        InAppMessaging.setUninitializedInstance()
+        InAppMessaging.setNotConfiguredInstance()
         `when`(configResponseData.rollOutPercentage).thenReturn(100)
         ConfigResponseRepository.instance().addConfigResponse(configResponseData)
 
@@ -86,7 +86,7 @@ open class InAppMessagingSpec : BaseTest() {
 
     @Test
     fun `should not crash when using uninitialized instance`() {
-        InAppMessaging.setUninitializedInstance()
+        InAppMessaging.setNotConfiguredInstance()
         InAppMessaging.instance().registerPreference(TestUserInfoProvider())
         InAppMessaging.instance().logEvent(AppStartEvent())
         InAppMessaging.instance().closeMessage()
@@ -96,13 +96,13 @@ open class InAppMessagingSpec : BaseTest() {
 
     @Test
     fun `should return null activity using uninitialized instance`() {
-        InAppMessaging.setUninitializedInstance()
+        InAppMessaging.setNotConfiguredInstance()
         InAppMessaging.instance().getRegisteredActivity().shouldBeNull()
     }
 
     @Test
     fun `should return null context using uninitialized instance`() {
-        InAppMessaging.setUninitializedInstance()
+        InAppMessaging.setNotConfiguredInstance()
         InAppMessaging.instance().getHostAppContext() shouldBeEqualTo null
     }
 
@@ -329,26 +329,30 @@ open class InAppMessagingSpec : BaseTest() {
 
     @Test
     fun `should return true when initialization have no issues`() {
-        InAppMessaging.init(ApplicationProvider.getApplicationContext()).shouldBeTrue()
+        InAppMessaging.configure(ApplicationProvider.getApplicationContext()).shouldBeTrue()
     }
 
     @Test
     fun `should return true when initialization have no issues with callback`() {
-        InAppMessaging.init(ApplicationProvider.getApplicationContext()) {
+        InAppMessaging.errorCallback = {
             Assert.fail()
-        }.shouldBeTrue()
+        }
+        InAppMessaging.configure(ApplicationProvider.getApplicationContext()).shouldBeTrue()
+        InAppMessaging.errorCallback = null
     }
 
     @Test
     fun `should return false when initialization failed`() {
-        InAppMessaging.init(mockContext).shouldBeFalse()
+        InAppMessaging.configure(mockContext).shouldBeFalse()
     }
 
     @Test
     fun `should return false when initialization failed with callback`() {
-        InAppMessaging.init(mockContext, mockCallback).shouldBeFalse()
+        InAppMessaging.errorCallback = mockCallback
+        InAppMessaging.configure(mockContext).shouldBeFalse()
 
         Mockito.verify(mockCallback).invoke(any())
+        InAppMessaging.errorCallback = null
     }
 
     private fun setupDisplayedView(message: Message) {
@@ -394,7 +398,7 @@ class InAppMessagingExceptionSpec : InAppMessagingSpec() {
     @Before
     override fun setup() {
         super.setup()
-        InApp.errorCallback = null
+        InAppMessaging.errorCallback = null
         `when`(dispMgr.displayMessage()).thenThrow(NullPointerException())
         `when`(dispMgr.removeMessage(anyOrNull())).thenThrow(NullPointerException())
         `when`(eventsManager.onEventReceived(any(), any(), any(), any(), any())).thenThrow(NullPointerException())
@@ -404,7 +408,7 @@ class InAppMessagingExceptionSpec : InAppMessagingSpec() {
     @After
     override fun tearDown() {
         super.tearDown()
-        InApp.errorCallback = null
+        InAppMessaging.errorCallback = null
     }
 
     @Test
@@ -417,7 +421,7 @@ class InAppMessagingExceptionSpec : InAppMessagingSpec() {
 
     @Test
     fun `should trigger callback when register preference failed due to forced exception`() {
-        InApp.errorCallback = mockCallback
+        InAppMessaging.errorCallback = mockCallback
         val mockProvider = Mockito.mock(UserInfoProvider::class.java)
         `when`(mockProvider.provideUserId()).thenThrow(NullPointerException())
 
@@ -434,7 +438,7 @@ class InAppMessagingExceptionSpec : InAppMessagingSpec() {
 
     @Test
     fun `should trigger callback when register activity failed due to forced exception`() {
-        InApp.errorCallback = mockCallback
+        InAppMessaging.errorCallback = mockCallback
         instance.registerMessageDisplayActivity(mockActivity)
 
         Mockito.verify(mockCallback).invoke(captor.capture())
@@ -449,7 +453,7 @@ class InAppMessagingExceptionSpec : InAppMessagingSpec() {
 
     @Test
     fun `should trigger callback when unregister activity failed due to forced exception`() {
-        InApp.errorCallback = mockCallback
+        InAppMessaging.errorCallback = mockCallback
         instance.unregisterMessageDisplayActivity()
 
         Mockito.verify(mockCallback).invoke(captor.capture())
@@ -463,7 +467,7 @@ class InAppMessagingExceptionSpec : InAppMessagingSpec() {
 
     @Test
     fun `should trigger callback when log event failed due to forced exception`() {
-        InApp.errorCallback = mockCallback
+        InAppMessaging.errorCallback = mockCallback
         instance.logEvent(AppStartEvent())
 
         Mockito.verify(mockCallback).invoke(captor.capture())
@@ -477,7 +481,7 @@ class InAppMessagingExceptionSpec : InAppMessagingSpec() {
 
     @Test
     fun `should trigger callback when save temp data failed due to forced exception`() {
-        InApp.errorCallback = mockCallback
+        InAppMessaging.errorCallback = mockCallback
         instance.saveTempData()
 
         Mockito.verify(mockCallback).invoke(captor.capture())

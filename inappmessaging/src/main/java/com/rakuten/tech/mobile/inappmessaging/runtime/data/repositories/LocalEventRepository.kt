@@ -2,7 +2,6 @@ package com.rakuten.tech.mobile.inappmessaging.runtime.data.repositories
 
 import androidx.annotation.VisibleForTesting
 import com.google.gson.Gson
-import com.rakuten.tech.mobile.inappmessaging.runtime.InApp
 import com.rakuten.tech.mobile.inappmessaging.runtime.InAppMessaging
 import com.rakuten.tech.mobile.inappmessaging.runtime.data.enums.EventType
 import com.rakuten.tech.mobile.inappmessaging.runtime.data.models.appevents.AppStartEvent
@@ -68,7 +67,7 @@ internal interface LocalEventRepository : EventRepository {
         @SuppressWarnings("ReturnCount")
         override fun addEvent(event: Event): Boolean {
             if (event.getEventName().isEmpty()) {
-                InApp.errorCallback?.let {
+                InAppMessaging.errorCallback?.let {
                     it(InAppMessagingException("In-App Messaging adding event failed due to invalid event name"))
                 }
                 return false
