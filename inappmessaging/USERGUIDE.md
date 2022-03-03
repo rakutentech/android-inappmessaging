@@ -138,7 +138,7 @@ Host app should configure the SDK, then register the provider containing the use
 In your Application class' `onCreate()` method, add:
 
 ```kotlin
-// set an optional lambda function callback to receive the exception that caused failed configuration and non-fatal failures in the SDK.
+// set an optional lambda function callback to receive the exception that caused failed configuration or non-fatal failures in the SDK.
 // this can be used for analytics and logging of encountered configuration issues.
 InAppMessaging.errorCallback = {
     Log.e(TAG, it.localizedMessage, it.cause)

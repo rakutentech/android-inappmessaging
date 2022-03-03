@@ -89,7 +89,7 @@ abstract class InAppMessaging internal constructor() {
     companion object {
         /**
          * This optional callback function is for app to receive the exception that caused failed configuration
-         * and non-fatal failures in the SDK.
+         * or non-fatal failures in the SDK.
          */
         var errorCallback: ((ex: Exception) -> Unit)? = null
 
