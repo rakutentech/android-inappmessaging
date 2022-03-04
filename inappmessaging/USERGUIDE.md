@@ -134,12 +134,13 @@ After logout is complete, please ensure that all `UserInfoProvider` methods in t
 
 ### <a name="configure-sdk"></a> #6 Configuring In-App Messaging SDK.
 Host app should configure the SDK, then register the provider containing the user information.
+* An optional lambda function callback can be set to receive exceptions that caused failed configuration or non-fatal failures in the SDK.
 
 In your Application class' `onCreate()` method, add:
 
 ```kotlin
-// set an optional lambda function callback to receive the exception that caused failed configuration or non-fatal failures in the SDK.
-// this can be used for analytics and logging of encountered configuration issues.
+// Set optional lambda function callback.
+// This can be used for analytics and logging of encountered configuration issues.
 InAppMessaging.errorCallback = {
     Log.e(TAG, it.localizedMessage, it.cause)
 }
@@ -389,7 +390,7 @@ Documents targeting Product Managers:
 ### 7.0.0 (in-progress)
 * SDKCF-4941: **Breaking Changes:** Updated configuration API to align with iOS.
   - Renamed `init()` API to `configure()`.
-  - Removed optional `errorCallback` lambda function parameter in `configure()`, and set as static variable.
+  - Removed optional `errorCallback` lambda function parameter in `configure()`, and changed as static variable.
   - Please see [Configuring In-App Messaging SDK section](#configure-sdk) for details and sample code.
 
 ### 6.1.0 (2022-02-09)
