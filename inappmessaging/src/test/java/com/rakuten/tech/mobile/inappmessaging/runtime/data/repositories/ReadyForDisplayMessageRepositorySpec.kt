@@ -49,7 +49,7 @@ class ReadyForDisplayMessageRepositorySpec : BaseTest() {
 
     @Test
     fun `should not crash while clearing messages`() {
-        InAppMessaging.setUninitializedInstance(true)
+        InAppMessaging.setNotConfiguredInstance(true)
         ReadyForDisplayMessageRepository.instance().clearMessages()
         ReadyForDisplayMessageRepository.instance().getAllMessagesCopy().shouldHaveSize(0)
     }
@@ -152,7 +152,7 @@ class ReadyForDisplayMessageRepositorySpec : BaseTest() {
     @Test
     fun `should not crash and reset map`() {
         setupAndTestMultipleUser()
-        InAppMessaging.setUninitializedInstance(true)
+        InAppMessaging.setNotConfiguredInstance(true)
         ReadyForDisplayMessageRepository.instance().getAllMessagesCopy().shouldBeEmpty()
     }
 

@@ -10,7 +10,6 @@ import androidx.work.testing.WorkManagerTestInitHelper
 import com.nhaarman.mockitokotlin2.any
 import com.nhaarman.mockitokotlin2.argumentCaptor
 import com.rakuten.tech.mobile.inappmessaging.runtime.BaseTest
-import com.rakuten.tech.mobile.inappmessaging.runtime.InApp
 import com.rakuten.tech.mobile.inappmessaging.runtime.InAppMessaging
 import com.rakuten.tech.mobile.inappmessaging.runtime.data.models.appevents.PurchaseSuccessfulEvent
 import com.rakuten.tech.mobile.inappmessaging.runtime.data.repositories.AccountRepository
@@ -75,7 +74,7 @@ class EventMessageReconciliationSchedulerSpec : BaseTest() {
     fun `should not crash when workmanager is not initialized with callback`() {
         val function: (ex: Exception) -> Unit = {}
         val mockCallback = Mockito.mock(function.javaClass)
-        InApp.errorCallback = mockCallback
+        InAppMessaging.errorCallback = mockCallback
 
         InAppMessaging.initialize(ApplicationProvider.getApplicationContext(), true)
         EventMessageReconciliationScheduler.instance().startEventMessageReconciliationWorker(mockWorkManager)
