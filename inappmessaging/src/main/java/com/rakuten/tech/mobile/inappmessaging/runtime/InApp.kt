@@ -182,7 +182,6 @@ internal class InApp(
     }
 
     companion object {
-        internal var errorCallback: ((ex: Exception) -> Unit)? = null
         private const val TAG = "IAM_InAppMessaging"
     }
 }

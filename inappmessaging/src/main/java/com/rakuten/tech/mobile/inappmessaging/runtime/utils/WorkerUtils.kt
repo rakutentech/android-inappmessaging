@@ -1,7 +1,7 @@
 package com.rakuten.tech.mobile.inappmessaging.runtime.utils
 
 import androidx.work.ListenableWorker
-import com.rakuten.tech.mobile.inappmessaging.runtime.InApp
+import com.rakuten.tech.mobile.inappmessaging.runtime.InAppMessaging
 import com.rakuten.tech.mobile.inappmessaging.runtime.exception.InAppMessagingException
 import com.rakuten.tech.mobile.sdkutils.logger.Logger
 
@@ -9,7 +9,7 @@ internal object WorkerUtils {
     fun logRequestError(tag: String, code: Int, message: String?) {
         val errMsg = "Response Code $code: ${message ?: "no error message"}"
         Logger(tag).error(errMsg)
-        InApp.errorCallback?.let {
+        InAppMessaging.errorCallback?.let {
             it(InAppMessagingException("$tag: $errMsg"))
         }
     }

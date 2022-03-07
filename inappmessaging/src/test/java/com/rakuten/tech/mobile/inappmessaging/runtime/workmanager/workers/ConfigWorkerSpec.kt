@@ -200,7 +200,7 @@ class ConfigWorkerSuccessSpec : ConfigWorkerSpec() {
         val worker = ConfigWorker(context, workerParameters, HostAppInfoRepository.instance(),
                 ConfigResponseRepository.instance(), mockMessageScheduler, mockConfigScheduler)
         worker.onResponse(mockResponse!!) shouldBeEqualTo ListenableWorker.Result.Success()
-        InAppMessaging.instance() shouldBeInstanceOf InAppMessaging.NotInitializedInAppMessaging::class.java
+        InAppMessaging.instance() shouldBeInstanceOf InAppMessaging.NotConfiguredInAppMessaging::class.java
         LocalEventRepository.instance().getEvents().shouldBeEmpty()
         Mockito.verify(mockMessageScheduler, never()).pingMessageMixerService(0)
     }
@@ -266,7 +266,7 @@ class ConfigWorkerFailSpec : ConfigWorkerSpec() {
         worker.onResponse(mockResponse!!) shouldBeEqualTo ListenableWorker.Result.failure()
 
         // should reset instance
-        InAppMessaging.instance() shouldBeInstanceOf InAppMessaging.NotInitializedInAppMessaging::class.java
+        InAppMessaging.instance() shouldBeInstanceOf InAppMessaging.NotConfiguredInAppMessaging::class.java
     }
 
     @Test

@@ -3,7 +3,6 @@ package com.rakuten.tech.mobile.inappmessaging.runtime.workmanager.schedulers
 import androidx.work.ExistingWorkPolicy
 import androidx.work.OneTimeWorkRequest
 import androidx.work.WorkManager
-import com.rakuten.tech.mobile.inappmessaging.runtime.InApp
 import com.rakuten.tech.mobile.inappmessaging.runtime.InAppMessaging
 import com.rakuten.tech.mobile.inappmessaging.runtime.exception.InAppMessagingException
 import com.rakuten.tech.mobile.inappmessaging.runtime.workmanager.workers.MessageEventReconciliationWorker
@@ -49,7 +48,7 @@ internal interface EventMessageReconciliationScheduler {
                 }
             } catch (ie: IllegalStateException) {
                 // this should not occur since work manager is initialized during SDK initialization
-                InApp.errorCallback?.let {
+                InAppMessaging.errorCallback?.let {
                     it(InAppMessagingException("In-App Messaging message reconciliation failed", ie))
                 }
             }

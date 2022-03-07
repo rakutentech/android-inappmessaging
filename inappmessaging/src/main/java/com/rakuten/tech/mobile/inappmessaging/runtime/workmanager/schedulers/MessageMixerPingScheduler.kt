@@ -3,7 +3,6 @@ package com.rakuten.tech.mobile.inappmessaging.runtime.workmanager.schedulers
 import androidx.work.ExistingWorkPolicy
 import androidx.work.OneTimeWorkRequest
 import androidx.work.WorkManager
-import com.rakuten.tech.mobile.inappmessaging.runtime.InApp
 import com.rakuten.tech.mobile.inappmessaging.runtime.InAppMessaging
 import com.rakuten.tech.mobile.inappmessaging.runtime.data.repositories.ConfigResponseRepository
 import com.rakuten.tech.mobile.inappmessaging.runtime.exception.InAppMessagingException
@@ -69,7 +68,7 @@ internal interface MessageMixerPingScheduler {
                 }
             } catch (ie: IllegalStateException) {
                 // this should not occur since work manager is initialized during SDK initialization
-                InApp.errorCallback?.let {
+                InAppMessaging.errorCallback?.let {
                     it(InAppMessagingException("In-App Messaging ping request failed", ie))
                 }
             }

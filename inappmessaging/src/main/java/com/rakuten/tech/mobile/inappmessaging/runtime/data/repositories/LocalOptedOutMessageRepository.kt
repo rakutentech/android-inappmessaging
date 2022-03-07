@@ -5,7 +5,6 @@ import com.rakuten.tech.mobile.inappmessaging.runtime.InAppMessaging
 import com.rakuten.tech.mobile.inappmessaging.runtime.data.models.messages.Message
 import com.rakuten.tech.mobile.sdkutils.PreferencesUtil
 import com.rakuten.tech.mobile.sdkutils.logger.Logger
-import java.lang.ClassCastException
 
 /**
  * This class contains opted out messages that user chose not to see it again.
@@ -70,7 +69,7 @@ internal interface LocalOptedOutMessageRepository {
             }
         }
 
-        @SuppressWarnings("LongMethod")
+        @SuppressWarnings("LongMethod", "NestedBlockDepth")
         private fun checkAndResetSet(onLaunch: Boolean = false) {
             // check if caching is enabled and if there are changes in user info
             if (InAppMessaging.instance().isLocalCachingEnabled() &&
@@ -78,20 +77,16 @@ internal interface LocalOptedOutMessageRepository {
                 user = AccountRepository.instance().userInfoHash
                 optedOutMessages.clear()
                 // reset id list from cached using updated user info
-                try {
-                    InAppMessaging.instance().getHostAppContext()?.let { it ->
-                        val sas = PreferencesUtil.getStringSet(
-                            it,
-                            InAppMessaging.getPreferencesFile(),
-                            LOCAL_OPTED_OUT_KEY,
-                            HashSet()
-                        )
-                            sas?.let { hashSet ->
-                            optedOutMessages.addAll(hashSet)
-                        }
+                InAppMessaging.instance().getHostAppContext()?.let { it ->
+                    val sas = PreferencesUtil.getStringSet(
+                        it,
+                        InAppMessaging.getPreferencesFile(),
+                        LOCAL_OPTED_OUT_KEY,
+                        HashSet()
+                    )
+                    sas?.let { hashSet ->
+                        optedOutMessages.addAll(hashSet)
                     }
-                } catch (ex: ClassCastException) {
-                    Logger(TAG).debug(ex.cause, "Incorrect type for $LOCAL_OPTED_OUT_KEY data")
                 }
             }
         }
