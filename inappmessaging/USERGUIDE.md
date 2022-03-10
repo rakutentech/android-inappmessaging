@@ -384,6 +384,9 @@ Documents targeting Product Managers:
 
 ## <a name="changelog"></a> Changelog
 
+### 6.2.0-TOOLTIP (2022-03-10)
+* SDKCF-4715: Added PoC implementation of Tooltip campaigns feature.
+
 ### 6.1.0 (2022-02-09)
 * SDKCF-4470: Updated the layout for close and campaign buttons. Added feature to customize text and button fonts, please see [custom font section](#custom-font) for details.
 * SDKCF-4684: Fixed Picasso bitmap retrieval to avoid crash on large images.
