@@ -6,6 +6,8 @@ trigger_map:
   workflow: build-and-test
 - pull_request_source_branch: "*"
   workflow: build-and-test
+- tag: "v*.*.*+*"
+  workflow: build-and-test
 - tag: "v*.*.*"
   workflow: release
 workflows:
