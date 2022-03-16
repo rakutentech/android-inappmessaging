@@ -71,7 +71,7 @@ class PingResponseMessageRepositorySpec : BaseTest() {
 
     @Test
     fun `should not crash while clearing messages`() {
-        InAppMessaging.setUninitializedInstance(true)
+        InAppMessaging.setNotConfiguredInstance(true)
         PingResponseMessageRepository.instance().clearMessages()
         PingResponseMessageRepository.instance().getAllMessagesCopy().shouldHaveSize(0)
     }
@@ -203,7 +203,7 @@ class PingResponseMessageRepositorySpec : BaseTest() {
     @Test
     fun `should not crash and reset map`() {
         setupAndTestMultipleUser()
-        InAppMessaging.setUninitializedInstance(true)
+        InAppMessaging.setNotConfiguredInstance(true)
         PingResponseMessageRepository.instance().getAllMessagesCopy().shouldBeEmpty()
     }
 

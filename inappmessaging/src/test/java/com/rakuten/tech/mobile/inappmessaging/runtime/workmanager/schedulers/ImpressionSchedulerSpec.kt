@@ -10,7 +10,6 @@ import androidx.work.testing.WorkManagerTestInitHelper
 import com.nhaarman.mockitokotlin2.argumentCaptor
 import com.rakuten.tech.mobile.inappmessaging.runtime.BaseTest
 import com.rakuten.tech.mobile.inappmessaging.runtime.BuildConfig
-import com.rakuten.tech.mobile.inappmessaging.runtime.InApp
 import com.rakuten.tech.mobile.inappmessaging.runtime.InAppMessaging
 import com.rakuten.tech.mobile.inappmessaging.runtime.data.enums.ImpressionType
 import com.rakuten.tech.mobile.inappmessaging.runtime.data.repositories.HostAppInfoRepository
@@ -62,7 +61,7 @@ class ImpressionSchedulerSpec : BaseTest() {
         val mockCallback = Mockito.mock(function.javaClass)
 
         InAppMessaging.initialize(ApplicationProvider.getApplicationContext(), true)
-        InApp.errorCallback = mockCallback
+        InAppMessaging.errorCallback = mockCallback
         setupImpressionScheduler(mockWorkManager)
 
         val captor = argumentCaptor<InAppMessagingException>()

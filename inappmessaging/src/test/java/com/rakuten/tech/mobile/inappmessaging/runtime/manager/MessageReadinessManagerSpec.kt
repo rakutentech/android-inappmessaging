@@ -227,7 +227,7 @@ class MessageReadinessManagerRequestSpec : BaseTest() {
         server.start()
         `when`(data.endpoints).thenReturn(endpoint)
         `when`(endpoint.displayPermission).thenReturn(server.url("client").toString())
-        InApp.errorCallback = null
+        InAppMessaging.errorCallback = null
     }
 
     @After
@@ -237,7 +237,7 @@ class MessageReadinessManagerRequestSpec : BaseTest() {
 
     @Test
     fun `should retry on network error`() {
-        InApp.errorCallback = {
+        InAppMessaging.errorCallback = {
             // ignore
         }
         verifyFailedResponse(false)
@@ -245,7 +245,7 @@ class MessageReadinessManagerRequestSpec : BaseTest() {
 
     @Test
     fun `should retry once for 500 response code`() {
-        InApp.errorCallback = {
+        InAppMessaging.errorCallback = {
             // ignore
         }
         val mockResponse = MockResponse().setResponseCode(500)

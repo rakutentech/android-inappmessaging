@@ -48,7 +48,7 @@ class LocalDisplayedMessageRepositorySpec : BaseTest() {
 
     @Test
     fun `should invoke callback when message's campaign ID is empty`() {
-        InApp.errorCallback = mockCallback
+        InAppMessaging.errorCallback = mockCallback
         LocalDisplayedMessageRepository.instance().addMessage(InvalidTestMessage())
 
         Mockito.verify(mockCallback).invoke(captor.capture())
@@ -64,7 +64,7 @@ class LocalDisplayedMessageRepositorySpec : BaseTest() {
 
     @Test
     fun `should throw exception with empty campaign id`() {
-        InApp.errorCallback = mockCallback
+        InAppMessaging.errorCallback = mockCallback
         LocalDisplayedMessageRepository.instance().addMessage(ValidTestMessage(""))
 
         Mockito.verify(mockCallback).invoke(captor.capture())
@@ -109,7 +109,7 @@ class LocalDisplayedMessageRepositorySpec : BaseTest() {
     @Test
     fun `should not crash while clearing messages`() {
         val message = ValidTestMessage()
-        InAppMessaging.setUninitializedInstance(true)
+        InAppMessaging.setNotConfiguredInstance(true)
         LocalDisplayedMessageRepository.instance().clearMessages()
         LocalDisplayedMessageRepository.instance().numberOfTimesDisplayed(message) shouldBeEqualTo 0
     }
@@ -158,7 +158,7 @@ class LocalDisplayedMessageRepositorySpec : BaseTest() {
     @Test
     fun `should not crash and reset displayed map`() {
         val message = setupAndTestMultipleUser()
-        InAppMessaging.setUninitializedInstance(true)
+        InAppMessaging.setNotConfiguredInstance(true)
         LocalDisplayedMessageRepository.instance().numberOfTimesDisplayed(message) shouldBeEqualTo 0
     }
 

@@ -3,7 +3,6 @@ package com.rakuten.tech.mobile.inappmessaging.runtime.data.repositories
 import androidx.annotation.VisibleForTesting
 import com.google.gson.Gson
 import com.google.gson.reflect.TypeToken
-import com.rakuten.tech.mobile.inappmessaging.runtime.InApp
 import com.rakuten.tech.mobile.inappmessaging.runtime.InAppMessaging
 import com.rakuten.tech.mobile.inappmessaging.runtime.data.models.messages.Message
 import com.rakuten.tech.mobile.inappmessaging.runtime.exception.InAppMessagingException
@@ -74,7 +73,7 @@ internal interface LocalDisplayedMessageRepository {
         @SuppressWarnings("LongMethod")
         override fun addMessage(message: Message) {
             if (message.getCampaignId().isEmpty()) {
-                InApp.errorCallback?.let {
+                InAppMessaging.errorCallback?.let {
                     it(InAppMessagingException("In-App Messaging storing campaign failed due to invalid value"))
                 }
                 return
