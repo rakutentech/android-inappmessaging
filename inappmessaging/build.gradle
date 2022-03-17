@@ -66,7 +66,7 @@ dependencies {
   implementation 'androidx.localbroadcastmanager:localbroadcastmanager:1.0.0'
   implementation 'com.google.code.gson:gson:2.8.6'
   implementation "com.squareup.picasso:picasso:2.71828"
-  implementation "io.github.rakutentech.sdkutils:sdk-utils:1.0.0"
+  implementation "io.github.rakutentech.sdkutils:sdk-utils:1.1.0"
 
   // Doclava needs an annotation class from this package (used by Retrofit)
   compileOnly 'org.codehaus.mojo:animal-sniffer-annotations:1.18'
