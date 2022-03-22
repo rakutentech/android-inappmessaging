@@ -7,6 +7,12 @@ apply from: "../config/quality/gitleaks/build.gradle"
 
 apply plugin: "kotlin-android"
 
+def enableGitleaks = System.getenv("ENABLE_GITLEAKS") ?: true
+println "enableGitleaks $enableGitleaks"
+if(!enableGitleaks) {
+  println "enableGitleaks false"
+}
+
 android {
   defaultConfig {
     resValue 'string', 'inappmessaging__version', project.version
