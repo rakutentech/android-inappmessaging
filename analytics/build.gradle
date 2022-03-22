@@ -1,3 +1,9 @@
+def enableGitleaks = System.getenv("ENABLE_GITLEAKS") ?: true
+println "enableGitleaks $enableGitleaks"
+if(!enableGitleaks) {
+    println "enableGitleaks false"
+}
+
 apply from: '../config/android/library.gradle'
 apply from: "../config/quality/gitleaks/build.gradle"
 apply plugin: 'kotlin-android'
