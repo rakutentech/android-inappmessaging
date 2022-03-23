@@ -103,14 +103,14 @@ checkstyle { // we rely on automated code formatting instead
   ignoreFailures true
 }
 
-import com.android.build.gradle.internal.tasks.PrepareLintJar
-tasks.whenTaskAdded { task ->
-  switch (task) {
-    case PrepareLintJar:
-      task.dependsOn ":${project.name}:reformatJavaSources"
-      break
-  }
-}
+//import com.android.build.gradle.internal.tasks.PrepareLintJar
+//tasks.whenTaskAdded { task ->
+//  switch (task) {
+//    case PrepareLintJar:
+//      task.dependsOn ":${project.name}:reformatJavaSources"
+//      break
+//  }
+//}
 
 tasks.withType(JavaCompile).configureEach {
   options.errorprone.disableWarningsInGeneratedCode = true
