@@ -7,7 +7,7 @@ import com.rakuten.tech.mobile.inappmessaging.runtime.data.responses.ping.Trigge
  * Interface for an InApp campaign message.
  * All in-app messages must implement this interface.
  */
-@SuppressWarnings("ComplexInterface")
+@SuppressWarnings("ComplexInterface", "TooManyFunctions")
 internal interface Message {
     /**
      * This method returns the message type.
@@ -59,17 +59,17 @@ internal interface Message {
     fun incrementTimesClosed()
 
     /**
-     * Indicates Impressions should never end
+     * Indicates Impressions should never end.
      */
     fun infiniteImpressions(): Boolean
 
     /**
-     * Indicates no end date for the campaign
+     * Indicates no end date for the campaign.
      */
     fun hasNoEndDate(): Boolean
 
     /**
-     * True if close 'X' button should be displayed on campaign
+     * True if close 'X' button should be displayed on campaign.
      */
     fun isCampaignDismissable(): Boolean
 }

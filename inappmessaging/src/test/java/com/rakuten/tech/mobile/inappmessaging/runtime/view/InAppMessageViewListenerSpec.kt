@@ -384,6 +384,31 @@ class InAppMessageViewListenerOnKeySpec : InAppMessageViewListenerSpec() {
     }
 
     @Test
+    fun `should return false with back button click`() {
+        val message = ValidTestMessage("1", true, isCampaignDismissable = false)
+        val listener = InAppMessageViewListener(message, mockCoroutine, mockDisplayManager)
+
+        `when`(keyEvent.action).thenReturn(KeyEvent.ACTION_UP)
+        `when`(mockView.id).thenReturn(R.id.message_close_button)
+        `when`(mockCoroutine.executeTask(message,
+                MessageActionsCoroutine.BACK_BUTTON, false)).thenReturn(true)
+
+        listener.onKey(mockView, KeyEvent.KEYCODE_BACK, keyEvent).shouldBeFalse()
+    }
+
+    @Test
+    fun `should return true when message is null with back button click`() {
+        val listener = InAppMessageViewListener(null, mockCoroutine, mockDisplayManager)
+
+        `when`(keyEvent.action).thenReturn(KeyEvent.ACTION_UP)
+        `when`(mockView.id).thenReturn(R.id.message_close_button)
+        `when`(mockCoroutine.executeTask(null,
+            MessageActionsCoroutine.BACK_BUTTON, false)).thenReturn(true)
+
+        listener.onKey(mockView, KeyEvent.KEYCODE_BACK, keyEvent).shouldBeTrue()
+    }
+
+    @Test
     fun `should return false with back button action down`() {
         val message = ValidTestMessage("1", true)
         val listener = InAppMessageViewListener(message, mockCoroutine, mockDisplayManager)

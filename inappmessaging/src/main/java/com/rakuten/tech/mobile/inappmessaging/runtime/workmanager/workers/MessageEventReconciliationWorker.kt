@@ -10,7 +10,7 @@ import com.rakuten.tech.mobile.inappmessaging.runtime.manager.DisplayManager
 import com.rakuten.tech.mobile.inappmessaging.runtime.utils.MessageEventReconciliationUtil
 import com.rakuten.tech.mobile.inappmessaging.runtime.utils.RuntimeUtil.getCurrentTimeMillis
 import com.rakuten.tech.mobile.sdkutils.logger.Logger
-import java.util.*
+import java.util.Date
 import kotlin.collections.ArrayList
 
 /**

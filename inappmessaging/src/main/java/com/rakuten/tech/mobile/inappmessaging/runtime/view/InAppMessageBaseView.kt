@@ -102,10 +102,11 @@ internal open class InAppMessageBaseView(context: Context, attrs: AttributeSet?)
     /**
      * This method binds data to buttons.
      */
+    @SuppressWarnings("LongMethod")
     private fun bindButtons() {
         // Set onClick listener to close button.
         val closeButton = findViewById<ImageButton>(R.id.message_close_button)
-        if(isDismissable) {
+        if (isDismissable) {
             closeButton?.setOnClickListener(this.listener)
         } else {
             closeButton?.visibility = View.GONE
@@ -246,7 +247,7 @@ internal open class InAppMessageBaseView(context: Context, attrs: AttributeSet?)
     // Computed value is from 0 (black) to 255 (white), and is considered dark if less than 130.
     @SuppressWarnings("MagicNumber")
     internal fun setCloseButton(button: ImageButton? = null) {
-        if(isDismissable) {
+        if (isDismissable) {
             val red = Color.red(bgColor)
             val green = Color.green(bgColor)
             val blue = Color.blue(bgColor)

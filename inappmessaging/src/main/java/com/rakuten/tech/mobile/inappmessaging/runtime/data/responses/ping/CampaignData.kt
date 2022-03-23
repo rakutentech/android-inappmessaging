@@ -6,6 +6,7 @@ import com.rakuten.tech.mobile.inappmessaging.runtime.data.models.messages.Messa
 /**
  * Class for parsing CampaignData, which is a response from MessageMixer.
  */
+@SuppressWarnings("TooManyFunctions")
 internal data class CampaignData(
     @SerializedName("messagePayload")
     private val messagePayload: MessagePayload,
