@@ -48,7 +48,7 @@ internal class MessageEventReconciliationWorker(
 
         // Messages list shouldn't be empty, if it is, then there's no more work to be done.
         val messageListCopy = pingRepo.getAllMessagesCopy().filter {
-            // filter outdated messages
+            // remove outdated messages
             it.hasNoEndDate() ||
             it.getMessagePayload().messageSettings.displaySettings.endTimeMillis > Date().time
         }
