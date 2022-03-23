@@ -14,6 +14,7 @@ android {
     manifestPlaceholders.config_url = CONFIG.property("CONFIG_URL_TEST_PROD") ?: ""
     manifestPlaceholders.test_sub_key = CONFIG.property("IAM_TEST_SUBSCRIPTION_KEY") ?: "test_sub_key"
     buildConfigField("boolean", "IS_CACHE_HANDLING", "true")
+    buildConfigField("String", "VERSION_NAME", "\"${versionName}\"")
   }
 
   sourceSets.each {

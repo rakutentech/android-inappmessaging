@@ -10,7 +10,7 @@ android {
         applicationId "com.rakuten.tech.mobile.test_compose"
         versionCode 1
         versionName "0.0"
-        minSdkVersion 21
+        minSdkVersion 23
         targetSdkVersion 31
 
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
@@ -49,15 +49,16 @@ android {
         return System.getenv(key) ?: (project.hasProperty(key) ? project."$key" : null)
     }
 
-//    productFlavors {
-//        prodTesting {
-//            manifestPlaceholders.in_app_messaging_sub_id = property("IAM_SUBSCRIPTION_KEY") ?: ""
-//            manifestPlaceholders.config_url = property("CONFIG_URL_TEST_PROD") ?: ""
-//        }
-//    }
+    productFlavors {
+        prodTesting {
+            manifestPlaceholders.in_app_messaging_sub_id = property("IAM_SUBSCRIPTION_KEY") ?: ""
+            manifestPlaceholders.config_url = property("CONFIG_URL_TEST_PROD") ?: ""
+        }
+    }
 }
 
 dependencies {
+    implementation project(':inappmessaging')
 
     implementation 'androidx.core:core-ktx:1.7.0'
     implementation "androidx.compose.ui:ui:$compose_version"
