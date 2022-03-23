@@ -18,7 +18,13 @@ internal data class CampaignData(
     @SerializedName("isTest")
     private val isTest: Boolean,
     @SerializedName("maxImpressions")
-    private var maxImpressions: Int = 0
+    private var maxImpressions: Int = 0,
+    @SerializedName("hasNoEndDate")
+    private val hasNoEndDate: Boolean = false,
+    @SerializedName("isCampaignDismissable")
+    private val isCampaignDismissable: Boolean = true,
+    @SerializedName("infiniteImpressions")
+    private val infiniteImpressions: Boolean = false
 ) : Message {
 
     @SerializedName("timesClosed")
@@ -54,4 +60,10 @@ internal data class CampaignData(
             timesClosed++
         }
     }
+
+    override fun infiniteImpressions() = infiniteImpressions
+
+    override fun hasNoEndDate() = hasNoEndDate
+
+    override fun isCampaignDismissable() = isCampaignDismissable
 }

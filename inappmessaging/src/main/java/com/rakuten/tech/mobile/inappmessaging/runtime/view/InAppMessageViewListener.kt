@@ -73,6 +73,11 @@ internal class InAppMessageViewListener(
             // If user only checked the opt-out box, just assign the isOptOutChecked variable.
             this.isOptOutChecked = (view as CheckBox).isChecked
         } else {
+
+            //Disable closing the message if not dismissable.
+            if (message?.isCampaignDismissable() != true) {
+                return
+            }
             // Handling button click in coroutine.
             handleClick(view.id)
         }
@@ -80,6 +85,11 @@ internal class InAppMessageViewListener(
 
     override fun onKey(v: View?, keyCode: Int, event: KeyEvent?): Boolean {
         if (event != null && event.action == KeyEvent.ACTION_UP && keyCode == KeyEvent.KEYCODE_BACK) {
+
+            //Disable closing the message if not dismissable.
+            if (message?.isCampaignDismissable() != true) {
+                return false
+            }
             // Handling back button click in coroutine.
             handleClick(MessageActionsCoroutine.BACK_BUTTON)
             return true

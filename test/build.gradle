@@ -1,6 +1,5 @@
 // Reduce code duplication.
 apply from: "$CONFIG.configDir/android/application.gradle"
-apply from: "../config/quality/gitleaks/build.gradle"
 apply plugin: "kotlin-android"
 apply plugin: 'kotlin-kapt'
 
@@ -50,7 +49,7 @@ android {
     productFlavors {
         prodTesting {
             manifestPlaceholders.in_app_messaging_sub_id = property("IAM_SUBSCRIPTION_KEY") ?: ""
-            manifestPlaceholders.config_url = property("CONFIG_URL_TEST_PROD") ?: ""
+            manifestPlaceholders.config_url = property("CONFIG_URL_STG") ?: ""
         }
     }
 }

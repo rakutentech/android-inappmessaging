@@ -57,4 +57,19 @@ internal interface Message {
      * was removed when closeMessage API was called.
      */
     fun incrementTimesClosed()
+
+    /**
+     * Indicates Impressions should never end
+     */
+    fun infiniteImpressions(): Boolean
+
+    /**
+     * Indicates no end date for the campaign
+     */
+    fun hasNoEndDate(): Boolean
+
+    /**
+     * True if close 'X' button should be displayed on campaign
+     */
+    fun isCampaignDismissable(): Boolean
 }

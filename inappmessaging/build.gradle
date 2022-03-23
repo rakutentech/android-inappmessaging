@@ -3,7 +3,6 @@ apply from: "../config/quality/checkstyle/android.gradle"
 apply from: "../config/quality/detekt/android.gradle"
 apply from: '../config/quality/errorprone/android.gradle'
 apply from: '../config/documentation/dokka/android.gradle'
-apply from: "../config/quality/gitleaks/build.gradle"
 
 apply plugin: "kotlin-android"
 
@@ -136,10 +135,10 @@ if (isSnapshot) {
   apply from: '../config/publish/maven-central.gradle'
 }
 
-dokkaGfm.configure {
-  dokkaSourceSets {
-    configureEach {
-      sourceRoots.from(file("inappmessaging/src/main"))
+dokka {
+  configuration {
+    sourceRoot {
+      path = "inappmessaging/src/main"
     }
   }
 }
