@@ -10,6 +10,9 @@ import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
+import com.rakuten.tech.mobile.inappmessaging.runtime.InAppMessaging
+import com.rakuten.tech.mobile.inappmessaging.runtime.data.models.appevents.AppStartEvent
+import com.rakuten.tech.mobile.inappmessaging.runtime.data.models.appevents.PurchaseSuccessfulEvent
 import com.rakuten.tech.mobile.test_compose.ui.theme.TestcomposeTheme
 
 class MainActivity : ComponentActivity() {
@@ -19,22 +22,38 @@ class MainActivity : ComponentActivity() {
             TestcomposeTheme {
                 // A surface container using the 'background' color from the theme
                 Surface(modifier = Modifier.fillMaxSize(), color = MaterialTheme.colors.background) {
-                    Greeting("Android")
+                    Screen1()
                 }
             }
         }
     }
-}
 
-@Composable
-fun Greeting(name: String) {
-    Text(text = "Hello $name!")
-}
+    override fun onStart() {
+        super.onStart()
+        InAppMessaging.instance().logEvent(AppStartEvent())
+    }
 
-@Preview(showBackground = true)
-@Composable
-fun DefaultPreview() {
-    TestcomposeTheme {
-        Greeting("Android")
+    override fun onResume() {
+        super.onResume()
+        InAppMessaging.instance().registerMessageDisplayActivity(this)
+    }
+
+    override fun onPause() {
+        super.onPause()
+        InAppMessaging.instance().unregisterMessageDisplayActivity()
     }
 }
+//
+//@Composable
+//fun Greeting(name: String) {
+//    Text(text = "Hello $name!")
+//    InAppMessaging.instance().logEvent(PurchaseSuccessfulEvent().currencyCode("JPY"))
+//}
+//
+//@Preview(showBackground = true)
+//@Composable
+//fun DefaultPreview() {
+//    TestcomposeTheme {
+//        Greeting("Android")
+//    }
+//}
