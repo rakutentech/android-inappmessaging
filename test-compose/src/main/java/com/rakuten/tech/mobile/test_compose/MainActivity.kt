@@ -10,15 +10,21 @@ import androidx.compose.ui.Modifier
 import com.rakuten.tech.mobile.inappmessaging.runtime.InAppMessaging
 import com.rakuten.tech.mobile.inappmessaging.runtime.data.models.appevents.AppStartEvent
 import com.rakuten.tech.mobile.test_compose.ui.Screen1
-import com.rakuten.tech.mobile.test_compose.ui.theme.TestcomposeTheme
+import com.rakuten.tech.mobile.test_compose.ui.theme.TestComposeTheme
 
+// With Compose, Activities remain the entry point to an Android app.
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        // Use setContent to define the layout, but instead of using XML, composable functions are called.
         setContent {
-            TestcomposeTheme {
-                // A surface container using the 'background' color from the theme
-                Surface(modifier = Modifier.fillMaxSize(), color = MaterialTheme.colors.background) {
+            // TestComposeTheme is a way to style Composable functions.
+            TestComposeTheme {
+                // A surface container using the 'background' color from the theme.
+                Surface(
+                    // A modifier tells a UI element how to lay out or display
+                    modifier = Modifier.fillMaxSize(),
+                    color = MaterialTheme.colors.background) {
                     Screen1()
                 }
             }
@@ -40,17 +46,3 @@ class MainActivity : ComponentActivity() {
         InAppMessaging.instance().unregisterMessageDisplayActivity()
     }
 }
-//
-//@Composable
-//fun Greeting(name: String) {
-//    Text(text = "Hello $name!")
-//    InAppMessaging.instance().logEvent(PurchaseSuccessfulEvent().currencyCode("JPY"))
-//}
-//
-//@Preview(showBackground = true)
-//@Composable
-//fun DefaultPreview() {
-//    TestcomposeTheme {
-//        Greeting("Android")
-//    }
-//}

@@ -6,6 +6,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 
+// Custom button with padding around it.
 @Composable
 fun MyButton(
     text: String,

@@ -22,7 +22,5 @@ fun Screen2() {
 @Preview(showBackground = true)
 @Composable
 private fun Screen2Preview() {
-    //TestcomposeTheme {
     Screen2()
-    //}
 }
