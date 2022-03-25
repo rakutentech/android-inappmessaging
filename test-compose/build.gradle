@@ -1,7 +1,7 @@
-plugins {
-    id 'com.android.application'
-    id 'org.jetbrains.kotlin.android'
-}
+// Reduce code duplication.
+apply from: "$CONFIG.configDir/android/application.gradle"
+apply plugin: "kotlin-android"
+apply plugin: 'kotlin-kapt'
 
 android {
     compileSdkVersion 31
@@ -10,7 +10,7 @@ android {
         applicationId "com.rakuten.tech.mobile.test_compose"
         versionCode 1
         versionName "0.0"
-        minSdkVersion 23
+        minSdkVersion CONFIG.versions.android.sdk.min
         targetSdkVersion 31
 
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
