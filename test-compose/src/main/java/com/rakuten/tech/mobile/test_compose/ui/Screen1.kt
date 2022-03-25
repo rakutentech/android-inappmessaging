@@ -1,10 +1,13 @@
-package com.rakuten.tech.mobile.test_compose
+package com.rakuten.tech.mobile.test_compose.ui
 
 import MyButton
 import android.app.Activity
+import android.content.Intent
 import androidx.compose.foundation.layout.*
 import androidx.compose.material.*
 import androidx.compose.runtime.*
+import androidx.compose.ui.Alignment
+import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
@@ -13,20 +16,25 @@ import com.rakuten.tech.mobile.inappmessaging.runtime.data.models.appevents.AppS
 import com.rakuten.tech.mobile.inappmessaging.runtime.data.models.appevents.CustomEvent
 import com.rakuten.tech.mobile.inappmessaging.runtime.data.models.appevents.LoginSuccessfulEvent
 import com.rakuten.tech.mobile.inappmessaging.runtime.data.models.appevents.PurchaseSuccessfulEvent
-import com.rakuten.tech.mobile.test_compose.ui.theme.TestcomposeTheme
+import com.rakuten.tech.mobile.test_compose.MainApplication
+import com.rakuten.tech.mobile.test_compose.SecondActivity
 
 @Composable
 fun Screen1() {
     Column(
-        verticalArrangement = Arrangement.spacedBy(8.dp),
+        modifier = Modifier
+            .fillMaxSize(),
+        verticalArrangement = Arrangement.Center,
+        horizontalAlignment = Alignment.CenterHorizontally
     ) {
         val showDialog = remember { mutableStateOf(false) }
-
+        val context = LocalContext.current
         MyButton(
             text = "Close Message",
             onClick = { InAppMessaging.instance().closeMessage() })
         MyButton(
-            text = "Launch Second Activity")
+            text = "Launch Second Activity",
+            onClick = { context.startActivity(Intent(context, SecondActivity::class.java)) })
         MyButton(
             text = "Change User",
             onClick = { showDialog.value = true} )
