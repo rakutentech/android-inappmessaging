@@ -10,7 +10,6 @@ import androidx.work.testing.WorkManagerTestInitHelper
 import com.nhaarman.mockitokotlin2.any
 import com.nhaarman.mockitokotlin2.argumentCaptor
 import com.rakuten.tech.mobile.inappmessaging.runtime.BaseTest
-import com.rakuten.tech.mobile.inappmessaging.runtime.InApp
 import com.rakuten.tech.mobile.inappmessaging.runtime.InAppMessaging
 import com.rakuten.tech.mobile.inappmessaging.runtime.exception.InAppMessagingException
 import com.rakuten.tech.mobile.inappmessaging.runtime.utils.RetryDelayUtil
@@ -61,7 +60,7 @@ class ConfigSchedulerSpec : BaseTest() {
     fun `should not throw exception when workmanager is not initialized with callback`() {
         val function: (ex: Exception) -> Unit = {}
         val mockCallback = Mockito.mock(function.javaClass)
-        InApp.errorCallback = mockCallback
+        InAppMessaging.errorCallback = mockCallback
 
         InAppMessaging.initialize(ApplicationProvider.getApplicationContext(), true)
         ConfigScheduler.instance().startConfig(0, mockWorkManager)
@@ -88,7 +87,7 @@ class ConfigSchedulerSpec : BaseTest() {
 
     @Test
     fun `should reset delay when max is encountered`() {
-        InAppMessaging.init(ApplicationProvider.getApplicationContext()).shouldBeTrue()
+        InAppMessaging.configure(ApplicationProvider.getApplicationContext()).shouldBeTrue()
         ConfigScheduler.currDelay *= 2
         ConfigScheduler.instance().startConfig(Long.MAX_VALUE - System.currentTimeMillis() + 2)
         ConfigScheduler.currDelay shouldBeEqualTo RetryDelayUtil.INITIAL_BACKOFF_DELAY

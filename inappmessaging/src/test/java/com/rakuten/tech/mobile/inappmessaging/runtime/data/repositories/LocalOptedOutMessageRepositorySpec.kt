@@ -9,7 +9,6 @@ import com.rakuten.tech.mobile.inappmessaging.runtime.InAppMessaging
 import com.rakuten.tech.mobile.inappmessaging.runtime.TestUserInfoProvider
 import com.rakuten.tech.mobile.inappmessaging.runtime.UserInfoProvider
 import com.rakuten.tech.mobile.inappmessaging.runtime.data.models.messages.ValidTestMessage
-import com.rakuten.tech.mobile.sdkutils.PreferencesUtil
 import org.amshove.kluent.shouldBeFalse
 import org.amshove.kluent.shouldBeTrue
 import org.junit.Test
@@ -42,7 +41,7 @@ class LocalOptedOutMessageRepositorySpec : BaseTest() {
     @Test
     fun `should not crash while clearing message`() {
         val message = ValidTestMessage()
-        InAppMessaging.setUninitializedInstance(true)
+        InAppMessaging.setNotConfiguredInstance(true)
         LocalOptedOutMessageRepository.instance().clearMessages()
         LocalOptedOutMessageRepository.instance().hasMessage(message.getCampaignId()).shouldBeFalse()
     }
@@ -67,16 +66,16 @@ class LocalOptedOutMessageRepositorySpec : BaseTest() {
     }
 
     @Test
-    fun `should not crash and clear previous when forced cast exception`() {
+    fun `should save and restore values for different users with null context`() {
+        LocalOptedOutMessageRepository.instance().clearMessages()
+        val message = ValidTestMessage()
+        InAppMessaging.setNotConfiguredInstance(true)
         val infoProvider = TestUserInfoProvider()
-        initializeInstance(infoProvider)
-        PreferencesUtil.putInt(
-            ApplicationProvider.getApplicationContext(),
-            InAppMessaging.getPreferencesFile(),
-            LocalOptedOutMessageRepository.LOCAL_OPTED_OUT_KEY,
-            1
-        )
-        LocalOptedOutMessageRepository.instance().hasMessage(ValidTestMessage().getCampaignId()).shouldBeFalse()
+        AccountRepository.instance().userInfoProvider = infoProvider
+        infoProvider.userId = "otheruser"
+        AccountRepository.instance().updateUserInfo()
+        LocalOptedOutMessageRepository.instance().addMessage(message)
+        LocalOptedOutMessageRepository.instance().hasMessage(message.getCampaignId()).shouldBeTrue()
     }
 
     private fun setupAndTestMultipleUser(): ValidTestMessage {

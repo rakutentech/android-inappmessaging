@@ -1,5 +1,5 @@
 buildscript {
-    ext.dokka_version = '0.10.0'
+    ext.dokka_version = '1.6.10'
     ext.compose_version = '1.0.1'
 
     // Build Config.
@@ -23,6 +23,7 @@ buildscript {
         classpath 'pl.allegro.tech.build:axion-release-plugin:1.10.2'
         classpath 'com.github.ben-manes:gradle-versions-plugin:0.27.0'
         classpath "org.jetbrains.dokka:dokka-gradle-plugin:${dokka_version}"
+        classpath 'org.owasp:dependency-check-gradle:6.5.3'
     }
 }
 
@@ -72,4 +73,5 @@ tasks.withType(JavaCompile) {
     options.incremental = true
 }
 
+apply from: "$project.rootDir/dependency-check.gradle"
 apply from: "$project.rootDir/sonar.gradle"

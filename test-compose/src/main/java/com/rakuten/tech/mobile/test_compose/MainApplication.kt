@@ -9,7 +9,7 @@ class MainApplication : Application() {
 
     override fun onCreate() {
         super.onCreate()
-        InAppMessaging.init(this)
+        InAppMessaging.configure(this)
         InAppMessaging.instance().registerPreference(provider)
     }
 }

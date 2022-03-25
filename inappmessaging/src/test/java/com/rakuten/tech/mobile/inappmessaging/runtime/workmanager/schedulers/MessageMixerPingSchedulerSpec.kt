@@ -6,7 +6,6 @@ import androidx.work.WorkManager
 import com.nhaarman.mockitokotlin2.any
 import com.nhaarman.mockitokotlin2.argumentCaptor
 import com.nhaarman.mockitokotlin2.atLeastOnce
-import com.nhaarman.mockitokotlin2.times
 import com.rakuten.tech.mobile.inappmessaging.runtime.BaseTest
 import com.rakuten.tech.mobile.inappmessaging.runtime.InAppMessaging
 import com.rakuten.tech.mobile.inappmessaging.runtime.data.repositories.ConfigResponseRepository
@@ -46,7 +45,7 @@ class MessageMixerPingSchedulerSpec : BaseTest() {
 
     @Test
     fun `should reset delay when max is encountered`() {
-        InAppMessaging.init(ApplicationProvider.getApplicationContext()).shouldBeTrue()
+        InAppMessaging.configure(ApplicationProvider.getApplicationContext()).shouldBeTrue()
         `when`(configResponseData.rollOutPercentage).thenReturn(100)
         ConfigResponseRepository.instance().addConfigResponse(configResponseData)
         MessageMixerPingScheduler.currDelay *= 2
@@ -60,12 +59,14 @@ class MessageMixerPingSchedulerSpec : BaseTest() {
         val mockCallback = Mockito.mock(function.javaClass)
 
         `when`(configResponseData.rollOutPercentage).thenReturn(100)
-        InAppMessaging.init(ApplicationProvider.getApplicationContext(), mockCallback)
+        InAppMessaging.errorCallback = mockCallback
+        InAppMessaging.configure(ApplicationProvider.getApplicationContext())
         ConfigResponseRepository.instance().addConfigResponse(configResponseData)
         MessageMixerPingScheduler.instance().pingMessageMixerService(10L, mockWorkManager)
 
         val captor = argumentCaptor<InAppMessagingException>()
         Mockito.verify(mockCallback, atLeastOnce()).invoke(captor.capture())
         captor.firstValue shouldBeInstanceOf InAppMessagingException::class.java
+        InAppMessaging.errorCallback = null
     }
 }

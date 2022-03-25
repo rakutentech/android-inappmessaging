@@ -3,7 +3,7 @@ package com.rakuten.tech.mobile.inappmessaging.runtime.manager
 import androidx.annotation.VisibleForTesting
 import androidx.annotation.WorkerThread
 import com.rakuten.tech.mobile.inappmessaging.runtime.BuildConfig
-import com.rakuten.tech.mobile.inappmessaging.runtime.InApp
+import com.rakuten.tech.mobile.inappmessaging.runtime.InAppMessaging
 import com.rakuten.tech.mobile.inappmessaging.runtime.api.MessageMixerRetrofitService
 import com.rakuten.tech.mobile.inappmessaging.runtime.data.models.messages.Message
 import com.rakuten.tech.mobile.inappmessaging.runtime.data.repositories.AccountRepository
@@ -186,7 +186,7 @@ internal interface MessageReadinessManager {
             } catch (e: Exception) {
                 return checkAndRetry(call.clone()) {
                     Logger(DISP_TAG).error(e.message)
-                    InApp.errorCallback?.let {
+                    InAppMessaging.errorCallback?.let {
                         it(InAppMessagingException("In-App Messaging display permission request failed", e))
                     }
                 }
