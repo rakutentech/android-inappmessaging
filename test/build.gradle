@@ -4,10 +4,6 @@ apply from: "../config/quality/gitleaks/build.gradle"
 apply plugin: "kotlin-android"
 apply plugin: 'kotlin-kapt'
 
-def property = { key ->
-    return System.getenv(key) ?: (project.hasProperty(key) ? project."$key" : null)
-}
-
 android {
     compileSdkVersion 31
 
@@ -26,9 +22,6 @@ android {
         // "pm clear" command after each test invocation. This command ensures
         // that the app's state is completely cleared between tests.
         testInstrumentationRunnerArguments clearPackageData: 'true'
-
-        manifestPlaceholders.in_app_messaging_sub_id = property("IAM_SUBSCRIPTION_KEY") ?: ""
-        manifestPlaceholders.config_url = property("CONFIG_URL_TEST_PROD") ?: ""
     }
 
     buildTypes {
@@ -49,6 +42,17 @@ android {
     }
 
     flavorDimensions 'version'
+
+    def property = { key ->
+        return System.getenv(key) ?: (project.hasProperty(key) ? project."$key" : null)
+    }
+
+    productFlavors {
+        prodTesting {
+            manifestPlaceholders.in_app_messaging_sub_id = property("IAM_SUBSCRIPTION_KEY") ?: ""
+            manifestPlaceholders.config_url = property("CONFIG_URL_TEST_PROD") ?: ""
+        }
+    }
 }
 
 dependencies {
