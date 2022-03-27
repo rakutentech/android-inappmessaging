@@ -217,6 +217,62 @@ class BaseViewSpec : BaseTest() {
         view?.findViewById<MaterialButton>(R.id.message_single_button)?.typeface.shouldNotBeNull()
     }
 
+    @Test
+    fun `should set button border for identical bg colors`() {
+        val bgColor = "#AA00BB"
+        `when`(mockPayload.headerColor).thenReturn(WHITE_HEX)
+        `when`(mockPayload.messageBodyColor).thenReturn(WHITE_HEX)
+        `when`(mockPayload.backgroundColor).thenReturn(bgColor)
+        view?.populateViewData(mockMessage)
+
+        val mockButton = Mockito.mock(MaterialButton::class.java)
+        view?.setButtonBorder(mockButton, Color.parseColor(bgColor), Color.BLACK)
+        Mockito.verify(mockButton, times(1)).setStrokeColor(ColorStateList.valueOf(Color.BLACK))
+        Mockito.verify(mockButton, times(1)).setStrokeWidth(any())
+    }
+
+    @Test
+    fun `should set button border for similar bg colors`() {
+        `when`(mockPayload.headerColor).thenReturn(WHITE_HEX)
+        `when`(mockPayload.messageBodyColor).thenReturn(WHITE_HEX)
+        `when`(mockPayload.backgroundColor).thenReturn("#AA00BB")
+        view?.populateViewData(mockMessage)
+
+        val mockButton = Mockito.mock(MaterialButton::class.java)
+        view?.setButtonBorder(mockButton, Color.parseColor("#AA05BB"), Color.BLACK)
+        Mockito.verify(mockButton, times(1)).setStrokeColor(ColorStateList.valueOf(Color.BLACK))
+        Mockito.verify(mockButton, times(1)).setStrokeWidth(any())
+    }
+
+    @Test
+    fun `should set grey button border for white bg colors`() {
+        `when`(mockPayload.headerColor).thenReturn(WHITE_HEX)
+        `when`(mockPayload.messageBodyColor).thenReturn(WHITE_HEX)
+        `when`(mockPayload.backgroundColor).thenReturn(WHITE_HEX)
+        view?.populateViewData(mockMessage)
+
+        val mockButton = Mockito.mock(MaterialButton::class.java)
+        view?.setButtonBorder(mockButton, Color.parseColor(WHITE_HEX), Color.BLACK)
+        val expectedColor = view?.resources?.getColorStateList(
+            R.color.modal_border_color_light_grey, view!!.context.theme
+        )
+        Mockito.verify(mockButton, times(1)).setStrokeColor(expectedColor)
+        Mockito.verify(mockButton, times(1)).setStrokeWidth(any())
+    }
+
+    @Test
+    fun `should not set button border for different bg colors`() {
+        `when`(mockPayload.headerColor).thenReturn(WHITE_HEX)
+        `when`(mockPayload.messageBodyColor).thenReturn(WHITE_HEX)
+        `when`(mockPayload.backgroundColor).thenReturn(WHITE_HEX)
+        view?.populateViewData(mockMessage)
+
+        val mockButton = Mockito.mock(MaterialButton::class.java)
+        view?.setButtonBorder(mockButton, Color.parseColor("#AA00BB"), Color.BLACK)
+        Mockito.verify(mockButton, never()).setStrokeColor(any())
+        Mockito.verify(mockButton, never()).setStrokeWidth(any())
+    }
+
     @SuppressWarnings("LongMethod")
     private fun setupMockContext(
         isInvalid: Boolean = false,
