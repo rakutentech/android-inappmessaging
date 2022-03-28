@@ -106,11 +106,14 @@ internal open class InAppMessageBaseView(context: Context, attrs: AttributeSet?)
     private fun bindButtons() {
         // Set onClick listener to close button.
         val closeButton = findViewById<ImageButton>(R.id.message_close_button)
-        if (isDismissable) {
-            closeButton?.setOnClickListener(this.listener)
-        } else {
-            closeButton?.visibility = View.GONE
+        closeButton?.let {
+            if (isDismissable) {
+                it.setOnClickListener(this.listener)
+            } else {
+                it.visibility = View.GONE
+            }
         }
+
         when (this.buttons?.size) {
             1 -> {
                 // Set bigger layout_margin if there's only one button.
