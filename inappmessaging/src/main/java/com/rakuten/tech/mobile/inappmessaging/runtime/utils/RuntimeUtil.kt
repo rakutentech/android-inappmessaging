@@ -26,9 +26,9 @@ import java.util.concurrent.TimeUnit
 internal object RuntimeUtil {
     private const val DEFAULT_TIMEOUT_IN_SECONDS = 5
     private val OK_HTTP_CLIENT = OkHttpClient.Builder()
-            .connectTimeout(DEFAULT_TIMEOUT_IN_SECONDS.toLong(), TimeUnit.SECONDS)
-            .readTimeout(DEFAULT_TIMEOUT_IN_SECONDS.toLong(), TimeUnit.SECONDS)
-            .build()
+        .connectTimeout(DEFAULT_TIMEOUT_IN_SECONDS.toLong(), TimeUnit.SECONDS)
+        .readTimeout(DEFAULT_TIMEOUT_IN_SECONDS.toLong(), TimeUnit.SECONDS)
+        .build()
     private val EXECUTOR = Executors.newSingleThreadExecutor()
     private val GSON_CONVERTER_FACTORY = GsonConverterFactory.create()
     private const val TAG = "IAM_RuntimeUtil"
@@ -56,7 +56,7 @@ internal object RuntimeUtil {
     fun getImage(imageUrl: String): Bitmap? {
         if (URLUtil.isNetworkUrl(imageUrl)) {
             val getImageCall: Call<ResponseBody> =
-                    getRetrofit().create(MessageMixerRetrofitService::class.java).getImage(imageUrl)
+                getRetrofit().create(MessageMixerRetrofitService::class.java).getImage(imageUrl)
             try {
                 val imageResponse = getImageCall.execute()
                 if (imageResponse.isSuccessful && imageResponse.body() != null) {

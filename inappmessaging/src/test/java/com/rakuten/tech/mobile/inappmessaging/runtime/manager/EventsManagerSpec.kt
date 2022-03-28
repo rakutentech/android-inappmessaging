@@ -64,8 +64,9 @@ class EventsManagerSpec : BaseTest() {
     fun `should invoke broadcast receiver`() {
         EventsManager.onEventReceived(mockEvent, mockEventBroadcaster::sendEvent)
         Mockito.verify(mockEventBroadcaster).sendEvent(
-                InAppMessagingConstants.RAT_EVENT_KEY_EVENTS,
-                mockEvent.getRatEventMap())
+            InAppMessagingConstants.RAT_EVENT_KEY_EVENTS,
+            mockEvent.getRatEventMap()
+        )
     }
 
     @Test
@@ -80,9 +81,10 @@ class EventsManagerSpec : BaseTest() {
     @Throws(ExecutionException::class, InterruptedException::class)
     fun `should not reconcile when config is disabled`() {
         Settings.Secure.putString(
-                ApplicationProvider.getApplicationContext<Context>().contentResolver,
-                Settings.Secure.ANDROID_ID,
-                "test_device_id")
+            ApplicationProvider.getApplicationContext<Context>().contentResolver,
+            Settings.Secure.ANDROID_ID,
+            "test_device_id"
+        )
         InAppMessaging.initialize(ApplicationProvider.getApplicationContext())
         InAppMessaging.instance().registerPreference(TestUserInfoProvider())
         ConfigResponseRepository.instance().addConfigResponse(configResponseData)
@@ -95,9 +97,10 @@ class EventsManagerSpec : BaseTest() {
     @Test
     fun `should clear all messages when user info is updated`() {
         Settings.Secure.putString(
-                ApplicationProvider.getApplicationContext<Context>().contentResolver,
-                Settings.Secure.ANDROID_ID,
-                "test_device_id")
+            ApplicationProvider.getApplicationContext<Context>().contentResolver,
+            Settings.Secure.ANDROID_ID,
+            "test_device_id"
+        )
         InAppMessaging.initialize(ApplicationProvider.getApplicationContext())
         InAppMessaging.instance().registerPreference(TestUserInfoProvider())
         ConfigResponseRepository.instance().addConfigResponse(configResponseData)
@@ -107,8 +110,10 @@ class EventsManagerSpec : BaseTest() {
         `when`(configResponseData.rollOutPercentage).thenReturn(0)
         `when`(mockAccount.updateUserInfo()).thenReturn(true)
 
-        EventsManager.onEventReceived(event = PurchaseSuccessfulEvent(), eventScheduler = eventRecon,
-                accountRepo = mockAccount)
+        EventsManager.onEventReceived(
+            event = PurchaseSuccessfulEvent(), eventScheduler = eventRecon,
+            accountRepo = mockAccount
+        )
 
         verifyTestData(0)
     }
@@ -116,9 +121,10 @@ class EventsManagerSpec : BaseTest() {
     @Test
     fun `should not clear messages when user info is not updated`() {
         Settings.Secure.putString(
-                ApplicationProvider.getApplicationContext<Context>().contentResolver,
-                Settings.Secure.ANDROID_ID,
-                "test_device_id")
+            ApplicationProvider.getApplicationContext<Context>().contentResolver,
+            Settings.Secure.ANDROID_ID,
+            "test_device_id"
+        )
         InAppMessaging.initialize(ApplicationProvider.getApplicationContext(), true)
         InAppMessaging.instance().registerPreference(TestUserInfoProvider())
         `when`(configResponseData.rollOutPercentage).thenReturn(100)
@@ -127,8 +133,10 @@ class EventsManagerSpec : BaseTest() {
 
         addTestData()
 
-        EventsManager.onEventReceived(event = PurchaseSuccessfulEvent(), eventScheduler = eventRecon,
-                accountRepo = mockAccount)
+        EventsManager.onEventReceived(
+            event = PurchaseSuccessfulEvent(), eventScheduler = eventRecon,
+            accountRepo = mockAccount
+        )
 
         verifyTestData(1)
     }

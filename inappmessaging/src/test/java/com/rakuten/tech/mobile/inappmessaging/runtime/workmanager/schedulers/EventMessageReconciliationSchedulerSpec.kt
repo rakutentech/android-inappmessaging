@@ -41,8 +41,12 @@ class EventMessageReconciliationSchedulerSpec : BaseTest() {
     @Before
     override fun setup() {
         super.setup()
-        `when`(mockWorkManager.beginUniqueWork(any(), any(),
-            ArgumentMatchers.any(OneTimeWorkRequest::class.java))).thenThrow(IllegalStateException("test"))
+        `when`(
+            mockWorkManager.beginUniqueWork(
+                any(), any(),
+                ArgumentMatchers.any(OneTimeWorkRequest::class.java)
+            )
+        ).thenThrow(IllegalStateException("test"))
     }
 
     @Test
@@ -50,13 +54,14 @@ class EventMessageReconciliationSchedulerSpec : BaseTest() {
     fun `should start reconciliation worker`() {
         WorkManagerTestInitHelper.initializeTestWorkManager(ApplicationProvider.getApplicationContext())
         Settings.Secure.putString(
-                ApplicationProvider.getApplicationContext<Context>().contentResolver,
-                Settings.Secure.ANDROID_ID,
-                "test_device_id")
+            ApplicationProvider.getApplicationContext<Context>().contentResolver,
+            Settings.Secure.ANDROID_ID,
+            "test_device_id"
+        )
         InAppMessaging.initialize(ApplicationProvider.getApplicationContext(), true)
         EventMessageReconciliationScheduler.instance().startEventMessageReconciliationWorker()
         WorkManager.getInstance(ApplicationProvider.getApplicationContext())
-                .getWorkInfosByTag(MESSAGES_EVENTS_WORKER_NAME).get()[0].shouldNotBeNull()
+            .getWorkInfosByTag(MESSAGES_EVENTS_WORKER_NAME).get()[0].shouldNotBeNull()
     }
 
     @Test

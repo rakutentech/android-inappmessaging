@@ -21,6 +21,7 @@ internal abstract class PingResponseMessageRepository : MessageRepository {
 
     companion object {
         private var instance: PingResponseMessageRepository = PingResponseMessageRepositoryImpl()
+
         @VisibleForTesting
         internal const val PING_RESPONSE_KEY = "ping_response_list"
         private const val TAG = "IAM_PingResponseRepo"
@@ -79,7 +80,7 @@ internal abstract class PingResponseMessageRepository : MessageRepository {
         override fun incrementTimesClosed(messageList: List<Message>) {
             checkAndResetMap()
             messages.filter { m -> messageList.any { it.getCampaignId() == m.key } }
-                    .forEach { it.value.incrementTimesClosed() }
+                .forEach { it.value.incrementTimesClosed() }
             saveUpdatedMap()
         }
 
@@ -93,7 +94,8 @@ internal abstract class PingResponseMessageRepository : MessageRepository {
         private fun checkAndResetMap(onLaunch: Boolean = false) {
             // check if caching is enabled and if there are changes in user info
             if (InAppMessaging.instance().isLocalCachingEnabled() &&
-                    (onLaunch || user != AccountRepository.instance().userInfoHash)) {
+                (onLaunch || user != AccountRepository.instance().userInfoHash)
+            ) {
                 user = AccountRepository.instance().userInfoHash
                 // reset message list from cached using updated user info
                 val listString = try {
@@ -114,7 +116,8 @@ internal abstract class PingResponseMessageRepository : MessageRepository {
                     val jsonObject = JSONObject(listString)
                     for (key in jsonObject.keys()) {
                         val campaign = Gson().fromJson(
-                                jsonObject.getJSONObject(key).toString(), CampaignData::class.java)
+                            jsonObject.getJSONObject(key).toString(), CampaignData::class.java
+                        )
                         // manual setting since not part of constructor
                         campaign.timesClosed = jsonObject.getJSONObject(key).getInt("timesClosed")
                         messages[key] = campaign

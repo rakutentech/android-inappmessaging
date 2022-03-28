@@ -90,8 +90,9 @@ internal interface LocalEventRepository : EventRepository {
             for ((key, value) in event.getAttributeMap()) {
                 Logger(TAG).debug("Key: %s", key)
                 Logger(TAG).debug(
-                        "Value name: %s, Value Type: %d, Value data: %s", value?.name, value?.valueType,
-                        value?.value)
+                    "Value name: %s, Value Type: %d, Value data: %s", value?.name, value?.valueType,
+                    value?.value
+                )
             }
         }
 
@@ -147,7 +148,8 @@ internal interface LocalEventRepository : EventRepository {
             if (event.isPersistentType()) {
                 for (currEvent in events) {
                     if (event.getEventType() == currEvent.getEventType() &&
-                            event.getEventName() == currEvent.getEventName()) return true
+                        event.getEventName() == currEvent.getEventName()
+                    ) return true
                 }
             }
 
@@ -158,7 +160,8 @@ internal interface LocalEventRepository : EventRepository {
         private fun checkAndResetList(onLaunch: Boolean = false) {
             // check if caching is enabled and if there are changes in user info
             if (InAppMessaging.instance().isLocalCachingEnabled() &&
-                    (onLaunch || user != AccountRepository.instance().userInfoHash)) {
+                (onLaunch || user != AccountRepository.instance().userInfoHash)
+            ) {
                 user = AccountRepository.instance().userInfoHash
                 // reset event list from cached using updated user info
                 val listString = try {

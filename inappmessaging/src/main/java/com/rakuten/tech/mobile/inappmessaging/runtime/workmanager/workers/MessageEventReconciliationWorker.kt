@@ -22,14 +22,16 @@ internal class MessageEventReconciliationWorker(
     private val pingRepo: PingResponseMessageRepository,
     private val messageUtil: MessageEventReconciliationUtil
 ) :
-        Worker(context, workerParams) {
+    Worker(context, workerParams) {
 
     /**
      * Overload constructor to handle OneTimeWorkRequest.Builder().
      */
     constructor(context: Context, workerParams: WorkerParameters) :
-            this(context, workerParams, PingResponseMessageRepository.instance(),
-            MessageEventReconciliationUtil.instance())
+        this(
+            context, workerParams, PingResponseMessageRepository.instance(),
+            MessageEventReconciliationUtil.instance()
+        )
 
     /**
      * This method is the entry point of this worker.

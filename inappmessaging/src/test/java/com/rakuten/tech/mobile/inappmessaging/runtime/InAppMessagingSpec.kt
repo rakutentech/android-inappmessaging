@@ -368,9 +368,10 @@ open class InAppMessagingSpec : BaseTest() {
     private fun initializeInstance(shouldEnableCaching: Boolean = false) {
         WorkManagerTestInitHelper.initializeTestWorkManager(ApplicationProvider.getApplicationContext())
         Settings.Secure.putString(
-                ApplicationProvider.getApplicationContext<Context>().contentResolver,
-                Settings.Secure.ANDROID_ID,
-                "test_device_id")
+            ApplicationProvider.getApplicationContext<Context>().contentResolver,
+            Settings.Secure.ANDROID_ID,
+            "test_device_id"
+        )
         `when`(configResponseData.rollOutPercentage).thenReturn(100)
         ConfigResponseRepository.instance().addConfigResponse(configResponseData)
         InAppMessaging.initialize(ApplicationProvider.getApplicationContext(), shouldEnableCaching)
@@ -380,8 +381,10 @@ open class InAppMessagingSpec : BaseTest() {
         `when`(configResponseData.rollOutPercentage).thenReturn(rollout)
         ConfigResponseRepository.instance().addConfigResponse(configResponseData)
 
-        return InApp(ApplicationProvider.getApplicationContext(), false, manager,
-                eventsManager = eventsManager, sessionManager = sessionManager)
+        return InApp(
+            ApplicationProvider.getApplicationContext(), false, manager,
+            eventsManager = eventsManager, sessionManager = sessionManager
+        )
     }
 
     companion object {

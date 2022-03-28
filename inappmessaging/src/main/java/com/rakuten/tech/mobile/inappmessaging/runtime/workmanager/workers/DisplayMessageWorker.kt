@@ -56,10 +56,10 @@ internal class DisplayMessageWorker(
         val imageUrl = message.getMessagePayload().resource.imageUrl
         if (hostActivity != null) {
             if (!imageUrl.isNullOrEmpty()) {
-                    fetchImageThenDisplayMessage(message, hostActivity, imageUrl)
+                fetchImageThenDisplayMessage(message, hostActivity, imageUrl)
             } else {
-                    // If no image, just display the message.
-                    displayMessage(message, hostActivity)
+                // If no image, just display the message.
+                displayMessage(message, hostActivity)
             }
         }
     }
@@ -73,15 +73,19 @@ internal class DisplayMessageWorker(
         hostActivity: Activity,
         imageUrl: String
     ) {
-        ImageUtil.fetchImage(imageUrl, object : Callback {
-            override fun onSuccess() {
-                displayMessage(message, hostActivity)
-            }
+        ImageUtil.fetchImage(
+            imageUrl,
+            object : Callback {
+                override fun onSuccess() {
+                    displayMessage(message, hostActivity)
+                }
 
-            override fun onError(e: Exception?) {
-                Logger(TAG).debug("Downloading image failed")
-            }
-        }, hostActivity, picasso)
+                override fun onError(e: Exception?) {
+                    Logger(TAG).debug("Downloading image failed")
+                }
+            },
+            hostActivity, picasso
+        )
     }
 
     /**

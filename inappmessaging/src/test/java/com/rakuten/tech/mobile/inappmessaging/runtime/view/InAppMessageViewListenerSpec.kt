@@ -40,6 +40,8 @@ import org.robolectric.annotation.Config
 /**
  * Test class for InAppMessageViewListener.
  */
+@ExperimentalCoroutinesApi
+@ObsoleteCoroutinesApi
 open class InAppMessageViewListenerSpec : BaseTest() {
     internal val mockView = Mockito.mock(View::class.java)
     internal val mockDisplayManager = Mockito.mock(DisplayManager::class.java)
@@ -47,19 +49,15 @@ open class InAppMessageViewListenerSpec : BaseTest() {
     internal val mockEventScheduler = Mockito.mock(EventMessageReconciliationScheduler::class.java)
     internal val mockActivity = Mockito.mock(Activity::class.java)
     internal val mockInApp = Mockito.mock(InAppMessaging::class.java)
-    @ObsoleteCoroutinesApi
+
     private val mainThreadSurrogate = newSingleThreadContext("UI thread")
 
-    @ExperimentalCoroutinesApi
-    @ObsoleteCoroutinesApi
     @Before
     override fun setup() {
         super.setup()
         Dispatchers.setMain(mainThreadSurrogate)
     }
 
-    @ExperimentalCoroutinesApi
-    @ObsoleteCoroutinesApi
     @After
     override fun tearDown() {
         super.tearDown()
@@ -68,6 +66,8 @@ open class InAppMessageViewListenerSpec : BaseTest() {
     }
 }
 
+@ObsoleteCoroutinesApi
+@ExperimentalCoroutinesApi
 @Config(sdk = [Build.VERSION_CODES.Q])
 class InAppMessageViewListenerOnClickSpec : InAppMessageViewListenerSpec() {
     private val mockCheckbox = Mockito.mock(CheckBox::class.java)
@@ -143,14 +143,14 @@ class InAppMessageViewListenerOnClickSpec : InAppMessageViewListenerSpec() {
         )
 }
 
+@ObsoleteCoroutinesApi
+@ExperimentalCoroutinesApi
 @Config(sdk = [Build.VERSION_CODES.Q])
 @SuppressWarnings("LargeClass")
 class InAppMessageViewListenerOnTouchSpec : InAppMessageViewListenerSpec() {
     private val mockMotionEvent = Mockito.mock(MotionEvent::class.java)
     private val mockCheck = Mockito.mock(BuildVersionChecker::class.java)
 
-    @ObsoleteCoroutinesApi
-    @ExperimentalCoroutinesApi
     @Before
     override fun setup() {
         super.setup()
@@ -365,6 +365,8 @@ class InAppMessageViewListenerOnTouchSpec : InAppMessageViewListenerSpec() {
     }
 }
 
+@ObsoleteCoroutinesApi
+@ExperimentalCoroutinesApi
 @Config(sdk = [Build.VERSION_CODES.Q])
 class InAppMessageViewListenerOnKeySpec : InAppMessageViewListenerSpec() {
 
@@ -377,8 +379,12 @@ class InAppMessageViewListenerOnKeySpec : InAppMessageViewListenerSpec() {
 
         `when`(keyEvent.action).thenReturn(KeyEvent.ACTION_UP)
         `when`(mockView.id).thenReturn(R.id.message_close_button)
-        `when`(mockCoroutine.executeTask(message,
-                MessageActionsCoroutine.BACK_BUTTON, false)).thenReturn(true)
+        `when`(
+            mockCoroutine.executeTask(
+                message,
+                MessageActionsCoroutine.BACK_BUTTON, false
+            )
+        ).thenReturn(true)
 
         listener.onKey(mockView, KeyEvent.KEYCODE_BACK, keyEvent).shouldBeTrue()
     }
@@ -390,8 +396,12 @@ class InAppMessageViewListenerOnKeySpec : InAppMessageViewListenerSpec() {
 
         `when`(keyEvent.action).thenReturn(KeyEvent.ACTION_DOWN)
         `when`(mockView.id).thenReturn(R.id.message_close_button)
-        `when`(mockCoroutine.executeTask(message,
-                MessageActionsCoroutine.BACK_BUTTON, false)).thenReturn(true)
+        `when`(
+            mockCoroutine.executeTask(
+                message,
+                MessageActionsCoroutine.BACK_BUTTON, false
+            )
+        ).thenReturn(true)
 
         listener.onKey(mockView, KeyEvent.KEYCODE_BACK, keyEvent).shouldBeFalse()
     }
@@ -431,18 +441,25 @@ class InAppMessageViewListenerOnKeySpec : InAppMessageViewListenerSpec() {
     }
 
 //    @Test
+    @SuppressWarnings("LongMethod")
     fun `should return true on false coroutine`() {
         val message = ValidTestMessage("1", true)
-        val listener = InAppMessageViewListener(message = message,
-                messageCoroutine = mockCoroutine,
-                displayManager = mockDisplayManager,
-                eventScheduler = mockEventScheduler,
-                inApp = mockInApp)
+        val listener = InAppMessageViewListener(
+            message = message,
+            messageCoroutine = mockCoroutine,
+            displayManager = mockDisplayManager,
+            eventScheduler = mockEventScheduler,
+            inApp = mockInApp
+        )
 
         `when`(keyEvent.action).thenReturn(KeyEvent.ACTION_UP)
         `when`(mockView.id).thenReturn(R.id.message_close_button)
-        `when`(mockCoroutine.executeTask(message,
-                MessageActionsCoroutine.BACK_BUTTON, false)).thenReturn(false)
+        `when`(
+            mockCoroutine.executeTask(
+                message,
+                MessageActionsCoroutine.BACK_BUTTON, false
+            )
+        ).thenReturn(false)
         `when`(mockInApp.getRegisteredActivity()).thenReturn(mockActivity)
 
         listener.onKey(mockView, KeyEvent.KEYCODE_BACK, keyEvent).shouldBeTrue()

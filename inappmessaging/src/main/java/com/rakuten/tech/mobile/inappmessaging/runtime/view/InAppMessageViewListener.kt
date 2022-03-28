@@ -51,8 +51,10 @@ internal class InAppMessageViewListener(
                 MotionEvent.ACTION_MOVE -> if (this.magnifier != null) {
                     val viewPosition = IntArray(2)
                     view.getLocationOnScreen(viewPosition)
-                    this.magnifier?.show(event.rawX - viewPosition[0],
-                            event.rawY - viewPosition[1])
+                    this.magnifier?.show(
+                        event.rawX - viewPosition[0],
+                        event.rawY - viewPosition[1]
+                    )
                 }
                 MotionEvent.ACTION_CANCEL, MotionEvent.ACTION_UP -> if (this.magnifier != null) {
                     this.magnifier?.dismiss()

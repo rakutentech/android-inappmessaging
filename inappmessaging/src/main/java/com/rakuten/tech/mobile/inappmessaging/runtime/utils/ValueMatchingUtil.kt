@@ -15,6 +15,7 @@ internal object ValueMatchingUtil {
      * This method compares two integer values (i.e. [eventValue] and [triggerValue]) using the [operatorType].
      * Supported operators are: EQUALS, DOES_NOT_EQUAL, GREATER_THAN, LESS_THAN.
      */
+    @SuppressWarnings("ComplexMethod")
     fun isOperatorConditionSatisfied(eventValue: Int?, operatorType: OperatorType?, triggerValue: Int?): Boolean {
         return if (eventValue == null || operatorType == null || triggerValue == null) {
             false
@@ -33,6 +34,7 @@ internal object ValueMatchingUtil {
      * This method compares two Double values (i.e. [eventValue] and [triggerValue]) using the [operatorType].
      * Supported operators are: EQUALS, DOES_NOT_EQUAL, GREATER_THAN, LESS_THAN.
      */
+    @SuppressWarnings("ComplexMethod")
     fun isOperatorConditionSatisfied(eventValue: Double?, operatorType: OperatorType?, triggerValue: Double?): Boolean {
         if (eventValue == null || operatorType == null || triggerValue == null) {
             return false
@@ -98,7 +100,7 @@ internal object ValueMatchingUtil {
      * Supported operators are: EQUALS, DOES_NOT_EQUAL.
      */
     fun isOperatorConditionSatisfied(eventValue: Boolean?, operatorType: OperatorType?, triggerValue: Boolean?):
-            Boolean {
+        Boolean {
         return if (eventValue == null || operatorType == null || triggerValue == null) {
             false
         } else when (operatorType) {

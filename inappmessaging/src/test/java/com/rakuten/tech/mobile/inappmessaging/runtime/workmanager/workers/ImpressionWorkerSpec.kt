@@ -56,27 +56,34 @@ class ImpressionWorkerSpec : BaseTest() {
     private val mockResponse: Response<ResponseBody>? = null
 
     @Before
+    @SuppressWarnings("LongMethod")
     override fun setup() {
         super.setup()
         MockitoAnnotations.initMocks(this)
         AccountRepository.instance().userInfoProvider = TestUserInfoProvider()
-        HostAppInfoRepository.instance().addHostInfo(HostAppInfo(InAppMessagingTestConstants.APP_ID,
+        HostAppInfoRepository.instance().addHostInfo(
+            HostAppInfo(
+                InAppMessagingTestConstants.APP_ID,
                 InAppMessagingTestConstants.DEVICE_ID, InAppMessagingTestConstants.APP_VERSION,
-                InAppMessagingTestConstants.SUB_KEY, InAppMessagingTestConstants.LOCALE))
+                InAppMessagingTestConstants.SUB_KEY, InAppMessagingTestConstants.LOCALE
+            )
+        )
         worker = ImpressionWorker(context, workerParameters)
         responseBodyCall = worker?.createReportImpressionCall(ENDPOINT, impressionRequest)
 
         // setup synchronous worker
         val config = Configuration.Builder()
-                // Set log level to Log.DEBUG to make it easier to debug
-                .setMinimumLoggingLevel(Log.DEBUG)
-                // Use a SynchronousExecutor here to make it easier to write tests
-                .setExecutor(SynchronousExecutor()).build()
+            // Set log level to Log.DEBUG to make it easier to debug
+            .setMinimumLoggingLevel(Log.DEBUG)
+            // Use a SynchronousExecutor here to make it easier to write tests
+            .setExecutor(SynchronousExecutor()).build()
 
         // Initialize WorkManager for instrumentation tests.
         WorkManagerTestInitHelper.initializeTestWorkManager(ApplicationProvider.getApplicationContext(), config)
-        Settings.Secure.putString(ApplicationProvider.getApplicationContext<Context>().contentResolver,
-                Settings.Secure.ANDROID_ID, "test_device_id")
+        Settings.Secure.putString(
+            ApplicationProvider.getApplicationContext<Context>().contentResolver,
+            Settings.Secure.ANDROID_ID, "test_device_id"
+        )
         InAppMessaging.initialize(ApplicationProvider.getApplicationContext(), true)
 
         ImpressionWorker.serverErrorCounter.set(0)
@@ -90,30 +97,31 @@ class ImpressionWorkerSpec : BaseTest() {
     @Test
     fun `should response body call contains token header`() {
         responseBodyCall!!.request().header(MessageMixerRetrofitService.ACCESS_TOKEN_HEADER) shouldBeEqualTo
-                "OAuth2 " + TestUserInfoProvider.TEST_USER_ACCESS_TOKEN
+            "OAuth2 " + TestUserInfoProvider.TEST_USER_ACCESS_TOKEN
     }
 
     @Test
     fun `should response body call contains sub id header`() {
         responseBodyCall!!.request().header(MessageMixerRetrofitService.SUBSCRIPTION_ID_HEADER) shouldBeEqualTo
-                InAppMessagingTestConstants.SUB_KEY
+            InAppMessagingTestConstants.SUB_KEY
     }
 
     @Test
     fun `should response body call contains device id header`() {
         responseBodyCall!!.request().header(MessageMixerRetrofitService.DEVICE_ID_HEADER) shouldBeEqualTo
-                InAppMessagingTestConstants.DEVICE_ID
+            InAppMessagingTestConstants.DEVICE_ID
     }
 
     @Test
     fun `should return failure for null endpoint`() {
         val impressionRequest = ImpressionRequest(
-                campaignId = "testId",
-                isTest = true,
-                appVersion = HostAppInfoRepository.instance().getVersion(),
-                sdkVersion = BuildConfig.VERSION_NAME,
-                userIdentifiers = RuntimeUtil.getUserIdentifiers(),
-                impressions = listOf(Impression(ImpressionType.ACTION_ONE, Date().time)))
+            campaignId = "testId",
+            isTest = true,
+            appVersion = HostAppInfoRepository.instance().getVersion(),
+            sdkVersion = BuildConfig.VERSION_NAME,
+            userIdentifiers = RuntimeUtil.getUserIdentifiers(),
+            impressions = listOf(Impression(ImpressionType.ACTION_ONE, Date().time))
+        )
         val workManager = WorkManager.getInstance(ApplicationProvider.getApplicationContext())
         val request = createWorkRequest(impressionRequest, ImpressionWorker.IMPRESSION_REQUEST_KEY)
 
@@ -127,12 +135,13 @@ class ImpressionWorkerSpec : BaseTest() {
     @Test
     fun `should return failure for empty endpoint`() {
         val impressionRequest = ImpressionRequest(
-                campaignId = "testId",
-                isTest = true,
-                appVersion = HostAppInfoRepository.instance().getVersion(),
-                sdkVersion = BuildConfig.VERSION_NAME,
-                userIdentifiers = RuntimeUtil.getUserIdentifiers(),
-                impressions = listOf(Impression(ImpressionType.ACTION_ONE, Date().time)))
+            campaignId = "testId",
+            isTest = true,
+            appVersion = HostAppInfoRepository.instance().getVersion(),
+            sdkVersion = BuildConfig.VERSION_NAME,
+            userIdentifiers = RuntimeUtil.getUserIdentifiers(),
+            impressions = listOf(Impression(ImpressionType.ACTION_ONE, Date().time))
+        )
         val workManager = WorkManager.getInstance(ApplicationProvider.getApplicationContext())
         val request = createWorkRequest(impressionRequest, ImpressionWorker.IMPRESSION_REQUEST_KEY)
 
@@ -147,12 +156,13 @@ class ImpressionWorkerSpec : BaseTest() {
     @Test
     fun `should return failure for null data`() {
         val impressionRequest = ImpressionRequest(
-                campaignId = "testId",
-                isTest = true,
-                appVersion = HostAppInfoRepository.instance().getVersion(),
-                sdkVersion = BuildConfig.VERSION_NAME,
-                userIdentifiers = RuntimeUtil.getUserIdentifiers(),
-                impressions = listOf(Impression(ImpressionType.ACTION_ONE, Date().time)))
+            campaignId = "testId",
+            isTest = true,
+            appVersion = HostAppInfoRepository.instance().getVersion(),
+            sdkVersion = BuildConfig.VERSION_NAME,
+            userIdentifiers = RuntimeUtil.getUserIdentifiers(),
+            impressions = listOf(Impression(ImpressionType.ACTION_ONE, Date().time))
+        )
         val workManager = WorkManager.getInstance(ApplicationProvider.getApplicationContext())
         val request = createWorkRequest(impressionRequest, "test-key")
 
@@ -163,17 +173,20 @@ class ImpressionWorkerSpec : BaseTest() {
     }
 
     @Test
+    @SuppressWarnings("LongMethod")
     fun `should return failure for invalid json`() {
         val impressionRequest = ImpressionRequest(
-                campaignId = "testId",
-                isTest = true,
-                appVersion = HostAppInfoRepository.instance().getVersion(),
-                sdkVersion = BuildConfig.VERSION_NAME,
-                userIdentifiers = RuntimeUtil.getUserIdentifiers(),
-                impressions = listOf(Impression(ImpressionType.ACTION_ONE, Date().time)))
+            campaignId = "testId",
+            isTest = true,
+            appVersion = HostAppInfoRepository.instance().getVersion(),
+            sdkVersion = BuildConfig.VERSION_NAME,
+            userIdentifiers = RuntimeUtil.getUserIdentifiers(),
+            impressions = listOf(Impression(ImpressionType.ACTION_ONE, Date().time))
+        )
         val workManager = WorkManager.getInstance(ApplicationProvider.getApplicationContext())
         val request = createWorkRequest(
-                impressionRequest, ImpressionWorker.IMPRESSION_REQUEST_KEY, false)
+            impressionRequest, ImpressionWorker.IMPRESSION_REQUEST_KEY, false
+        )
 
         retrieveValidConfig()
         val response = Gson().fromJson(CONFIG_RESPONSE_INVALID.trimIndent(), ConfigResponse::class.java)
@@ -186,15 +199,17 @@ class ImpressionWorkerSpec : BaseTest() {
     @Test
     fun `should return retry invalid impression call`() {
         val impressionRequest = ImpressionRequest(
-                campaignId = "testId",
-                isTest = true,
-                appVersion = HostAppInfoRepository.instance().getVersion(),
-                sdkVersion = BuildConfig.VERSION_NAME,
-                userIdentifiers = RuntimeUtil.getUserIdentifiers(),
-                impressions = listOf(Impression(ImpressionType.ACTION_ONE, Date().time)))
+            campaignId = "testId",
+            isTest = true,
+            appVersion = HostAppInfoRepository.instance().getVersion(),
+            sdkVersion = BuildConfig.VERSION_NAME,
+            userIdentifiers = RuntimeUtil.getUserIdentifiers(),
+            impressions = listOf(Impression(ImpressionType.ACTION_ONE, Date().time))
+        )
         val workManager = WorkManager.getInstance(ApplicationProvider.getApplicationContext())
         val request = createWorkRequest(
-                impressionRequest, ImpressionWorker.IMPRESSION_REQUEST_KEY)
+            impressionRequest, ImpressionWorker.IMPRESSION_REQUEST_KEY
+        )
 
         val response = Gson().fromJson(CONFIG_RESPONSE_INVALID.trimIndent(), ConfigResponse::class.java)
         ConfigResponseRepository.instance().addConfigResponse(response.data)
@@ -204,18 +219,22 @@ class ImpressionWorkerSpec : BaseTest() {
     }
 
     @Test
+    @SuppressWarnings("LongMethod")
     fun `should return failure due invalid token`() {
         HostAppInfoRepository.instance().addHostInfo(
-                HostAppInfo(
-                        "rakuten.com.tech.mobile.test",
-                        InAppMessagingTestConstants.DEVICE_ID,
-                        InAppMessagingTestConstants.APP_VERSION,
-                        "sample-key",
-                        InAppMessagingTestConstants.LOCALE))
+            HostAppInfo(
+                "rakuten.com.tech.mobile.test",
+                InAppMessagingTestConstants.DEVICE_ID,
+                InAppMessagingTestConstants.APP_VERSION,
+                "sample-key",
+                InAppMessagingTestConstants.LOCALE
+            )
+        )
         val workManager = WorkManager.getInstance(ApplicationProvider.getApplicationContext())
         val request = createWorkRequest(
-                Gson().fromJson(REQUEST.trimIndent(), ImpressionRequest::class.java),
-                ImpressionWorker.IMPRESSION_REQUEST_KEY)
+            Gson().fromJson(REQUEST.trimIndent(), ImpressionRequest::class.java),
+            ImpressionWorker.IMPRESSION_REQUEST_KEY
+        )
 
         retrieveValidConfig()
         workManager.enqueue(request).result.get()
@@ -268,24 +287,26 @@ class ImpressionWorkerSpec : BaseTest() {
         val version = ctx.packageManager.getPackageInfo(ctx.packageName, 0).versionName
         `when`(mockHostRespository.getVersion()).thenReturn(version)
         `when`(mockHostRespository.getInAppMessagingSubscriptionKey()).thenReturn("test_key")
-        val worker = ConfigWorker(context, workerParameters, mockHostRespository, ConfigResponseRepository.instance(),
-                mockMessageScheduler)
+        val worker = ConfigWorker(
+            context, workerParameters, mockHostRespository, ConfigResponseRepository.instance(),
+            mockMessageScheduler
+        )
         worker.doWork()
     }
 
     private fun createWorkRequest(impressionRequest: ImpressionRequest, key: String, isValid: Boolean = true):
-            OneTimeWorkRequest = OneTimeWorkRequest.Builder(ImpressionWorker::class.java)
-            .setInputData(if (isValid) getInputData(impressionRequest, key) else getInvalidInputData(key))
-            .addTag("iam_impression_work")
-            .build()
+        OneTimeWorkRequest = OneTimeWorkRequest.Builder(ImpressionWorker::class.java)
+        .setInputData(if (isValid) getInputData(impressionRequest, key) else getInvalidInputData(key))
+        .addTag("iam_impression_work")
+        .build()
 
     private fun getInputData(impressionRequest: ImpressionRequest, key: String): Data {
         // Convert ImpressionRequest object into a Json String before setting it as input data.
         val impressionRequestJsonString = Gson().toJson(impressionRequest)
         // Create input data objects.
         return Data.Builder()
-                .putString(key, impressionRequestJsonString)
-                .build()
+            .putString(key, impressionRequestJsonString)
+            .build()
     }
 
     private fun getInvalidInputData(key: String): Data {
@@ -293,8 +314,8 @@ class ImpressionWorkerSpec : BaseTest() {
         val impressionRequestJsonString = Gson().toJson("{\"test\":\"invalid\"}")
         // Create input data objects.
         return Data.Builder()
-                .putString(key, impressionRequestJsonString)
-                .build()
+            .putString(key, impressionRequestJsonString)
+            .build()
     }
 
     companion object {

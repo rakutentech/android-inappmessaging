@@ -55,41 +55,47 @@ class ImpressionManagerSpec : BaseTest() {
     fun `should invoke start impression worker`() {
         WorkManagerTestInitHelper.initializeTestWorkManager(ApplicationProvider.getApplicationContext())
         Settings.Secure.putString(
-                ApplicationProvider.getApplicationContext<Context>().contentResolver,
-                Settings.Secure.ANDROID_ID,
-                "test_device_id")
+            ApplicationProvider.getApplicationContext<Context>().contentResolver,
+            Settings.Secure.ANDROID_ID,
+            "test_device_id"
+        )
         InAppMessaging.initialize(ApplicationProvider.getApplicationContext(), true)
         InAppMessaging.instance().registerPreference(TestUserInfoProvider())
-        ImpressionManager().scheduleReportImpression(impressionList!!, "1234", false,
-                eventTracker::sendEvent)
+        ImpressionManager().scheduleReportImpression(
+            impressionList!!, "1234", false,
+            eventTracker::sendEvent
+        )
         val status =
-                WorkManager.getInstance(ApplicationProvider.getApplicationContext<Context>())
-                        .getWorkInfosByTag(IMPRESSION_WORKER_NAME)
+            WorkManager.getInstance(ApplicationProvider.getApplicationContext<Context>())
+                .getWorkInfosByTag(IMPRESSION_WORKER_NAME)
         status.get().shouldHaveSize(1)
     }
 
     @Test
     fun `should invoke broadcaster`() {
         WorkManagerTestInitHelper.initializeTestWorkManager(ApplicationProvider.getApplicationContext())
-        Settings.Secure.putString(ApplicationProvider.getApplicationContext<Context>().contentResolver,
-                Settings.Secure.ANDROID_ID,
-                "test_device_id")
+        Settings.Secure.putString(
+            ApplicationProvider.getApplicationContext<Context>().contentResolver,
+            Settings.Secure.ANDROID_ID,
+            "test_device_id"
+        )
         InAppMessaging.initialize(ApplicationProvider.getApplicationContext(), true)
         InAppMessaging.instance().registerPreference(TestUserInfoProvider())
         ImpressionManager().scheduleReportImpression(
-                impressionList!!,
-                "1234",
-                false,
-                eventTracker::sendEvent)
+            impressionList!!,
+            "1234",
+            false,
+            eventTracker::sendEvent
+        )
         Mockito.verify(eventTracker).sendEvent(ArgumentMatchers.anyString(), ArgumentMatchers.anyMap<String, Any>())
     }
 
     companion object {
         private const val IMPRESSION_WORKER_NAME = "iam_impression_work"
         private val VALID_IMPRESSION_TYPES: MutableList<ImpressionType> =
-                mutableListOf(ImpressionType.ACTION_ONE, ImpressionType.OPT_OUT)
+            mutableListOf(ImpressionType.ACTION_ONE, ImpressionType.OPT_OUT)
         private val INVALID_IMPRESSION_TYPES: MutableList<ImpressionType> =
-                mutableListOf(ImpressionType.ACTION_ONE, ImpressionType.IMPRESSION)
+            mutableListOf(ImpressionType.ACTION_ONE, ImpressionType.IMPRESSION)
         private var impressionList: List<Impression>? = null
     }
 }

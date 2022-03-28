@@ -77,7 +77,7 @@ class CustomEvent(@NonNull eventName: String) : BaseEvent(EventType.CUSTOM, even
     @RestrictTo(LIBRARY)
     @NotNull
     override fun getAttributeMap(): Map<String, Attribute?> =
-            Collections.unmodifiableMap(attributesMap)
+        Collections.unmodifiableMap(attributesMap)
 
     /**
      * This method returns an unmodifiable map which contains all event's attributes.
