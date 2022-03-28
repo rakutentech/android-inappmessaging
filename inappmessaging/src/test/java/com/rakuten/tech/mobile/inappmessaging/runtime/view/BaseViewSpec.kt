@@ -58,6 +58,7 @@ class BaseViewSpec : BaseTest() {
                 .layoutInflater
         ).thenReturn(LayoutInflater.from(ApplicationProvider.getApplicationContext()))
         `when`(mockMessage.getMessagePayload()).thenReturn(mockPayload)
+        `when`(mockMessage.isCampaignDismissable()).thenReturn(true)
         `when`(mockPayload.header).thenReturn("test")
         `when`(mockPayload.messageBody).thenReturn("test")
         `when`(mockPayload.messageSettings).thenReturn(mockSettings)

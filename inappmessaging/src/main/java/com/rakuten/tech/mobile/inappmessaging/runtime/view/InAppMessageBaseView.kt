@@ -48,6 +48,7 @@ internal open class InAppMessageBaseView(context: Context, attrs: AttributeSet?)
     private var messageBody: String? = null
     private var buttons: List<MessageButton>? = null
     private var displayOptOut = false
+    private var isDismissable: Boolean = true
     @VisibleForTesting
     internal var picasso: Picasso? = null
 
@@ -77,6 +78,7 @@ internal open class InAppMessageBaseView(context: Context, attrs: AttributeSet?)
         this.imageUrl = message.getMessagePayload().resource.imageUrl
         this.listener = InAppMessageViewListener(message)
         this.displayOptOut = message.getMessagePayload().messageSettings.displaySettings.optOut
+        this.isDismissable = message.isCampaignDismissable()
         bindViewData()
         this.tag = message.getCampaignId()
     }
@@ -100,10 +102,18 @@ internal open class InAppMessageBaseView(context: Context, attrs: AttributeSet?)
     /**
      * This method binds data to buttons.
      */
+    @SuppressWarnings("LongMethod")
     private fun bindButtons() {
         // Set onClick listener to close button.
         val closeButton = findViewById<ImageButton>(R.id.message_close_button)
-        closeButton?.setOnClickListener(this.listener)
+        closeButton?.let {
+            if (isDismissable) {
+                it.setOnClickListener(this.listener)
+            } else {
+                it.visibility = View.GONE
+            }
+        }
+
         when (this.buttons?.size) {
             1 -> {
                 // Set bigger layout_margin if there's only one button.
@@ -240,13 +250,15 @@ internal open class InAppMessageBaseView(context: Context, attrs: AttributeSet?)
     // Computed value is from 0 (black) to 255 (white), and is considered dark if less than 130.
     @SuppressWarnings("MagicNumber")
     internal fun setCloseButton(button: ImageButton? = null) {
-        val red = Color.red(bgColor)
-        val green = Color.green(bgColor)
-        val blue = Color.blue(bgColor)
-        val brightness = sqrt((red * red * .241) + (green * green * .691) + (blue * blue * .068)).toInt()
-        if (brightness < 130) {
-            (button ?: findViewById(R.id.message_close_button))
-                ?.setImageResource(R.drawable.close_button_white)
+        if (isDismissable) {
+            val red = Color.red(bgColor)
+            val green = Color.green(bgColor)
+            val blue = Color.blue(bgColor)
+            val brightness = sqrt((red * red * .241) + (green * green * .691) + (blue * blue * .068)).toInt()
+            if (brightness < 130) {
+                (button ?: findViewById(R.id.message_close_button))
+                    ?.setImageResource(R.drawable.close_button_white)
+            }
         }
     }
 

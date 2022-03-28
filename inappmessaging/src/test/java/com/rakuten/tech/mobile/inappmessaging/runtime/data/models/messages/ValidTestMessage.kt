@@ -5,7 +5,8 @@ import com.rakuten.tech.mobile.inappmessaging.runtime.data.responses.ping.*
 
 internal class ValidTestMessage(
     private val campaignId: String = DEFAULT_CAMPAIGN_ID,
-    private val isTest: Boolean = IS_TEST
+    private val isTest: Boolean = IS_TEST,
+    private val isCampaignDismissable: Boolean = true
 ) : Message {
     internal var timesClosed = 0
     private var max = 1
@@ -42,6 +43,12 @@ internal class ValidTestMessage(
     override fun incrementTimesClosed() {
         timesClosed++
     }
+
+    override fun infiniteImpressions() = false
+
+    override fun hasNoEndDate() = false
+
+    override fun isCampaignDismissable() = isCampaignDismissable
 
     @SuppressWarnings("ComplexCondition")
     override fun equals(other: Any?): Boolean {

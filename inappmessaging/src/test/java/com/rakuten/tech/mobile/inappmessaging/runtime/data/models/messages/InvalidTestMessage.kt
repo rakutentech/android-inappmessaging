@@ -28,4 +28,10 @@ internal class InvalidTestMessage : Message {
 
     @SuppressWarnings("EmptyFunctionBlock")
     override fun incrementTimesClosed() {}
+
+    override fun infiniteImpressions() = false
+
+    override fun hasNoEndDate() = false
+
+    override fun isCampaignDismissable() = true
 }
