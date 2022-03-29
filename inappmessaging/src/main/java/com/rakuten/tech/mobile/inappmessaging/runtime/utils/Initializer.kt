@@ -34,6 +34,9 @@ internal object Initializer {
 
     private const val TAG = "IAM_InitWorker"
     internal const val ID_KEY = "uuid_key"
+    private const val IMAGE_REQUEST_TIMEOUT_SECONDS = 20L
+    private const val IMAGE_RESOURCE_TIMEOUT_SECONDS = 300L
+    private const val CACHE_MAX_SIZE = 50L * 1024L * 1024L // 50 MiB
 
     /**
      * This method returns a string of Android Device ID. Note: In order to get device ID without Context,
@@ -41,8 +44,8 @@ internal object Initializer {
      */
     @SuppressLint("HardwareIds") // Suppress lint check of using device id.
     private fun getDeviceId(context: Context, sharedUtil: PreferencesUtil) =
-            Settings.Secure.getString(context.contentResolver, Settings.Secure.ANDROID_ID)
-                    ?: getUuid(context, sharedUtil)
+        Settings.Secure.getString(context.contentResolver, Settings.Secure.ANDROID_ID)
+            ?: getUuid(context, sharedUtil)
 
     /**
      * This method gets device's locale based on API level.
@@ -50,11 +53,11 @@ internal object Initializer {
     @SuppressWarnings("DEPRECATION", "kotlin:S1874")
     @TargetApi(Build.VERSION_CODES.N)
     private fun getLocale(context: Context): Locale? =
-            if (BuildVersionChecker.instance().isNougatAndAbove()) {
-                context.resources.configuration.locales[0]
-            } else {
-                context.resources.configuration.locale
-            }
+        if (BuildVersionChecker.instance().isNougatAndAbove()) {
+            context.resources.configuration.locales[0]
+        } else {
+            context.resources.configuration.locale
+        }
 
     /**
      * This method retrieves host app's app version.
@@ -77,7 +80,7 @@ internal object Initializer {
      * This method retrieves host app's package name.
      */
     private fun getHostAppPackageName(context: Context): String =
-            if (context.packageName != null) context.packageName else ""
+        if (context.packageName != null) context.packageName else ""
 
     @SuppressWarnings("LongParameterList")
     @Throws(InAppMessagingException::class)
@@ -87,8 +90,10 @@ internal object Initializer {
         configUrl: String?,
         sharedUtil: PreferencesUtil = PreferencesUtil
     ) {
-        val hostAppInfo = HostAppInfo(getHostAppPackageName(context), getDeviceId(context, sharedUtil),
-                getHostAppVersion(context), subscriptionKey, getLocale(context), configUrl)
+        val hostAppInfo = HostAppInfo(
+            getHostAppPackageName(context), getDeviceId(context, sharedUtil),
+            getHostAppVersion(context), subscriptionKey, getLocale(context), configUrl
+        )
 
         // Store hostAppInfo in repository.
         HostAppInfoRepository.instance().addHostInfo(hostAppInfo)
@@ -114,10 +119,6 @@ internal object Initializer {
         sharedUtil.putString(context, "uuid", ID_KEY, id)
         return id
     }
-
-    private const val IMAGE_REQUEST_TIMEOUT_SECONDS = 20L
-    private const val IMAGE_RESOURCE_TIMEOUT_SECONDS = 300L
-    private const val CACHE_MAX_SIZE = 50L * 1024L * 1024L // 50 MiB
 
     private fun initializePicassoInstance(context: Context) {
         try {

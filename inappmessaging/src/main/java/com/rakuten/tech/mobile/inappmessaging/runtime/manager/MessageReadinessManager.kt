@@ -49,7 +49,7 @@ internal interface MessageReadinessManager {
     @VisibleForTesting
     @SuppressWarnings("FunctionMaxLength")
     fun getDisplayPermissionResponseCall(displayPermissionUrl: String, request: DisplayPermissionRequest):
-            Call<DisplayPermissionResponse>
+        Call<DisplayPermissionResponse>
 
     companion object {
         private const val TAG = "IAM_MsgReadinessManager"
@@ -114,7 +114,7 @@ internal interface MessageReadinessManager {
             displayPermissionUrl: String,
             request: DisplayPermissionRequest
         ):
-                Call<DisplayPermissionResponse> =
+            Call<DisplayPermissionResponse> =
             RuntimeUtil.getRetrofit()
                 .create(MessageMixerRetrofitService::class.java)
                 .getDisplayPermissionService(
@@ -129,10 +129,12 @@ internal interface MessageReadinessManager {
          * than its max impressions, or has been opted out.
          */
         private fun shouldDisplayMessage(message: Message): Boolean =
-            (message.infiniteImpressions() ||
-            LocalDisplayedMessageRepository.instance().numberOfTimesDisplayed(message)
-                    < message.getMaxImpressions()) &&
-                    !LocalOptedOutMessageRepository.instance().hasMessage(message.getCampaignId())
+            (
+                message.infiniteImpressions() ||
+                    LocalDisplayedMessageRepository.instance().numberOfTimesDisplayed(message)
+                    < message.getMaxImpressions()
+                ) &&
+                !LocalOptedOutMessageRepository.instance().hasMessage(message.getCampaignId())
 
         /**
          * This methods checks if According to the message display permission response parameter,

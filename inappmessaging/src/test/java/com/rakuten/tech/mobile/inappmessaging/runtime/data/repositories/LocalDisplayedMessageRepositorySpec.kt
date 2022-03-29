@@ -75,9 +75,11 @@ class LocalDisplayedMessageRepositorySpec : BaseTest() {
     @SuppressWarnings("LongMethod")
     fun `should be called once`() {
         WorkManagerTestInitHelper.initializeTestWorkManager(ApplicationProvider.getApplicationContext())
-        Settings.Secure.putString(ApplicationProvider.getApplicationContext<Context>().contentResolver,
-                Settings.Secure.ANDROID_ID,
-                "test_device_id")
+        Settings.Secure.putString(
+            ApplicationProvider.getApplicationContext<Context>().contentResolver,
+            Settings.Secure.ANDROID_ID,
+            "test_device_id"
+        )
         InAppMessaging.initialize(ApplicationProvider.getApplicationContext(), true)
 
         val mockRepo = Mockito.mock(LocalDisplayedMessageRepository::class.java)
@@ -212,9 +214,10 @@ class LocalDisplayedMessageRepositorySpec : BaseTest() {
     private fun initializeInstance(infoProvider: UserInfoProvider, isCache: Boolean = true) {
         WorkManagerTestInitHelper.initializeTestWorkManager(ApplicationProvider.getApplicationContext())
         Settings.Secure.putString(
-                ApplicationProvider.getApplicationContext<Context>().contentResolver,
-                Settings.Secure.ANDROID_ID,
-                "test_device_id")
+            ApplicationProvider.getApplicationContext<Context>().contentResolver,
+            Settings.Secure.ANDROID_ID,
+            "test_device_id"
+        )
         InAppMessaging.initialize(ApplicationProvider.getApplicationContext(), isCache)
         InAppMessaging.instance().registerPreference(infoProvider)
     }

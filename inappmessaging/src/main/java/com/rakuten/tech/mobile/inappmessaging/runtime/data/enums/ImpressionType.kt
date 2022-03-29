@@ -6,16 +6,22 @@ package com.rakuten.tech.mobile.inappmessaging.runtime.data.enums
 @SuppressWarnings("MagicNumber")
 internal enum class ImpressionType(val typeId: Int) {
     INVALID(0),
+
     // View impression.
     IMPRESSION(1),
+
     // Clicking button 1.
     ACTION_ONE(2),
+
     // Clicking button 2.
     ACTION_TWO(3),
+
     // Clicking close button.
     EXIT(4),
+
     // Clicking content.
     CLICK_CONTENT(5),
+
     // Checkbox of opt-out.
     OPT_OUT(6);
 

@@ -49,10 +49,13 @@ class IntegrationSpec {
 
     @Test
     fun `should return valid config`() {
-        val worker = ConfigWorker(context, workerParameters, HostAppInfoRepository.instance(),
-                ConfigResponseRepository.instance(), mockMessageScheduler)
-        val expected = if (HostAppInfoRepository.instance().getConfigUrl().isNullOrEmpty())
-            ListenableWorker.Result.retry() else ListenableWorker.Result.success()
+        val worker = ConfigWorker(
+            context, workerParameters, HostAppInfoRepository.instance(),
+            ConfigResponseRepository.instance(), mockMessageScheduler
+        )
+        val expected = if (HostAppInfoRepository.instance().getConfigUrl().isNullOrEmpty()) {
+            ListenableWorker.Result.retry()
+        } else ListenableWorker.Result.success()
         worker.doWork() shouldBeEqualTo expected
 
         // will not work on forked repo (PR) since environment variables are not shared
@@ -67,8 +70,10 @@ class IntegrationSpec {
 
     @Test
     fun `should return valid ping response`() {
-        val worker = ConfigWorker(context, workerParameters, HostAppInfoRepository.instance(),
-                ConfigResponseRepository.instance(), mockMessageScheduler)
+        val worker = ConfigWorker(
+            context, workerParameters, HostAppInfoRepository.instance(),
+            ConfigResponseRepository.instance(), mockMessageScheduler
+        )
         val result = worker.doWork()
         if (result == ListenableWorker.Result.success()) {
             val pingWorker = MessageMixerWorker(context, workerParameters, mockEventScheduler, mockMessageScheduler)

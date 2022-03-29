@@ -31,9 +31,11 @@ internal interface ConfigScheduler {
                 val context = InAppMessaging.instance().getHostAppContext()
                 context?.let {
                     val manager = workManager ?: WorkManager.getInstance(it)
-                    manager.beginUniqueWork(CONFIG_WORKER_NAME, ExistingWorkPolicy.REPLACE,
-                            getConfigWorkRequest(delay))
-                            .enqueue()
+                    manager.beginUniqueWork(
+                        CONFIG_WORKER_NAME, ExistingWorkPolicy.REPLACE,
+                        getConfigWorkRequest(delay)
+                    )
+                        .enqueue()
                 }
             } catch (ie: IllegalStateException) {
                 // this should not occur since work manager is initialized during SDK initialization
@@ -50,7 +52,8 @@ internal interface ConfigScheduler {
         private fun getConfigWorkRequest(delay: Long): OneTimeWorkRequest {
             // this is just to handle possible overflow but should never occur
             val newDelay = if (Long.MAX_VALUE - System.currentTimeMillis()
-                    <= TimeUnit.MILLISECONDS.toMillis(delay)) {
+                <= TimeUnit.MILLISECONDS.toMillis(delay)
+            ) {
                 // reset current delay
                 currDelay = RetryDelayUtil.INITIAL_BACKOFF_DELAY
                 RetryDelayUtil.INITIAL_BACKOFF_DELAY
@@ -59,9 +62,9 @@ internal interface ConfigScheduler {
             }
             // Creating a config work request.
             return OneTimeWorkRequest.Builder(ConfigWorker::class.java)
-                    .setInitialDelay(newDelay, TimeUnit.MILLISECONDS)
-                    .setConstraints(WorkManagerUtil.getNetworkConnectedConstraint())
-                    .build()
+                .setInitialDelay(newDelay, TimeUnit.MILLISECONDS)
+                .setConstraints(WorkManagerUtil.getNetworkConnectedConstraint())
+                .build()
         }
     }
 }

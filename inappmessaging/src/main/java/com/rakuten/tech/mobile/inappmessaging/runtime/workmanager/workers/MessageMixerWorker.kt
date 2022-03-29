@@ -39,15 +39,17 @@ internal class MessageMixerWorker(
 ) :
     Worker(context, workerParams) {
 
+    @VisibleForTesting
+    internal var responseCall: Call<MessageMixerResponse>? = null
+
     /**
      * Overload constructor to handle OneTimeWorkRequest.Builder().
      */
     constructor(context: Context, workerParams: WorkerParameters) :
-            this(context, workerParams, EventMessageReconciliationScheduler.instance(),
-                    MessageMixerPingScheduler.instance())
-
-    @VisibleForTesting
-    internal var responseCall: Call<MessageMixerResponse>? = null
+        this(
+            context, workerParams, EventMessageReconciliationScheduler.instance(),
+            MessageMixerPingScheduler.instance()
+        )
 
     /**
      * Main method to do the work. Make Message Mixer network call is the main work.
@@ -56,18 +58,19 @@ internal class MessageMixerWorker(
     override fun doWork(): Result {
         // Create a retrofit API.
         val serviceApi: MessageMixerRetrofitService =
-                RuntimeUtil.getRetrofit().create(MessageMixerRetrofitService::class.java)
+            RuntimeUtil.getRetrofit().create(MessageMixerRetrofitService::class.java)
 
         // Create an pingRequest for the API.
         val pingRequest = PingRequest(HostAppInfoRepository.instance().getVersion(), RuntimeUtil.getUserIdentifiers())
 
         // Create an retrofit API network call.
         responseCall = serviceApi.performPing(
-                HostAppInfoRepository.instance().getInAppMessagingSubscriptionKey(),
-                AccountRepository.instance().getAccessToken(),
-                HostAppInfoRepository.instance().getDeviceId(),
-                ConfigResponseRepository.instance().getPingEndpoint(),
-                pingRequest)
+            HostAppInfoRepository.instance().getInAppMessagingSubscriptionKey(),
+            AccountRepository.instance().getAccessToken(),
+            HostAppInfoRepository.instance().getDeviceId(),
+            ConfigResponseRepository.instance().getPingEndpoint(),
+            pingRequest
+        )
         AccountRepository.instance().logWarningForUserInfo(TAG)
         return try {
             // Execute a thread blocking API network call, and handle response.

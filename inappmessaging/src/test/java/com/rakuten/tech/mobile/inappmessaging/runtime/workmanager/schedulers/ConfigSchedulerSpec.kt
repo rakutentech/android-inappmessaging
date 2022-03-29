@@ -35,17 +35,22 @@ class ConfigSchedulerSpec : BaseTest() {
     @Before
     override fun setup() {
         super.setup()
-        `when`(mockWorkManager.beginUniqueWork(any(), any(),
-            ArgumentMatchers.any(OneTimeWorkRequest::class.java))).thenThrow(IllegalStateException("test"))
+        `when`(
+            mockWorkManager.beginUniqueWork(
+                any(), any(),
+                ArgumentMatchers.any(OneTimeWorkRequest::class.java)
+            )
+        ).thenThrow(IllegalStateException("test"))
     }
 
     @Test
     fun `should not throw exception`() {
         WorkManagerTestInitHelper.initializeTestWorkManager(ApplicationProvider.getApplicationContext())
         Settings.Secure.putString(
-                ApplicationProvider.getApplicationContext<Context>().contentResolver,
-                Settings.Secure.ANDROID_ID,
-                "test_device_id")
+            ApplicationProvider.getApplicationContext<Context>().contentResolver,
+            Settings.Secure.ANDROID_ID,
+            "test_device_id"
+        )
         InAppMessaging.initialize(ApplicationProvider.getApplicationContext(), true)
         ConfigScheduler.instance().startConfig()
     }
@@ -74,13 +79,16 @@ class ConfigSchedulerSpec : BaseTest() {
     fun `should be called once`() {
         WorkManagerTestInitHelper.initializeTestWorkManager(ApplicationProvider.getApplicationContext())
         Settings.Secure.putString(
-                ApplicationProvider.getApplicationContext<Context>().contentResolver,
-                Settings.Secure.ANDROID_ID,
-                "test_device_id")
+            ApplicationProvider.getApplicationContext<Context>().contentResolver,
+            Settings.Secure.ANDROID_ID,
+            "test_device_id"
+        )
         val mockConfigScheduler = Mockito.mock(ConfigScheduler::class.java)
 
-        InAppMessaging.initialize(ApplicationProvider.getApplicationContext(),
-                configScheduler = mockConfigScheduler)
+        InAppMessaging.initialize(
+            ApplicationProvider.getApplicationContext(),
+            configScheduler = mockConfigScheduler
+        )
 
         Mockito.verify(mockConfigScheduler).startConfig()
     }

@@ -51,8 +51,10 @@ internal class InAppMessageViewListener(
                 MotionEvent.ACTION_MOVE -> if (this.magnifier != null) {
                     val viewPosition = IntArray(2)
                     view.getLocationOnScreen(viewPosition)
-                    this.magnifier?.show(event.rawX - viewPosition[0],
-                            event.rawY - viewPosition[1])
+                    this.magnifier?.show(
+                        event.rawX - viewPosition[0],
+                        event.rawY - viewPosition[1]
+                    )
                 }
                 MotionEvent.ACTION_CANCEL, MotionEvent.ACTION_UP -> if (this.magnifier != null) {
                     this.magnifier?.dismiss()
@@ -84,7 +86,6 @@ internal class InAppMessageViewListener(
     @SuppressWarnings("ReturnCount")
     override fun onKey(v: View?, keyCode: Int, event: KeyEvent?): Boolean {
         if (event != null && event.action == KeyEvent.ACTION_UP && keyCode == KeyEvent.KEYCODE_BACK) {
-
             // Disable closing the message if not dismissable.
             if (message != null && !message.isCampaignDismissable()) {
                 return false

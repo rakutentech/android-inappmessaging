@@ -32,8 +32,12 @@ class MessageMixerPingSchedulerSpec : BaseTest() {
     @Before
     override fun setup() {
         super.setup()
-        `when`(mockWorkManager.enqueueUniqueWork(any(), any(),
-            ArgumentMatchers.any(OneTimeWorkRequest::class.java))).thenThrow(IllegalStateException("test"))
+        `when`(
+            mockWorkManager.enqueueUniqueWork(
+                any(), any(),
+                ArgumentMatchers.any(OneTimeWorkRequest::class.java)
+            )
+        ).thenThrow(IllegalStateException("test"))
     }
 
     @Test

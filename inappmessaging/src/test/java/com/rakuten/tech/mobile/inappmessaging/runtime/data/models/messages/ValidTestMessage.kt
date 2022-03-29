@@ -21,12 +21,15 @@ internal class ValidTestMessage(
         return triggerList
     }
 
-    override fun getMessagePayload(): MessagePayload = MessagePayload(DEFAULT_COLOR, "#ffffff",
+    override fun getMessagePayload(): MessagePayload = MessagePayload(
+        DEFAULT_COLOR, "#ffffff",
         MessageSettings(
             DisplaySettings(1, 1, 1, 1, false, 1, false),
             ControlSettings(listOf())
-        ), null, Resource(cropType = 2), DEFAULT_COLOR, null, "#ffffff", "title",
-        DEFAULT_COLOR)
+        ),
+        null, Resource(cropType = 2), DEFAULT_COLOR, null, "#ffffff", "title",
+        DEFAULT_COLOR
+    )
 
     override fun isTest(): Boolean = isTest
 
@@ -54,9 +57,10 @@ internal class ValidTestMessage(
     override fun equals(other: Any?): Boolean {
         val otherObject = other as Message
         if (getType() != otherObject.getType() ||
-                getCampaignId() != otherObject.getCampaignId() ||
-                isTest() != otherObject.isTest() ||
-                getMaxImpressions() != otherObject.getMaxImpressions()) return false
+            getCampaignId() != otherObject.getCampaignId() ||
+            isTest() != otherObject.isTest() ||
+            getMaxImpressions() != otherObject.getMaxImpressions()
+        ) return false
         return true
     }
 

@@ -45,25 +45,27 @@ class SessionManagerSpec : BaseTest() {
     fun `should start ping message mixer on log in successful`() {
         WorkManagerTestInitHelper.initializeTestWorkManager(ApplicationProvider.getApplicationContext())
         Settings.Secure.putString(
-                ApplicationProvider.getApplicationContext<Context>().contentResolver,
-                Settings.Secure.ANDROID_ID,
-                "test_device_id")
+            ApplicationProvider.getApplicationContext<Context>().contentResolver,
+            Settings.Secure.ANDROID_ID,
+            "test_device_id"
+        )
         InAppMessaging.initialize(ApplicationProvider.getApplicationContext())
         `when`(configResponseData.rollOutPercentage).thenReturn(100)
         `when`(configResponseData.endpoints).thenReturn(endpoints)
         ConfigResponseRepository.instance().addConfigResponse(configResponseData)
         onSessionUpdate()
         WorkManager.getInstance(ApplicationProvider.getApplicationContext())
-                .getWorkInfosByTag(MESSAGE_MIXER_PING_WORKER).get().shouldHaveSize(1)
+            .getWorkInfosByTag(MESSAGE_MIXER_PING_WORKER).get().shouldHaveSize(1)
     }
 
     @Test
     fun `should clear repositories with null event`() {
         WorkManagerTestInitHelper.initializeTestWorkManager(ApplicationProvider.getApplicationContext())
         Settings.Secure.putString(
-                ApplicationProvider.getApplicationContext<Context>().contentResolver,
-                Settings.Secure.ANDROID_ID,
-                "test_device_id")
+            ApplicationProvider.getApplicationContext<Context>().contentResolver,
+            Settings.Secure.ANDROID_ID,
+            "test_device_id"
+        )
         InAppMessaging.initialize(ApplicationProvider.getApplicationContext())
         `when`(configResponseData.rollOutPercentage).thenReturn(0)
 
@@ -78,9 +80,10 @@ class SessionManagerSpec : BaseTest() {
     fun `should clear repositories with valid event`() {
         WorkManagerTestInitHelper.initializeTestWorkManager(ApplicationProvider.getApplicationContext())
         Settings.Secure.putString(
-                ApplicationProvider.getApplicationContext<Context>().contentResolver,
-                Settings.Secure.ANDROID_ID,
-                "test_device_id")
+            ApplicationProvider.getApplicationContext<Context>().contentResolver,
+            Settings.Secure.ANDROID_ID,
+            "test_device_id"
+        )
         InAppMessaging.initialize(ApplicationProvider.getApplicationContext())
         `when`(configResponseData.rollOutPercentage).thenReturn(0)
 
@@ -95,9 +98,10 @@ class SessionManagerSpec : BaseTest() {
     fun `should clear repositories with valid persistent event`() {
         WorkManagerTestInitHelper.initializeTestWorkManager(ApplicationProvider.getApplicationContext())
         Settings.Secure.putString(
-                ApplicationProvider.getApplicationContext<Context>().contentResolver,
-                Settings.Secure.ANDROID_ID,
-                "test_device_id")
+            ApplicationProvider.getApplicationContext<Context>().contentResolver,
+            Settings.Secure.ANDROID_ID,
+            "test_device_id"
+        )
         InAppMessaging.initialize(ApplicationProvider.getApplicationContext())
         `when`(configResponseData.rollOutPercentage).thenReturn(0)
 

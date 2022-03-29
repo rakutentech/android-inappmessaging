@@ -37,6 +37,7 @@ import kotlin.collections.ArrayList
  */
 @RunWith(RobolectricTestRunner::class)
 @Config(sdk = [Build.VERSION_CODES.O_MR1])
+@SuppressWarnings("LargeClass")
 open class MessageReadinessManagerSpec : BaseTest() {
 
     private var mockRequest = Mockito.mock(DisplayPermissionRequest::class.java)
@@ -45,15 +46,19 @@ open class MessageReadinessManagerSpec : BaseTest() {
     private var configResponseEndpoints = Mockito.mock(ConfigResponseEndpoints::class.java)
 
     @Before
+    @SuppressWarnings("LongMethod")
     override fun setup() {
         super.setup()
         AccountRepository.instance().userInfoProvider = TestUserInfoProvider()
-        HostAppInfoRepository.instance().addHostInfo(HostAppInfo(
+        HostAppInfoRepository.instance().addHostInfo(
+            HostAppInfo(
                 InAppMessagingTestConstants.APP_ID,
                 InAppMessagingTestConstants.DEVICE_ID,
                 InAppMessagingTestConstants.APP_VERSION,
                 InAppMessagingTestConstants.SUB_KEY,
-                InAppMessagingTestConstants.LOCALE))
+                InAppMessagingTestConstants.LOCALE
+            )
+        )
         ConfigResponseRepository.instance().addConfigResponse(configResponseData)
         PingResponseMessageRepository.instance().lastPingMillis = LAST_PING_MILLIS
         `when`(configResponseData.endpoints).thenReturn(configResponseEndpoints)
@@ -114,30 +119,30 @@ open class MessageReadinessManagerSpec : BaseTest() {
         request.sdkVersion shouldBeEqualTo BuildConfig.VERSION_NAME
         request.lastPingInMillis shouldBeEqualTo LAST_PING_MILLIS
         request.locale shouldBeEqualTo InAppMessagingTestConstants.LOCALE.toString()
-                .replace("_", "-").lowercase(Locale.getDefault())
+            .replace("_", "-").lowercase(Locale.getDefault())
     }
 
     @Test
     fun `should response call contain two headers`() {
         val responseCall: Call<DisplayPermissionResponse> =
-                MessageReadinessManager.instance().getDisplayPermissionResponseCall(DISPLAY_PERMISSION_URL, mockRequest)
+            MessageReadinessManager.instance().getDisplayPermissionResponseCall(DISPLAY_PERMISSION_URL, mockRequest)
         responseCall.request().headers().size() shouldBeEqualTo 2
     }
 
     @Test
     fun `should add token to header`() {
         val responseCall: Call<DisplayPermissionResponse> =
-                MessageReadinessManager.instance().getDisplayPermissionResponseCall(DISPLAY_PERMISSION_URL, mockRequest)
+            MessageReadinessManager.instance().getDisplayPermissionResponseCall(DISPLAY_PERMISSION_URL, mockRequest)
         responseCall.request().header(MessageMixerRetrofitService.ACCESS_TOKEN_HEADER) shouldBeEqualTo
-                "OAuth2 " + TestUserInfoProvider.TEST_USER_ACCESS_TOKEN
+            "OAuth2 " + TestUserInfoProvider.TEST_USER_ACCESS_TOKEN
     }
 
     @Test
     fun `should add sub id header`() {
         val responseCall: Call<DisplayPermissionResponse> =
-                MessageReadinessManager.instance().getDisplayPermissionResponseCall(DISPLAY_PERMISSION_URL, mockRequest)
+            MessageReadinessManager.instance().getDisplayPermissionResponseCall(DISPLAY_PERMISSION_URL, mockRequest)
         responseCall.request().header(MessageMixerRetrofitService.SUBSCRIPTION_ID_HEADER) shouldBeEqualTo
-                InAppMessagingTestConstants.SUB_KEY
+            InAppMessagingTestConstants.SUB_KEY
     }
 
     @Test
@@ -158,10 +163,15 @@ open class MessageReadinessManagerSpec : BaseTest() {
         initializeInApp()
         createMessageList()
         ConfigResponseRepository.instance().addConfigResponse(
-                Gson().fromJson(CONFIG_RESPONSE.trimIndent(), ConfigResponse::class.java).data)
-        HostAppInfoRepository.instance().addHostInfo(HostAppInfo("rakuten.com.tech.mobile.test",
+            Gson().fromJson(CONFIG_RESPONSE.trimIndent(), ConfigResponse::class.java).data
+        )
+        HostAppInfoRepository.instance().addHostInfo(
+            HostAppInfo(
+                "rakuten.com.tech.mobile.test",
                 InAppMessagingTestConstants.DEVICE_ID, InAppMessagingTestConstants.APP_VERSION,
-                "2", InAppMessagingTestConstants.LOCALE))
+                "2", InAppMessagingTestConstants.LOCALE
+            )
+        )
         MessageReadinessManager.instance().getNextDisplayMessage().shouldBeNull()
     }
 
@@ -171,10 +181,15 @@ open class MessageReadinessManagerSpec : BaseTest() {
 
         createMessageList()
         ConfigResponseRepository.instance().addConfigResponse(
-                Gson().fromJson(CONFIG_RESPONSE_EMPTY.trimIndent(), ConfigResponse::class.java).data)
-        HostAppInfoRepository.instance().addHostInfo(HostAppInfo("rakuten.com.tech.mobile.test",
+            Gson().fromJson(CONFIG_RESPONSE_EMPTY.trimIndent(), ConfigResponse::class.java).data
+        )
+        HostAppInfoRepository.instance().addHostInfo(
+            HostAppInfo(
+                "rakuten.com.tech.mobile.test",
                 InAppMessagingTestConstants.DEVICE_ID, InAppMessagingTestConstants.APP_VERSION,
-                "2", InAppMessagingTestConstants.LOCALE))
+                "2", InAppMessagingTestConstants.LOCALE
+            )
+        )
         MessageReadinessManager.instance().getNextDisplayMessage().shouldBeNull()
     }
 
@@ -191,14 +206,17 @@ open class MessageReadinessManagerSpec : BaseTest() {
         val message = ValidTestMessage("10", false)
         message.setMaxImpression(0)
         ReadyForDisplayMessageRepository.instance().replaceAllMessages(
-            arrayListOf(message))
+            arrayListOf(message)
+        )
         MessageReadinessManager.instance().getNextDisplayMessage().shouldBeNull()
     }
 
     private fun initializeInApp() {
         WorkManagerTestInitHelper.initializeTestWorkManager(ApplicationProvider.getApplicationContext())
-        Settings.Secure.putString(ApplicationProvider.getApplicationContext<Context>().contentResolver,
-                Settings.Secure.ANDROID_ID, "test_device_id")
+        Settings.Secure.putString(
+            ApplicationProvider.getApplicationContext<Context>().contentResolver,
+            Settings.Secure.ANDROID_ID, "test_device_id"
+        )
         InAppMessaging.initialize(ApplicationProvider.getApplicationContext(), true)
     }
 
@@ -234,18 +252,23 @@ class MessageReadinessManagerRequestSpec : BaseTest() {
     private var endpoint = Mockito.mock(ConfigResponseEndpoints::class.java)
 
     @Before
+    @SuppressWarnings("LongMethod")
     override fun setup() {
         super.setup()
         AccountRepository.instance().userInfoProvider = TestUserInfoProvider()
-        HostAppInfoRepository.instance().addHostInfo(HostAppInfo(
-            InAppMessagingTestConstants.APP_ID,
-            InAppMessagingTestConstants.DEVICE_ID,
-            InAppMessagingTestConstants.APP_VERSION,
-            InAppMessagingTestConstants.SUB_KEY,
-            InAppMessagingTestConstants.LOCALE))
+        HostAppInfoRepository.instance().addHostInfo(
+            HostAppInfo(
+                InAppMessagingTestConstants.APP_ID,
+                InAppMessagingTestConstants.DEVICE_ID,
+                InAppMessagingTestConstants.APP_VERSION,
+                InAppMessagingTestConstants.SUB_KEY,
+                InAppMessagingTestConstants.LOCALE
+            )
+        )
         ConfigResponseRepository.instance().addConfigResponse(data)
         ReadyForDisplayMessageRepository.instance().replaceAllMessages(
-            arrayListOf(ValidTestMessage(CAMPAIGN_ID, false)))
+            arrayListOf(ValidTestMessage(CAMPAIGN_ID, false))
+        )
         server.start()
         `when`(data.endpoints).thenReturn(endpoint)
         `when`(endpoint.displayPermission).thenReturn(server.url("client").toString())

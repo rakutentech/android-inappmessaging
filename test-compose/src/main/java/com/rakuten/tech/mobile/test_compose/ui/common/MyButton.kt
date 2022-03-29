@@ -16,7 +16,7 @@ fun MyButton(
     Button(
         onClick = onClick,
         modifier = modifier
-            .padding(6.dp)
+            .padding(6.dp, 0.dp)
             .fillMaxWidth()
     ) {
         Text(text = text)

@@ -1,6 +1,7 @@
 package com.rakuten.tech.mobile.inappmessaging.runtime.utils
 
 internal object CacheUtil {
+    private const val MEM_FRACTION = 8
 
     /**
      * @return 1/8th of the given memory in byte.
@@ -13,6 +14,4 @@ internal object CacheUtil {
      * OutOfMemory exception.
      */
     private fun getMaxMemory() = Runtime.getRuntime().maxMemory().toInt()
-
-    private const val MEM_FRACTION = 8
 }

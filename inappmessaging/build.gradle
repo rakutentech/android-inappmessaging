@@ -1,8 +1,6 @@
 apply from: '../config/android/library.gradle'
 apply from: "../config/quality/checkstyle/android.gradle"
 apply from: "../config/quality/detekt/android.gradle"
-apply from: '../config/quality/errorprone/android.gradle'
-apply from: '../config/documentation/dokka/android.gradle'
 apply from: "../config/quality/gitleaks/build.gradle"
 
 apply plugin: "kotlin-android"
@@ -15,7 +13,7 @@ android {
     manifestPlaceholders.config_url = CONFIG.property("CONFIG_URL_TEST_PROD") ?: ""
     manifestPlaceholders.test_sub_key = CONFIG.property("IAM_TEST_SUBSCRIPTION_KEY") ?: "test_sub_key"
     buildConfigField("boolean", "IS_CACHE_HANDLING", "true")
-    buildConfigField("String", "VERSION_NAME", "\"${versionName}\"")
+    buildConfigField("String","VERSION_NAME","\"${defaultConfig.versionName}\"")
   }
 
   sourceSets.each {
@@ -60,8 +58,8 @@ dependencies {
   implementation 'org.jetbrains.kotlinx:kotlinx-coroutines-android:1.5.2'
 
   implementation 'androidx.constraintlayout:constraintlayout:2.0.4'
-  implementation 'androidx.work:work-runtime:2.7.0'
-  implementation("androidx.work:work-runtime-ktx:2.7.0")
+  implementation 'androidx.work:work-runtime:2.7.1'
+  implementation("androidx.work:work-runtime-ktx:2.7.1")
   implementation 'com.google.android.material:material:1.2.1'
   implementation 'com.squareup.retrofit2:converter-gson:2.5.0'
   implementation 'com.squareup.retrofit2:retrofit:2.8.1'
@@ -88,7 +86,7 @@ dependencies {
   testImplementation "com.facebook.soloader:soloader:0.9.0"
   testImplementation "com.squareup.okhttp3:mockwebserver:3.14.7"
 
-  detektPlugins "io.gitlab.arturbosch.detekt:detekt-formatting:1.1.1"
+  detektPlugins "io.gitlab.arturbosch.detekt:detekt-formatting:1.19.0"
 }
 
 task checkUrlPrefixes {
@@ -103,11 +101,6 @@ task checkUrlPrefixes {
 
 checkstyle { // we rely on automated code formatting instead
   ignoreFailures true
-}
-
-tasks.withType(JavaCompile).configureEach {
-  options.errorprone.disableWarningsInGeneratedCode = true
-  options.errorprone.enabled = false // change it to true to enable
 }
 
 apply from: '../config/publish/android.gradle'
@@ -128,12 +121,18 @@ if (isSnapshot) {
   apply from: '../config/publish/maven-central.gradle'
 }
 
+apply from: '../config/documentation/dokka/android.gradle'
 dokkaGfm.configure {
   dokkaSourceSets {
-    configureEach {
+    named("main") {
       sourceRoots.from(file("inappmessaging/src/main"))
     }
   }
+}
+
+detekt {
+  allRules = true
+  config = rootProject.files('detekt-config.yml')
 }
 
 apply from: "../config/quality/jacoco/android.gradle"

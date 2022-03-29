@@ -17,9 +17,8 @@ internal object EventTrackerHelper {
      * @param eventName The given Event's name to be tracked.
      * @param data the given Event parameters to be tracked.
      * @return true if the analytics event has been sent, false otherwise.
-    */
+     */
     fun sendEvent(eventName: String, data: Map<String, *>?): Boolean {
-
         if (!TextUtils.isEmpty(eventName)) {
             val serializableData: HashMap<String, *> = when (data) {
                 null -> hashMapOf<String, Any>()

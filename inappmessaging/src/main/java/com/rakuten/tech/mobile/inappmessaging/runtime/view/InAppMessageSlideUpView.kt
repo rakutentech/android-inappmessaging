@@ -15,7 +15,7 @@ internal class InAppMessageSlideUpView(
     context: Context,
     attrs: AttributeSet?
 ) :
-        InAppMessageBaseView(context, attrs) {
+    InAppMessageBaseView(context, attrs) {
 
     /**
      * Populating view data according to Slide Up view.
@@ -30,10 +30,11 @@ internal class InAppMessageSlideUpView(
         constraintLayout?.setBackgroundColor(bgColor)
         // Start animation based on direction.
         val animation = ViewUtil.getSlidingAnimation(
-                context,
-                SlideFromDirectionType.getById(
-                    message.getMessagePayload().messageSettings.displaySettings.slideFrom
-                ))
+            context,
+            SlideFromDirectionType.getById(
+                message.getMessagePayload().messageSettings.displaySettings.slideFrom
+            )
+        )
         animation?.let {
             constraintLayout?.startAnimation(it)
         }

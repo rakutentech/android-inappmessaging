@@ -392,11 +392,11 @@ Documents targeting Product Managers:
   - Renamed `init()` API to `configure()`.
   - Removed optional `errorCallback` lambda function parameter in `configure()`, and changed as static variable.
   - Please see [Configuring In-App Messaging SDK section](#configure-sdk) for details and sample code.
+* SDKCF-4904: Updated dependencies to fix vulnerability issues.
 * SDKCF-5002:  Campaign UX Improvements: Added handling for new flags in campaign payload:
   - Setting to Hide the top right "x" closing button.
   - "End Date" setting in order to have a "Never ends" option.
   - "Max Lifetime impressions" setting in order to have several options (No limits/Only once/Multiple times). By default set it to "Only Once".
-
 
 ### 6.1.0 (2022-02-09)
 * SDKCF-4470: Updated the layout for close and campaign buttons. Added feature to customize text and button fonts, please see [custom font section](#custom-font) for details.

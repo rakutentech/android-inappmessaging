@@ -43,7 +43,7 @@ internal abstract class AccountRepository {
     companion object {
         private const val TOKEN_PREFIX = "OAuth2 "
         internal const val ID_TRACKING_ERR_MSG = "Both an access token and a user tracking id have been set. " +
-                "Only one of these id types is expected to be set at the same time"
+            "Only one of these id types is expected to be set at the same time"
         internal const val TOKEN_USER_ERR_MSG = "User Id must be present and not empty when access token is specified"
 
         private var instance: AccountRepository = AccountRepositoryImpl()
@@ -54,7 +54,8 @@ internal abstract class AccountRepository {
     private class AccountRepositoryImpl : AccountRepository() {
 
         override fun getAccessToken() = if (this.userInfoProvider == null ||
-                this.userInfoProvider?.provideAccessToken().isNullOrEmpty()) {
+            this.userInfoProvider?.provideAccessToken().isNullOrEmpty()
+        ) {
             ""
         } else TOKEN_PREFIX + this.userInfoProvider?.provideAccessToken()
         // According to backend specs, token has to start with "OAuth2{space}", followed by real token.
@@ -97,8 +98,8 @@ internal abstract class AccountRepository {
             return try {
                 // MD5 hashing
                 val bytes = MessageDigest
-                        .getInstance(algo ?: "MD5")
-                        .digest(input.toByteArray())
+                    .getInstance(algo ?: "MD5")
+                    .digest(input.toByteArray())
 
                 BigInteger(1, bytes).toString(16).padStart(32, '0')
             } catch (ex: Exception) {
