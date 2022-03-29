@@ -27,6 +27,9 @@ class MessageMixerResponseSpec(private val testname: String, private val actual:
                     arrayOf("type", campaignData.getType(), 2),
                     arrayOf("campaignId", campaignData.getCampaignId(), "1234567890"),
                     arrayOf("isTest", campaignData.isTest(), false),
+                    arrayOf("hasNoEndDate", campaignData.hasNoEndDate(), true),
+                    arrayOf("isCampaignDismissable", campaignData.isCampaignDismissable(), false),
+                    arrayOf("infiniteImpressions", campaignData.infiniteImpressions(), true),
                     arrayOf("maxImpressions", campaignData.getMaxImpressions(), 0), // default value
                     arrayOf("headerColor", messagePayload.headerColor, "#ffffff"),
                     arrayOf("backgroundColor", messagePayload.backgroundColor, "#000000"),
@@ -81,7 +84,8 @@ class MessageMixerResponseSpec(private val testname: String, private val actual:
         private val campaignData = CampaignData(dataItem.campaignData.getMessagePayload(),
                 dataItem.campaignData.getType(), dataItem.campaignData.getTriggers(),
                 dataItem.campaignData.getCampaignId(), dataItem.campaignData.isTest(),
-                dataItem.campaignData.getMaxImpressions())
+                dataItem.campaignData.getMaxImpressions(), dataItem.campaignData.hasNoEndDate(),
+                dataItem.campaignData.isCampaignDismissable(), dataItem.campaignData.infiniteImpressions())
         private val messagePayload = MessagePayload(campaignData.getMessagePayload().headerColor,
                 campaignData.getMessagePayload().backgroundColor, campaignData.getMessagePayload().messageSettings,
                 campaignData.getMessagePayload().messageBody, campaignData.getMessagePayload().resource,

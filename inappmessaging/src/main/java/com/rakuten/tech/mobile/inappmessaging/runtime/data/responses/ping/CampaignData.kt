@@ -6,6 +6,7 @@ import com.rakuten.tech.mobile.inappmessaging.runtime.data.models.messages.Messa
 /**
  * Class for parsing CampaignData, which is a response from MessageMixer.
  */
+@SuppressWarnings("TooManyFunctions")
 internal data class CampaignData(
     @SerializedName("messagePayload")
     private val messagePayload: MessagePayload,
@@ -18,7 +19,13 @@ internal data class CampaignData(
     @SerializedName("isTest")
     private val isTest: Boolean,
     @SerializedName("maxImpressions")
-    private var maxImpressions: Int = 0
+    private var maxImpressions: Int = 0,
+    @SerializedName("hasNoEndDate")
+    private val hasNoEndDate: Boolean = false,
+    @SerializedName("isCampaignDismissable")
+    private val isCampaignDismissable: Boolean = true,
+    @SerializedName("infiniteImpressions")
+    private val infiniteImpressions: Boolean = false
 ) : Message {
 
     @SerializedName("timesClosed")
@@ -54,4 +61,10 @@ internal data class CampaignData(
             timesClosed++
         }
     }
+
+    override fun infiniteImpressions() = infiniteImpressions
+
+    override fun hasNoEndDate() = hasNoEndDate
+
+    override fun isCampaignDismissable() = isCampaignDismissable
 }
