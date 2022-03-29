@@ -396,8 +396,12 @@ class InAppMessageViewListenerOnKeySpec : InAppMessageViewListenerSpec() {
 
         `when`(keyEvent.action).thenReturn(KeyEvent.ACTION_UP)
         `when`(mockView.id).thenReturn(R.id.message_close_button)
-        `when`(mockCoroutine.executeTask(message,
-                MessageActionsCoroutine.BACK_BUTTON, false)).thenReturn(true)
+        `when`(
+            mockCoroutine.executeTask(
+                message,
+                MessageActionsCoroutine.BACK_BUTTON, false
+            )
+        ).thenReturn(true)
 
         listener.onKey(mockView, KeyEvent.KEYCODE_BACK, keyEvent).shouldBeFalse()
     }
@@ -408,8 +412,12 @@ class InAppMessageViewListenerOnKeySpec : InAppMessageViewListenerSpec() {
 
         `when`(keyEvent.action).thenReturn(KeyEvent.ACTION_UP)
         `when`(mockView.id).thenReturn(R.id.message_close_button)
-        `when`(mockCoroutine.executeTask(null,
-            MessageActionsCoroutine.BACK_BUTTON, false)).thenReturn(true)
+        `when`(
+            mockCoroutine.executeTask(
+                null,
+                MessageActionsCoroutine.BACK_BUTTON, false
+            )
+        ).thenReturn(true)
 
         listener.onKey(mockView, KeyEvent.KEYCODE_BACK, keyEvent).shouldBeTrue()
     }

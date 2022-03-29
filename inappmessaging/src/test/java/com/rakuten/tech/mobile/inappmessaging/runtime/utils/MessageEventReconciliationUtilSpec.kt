@@ -69,7 +69,7 @@ open class MessageEventReconciliationUtilSpec : BaseTest() {
         `when`(trigger4.eventType).thenReturn(4)
 
         // non outdated message
-        `when`(displaySettings.endTimeMillis).thenReturn(Date().time + 60*60*60*1000)
+        `when`(displaySettings.endTimeMillis).thenReturn(Date().time + 60 * 60 * 60 * 1000)
         `when`(messageSettings.displaySettings).thenReturn(displaySettings)
         `when`(payload.messageSettings).thenReturn(messageSettings)
         `when`(message1.getMaxImpressions()).thenReturn(1)

@@ -86,7 +86,6 @@ internal class InAppMessageViewListener(
     @SuppressWarnings("ReturnCount")
     override fun onKey(v: View?, keyCode: Int, event: KeyEvent?): Boolean {
         if (event != null && event.action == KeyEvent.ACTION_UP && keyCode == KeyEvent.KEYCODE_BACK) {
-
             // Disable closing the message if not dismissable.
             if (message != null && !message.isCampaignDismissable()) {
                 return false

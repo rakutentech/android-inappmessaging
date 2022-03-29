@@ -52,7 +52,7 @@ internal class MessageEventReconciliationWorker(
         val messageListCopy = pingRepo.getAllMessagesCopy().filter {
             // Keep only non-outdated (or has no end date) messages
             it.hasNoEndDate() ||
-            it.getMessagePayload().messageSettings.displaySettings.endTimeMillis >= Date().time
+                it.getMessagePayload().messageSettings.displaySettings.endTimeMillis >= Date().time
         }
         if (messageListCopy.isEmpty()) {
             // Job is done!

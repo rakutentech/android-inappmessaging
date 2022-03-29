@@ -49,7 +49,7 @@ internal open class InAppMessageBaseView(context: Context, attrs: AttributeSet?)
     private var buttons: List<MessageButton>? = null
     private var displayOptOut = false
     private var isDismissable: Boolean = true
-    
+
     @VisibleForTesting
     internal var picasso: Picasso? = null
 
