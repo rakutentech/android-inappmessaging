@@ -101,6 +101,7 @@ task checkUrlPrefixes {
 
 checkstyle { // we rely on automated code formatting instead
   ignoreFailures true
+  toolVersion '10.0'
 }
 
 apply from: '../config/publish/android.gradle'
