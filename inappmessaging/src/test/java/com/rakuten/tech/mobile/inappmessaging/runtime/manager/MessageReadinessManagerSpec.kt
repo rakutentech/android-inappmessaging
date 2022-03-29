@@ -65,10 +65,12 @@ open class MessageReadinessManagerSpec : BaseTest() {
         `when`(testMessage.isTest()).thenReturn(true)
         `when`(testMessage.getCampaignId()).thenReturn("2")
         `when`(testMessage.getMaxImpressions()).thenReturn(1)
+        `when`(testMessage.infiniteImpressions()).thenReturn(false)
     }
 
     @Test
     fun `should return null if no message in ready repo`() {
+        ReadyForDisplayMessageRepository.instance().replaceAllMessages(emptyList())
         MessageReadinessManager.instance().getNextDisplayMessage().shouldBeNull()
     }
 
@@ -85,6 +87,26 @@ open class MessageReadinessManagerSpec : BaseTest() {
         messageList.add(testMessage)
         ReadyForDisplayMessageRepository.instance().replaceAllMessages(messageList)
         MessageReadinessManager.instance().getNextDisplayMessage() shouldBeEqualTo testMessage
+    }
+
+    @Test
+    fun `should return test message when is infinity impression`() {
+        `when`(testMessage.getMaxImpressions()).thenReturn(0)
+        `when`(testMessage.infiniteImpressions()).thenReturn(true)
+        val messageList = ArrayList<Message>()
+        messageList.add(testMessage)
+        ReadyForDisplayMessageRepository.instance().replaceAllMessages(messageList)
+        MessageReadinessManager.instance().getNextDisplayMessage() shouldBeEqualTo testMessage
+    }
+
+    @Test
+    fun `should return null when not infinity impression`() {
+        `when`(testMessage.getMaxImpressions()).thenReturn(0)
+        `when`(testMessage.infiniteImpressions()).thenReturn(false)
+        val messageList = ArrayList<Message>()
+        messageList.add(testMessage)
+        ReadyForDisplayMessageRepository.instance().replaceAllMessages(messageList)
+        MessageReadinessManager.instance().getNextDisplayMessage() shouldBeEqualTo null
     }
 
     @Test

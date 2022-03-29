@@ -10,6 +10,8 @@ import com.rakuten.tech.mobile.inappmessaging.runtime.manager.DisplayManager
 import com.rakuten.tech.mobile.inappmessaging.runtime.utils.MessageEventReconciliationUtil
 import com.rakuten.tech.mobile.inappmessaging.runtime.utils.RuntimeUtil.getCurrentTimeMillis
 import com.rakuten.tech.mobile.sdkutils.logger.Logger
+import java.util.Date
+import kotlin.collections.ArrayList
 
 /**
  * This worker's main task is to reconcile messages with local events. This worker must be a unique
@@ -47,7 +49,11 @@ internal class MessageEventReconciliationWorker(
         }
 
         // Messages list shouldn't be empty, if it is, then there's no more work to be done.
-        val messageListCopy = pingRepo.getAllMessagesCopy()
+        val messageListCopy = pingRepo.getAllMessagesCopy().filter {
+            // Keep only non-outdated (or has no end date) messages
+            it.hasNoEndDate() ||
+            it.getMessagePayload().messageSettings.displaySettings.endTimeMillis >= Date().time
+        }
         if (messageListCopy.isEmpty()) {
             // Job is done!
             return Result.success()

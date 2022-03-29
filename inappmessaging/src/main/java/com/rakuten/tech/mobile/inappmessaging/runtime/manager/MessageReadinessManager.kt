@@ -125,15 +125,14 @@ internal interface MessageReadinessManager {
                 )
 
         /**
-         * This method checks if the message displayed less than its max impressions,
-         * or message has been opted out.
+         * This method checks if the message has infinite impressions, or has been displayed less
+         * than its max impressions, or has been opted out.
          */
         private fun shouldDisplayMessage(message: Message): Boolean =
-            (
-                LocalDisplayedMessageRepository.instance().numberOfTimesDisplayed(message)
-                    < message.getMaxImpressions()
-                ) &&
-                !LocalOptedOutMessageRepository.instance().hasMessage(message.getCampaignId())
+            (message.infiniteImpressions() ||
+            LocalDisplayedMessageRepository.instance().numberOfTimesDisplayed(message)
+                    < message.getMaxImpressions()) &&
+                    !LocalOptedOutMessageRepository.instance().hasMessage(message.getCampaignId())
 
         /**
          * This methods checks if According to the message display permission response parameter,

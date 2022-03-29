@@ -5,6 +5,9 @@
       "campaignData": {
         "campaignId": "1234567890",
         "isTest": false,
+        "hasNoEndDate": true,
+        "isCampaignDismissable": false,
+        "infiniteImpressions": true,
         "messagePayload": {
           "backgroundColor": "#000000",
           "frameColor": "#ffffff",
