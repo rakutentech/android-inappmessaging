@@ -37,6 +37,7 @@ internal interface ConfigResponseRepository {
 
     companion object {
         private var instance: ConfigResponseRepository = ConfigResponseRepositoryImpl()
+
         @VisibleForTesting
         internal var randomizer: Random = Random
 

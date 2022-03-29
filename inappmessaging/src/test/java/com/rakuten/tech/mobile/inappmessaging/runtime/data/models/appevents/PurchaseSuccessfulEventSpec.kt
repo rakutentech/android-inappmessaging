@@ -20,18 +20,18 @@ class PurchaseSuccessfulEventSpec : BaseTest() {
         itemList.add("item_id_2")
         itemList.add("item_id_3")
         event = PurchaseSuccessfulEvent()
-                .purchaseAmountMicros(PURCHASE_AMOUNT_MICRO)
-                .numberOfItems(NUMBER_OF_ITEMS)
-                .currencyCode(CURRENCY)
-                .itemIdList(itemList)
+            .purchaseAmountMicros(PURCHASE_AMOUNT_MICRO)
+            .numberOfItems(NUMBER_OF_ITEMS)
+            .currencyCode(CURRENCY)
+            .itemIdList(itemList)
     }
 
     @Test
     fun `should have correct custom attributes`() {
         val event = PurchaseSuccessfulEvent()
-                .currencyCode("USD")
-                .numberOfItems(5)
-                .purchaseAmountMicros(5000000)
+            .currencyCode("USD")
+            .numberOfItems(5)
+            .purchaseAmountMicros(5000000)
         val map = event.getRatEventMap()
 
         map shouldHaveKey InAppMessagingConstants.RAT_EVENT_KEY_EVENT_CUSTOM_ATTRIBUTE

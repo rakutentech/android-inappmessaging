@@ -24,14 +24,16 @@ internal class MessageEventReconciliationWorker(
     private val pingRepo: PingResponseMessageRepository,
     private val messageUtil: MessageEventReconciliationUtil
 ) :
-        Worker(context, workerParams) {
+    Worker(context, workerParams) {
 
     /**
      * Overload constructor to handle OneTimeWorkRequest.Builder().
      */
     constructor(context: Context, workerParams: WorkerParameters) :
-            this(context, workerParams, PingResponseMessageRepository.instance(),
-            MessageEventReconciliationUtil.instance())
+        this(
+            context, workerParams, PingResponseMessageRepository.instance(),
+            MessageEventReconciliationUtil.instance()
+        )
 
     /**
      * This method is the entry point of this worker.
@@ -50,7 +52,7 @@ internal class MessageEventReconciliationWorker(
         val messageListCopy = pingRepo.getAllMessagesCopy().filter {
             // Keep only non-outdated (or has no end date) messages
             it.hasNoEndDate() ||
-            it.getMessagePayload().messageSettings.displaySettings.endTimeMillis >= Date().time
+                it.getMessagePayload().messageSettings.displaySettings.endTimeMillis >= Date().time
         }
         if (messageListCopy.isEmpty()) {
             // Job is done!

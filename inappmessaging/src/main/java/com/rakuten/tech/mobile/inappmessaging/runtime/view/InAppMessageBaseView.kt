@@ -33,7 +33,7 @@ import java.lang.Exception
  */
 @SuppressWarnings("LargeClass")
 internal open class InAppMessageBaseView(context: Context, attrs: AttributeSet?) :
-        FrameLayout(context, attrs), InAppMessageView {
+    FrameLayout(context, attrs), InAppMessageView {
 
     init {
         id = R.id.in_app_message_base_view
@@ -49,6 +49,7 @@ internal open class InAppMessageBaseView(context: Context, attrs: AttributeSet?)
     private var buttons: List<MessageButton>? = null
     private var displayOptOut = false
     private var isDismissable: Boolean = true
+
     @VisibleForTesting
     internal var picasso: Picasso? = null
 
@@ -148,7 +149,6 @@ internal open class InAppMessageBaseView(context: Context, attrs: AttributeSet?)
     @Suppress("ClickableViewAccessibility", "TooGenericExceptionCaught", "LongMethod")
     private fun bindImage() { // Display image.
         if (!this.imageUrl.isNullOrEmpty()) {
-
             // load the image then display the view
             this.visibility = GONE
             findViewById<ImageView>(R.id.message_image_view)?.let {
@@ -267,8 +267,10 @@ internal open class InAppMessageBaseView(context: Context, attrs: AttributeSet?)
         val strId = ResourceUtils.getResourceIdentifier(ctx, name, "string")
         if (strId > 0) {
             try {
-                return ResourceUtils.getFont(ctx,
-                    ResourceUtils.getResourceIdentifier(ctx, ctx.getString(strId), "font"))
+                return ResourceUtils.getFont(
+                    ctx,
+                    ResourceUtils.getResourceIdentifier(ctx, ctx.getString(strId), "font")
+                )
             } catch (rex: Resources.NotFoundException) {
                 Logger(TAG).debug(rex.cause, "Font file is not found. Will revert to default font.")
             }

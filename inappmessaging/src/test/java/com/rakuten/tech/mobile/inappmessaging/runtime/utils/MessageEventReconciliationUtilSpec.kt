@@ -69,7 +69,7 @@ open class MessageEventReconciliationUtilSpec : BaseTest() {
         `when`(trigger4.eventType).thenReturn(4)
 
         // non outdated message
-        `when`(displaySettings.endTimeMillis).thenReturn(Date().time + 60*60*60*1000)
+        `when`(displaySettings.endTimeMillis).thenReturn(Date().time + 60 * 60 * 60 * 1000)
         `when`(messageSettings.displaySettings).thenReturn(displaySettings)
         `when`(payload.messageSettings).thenReturn(messageSettings)
         `when`(message1.getMaxImpressions()).thenReturn(1)
@@ -139,7 +139,7 @@ class MessageEventReconciliationUtilReconcileSpec : MessageEventReconciliationUt
         LocalEventRepository.instance().addEvent(appStartEvent)
         // Act.
         val outputMessageList = MessageEventReconciliationUtil.instance()
-                .reconcileMessagesAndEvents(inputMessageList)
+            .reconcileMessagesAndEvents(inputMessageList)
         // Re-assert the output with qualifying event.
         outputMessageList[0] shouldBeEqualTo message2
         outputMessageList.shouldHaveSize(1)
@@ -152,7 +152,7 @@ class MessageEventReconciliationUtilReconcileSpec : MessageEventReconciliationUt
         inputMessageList.add(message2)
         // Act.
         val outputMessageList = MessageEventReconciliationUtil.instance()
-                .reconcileMessagesAndEvents(inputMessageList)
+            .reconcileMessagesAndEvents(inputMessageList)
         outputMessageList.shouldHaveSize(0)
     }
 
@@ -163,7 +163,7 @@ class MessageEventReconciliationUtilReconcileSpec : MessageEventReconciliationUt
         inputMessageList.add(testMessage)
         // Act.
         val outputMessageList = MessageEventReconciliationUtil.instance()
-                .reconcileMessagesAndEvents(inputMessageList)
+            .reconcileMessagesAndEvents(inputMessageList)
         // Re-assert the output with qualifying event.
         outputMessageList.shouldHaveSize(0)
     }
@@ -188,7 +188,7 @@ class MessageEventReconciliationUtilReconcileSpec : MessageEventReconciliationUt
         LocalEventRepository.instance().addEvent(customEvent)
         // Act.
         val outputMessageList = MessageEventReconciliationUtil.instance()
-                .reconcileMessagesAndEvents(inputMessageList)
+            .reconcileMessagesAndEvents(inputMessageList)
         // Re-assert the output with qualifying event.
         outputMessageList.shouldHaveSize(1)
     }
@@ -199,7 +199,7 @@ class MessageEventReconciliationUtilReconcileSpec : MessageEventReconciliationUt
         val inputMessageList = setupMessageTrigger()
         // Act.
         val outputMessageList = MessageEventReconciliationUtil.instance()
-                .reconcileMessagesAndEvents(inputMessageList)
+            .reconcileMessagesAndEvents(inputMessageList)
         // Re-assert the output with qualifying event.
         outputMessageList.shouldHaveSize(1)
     }
@@ -219,7 +219,7 @@ class MessageEventReconciliationUtilReconcileSpec : MessageEventReconciliationUt
         LocalEventRepository.instance().addEvent(customEvent)
         // Act.
         val outputMessageList = MessageEventReconciliationUtil.instance()
-                .reconcileMessagesAndEvents(inputMessageList)
+            .reconcileMessagesAndEvents(inputMessageList)
         // Re-assert the output with qualifying event.
         outputMessageList.shouldHaveSize(1)
     }
@@ -239,7 +239,7 @@ class MessageEventReconciliationUtilReconcileSpec : MessageEventReconciliationUt
         LocalEventRepository.instance().addEvent(customEvent)
         // Act.
         val outputMessageList = MessageEventReconciliationUtil.instance()
-                .reconcileMessagesAndEvents(inputMessageList)
+            .reconcileMessagesAndEvents(inputMessageList)
         // Re-assert the output with qualifying event.
         outputMessageList.shouldHaveSize(1)
     }
@@ -253,7 +253,7 @@ class MessageEventReconciliationUtilReconcileSpec : MessageEventReconciliationUt
         LocalEventRepository.instance().addEvent(customEvent)
 
         val outputMessageList = MessageEventReconciliationUtil.instance()
-                .reconcileMessagesAndEvents(inputMessageList)
+            .reconcileMessagesAndEvents(inputMessageList)
 
         outputMessageList.shouldBeEmpty()
     }
@@ -268,7 +268,7 @@ class MessageEventReconciliationUtilReconcileSpec : MessageEventReconciliationUt
         LocalEventRepository.instance().addEvent(customEvent)
 
         val outputMessageList = MessageEventReconciliationUtil.instance()
-                .reconcileMessagesAndEvents(inputMessageList)
+            .reconcileMessagesAndEvents(inputMessageList)
 
         outputMessageList.shouldHaveSize(1)
     }
@@ -294,8 +294,10 @@ class MessageEventReconciliationUtilReconcileSpec : MessageEventReconciliationUt
 
         val workerParameters = Mockito.mock(WorkerParameters::class.java)
         WorkManagerTestInitHelper.initializeTestWorkManager(ApplicationProvider.getApplicationContext())
-        val worker = MessageEventReconciliationWorker(ApplicationProvider.getApplicationContext(), workerParameters,
-                mockPingRepo, mockReconUtil)
+        val worker = MessageEventReconciliationWorker(
+            ApplicationProvider.getApplicationContext(), workerParameters,
+            mockPingRepo, mockReconUtil
+        )
         worker.doWork()
 
         Mockito.verify(mockReconUtil).extractTestMessages(messageList)
@@ -317,7 +319,7 @@ class MessageEventReconciliationUtilReconcileSpec : MessageEventReconciliationUt
 
         // first display
         var outputMessageList = MessageEventReconciliationUtil.instance()
-                .reconcileMessagesAndEvents(inputMessageList)
+            .reconcileMessagesAndEvents(inputMessageList)
         // Re-assert the output with qualifying event.
         outputMessageList.shouldHaveSize(1)
         outputMessageList[0].getCampaignId() shouldBeEqualTo "message2"
@@ -326,7 +328,7 @@ class MessageEventReconciliationUtilReconcileSpec : MessageEventReconciliationUt
 
         // second display
         outputMessageList = MessageEventReconciliationUtil.instance()
-                .reconcileMessagesAndEvents(inputMessageList)
+            .reconcileMessagesAndEvents(inputMessageList)
         // Re-assert the output with qualifying event.
         outputMessageList.shouldBeEmpty()
     }
@@ -374,7 +376,7 @@ class MessageEventReconciliationUtilReconcileSpec : MessageEventReconciliationUt
 
         // first display
         var outputMessageList = MessageEventReconciliationUtil.instance()
-                .reconcileMessagesAndEvents(inputMessageList)
+            .reconcileMessagesAndEvents(inputMessageList)
         // Re-assert the output with qualifying event.
         outputMessageList.shouldHaveSize(1)
         outputMessageList[0].getCampaignId() shouldBeEqualTo "message2"
@@ -383,7 +385,7 @@ class MessageEventReconciliationUtilReconcileSpec : MessageEventReconciliationUt
 
         // second display
         outputMessageList = MessageEventReconciliationUtil.instance()
-                .reconcileMessagesAndEvents(inputMessageList)
+            .reconcileMessagesAndEvents(inputMessageList)
         // Re-assert the output with qualifying event.
         outputMessageList.shouldHaveSize(0)
     }
@@ -403,7 +405,7 @@ class MessageEventReconciliationUtilReconcileSpec : MessageEventReconciliationUt
 
         // first display
         var outputMessageList = MessageEventReconciliationUtil.instance()
-                .reconcileMessagesAndEvents(inputMessageList)
+            .reconcileMessagesAndEvents(inputMessageList)
         // Re-assert the output with qualifying event.
         outputMessageList.shouldHaveSize(1)
         outputMessageList[0].getCampaignId() shouldBeEqualTo "message2"
@@ -412,7 +414,7 @@ class MessageEventReconciliationUtilReconcileSpec : MessageEventReconciliationUt
 
         // second display
         outputMessageList = MessageEventReconciliationUtil.instance()
-                .reconcileMessagesAndEvents(inputMessageList)
+            .reconcileMessagesAndEvents(inputMessageList)
         // Re-assert the output with qualifying event.
         outputMessageList.shouldHaveSize(0)
     }
@@ -501,7 +503,7 @@ class MessageEventReconciliationUtilReconcileInvalidSpec : MessageEventReconcili
     fun `should modify reconciled messages throw exception`() {
         // Act.
         val outputMessageList = MessageEventReconciliationUtil.instance()
-                .reconcileMessagesAndEvents(ArrayList())
+            .reconcileMessagesAndEvents(ArrayList())
         // Re-assert the output with qualifying event.
         outputMessageList.add(message1)
     }
@@ -517,7 +519,7 @@ class MessageEventReconciliationUtilReconcileInvalidSpec : MessageEventReconcili
         LocalEventRepository.instance().addEvent(mockEvent)
         // Act.
         val outputMessageList = MessageEventReconciliationUtil.instance()
-                .reconcileMessagesAndEvents(inputMessageList)
+            .reconcileMessagesAndEvents(inputMessageList)
         // Re-assert the output with qualifying event.
         outputMessageList.shouldHaveSize(0)
     }
@@ -546,7 +548,7 @@ class MessageEventReconciliationUtilReconcileInvalidSpec : MessageEventReconcili
         LocalEventRepository.instance().addEvent(customEvent)
         // Act.
         val outputMessageList = MessageEventReconciliationUtil.instance()
-                .reconcileMessagesAndEvents(inputMessageList)
+            .reconcileMessagesAndEvents(inputMessageList)
         // Re-assert the output with qualifying event.
         outputMessageList.shouldHaveSize(0)
     }
@@ -567,7 +569,7 @@ class MessageEventReconciliationUtilReconcileInvalidSpec : MessageEventReconcili
         LocalEventRepository.instance().addEvent(customEvent)
         // Act.
         val outputMessageList = MessageEventReconciliationUtil.instance()
-                .reconcileMessagesAndEvents(inputMessageList)
+            .reconcileMessagesAndEvents(inputMessageList)
         // Re-assert the output with qualifying event.
         outputMessageList.shouldHaveSize(0)
     }
@@ -589,7 +591,7 @@ class MessageEventReconciliationUtilReconcileInvalidSpec : MessageEventReconcili
         LocalEventRepository.instance().addEvent(customEvent)
         // Act.
         val outputMessageList = MessageEventReconciliationUtil.instance()
-                .reconcileMessagesAndEvents(inputMessageList)
+            .reconcileMessagesAndEvents(inputMessageList)
         // Re-assert the output with qualifying event.
         outputMessageList.shouldHaveSize(0)
     }

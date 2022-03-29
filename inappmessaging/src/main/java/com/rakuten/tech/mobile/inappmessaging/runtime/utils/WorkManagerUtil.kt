@@ -11,5 +11,5 @@ internal object WorkManagerUtil {
      * This method returns work constraints for impression worker.
      */
     fun getNetworkConnectedConstraint(): Constraints =
-            Constraints.Builder().setRequiredNetworkType(NetworkType.CONNECTED).build()
+        Constraints.Builder().setRequiredNetworkType(NetworkType.CONNECTED).build()
 }

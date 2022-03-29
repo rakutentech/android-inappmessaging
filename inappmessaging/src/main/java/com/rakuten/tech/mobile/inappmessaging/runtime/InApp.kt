@@ -45,7 +45,8 @@ internal class InApp(
 
     // ------------------------------------Public APIs-----------------------------------------------
     @NonNull
-    override var onVerifyContext: (contexts: List<String>, campaignTitle: String) -> Boolean = { _, _ -> Boolean
+    override var onVerifyContext: (contexts: List<String>, campaignTitle: String) -> Boolean = { _, _ ->
+        Boolean
         // Allow all contexts by default
         true
     }

@@ -38,42 +38,23 @@ internal class MessageActionsCoroutineSpec(
     private val isOpt: Boolean
 ) : BaseTest() {
 
-    companion object {
-        @JvmStatic
-        @ParameterizedRobolectricTestRunner.Parameters(
-                name = "{0} testing"
-        )
-        fun data(): Collection<Array<Any>> {
-            return listOf(
-                    arrayOf("Close button - isOpt true", R.id.message_close_button, true),
-                    arrayOf("Close button - isOpt false", R.id.message_close_button, false),
-                    arrayOf("Single button - isOpt true", R.id.message_single_button, true),
-                    arrayOf("Single button - isOpt false", R.id.message_single_button, false),
-                    arrayOf("Right button - isOpt true", R.id.message_button_right, true),
-                    arrayOf("Right button - isOpt false", R.id.message_button_right, false),
-                    arrayOf("Left button - isOpt true", R.id.message_button_left, true),
-                    arrayOf("Left button - isOpt false", R.id.message_button_left, false),
-                    arrayOf("Content - isOpt true", R.id.slide_up, true),
-                    arrayOf("Content - isOpt false", R.id.slide_up, false),
-                    arrayOf("Back - isOpt true", MessageActionsCoroutine.BACK_BUTTON, true),
-                    arrayOf("Back - isOpt false", MessageActionsCoroutine.BACK_BUTTON, false)
-            )
-        }
-    }
-
     private val message = MessageMixerResponseSpec.response.data[0].campaignData
     private val activity = Mockito.mock(Activity::class.java)
 
     @Before
     override fun setup() {
         super.setup()
-        `when`(activity.packageManager).thenReturn(ApplicationProvider
-                .getApplicationContext<Context>().packageManager)
+        `when`(activity.packageManager).thenReturn(
+            ApplicationProvider
+                .getApplicationContext<Context>().packageManager
+        )
 
         WorkManagerTestInitHelper.initializeTestWorkManager(ApplicationProvider.getApplicationContext())
-        Settings.Secure.putString(ApplicationProvider.getApplicationContext<Context>().contentResolver,
-                Settings.Secure.ANDROID_ID,
-                "test_device_id")
+        Settings.Secure.putString(
+            ApplicationProvider.getApplicationContext<Context>().contentResolver,
+            Settings.Secure.ANDROID_ID,
+            "test_device_id"
+        )
         InAppMessaging.initialize(ApplicationProvider.getApplicationContext(), true)
         InAppMessaging.instance().registerMessageDisplayActivity(activity)
         InAppMessaging.instance().registerPreference(TestUserInfoProvider())
@@ -107,7 +88,7 @@ internal class MessageActionsCoroutineSpec(
         val result = MessageActionsCoroutine().executeTask(message, resourceId, isOpt)
         result.shouldBeTrue()
         LocalDisplayedMessageRepository.instance()
-                .numberOfTimesDisplayed(message) shouldBeEqualTo numberOfTimesDisplayed + 1
+            .numberOfTimesDisplayed(message) shouldBeEqualTo numberOfTimesDisplayed + 1
     }
 
     @Test
@@ -123,5 +104,28 @@ internal class MessageActionsCoroutineSpec(
             DisplayManager.instance().displayMessage()
         }
         ReadyForDisplayMessageRepository.instance().getAllMessagesCopy().shouldHaveSize(0)
+    }
+
+    companion object {
+        @JvmStatic
+        @ParameterizedRobolectricTestRunner.Parameters(
+            name = "{0} testing"
+        )
+        fun data(): Collection<Array<Any>> {
+            return listOf(
+                arrayOf("Close button - isOpt true", R.id.message_close_button, true),
+                arrayOf("Close button - isOpt false", R.id.message_close_button, false),
+                arrayOf("Single button - isOpt true", R.id.message_single_button, true),
+                arrayOf("Single button - isOpt false", R.id.message_single_button, false),
+                arrayOf("Right button - isOpt true", R.id.message_button_right, true),
+                arrayOf("Right button - isOpt false", R.id.message_button_right, false),
+                arrayOf("Left button - isOpt true", R.id.message_button_left, true),
+                arrayOf("Left button - isOpt false", R.id.message_button_left, false),
+                arrayOf("Content - isOpt true", R.id.slide_up, true),
+                arrayOf("Content - isOpt false", R.id.slide_up, false),
+                arrayOf("Back - isOpt true", MessageActionsCoroutine.BACK_BUTTON, true),
+                arrayOf("Back - isOpt false", MessageActionsCoroutine.BACK_BUTTON, false)
+            )
+        }
     }
 }

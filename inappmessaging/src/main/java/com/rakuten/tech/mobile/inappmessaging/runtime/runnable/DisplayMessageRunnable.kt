@@ -38,26 +38,28 @@ internal class DisplayMessageRunnable(
             when (messageType) {
                 InAppMessageType.MODAL -> {
                     val modalView = hostActivity
-                            .layoutInflater
-                            .inflate(R.layout.in_app_message_modal, null) as InAppMessageModalView
+                        .layoutInflater
+                        .inflate(R.layout.in_app_message_modal, null) as InAppMessageModalView
                     modalView.populateViewData(message)
                     hostActivity.addContentView(modalView, hostActivity.window.attributes)
                 }
                 InAppMessageType.FULL -> {
                     val fullScreenView = hostActivity
-                            .layoutInflater
-                            .inflate(
-                                    R.layout.in_app_message_full_screen,
-                                    null) as InAppMessageFullScreenView
+                        .layoutInflater
+                        .inflate(
+                            R.layout.in_app_message_full_screen,
+                            null
+                        ) as InAppMessageFullScreenView
                     fullScreenView.populateViewData(message)
                     hostActivity.addContentView(fullScreenView, hostActivity.window.attributes)
                 }
                 InAppMessageType.SLIDE -> {
                     val slideUpView = hostActivity
-                            .layoutInflater
-                            .inflate(
-                                    R.layout.in_app_message_slide_up,
-                                    null) as InAppMessageSlideUpView
+                        .layoutInflater
+                        .inflate(
+                            R.layout.in_app_message_slide_up,
+                            null
+                        ) as InAppMessageSlideUpView
                     slideUpView.populateViewData(message)
                     hostActivity.addContentView(slideUpView, hostActivity.window.attributes)
                 }
