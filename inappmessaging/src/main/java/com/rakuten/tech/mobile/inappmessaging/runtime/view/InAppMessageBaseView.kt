@@ -27,6 +27,7 @@ import com.squareup.picasso.Callback
 import com.squareup.picasso.Picasso
 import kotlin.math.sqrt
 import java.lang.Exception
+import kotlin.math.round
 
 /**
  * Base class of all custom views.
@@ -203,13 +204,13 @@ internal open class InAppMessageBaseView(context: Context, attrs: AttributeSet?)
         }
 
         buttonView.backgroundTintList = ColorStateList.valueOf(bgColor)
-        // Button stroke color equals to button text color.
-        buttonView.strokeColor = ColorStateList.valueOf(textColor)
+        setButtonBorder(buttonView, bgColor, textColor)
+
         buttonView.setOnClickListener(this.listener)
 
         getFont(BUTTON_FONT)?.let { buttonView.typeface = it }
-        buttonView.visibility = View.VISIBLE
-        findViewById<LinearLayout>(R.id.message_buttons)?.visibility = View.VISIBLE
+        buttonView.visibility = VISIBLE
+        findViewById<LinearLayout>(R.id.message_buttons)?.visibility = VISIBLE
     }
 
     /**
@@ -258,6 +259,40 @@ internal open class InAppMessageBaseView(context: Context, attrs: AttributeSet?)
             if (brightness < 130) {
                 (button ?: findViewById(R.id.message_close_button))
                     ?.setImageResource(R.drawable.close_button_white)
+            }
+        }
+    }
+
+    // Set button's border based on similarity between its background color and campaign's background color.
+    // The method calculates a distance between colors based on the low-cost approximation algorithm
+    // from [](https://www.compuphase.com/cmetric.htm).
+    // The distance value is compared against a threshold constant to decide if the colors
+    // are visually similar or not.
+    @SuppressWarnings("MagicNumber", "LongMethod")
+    @VisibleForTesting
+    internal fun setButtonBorder(
+        buttonView: MaterialButton,
+        buttonBackgroundColor: Int,
+        defaultStrokeColor: Int
+    ) {
+        val redMean = (Color.red(bgColor) + Color.red(buttonBackgroundColor)) / 2.0
+        val dRed = Color.red(bgColor) - Color.red(buttonBackgroundColor)
+        val dGreen = Color.green(bgColor) - Color.green(buttonBackgroundColor)
+        val dBlue = Color.blue(bgColor) - Color.blue(buttonBackgroundColor)
+        val distance = round(
+            sqrt(
+                (2 + redMean / 256) * dRed * dRed + 4 * dGreen * dGreen + (2 + (255 - redMean) / 256) * dBlue * dBlue
+            )
+        ).toInt()
+
+        if (distance <= 15) {
+            buttonView.strokeWidth =
+                resources.getDimension(R.dimen.modal_button_border_stroke_width).toInt()
+            if (buttonBackgroundColor == Color.WHITE) {
+                val strokeColor = resources.getColorStateList(R.color.modal_border_color_light_grey, context.theme)
+                buttonView.strokeColor = strokeColor
+            } else {
+                buttonView.strokeColor = ColorStateList.valueOf(defaultStrokeColor)
             }
         }
     }

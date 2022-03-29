@@ -40,6 +40,7 @@
     <item name="backgroundTint">@android:color/holo_orange_light</item>
     <item name="backgroundTintMode">src_over</item>
     <item name="cornerRadius">@dimen/modal_button_corner_radius</item>
+    <item name="strokeColor">@color/modal_border_color_light_grey</item>
     <item name="android:textAllCaps">false</item>
     <item name="android:layout_height">@dimen/modal_button_height</item>
     <item name="android:includeFontPadding">false</item>
