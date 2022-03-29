@@ -7,10 +7,15 @@
   <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE"/>
   <uses-permission android:name="android.permission.INTERNET"/>
 
+  <!--
+  As of AGP 4.2.2, processDebugUnitTestManifest fails because manifest placeholders aren't substituted in unit tests:
+  https://issuetracker.google.com/issues/187326576. Ticket says it should be fixed in next release (AGP 7+) but
+  introduces project configuration/build issues so removing placeholders here as a workaround.
+  -->
   <application>
     <meta-data
       android:name="com.rakuten.tech.mobile.inappmessaging.subscriptionkey"
-      android:value="${test_sub_key}"/>
+      android:value="test_sub_key"/>
 
     <meta-data
       android:name="com.rakuten.tech.mobile.inappmessaging.debugging"
@@ -18,7 +23,7 @@
 
     <meta-data
       android:name="com.rakuten.tech.mobile.inappmessaging.configurl"
-      android:value="${config_url}"/>
+      android:value="test_config_url"/>
   </application>
 
 </manifest>
