@@ -39,20 +39,25 @@ class ImpressionSchedulerSpec : BaseTest() {
     @Before
     override fun setup() {
         super.setup()
-        `when`(mockWorkManager.enqueue(
-            ArgumentMatchers.any(WorkRequest::class.java))).thenThrow(IllegalStateException("test"))
+        `when`(
+            mockWorkManager.enqueue(
+                ArgumentMatchers.any(WorkRequest::class.java)
+            )
+        ).thenThrow(IllegalStateException("test"))
     }
 
     @Test
     fun `should not throw exception with valid impression request`() {
         WorkManagerTestInitHelper.initializeTestWorkManager(ApplicationProvider.getApplicationContext())
-        Settings.Secure.putString(ApplicationProvider.getApplicationContext<Context>().contentResolver,
-                Settings.Secure.ANDROID_ID,
-                "test_device_id")
+        Settings.Secure.putString(
+            ApplicationProvider.getApplicationContext<Context>().contentResolver,
+            Settings.Secure.ANDROID_ID,
+            "test_device_id"
+        )
         InAppMessaging.initialize(ApplicationProvider.getApplicationContext(), true)
         setupImpressionScheduler()
         WorkManager.getInstance(ApplicationProvider.getApplicationContext())
-                .getWorkInfosByTag(IMPRESSION_WORKER_NAME).get()[0].shouldNotBeNull()
+            .getWorkInfosByTag(IMPRESSION_WORKER_NAME).get()[0].shouldNotBeNull()
     }
 
     @Test
@@ -80,19 +85,20 @@ class ImpressionSchedulerSpec : BaseTest() {
         WorkManagerTestInitHelper.initializeTestWorkManager(ApplicationProvider.getApplicationContext())
         setupImpressionScheduler()
         WorkManager.getInstance(ApplicationProvider.getApplicationContext())
-                .getWorkInfosByTag(IMPRESSION_WORKER_NAME).get().shouldBeEmpty()
+            .getWorkInfosByTag(IMPRESSION_WORKER_NAME).get().shouldBeEmpty()
     }
 
     private fun setupImpressionScheduler(mockManager: WorkManager? = null) {
         val impressionTypes = mutableListOf(ImpressionType.CLICK_CONTENT)
         // Assemble ImpressionRequest object.
         val impressionRequest = ImpressionRequest(
-                "id",
-                true,
-                BuildConfig.VERSION_NAME,
-                HostAppInfoRepository.instance().getVersion(),
-                RuntimeUtil.getUserIdentifiers(),
-                ImpressionManager().createImpressionList(impressionTypes))
+            "id",
+            true,
+            BuildConfig.VERSION_NAME,
+            HostAppInfoRepository.instance().getVersion(),
+            RuntimeUtil.getUserIdentifiers(),
+            ImpressionManager().createImpressionList(impressionTypes)
+        )
         ImpressionScheduler().startImpressionWorker(impressionRequest, mockManager)
     }
 

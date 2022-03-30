@@ -72,7 +72,7 @@ class ConfigResponseRepositorySpec : BaseTest() {
         val response = Gson().fromJson(CONFIG_RESPONSE.trimIndent(), ConfigResponse::class.java)
         ConfigResponseRepository.instance().addConfigResponse(response.data)
         ConfigResponseRepository.instance()
-                .getDisplayPermissionEndpoint() shouldBeEqualTo response.data?.endpoints?.displayPermission
+            .getDisplayPermissionEndpoint() shouldBeEqualTo response.data?.endpoints?.displayPermission
     }
 
     @Test

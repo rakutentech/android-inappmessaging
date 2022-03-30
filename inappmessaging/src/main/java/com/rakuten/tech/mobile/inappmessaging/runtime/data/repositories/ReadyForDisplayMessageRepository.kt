@@ -17,6 +17,7 @@ internal abstract class ReadyForDisplayMessageRepository : ReadyMessageRepositor
 
     companion object {
         private var instance: ReadyForDisplayMessageRepository = ReadyForDisplayMessageRepositoryImpl()
+
         @VisibleForTesting
         internal const val READY_DISPLAY_KEY = "ready_display_list"
         private const val TAG = "IAM_ReadyDisplayRepo"
@@ -83,7 +84,8 @@ internal abstract class ReadyForDisplayMessageRepository : ReadyMessageRepositor
         @SuppressWarnings("TooGenericExceptionCaught", "LongMethod")
         private fun checkAndResetList(onLaunch: Boolean = false) {
             if (InAppMessaging.instance().isLocalCachingEnabled() &&
-                    (onLaunch || user != AccountRepository.instance().userInfoHash)) {
+                (onLaunch || user != AccountRepository.instance().userInfoHash)
+            ) {
                 user = AccountRepository.instance().userInfoHash
                 // reset message list from cached using updated user info
                 val listString = try {

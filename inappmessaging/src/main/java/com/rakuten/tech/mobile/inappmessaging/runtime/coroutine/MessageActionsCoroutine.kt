@@ -33,7 +33,6 @@ internal class MessageActionsCoroutine(
 ) {
 
     fun executeTask(message: Message?, viewResourceId: Int, optOut: Boolean): Boolean {
-
         if (message == null || message.getCampaignId().isEmpty()) {
             return false
         }
@@ -109,7 +108,6 @@ internal class MessageActionsCoroutine(
      */
     @WorkerThread
     private fun getOnClickBehavior(impressionType: ImpressionType, message: Message): OnClickBehavior? {
-
         val controlSettings = message.getMessagePayload().messageSettings.controlSettings
 
         return when {
@@ -129,12 +127,12 @@ internal class MessageActionsCoroutine(
      * @param impressionTypes An ImpressionType of the button click.
      */
     private fun scheduleReportImpression(message: Message, impressionTypes: List<ImpressionType>) {
-
         val impressionManager = ImpressionManager()
         impressionManager.scheduleReportImpression(
-                impressionManager.createImpressionList(impressionTypes),
-                message.getCampaignId(),
-                message.isTest())
+            impressionManager.createImpressionList(impressionTypes),
+            message.getCampaignId(),
+            message.isTest()
+        )
     }
 
     /**
@@ -170,7 +168,6 @@ internal class MessageActionsCoroutine(
      * object. Only add embedded event when corresponding button or content was clicked by user.
      */
     private fun addEmbeddedEvent(impressionType: ImpressionType, message: Message) {
-
         val embeddedEvent = getEmbeddedEvent(impressionType, message) ?: return
 
         val event = createLocalCustomEvent(embeddedEvent) ?: return
@@ -199,7 +196,7 @@ internal class MessageActionsCoroutine(
     /**
      * This method creates a local custom event based on argument.
      */
-    @SuppressWarnings("LongMethod", "ReturnCount")
+    @SuppressWarnings("LongMethod", "ReturnCount", "ComplexMethod")
     private fun createLocalCustomEvent(embeddedEvent: Trigger): Event? {
         val type = embeddedEvent.eventType
         if (EventType.CUSTOM != EventType.getById(type)) {

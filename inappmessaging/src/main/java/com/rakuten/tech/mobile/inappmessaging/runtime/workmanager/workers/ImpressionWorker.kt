@@ -26,7 +26,7 @@ internal class ImpressionWorker(
     context: Context,
     workerParams: WorkerParameters
 ) :
-        Worker(context, workerParams) {
+    Worker(context, workerParams) {
 
     /**
      * This method makes a thread blocking network call to post impression.
@@ -86,15 +86,16 @@ internal class ImpressionWorker(
         impressionRequest: ImpressionRequest,
         accountRepo: AccountRepository = AccountRepository.instance()
     ): Call<ResponseBody> =
-            // Create a Retrofit API call.
-            RuntimeUtil.getRetrofit()
-                    .create(MessageMixerRetrofitService::class.java)
-                    .reportImpression(
-                            HostAppInfoRepository.instance().getInAppMessagingSubscriptionKey(),
-                            HostAppInfoRepository.instance().getDeviceId(),
-                            accountRepo.getAccessToken(),
-                            impressionEndpoint,
-                            impressionRequest)
+        // Create a Retrofit API call.
+        RuntimeUtil.getRetrofit()
+            .create(MessageMixerRetrofitService::class.java)
+            .reportImpression(
+                HostAppInfoRepository.instance().getInAppMessagingSubscriptionKey(),
+                HostAppInfoRepository.instance().getDeviceId(),
+                accountRepo.getAccessToken(),
+                impressionEndpoint,
+                impressionRequest
+            )
 
     companion object {
         const val IMPRESSION_REQUEST_KEY = "impression_request_key"

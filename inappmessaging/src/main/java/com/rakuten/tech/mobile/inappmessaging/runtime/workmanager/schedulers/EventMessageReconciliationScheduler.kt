@@ -34,17 +34,19 @@ internal interface EventMessageReconciliationScheduler {
             // This worker must be a unique worker, but it can be replaced with a new one. Because we don't
             // want the same worker working in parallel which will result bad data, and unwanted behaviour.
             val reconciliationWorkRequest = OneTimeWorkRequest.Builder(MessageEventReconciliationWorker::class.java)
-                    .setInitialDelay(delay, TimeUnit.MILLISECONDS)
-                    .addTag(MESSAGES_EVENTS_WORKER_NAME)
-                    .build()
+                .setInitialDelay(delay, TimeUnit.MILLISECONDS)
+                .addTag(MESSAGES_EVENTS_WORKER_NAME)
+                .build()
 
             try {
                 val context = InAppMessaging.instance().getHostAppContext()
                 context?.let {
                     val manager = workManager ?: WorkManager.getInstance(it)
-                    manager.beginUniqueWork(MESSAGES_EVENTS_WORKER_NAME,
-                            ExistingWorkPolicy.REPLACE, reconciliationWorkRequest)
-                            .enqueue()
+                    manager.beginUniqueWork(
+                        MESSAGES_EVENTS_WORKER_NAME,
+                        ExistingWorkPolicy.REPLACE, reconciliationWorkRequest
+                    )
+                        .enqueue()
                 }
             } catch (ie: IllegalStateException) {
                 // this should not occur since work manager is initialized during SDK initialization

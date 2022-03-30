@@ -39,11 +39,11 @@ internal class ImpressionScheduler {
      * This method creates an impression work request.
      */
     private fun createWorkRequest(impressionRequest: ImpressionRequest): OneTimeWorkRequest =
-            OneTimeWorkRequest.Builder(ImpressionWorker::class.java)
-                    .setInputData(getInputData(impressionRequest))
-                    .addTag(IMPRESSION_WORKER_NAME)
-                    .setConstraints(WorkManagerUtil.getNetworkConnectedConstraint())
-                    .build()
+        OneTimeWorkRequest.Builder(ImpressionWorker::class.java)
+            .setInputData(getInputData(impressionRequest))
+            .addTag(IMPRESSION_WORKER_NAME)
+            .setConstraints(WorkManagerUtil.getNetworkConnectedConstraint())
+            .build()
 
     /**
      * This method retrieves a data object which contains the necessary data required by ReportImpressionWorker.
@@ -53,8 +53,8 @@ internal class ImpressionScheduler {
         val impressionRequestJsonString = Gson().toJson(impressionRequest)
         // Create input data objects.
         return Data.Builder()
-                .putString(IMPRESSION_REQUEST_KEY, impressionRequestJsonString)
-                .build()
+            .putString(IMPRESSION_REQUEST_KEY, impressionRequestJsonString)
+            .build()
     }
 
     companion object {

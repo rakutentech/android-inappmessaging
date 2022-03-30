@@ -6,10 +6,10 @@ import android.graphics.Typeface
 import androidx.core.content.res.ResourcesCompat
 
 internal object ResourceUtils {
+    internal var mockFont: Typeface? = null
+
     fun getResourceIdentifier(context: Context, name: String, type: String) =
         context.resources.getIdentifier(name, type, context.packageName)
-
-    internal var mockFont: Typeface? = null
 
     @SuppressLint("NewApi")
     fun getFont(context: Context, id: Int) = when {

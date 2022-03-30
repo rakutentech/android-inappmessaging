@@ -36,16 +36,18 @@ internal class ImpressionManager {
         if (impressionList.isEmpty()) return
         // Assemble ImpressionRequest object.
         val impressionRequest = ImpressionRequest(
-                campaignId = campaignId,
-                isTest = isTestMessage,
-                appVersion = HostAppInfoRepository.instance().getVersion(),
-                sdkVersion = BuildConfig.VERSION_NAME,
-                userIdentifiers = RuntimeUtil.getUserIdentifiers(),
-                impressions = impressionList)
+            campaignId = campaignId,
+            isTest = isTestMessage,
+            appVersion = HostAppInfoRepository.instance().getVersion(),
+            sdkVersion = BuildConfig.VERSION_NAME,
+            userIdentifiers = RuntimeUtil.getUserIdentifiers(),
+            impressions = impressionList
+        )
         // Broadcasting impressions to RAT.
         sendEvent(
-                InAppMessagingConstants.RAT_EVENT_KEY_IMPRESSION,
-                createImpressionMap(impressionRequest.impressions))
+            InAppMessagingConstants.RAT_EVENT_KEY_IMPRESSION,
+            createImpressionMap(impressionRequest.impressions)
+        )
         // Schedule work to report impressions back to IAM backend.
         ImpressionScheduler().startImpressionWorker(impressionRequest)
     }
@@ -65,7 +67,6 @@ internal class ImpressionManager {
 
         // Add impressions included in the method argument.
         for (impressionType in impressionTypes) {
-
             // If impressionType is Impression or Invalid, there's something wrong, do not proceed.
             if (ImpressionType.IMPRESSION == impressionType || ImpressionType.INVALID == impressionType) {
                 return ArrayList()

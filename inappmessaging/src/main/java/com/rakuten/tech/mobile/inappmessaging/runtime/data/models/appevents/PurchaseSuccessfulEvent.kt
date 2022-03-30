@@ -20,15 +20,20 @@ import kotlin.collections.set
  * Purchase successful Event for host app to use.
  */
 class PurchaseSuccessfulEvent : BaseEvent(EventType.PURCHASE_SUCCESSFUL, EventType.PURCHASE_SUCCESSFUL.name, false) {
+
+    /** Purchase amount in micros, $1 = 100_000. Such as $10.58 = 1058_000. */
     var purchaseAmountMicros = -1
         private set
 
+    /** Number of items in this purchase. */
     var numberOfItems = -1
         private set
 
+    /** Currency code. */
     var currencyCode = "UNKNOWN"
         private set
 
+    /** List of purchased item IDs. */
     var itemIdList: List<String> = emptyList()
         private set
 
@@ -97,7 +102,7 @@ class PurchaseSuccessfulEvent : BaseEvent(EventType.PURCHASE_SUCCESSFUL, EventTy
     override fun getAttributeMap(): Map<String, Attribute?> {
         val map = java.util.HashMap<String, Attribute>()
         map[PURCHASE_AMOUNT_MICROS_TAG] =
-                Attribute(PURCHASE_AMOUNT_MICROS_TAG, purchaseAmountMicros.toString(), ValueType.INTEGER)
+            Attribute(PURCHASE_AMOUNT_MICROS_TAG, purchaseAmountMicros.toString(), ValueType.INTEGER)
         map[NUMBER_OF_ITEMS_TAG] = Attribute(NUMBER_OF_ITEMS_TAG, numberOfItems.toString(), ValueType.INTEGER)
         map[CURRENCY_CODE_TAG] = Attribute(CURRENCY_CODE_TAG, currencyCode, ValueType.STRING)
         map[ITEM_ID_LIST_TAG] = Attribute(ITEM_ID_LIST_TAG, itemIdList.toString(), ValueType.STRING)
