@@ -19,8 +19,13 @@ class SendEventSpec(
     private val data: Map<String, *>?,
     private val expected: Boolean
 ) {
-
     private val sendEvent = EventTrackerHelper::sendEvent
+
+    @Test
+    fun `should return if event was sent`() {
+        sendEvent(eventName, data) shouldBeEqualTo expected
+    }
+
     companion object {
         @JvmStatic
         @ParameterizedRobolectricTestRunner.Parameters
@@ -34,11 +39,6 @@ class SendEventSpec(
             )
         }
     }
-
-    @Test
-    fun `should return if event was sent`() {
-        sendEvent(eventName, data) shouldBeEqualTo expected
-    }
 }
 
 @RunWith(ParameterizedRobolectricTestRunner::class)
@@ -48,8 +48,13 @@ class HasClassSpec(
     private val className: String,
     private val expected: Boolean
 ) {
-
     private val hasClass = EventTrackerHelper::hasClass
+
+    @Test
+    fun `should return if class exists`() {
+        hasClass(className) shouldBeEqualTo expected
+    }
+
     companion object {
         @JvmStatic
         @ParameterizedRobolectricTestRunner.Parameters
@@ -60,10 +65,5 @@ class HasClassSpec(
                 arrayOf("com.rakuten.tech.mobile.NonExistingClass", false)
             )
         }
-    }
-
-    @Test
-    fun `should return if class exists`() {
-        hasClass(className) shouldBeEqualTo expected
     }
 }

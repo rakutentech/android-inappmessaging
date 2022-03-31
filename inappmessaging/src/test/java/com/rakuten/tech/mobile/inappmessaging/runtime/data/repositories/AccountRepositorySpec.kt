@@ -56,14 +56,14 @@ class AccountRepositoryDefaultSpec : AccountRepositorySpec() {
     fun `should get access token with valid provider`() {
         AccountRepository.instance().userInfoProvider = TestUserInfoProvider()
         AccountRepository.instance().getAccessToken() shouldBeEqualTo "OAuth2 " +
-                TestUserInfoProvider().provideAccessToken()
+            TestUserInfoProvider().provideAccessToken()
     }
 
     @Test
     fun `should get id tracking identifier with valid provider`() {
         AccountRepository.instance().userInfoProvider = TestUserInfoProvider()
         AccountRepository.instance()
-                .getIdTrackingIdentifier() shouldBeEqualTo TestUserInfoProvider().provideIdTrackingIdentifier()
+            .getIdTrackingIdentifier() shouldBeEqualTo TestUserInfoProvider().provideIdTrackingIdentifier()
     }
 }
 
@@ -101,20 +101,27 @@ class AccountRepositoryUsageSpec : AccountRepositorySpec() {
     private val captor = argumentCaptor<String>()
 
     @Test
+    @SuppressWarnings("LongMethod")
     fun `should get be called once for get access token`() {
         val mockAcctRepo = Mockito.mock(AccountRepository::class.java)
 
         `when`(mockAcctRepo.userInfoProvider).thenReturn(TestUserInfoProvider())
         `when`(mockAcctRepo.getAccessToken()).thenReturn(TestUserInfoProvider().provideAccessToken().toString())
-        HostAppInfoRepository.instance().addHostInfo(HostAppInfo(InAppMessagingTestConstants.APP_ID,
+        HostAppInfoRepository.instance().addHostInfo(
+            HostAppInfo(
+                InAppMessagingTestConstants.APP_ID,
                 InAppMessagingTestConstants.DEVICE_ID, InAppMessagingTestConstants.APP_VERSION,
-                InAppMessagingTestConstants.SUB_KEY, InAppMessagingTestConstants.LOCALE))
+                InAppMessagingTestConstants.SUB_KEY, InAppMessagingTestConstants.LOCALE
+            )
+        )
         val context = Mockito.mock(Context::class.java)
         val workerParameters = Mockito.mock(WorkerParameters::class.java)
         val impressionRequest = Mockito.mock(ImpressionRequest::class.java)
         val worker = ImpressionWorker(context, workerParameters)
-        worker.createReportImpressionCall("https://host/impression/", impressionRequest,
-                accountRepo = mockAcctRepo)
+        worker.createReportImpressionCall(
+            "https://host/impression/", impressionRequest,
+            accountRepo = mockAcctRepo
+        )
         Mockito.verify(mockAcctRepo).getAccessToken()
     }
 
@@ -136,8 +143,10 @@ class AccountRepositoryUsageSpec : AccountRepositorySpec() {
         provider.idTrackingIdentifier = TestUserInfoProvider.TEST_ID_TRACKING_IDENTIFIER
         `when`(mockAcctRepo.userInfoProvider).thenReturn(provider)
         `when`(mockAcctRepo.getUserId()).thenReturn("")
-        `when`(mockAcctRepo
-                .getIdTrackingIdentifier()).thenReturn(provider.provideIdTrackingIdentifier().toString())
+        `when`(
+            mockAcctRepo
+                .getIdTrackingIdentifier()
+        ).thenReturn(provider.provideIdTrackingIdentifier().toString())
         RuntimeUtil.getUserIdentifiers(mockAcctRepo).shouldHaveSize(1)
         Mockito.verify(mockAcctRepo).getIdTrackingIdentifier()
     }
@@ -201,7 +210,7 @@ class AccountRepositoryUsageSpec : AccountRepositorySpec() {
         AccountRepository.instance().updateUserInfo("test").shouldBeTrue()
 
         AccountRepository.instance().userInfoHash shouldBeEqualTo TestUserInfoProvider.TEST_USER_ID +
-                TestUserInfoProvider.TEST_ID_TRACKING_IDENTIFIER
+            TestUserInfoProvider.TEST_ID_TRACKING_IDENTIFIER
     }
 
     @Test

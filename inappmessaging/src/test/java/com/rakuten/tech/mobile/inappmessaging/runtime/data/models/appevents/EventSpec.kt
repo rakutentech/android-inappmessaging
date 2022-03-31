@@ -24,28 +24,6 @@ class EventSpec(
     private val expectedPersistType: Boolean
 ) : BaseTest() {
 
-    companion object {
-        @JvmStatic
-        @ParameterizedRobolectricTestRunner.Parameters(name = "{0} event type")
-        fun data(): Collection<Array<Any>> {
-            return listOf(
-                    arrayOf("AppStart", AppStartEvent(), EventType.APP_START,
-                            EventType.APP_START.name.lowercase(Locale.getDefault()), true),
-                    arrayOf("Custom", CustomEvent("custom"), EventType.CUSTOM, "custom", false),
-                    arrayOf("Custom UpperCase", CustomEvent("CuStOm"), EventType.CUSTOM, "custom", false),
-                    arrayOf("LoginSuccessful",
-                            LoginSuccessfulEvent(), EventType.LOGIN_SUCCESSFUL,
-                            EventType.LOGIN_SUCCESSFUL.name.lowercase(Locale.getDefault()),
-                            false),
-                    arrayOf("PurchaseSuccessful",
-                            PurchaseSuccessfulEvent(),
-                            EventType.PURCHASE_SUCCESSFUL,
-                            EventType.PURCHASE_SUCCESSFUL.name.lowercase(Locale.getDefault()),
-                            false)
-            )
-        }
-    }
-
     @Test
     fun `should have correct event type`() {
         event.getEventType() shouldBeEqualTo expectedType.typeId
@@ -87,5 +65,34 @@ class EventSpec(
     @Test
     fun `should not be persistent type`() {
         event.isPersistentType() shouldBeEqualTo expectedPersistType
+    }
+
+    companion object {
+        @JvmStatic
+        @ParameterizedRobolectricTestRunner.Parameters(name = "{0} event type")
+        @SuppressWarnings("LongMethod")
+        fun data(): Collection<Array<Any>> {
+            return listOf(
+                arrayOf(
+                    "AppStart", AppStartEvent(), EventType.APP_START,
+                    EventType.APP_START.name.lowercase(Locale.getDefault()), true
+                ),
+                arrayOf("Custom", CustomEvent("custom"), EventType.CUSTOM, "custom", false),
+                arrayOf("Custom UpperCase", CustomEvent("CuStOm"), EventType.CUSTOM, "custom", false),
+                arrayOf(
+                    "LoginSuccessful",
+                    LoginSuccessfulEvent(), EventType.LOGIN_SUCCESSFUL,
+                    EventType.LOGIN_SUCCESSFUL.name.lowercase(Locale.getDefault()),
+                    false
+                ),
+                arrayOf(
+                    "PurchaseSuccessful",
+                    PurchaseSuccessfulEvent(),
+                    EventType.PURCHASE_SUCCESSFUL,
+                    EventType.PURCHASE_SUCCESSFUL.name.lowercase(Locale.getDefault()),
+                    false
+                )
+            )
+        }
     }
 }

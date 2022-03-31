@@ -25,6 +25,7 @@ import java.util.concurrent.atomic.AtomicInteger
  * This class contains the actual work to communicate with Config Service. It extends Worker class,
  * and uses synchronized network call to make request to Config Service.
  */
+@SuppressWarnings("LongParameterList")
 internal class ConfigWorker(
     context: Context,
     workerParams: WorkerParameters,
@@ -40,8 +41,10 @@ internal class ConfigWorker(
      * Overload constructor to handle OneTimeWorkRequest.Builder().
      */
     constructor(context: Context, workerParams: WorkerParameters) :
-            this(context, workerParams, HostAppInfoRepository.instance(), ConfigResponseRepository.instance(),
-                MessageMixerPingScheduler.instance())
+        this(
+            context, workerParams, HostAppInfoRepository.instance(), ConfigResponseRepository.instance(),
+            MessageMixerPingScheduler.instance()
+        )
 
     /**
      * Main method to do the work. Make Config Service network call is the main work.
@@ -63,8 +66,8 @@ internal class ConfigWorker(
         val sdkVersion = BuildConfig.VERSION_NAME
         val params = ConfigQueryParamsBuilder(hostAppId, locale, hostAppVersion, sdkVersion).queryParams
         val configServiceCall = RuntimeUtil.getRetrofit()
-                .create(ConfigRetrofitService::class.java)
-                .getConfigService(configUrl, subscriptionId, params)
+            .create(ConfigRetrofitService::class.java)
+            .getConfigService(configUrl, subscriptionId, params)
 
         return try {
             // Executing the API network call.
@@ -93,8 +96,10 @@ internal class ConfigWorker(
             // Schedule a ping request to message mixer. Initial delay is 0
             // reset current delay to initial
             ConfigScheduler.currDelay = RetryDelayUtil.INITIAL_BACKOFF_DELAY
-            Logger(TAG).debug("Config Response: %d (%b)",
-                    response.body()?.data?.rollOutPercentage, configRepo.isConfigEnabled())
+            Logger(TAG).debug(
+                "Config Response: %d (%b)",
+                response.body()?.data?.rollOutPercentage, configRepo.isConfigEnabled()
+            )
             if (configRepo.isConfigEnabled()) {
                 // move temp data to persistent cache
                 InAppMessaging.instance().saveTempData()

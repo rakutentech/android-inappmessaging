@@ -49,8 +49,10 @@ class MessageEventReconciliationWorkerSpec : BaseTest() {
     fun `should return success with valid messages`() {
         val message = ValidTestMessage()
         val notTestMessage = ValidTestMessage(isTest = false)
-        worker = MessageEventReconciliationWorker(ApplicationProvider.getApplicationContext(), workerParameters,
-                mockPingResponseRepo, MessageEventReconciliationUtil.instance())
+        worker = MessageEventReconciliationWorker(
+            ApplicationProvider.getApplicationContext(), workerParameters,
+            mockPingResponseRepo, MessageEventReconciliationUtil.instance()
+        )
         `when`(mockPingResponseRepo.getAllMessagesCopy()).thenReturn(listOf(message, notTestMessage))
         worker?.doWork() shouldBeEqualTo ListenableWorker.Result.success()
     }

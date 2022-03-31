@@ -15,22 +15,12 @@ class DisplayPermissionResponseSpec(
     private val actual: Boolean,
     private val expected: Boolean
 ) {
+    @Test
+    fun `should be correct value after parsing`() {
+        actual shouldBeEqualTo expected
+    }
 
     companion object {
-        @JvmStatic
-        @ParameterizedRobolectricTestRunner.Parameters(
-                name = "{0} type test"
-        )
-        @SuppressWarnings("LongMethod")
-        fun data(): List<Array<out Any?>> {
-            return listOf(
-                    arrayOf("display-true", response.display, true),
-                    arrayOf("display-false", otherResponse.display, false),
-                    arrayOf("performPing-true", otherResponse.performPing, true),
-                    arrayOf("performPing-false", response.performPing, false)
-            )
-        }
-
         private const val DISPLAY_RESPONSE = """
             {
                 "display":true,
@@ -44,14 +34,23 @@ class DisplayPermissionResponseSpec(
             }"""
 
         private val response =
-                Gson().fromJson(DISPLAY_RESPONSE.trimIndent(), DisplayPermissionResponse::class.java)
+            Gson().fromJson(DISPLAY_RESPONSE.trimIndent(), DisplayPermissionResponse::class.java)
 
         private val otherResponse =
-                Gson().fromJson(DISPLAY_OTHER_RESPONSE.trimIndent(), DisplayPermissionResponse::class.java)
-    }
+            Gson().fromJson(DISPLAY_OTHER_RESPONSE.trimIndent(), DisplayPermissionResponse::class.java)
 
-    @Test
-    fun `should be correct value after parsing`() {
-        actual shouldBeEqualTo expected
+        @JvmStatic
+        @ParameterizedRobolectricTestRunner.Parameters(
+            name = "{0} type test"
+        )
+        @SuppressWarnings("LongMethod")
+        fun data(): List<Array<out Any?>> {
+            return listOf(
+                arrayOf("display-true", response.display, true),
+                arrayOf("display-false", otherResponse.display, false),
+                arrayOf("performPing-true", otherResponse.performPing, true),
+                arrayOf("performPing-false", response.performPing, false)
+            )
+        }
     }
 }

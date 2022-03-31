@@ -7,10 +7,15 @@
   <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE"/>
   <uses-permission android:name="android.permission.INTERNET"/>
 
+  <!--
+  As of AGP 4.2.2, manifestPlaceholder isn't working on unit tests: https://issuetracker.google.com/issues/187326576.
+  Issue said to be fixed in next release (AGP 7.0+), but introduces project build/config issues.
+  As a workaround, used resValue instead of manifestPlaceholder.
+  -->
   <application>
     <meta-data
       android:name="com.rakuten.tech.mobile.inappmessaging.subscriptionkey"
-      android:value="${test_sub_key}"/>
+      android:value="@string/test_sub_key"/>
 
     <meta-data
       android:name="com.rakuten.tech.mobile.inappmessaging.debugging"
@@ -18,7 +23,7 @@
 
     <meta-data
       android:name="com.rakuten.tech.mobile.inappmessaging.configurl"
-      android:value="${config_url}"/>
+      android:value="@string/config_url"/>
   </application>
 
 </manifest>

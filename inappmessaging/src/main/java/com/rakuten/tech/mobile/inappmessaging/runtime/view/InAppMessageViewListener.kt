@@ -51,8 +51,10 @@ internal class InAppMessageViewListener(
                 MotionEvent.ACTION_MOVE -> if (this.magnifier != null) {
                     val viewPosition = IntArray(2)
                     view.getLocationOnScreen(viewPosition)
-                    this.magnifier?.show(event.rawX - viewPosition[0],
-                            event.rawY - viewPosition[1])
+                    this.magnifier?.show(
+                        event.rawX - viewPosition[0],
+                        event.rawY - viewPosition[1]
+                    )
                 }
                 MotionEvent.ACTION_CANCEL, MotionEvent.ACTION_UP -> if (this.magnifier != null) {
                     this.magnifier?.dismiss()
@@ -72,14 +74,22 @@ internal class InAppMessageViewListener(
         if (R.id.opt_out_checkbox == view.id) {
             // If user only checked the opt-out box, just assign the isOptOutChecked variable.
             this.isOptOutChecked = (view as CheckBox).isChecked
+        } else if (R.id.message_close_button == view.id && message != null && !message.isCampaignDismissable()) {
+            // Disable closing the message if not dismissable.
+            return
         } else {
             // Handling button click in coroutine.
             handleClick(view.id)
         }
     }
 
+    @SuppressWarnings("ReturnCount")
     override fun onKey(v: View?, keyCode: Int, event: KeyEvent?): Boolean {
         if (event != null && event.action == KeyEvent.ACTION_UP && keyCode == KeyEvent.KEYCODE_BACK) {
+            // Disable closing the message if not dismissable.
+            if (message != null && !message.isCampaignDismissable()) {
+                return false
+            }
             // Handling back button click in coroutine.
             handleClick(MessageActionsCoroutine.BACK_BUTTON)
             return true

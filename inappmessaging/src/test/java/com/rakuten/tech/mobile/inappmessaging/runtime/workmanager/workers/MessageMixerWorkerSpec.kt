@@ -59,9 +59,10 @@ class MessageMixerWorkerSpec : BaseTest() {
         MockitoAnnotations.initMocks(this)
         WorkManagerTestInitHelper.initializeTestWorkManager(ApplicationProvider.getApplicationContext())
         Settings.Secure.putString(
-                ApplicationProvider.getApplicationContext<Context>().contentResolver,
-                Settings.Secure.ANDROID_ID,
-                "test_device_id")
+            ApplicationProvider.getApplicationContext<Context>().contentResolver,
+            Settings.Secure.ANDROID_ID,
+            "test_device_id"
+        )
         InAppMessaging.initialize(ApplicationProvider.getApplicationContext(), true)
         MessageMixerPingScheduler.currDelay = RetryDelayUtil.INITIAL_BACKOFF_DELAY
         MessageMixerWorker.serverErrorCounter.set(0)
@@ -71,7 +72,7 @@ class MessageMixerWorkerSpec : BaseTest() {
     fun `should fail if request fail`() {
         `when`(mockResponse?.isSuccessful).thenReturn(false)
         MessageMixerWorker(context, workerParameters!!)
-                .onResponse(mockResponse!!) shouldBeEqualTo ListenableWorker.Result.failure()
+            .onResponse(mockResponse!!) shouldBeEqualTo ListenableWorker.Result.failure()
     }
 
     @Test
@@ -79,7 +80,7 @@ class MessageMixerWorkerSpec : BaseTest() {
         `when`(mockResponse?.isSuccessful).thenReturn(true)
         `when`(mockResponse?.body() as Any?).thenReturn(null)
         MessageMixerWorker(context!!, workerParameters!!)
-                .onResponse(mockResponse!!) shouldBeEqualTo ListenableWorker.Result.success()
+            .onResponse(mockResponse!!) shouldBeEqualTo ListenableWorker.Result.success()
     }
 
     @Test
@@ -87,7 +88,7 @@ class MessageMixerWorkerSpec : BaseTest() {
         `when`(mockResponse?.isSuccessful).thenReturn(true)
         `when`(mockResponse?.body() as Any?).thenReturn(null)
         MessageMixerWorker(context!!, workerParameters!!)
-                .onResponse(mockResponse!!) shouldBeEqualTo ListenableWorker.Result.success()
+            .onResponse(mockResponse!!) shouldBeEqualTo ListenableWorker.Result.success()
     }
 
     @Test
@@ -95,7 +96,7 @@ class MessageMixerWorkerSpec : BaseTest() {
         `when`(mockResponse?.isSuccessful).thenReturn(true)
         `when`(mockResponse?.body()).thenReturn(MessageMixerResponseSpec.response)
         MessageMixerWorker(context!!, workerParameters!!)
-                .onResponse(mockResponse!!) shouldBeEqualTo ListenableWorker.Result.success()
+            .onResponse(mockResponse!!) shouldBeEqualTo ListenableWorker.Result.success()
     }
 
     @Test
@@ -124,9 +125,11 @@ class MessageMixerWorkerSpec : BaseTest() {
         setupErrorBody()
         `when`(mockRetry.getNextDelay(any())).thenReturn(1000)
 
-        MessageMixerWorker(context!!, workerParameters!!, EventMessageReconciliationScheduler.instance(),
-                mockScheduler, mockRetry)
-                .onResponse(mockResponse!!) shouldBeEqualTo ListenableWorker.Result.Success()
+        MessageMixerWorker(
+            context!!, workerParameters!!, EventMessageReconciliationScheduler.instance(),
+            mockScheduler, mockRetry
+        )
+            .onResponse(mockResponse!!) shouldBeEqualTo ListenableWorker.Result.Success()
 
         Mockito.verify(mockScheduler).pingMessageMixerService(eq(RetryDelayUtil.INITIAL_BACKOFF_DELAY), anyOrNull())
         Mockito.verify(mockRetry).getNextDelay(eq(RetryDelayUtil.INITIAL_BACKOFF_DELAY))
@@ -142,8 +145,10 @@ class MessageMixerWorkerSpec : BaseTest() {
     fun `should return failure on bad request`() {
         setupResponse(HttpURLConnection.HTTP_BAD_REQUEST)
         setupErrorBody()
-        val worker = MessageMixerWorker(context!!, workerParameters!!, EventMessageReconciliationScheduler.instance(),
-            mockScheduler)
+        val worker = MessageMixerWorker(
+            context!!, workerParameters!!, EventMessageReconciliationScheduler.instance(),
+            mockScheduler
+        )
         worker.onResponse(mockResponse!!) shouldBeEqualTo ListenableWorker.Result.failure()
     }
 
@@ -152,8 +157,10 @@ class MessageMixerWorkerSpec : BaseTest() {
         setupResponse(RetryDelayUtil.RETRY_ERROR_CODE)
         `when`(mockResponse?.body()).thenReturn(Mockito.mock(MessageMixerResponse::class.java))
 
-        val worker = MessageMixerWorker(context!!, workerParameters!!, EventMessageReconciliationScheduler.instance(),
-                mockScheduler)
+        val worker = MessageMixerWorker(
+            context!!, workerParameters!!, EventMessageReconciliationScheduler.instance(),
+            mockScheduler
+        )
         worker.onResponse(mockResponse!!) shouldBeEqualTo ListenableWorker.Result.Success()
         Mockito.verify(mockScheduler).pingMessageMixerService(eq(RetryDelayUtil.INITIAL_BACKOFF_DELAY), anyOrNull())
         MessageMixerPingScheduler.currDelay shouldBeGreaterThan (RetryDelayUtil.INITIAL_BACKOFF_DELAY * 2)
@@ -167,22 +174,28 @@ class MessageMixerWorkerSpec : BaseTest() {
     @Test
     fun `should return success in api call`() {
         HostAppInfoRepository.instance().addHostInfo(
-                HostAppInfo(
-                        "rakuten.com.tech.mobile.test",
-                        InAppMessagingTestConstants.DEVICE_ID,
-                        InAppMessagingTestConstants.APP_VERSION,
-                        "test-key",
-                        InAppMessagingTestConstants.LOCALE))
+            HostAppInfo(
+                "rakuten.com.tech.mobile.test",
+                InAppMessagingTestConstants.DEVICE_ID,
+                InAppMessagingTestConstants.APP_VERSION,
+                "test-key",
+                InAppMessagingTestConstants.LOCALE
+            )
+        )
         retrieveValidConfig()
         MessageMixerWorker(context!!, workerParameters!!).doWork() shouldBeEqualTo ListenableWorker.Result.retry()
     }
 
     @Test
+    @SuppressWarnings("LongMethod")
     fun `should have valid request payload`() {
         HostAppInfoRepository.instance().addHostInfo(
-                HostAppInfo("rakuten.com.tech.mobile.test", InAppMessagingTestConstants.DEVICE_ID,
-                        InAppMessagingTestConstants.APP_VERSION, "test-key",
-                        InAppMessagingTestConstants.LOCALE))
+            HostAppInfo(
+                "rakuten.com.tech.mobile.test", InAppMessagingTestConstants.DEVICE_ID,
+                InAppMessagingTestConstants.APP_VERSION, "test-key",
+                InAppMessagingTestConstants.LOCALE
+            )
+        )
         AccountRepository.instance().userInfoProvider = object : UserInfoProvider {
             override fun provideAccessToken() = ""
             override fun provideUserId() = "user1"
@@ -194,8 +207,9 @@ class MessageMixerWorkerSpec : BaseTest() {
         val buffer = Buffer()
         worker.responseCall!!.request().body()!!.writeTo(buffer)
         buffer.readUtf8().shouldContainAll(
-                "\"id\":\"tracking1\",\"type\":2",
-                "\"id\":\"user1\",\"type\":3")
+            "\"id\":\"tracking1\",\"type\":2",
+            "\"id\":\"user1\",\"type\":3"
+        )
     }
 
     private fun verifyBackoff() {
@@ -216,8 +230,10 @@ class MessageMixerWorkerSpec : BaseTest() {
 
     private fun retrieveValidConfig() {
         val mockMessageScheduler = Mockito.mock(MessageMixerPingScheduler::class.java)
-        val worker = ConfigWorker(context, workerParameters, HostAppInfoRepository.instance(),
-                ConfigResponseRepository.instance(), mockMessageScheduler)
+        val worker = ConfigWorker(
+            context, workerParameters, HostAppInfoRepository.instance(),
+            ConfigResponseRepository.instance(), mockMessageScheduler
+        )
         worker.doWork()
     }
 

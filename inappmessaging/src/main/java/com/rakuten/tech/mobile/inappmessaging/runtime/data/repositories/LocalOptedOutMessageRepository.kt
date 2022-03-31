@@ -29,6 +29,7 @@ internal interface LocalOptedOutMessageRepository {
 
     companion object {
         private var instance: LocalOptedOutMessageRepository = LocalOptedOutMessageRepositoryImpl()
+
         @VisibleForTesting
         internal const val LOCAL_OPTED_OUT_KEY = "local_opted_out_list"
         private const val TAG = "IAM_LocalOptedOutRepo"
@@ -73,7 +74,8 @@ internal interface LocalOptedOutMessageRepository {
         private fun checkAndResetSet(onLaunch: Boolean = false) {
             // check if caching is enabled and if there are changes in user info
             if (InAppMessaging.instance().isLocalCachingEnabled() &&
-                    (onLaunch || user != AccountRepository.instance().userInfoHash)) {
+                (onLaunch || user != AccountRepository.instance().userInfoHash)
+            ) {
                 user = AccountRepository.instance().userInfoHash
                 optedOutMessages.clear()
                 // reset id list from cached using updated user info

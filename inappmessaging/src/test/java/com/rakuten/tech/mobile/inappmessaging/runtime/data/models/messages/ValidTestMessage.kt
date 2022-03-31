@@ -5,7 +5,8 @@ import com.rakuten.tech.mobile.inappmessaging.runtime.data.responses.ping.*
 
 internal class ValidTestMessage(
     private val campaignId: String = DEFAULT_CAMPAIGN_ID,
-    private val isTest: Boolean = IS_TEST
+    private val isTest: Boolean = IS_TEST,
+    private val isCampaignDismissable: Boolean = true
 ) : Message {
     internal var timesClosed = 0
     private var max = 1
@@ -20,12 +21,15 @@ internal class ValidTestMessage(
         return triggerList
     }
 
-    override fun getMessagePayload(): MessagePayload = MessagePayload(DEFAULT_COLOR, "#ffffff",
+    override fun getMessagePayload(): MessagePayload = MessagePayload(
+        DEFAULT_COLOR, "#ffffff",
         MessageSettings(
             DisplaySettings(1, 1, 1, 1, false, 1, false),
             ControlSettings(listOf())
-        ), null, Resource(cropType = 2), DEFAULT_COLOR, null, "#ffffff", "title",
-        DEFAULT_COLOR)
+        ),
+        null, Resource(cropType = 2), DEFAULT_COLOR, null, "#ffffff", "title",
+        DEFAULT_COLOR
+    )
 
     override fun isTest(): Boolean = isTest
 
@@ -43,13 +47,20 @@ internal class ValidTestMessage(
         timesClosed++
     }
 
+    override fun infiniteImpressions() = false
+
+    override fun hasNoEndDate() = false
+
+    override fun isCampaignDismissable() = isCampaignDismissable
+
     @SuppressWarnings("ComplexCondition")
     override fun equals(other: Any?): Boolean {
         val otherObject = other as Message
         if (getType() != otherObject.getType() ||
-                getCampaignId() != otherObject.getCampaignId() ||
-                isTest() != otherObject.isTest() ||
-                getMaxImpressions() != otherObject.getMaxImpressions()) return false
+            getCampaignId() != otherObject.getCampaignId() ||
+            isTest() != otherObject.isTest() ||
+            getMaxImpressions() != otherObject.getMaxImpressions()
+        ) return false
         return true
     }
 

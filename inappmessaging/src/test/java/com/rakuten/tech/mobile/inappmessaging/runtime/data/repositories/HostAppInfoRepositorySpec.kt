@@ -18,18 +18,19 @@ class HostAppInfoRepositorySpec : BaseTest() {
     @Test
     fun `should use correct data`() {
         val testAppInfo = HostAppInfo(
-                InAppMessagingTestConstants.APP_ID,
-                InAppMessagingTestConstants.DEVICE_ID,
-                InAppMessagingTestConstants.APP_VERSION,
-                InAppMessagingTestConstants.SUB_KEY,
-                InAppMessagingTestConstants.LOCALE)
+            InAppMessagingTestConstants.APP_ID,
+            InAppMessagingTestConstants.DEVICE_ID,
+            InAppMessagingTestConstants.APP_VERSION,
+            InAppMessagingTestConstants.SUB_KEY,
+            InAppMessagingTestConstants.LOCALE
+        )
         HostAppInfoRepository.instance().addHostInfo(testAppInfo)
         HostAppInfoRepository.instance().getVersion() shouldBeEqualTo InAppMessagingTestConstants.APP_VERSION
         HostAppInfoRepository.instance().getPackageName() shouldBeEqualTo InAppMessagingTestConstants.APP_ID
         HostAppInfoRepository.instance().getDeviceLocale() shouldBeEqualTo InAppMessagingTestConstants.LOCALE.toString()
-                .replace("_", "-").lowercase(Locale.getDefault())
+            .replace("_", "-").lowercase(Locale.getDefault())
         HostAppInfoRepository.instance()
-                .getInAppMessagingSubscriptionKey() shouldBeEqualTo InAppMessagingTestConstants.SUB_KEY
+            .getInAppMessagingSubscriptionKey() shouldBeEqualTo InAppMessagingTestConstants.SUB_KEY
         HostAppInfoRepository.instance().getDeviceId() shouldBeEqualTo InAppMessagingTestConstants.DEVICE_ID
     }
 
@@ -68,8 +69,9 @@ class HostAppInfoRepositorySpec : BaseTest() {
     @Test
     fun `should throw exception for invalid subscription key`() {
         val hostAppInfo = HostAppInfo(
-                version = InAppMessagingTestConstants.APP_VERSION,
-                packageName = InAppMessagingTestConstants.APP_ID)
+            version = InAppMessagingTestConstants.APP_VERSION,
+            packageName = InAppMessagingTestConstants.APP_ID
+        )
         try {
             HostAppInfoRepository.instance().addHostInfo(hostAppInfo)
             Assert.fail()
@@ -81,19 +83,21 @@ class HostAppInfoRepositorySpec : BaseTest() {
     @Test
     fun `should not throw exception for invalid locale`() {
         val hostAppInfo = HostAppInfo(
-                version = InAppMessagingTestConstants.APP_VERSION,
-                packageName = InAppMessagingTestConstants.APP_ID,
-                subscriptionKey = InAppMessagingTestConstants.SUB_KEY)
+            version = InAppMessagingTestConstants.APP_VERSION,
+            packageName = InAppMessagingTestConstants.APP_ID,
+            subscriptionKey = InAppMessagingTestConstants.SUB_KEY
+        )
         HostAppInfoRepository.instance().addHostInfo(hostAppInfo)
     }
 
     @Test
     fun `should not throw exception for invalid device id`() {
         val hostAppInfo = HostAppInfo(
-                version = InAppMessagingTestConstants.APP_VERSION,
-                packageName = InAppMessagingTestConstants.APP_ID,
-                subscriptionKey = InAppMessagingTestConstants.SUB_KEY,
-                locale = InAppMessagingTestConstants.LOCALE)
+            version = InAppMessagingTestConstants.APP_VERSION,
+            packageName = InAppMessagingTestConstants.APP_ID,
+            subscriptionKey = InAppMessagingTestConstants.SUB_KEY,
+            locale = InAppMessagingTestConstants.LOCALE
+        )
         HostAppInfoRepository.instance().addHostInfo(hostAppInfo)
     }
 }

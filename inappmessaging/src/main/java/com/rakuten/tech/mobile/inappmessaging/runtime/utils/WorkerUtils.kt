@@ -6,6 +6,8 @@ import com.rakuten.tech.mobile.inappmessaging.runtime.exception.InAppMessagingEx
 import com.rakuten.tech.mobile.sdkutils.logger.Logger
 
 internal object WorkerUtils {
+    private const val MAX_RETRY = 3
+
     fun logRequestError(tag: String, code: Int, message: String?) {
         val errMsg = "Response Code $code: ${message ?: "no error message"}"
         Logger(tag).error(errMsg)
@@ -25,6 +27,4 @@ internal object WorkerUtils {
             ListenableWorker.Result.failure()
         }
     }
-
-    private const val MAX_RETRY = 3
 }

@@ -56,7 +56,8 @@ class PingResponseMessageRepositorySpec : BaseTest() {
     @Test
     fun `should ignore invalid message in the list`() {
         PingResponseMessageRepository.instance().replaceAllMessages(
-                listOf(InvalidTestMessage(), message0, ValidTestMessage("")))
+            listOf(InvalidTestMessage(), message0, ValidTestMessage(""))
+        )
         PingResponseMessageRepository.instance().getAllMessagesCopy().shouldHaveSize(1)
     }
 
@@ -133,7 +134,7 @@ class PingResponseMessageRepositorySpec : BaseTest() {
         PingResponseMessageRepository.instance().replaceAllMessages(messageList)
         for (msg in PingResponseMessageRepository.instance().getAllMessagesCopy()) {
             PingResponseMessageRepository.instance()
-                    .shouldDisplayAppLaunchCampaign(msg.getCampaignId()).shouldBeFalse()
+                .shouldDisplayAppLaunchCampaign(msg.getCampaignId()).shouldBeFalse()
         }
     }
 
@@ -144,18 +145,26 @@ class PingResponseMessageRepositorySpec : BaseTest() {
         PingResponseMessageRepository.instance().replaceAllMessages(messageList)
         for (msg in PingResponseMessageRepository.instance().getAllMessagesCopy()) {
             PingResponseMessageRepository.instance()
-                    .shouldDisplayAppLaunchCampaign(msg.getCampaignId()).shouldBeTrue()
+                .shouldDisplayAppLaunchCampaign(msg.getCampaignId()).shouldBeTrue()
         }
     }
 
     @Test
+    @SuppressWarnings("LongMethod")
     fun `should return true to app launch only and false to multiple triggers`() {
         initializeInstance(TestUserInfoProvider(), false)
         PingResponseMessageRepository.isInitialLaunch = true
         val mockMessage = Mockito.mock(Message::class.java)
         `when`(mockMessage.getCampaignId()).thenReturn("54321")
-        `when`(mockMessage.getTriggers()).thenReturn(listOf(Trigger(1, 1, "test",
-            mutableListOf()), Trigger(1, 2, "test2", mutableListOf())))
+        `when`(mockMessage.getTriggers()).thenReturn(
+            listOf(
+                Trigger(
+                    1, 1, "test",
+                    mutableListOf()
+                ),
+                Trigger(1, 2, "test2", mutableListOf())
+            )
+        )
         messageList.add(mockMessage)
         PingResponseMessageRepository.instance().replaceAllMessages(messageList)
         for (msg in PingResponseMessageRepository.instance().getAllMessagesCopy()) {
@@ -225,8 +234,10 @@ class PingResponseMessageRepositorySpec : BaseTest() {
 
     private fun initializeInstance(infoProvider: UserInfoProvider, isCache: Boolean = true) {
         WorkManagerTestInitHelper.initializeTestWorkManager(ApplicationProvider.getApplicationContext())
-        Settings.Secure.putString(ApplicationProvider.getApplicationContext<Context>().contentResolver,
-                Settings.Secure.ANDROID_ID, "test_device_id")
+        Settings.Secure.putString(
+            ApplicationProvider.getApplicationContext<Context>().contentResolver,
+            Settings.Secure.ANDROID_ID, "test_device_id"
+        )
         InAppMessaging.initialize(ApplicationProvider.getApplicationContext(), isCache)
         InAppMessaging.instance().registerPreference(infoProvider)
     }

@@ -70,14 +70,17 @@ class DisplayMessageRunnableSpec : BaseTest() {
     fun `should throw exception with mock activity for full`() {
         WorkManagerTestInitHelper.initializeTestWorkManager(ApplicationProvider.getApplicationContext())
         Settings.Secure.putString(
-                ApplicationProvider.getApplicationContext<Context>().contentResolver,
-                Settings.Secure.ANDROID_ID,
-                "test_device_id")
+            ApplicationProvider.getApplicationContext<Context>().contentResolver,
+            Settings.Secure.ANDROID_ID,
+            "test_device_id"
+        )
         InAppMessaging.initialize(ApplicationProvider.getApplicationContext())
         `when`(message.getType()).thenReturn(InAppMessageType.FULL.typeId)
         `when`(message.getMessagePayload()).thenReturn(payload)
-        `when`(hostAppActivity
-                .layoutInflater).thenReturn(LayoutInflater.from(ApplicationProvider.getApplicationContext()))
+        `when`(
+            hostAppActivity
+                .layoutInflater
+        ).thenReturn(LayoutInflater.from(ApplicationProvider.getApplicationContext()))
         DisplayMessageRunnable(message, hostAppActivity).run()
     }
 
@@ -85,14 +88,17 @@ class DisplayMessageRunnableSpec : BaseTest() {
     fun `should not throw exception with mock activity for modal`() {
         WorkManagerTestInitHelper.initializeTestWorkManager(ApplicationProvider.getApplicationContext())
         Settings.Secure.putString(
-                ApplicationProvider.getApplicationContext<Context>().contentResolver,
-                Settings.Secure.ANDROID_ID,
-                "test_device_id")
+            ApplicationProvider.getApplicationContext<Context>().contentResolver,
+            Settings.Secure.ANDROID_ID,
+            "test_device_id"
+        )
         InAppMessaging.initialize(ApplicationProvider.getApplicationContext())
         `when`(message.getType()).thenReturn(InAppMessageType.MODAL.typeId)
         `when`(message.getMessagePayload()).thenReturn(payload)
-        `when`(hostAppActivity
-                .layoutInflater).thenReturn(LayoutInflater.from(ApplicationProvider.getApplicationContext()))
+        `when`(
+            hostAppActivity
+                .layoutInflater
+        ).thenReturn(LayoutInflater.from(ApplicationProvider.getApplicationContext()))
         DisplayMessageRunnable(message, hostAppActivity).run()
     }
 
@@ -100,14 +106,17 @@ class DisplayMessageRunnableSpec : BaseTest() {
     fun `should not throw exception with mock activity for slide`() {
         WorkManagerTestInitHelper.initializeTestWorkManager(ApplicationProvider.getApplicationContext())
         Settings.Secure.putString(
-                ApplicationProvider.getApplicationContext<Context>().contentResolver,
-                Settings.Secure.ANDROID_ID,
-                "test_device_id")
+            ApplicationProvider.getApplicationContext<Context>().contentResolver,
+            Settings.Secure.ANDROID_ID,
+            "test_device_id"
+        )
         InAppMessaging.initialize(ApplicationProvider.getApplicationContext())
         `when`(message.getType()).thenReturn(InAppMessageType.SLIDE.typeId)
         `when`(message.getMessagePayload()).thenReturn(payload)
-        `when`(hostAppActivity
-                .layoutInflater).thenReturn(LayoutInflater.from(ApplicationProvider.getApplicationContext()))
+        `when`(
+            hostAppActivity
+                .layoutInflater
+        ).thenReturn(LayoutInflater.from(ApplicationProvider.getApplicationContext()))
         DisplayMessageRunnable(message, hostAppActivity).run()
     }
 }

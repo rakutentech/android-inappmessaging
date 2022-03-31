@@ -51,6 +51,7 @@ internal interface LocalDisplayedMessageRepository {
 
     companion object {
         private var instance: LocalDisplayedMessageRepository = LocalDisplayedMessageRepositoryImpl()
+
         @VisibleForTesting
         internal const val LOCAL_DISPLAYED_KEY = "local_displayed_list"
         private const val TAG = "IAM_LocalDisplayRepo"
@@ -130,7 +131,8 @@ internal interface LocalDisplayedMessageRepository {
         private fun checkAndResetMap(onLaunch: Boolean = false) {
             // check if caching is enabled and if there are changes in user info
             if (InAppMessaging.instance().isLocalCachingEnabled() &&
-                    (onLaunch || user != AccountRepository.instance().userInfoHash)) {
+                (onLaunch || user != AccountRepository.instance().userInfoHash)
+            ) {
                 user = AccountRepository.instance().userInfoHash
                 // reset message list from cached using updated user info
                 resetDisplayed()
