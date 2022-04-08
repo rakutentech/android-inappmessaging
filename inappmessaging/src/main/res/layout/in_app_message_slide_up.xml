@@ -34,21 +34,25 @@
       style="@style/InAppMessaging.Text.Slide"
       android:layout_width="0dp"
       android:layout_height="match_parent"
-      android:layout_marginTop="@dimen/slide_up_text_margin_top"
+      android:layout_marginEnd="@dimen/slide_up_text_margin_end"
+      android:paddingTop="@dimen/slide_up_text_margin_top"
+      android:paddingBottom="@dimen/slide_up_text_margin_bottom"
       android:minHeight="@dimen/slide_up_text_min_height"
       app:layout_constraintLeft_toLeftOf="@id/left_guideline"
-      app:layout_constraintRight_toRightOf="@id/right_guideline"
+      app:layout_constraintRight_toLeftOf="@id/message_close_button"
       tools:text="@string/example_body_text"
-      tools:visibility="visible" />
+      tools:visibility="visible"/>
 
     <ImageButton
       android:id="@+id/message_close_button"
       style="@style/InAppMessaging.CloseButton.SlideUp"
       app:layout_constraintEnd_toEndOf="parent"
       app:layout_constraintHorizontal_bias="1.0"
-      app:layout_constraintStart_toStartOf="parent"
+      app:layout_constraintStart_toStartOf="@id/right_guideline"
       app:layout_constraintTop_toTopOf="parent"
-      android:contentDescription="@string/close_button" />
+      android:contentDescription="@string/close_button"
+      android:visibility="visible"/>
+
 
   </androidx.constraintlayout.widget.ConstraintLayout>
 
