@@ -17,7 +17,7 @@
 
   <!--Modal Button-->
   <dimen name="modal_button_height">53dp</dimen>
-  <dimen name="modal_button_border_stroke_width">0.5dp</dimen>
+  <dimen name="modal_button_border_stroke_width">1dp</dimen>
   <dimen name="modal_button_corner_radius">4dp</dimen>
   <dimen name="modal_button_double_margin_left_right">8dp</dimen>
   <dimen name="modal_button_double_margin_top_bottom">24dp</dimen>
