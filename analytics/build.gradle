@@ -2,7 +2,9 @@ apply from: '../config/android/library.gradle'
 apply from: "../config/quality/gitleaks/build.gradle"
 apply plugin: 'kotlin-android'
 
-java {
-    sourceCompatibility = JavaVersion.VERSION_11
-    targetCompatibility = JavaVersion.VERSION_11
+
+android {
+    kotlinOptions {
+        jvmTarget = JavaVersion.toVersion(CONFIG.versions.java).toString()
+    }
 }

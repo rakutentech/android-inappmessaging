@@ -19,7 +19,7 @@ buildscript {
     dependencies {
         classpath "com.android.tools.build:gradle:$CONFIG.versions.android.plugin"
         classpath "org.jetbrains.kotlin:kotlin-gradle-plugin:$CONFIG.versions.kotlin"
-        classpath 'pl.allegro.tech.build:axion-release-plugin:1.10.2'
+        classpath 'pl.allegro.tech.build:axion-release-plugin:1.13.6'
         classpath 'com.github.ben-manes:gradle-versions-plugin:0.27.0'
         classpath "org.jetbrains.dokka:dokka-gradle-plugin:${dokka_version}"
         classpath 'org.owasp:dependency-check-gradle:6.5.3'

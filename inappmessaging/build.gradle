@@ -21,13 +21,6 @@ android {
     it.java.srcDirs += "src/$it.name/kotlin"
   }
 
-  compileOptions {
-    // Source code java level(Source code of this project).
-    sourceCompatibility JavaVersion.VERSION_11
-    // Target JVM level(JVM on Android devices).
-    targetCompatibility JavaVersion.VERSION_11
-  }
-
   kotlinOptions {
     jvmTarget = JavaVersion.VERSION_11.toString()
   }
