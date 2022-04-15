@@ -388,6 +388,9 @@ Documents targeting Product Managers:
 ## <a name="changelog"></a> Changelog
 
 ### 7.0.0 (in-progress)
+* SDKCF-4919: **Breaking Changes:** Build using Java 11.
+  - Added Support for building with Java 11. You will need to set your JDK version to 11.
+  - Bumped gradle to 7.2.
 * SDKCF-4941: **Breaking Changes:** Updated configuration API to align with iOS.
   - Renamed `init()` API to `configure()`.
   - Removed optional `errorCallback` lambda function parameter in `configure()`, and changed as static variable.
