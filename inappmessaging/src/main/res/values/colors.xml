@@ -1,4 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
   <color name="in_app_message_frame_light">#5F333333</color>
+  <color name="modal_border_color_light_grey">#D1D1D1</color>
 </resources>

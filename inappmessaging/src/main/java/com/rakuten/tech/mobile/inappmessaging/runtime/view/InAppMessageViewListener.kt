@@ -74,7 +74,7 @@ internal class InAppMessageViewListener(
         if (R.id.opt_out_checkbox == view.id) {
             // If user only checked the opt-out box, just assign the isOptOutChecked variable.
             this.isOptOutChecked = (view as CheckBox).isChecked
-        } else if (message != null && !message.isCampaignDismissable()) {
+        } else if (R.id.message_close_button == view.id && message != null && !message.isCampaignDismissable()) {
             // Disable closing the message if not dismissable.
             return
         } else {
