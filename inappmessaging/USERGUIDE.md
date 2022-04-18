@@ -392,6 +392,9 @@ Documents targeting Product Managers:
   - Renamed `init()` API to `configure()`.
   - Removed optional `errorCallback` lambda function parameter in `configure()`, and changed as static variable.
   - Please see [Configuring In-App Messaging SDK section](#configure-sdk) for details and sample code.
+* SDKCF-4919: Added support for building using Java 11.
+  - Bumped Java version to Java 11.
+  - Bumped gradle to 7.2.
 * SDKCF-4904: Updated dependencies to fix vulnerability issues.
 * SDKCF-5002:  Campaign UX Improvements: Added handling for new flags in campaign payload:
   - Setting to Hide the top right "x" closing button.
