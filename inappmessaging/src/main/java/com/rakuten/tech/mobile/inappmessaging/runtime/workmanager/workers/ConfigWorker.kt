@@ -64,7 +64,9 @@ internal class ConfigWorker(
 
         val configUrl = hostRepo.getConfigUrl()
         val sdkVersion = BuildConfig.VERSION_NAME
-        val params = ConfigQueryParamsBuilder(hostAppId, locale, hostAppVersion, sdkVersion).queryParams
+        val params = ConfigQueryParamsBuilder(
+            appId = hostAppId, locale = locale, appVersion = hostAppVersion, sdkVersion = sdkVersion
+        ).queryParams
         val configServiceCall = RuntimeUtil.getRetrofit()
             .create(ConfigRetrofitService::class.java)
             .getConfigService(configUrl, subscriptionId, params)

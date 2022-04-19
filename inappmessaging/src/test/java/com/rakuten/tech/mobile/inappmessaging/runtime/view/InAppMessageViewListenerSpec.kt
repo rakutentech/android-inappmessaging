@@ -105,21 +105,13 @@ class InAppMessageViewListenerOnClickSpec : InAppMessageViewListenerSpec() {
     }
 
     @Test
-    fun `should start worker with zero delay due to null values`() {
+    fun `should start worker with zero delay due to null value`() {
         `when`(mockCoroutine.executeTask(mockMessage, R.id.message_close_button, false)).thenReturn(true)
-        `when`(mockMessage.getMessagePayload()).thenReturn(null)
-        instance.handleMessage(R.id.message_close_button)
-        Mockito.verify(mockEventScheduler).startEventMessageReconciliationWorker(anyOrNull(), eq(0L))
-
         `when`(mockMessage.getMessagePayload()).thenReturn(mockPayload)
-        `when`(mockPayload.messageSettings).thenReturn(null)
-        instance.handleMessage(R.id.message_close_button)
-        Mockito.verify(mockEventScheduler, times(2)).startEventMessageReconciliationWorker(anyOrNull(), eq(0L))
-
         `when`(mockPayload.messageSettings).thenReturn(mockSettings)
         `when`(mockSettings.displaySettings).thenReturn(Mockito.mock(DisplaySettings::class.java))
         instance.handleMessage(R.id.message_close_button)
-        Mockito.verify(mockEventScheduler, times(3)).startEventMessageReconciliationWorker(anyOrNull(), eq(0L))
+        Mockito.verify(mockEventScheduler).startEventMessageReconciliationWorker(anyOrNull(), eq(0L))
     }
 
     @Test

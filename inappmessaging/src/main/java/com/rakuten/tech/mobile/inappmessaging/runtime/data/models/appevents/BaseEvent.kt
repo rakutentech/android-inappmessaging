@@ -22,6 +22,7 @@ import java.util.Collections
  * logEvent name will be stored in upper case form.
  */
 @RestrictTo(LIBRARY)
+@SuppressWarnings("UnnecessaryAbstractClass")
 abstract class BaseEvent(
     @NotNull private val eventType: EventType,
     @NotNull private var eventName: String,

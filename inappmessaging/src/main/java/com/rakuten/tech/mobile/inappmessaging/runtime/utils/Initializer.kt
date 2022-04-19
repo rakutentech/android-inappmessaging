@@ -91,8 +91,9 @@ internal object Initializer {
         sharedUtil: PreferencesUtil = PreferencesUtil
     ) {
         val hostAppInfo = HostAppInfo(
-            getHostAppPackageName(context), getDeviceId(context, sharedUtil),
-            getHostAppVersion(context), subscriptionKey, getLocale(context), configUrl
+            packageName = getHostAppPackageName(context), deviceId = getDeviceId(context, sharedUtil),
+            version = getHostAppVersion(context), subscriptionKey = subscriptionKey, locale = getLocale(context),
+            configUrl = configUrl
         )
 
         // Store hostAppInfo in repository.
@@ -110,13 +111,13 @@ internal object Initializer {
     private fun getUuid(context: Context, sharedUtil: PreferencesUtil): String {
         if (sharedUtil.contains(context, "uuid", ID_KEY)) {
             try {
-                return sharedUtil.getString(context, "uuid", ID_KEY, "").toString()
+                return sharedUtil.getString(context = context, name = "uuid", key = ID_KEY, defValue = "").orEmpty()
             } catch (ex: ClassCastException) {
                 Logger(TAG).debug(ex.cause, "Incorrect type for $ID_KEY data")
             }
         }
         val id = UUID.randomUUID().toString()
-        sharedUtil.putString(context, "uuid", ID_KEY, id)
+        sharedUtil.putString(context = context, name = "uuid", key = ID_KEY, value = id)
         return id
     }
 

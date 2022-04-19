@@ -89,9 +89,9 @@ internal interface HostAppInfoRepository {
             }
         }
 
-        override fun getVersion(): String = hostAppInfo?.version ?: ""
+        override fun getVersion(): String = hostAppInfo?.version.orEmpty()
 
-        override fun getPackageName(): String = hostAppInfo?.packageName ?: ""
+        override fun getPackageName(): String = hostAppInfo?.packageName.orEmpty()
 
         override fun getDeviceLocale(): String {
             val locale = hostAppInfo?.locale ?: Locale.getDefault()
@@ -99,10 +99,10 @@ internal interface HostAppInfoRepository {
         }
 
         @SuppressWarnings("FunctionMaxLength")
-        override fun getInAppMessagingSubscriptionKey(): String = hostAppInfo?.subscriptionKey ?: ""
+        override fun getInAppMessagingSubscriptionKey(): String = hostAppInfo?.subscriptionKey.orEmpty()
 
-        override fun getDeviceId(): String = hostAppInfo?.deviceId ?: ""
+        override fun getDeviceId(): String = hostAppInfo?.deviceId.orEmpty()
 
-        override fun getConfigUrl(): String = hostAppInfo?.configUrl ?: ""
+        override fun getConfigUrl(): String = hostAppInfo?.configUrl.orEmpty()
     }
 }

@@ -47,7 +47,7 @@ internal open class InAppMessageBaseView(context: Context, attrs: AttributeSet?)
     private var messageBodyColor = 0
     private var header: String? = null
     private var messageBody: String? = null
-    private var buttons: List<MessageButton>? = null
+    private var buttons = emptyList<MessageButton>()
     private var displayOptOut = false
     private var isDismissable: Boolean = true
 
@@ -116,17 +116,17 @@ internal open class InAppMessageBaseView(context: Context, attrs: AttributeSet?)
             }
         }
 
-        when (this.buttons?.size) {
+        when (this.buttons.size) {
             1 -> {
                 // Set bigger layout_margin if there's only one button.
                 findViewById<MaterialButton>(R.id.message_single_button)?.let {
-                    setButtonInfo(it, this.buttons!![0])
+                    setButtonInfo(it, this.buttons[0])
                 }
             }
             2 -> {
                 // Set bigger layout_margin if there's only one button.
-                findViewById<MaterialButton>(R.id.message_button_left)?.let { setButtonInfo(it, this.buttons!![0]) }
-                findViewById<MaterialButton>(R.id.message_button_right)?.let { setButtonInfo(it, this.buttons!![1]) }
+                findViewById<MaterialButton>(R.id.message_button_left)?.let { setButtonInfo(it, this.buttons[0]) }
+                findViewById<MaterialButton>(R.id.message_button_right)?.let { setButtonInfo(it, this.buttons[1]) }
             }
             else -> Any()
         }
@@ -152,12 +152,12 @@ internal open class InAppMessageBaseView(context: Context, attrs: AttributeSet?)
         if (!this.imageUrl.isNullOrEmpty()) {
             // load the image then display the view
             this.visibility = GONE
-            findViewById<ImageView>(R.id.message_image_view)?.let {
-                it.setOnTouchListener(this.listener)
+            findViewById<ImageView>(R.id.message_image_view)?.let { imgView ->
+                imgView.setOnTouchListener(this.listener)
                 try {
                     val callback = object : Callback {
                         override fun onSuccess() {
-                            it.visibility = VISIBLE
+                            imgView.visibility = VISIBLE
                             this@InAppMessageBaseView.visibility = VISIBLE
                         }
 
@@ -170,7 +170,7 @@ internal open class InAppMessageBaseView(context: Context, attrs: AttributeSet?)
                         .resize(ViewUtil.getDisplayWidth(context), 0)
                         .onlyScaleDown()
                         .centerInside()
-                        .into(it, callback)
+                        .into(imgView, callback)
                 } catch (ex: Exception) {
                     Logger(TAG).debug(ex, "Downloading image failed $imageUrl")
                 }
@@ -223,24 +223,24 @@ internal open class InAppMessageBaseView(context: Context, attrs: AttributeSet?)
             findViewById<NestedScrollView>(R.id.message_scrollview)?.visibility = View.VISIBLE
         }
         if (!header.isNullOrEmpty()) {
-            findViewById<TextView>(R.id.header_text)?.let {
-                it.text = header
-                it.setTextColor(headerColor)
-                it.setOnTouchListener(listener)
-                it.visibility = View.VISIBLE
+            findViewById<TextView>(R.id.header_text)?.let { textView ->
+                textView.text = header
+                textView.setTextColor(headerColor)
+                textView.setOnTouchListener(listener)
+                textView.visibility = View.VISIBLE
                 getFont(HEADER_FONT)?.let { font ->
-                    it.typeface = font
+                    textView.typeface = font
                 }
             }
         }
         if (!messageBody.isNullOrEmpty()) {
-            findViewById<TextView>(R.id.message_body)?.let {
-                it.text = messageBody
-                it.setTextColor(messageBodyColor)
-                it.setOnTouchListener(listener)
-                it.visibility = View.VISIBLE
+            findViewById<TextView>(R.id.message_body)?.let { textView ->
+                textView.text = messageBody
+                textView.setTextColor(messageBodyColor)
+                textView.setOnTouchListener(listener)
+                textView.visibility = View.VISIBLE
                 getFont(BODY_FONT)?.let { font ->
-                    it.typeface = font
+                    textView.typeface = font
                 }
             }
         }

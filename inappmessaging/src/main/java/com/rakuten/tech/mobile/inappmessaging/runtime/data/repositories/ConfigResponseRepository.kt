@@ -72,10 +72,10 @@ internal interface ConfigResponseRepository {
 
         override fun isConfigEnabled(): Boolean = isEnabled
 
-        override fun getPingEndpoint(): String = configResponseData?.endpoints?.ping ?: ""
+        override fun getPingEndpoint(): String = configResponseData?.endpoints?.ping.orEmpty()
 
-        override fun getImpressionEndpoint(): String = configResponseData?.endpoints?.impression ?: ""
+        override fun getImpressionEndpoint(): String = configResponseData?.endpoints?.impression.orEmpty()
 
-        override fun getDisplayPermissionEndpoint(): String = configResponseData?.endpoints?.displayPermission ?: ""
+        override fun getDisplayPermissionEndpoint(): String = configResponseData?.endpoints?.displayPermission.orEmpty()
     }
 }

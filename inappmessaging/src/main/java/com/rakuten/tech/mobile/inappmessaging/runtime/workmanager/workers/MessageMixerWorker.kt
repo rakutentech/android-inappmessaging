@@ -40,7 +40,7 @@ internal class MessageMixerWorker(
     Worker(context, workerParams) {
 
     @VisibleForTesting
-    internal var responseCall: Call<MessageMixerResponse>? = null
+    internal var testResponse: Call<MessageMixerResponse>? = null
 
     /**
      * Overload constructor to handle OneTimeWorkRequest.Builder().
@@ -55,6 +55,7 @@ internal class MessageMixerWorker(
      * Main method to do the work. Make Message Mixer network call is the main work.
      * Retries sending the request with default backoff when network error is encountered.
      */
+    @SuppressWarnings("LongMethod")
     override fun doWork(): Result {
         // Create a retrofit API.
         val serviceApi: MessageMixerRetrofitService =
@@ -64,17 +65,19 @@ internal class MessageMixerWorker(
         val pingRequest = PingRequest(HostAppInfoRepository.instance().getVersion(), RuntimeUtil.getUserIdentifiers())
 
         // Create an retrofit API network call.
-        responseCall = serviceApi.performPing(
-            HostAppInfoRepository.instance().getInAppMessagingSubscriptionKey(),
-            AccountRepository.instance().getAccessToken(),
-            HostAppInfoRepository.instance().getDeviceId(),
-            ConfigResponseRepository.instance().getPingEndpoint(),
-            pingRequest
+        val call = serviceApi.performPing(
+            subscriptionId = HostAppInfoRepository.instance().getInAppMessagingSubscriptionKey(),
+            accessToken = AccountRepository.instance().getAccessToken(),
+            deviceId = HostAppInfoRepository.instance().getDeviceId(),
+            url = ConfigResponseRepository.instance().getPingEndpoint(),
+            requestBody = pingRequest
         )
+        // for testing
+        testResponse = call
         AccountRepository.instance().logWarningForUserInfo(TAG)
         return try {
             // Execute a thread blocking API network call, and handle response.
-            onResponse(responseCall!!.execute())
+            onResponse(call.execute())
         } catch (e: Exception) {
             Logger(TAG).error(e.message)
             Result.retry()

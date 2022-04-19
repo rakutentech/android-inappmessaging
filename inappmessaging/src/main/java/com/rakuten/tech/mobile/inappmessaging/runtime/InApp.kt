@@ -36,7 +36,7 @@ internal class InApp(
     private var activityWeakReference: WeakReference<Activity>? = null
 
     @VisibleForTesting
-    internal var tempEventList = ArrayList<Event>()
+    internal val tempEventList = ArrayList<Event>()
 
     init {
         // Start logging for debug builds.
@@ -136,9 +136,9 @@ internal class InApp(
         try {
             AccountRepository.instance().updateUserInfo()
             synchronized(tempEventList) {
-                tempEventList.forEach {
-                    it.setShouldNotClear(PingResponseMessageRepository.isInitialLaunch)
-                    LocalEventRepository.instance().addEvent(it)
+                tempEventList.forEach { ev ->
+                    ev.setShouldNotClear(PingResponseMessageRepository.isInitialLaunch)
+                    LocalEventRepository.instance().addEvent(ev)
                 }
                 tempEventList.clear()
             }
