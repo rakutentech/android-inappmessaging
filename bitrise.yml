@@ -23,6 +23,10 @@ workflows:
         inputs:
         - content: ./gradlew androidDependencies
     - script@1:
+        title: Dependency Check
+        inputs:
+        - content: ./gradlew dependencyCheckAggregate
+    - script@1:
         title: Run Check
         inputs:
         - content: ./gradlew check
