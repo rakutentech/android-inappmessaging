@@ -34,6 +34,13 @@ android {
         }
     }
 
+    compileOptions {
+        // Source code java level(Source code of this project).
+        sourceCompatibility JavaVersion.VERSION_1_8
+        // Target JVM level(JVM on Android devices).
+        targetCompatibility JavaVersion.VERSION_1_8
+    }
+
     flavorDimensions 'version'
 
     def property = { key ->
