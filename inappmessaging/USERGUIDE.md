@@ -387,7 +387,7 @@ Documents targeting Product Managers:
 
 ## <a name="changelog"></a> Changelog
 
-### 7.0.0 (in-progress)
+### 7.0.0 (2022-04-25)
 * SDKCF-4941: **Breaking Changes:** Updated configuration API to align with iOS.
   - Renamed `init()` API to `configure()`.
   - Removed optional `errorCallback` lambda function parameter in `configure()`, and changed as static variable.
@@ -397,6 +397,9 @@ Documents targeting Product Managers:
   - Setting to Hide the top right "x" closing button.
   - "End Date" setting in order to have a "Never ends" option.
   - "Max Lifetime impressions" setting in order to have several options (No limits/Only once/Multiple times). By default set it to "Only Once".
+* SDKCF-4859: Fixed campaign button boundaries when campaign and button backgrounds have the same color.
+* SDKCF-5019: Updated SDK Utils to v1.1.0.
+* SDKCF-4860: Added Jetpack Compose sample app.
 
 ### 6.1.0 (2022-02-09)
 * SDKCF-4470: Updated the layout for close and campaign buttons. Added feature to customize text and button fonts, please see [custom font section](#custom-font) for details.
