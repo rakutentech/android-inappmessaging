@@ -205,7 +205,7 @@ class MessageMixerWorkerSpec : BaseTest() {
         val worker = MessageMixerWorker(context!!, workerParameters!!)
         worker.doWork() shouldBeEqualTo ListenableWorker.Result.retry()
         val buffer = Buffer()
-        worker.responseCall!!.request().body()!!.writeTo(buffer)
+        worker.testResponse!!.request().body()!!.writeTo(buffer)
         buffer.readUtf8().shouldContainAll(
             "\"id\":\"tracking1\",\"type\":2",
             "\"id\":\"user1\",\"type\":3"

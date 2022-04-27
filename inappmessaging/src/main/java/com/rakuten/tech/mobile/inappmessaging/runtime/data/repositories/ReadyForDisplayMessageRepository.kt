@@ -89,14 +89,14 @@ internal abstract class ReadyForDisplayMessageRepository : ReadyMessageRepositor
                 user = AccountRepository.instance().userInfoHash
                 // reset message list from cached using updated user info
                 val listString = try {
-                    InAppMessaging.instance().getHostAppContext()?.let { it ->
+                    InAppMessaging.instance().getHostAppContext()?.let { ctx ->
                         PreferencesUtil.getString(
-                            it,
-                            InAppMessaging.getPreferencesFile(),
-                            READY_DISPLAY_KEY,
-                            ""
+                            context = ctx,
+                            name = InAppMessaging.getPreferencesFile(),
+                            key = READY_DISPLAY_KEY,
+                            defValue = ""
                         )
-                    } ?: ""
+                    }.orEmpty()
                 } catch (ex: ClassCastException) {
                     Logger(TAG).debug(ex.cause, "Incorrect type for $READY_DISPLAY_KEY data")
                     ""
@@ -118,12 +118,12 @@ internal abstract class ReadyForDisplayMessageRepository : ReadyMessageRepositor
             // check if caching is enabled to update persistent data
             if (InAppMessaging.instance().isLocalCachingEnabled()) {
                 // reset updated message list
-                InAppMessaging.instance().getHostAppContext()?.let {
+                InAppMessaging.instance().getHostAppContext()?.let { ctx ->
                     PreferencesUtil.putString(
-                        it,
-                        InAppMessaging.getPreferencesFile(),
-                        READY_DISPLAY_KEY,
-                        Gson().toJson(messages)
+                        context = ctx,
+                        name = InAppMessaging.getPreferencesFile(),
+                        key = READY_DISPLAY_KEY,
+                        value = Gson().toJson(messages)
                     )
                 } ?: Logger(TAG).debug("failed saving ready data")
             }

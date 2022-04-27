@@ -74,8 +74,8 @@ internal class DisplayMessageWorker(
         imageUrl: String
     ) {
         ImageUtil.fetchImage(
-            imageUrl,
-            object : Callback {
+            imageUrl = imageUrl,
+            callback = object : Callback {
                 override fun onSuccess() {
                     displayMessage(message, hostActivity)
                 }
@@ -84,7 +84,7 @@ internal class DisplayMessageWorker(
                     Logger(TAG).debug("Downloading image failed")
                 }
             },
-            hostActivity, picasso
+            context = hostActivity, picasso = picasso
         )
     }
 
@@ -128,12 +128,12 @@ internal class DisplayMessageWorker(
          * This method enqueues work in to this service.
          */
         fun enqueueWork(work: Intent) {
-            InAppMessaging.instance().getHostAppContext()?.let {
+            InAppMessaging.instance().getHostAppContext()?.let { ctx ->
                 val displayRequest = OneTimeWorkRequest.Builder(DisplayMessageWorker::class.java)
                     .setConstraints(WorkManagerUtil.getNetworkConnectedConstraint())
                     .addTag(DISPLAY_WORKER)
                     .build()
-                WorkManager.getInstance(it).enqueue(displayRequest)
+                WorkManager.getInstance(ctx).enqueue(displayRequest)
             }
         }
     }

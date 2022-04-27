@@ -60,9 +60,9 @@ internal abstract class AccountRepository {
         } else TOKEN_PREFIX + this.userInfoProvider?.provideAccessToken()
         // According to backend specs, token has to start with "OAuth2{space}", followed by real token.
 
-        override fun getUserId() = this.userInfoProvider?.provideUserId() ?: ""
+        override fun getUserId() = this.userInfoProvider?.provideUserId().orEmpty()
 
-        override fun getIdTrackingIdentifier() = this.userInfoProvider?.provideIdTrackingIdentifier() ?: ""
+        override fun getIdTrackingIdentifier() = this.userInfoProvider?.provideIdTrackingIdentifier().orEmpty()
 
         override fun updateUserInfo(algo: String?): Boolean {
             val curr = hash(getUserId() + getIdTrackingIdentifier(), algo)

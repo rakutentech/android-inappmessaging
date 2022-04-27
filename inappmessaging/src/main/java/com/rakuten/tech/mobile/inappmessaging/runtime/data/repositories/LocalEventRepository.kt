@@ -165,14 +165,14 @@ internal interface LocalEventRepository : EventRepository {
                 user = AccountRepository.instance().userInfoHash
                 // reset event list from cached using updated user info
                 val listString = try {
-                    InAppMessaging.instance().getHostAppContext()?.let { it ->
+                    InAppMessaging.instance().getHostAppContext()?.let { ctx ->
                         PreferencesUtil.getString(
-                            it,
-                            InAppMessaging.getPreferencesFile(),
-                            LOCAL_EVENT_KEY,
-                            ""
+                            context = ctx,
+                            name = InAppMessaging.getPreferencesFile(),
+                            key = LOCAL_EVENT_KEY,
+                            defValue = ""
                         )
-                    } ?: ""
+                    }.orEmpty()
                 } catch (ex: ClassCastException) {
                     Logger(TAG).debug(ex.cause, "Incorrect type for $LOCAL_EVENT_KEY data")
                     ""
@@ -213,10 +213,10 @@ internal interface LocalEventRepository : EventRepository {
                 // save updated event list
                 InAppMessaging.instance().getHostAppContext()?.let {
                     PreferencesUtil.putString(
-                        it,
-                        InAppMessaging.getPreferencesFile(),
-                        LOCAL_EVENT_KEY,
-                        Gson().toJson(events)
+                        context = it,
+                        name = InAppMessaging.getPreferencesFile(),
+                        key = LOCAL_EVENT_KEY,
+                        value = Gson().toJson(events)
                     )
                 } ?: Logger(TAG).debug("failed saving event data")
             }

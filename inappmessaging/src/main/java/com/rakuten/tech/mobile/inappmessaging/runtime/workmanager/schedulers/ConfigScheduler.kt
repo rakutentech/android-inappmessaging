@@ -29,8 +29,8 @@ internal interface ConfigScheduler {
         override fun startConfig(delay: Long, workManager: WorkManager?) {
             try {
                 val context = InAppMessaging.instance().getHostAppContext()
-                context?.let {
-                    val manager = workManager ?: WorkManager.getInstance(it)
+                context?.let { ctx ->
+                    val manager = workManager ?: WorkManager.getInstance(ctx)
                     manager.beginUniqueWork(
                         CONFIG_WORKER_NAME, ExistingWorkPolicy.REPLACE,
                         getConfigWorkRequest(delay)

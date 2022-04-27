@@ -90,11 +90,11 @@ internal class ImpressionWorker(
         RuntimeUtil.getRetrofit()
             .create(MessageMixerRetrofitService::class.java)
             .reportImpression(
-                HostAppInfoRepository.instance().getInAppMessagingSubscriptionKey(),
-                HostAppInfoRepository.instance().getDeviceId(),
-                accountRepo.getAccessToken(),
-                impressionEndpoint,
-                impressionRequest
+                subscriptionId = HostAppInfoRepository.instance().getInAppMessagingSubscriptionKey(),
+                deviceId = HostAppInfoRepository.instance().getDeviceId(),
+                accessToken = accountRepo.getAccessToken(),
+                impressionUrl = impressionEndpoint,
+                impressionRequest = impressionRequest
             )
 
     companion object {
