@@ -327,6 +327,8 @@ naming:
     privateVariablePattern: '(_)?[a-z][A-Za-z0-9]*'
     excludeClassPattern: '$^'
     ignoreOverridden: true
+  BooleanPropertyNaming:
+    allowedPattern: '^(is|has|are|should|display|result|logged)'
 
 performance:
   active: true
@@ -367,8 +369,12 @@ potential-bugs:
     active: true
   UnreachableCode:
     active: true
+  MapGetWithNotNullAssertionOperator:
+    active: true
+    excludes: [ '**/test/**', '**/*Test.kt', '**/*Spec.kt' ]
   UnsafeCallOnNullableType:
-    active: false
+    active: true
+    excludes: ['**/test/**', '**/*Test.kt', '**/*Spec.kt']
   UnsafeCast:
     active: false
   UselessPostfixExpression:

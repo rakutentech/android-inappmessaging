@@ -137,6 +137,8 @@ detekt {
   config = rootProject.files('detekt-config.yml')
 }
 
+check.dependsOn 'detektRelease'
+
 apply from: "../config/quality/jacoco/android.gradle"
 jacoco {
   toolVersion = "0.8.7"

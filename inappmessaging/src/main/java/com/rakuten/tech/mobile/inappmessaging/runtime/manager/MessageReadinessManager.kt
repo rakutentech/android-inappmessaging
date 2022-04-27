@@ -99,12 +99,12 @@ internal interface MessageReadinessManager {
         @VisibleForTesting
         override fun getDisplayPermissionRequest(message: Message): DisplayPermissionRequest {
             return DisplayPermissionRequest(
-                message.getCampaignId(),
-                HostAppInfoRepository.instance().getVersion(),
-                BuildConfig.VERSION_NAME,
-                HostAppInfoRepository.instance().getDeviceLocale(),
-                PingResponseMessageRepository.instance().lastPingMillis,
-                RuntimeUtil.getUserIdentifiers()
+                campaignId = message.getCampaignId(),
+                appVersion = HostAppInfoRepository.instance().getVersion(),
+                sdkVersion = BuildConfig.VERSION_NAME,
+                locale = HostAppInfoRepository.instance().getDeviceLocale(),
+                lastPingInMillis = PingResponseMessageRepository.instance().lastPingMillis,
+                userIdentifier = RuntimeUtil.getUserIdentifiers()
             )
         }
 
@@ -118,10 +118,10 @@ internal interface MessageReadinessManager {
             RuntimeUtil.getRetrofit()
                 .create(MessageMixerRetrofitService::class.java)
                 .getDisplayPermissionService(
-                    HostAppInfoRepository.instance().getInAppMessagingSubscriptionKey(),
-                    AccountRepository.instance().getAccessToken(),
-                    displayPermissionUrl,
-                    request
+                    subscriptionId = HostAppInfoRepository.instance().getInAppMessagingSubscriptionKey(),
+                    accessToken = AccountRepository.instance().getAccessToken(),
+                    url = displayPermissionUrl,
+                    request = request
                 )
 
         /**

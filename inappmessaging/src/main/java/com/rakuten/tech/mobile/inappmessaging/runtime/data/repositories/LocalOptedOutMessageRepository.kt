@@ -79,12 +79,12 @@ internal interface LocalOptedOutMessageRepository {
                 user = AccountRepository.instance().userInfoHash
                 optedOutMessages.clear()
                 // reset id list from cached using updated user info
-                InAppMessaging.instance().getHostAppContext()?.let { it ->
+                InAppMessaging.instance().getHostAppContext()?.let { ctx ->
                     val sas = PreferencesUtil.getStringSet(
-                        it,
-                        InAppMessaging.getPreferencesFile(),
-                        LOCAL_OPTED_OUT_KEY,
-                        HashSet()
+                        context = ctx,
+                        name = InAppMessaging.getPreferencesFile(),
+                        key = LOCAL_OPTED_OUT_KEY,
+                        defValue = HashSet()
                     )
                     sas?.let { hashSet ->
                         optedOutMessages.addAll(hashSet)
@@ -97,12 +97,12 @@ internal interface LocalOptedOutMessageRepository {
             // check if caching is enabled to update persistent data
             if (InAppMessaging.instance().isLocalCachingEnabled()) {
                 // save updated id list
-                InAppMessaging.instance().getHostAppContext()?.let {
+                InAppMessaging.instance().getHostAppContext()?.let { ctx ->
                     PreferencesUtil.putStringSet(
-                        it,
-                        InAppMessaging.getPreferencesFile(),
-                        LOCAL_OPTED_OUT_KEY,
-                        optedOutMessages
+                        context = ctx,
+                        name = InAppMessaging.getPreferencesFile(),
+                        key = LOCAL_OPTED_OUT_KEY,
+                        values = optedOutMessages
                     )
                 } ?: Logger(TAG).debug("failed saving opted out data")
             }

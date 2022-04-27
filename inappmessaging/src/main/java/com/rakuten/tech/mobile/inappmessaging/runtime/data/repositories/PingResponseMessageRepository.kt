@@ -9,7 +9,6 @@ import com.rakuten.tech.mobile.sdkutils.PreferencesUtil
 import com.rakuten.tech.mobile.sdkutils.logger.Logger
 import org.json.JSONObject
 import java.lang.ClassCastException
-import java.util.concurrent.ConcurrentHashMap
 
 /**
  * Contains all downloaded messages from Ping Message Mixer. Also exposed internal api which can get
@@ -34,8 +33,8 @@ internal abstract class PingResponseMessageRepository : MessageRepository {
     private class PingResponseMessageRepositoryImpl : PingResponseMessageRepository() {
         // LinkedHashMap can preserve the message insertion order.
         // Map - Key: Campaign ID, Value: Message object
-        private var messages: MutableMap<String, Message> = ConcurrentHashMap()
-        private var appLaunchList: MutableMap<String, Boolean> = ConcurrentHashMap()
+        private val messages = LinkedHashMap<String, Message>()
+        private val appLaunchList = LinkedHashMap<String, Boolean>()
         private var user = ""
 
         init {
@@ -49,8 +48,8 @@ internal abstract class PingResponseMessageRepository : MessageRepository {
         override fun replaceAllMessages(messageList: List<Message>) {
             checkAndResetMap()
 
-            messages = LinkedHashMap()
-            appLaunchList = LinkedHashMap()
+            messages.clear()
+            appLaunchList.clear()
             for (message in messageList) {
                 if (message.getCampaignId().isEmpty()) {
                     continue
@@ -99,14 +98,14 @@ internal abstract class PingResponseMessageRepository : MessageRepository {
                 user = AccountRepository.instance().userInfoHash
                 // reset message list from cached using updated user info
                 val listString = try {
-                    InAppMessaging.instance().getHostAppContext()?.let {
+                    InAppMessaging.instance().getHostAppContext()?.let { ctx ->
                         PreferencesUtil.getString(
-                            it,
-                            InAppMessaging.getPreferencesFile(),
-                            PING_RESPONSE_KEY,
-                            ""
+                            context = ctx,
+                            name = InAppMessaging.getPreferencesFile(),
+                            key = PING_RESPONSE_KEY,
+                            defValue = ""
                         )
-                    } ?: ""
+                    }.orEmpty()
                 } catch (ex: ClassCastException) {
                     Logger(TAG).debug(ex.cause, "Incorrect type for $PING_RESPONSE_KEY data")
                     ""
@@ -134,10 +133,10 @@ internal abstract class PingResponseMessageRepository : MessageRepository {
                 // save updated message list
                 InAppMessaging.instance().getHostAppContext()?.let {
                     PreferencesUtil.putString(
-                        it,
-                        InAppMessaging.getPreferencesFile(),
-                        PING_RESPONSE_KEY,
-                        Gson().toJson(messages)
+                        context = it,
+                        name = InAppMessaging.getPreferencesFile(),
+                        key = PING_RESPONSE_KEY,
+                        value = Gson().toJson(messages)
                     )
                 } ?: Logger(TAG).debug("failed saving response data")
             }

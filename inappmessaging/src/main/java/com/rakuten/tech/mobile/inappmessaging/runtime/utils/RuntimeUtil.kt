@@ -39,10 +39,10 @@ internal object RuntimeUtil {
      */
     fun getRetrofit(): Retrofit {
         return Retrofit.Builder().build(
-            InAppMessagingConstants.TEMPLATE_BASE_URL,
-            OK_HTTP_CLIENT,
-            GSON_CONVERTER_FACTORY,
-            EXECUTOR
+            baseUrl = InAppMessagingConstants.TEMPLATE_BASE_URL,
+            okHttpClient = OK_HTTP_CLIENT,
+            gsonConverterFactory = GSON_CONVERTER_FACTORY,
+            executor = EXECUTOR
         )
     }
 
@@ -52,16 +52,18 @@ internal object RuntimeUtil {
      * Throws IOException if an error occur when making Get request, or converting image data
      * into bytes.
      */
-    @SuppressWarnings("TooGenericExceptionCaught")
+    @SuppressWarnings("TooGenericExceptionCaught", "NestedBlockDepth")
     fun getImage(imageUrl: String): Bitmap? {
         if (URLUtil.isNetworkUrl(imageUrl)) {
             val getImageCall: Call<ResponseBody> =
                 getRetrofit().create(MessageMixerRetrofitService::class.java).getImage(imageUrl)
             try {
                 val imageResponse = getImageCall.execute()
-                if (imageResponse.isSuccessful && imageResponse.body() != null) {
-                    val bytes = imageResponse.body()!!.bytes() // should no longer be null
-                    return BitmapFactory.decodeByteArray(bytes, 0, bytes.size)
+                if (imageResponse.isSuccessful) {
+                    imageResponse.body()?.let { body ->
+                        val bytes = body.bytes() // should no longer be null
+                        return BitmapFactory.decodeByteArray(bytes, 0, bytes.size)
+                    }
                 }
             } catch (ex: Exception) {
                 Logger(TAG).debug(ex.message)
