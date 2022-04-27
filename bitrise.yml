@@ -23,6 +23,10 @@ workflows:
         inputs:
         - content: ./gradlew androidDependencies
     - script@1:
+        title: Dependency Check
+        inputs:
+        - content: ./gradlew dependencyCheckAggregate
+    - script@1:
         title: Run Check
         inputs:
         - content: ./gradlew check
@@ -132,7 +136,7 @@ workflows:
     steps:
     - set-java-version@1:
         inputs:
-        - set_java_version: '11'
+        - set_java_version: '8'
     - git-clone@6:
         inputs:
         - fetch_tags: 'yes'
