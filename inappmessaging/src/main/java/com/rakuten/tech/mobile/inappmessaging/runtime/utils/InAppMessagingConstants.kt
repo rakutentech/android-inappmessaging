@@ -21,12 +21,14 @@ internal class InAppMessagingConstants {
         // -------------------------------URL Only--------------------------------------------------------
         const val TEMPLATE_BASE_URL = "http://your.base.url/"
 
-        // ------------------------------ RAT Broadcast KEYS ---------------------------------------------
-        const val RAT_EVENT_KEY_IMPRESSION = "InAppMessaging_impressions"
-        const val RAT_EVENT_KEY_IMPRESSION_VALUE = "impressions"
-        const val RAT_EVENT_KEY_EVENTS = "InAppMessaging_triggeredEvent"
+        // ------------------------------ Analytics Event KEYS ---------------------------------------------
+        const val RAT_EVENT_KEY_IMPRESSION = "_rem_iam_impressions"
         const val RAT_EVENT_KEY_EVENT_NAME = "eventName"
         const val RAT_EVENT_KEY_EVENT_TIMESTAMP = "timestamp"
         const val RAT_EVENT_KEY_EVENT_CUSTOM_ATTRIBUTE = "customAttributes"
+        const val RAT_EVENT_CAMP_ID = "campaign_id"
+        const val RAT_EVENT_SUBS_ID = "subscription_id"
+        const val RAT_EVENT_IMP = "impressions"
+        const val RAT_EVENT_ACC = "acc"
     }
 }

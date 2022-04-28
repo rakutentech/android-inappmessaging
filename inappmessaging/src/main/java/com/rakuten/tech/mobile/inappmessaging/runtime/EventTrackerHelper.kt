@@ -27,7 +27,7 @@ internal object EventTrackerHelper {
             }
 
             if (hasClass("com.rakuten.tech.mobile.analytics.Event")) {
-                com.rakuten.tech.mobile.analytics.Event("rat.$eventName", serializableData).track()
+                com.rakuten.tech.mobile.analytics.Event(eventName, serializableData).track()
                 return true
             }
         }

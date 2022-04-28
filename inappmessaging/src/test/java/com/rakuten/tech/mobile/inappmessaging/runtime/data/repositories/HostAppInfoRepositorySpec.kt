@@ -1,12 +1,16 @@
 package com.rakuten.tech.mobile.inappmessaging.runtime.data.repositories
 
 import com.rakuten.tech.mobile.inappmessaging.runtime.BaseTest
+import com.rakuten.tech.mobile.inappmessaging.runtime.InApp
 import com.rakuten.tech.mobile.inappmessaging.runtime.InAppMessagingTestConstants
 import com.rakuten.tech.mobile.inappmessaging.runtime.data.models.HostAppInfo
 import com.rakuten.tech.mobile.inappmessaging.runtime.exception.InAppMessagingException
 import com.rakuten.tech.mobile.inappmessaging.runtime.utils.InAppMessagingConstants
+import org.amshove.kluent.shouldBeEmpty
 import org.amshove.kluent.shouldBeEqualTo
+import org.junit.After
 import org.junit.Assert
+import org.junit.Before
 import org.junit.Test
 import java.util.Locale
 
@@ -15,6 +19,18 @@ import java.util.Locale
  */
 class HostAppInfoRepositorySpec : BaseTest() {
 
+    @Before
+    override fun setup() {
+        super.setup()
+        HostAppInfoRepository.instance().clearInfo()
+    }
+
+    @After
+    override fun tearDown() {
+        super.tearDown()
+        HostAppInfoRepository.instance().clearInfo()
+    }
+
     @Test
     fun `should use correct data`() {
         val testAppInfo = HostAppInfo(
@@ -22,7 +38,8 @@ class HostAppInfoRepositorySpec : BaseTest() {
             InAppMessagingTestConstants.DEVICE_ID,
             InAppMessagingTestConstants.APP_VERSION,
             InAppMessagingTestConstants.SUB_KEY,
-            InAppMessagingTestConstants.LOCALE
+            InAppMessagingTestConstants.LOCALE,
+            customAcc = InAppMessagingTestConstants.ACC
         )
         HostAppInfoRepository.instance().addHostInfo(testAppInfo)
         HostAppInfoRepository.instance().getVersion() shouldBeEqualTo InAppMessagingTestConstants.APP_VERSION
@@ -32,6 +49,7 @@ class HostAppInfoRepositorySpec : BaseTest() {
         HostAppInfoRepository.instance()
             .getInAppMessagingSubscriptionKey() shouldBeEqualTo InAppMessagingTestConstants.SUB_KEY
         HostAppInfoRepository.instance().getDeviceId() shouldBeEqualTo InAppMessagingTestConstants.DEVICE_ID
+        HostAppInfoRepository.instance().getCustomAcc() shouldBeEqualTo InAppMessagingTestConstants.ACC
     }
 
     @Test
@@ -46,7 +64,7 @@ class HostAppInfoRepositorySpec : BaseTest() {
 
     @Test
     fun `should throw exception for invalid version`() {
-        val hostAppInfo = HostAppInfo()
+        val hostAppInfo = HostAppInfo(customAcc = InAppMessagingTestConstants.ACC)
         try {
             HostAppInfoRepository.instance().addHostInfo(hostAppInfo)
             Assert.fail()
@@ -57,7 +75,10 @@ class HostAppInfoRepositorySpec : BaseTest() {
 
     @Test
     fun `should throw exception for invalid package name`() {
-        val hostAppInfo = HostAppInfo(version = InAppMessagingTestConstants.APP_VERSION)
+        val hostAppInfo = HostAppInfo(
+            version = InAppMessagingTestConstants.APP_VERSION,
+            customAcc = InAppMessagingTestConstants.ACC
+        )
         try {
             HostAppInfoRepository.instance().addHostInfo(hostAppInfo)
             Assert.fail()
@@ -70,7 +91,8 @@ class HostAppInfoRepositorySpec : BaseTest() {
     fun `should throw exception for invalid subscription key`() {
         val hostAppInfo = HostAppInfo(
             version = InAppMessagingTestConstants.APP_VERSION,
-            packageName = InAppMessagingTestConstants.APP_ID
+            packageName = InAppMessagingTestConstants.APP_ID,
+            customAcc = InAppMessagingTestConstants.ACC
         )
         try {
             HostAppInfoRepository.instance().addHostInfo(hostAppInfo)
@@ -85,7 +107,8 @@ class HostAppInfoRepositorySpec : BaseTest() {
         val hostAppInfo = HostAppInfo(
             version = InAppMessagingTestConstants.APP_VERSION,
             packageName = InAppMessagingTestConstants.APP_ID,
-            subscriptionKey = InAppMessagingTestConstants.SUB_KEY
+            subscriptionKey = InAppMessagingTestConstants.SUB_KEY,
+            customAcc = InAppMessagingTestConstants.ACC
         )
         HostAppInfoRepository.instance().addHostInfo(hostAppInfo)
     }
@@ -96,8 +119,22 @@ class HostAppInfoRepositorySpec : BaseTest() {
             version = InAppMessagingTestConstants.APP_VERSION,
             packageName = InAppMessagingTestConstants.APP_ID,
             subscriptionKey = InAppMessagingTestConstants.SUB_KEY,
-            locale = InAppMessagingTestConstants.LOCALE
+            locale = InAppMessagingTestConstants.LOCALE,
+            customAcc = InAppMessagingTestConstants.ACC
         )
         HostAppInfoRepository.instance().addHostInfo(hostAppInfo)
+    }
+
+    @Test
+    fun `should return empty or default value for unset host app info`() {
+        val instance = HostAppInfoRepository.instance()
+        instance.getVersion().shouldBeEmpty()
+        instance.getPackageName().shouldBeEmpty()
+        instance.getDeviceLocale() shouldBeEqualTo Locale.getDefault().toString().replace("_", "-")
+            .lowercase(Locale.getDefault())
+        instance.getInAppMessagingSubscriptionKey().shouldBeEmpty()
+        instance.getDeviceId().shouldBeEmpty()
+        instance.getConfigUrl().shouldBeEmpty()
+        instance.getCustomAcc() shouldBeEqualTo InApp.DEFAULT_ACC
     }
 }

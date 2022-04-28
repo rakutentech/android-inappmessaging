@@ -16,7 +16,6 @@ import com.rakuten.tech.mobile.inappmessaging.runtime.data.models.messages.Messa
 import com.rakuten.tech.mobile.inappmessaging.runtime.data.models.messages.ValidTestMessage
 import com.rakuten.tech.mobile.inappmessaging.runtime.data.repositories.*
 import com.rakuten.tech.mobile.inappmessaging.runtime.data.responses.config.ConfigResponseData
-import com.rakuten.tech.mobile.inappmessaging.runtime.utils.InAppMessagingConstants
 import com.rakuten.tech.mobile.inappmessaging.runtime.workmanager.schedulers.EventMessageReconciliationScheduler
 import org.amshove.kluent.*
 import org.junit.Before
@@ -58,15 +57,6 @@ class EventsManagerSpec : BaseTest() {
         LocalEventRepository.instance().clearEvents()
         EventsManager.onEventReceived(mockEvent)
         LocalEventRepository.instance().getEvents()[0].getEventName() shouldBeEqualTo EVENT_NAME
-    }
-
-    @Test
-    fun `should invoke broadcast receiver`() {
-        EventsManager.onEventReceived(mockEvent, mockEventBroadcaster::sendEvent)
-        Mockito.verify(mockEventBroadcaster).sendEvent(
-            InAppMessagingConstants.RAT_EVENT_KEY_EVENTS,
-            mockEvent.getRatEventMap()
-        )
     }
 
     @Test

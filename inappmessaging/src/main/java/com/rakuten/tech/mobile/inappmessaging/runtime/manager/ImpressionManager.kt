@@ -7,11 +7,14 @@ import com.rakuten.tech.mobile.inappmessaging.runtime.data.models.Impression
 import com.rakuten.tech.mobile.inappmessaging.runtime.data.models.rat.RatImpression
 import com.rakuten.tech.mobile.inappmessaging.runtime.data.repositories.HostAppInfoRepository
 import com.rakuten.tech.mobile.inappmessaging.runtime.data.requests.ImpressionRequest
-import com.rakuten.tech.mobile.inappmessaging.runtime.utils.InAppMessagingConstants
+import com.rakuten.tech.mobile.inappmessaging.runtime.utils.InAppMessagingConstants.Companion.RAT_EVENT_ACC
+import com.rakuten.tech.mobile.inappmessaging.runtime.utils.InAppMessagingConstants.Companion.RAT_EVENT_CAMP_ID
+import com.rakuten.tech.mobile.inappmessaging.runtime.utils.InAppMessagingConstants.Companion.RAT_EVENT_IMP
+import com.rakuten.tech.mobile.inappmessaging.runtime.utils.InAppMessagingConstants.Companion.RAT_EVENT_KEY_IMPRESSION
+import com.rakuten.tech.mobile.inappmessaging.runtime.utils.InAppMessagingConstants.Companion.RAT_EVENT_SUBS_ID
 import com.rakuten.tech.mobile.inappmessaging.runtime.utils.RuntimeUtil
 import com.rakuten.tech.mobile.inappmessaging.runtime.workmanager.schedulers.ImpressionScheduler
 import com.rakuten.tech.mobile.sdkutils.logger.Logger
-import java.util.Collections
 import java.util.Date
 import kotlin.collections.ArrayList
 import kotlin.collections.HashMap
@@ -21,10 +24,11 @@ import kotlin.collections.set
  * ImpressionManager dispatches works accordingly. For instance, reporting impressions to IAM
  * backend, or RAT.
  */
-internal class ImpressionManager {
+internal object ImpressionManager {
+    private const val TAG = "IAM_ImpressionManager"
 
     /**
-     * Reporting impression list to IAM backend, and broadcasting to RAT. This method is invoked on
+     * Reporting impression list to IAM backend, and sending to analytics. This method is invoked on
      * main thread.
      */
     fun scheduleReportImpression(
@@ -43,13 +47,26 @@ internal class ImpressionManager {
             userIdentifiers = RuntimeUtil.getUserIdentifiers(),
             impressions = impressionList
         )
-        // Broadcasting impressions to RAT.
-        sendEvent(
-            InAppMessagingConstants.RAT_EVENT_KEY_IMPRESSION,
-            createImpressionMap(impressionRequest.impressions)
-        )
+
+        // send user action impression
+        sendImpressionEvent(campaignId, impressionList, sendEvent)
+
         // Schedule work to report impressions back to IAM backend.
         ImpressionScheduler().startImpressionWorker(impressionRequest)
+    }
+
+    internal fun sendImpressionEvent(
+        campaignId: String,
+        impressionList: List<Impression>,
+        sendEvent: (String, data: Map<String, *>?) -> Boolean = EventTrackerHelper::sendEvent
+    ) {
+        val params: MutableMap<String, Any?> = HashMap()
+        params[RAT_EVENT_CAMP_ID] = campaignId
+        params[RAT_EVENT_SUBS_ID] = HostAppInfoRepository.instance().getInAppMessagingSubscriptionKey()
+        params[RAT_EVENT_IMP] = createRatImpressionList(impressionList)
+        params[RAT_EVENT_ACC] = HostAppInfoRepository.instance().getCustomAcc()
+
+        sendEvent(RAT_EVENT_KEY_IMPRESSION, params)
     }
 
     /**
@@ -63,7 +80,6 @@ internal class ImpressionManager {
 
         // Adding view impression by default.
         val currentTimeInMillis = Date().time
-        impressionList.add(Impression(ImpressionType.IMPRESSION, currentTimeInMillis))
 
         // Add impressions included in the method argument.
         for (impressionType in impressionTypes) {
@@ -79,24 +95,19 @@ internal class ImpressionManager {
     }
 
     /**
-     * This method returns a map which contains all impreassions in the argument list.
+     * This method returns a list which contains all impressions.
      */
-    private fun createImpressionMap(impressionList: List<Impression>): Map<String, List<RatImpression>> {
+    private fun createRatImpressionList(impressionList: List<Impression>): List<RatImpression> {
         // Adding all impressions to a list of RatImpression objects.
         val ratImpressionList = ArrayList<RatImpression>()
         for (impression in impressionList) {
+            System.out.println("$impression")
             val impressionType = ImpressionType.getById(impression.type)
             if (impressionType != null) {
-                ratImpressionList.add(RatImpression(impressionType, impression.timestamp))
+                ratImpressionList.add(RatImpression(impressionType.typeId, impression.timestamp))
             }
         }
-        // Adding impression list to an unmodifiable map.
-        val ratMap = HashMap<String, List<RatImpression>>()
-        ratMap[InAppMessagingConstants.RAT_EVENT_KEY_IMPRESSION_VALUE] = ratImpressionList
-        return Collections.unmodifiableMap(ratMap)
-    }
 
-    companion object {
-        private const val TAG = "IAM_ImpressionManager"
+        return ratImpressionList
     }
 }

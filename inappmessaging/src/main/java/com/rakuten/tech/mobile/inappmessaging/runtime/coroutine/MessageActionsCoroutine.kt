@@ -127,9 +127,8 @@ internal class MessageActionsCoroutine(
      * @param impressionTypes An ImpressionType of the button click.
      */
     private fun scheduleReportImpression(message: Message, impressionTypes: List<ImpressionType>) {
-        val impressionManager = ImpressionManager()
-        impressionManager.scheduleReportImpression(
-            impressionManager.createImpressionList(impressionTypes),
+        ImpressionManager.scheduleReportImpression(
+            ImpressionManager.createImpressionList(impressionTypes),
             message.getCampaignId(),
             message.isTest()
         )

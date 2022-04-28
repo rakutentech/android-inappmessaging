@@ -6,15 +6,15 @@ import android.provider.Settings
 import androidx.test.core.app.ApplicationProvider
 import androidx.work.WorkManager
 import androidx.work.testing.WorkManagerTestInitHelper
-import com.rakuten.tech.mobile.inappmessaging.runtime.BaseTest
-import com.rakuten.tech.mobile.inappmessaging.runtime.InAppMessaging
-import com.rakuten.tech.mobile.inappmessaging.runtime.EventTrackerHelper
-import com.rakuten.tech.mobile.inappmessaging.runtime.TestUserInfoProvider
+import com.nhaarman.mockitokotlin2.argumentCaptor
+import com.nhaarman.mockitokotlin2.eq
+import com.nhaarman.mockitokotlin2.never
+import com.rakuten.tech.mobile.inappmessaging.runtime.*
 import com.rakuten.tech.mobile.inappmessaging.runtime.data.enums.ImpressionType
 import com.rakuten.tech.mobile.inappmessaging.runtime.data.models.Impression
-import org.amshove.kluent.shouldBeGreaterThan
-import org.amshove.kluent.shouldBeEqualTo
-import org.amshove.kluent.shouldHaveSize
+import com.rakuten.tech.mobile.inappmessaging.runtime.data.models.rat.RatImpression
+import com.rakuten.tech.mobile.inappmessaging.runtime.utils.InAppMessagingConstants
+import org.amshove.kluent.*
 import org.junit.Before
 import org.junit.Test
 import org.junit.runner.RunWith
@@ -22,6 +22,7 @@ import org.mockito.ArgumentMatchers
 import org.mockito.Mockito
 import org.robolectric.RobolectricTestRunner
 import org.robolectric.annotation.Config
+import java.util.*
 import java.util.concurrent.ExecutionException
 
 /**
@@ -36,18 +37,19 @@ class ImpressionManagerSpec : BaseTest() {
     @Before
     override fun setup() {
         super.setup()
-        impressionList = ImpressionManager().createImpressionList(VALID_IMPRESSION_TYPES)
+        impressionList = ImpressionManager.createImpressionList(VALID_IMPRESSION_TYPES)
     }
 
     @Test
     fun `should create impression list with correct attributes`() {
         impressionList!![0].timestamp shouldBeGreaterThan 0L
-        impressionList!![1].type shouldBeEqualTo ImpressionType.ACTION_ONE.typeId
+        impressionList!![0].type shouldBeEqualTo ImpressionType.ACTION_ONE.typeId
     }
 
     @Test
-    fun `should throw exception when create impression list with wrong arg`() {
-        ImpressionManager().createImpressionList(INVALID_IMPRESSION_TYPES).isEmpty()
+    fun `should return empty when create impression list with wrong arg`() {
+        ImpressionManager.createImpressionList(IMPRESSION_TYPES).isEmpty()
+        ImpressionManager.createImpressionList(INVALID_TYPES).isEmpty()
     }
 
     @Test
@@ -61,7 +63,7 @@ class ImpressionManagerSpec : BaseTest() {
         )
         InAppMessaging.initialize(ApplicationProvider.getApplicationContext(), true)
         InAppMessaging.instance().registerPreference(TestUserInfoProvider())
-        ImpressionManager().scheduleReportImpression(
+        ImpressionManager.scheduleReportImpression(
             impressionList!!, "1234", false,
             eventTracker::sendEvent
         )
@@ -72,6 +74,7 @@ class ImpressionManagerSpec : BaseTest() {
     }
 
     @Test
+    @SuppressWarnings("LongMethod")
     fun `should invoke broadcaster`() {
         WorkManagerTestInitHelper.initializeTestWorkManager(ApplicationProvider.getApplicationContext())
         Settings.Secure.putString(
@@ -81,21 +84,63 @@ class ImpressionManagerSpec : BaseTest() {
         )
         InAppMessaging.initialize(ApplicationProvider.getApplicationContext(), true)
         InAppMessaging.instance().registerPreference(TestUserInfoProvider())
-        ImpressionManager().scheduleReportImpression(
+        ImpressionManager.scheduleReportImpression(
             impressionList!!,
             "1234",
             false,
             eventTracker::sendEvent
         )
-        Mockito.verify(eventTracker).sendEvent(ArgumentMatchers.anyString(), ArgumentMatchers.anyMap<String, Any>())
+        val captor = argumentCaptor<Map<String, Any>>()
+        Mockito.verify(eventTracker).sendEvent(
+            eq(InAppMessagingConstants.RAT_EVENT_KEY_IMPRESSION), captor.capture()
+        )
+
+        val map = captor.firstValue
+        map[InAppMessagingConstants.RAT_EVENT_CAMP_ID] shouldBeEqualTo "1234"
+        (map[InAppMessagingConstants.RAT_EVENT_SUBS_ID] as String).shouldNotBeEmpty()
+        (map[InAppMessagingConstants.RAT_EVENT_IMP] as List<RatImpression>) shouldHaveSize impressionList!!.size
+        map[InAppMessagingConstants.RAT_EVENT_ACC] shouldBeEqualTo InApp.DEFAULT_ACC
+    }
+
+    @Test
+    fun `should not invoke broadcaster if empty list`() {
+        ImpressionManager.scheduleReportImpression(
+            emptyList(),
+            "1234",
+            false,
+            eventTracker::sendEvent
+        )
+        Mockito.verify(eventTracker, never()).sendEvent(
+            ArgumentMatchers.anyString(), ArgumentMatchers.anyMap<String, Any>()
+        )
+    }
+
+    @Test
+    fun `should invoke broadcaster for impression type`() {
+        ImpressionManager.sendImpressionEvent(
+            "1234", listOf(Impression(ImpressionType.IMPRESSION, Date().time)), eventTracker::sendEvent
+        )
+
+        val captor = argumentCaptor<Map<String, Any>>()
+        Mockito.verify(eventTracker).sendEvent(
+            eq(InAppMessagingConstants.RAT_EVENT_KEY_IMPRESSION), captor.capture()
+        )
+
+        val map = captor.firstValue
+        map[InAppMessagingConstants.RAT_EVENT_CAMP_ID] shouldBeEqualTo "1234"
+        (map[InAppMessagingConstants.RAT_EVENT_SUBS_ID] as String).shouldNotBeEmpty()
+        (map[InAppMessagingConstants.RAT_EVENT_IMP] as List<RatImpression>) shouldHaveSize 1
+        map[InAppMessagingConstants.RAT_EVENT_ACC] shouldBeEqualTo InApp.DEFAULT_ACC
     }
 
     companion object {
         private const val IMPRESSION_WORKER_NAME = "iam_impression_work"
         private val VALID_IMPRESSION_TYPES: MutableList<ImpressionType> =
             mutableListOf(ImpressionType.ACTION_ONE, ImpressionType.OPT_OUT)
-        private val INVALID_IMPRESSION_TYPES: MutableList<ImpressionType> =
+        private val IMPRESSION_TYPES: MutableList<ImpressionType> =
             mutableListOf(ImpressionType.ACTION_ONE, ImpressionType.IMPRESSION)
+        private val INVALID_TYPES: MutableList<ImpressionType> =
+            mutableListOf(ImpressionType.ACTION_ONE, ImpressionType.INVALID)
         private var impressionList: List<Impression>? = null
     }
 }

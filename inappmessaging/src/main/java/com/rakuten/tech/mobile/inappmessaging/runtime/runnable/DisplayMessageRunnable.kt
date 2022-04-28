@@ -4,12 +4,16 @@ import android.app.Activity
 import android.view.View
 import androidx.annotation.UiThread
 import com.rakuten.tech.mobile.inappmessaging.runtime.R
+import com.rakuten.tech.mobile.inappmessaging.runtime.data.enums.ImpressionType
 import com.rakuten.tech.mobile.inappmessaging.runtime.data.enums.InAppMessageType
+import com.rakuten.tech.mobile.inappmessaging.runtime.data.models.Impression
 import com.rakuten.tech.mobile.inappmessaging.runtime.data.models.messages.Message
+import com.rakuten.tech.mobile.inappmessaging.runtime.manager.ImpressionManager
 import com.rakuten.tech.mobile.inappmessaging.runtime.view.InAppMessageFullScreenView
 import com.rakuten.tech.mobile.inappmessaging.runtime.view.InAppMessageModalView
 import com.rakuten.tech.mobile.inappmessaging.runtime.view.InAppMessageSlideUpView
 import kotlinx.coroutines.Runnable
+import java.util.Date
 
 /**
  * Displaying message runnable which presents the message on the UI thread. Message close, and other
@@ -42,6 +46,9 @@ internal class DisplayMessageRunnable(
                         .inflate(R.layout.in_app_message_modal, null) as InAppMessageModalView
                     modalView.populateViewData(message)
                     hostActivity.addContentView(modalView, hostActivity.window.attributes)
+                    ImpressionManager.sendImpressionEvent(
+                        message.getCampaignId(), listOf(Impression(ImpressionType.IMPRESSION, Date().time))
+                    )
                 }
                 InAppMessageType.FULL -> {
                     val fullScreenView = hostActivity
@@ -52,6 +59,9 @@ internal class DisplayMessageRunnable(
                         ) as InAppMessageFullScreenView
                     fullScreenView.populateViewData(message)
                     hostActivity.addContentView(fullScreenView, hostActivity.window.attributes)
+                    ImpressionManager.sendImpressionEvent(
+                        message.getCampaignId(), listOf(Impression(ImpressionType.IMPRESSION, Date().time))
+                    )
                 }
                 InAppMessageType.SLIDE -> {
                     val slideUpView = hostActivity
@@ -62,6 +72,9 @@ internal class DisplayMessageRunnable(
                         ) as InAppMessageSlideUpView
                     slideUpView.populateViewData(message)
                     hostActivity.addContentView(slideUpView, hostActivity.window.attributes)
+                    ImpressionManager.sendImpressionEvent(
+                        message.getCampaignId(), listOf(Impression(ImpressionType.IMPRESSION, Date().time))
+                    )
                 }
                 else -> Any()
             }

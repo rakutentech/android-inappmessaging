@@ -111,7 +111,8 @@ class AccountRepositoryUsageSpec : AccountRepositorySpec() {
             HostAppInfo(
                 InAppMessagingTestConstants.APP_ID,
                 InAppMessagingTestConstants.DEVICE_ID, InAppMessagingTestConstants.APP_VERSION,
-                InAppMessagingTestConstants.SUB_KEY, InAppMessagingTestConstants.LOCALE
+                InAppMessagingTestConstants.SUB_KEY, InAppMessagingTestConstants.LOCALE,
+                customAcc = InAppMessagingTestConstants.ACC
             )
         )
         val context = Mockito.mock(Context::class.java)
