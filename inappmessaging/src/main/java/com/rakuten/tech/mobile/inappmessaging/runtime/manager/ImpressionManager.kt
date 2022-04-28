@@ -101,7 +101,6 @@ internal object ImpressionManager {
         // Adding all impressions to a list of RatImpression objects.
         val ratImpressionList = ArrayList<RatImpression>()
         for (impression in impressionList) {
-            System.out.println("$impression")
             val impressionType = ImpressionType.getById(impression.type)
             if (impressionType != null) {
                 ratImpressionList.add(RatImpression(impressionType.typeId, impression.timestamp))
