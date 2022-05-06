@@ -62,8 +62,8 @@ internal interface MessageMixerPingScheduler {
             // Enqueue work request in the background.
             try {
                 val context = InAppMessaging.instance().getHostAppContext()
-                context?.let {
-                    val manager = workManager ?: WorkManager.getInstance(it)
+                context?.let { ctx ->
+                    val manager = workManager ?: WorkManager.getInstance(ctx)
                     manager.enqueueUniqueWork(
                         MESSAGE_MIXER_PING_WORKER, ExistingWorkPolicy.REPLACE, periodicMessageMixerFetch
                     )

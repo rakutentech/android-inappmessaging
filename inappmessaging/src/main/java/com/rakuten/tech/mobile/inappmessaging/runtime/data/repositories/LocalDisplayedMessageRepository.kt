@@ -85,17 +85,14 @@ internal interface LocalDisplayedMessageRepository {
 
             // Prevents race condition.
             synchronized(messages) {
-                checkAndResetMap()
-
-                if (!messages.containsKey(campaignId)) {
-                    val timeStamps = ArrayList<Long>()
-                    timeStamps.add(Calendar.getInstance().timeInMillis)
-                    messages[campaignId] = timeStamps
+                val list = messages[campaignId]
+                val timeStamps = if (list != null) {
+                    ArrayList(list)
                 } else {
-                    val timeStamps = ArrayList(messages[campaignId]!!)
-                    timeStamps.add(Calendar.getInstance().timeInMillis)
-                    messages[campaignId] = timeStamps
+                    ArrayList<Long>()
                 }
+                timeStamps.add(Calendar.getInstance().timeInMillis)
+                messages[campaignId] = timeStamps
                 saveUpdatedMap()
             }
         }
@@ -142,14 +139,14 @@ internal interface LocalDisplayedMessageRepository {
         @SuppressWarnings("TooGenericExceptionCaught", "LongMethod")
         private fun resetDisplayed() {
             val listString = try {
-                InAppMessaging.instance().getHostAppContext()?.let { it ->
+                InAppMessaging.instance().getHostAppContext()?.let { ctx ->
                     PreferencesUtil.getString(
-                        it,
-                        InAppMessaging.getPreferencesFile(),
-                        LOCAL_DISPLAYED_KEY,
-                        ""
+                        context = ctx,
+                        name = InAppMessaging.getPreferencesFile(),
+                        key = LOCAL_DISPLAYED_KEY,
+                        defValue = ""
                     )
-                } ?: ""
+                }.orEmpty()
             } catch (ex: ClassCastException) {
                 Logger(TAG).debug(ex.cause, "Incorrect JSON format for $LOCAL_DISPLAYED_KEY data")
                 ""
@@ -171,10 +168,10 @@ internal interface LocalDisplayedMessageRepository {
                 // reset message list from cached using updated user info
                 InAppMessaging.instance().getHostAppContext()?.let {
                     PreferencesUtil.putString(
-                        it,
-                        InAppMessaging.getPreferencesFile(),
-                        LOCAL_DISPLAYED_KEY,
-                        Gson().toJson(messages)
+                        context = it,
+                        name = InAppMessaging.getPreferencesFile(),
+                        key = LOCAL_DISPLAYED_KEY,
+                        value = Gson().toJson(messages)
                     )
                 } ?: Logger(TAG).debug("failed saving displayed data")
             }

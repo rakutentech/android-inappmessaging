@@ -22,7 +22,7 @@ android {
   }
 
   kotlinOptions {
-    jvmTarget = JavaVersion.VERSION_11.toString()
+    jvmTarget = JavaVersion.toVersion(CONFIG.versions.java).toString()
   }
 
   testOptions {
@@ -80,7 +80,7 @@ dependencies {
   testImplementation "com.facebook.soloader:soloader:0.9.0"
   testImplementation "com.squareup.okhttp3:mockwebserver:3.14.7"
 
-  detektPlugins "io.gitlab.arturbosch.detekt:detekt-formatting:1.19.0"
+  detektPlugins "io.gitlab.arturbosch.detekt:detekt-formatting:1.20.0"
 }
 
 task checkUrlPrefixes {
@@ -129,6 +129,8 @@ detekt {
   allRules = true
   config = rootProject.files('detekt-config.yml')
 }
+
+check.dependsOn 'detektRelease'
 
 apply from: "../config/quality/jacoco/android.gradle"
 jacoco {

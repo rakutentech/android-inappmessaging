@@ -196,7 +196,7 @@ internal class MessageActionsCoroutine(
     /**
      * This method creates a local custom event based on argument.
      */
-    @SuppressWarnings("LongMethod", "ReturnCount", "ComplexMethod")
+    @SuppressWarnings("LongMethod", "ReturnCount", "ComplexMethod", "ElseCaseInsteadOfExhaustiveWhen")
     private fun createLocalCustomEvent(embeddedEvent: Trigger): Event? {
         val type = embeddedEvent.eventType
         if (EventType.CUSTOM != EventType.getById(type)) {

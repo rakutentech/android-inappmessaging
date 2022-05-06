@@ -40,8 +40,8 @@ internal interface EventMessageReconciliationScheduler {
 
             try {
                 val context = InAppMessaging.instance().getHostAppContext()
-                context?.let {
-                    val manager = workManager ?: WorkManager.getInstance(it)
+                context?.let { ctx ->
+                    val manager = workManager ?: WorkManager.getInstance(ctx)
                     manager.beginUniqueWork(
                         MESSAGES_EVENTS_WORKER_NAME,
                         ExistingWorkPolicy.REPLACE, reconciliationWorkRequest

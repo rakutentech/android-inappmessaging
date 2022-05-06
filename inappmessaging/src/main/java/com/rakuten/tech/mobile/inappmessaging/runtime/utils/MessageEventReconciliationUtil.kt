@@ -95,10 +95,16 @@ internal interface MessageEventReconciliationUtil {
                 return false
             }
 
-            val triggerList = message.getTriggers() ?: listOf()
+            val triggerList = message.getTriggers().orEmpty()
             for (trigger in triggerList) {
-                checkTrigger(trigger, eventMap, triggerList.size, message.getCampaignId(), requiredSetsToSatisfy)?.let {
-                    return it
+                checkTrigger(
+                    trigger = trigger,
+                    eventMap = eventMap,
+                    size = triggerList.size,
+                    id = message.getCampaignId(),
+                    required = requiredSetsToSatisfy
+                )?.let { result ->
+                    return result
                 }
             }
             // At this point, all triggers had been reconciled
@@ -214,10 +220,10 @@ internal interface MessageEventReconciliationUtil {
                 // If trigger's attribute value type is different from event's, value can't be reconciled.
                 false
             } else isValueReconciled(
-                valueTypeId,
-                eventAttribute.value,
-                triggerAttribute.operator,
-                triggerAttribute.value
+                valueTypeId = valueTypeId,
+                eventValue = eventAttribute.value,
+                operatorTypeId = triggerAttribute.operator,
+                triggerValue = triggerAttribute.value
             )
         }
 
@@ -225,7 +231,10 @@ internal interface MessageEventReconciliationUtil {
          * The method checks if the value from event attribute can satisfy trigger's attribute values according to
          * trigger attribute's operator type.
          */
-        @SuppressWarnings("ReturnCount", "ComplexMethod", "LongMethod", "ComplexCondition")
+        @SuppressWarnings(
+            "ReturnCount", "ComplexMethod", "LongMethod", "ComplexCondition",
+            "ElseCaseInsteadOfExhaustiveWhen"
+        )
         private fun isValueReconciled(
             valueTypeId: Int,
             eventValue: String?,
@@ -255,11 +264,16 @@ internal interface MessageEventReconciliationUtil {
                     )
                 ValueType.INTEGER ->
                     ValueMatchingUtil.isOperatorConditionSatisfied(
-                        eventValue.toIntOrNull(), operatorType, triggerValue.toIntOrNull()
+                        eventValue = eventValue.toIntOrNull(),
+                        operatorType = operatorType,
+                        triggerValue = triggerValue.toIntOrNull()
                     )
                 ValueType.TIME_IN_MILLI ->
                     ValueMatchingUtil.isOperatorConditionSatisfied(
-                        eventValue.toLongOrNull(), operatorType, triggerValue.toLongOrNull(), true
+                        eventValue = eventValue.toLongOrNull(),
+                        operatorType = operatorType,
+                        triggerValue = triggerValue.toLongOrNull(),
+                        isTime = true
                     )
                 else -> false
             }
@@ -302,9 +316,8 @@ internal interface MessageEventReconciliationUtil {
             for (event in LocalEventRepository.instance().getEvents()) {
                 val eventName = event.getEventName()
                 if (eventName.isNotEmpty()) {
-                    var eventList = eventMap[eventName]
-                    if (eventList == null || eventList.isEmpty()) {
-                        eventList = ArrayList()
+                    val eventList = eventMap[eventName] ?: ArrayList()
+                    if (eventList.isEmpty()) {
                         eventMap[eventName] = eventList
                     }
                     eventList.add(event)
@@ -326,7 +339,7 @@ internal interface MessageEventReconciliationUtil {
          */
         @SuppressWarnings("ReturnCount", "LongMethod")
         private fun copyEventsForTrigger(trigger: Trigger, eventMap: Map<String, MutableList<Event>>):
-            MutableList<Event>? {
+            List<Event>? {
             // Reconcile by trigger's type.
             val eventType = EventType.getById(trigger.eventType)
             if (eventType == null || eventType == EventType.INVALID) {
@@ -346,7 +359,7 @@ internal interface MessageEventReconciliationUtil {
 
             // Only retrieve a list of events according to trigger's event type. Since this list of events
             // is only a copy from the event repository, therefore, it's OK to modify or remove elements.
-            var eventsCopy: MutableList<Event>? = null
+            var eventsCopy: List<Event>? = null
             val eventsFound = eventMap[eventName]
             if (!eventsFound.isNullOrEmpty()) {
                 eventsCopy = ArrayList(eventsFound)

@@ -12,4 +12,5 @@ Add links to github/jira issues, design documents and other relevant resources (
 - [ ] I checked that all possible internal and platform/library exceptions are gracefully handled and **will not** crash the host app
 - [ ] I checked for open & known issues (especially crashes) for any newly added platform APIs or libraries
 - [ ] I tested non-trivial changes on a real device
+- [ ] I added ticket/changes in changelog
 - [ ] I ran `./gradlew check` without errors

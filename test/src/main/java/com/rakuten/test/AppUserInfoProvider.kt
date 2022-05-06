@@ -4,11 +4,11 @@ import com.rakuten.tech.mobile.inappmessaging.runtime.UserInfoProvider
 
 class AppUserInfoProvider : UserInfoProvider {
 
-    var userId = "user1"
-    var accessToken = "token1"
-    var idTracking = "tracking1"
+    var userId = ""
+    var accessToken = ""
+    var idTracking = ""
     
-    override fun provideAccessToken() = ""
+    override fun provideAccessToken() = accessToken
 
     override fun provideUserId() = userId
 
