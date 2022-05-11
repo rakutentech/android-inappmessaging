@@ -6,6 +6,7 @@ import android.provider.Settings
 import androidx.test.core.app.ApplicationProvider
 import androidx.work.WorkManager
 import androidx.work.testing.WorkManagerTestInitHelper
+import com.nhaarman.mockitokotlin2.any
 import com.nhaarman.mockitokotlin2.argumentCaptor
 import com.nhaarman.mockitokotlin2.eq
 import com.nhaarman.mockitokotlin2.never
@@ -131,6 +132,14 @@ class ImpressionManagerSpec : BaseTest() {
         (map[InAppMessagingConstants.RAT_EVENT_SUBS_ID] as String).shouldNotBeEmpty()
         (map[InAppMessagingConstants.RAT_EVENT_IMP] as List<RatImpression>) shouldHaveSize 1
         map[InAppMessagingConstants.RAT_EVENT_ACC] shouldBeEqualTo InApp.DEFAULT_ACC
+    }
+
+    @Test
+    fun `should not invoke broadcaster for empty list`() {
+        ImpressionManager.sendImpressionEvent("1234", listOf(), eventTracker::sendEvent)
+
+        val captor = argumentCaptor<Map<String, Any>>()
+        Mockito.verify(eventTracker, never()).sendEvent(eq(InAppMessagingConstants.RAT_EVENT_KEY_IMPRESSION), any())
     }
 
     companion object {

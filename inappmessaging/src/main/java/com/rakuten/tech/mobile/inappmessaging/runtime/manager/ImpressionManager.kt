@@ -16,6 +16,7 @@ import com.rakuten.tech.mobile.inappmessaging.runtime.utils.RuntimeUtil
 import com.rakuten.tech.mobile.inappmessaging.runtime.workmanager.schedulers.ImpressionScheduler
 import com.rakuten.tech.mobile.sdkutils.logger.Logger
 import java.util.Date
+import java.util.concurrent.ConcurrentHashMap
 import kotlin.collections.ArrayList
 import kotlin.collections.HashMap
 import kotlin.collections.set
@@ -26,6 +27,7 @@ import kotlin.collections.set
  */
 internal object ImpressionManager {
     private const val TAG = "IAM_ImpressionManager"
+    internal val impressionMap by lazy { ConcurrentHashMap<String, Impression>() }
 
     /**
      * Reporting impression list to IAM backend, and sending to analytics. This method is invoked on
@@ -38,6 +40,15 @@ internal object ImpressionManager {
         sendEvent: (String, data: Map<String, *>?) -> Boolean = EventTrackerHelper::sendEvent
     ) {
         if (impressionList.isEmpty()) return
+
+        // send user action impression
+        sendImpressionEvent(campaignId, impressionList, sendEvent)
+
+        val impListRequest = impressionList.toMutableList()
+        impressionMap[campaignId]?.let { mapData ->
+            impListRequest.add(mapData)
+        }
+
         // Assemble ImpressionRequest object.
         val impressionRequest = ImpressionRequest(
             campaignId = campaignId,
@@ -45,11 +56,8 @@ internal object ImpressionManager {
             appVersion = HostAppInfoRepository.instance().getVersion(),
             sdkVersion = BuildConfig.VERSION_NAME,
             userIdentifiers = RuntimeUtil.getUserIdentifiers(),
-            impressions = impressionList
+            impressions = impListRequest
         )
-
-        // send user action impression
-        sendImpressionEvent(campaignId, impressionList, sendEvent)
 
         // Schedule work to report impressions back to IAM backend.
         ImpressionScheduler().startImpressionWorker(impressionRequest)
@@ -58,8 +66,15 @@ internal object ImpressionManager {
     internal fun sendImpressionEvent(
         campaignId: String,
         impressionList: List<Impression>,
-        sendEvent: (String, data: Map<String, *>?) -> Boolean = EventTrackerHelper::sendEvent
+        sendEvent: (String, data: Map<String, *>?) -> Boolean = EventTrackerHelper::sendEvent,
+        impressionTypeOnly: Boolean = false
     ) {
+        if (impressionList.isEmpty()) return
+
+        if (impressionTypeOnly) {
+            impressionMap[campaignId] = impressionList[0] // if impression type only, it is assumed that only one entry
+        }
+
         val params: MutableMap<String, Any?> = HashMap()
         params[RAT_EVENT_CAMP_ID] = campaignId
         params[RAT_EVENT_SUBS_ID] = HostAppInfoRepository.instance().getInAppMessagingSubscriptionKey()
@@ -78,7 +93,6 @@ internal object ImpressionManager {
 
         val impressionList = ArrayList<Impression>()
 
-        // Adding view impression by default.
         val currentTimeInMillis = Date().time
 
         // Add impressions included in the method argument.

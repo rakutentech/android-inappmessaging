@@ -5,6 +5,7 @@ import com.google.gson.Gson
 import com.rakuten.tech.mobile.inappmessaging.runtime.InAppMessaging
 import com.rakuten.tech.mobile.inappmessaging.runtime.data.models.messages.Message
 import com.rakuten.tech.mobile.inappmessaging.runtime.data.responses.ping.CampaignData
+import com.rakuten.tech.mobile.inappmessaging.runtime.manager.ImpressionManager
 import com.rakuten.tech.mobile.sdkutils.PreferencesUtil
 import com.rakuten.tech.mobile.sdkutils.logger.Logger
 import org.json.JSONArray
@@ -40,6 +41,7 @@ internal abstract class ReadyForDisplayMessageRepository : ReadyMessageRepositor
             // Preventing race condition.
             synchronized(messages) {
                 messages.clear()
+                ImpressionManager.impressionMap.clear() // clear impression map when ready messages are replaced
                 messages.addAll(messageList)
                 saveUpdatedList()
             }
@@ -77,6 +79,7 @@ internal abstract class ReadyForDisplayMessageRepository : ReadyMessageRepositor
                     PingResponseMessageRepository.instance().incrementTimesClosed(messages)
                 }
                 messages.clear()
+                ImpressionManager.impressionMap.clear() // clear impression map when ready messages are cleared
                 saveUpdatedList()
             }
         }

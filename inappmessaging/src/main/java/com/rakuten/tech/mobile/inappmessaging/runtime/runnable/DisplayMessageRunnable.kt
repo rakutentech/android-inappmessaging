@@ -47,7 +47,9 @@ internal class DisplayMessageRunnable(
                     modalView.populateViewData(message)
                     hostActivity.addContentView(modalView, hostActivity.window.attributes)
                     ImpressionManager.sendImpressionEvent(
-                        message.getCampaignId(), listOf(Impression(ImpressionType.IMPRESSION, Date().time))
+                        message.getCampaignId(),
+                        listOf(Impression(ImpressionType.IMPRESSION, Date().time)),
+                        impressionTypeOnly = true
                     )
                 }
                 InAppMessageType.FULL -> {
@@ -60,7 +62,9 @@ internal class DisplayMessageRunnable(
                     fullScreenView.populateViewData(message)
                     hostActivity.addContentView(fullScreenView, hostActivity.window.attributes)
                     ImpressionManager.sendImpressionEvent(
-                        message.getCampaignId(), listOf(Impression(ImpressionType.IMPRESSION, Date().time))
+                        message.getCampaignId(),
+                        listOf(Impression(ImpressionType.IMPRESSION, Date().time)),
+                        impressionTypeOnly = true
                     )
                 }
                 InAppMessageType.SLIDE -> {
@@ -73,7 +77,9 @@ internal class DisplayMessageRunnable(
                     slideUpView.populateViewData(message)
                     hostActivity.addContentView(slideUpView, hostActivity.window.attributes)
                     ImpressionManager.sendImpressionEvent(
-                        message.getCampaignId(), listOf(Impression(ImpressionType.IMPRESSION, Date().time))
+                        message.getCampaignId(),
+                        listOf(Impression(ImpressionType.IMPRESSION, Date().time)),
+                        impressionTypeOnly = true
                     )
                 }
                 else -> Any()
