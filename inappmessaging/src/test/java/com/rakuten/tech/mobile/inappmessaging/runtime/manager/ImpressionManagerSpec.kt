@@ -8,6 +8,7 @@ import androidx.work.WorkManager
 import androidx.work.testing.WorkManagerTestInitHelper
 import com.nhaarman.mockitokotlin2.any
 import com.nhaarman.mockitokotlin2.argumentCaptor
+import com.nhaarman.mockitokotlin2.KArgumentCaptor
 import com.nhaarman.mockitokotlin2.eq
 import com.nhaarman.mockitokotlin2.never
 import com.rakuten.tech.mobile.inappmessaging.runtime.*
@@ -56,20 +57,9 @@ class ImpressionManagerSpec : BaseTest() {
     @Test
     @Throws(ExecutionException::class, InterruptedException::class)
     fun `should invoke start impression worker`() {
-        WorkManagerTestInitHelper.initializeTestWorkManager(ApplicationProvider.getApplicationContext())
-        Settings.Secure.putString(
-            ApplicationProvider.getApplicationContext<Context>().contentResolver,
-            Settings.Secure.ANDROID_ID,
-            "test_device_id"
-        )
-        InAppMessaging.initialize(ApplicationProvider.getApplicationContext(), true)
-        InAppMessaging.instance().registerPreference(TestUserInfoProvider())
-        ImpressionManager.scheduleReportImpression(
-            impressionList!!, "1234", false,
-            eventTracker::sendEvent
-        )
+        setupEventBroadcaster()
         val status =
-            WorkManager.getInstance(ApplicationProvider.getApplicationContext<Context>())
+            WorkManager.getInstance(ApplicationProvider.getApplicationContext())
                 .getWorkInfosByTag(IMPRESSION_WORKER_NAME)
         status.get().shouldHaveSize(1)
     }
@@ -77,24 +67,7 @@ class ImpressionManagerSpec : BaseTest() {
     @Test
     @SuppressWarnings("LongMethod")
     fun `should invoke broadcaster`() {
-        WorkManagerTestInitHelper.initializeTestWorkManager(ApplicationProvider.getApplicationContext())
-        Settings.Secure.putString(
-            ApplicationProvider.getApplicationContext<Context>().contentResolver,
-            Settings.Secure.ANDROID_ID,
-            "test_device_id"
-        )
-        InAppMessaging.initialize(ApplicationProvider.getApplicationContext(), true)
-        InAppMessaging.instance().registerPreference(TestUserInfoProvider())
-        ImpressionManager.scheduleReportImpression(
-            impressionList!!,
-            "1234",
-            false,
-            eventTracker::sendEvent
-        )
-        val captor = argumentCaptor<Map<String, Any>>()
-        Mockito.verify(eventTracker).sendEvent(
-            eq(InAppMessagingConstants.RAT_EVENT_KEY_IMPRESSION), captor.capture()
-        )
+        val captor = setupEventBroadcaster()
 
         val map = captor.firstValue
         map[InAppMessagingConstants.RAT_EVENT_CAMP_ID] shouldBeEqualTo "1234"
@@ -114,6 +87,20 @@ class ImpressionManagerSpec : BaseTest() {
         Mockito.verify(eventTracker, never()).sendEvent(
             ArgumentMatchers.anyString(), ArgumentMatchers.anyMap<String, Any>()
         )
+    }
+
+    @Test
+    fun `should invoke broadcaster with valid impression content`() {
+        ImpressionManager.impressionMap["1234"] = Impression(ImpressionType.IMPRESSION, Date().time)
+        val captor = setupEventBroadcaster()
+
+        val map = captor.firstValue
+        map[InAppMessagingConstants.RAT_EVENT_CAMP_ID] shouldBeEqualTo "1234"
+        (map[InAppMessagingConstants.RAT_EVENT_SUBS_ID] as String).shouldNotBeEmpty()
+        (map[InAppMessagingConstants.RAT_EVENT_IMP] as List<RatImpression>) shouldHaveSize impressionList!!.size
+        map[InAppMessagingConstants.RAT_EVENT_ACC] shouldBeEqualTo InApp.DEFAULT_ACC
+
+        ImpressionManager.impressionMap.clear()
     }
 
     @Test
@@ -140,6 +127,29 @@ class ImpressionManagerSpec : BaseTest() {
 
         val captor = argumentCaptor<Map<String, Any>>()
         Mockito.verify(eventTracker, never()).sendEvent(eq(InAppMessagingConstants.RAT_EVENT_KEY_IMPRESSION), any())
+    }
+
+    @SuppressWarnings("LongMethod")
+    private fun setupEventBroadcaster(): KArgumentCaptor<Map<String, Any>> {
+        WorkManagerTestInitHelper.initializeTestWorkManager(ApplicationProvider.getApplicationContext())
+        Settings.Secure.putString(
+            ApplicationProvider.getApplicationContext<Context>().contentResolver,
+            Settings.Secure.ANDROID_ID,
+            "test_device_id"
+        )
+        InAppMessaging.initialize(ApplicationProvider.getApplicationContext(), true)
+        InAppMessaging.instance().registerPreference(TestUserInfoProvider())
+        ImpressionManager.scheduleReportImpression(
+            impressionList!!,
+            "1234",
+            false,
+            eventTracker::sendEvent
+        )
+        val captor = argumentCaptor<Map<String, Any>>()
+        Mockito.verify(eventTracker).sendEvent(
+            eq(InAppMessagingConstants.RAT_EVENT_KEY_IMPRESSION), captor.capture()
+        )
+        return captor
     }
 
     companion object {
