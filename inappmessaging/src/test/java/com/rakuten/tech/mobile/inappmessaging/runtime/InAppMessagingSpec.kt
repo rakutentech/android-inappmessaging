@@ -289,7 +289,7 @@ open class InAppMessagingSpec : BaseTest() {
         instance.logEvent(AppStartEvent())
         instance.logEvent(PurchaseSuccessfulEvent())
         instance.logEvent(LoginSuccessfulEvent())
-        Mockito.verify(eventsManager, never()).onEventReceived(any(), any(), any(), any(), any())
+        Mockito.verify(eventsManager, never()).onEventReceived(any(), any(), any(), any())
         LocalEventRepository.instance().getEvents().shouldHaveSize(0)
         (instance as InApp).tempEventList.shouldHaveSize(4)
     }
@@ -303,7 +303,7 @@ open class InAppMessagingSpec : BaseTest() {
         instance.logEvent(AppStartEvent())
         instance.logEvent(PurchaseSuccessfulEvent())
         instance.logEvent(LoginSuccessfulEvent())
-        Mockito.verify(eventsManager, never()).onEventReceived(any(), any(), any(), any(), any())
+        Mockito.verify(eventsManager, never()).onEventReceived(any(), any(), any(), any())
         LocalEventRepository.instance().getEvents().shouldHaveSize(0)
         (instance as InApp).tempEventList.shouldHaveSize(4)
 
@@ -317,7 +317,7 @@ open class InAppMessagingSpec : BaseTest() {
         val instance = initializeMockInstance(100)
 
         instance.logEvent(AppStartEvent())
-        Mockito.verify(eventsManager).onEventReceived(any(), any(), any(), any(), any())
+        Mockito.verify(eventsManager).onEventReceived(any(), any(), any(), any())
     }
 
     @Test
@@ -404,7 +404,7 @@ class InAppMessagingExceptionSpec : InAppMessagingSpec() {
         InAppMessaging.errorCallback = null
         `when`(dispMgr.displayMessage()).thenThrow(NullPointerException())
         `when`(dispMgr.removeMessage(anyOrNull())).thenThrow(NullPointerException())
-        `when`(eventsManager.onEventReceived(any(), any(), any(), any(), any())).thenThrow(NullPointerException())
+        `when`(eventsManager.onEventReceived(any(), any(), any(), any())).thenThrow(NullPointerException())
         `when`(sessionManager.onSessionUpdate()).thenThrow(NullPointerException())
     }
 

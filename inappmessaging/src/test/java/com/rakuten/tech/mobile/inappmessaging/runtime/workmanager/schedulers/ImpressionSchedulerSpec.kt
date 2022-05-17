@@ -97,7 +97,7 @@ class ImpressionSchedulerSpec : BaseTest() {
             BuildConfig.VERSION_NAME,
             HostAppInfoRepository.instance().getVersion(),
             RuntimeUtil.getUserIdentifiers(),
-            ImpressionManager().createImpressionList(impressionTypes)
+            ImpressionManager.createImpressionList(impressionTypes)
         )
         ImpressionScheduler().startImpressionWorker(impressionRequest, mockManager)
     }

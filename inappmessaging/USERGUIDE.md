@@ -387,6 +387,9 @@ Documents targeting Product Managers:
 
 ## <a name="changelog"></a> Changelog
 
+### 7.1.0 (in-progress)
+* SDKCF-5256: Added sending of impression events with campaign details to analytics account.
+
 ### 7.0.0 (2022-04-25)
 * SDKCF-4941: **Breaking Changes:** Updated configuration API to align with iOS.
   - Renamed `init()` API to `configure()`.

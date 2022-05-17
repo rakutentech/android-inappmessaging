@@ -1,5 +1,6 @@
 package com.rakuten.tech.mobile.inappmessaging.runtime.data.repositories
 
+import androidx.annotation.VisibleForTesting
 import com.rakuten.tech.mobile.inappmessaging.runtime.data.models.HostAppInfo
 import com.rakuten.tech.mobile.inappmessaging.runtime.exception.InAppMessagingException
 import com.rakuten.tech.mobile.inappmessaging.runtime.utils.InAppMessagingConstants.Companion.ARGUMENT_IS_NULL_EXCEPTION
@@ -53,6 +54,12 @@ internal interface HostAppInfoRepository {
      */
     fun getConfigUrl(): String
 
+    /**
+     * Clears host app info for testing.
+     */
+    @VisibleForTesting
+    fun clearInfo()
+
     companion object {
         private const val TAG = "IAM_HostAppRepository"
         private var instance: HostAppInfoRepository = HostAppInfoRepositoryImpl()
@@ -104,5 +111,9 @@ internal interface HostAppInfoRepository {
         override fun getDeviceId(): String = hostAppInfo?.deviceId.orEmpty()
 
         override fun getConfigUrl(): String = hostAppInfo?.configUrl.orEmpty()
+
+        override fun clearInfo() {
+            hostAppInfo = null
+        }
     }
 }
