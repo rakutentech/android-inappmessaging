@@ -52,7 +52,7 @@ class InitializerSpec : BaseTest() {
     @Test
     fun `should not throw exception`() {
         WorkManagerTestInitHelper.initializeTestWorkManager(context)
-        Initializer.initializeSdk(context, "test", "", 1)
+        Initializer.initializeSdk(context, "test", "")
     }
 
     @Test(expected = InAppMessagingException::class)
@@ -76,7 +76,7 @@ class InitializerSpec : BaseTest() {
             ApplicationProvider.getApplicationContext<Context>()
                 .resources
         )
-        Initializer.initializeSdk(context, "test", "", 1)
+        Initializer.initializeSdk(context, "test", "")
     }
 
     @Test
@@ -87,7 +87,7 @@ class InitializerSpec : BaseTest() {
         // clear preferences
         PreferencesUtil.clear(context, "uuid")
 
-        Initializer.initializeSdk(appCtx, "test", "", 1)
+        Initializer.initializeSdk(appCtx, "test", "")
 
         HostAppInfoRepository.instance().getDeviceId().shouldNotBeNullOrEmpty()
     }
@@ -100,7 +100,7 @@ class InitializerSpec : BaseTest() {
         // add test value
         PreferencesUtil.putString(context, "uuid", Initializer.ID_KEY, "test_uuid")
 
-        Initializer.initializeSdk(appCtx, "test", "", 1)
+        Initializer.initializeSdk(appCtx, "test", "")
 
         HostAppInfoRepository.instance().getDeviceId() shouldBeEqualTo "test_uuid"
     }

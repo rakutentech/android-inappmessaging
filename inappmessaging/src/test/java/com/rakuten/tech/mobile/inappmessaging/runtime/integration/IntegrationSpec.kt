@@ -44,7 +44,7 @@ class IntegrationSpec {
             override fun provideIdTrackingIdentifier() = ""
         })
         // to initialize host app info
-        Initializer.initializeSdk(context, manifest.subscriptionKey(), manifest.configUrl(), manifest.customAcc())
+        Initializer.initializeSdk(context, manifest.subscriptionKey(), manifest.configUrl())
     }
 
     @Test

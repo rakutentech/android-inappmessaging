@@ -56,8 +56,7 @@ open class MessageReadinessManagerSpec : BaseTest() {
                 InAppMessagingTestConstants.DEVICE_ID,
                 InAppMessagingTestConstants.APP_VERSION,
                 InAppMessagingTestConstants.SUB_KEY,
-                InAppMessagingTestConstants.LOCALE,
-                customAcc = InAppMessagingTestConstants.ACC
+                InAppMessagingTestConstants.LOCALE
             )
         )
         ConfigResponseRepository.instance().addConfigResponse(configResponseData)
@@ -170,8 +169,7 @@ open class MessageReadinessManagerSpec : BaseTest() {
             HostAppInfo(
                 "rakuten.com.tech.mobile.test",
                 InAppMessagingTestConstants.DEVICE_ID, InAppMessagingTestConstants.APP_VERSION,
-                "2", InAppMessagingTestConstants.LOCALE,
-                customAcc = InAppMessagingTestConstants.ACC
+                "2", InAppMessagingTestConstants.LOCALE
             )
         )
         MessageReadinessManager.instance().getNextDisplayMessage().shouldBeNull()
@@ -189,8 +187,7 @@ open class MessageReadinessManagerSpec : BaseTest() {
             HostAppInfo(
                 "rakuten.com.tech.mobile.test",
                 InAppMessagingTestConstants.DEVICE_ID, InAppMessagingTestConstants.APP_VERSION,
-                "2", InAppMessagingTestConstants.LOCALE,
-                customAcc = InAppMessagingTestConstants.ACC
+                "2", InAppMessagingTestConstants.LOCALE
             )
         )
         MessageReadinessManager.instance().getNextDisplayMessage().shouldBeNull()
@@ -265,8 +262,7 @@ class MessageReadinessManagerRequestSpec : BaseTest() {
                 InAppMessagingTestConstants.DEVICE_ID,
                 InAppMessagingTestConstants.APP_VERSION,
                 InAppMessagingTestConstants.SUB_KEY,
-                InAppMessagingTestConstants.LOCALE,
-                customAcc = InAppMessagingTestConstants.ACC
+                InAppMessagingTestConstants.LOCALE
             )
         )
         ConfigResponseRepository.instance().addConfigResponse(data)

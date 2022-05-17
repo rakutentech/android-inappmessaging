@@ -73,7 +73,6 @@ class ImpressionManagerSpec : BaseTest() {
         map[InAppMessagingConstants.RAT_EVENT_CAMP_ID] shouldBeEqualTo "1234"
         (map[InAppMessagingConstants.RAT_EVENT_SUBS_ID] as String).shouldNotBeEmpty()
         (map[InAppMessagingConstants.RAT_EVENT_IMP] as List<RatImpression>) shouldHaveSize impressionList!!.size
-        map[InAppMessagingConstants.RAT_EVENT_ACC] shouldBeEqualTo InApp.DEFAULT_ACC
     }
 
     @Test
@@ -98,7 +97,6 @@ class ImpressionManagerSpec : BaseTest() {
         map[InAppMessagingConstants.RAT_EVENT_CAMP_ID] shouldBeEqualTo "1234"
         (map[InAppMessagingConstants.RAT_EVENT_SUBS_ID] as String).shouldNotBeEmpty()
         (map[InAppMessagingConstants.RAT_EVENT_IMP] as List<RatImpression>) shouldHaveSize impressionList!!.size
-        map[InAppMessagingConstants.RAT_EVENT_ACC] shouldBeEqualTo InApp.DEFAULT_ACC
 
         ImpressionManager.impressionMap.clear()
     }
@@ -118,7 +116,6 @@ class ImpressionManagerSpec : BaseTest() {
         map[InAppMessagingConstants.RAT_EVENT_CAMP_ID] shouldBeEqualTo "1234"
         (map[InAppMessagingConstants.RAT_EVENT_SUBS_ID] as String).shouldNotBeEmpty()
         (map[InAppMessagingConstants.RAT_EVENT_IMP] as List<RatImpression>) shouldHaveSize 1
-        map[InAppMessagingConstants.RAT_EVENT_ACC] shouldBeEqualTo InApp.DEFAULT_ACC
     }
 
     @Test

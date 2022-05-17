@@ -29,6 +29,5 @@ internal class InAppMessagingConstants {
         const val RAT_EVENT_CAMP_ID = "campaign_id"
         const val RAT_EVENT_SUBS_ID = "subscription_id"
         const val RAT_EVENT_IMP = "impressions"
-        const val RAT_EVENT_ACC = "acc"
     }
 }

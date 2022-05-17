@@ -1,7 +1,6 @@
 package com.rakuten.tech.mobile.inappmessaging.runtime.data.repositories
 
 import com.rakuten.tech.mobile.inappmessaging.runtime.BaseTest
-import com.rakuten.tech.mobile.inappmessaging.runtime.InApp
 import com.rakuten.tech.mobile.inappmessaging.runtime.InAppMessagingTestConstants
 import com.rakuten.tech.mobile.inappmessaging.runtime.data.models.HostAppInfo
 import com.rakuten.tech.mobile.inappmessaging.runtime.exception.InAppMessagingException
@@ -38,8 +37,7 @@ class HostAppInfoRepositorySpec : BaseTest() {
             InAppMessagingTestConstants.DEVICE_ID,
             InAppMessagingTestConstants.APP_VERSION,
             InAppMessagingTestConstants.SUB_KEY,
-            InAppMessagingTestConstants.LOCALE,
-            customAcc = InAppMessagingTestConstants.ACC
+            InAppMessagingTestConstants.LOCALE
         )
         HostAppInfoRepository.instance().addHostInfo(testAppInfo)
         HostAppInfoRepository.instance().getVersion() shouldBeEqualTo InAppMessagingTestConstants.APP_VERSION
@@ -49,7 +47,6 @@ class HostAppInfoRepositorySpec : BaseTest() {
         HostAppInfoRepository.instance()
             .getInAppMessagingSubscriptionKey() shouldBeEqualTo InAppMessagingTestConstants.SUB_KEY
         HostAppInfoRepository.instance().getDeviceId() shouldBeEqualTo InAppMessagingTestConstants.DEVICE_ID
-        HostAppInfoRepository.instance().getCustomAcc() shouldBeEqualTo InAppMessagingTestConstants.ACC
     }
 
     @Test
@@ -64,7 +61,7 @@ class HostAppInfoRepositorySpec : BaseTest() {
 
     @Test
     fun `should throw exception for invalid version`() {
-        val hostAppInfo = HostAppInfo(customAcc = InAppMessagingTestConstants.ACC)
+        val hostAppInfo = HostAppInfo()
         try {
             HostAppInfoRepository.instance().addHostInfo(hostAppInfo)
             Assert.fail()
@@ -76,8 +73,7 @@ class HostAppInfoRepositorySpec : BaseTest() {
     @Test
     fun `should throw exception for invalid package name`() {
         val hostAppInfo = HostAppInfo(
-            version = InAppMessagingTestConstants.APP_VERSION,
-            customAcc = InAppMessagingTestConstants.ACC
+            version = InAppMessagingTestConstants.APP_VERSION
         )
         try {
             HostAppInfoRepository.instance().addHostInfo(hostAppInfo)
@@ -91,8 +87,7 @@ class HostAppInfoRepositorySpec : BaseTest() {
     fun `should throw exception for invalid subscription key`() {
         val hostAppInfo = HostAppInfo(
             version = InAppMessagingTestConstants.APP_VERSION,
-            packageName = InAppMessagingTestConstants.APP_ID,
-            customAcc = InAppMessagingTestConstants.ACC
+            packageName = InAppMessagingTestConstants.APP_ID
         )
         try {
             HostAppInfoRepository.instance().addHostInfo(hostAppInfo)
@@ -107,8 +102,7 @@ class HostAppInfoRepositorySpec : BaseTest() {
         val hostAppInfo = HostAppInfo(
             version = InAppMessagingTestConstants.APP_VERSION,
             packageName = InAppMessagingTestConstants.APP_ID,
-            subscriptionKey = InAppMessagingTestConstants.SUB_KEY,
-            customAcc = InAppMessagingTestConstants.ACC
+            subscriptionKey = InAppMessagingTestConstants.SUB_KEY
         )
         HostAppInfoRepository.instance().addHostInfo(hostAppInfo)
     }
@@ -119,8 +113,7 @@ class HostAppInfoRepositorySpec : BaseTest() {
             version = InAppMessagingTestConstants.APP_VERSION,
             packageName = InAppMessagingTestConstants.APP_ID,
             subscriptionKey = InAppMessagingTestConstants.SUB_KEY,
-            locale = InAppMessagingTestConstants.LOCALE,
-            customAcc = InAppMessagingTestConstants.ACC
+            locale = InAppMessagingTestConstants.LOCALE
         )
         HostAppInfoRepository.instance().addHostInfo(hostAppInfo)
     }
@@ -135,6 +128,5 @@ class HostAppInfoRepositorySpec : BaseTest() {
         instance.getInAppMessagingSubscriptionKey().shouldBeEmpty()
         instance.getDeviceId().shouldBeEmpty()
         instance.getConfigUrl().shouldBeEmpty()
-        instance.getCustomAcc() shouldBeEqualTo InApp.DEFAULT_ACC
     }
 }

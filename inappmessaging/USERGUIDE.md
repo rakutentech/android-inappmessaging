@@ -312,19 +312,6 @@ in strings.xml:
     <string name="iam_custom_font_button">your_app_other_font</string>
 ```
 
-## <a name="custom-account"></a> #4 Custom analytics account
-
-Starting v7.1.0, if you want to use a custom account for sending impression events, add the following meta-data in AndroidManifest.xml file.
-
-```xml
-  <meta-data android:name="com.rakuten.tech.mobile.inappmessaging.acc"
-  android:value="<your-custom-acc>"/>
-  ```
-
-  | Field            | Datatype| Manifest Key                                             | Optional   | Default |
-  |------------------|---------|----------------------------------------------------------|------------|---------|
-  | Custom Acc       | Integer | `com.rakuten.tech.mobile.inappmessaging.acc`             | ✅         | `TBD`   |
-
 ## <a name="troubleshooting"></a> Troubleshooting
 ### Proguard ParseException
 ```kotlin
@@ -401,8 +388,7 @@ Documents targeting Product Managers:
 ## <a name="changelog"></a> Changelog
 
 ### 7.1.0 (in-progress)
-* SDKCF-5256: Added sending of impression events to a custom account.
-  - Added build time config to set custom event. Please see [custom account](#custom-account) section for details.
+* SDKCF-5256: Added sending of impression events with campaign details to analytics account.
 
 ### 7.0.0 (2022-04-25)
 * SDKCF-4941: **Breaking Changes:** Updated configuration API to align with iOS.

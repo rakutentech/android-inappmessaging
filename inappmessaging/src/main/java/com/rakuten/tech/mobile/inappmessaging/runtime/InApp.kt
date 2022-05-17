@@ -177,11 +177,6 @@ internal class InApp(
         fun configUrl(): String? = metadata.getString("com.rakuten.tech.mobile.inappmessaging.configurl")
 
         /**
-         * Account for Analytics modules.
-         **/
-        fun customAcc(): Int = metadata.getInt("com.rakuten.tech.mobile.inappmessaging.acc", DEFAULT_ACC)
-
-        /**
          * Flag to enable/disable debug logging.
          **/
         fun isDebugging(): Boolean = metadata.getBoolean("com.rakuten.tech.mobile.inappmessaging.debugging")
@@ -189,6 +184,5 @@ internal class InApp(
 
     companion object {
         private const val TAG = "IAM_InAppMessaging"
-        internal const val DEFAULT_ACC = 1 // TBD
     }
 }

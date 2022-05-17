@@ -71,8 +71,7 @@ open class ConfigWorkerSpec : BaseTest() {
         val testAppInfo = HostAppInfo(
             "rakuten.com.tech.mobile.test",
             InAppMessagingTestConstants.DEVICE_ID, InAppMessagingTestConstants.APP_VERSION,
-            "test-key", InAppMessagingTestConstants.LOCALE,
-            customAcc = InAppMessagingTestConstants.ACC
+            "test-key", InAppMessagingTestConstants.LOCALE
         )
         HostAppInfoRepository.instance().addHostInfo(testAppInfo)
         val context: Context = ApplicationProvider.getApplicationContext()

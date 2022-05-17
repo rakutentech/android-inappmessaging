@@ -65,8 +65,7 @@ class ImpressionWorkerSpec : BaseTest() {
             HostAppInfo(
                 InAppMessagingTestConstants.APP_ID,
                 InAppMessagingTestConstants.DEVICE_ID, InAppMessagingTestConstants.APP_VERSION,
-                InAppMessagingTestConstants.SUB_KEY, InAppMessagingTestConstants.LOCALE,
-                customAcc = InAppMessagingTestConstants.ACC
+                InAppMessagingTestConstants.SUB_KEY, InAppMessagingTestConstants.LOCALE
             )
         )
         worker = ImpressionWorker(context, workerParameters)
@@ -228,8 +227,7 @@ class ImpressionWorkerSpec : BaseTest() {
                 InAppMessagingTestConstants.DEVICE_ID,
                 InAppMessagingTestConstants.APP_VERSION,
                 "sample-key",
-                InAppMessagingTestConstants.LOCALE,
-                customAcc = InAppMessagingTestConstants.ACC
+                InAppMessagingTestConstants.LOCALE
             )
         )
         val workManager = WorkManager.getInstance(ApplicationProvider.getApplicationContext())

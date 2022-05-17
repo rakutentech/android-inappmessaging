@@ -179,8 +179,7 @@ class MessageMixerWorkerSpec : BaseTest() {
                 InAppMessagingTestConstants.DEVICE_ID,
                 InAppMessagingTestConstants.APP_VERSION,
                 "test-key",
-                InAppMessagingTestConstants.LOCALE,
-                customAcc = InAppMessagingTestConstants.ACC
+                InAppMessagingTestConstants.LOCALE
             )
         )
         retrieveValidConfig()
@@ -194,8 +193,7 @@ class MessageMixerWorkerSpec : BaseTest() {
             HostAppInfo(
                 "rakuten.com.tech.mobile.test", InAppMessagingTestConstants.DEVICE_ID,
                 InAppMessagingTestConstants.APP_VERSION, "test-key",
-                InAppMessagingTestConstants.LOCALE,
-                customAcc = InAppMessagingTestConstants.ACC
+                InAppMessagingTestConstants.LOCALE
             )
         )
         AccountRepository.instance().userInfoProvider = object : UserInfoProvider {

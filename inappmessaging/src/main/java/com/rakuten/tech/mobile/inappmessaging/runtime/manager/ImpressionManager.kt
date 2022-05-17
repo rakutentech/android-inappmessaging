@@ -7,7 +7,6 @@ import com.rakuten.tech.mobile.inappmessaging.runtime.data.models.Impression
 import com.rakuten.tech.mobile.inappmessaging.runtime.data.models.rat.RatImpression
 import com.rakuten.tech.mobile.inappmessaging.runtime.data.repositories.HostAppInfoRepository
 import com.rakuten.tech.mobile.inappmessaging.runtime.data.requests.ImpressionRequest
-import com.rakuten.tech.mobile.inappmessaging.runtime.utils.InAppMessagingConstants.Companion.RAT_EVENT_ACC
 import com.rakuten.tech.mobile.inappmessaging.runtime.utils.InAppMessagingConstants.Companion.RAT_EVENT_CAMP_ID
 import com.rakuten.tech.mobile.inappmessaging.runtime.utils.InAppMessagingConstants.Companion.RAT_EVENT_IMP
 import com.rakuten.tech.mobile.inappmessaging.runtime.utils.InAppMessagingConstants.Companion.RAT_EVENT_KEY_IMPRESSION
@@ -79,7 +78,6 @@ internal object ImpressionManager {
         params[RAT_EVENT_CAMP_ID] = campaignId
         params[RAT_EVENT_SUBS_ID] = HostAppInfoRepository.instance().getInAppMessagingSubscriptionKey()
         params[RAT_EVENT_IMP] = createRatImpressionList(impressionList)
-        params[RAT_EVENT_ACC] = HostAppInfoRepository.instance().getCustomAcc()
 
         sendEvent(RAT_EVENT_KEY_IMPRESSION, params)
     }

@@ -138,8 +138,7 @@ abstract class InAppMessaging internal constructor() {
             Initializer.initializeSdk(
                 context = context,
                 subscriptionKey = manifestConfig.subscriptionKey(),
-                configUrl = manifestConfig.configUrl(),
-                customAcc = manifestConfig.customAcc()
+                configUrl = manifestConfig.configUrl()
             )
 
             // inform repositories that it is initial launch to display app launch campaign at least once

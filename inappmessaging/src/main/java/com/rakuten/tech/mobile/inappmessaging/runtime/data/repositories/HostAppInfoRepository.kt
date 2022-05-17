@@ -1,7 +1,6 @@
 package com.rakuten.tech.mobile.inappmessaging.runtime.data.repositories
 
 import androidx.annotation.VisibleForTesting
-import com.rakuten.tech.mobile.inappmessaging.runtime.InApp
 import com.rakuten.tech.mobile.inappmessaging.runtime.data.models.HostAppInfo
 import com.rakuten.tech.mobile.inappmessaging.runtime.exception.InAppMessagingException
 import com.rakuten.tech.mobile.inappmessaging.runtime.utils.InAppMessagingConstants.Companion.ARGUMENT_IS_NULL_EXCEPTION
@@ -54,11 +53,6 @@ internal interface HostAppInfoRepository {
      * This method returns IAM config url.
      */
     fun getConfigUrl(): String
-
-    /**
-     * This method returns IAM account for analytics.
-     */
-    fun getCustomAcc(): Int
 
     /**
      * Clears host app info for testing.
@@ -117,8 +111,6 @@ internal interface HostAppInfoRepository {
         override fun getDeviceId(): String = hostAppInfo?.deviceId.orEmpty()
 
         override fun getConfigUrl(): String = hostAppInfo?.configUrl.orEmpty()
-
-        override fun getCustomAcc(): Int = hostAppInfo?.customAcc ?: InApp.DEFAULT_ACC
 
         override fun clearInfo() {
             hostAppInfo = null
