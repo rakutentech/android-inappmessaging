@@ -389,6 +389,7 @@ Documents targeting Product Managers:
 
 ### 7.1.0 (in-progress)
 * SDKCF-5256: Added sending of impression events with campaign details to analytics account.
+* SDKCF-5295: Updated SDK Utils version to update default `initOrder` of content provider.
 
 ### 7.0.0 (2022-04-25)
 * SDKCF-4941: **Breaking Changes:** Updated configuration API to align with iOS.
