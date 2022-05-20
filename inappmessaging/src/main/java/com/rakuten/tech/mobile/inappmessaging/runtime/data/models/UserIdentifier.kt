@@ -1,13 +1,15 @@
 package com.rakuten.tech.mobile.inappmessaging.runtime.data.models
 
-import com.google.gson.annotations.SerializedName
+import com.squareup.moshi.Json
+import com.squareup.moshi.JsonClass
 
 /**
  * This class represents user identification.
  */
+@JsonClass(generateAdapter = true)
 internal data class UserIdentifier(
-    @SerializedName("id")
+    @Json(name = "id")
     private val id: String,
-    @SerializedName("type")
+    @Json(name = "type")
     private val type: Int
 )

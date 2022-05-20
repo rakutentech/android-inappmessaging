@@ -1,6 +1,7 @@
 package com.rakuten.tech.mobile.inappmessaging.runtime.data.requests
 
-import com.google.gson.annotations.SerializedName
+import com.squareup.moshi.Json
+import com.squareup.moshi.JsonClass
 import com.rakuten.tech.mobile.inappmessaging.runtime.data.models.UserIdentifier
 import com.rakuten.tech.mobile.inappmessaging.runtime.utils.InAppMessagingConstants
 
@@ -8,20 +9,21 @@ import com.rakuten.tech.mobile.inappmessaging.runtime.utils.InAppMessagingConsta
  * This class represents the request body for message display permission request.
  */
 @SuppressWarnings("ObjectToString") // toString() method is not needed for this class.
+@JsonClass(generateAdapter = true)
 internal data class DisplayPermissionRequest(
-    @SerializedName("campaignId")
+    @Json(name = "campaignId")
     val campaignId: String?,
-    @SerializedName("appVersion")
+    @Json(name = "appVersion")
     val appVersion: String?,
-    @SerializedName("sdkVersion")
+    @Json(name = "sdkVersion")
     val sdkVersion: String?,
-    @SerializedName("locale")
+    @Json(name = "locale")
     val locale: String?,
-    @SerializedName("lastPingInMillis")
+    @Json(name = "lastPingInMillis")
     val lastPingInMillis: Long,
-    @SerializedName("userIdentifier")
+    @Json(name = "userIdentifier")
     val userIdentifier: List<UserIdentifier>
 ) {
-    @SerializedName("platform")
+    @Json(name = "platform")
     private val platform: Int = InAppMessagingConstants.ANDROID_PLATFORM_ENUM
 }

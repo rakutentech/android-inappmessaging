@@ -1,6 +1,7 @@
 package com.rakuten.tech.mobile.inappmessaging.runtime.data.responses.config
 
-import com.google.gson.annotations.SerializedName
+import com.squareup.moshi.Json
+import com.squareup.moshi.JsonClass
 
 /**
  * Data object from Config Service.
@@ -11,7 +12,8 @@ import com.google.gson.annotations.SerializedName
  * Example: 0 = Disabled, 65 = 65% chances of being enabled, 100 = 100% chances of being enabled
  */
 @SuppressWarnings("OutdatedDocumentation")
+@JsonClass(generateAdapter = true)
 internal data class ConfigResponseData(
-    @SerializedName("endpoints") val endpoints: ConfigResponseEndpoints? = null,
-    @SerializedName("rolloutPercentage") val rollOutPercentage: Int,
+    @Json(name = "endpoints") val endpoints: ConfigResponseEndpoints? = null,
+    @Json(name = "rolloutPercentage") val rollOutPercentage: Int,
 )

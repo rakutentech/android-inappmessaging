@@ -1,20 +1,22 @@
 package com.rakuten.tech.mobile.inappmessaging.runtime.data.responses.ping
 
-import com.google.gson.annotations.SerializedName
+import com.squareup.moshi.Json
+import com.squareup.moshi.JsonClass
 
 /**
  * Class for parsing Trigger, which is a response from MessageMixer.
  */
+@JsonClass(generateAdapter = true)
 internal data class Trigger(
-    @SerializedName("type")
+    @Json(name = "type")
     val type: Int,
 
-    @SerializedName("eventType")
+    @Json(name = "eventType")
     val eventType: Int,
 
-    @SerializedName("eventName")
+    @Json(name = "eventName")
     val eventName: String,
 
-    @SerializedName("attributes")
+    @Json(name = "attributes")
     val triggerAttributes: MutableList<TriggerAttribute>
 )

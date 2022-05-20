@@ -1,23 +1,25 @@
 package com.rakuten.tech.mobile.inappmessaging.runtime.data.requests
 
-import com.google.gson.annotations.SerializedName
+import com.squareup.moshi.Json
+import com.squareup.moshi.JsonClass
 import com.rakuten.tech.mobile.inappmessaging.runtime.data.models.Impression
 import com.rakuten.tech.mobile.inappmessaging.runtime.data.models.UserIdentifier
 
 /**
  * This class represents the request body for impression.
  */
+@JsonClass(generateAdapter = true)
 internal data class ImpressionRequest(
-    @SerializedName("campaignId")
+    @Json(name = "campaignId")
     private val campaignId: String?,
-    @SerializedName("isTest")
+    @Json(name = "isTest")
     private val isTest: Boolean,
-    @SerializedName("appVersion")
+    @Json(name = "appVersion")
     private val appVersion: String?,
-    @SerializedName("sdkVersion")
+    @Json(name = "sdkVersion")
     private val sdkVersion: String?,
-    @SerializedName("userIdentifiers")
+    @Json(name = "userIdentifiers")
     private val userIdentifiers: List<UserIdentifier>,
-    @SerializedName("impressions")
+    @Json(name = "impressions")
     val impressions: List<Impression>
 )

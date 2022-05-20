@@ -8,12 +8,12 @@ import com.rakuten.tech.mobile.inappmessaging.runtime.data.enums.UserIdentifierT
 import com.rakuten.tech.mobile.inappmessaging.runtime.data.models.UserIdentifier
 import com.rakuten.tech.mobile.inappmessaging.runtime.data.repositories.AccountRepository
 import com.rakuten.tech.mobile.sdkutils.logger.Logger
-import com.rakuten.tech.mobile.sdkutils.network.build
+import com.squareup.moshi.Moshi
 import okhttp3.OkHttpClient
 import okhttp3.ResponseBody
 import retrofit2.Call
 import retrofit2.Retrofit
-import retrofit2.converter.gson.GsonConverterFactory
+import retrofit2.converter.moshi.MoshiConverterFactory
 import java.util.Calendar
 import java.util.concurrent.Executors
 import java.util.concurrent.TimeUnit
@@ -30,21 +30,23 @@ internal object RuntimeUtil {
         .readTimeout(DEFAULT_TIMEOUT_IN_SECONDS.toLong(), TimeUnit.SECONDS)
         .build()
     private val EXECUTOR = Executors.newSingleThreadExecutor()
-    private val GSON_CONVERTER_FACTORY = GsonConverterFactory.create()
+    private val CONVERTER_FACTORY = MoshiConverterFactory.create()
     private const val TAG = "IAM_RuntimeUtil"
 
     /**
      * This method returns a reference of Retrofit. Retrofit is handling API calls.
-     * Adding GsonConverterFactory for parsing returned JSON. Adding OkHttp to handle the main network requests.
+     * Adding MoshiConverterFactory for parsing returned JSON. Adding OkHttp to handle the main network requests.
      */
     fun getRetrofit(): Retrofit {
-        return Retrofit.Builder().build(
-            baseUrl = InAppMessagingConstants.TEMPLATE_BASE_URL,
-            okHttpClient = OK_HTTP_CLIENT,
-            gsonConverterFactory = GSON_CONVERTER_FACTORY,
-            executor = EXECUTOR
-        )
+        return Retrofit.Builder()
+            .client(OK_HTTP_CLIENT)
+            .addConverterFactory(CONVERTER_FACTORY)
+            .baseUrl(InAppMessagingConstants.TEMPLATE_BASE_URL)
+            .callbackExecutor(EXECUTOR)
+            .build()
     }
+
+    fun getMoshi(): Moshi = Moshi.Builder().build()
 
     /**
      * This method s a thread blocking GET request to retrieve image from server.

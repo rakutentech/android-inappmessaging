@@ -1,12 +1,14 @@
 package com.rakuten.tech.mobile.inappmessaging.runtime.data.models.rat
 
-import com.google.gson.annotations.SerializedName
+import com.squareup.moshi.Json
+import com.squareup.moshi.JsonClass
 
 /**
  * This class contains just name and value attributes.
  * Specially made for broadcasting RAT events.
  */
+@JsonClass(generateAdapter = true)
 internal data class RatAttribute(
-    @SerializedName("name") private val name: String,
-    @SerializedName("value") private val value: Any
+    @Json(name = "name") private val name: String,
+    @Json(name = "value") private val value: Any
 )

@@ -1,14 +1,16 @@
 package com.rakuten.tech.mobile.inappmessaging.runtime.data.requests
 
-import com.google.gson.annotations.SerializedName
+import com.squareup.moshi.Json
+import com.squareup.moshi.JsonClass
 import com.rakuten.tech.mobile.inappmessaging.runtime.data.models.UserIdentifier
 
 /**
  * This class represents the request body for ping request.
  */
+@JsonClass(generateAdapter = true)
 internal data class PingRequest(
-    @SerializedName("appVersion")
+    @Json(name = "appVersion")
     private val appVersion: String?,
-    @SerializedName("userIdentifiers")
+    @Json(name = "userIdentifiers")
     private val userIdentifiers: MutableList<UserIdentifier>?
 )

@@ -1,34 +1,36 @@
 package com.rakuten.tech.mobile.inappmessaging.runtime.data.responses.ping
 
-import com.google.gson.annotations.SerializedName
+import com.squareup.moshi.Json
+import com.squareup.moshi.JsonClass
 import com.rakuten.tech.mobile.inappmessaging.runtime.data.models.messages.Message
 
 /**
  * Class for parsing CampaignData, which is a response from MessageMixer.
  */
 @SuppressWarnings("TooManyFunctions")
+@JsonClass(generateAdapter = true)
 internal data class CampaignData(
-    @SerializedName("messagePayload")
+    @Json(name = "messagePayload")
     private val messagePayload: MessagePayload,
-    @SerializedName("type")
+    @Json(name = "type")
     private val type: Int,
-    @SerializedName("triggers")
+    @Json(name = "triggers")
     private val triggers: List<Trigger>?,
-    @SerializedName("campaignId")
+    @Json(name = "campaignId")
     private val campaignId: String,
-    @SerializedName("isTest")
+    @Json(name = "isTest")
     private val isTest: Boolean,
-    @SerializedName("maxImpressions")
+    @Json(name = "maxImpressions")
     private var maxImpressions: Int = 0,
-    @SerializedName("hasNoEndDate")
+    @Json(name = "hasNoEndDate")
     private val hasNoEndDate: Boolean = false,
-    @SerializedName("isCampaignDismissable")
+    @Json(name = "isCampaignDismissable")
     private val isCampaignDismissable: Boolean = true,
-    @SerializedName("infiniteImpressions")
+    @Json(name = "infiniteImpressions")
     private val infiniteImpressions: Boolean = false
 ) : Message {
 
-    @SerializedName("timesClosed")
+    @Json(name = "timesClosed")
     internal var timesClosed = 0
 
     override fun getType(): Int = type

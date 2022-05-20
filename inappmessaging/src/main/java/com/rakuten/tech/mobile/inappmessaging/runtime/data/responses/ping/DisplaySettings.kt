@@ -1,29 +1,31 @@
 package com.rakuten.tech.mobile.inappmessaging.runtime.data.responses.ping
 
-import com.google.gson.annotations.SerializedName
+import com.squareup.moshi.Json
+import com.squareup.moshi.JsonClass
 
 /**
  * Class for parsing DisplaySettings, which is a response from MessageMixer.
  */
+@JsonClass(generateAdapter = true)
 internal data class DisplaySettings(
-    @SerializedName("orientation")
+    @Json(name = "orientation")
     val orientation: Int,
 
-    @SerializedName("slideFrom")
+    @Json(name = "slideFrom")
     val slideFrom: Int,
 
-    @SerializedName("endTimeMillis")
+    @Json(name = "endTimeMillis")
     val endTimeMillis: Long,
 
-    @SerializedName("textAlign")
+    @Json(name = "textAlign")
     val textAlign: Int,
 
-    @SerializedName("optOut")
+    @Json(name = "optOut")
     val optOut: Boolean,
 
-    @SerializedName("delay")
+    @Json(name = "delay")
     val delay: Int,
 
-    @SerializedName("html")
+    @Json(name = "html")
     val html: Boolean // currently not used (always false)
 )

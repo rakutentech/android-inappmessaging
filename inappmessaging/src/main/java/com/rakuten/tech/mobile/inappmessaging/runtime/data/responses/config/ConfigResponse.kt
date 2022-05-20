@@ -1,10 +1,12 @@
 package com.rakuten.tech.mobile.inappmessaging.runtime.data.responses.config
 
-import com.google.gson.annotations.SerializedName
+import com.squareup.moshi.Json
+import com.squareup.moshi.JsonClass
 
 /**
  * Config Response class for GSON.
  */
+@JsonClass(generateAdapter = true)
 internal data class ConfigResponse(
-    @SerializedName("data") val data: ConfigResponseData? = null
+    @Json(name = "data") val data: ConfigResponseData? = null
 )

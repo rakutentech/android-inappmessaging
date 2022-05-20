@@ -1,14 +1,16 @@
 package com.rakuten.tech.mobile.inappmessaging.runtime.data.responses.ping
 
-import com.google.gson.annotations.SerializedName
+import com.squareup.moshi.Json
+import com.squareup.moshi.JsonClass
 
 /**
  * Class for parsing MessageSettings, which is a response from MessageMixer.
  */
+@JsonClass(generateAdapter = true)
 internal data class MessageSettings(
-    @SerializedName("displaySettings")
+    @Json(name = "displaySettings")
     val displaySettings: DisplaySettings,
 
-    @com.google.gson.annotations.SerializedName("controlSettings")
+    @Json(name = "controlSettings")
     val controlSettings: ControlSettings
 )

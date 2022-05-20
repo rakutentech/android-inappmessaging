@@ -1,38 +1,40 @@
 package com.rakuten.tech.mobile.inappmessaging.runtime.data.responses.ping
 
-import com.google.gson.annotations.SerializedName
+import com.squareup.moshi.Json
+import com.squareup.moshi.JsonClass
 
 /**
  * Class for parsing MessagePayload, which is a response from MessageMixer.
  */
+@JsonClass(generateAdapter = true)
 internal data class MessagePayload(
-    @SerializedName("headerColor")
+    @Json(name = "headerColor")
     val headerColor: String,
 
-    @SerializedName("backgroundColor")
+    @Json(name = "backgroundColor")
     val backgroundColor: String,
 
-    @SerializedName("messageSettings")
+    @Json(name = "messageSettings")
     val messageSettings: MessageSettings,
 
-    @SerializedName("messageBody")
+    @Json(name = "messageBody")
     val messageBody: String? = null,
 
-    @SerializedName("resource")
+    @Json(name = "resource")
     val resource: Resource,
 
-    @SerializedName("titleColor")
+    @Json(name = "titleColor")
     val titleColor: String,
 
-    @SerializedName("header")
+    @Json(name = "header")
     val header: String? = null,
 
-    @SerializedName("frameColor")
+    @Json(name = "frameColor")
     val frameColor: String,
 
-    @SerializedName("title")
+    @Json(name = "title")
     val title: String,
 
-    @SerializedName("messageBodyColor")
+    @Json(name = "messageBodyColor")
     val messageBodyColor: String
 )

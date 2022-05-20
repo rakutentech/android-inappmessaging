@@ -1,14 +1,16 @@
 package com.rakuten.tech.mobile.inappmessaging.runtime.data.responses.ping
 
-import com.google.gson.annotations.SerializedName
+import com.squareup.moshi.Json
+import com.squareup.moshi.JsonClass
 
 /**
  * Class for parsing OnClickBehavior, which is a response from MessageMixer.
  */
+@JsonClass(generateAdapter = true)
 internal data class OnClickBehavior(
-    @SerializedName("action")
+    @Json(name = "action")
     val action: Int,
 
-    @SerializedName("uri")
+    @Json(name = "uri")
     val uri: String? = null
 )

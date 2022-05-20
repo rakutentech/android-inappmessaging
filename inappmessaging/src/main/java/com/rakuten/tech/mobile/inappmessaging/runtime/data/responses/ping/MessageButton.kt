@@ -1,23 +1,25 @@
 package com.rakuten.tech.mobile.inappmessaging.runtime.data.responses.ping
 
-import com.google.gson.annotations.SerializedName
+import com.squareup.moshi.Json
+import com.squareup.moshi.JsonClass
 
 /**
  * Class for parsing MessageButton, which is a response from MessageMixer.
  */
+@JsonClass(generateAdapter = true)
 internal data class MessageButton(
-    @SerializedName("buttonBackgroundColor")
+    @Json(name = "buttonBackgroundColor")
     val buttonBackgroundColor: String,
 
-    @com.google.gson.annotations.SerializedName("buttonTextColor")
+    @Json(name = "buttonTextColor")
     val buttonTextColor: String,
 
-    @SerializedName("buttonBehavior")
+    @Json(name = "buttonBehavior")
     val buttonBehavior: OnClickBehavior,
 
-    @SerializedName("buttonText")
+    @Json(name = "buttonText")
     val buttonText: String,
 
-    @SerializedName("campaignTrigger")
+    @Json(name = "campaignTrigger")
     val embeddedEvent: Trigger? = null
 )
