@@ -8,7 +8,8 @@ import com.rakuten.tech.mobile.inappmessaging.runtime.utils.InAppMessagingConsta
 /**
  * This class represents the request body for message display permission request.
  */
-@SuppressWarnings("ObjectToString") // toString() method is not needed for this class.
+@SuppressWarnings("ObjectToString")
+// toString() method is not needed for this class.
 @JsonClass(generateAdapter = true)
 internal data class DisplayPermissionRequest(
     @Json(name = "campaignId")

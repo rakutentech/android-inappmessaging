@@ -8,13 +8,14 @@ import android.content.pm.PackageManager.NameNotFoundException
 import android.os.Build
 import android.provider.Settings
 import androidx.core.content.pm.PackageInfoCompat
-import com.google.gson.Gson
 import com.rakuten.tech.mobile.inappmessaging.runtime.data.models.HostAppInfo
 import com.rakuten.tech.mobile.inappmessaging.runtime.data.repositories.HostAppInfoRepository
 import com.rakuten.tech.mobile.inappmessaging.runtime.exception.InAppMessagingException
+import com.rakuten.tech.mobile.inappmessaging.runtime.toJson
 import com.rakuten.tech.mobile.inappmessaging.runtime.utils.CacheUtil.getMemoryCacheSize
 import com.rakuten.tech.mobile.sdkutils.PreferencesUtil
 import com.rakuten.tech.mobile.sdkutils.logger.Logger
+import com.squareup.moshi.Moshi
 import com.squareup.picasso.LruCache
 import com.squareup.picasso.Picasso
 import java.lang.ClassCastException
@@ -101,7 +102,7 @@ internal object Initializer {
 
         initializePicassoInstance(context)
 
-        Logger(TAG).debug(Gson().toJson(hostAppInfo))
+        Logger(TAG).debug(Moshi.Builder().build().toJson(data = hostAppInfo))
     }
 
     /**

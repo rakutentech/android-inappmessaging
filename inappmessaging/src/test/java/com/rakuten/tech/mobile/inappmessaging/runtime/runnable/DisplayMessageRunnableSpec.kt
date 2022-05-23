@@ -33,7 +33,7 @@ class DisplayMessageRunnableSpec : BaseTest() {
     private val hostAppActivity = Mockito.mock(Activity::class.java)
     private val view = Mockito.mock(View::class.java)
     private val window = Mockito.mock(Window::class.java)
-    private val payload = MessageMixerResponseSpec.response.data[0].campaignData.getMessagePayload()
+    private val payload = MessageMixerResponseSpec.response!!.data[0].campaignData.getMessagePayload()
 
     @Before
     override fun setup() {

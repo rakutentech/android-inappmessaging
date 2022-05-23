@@ -8,7 +8,6 @@ import androidx.test.core.app.ApplicationProvider
 import androidx.work.*
 import androidx.work.testing.SynchronousExecutor
 import androidx.work.testing.WorkManagerTestInitHelper
-import com.google.gson.Gson
 import com.rakuten.tech.mobile.inappmessaging.runtime.*
 import com.rakuten.tech.mobile.inappmessaging.runtime.api.MessageMixerRetrofitService
 import com.rakuten.tech.mobile.inappmessaging.runtime.data.enums.ImpressionType
@@ -21,6 +20,7 @@ import com.rakuten.tech.mobile.inappmessaging.runtime.data.requests.ImpressionRe
 import com.rakuten.tech.mobile.inappmessaging.runtime.data.responses.config.ConfigResponse
 import com.rakuten.tech.mobile.inappmessaging.runtime.utils.RuntimeUtil
 import com.rakuten.tech.mobile.inappmessaging.runtime.workmanager.schedulers.MessageMixerPingScheduler
+import com.squareup.moshi.Moshi
 import okhttp3.ResponseBody
 import org.amshove.kluent.shouldBeEqualTo
 import org.junit.Before
@@ -125,8 +125,8 @@ class ImpressionWorkerSpec : BaseTest() {
         val workManager = WorkManager.getInstance(ApplicationProvider.getApplicationContext())
         val request = createWorkRequest(impressionRequest, ImpressionWorker.IMPRESSION_REQUEST_KEY)
 
-        val response = Gson().fromJson(CONFIG_RESPONSE_NULL.trimIndent(), ConfigResponse::class.java)
-        ConfigResponseRepository.instance().addConfigResponse(response.data)
+        val response = Moshi.Builder().build().fromJson<ConfigResponse>(data = CONFIG_RESPONSE_NULL.trimIndent())
+        ConfigResponseRepository.instance().addConfigResponse(response?.data)
         workManager.enqueue(request).result.get()
         val workInfo = workManager.getWorkInfoById(request.id).get()
         workInfo.state shouldBeEqualTo WorkInfo.State.FAILED
@@ -145,8 +145,8 @@ class ImpressionWorkerSpec : BaseTest() {
         val workManager = WorkManager.getInstance(ApplicationProvider.getApplicationContext())
         val request = createWorkRequest(impressionRequest, ImpressionWorker.IMPRESSION_REQUEST_KEY)
 
-        val response = Gson().fromJson(CONFIG_RESPONSE_EMPTY.trimIndent(), ConfigResponse::class.java)
-        ConfigResponseRepository.instance().addConfigResponse(response.data)
+        val response = Moshi.Builder().build().fromJson<ConfigResponse>(data = CONFIG_RESPONSE_EMPTY.trimIndent())
+        ConfigResponseRepository.instance().addConfigResponse(response?.data)
 
         workManager.enqueue(request).result.get()
         val workInfo = workManager.getWorkInfoById(request.id).get()
@@ -189,8 +189,8 @@ class ImpressionWorkerSpec : BaseTest() {
         )
 
         retrieveValidConfig()
-        val response = Gson().fromJson(CONFIG_RESPONSE_INVALID.trimIndent(), ConfigResponse::class.java)
-        ConfigResponseRepository.instance().addConfigResponse(response.data)
+        val response = Moshi.Builder().build().fromJson<ConfigResponse>(data = CONFIG_RESPONSE_INVALID.trimIndent())
+        ConfigResponseRepository.instance().addConfigResponse(response?.data)
         workManager.enqueue(request).result.get()
         val workInfo = workManager.getWorkInfoById(request.id).get()
         workInfo.state shouldBeEqualTo WorkInfo.State.FAILED
@@ -211,8 +211,8 @@ class ImpressionWorkerSpec : BaseTest() {
             impressionRequest, ImpressionWorker.IMPRESSION_REQUEST_KEY
         )
 
-        val response = Gson().fromJson(CONFIG_RESPONSE_INVALID.trimIndent(), ConfigResponse::class.java)
-        ConfigResponseRepository.instance().addConfigResponse(response.data)
+        val response = Moshi.Builder().build().fromJson<ConfigResponse>(data = CONFIG_RESPONSE_INVALID.trimIndent())
+        ConfigResponseRepository.instance().addConfigResponse(response?.data)
         workManager.enqueue(request).result.get()
         val workInfo = workManager.getWorkInfoById(request.id).get()
         workInfo.state shouldBeEqualTo WorkInfo.State.ENQUEUED
@@ -231,13 +231,15 @@ class ImpressionWorkerSpec : BaseTest() {
             )
         )
         val workManager = WorkManager.getInstance(ApplicationProvider.getApplicationContext())
-        val request = createWorkRequest(
-            Gson().fromJson(REQUEST.trimIndent(), ImpressionRequest::class.java),
-            ImpressionWorker.IMPRESSION_REQUEST_KEY
-        )
+        val request = Moshi.Builder().build().fromJson<ImpressionRequest>(data = REQUEST.trimIndent())?.let {
+            createWorkRequest(
+                it,
+                ImpressionWorker.IMPRESSION_REQUEST_KEY
+            )
+        }
 
         retrieveValidConfig()
-        workManager.enqueue(request).result.get()
+        workManager.enqueue(request!!).result.get()
         val workInfo = workManager.getWorkInfoById(request.id).get()
         workInfo.state shouldBeEqualTo WorkInfo.State.FAILED
     }
@@ -302,7 +304,7 @@ class ImpressionWorkerSpec : BaseTest() {
 
     private fun getInputData(impressionRequest: ImpressionRequest, key: String): Data {
         // Convert ImpressionRequest object into a Json String before setting it as input data.
-        val impressionRequestJsonString = Gson().toJson(impressionRequest)
+        val impressionRequestJsonString = Moshi.Builder().build().toJson(data = impressionRequest)
         // Create input data objects.
         return Data.Builder()
             .putString(key, impressionRequestJsonString)
@@ -311,7 +313,7 @@ class ImpressionWorkerSpec : BaseTest() {
 
     private fun getInvalidInputData(key: String): Data {
         // Convert ImpressionRequest object into a Json String before setting it as input data.
-        val impressionRequestJsonString = Gson().toJson("{\"test\":\"invalid\"}")
+        val impressionRequestJsonString = Moshi.Builder().build().toJson(data = "{\"test\":\"invalid\"}")
         // Create input data objects.
         return Data.Builder()
             .putString(key, impressionRequestJsonString)

@@ -38,7 +38,7 @@ internal class MessageActionsCoroutineSpec(
     private val isOpt: Boolean
 ) : BaseTest() {
 
-    private val message = MessageMixerResponseSpec.response.data[0].campaignData
+    private val message = MessageMixerResponseSpec.response!!.data[0].campaignData
     private val activity = Mockito.mock(Activity::class.java)
 
     @Before

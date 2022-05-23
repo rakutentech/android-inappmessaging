@@ -5,7 +5,6 @@ import android.os.Build
 import android.provider.Settings
 import androidx.test.core.app.ApplicationProvider
 import androidx.work.testing.WorkManagerTestInitHelper
-import com.google.gson.Gson
 import com.rakuten.tech.mobile.inappmessaging.runtime.*
 import com.rakuten.tech.mobile.inappmessaging.runtime.api.MessageMixerRetrofitService
 import com.rakuten.tech.mobile.inappmessaging.runtime.data.models.HostAppInfo
@@ -17,6 +16,7 @@ import com.rakuten.tech.mobile.inappmessaging.runtime.data.responses.config.Conf
 import com.rakuten.tech.mobile.inappmessaging.runtime.data.responses.config.ConfigResponseData
 import com.rakuten.tech.mobile.inappmessaging.runtime.data.responses.config.ConfigResponseEndpoints
 import com.rakuten.tech.mobile.inappmessaging.runtime.data.responses.displaypermission.DisplayPermissionResponse
+import com.squareup.moshi.Moshi
 import okhttp3.mockwebserver.MockResponse
 import okhttp3.mockwebserver.MockWebServer
 import org.amshove.kluent.*
@@ -163,7 +163,7 @@ open class MessageReadinessManagerSpec : BaseTest() {
         initializeInApp()
         createMessageList()
         ConfigResponseRepository.instance().addConfigResponse(
-            Gson().fromJson(CONFIG_RESPONSE.trimIndent(), ConfigResponse::class.java).data
+            Moshi.Builder().build().fromJson<ConfigResponse>(data = CONFIG_RESPONSE.trimIndent())!!.data
         )
         HostAppInfoRepository.instance().addHostInfo(
             HostAppInfo(
@@ -181,7 +181,7 @@ open class MessageReadinessManagerSpec : BaseTest() {
 
         createMessageList()
         ConfigResponseRepository.instance().addConfigResponse(
-            Gson().fromJson(CONFIG_RESPONSE_EMPTY.trimIndent(), ConfigResponse::class.java).data
+            Moshi.Builder().build().fromJson<ConfigResponse>(data = CONFIG_RESPONSE_EMPTY.trimIndent())!!.data
         )
         HostAppInfoRepository.instance().addHostInfo(
             HostAppInfo(

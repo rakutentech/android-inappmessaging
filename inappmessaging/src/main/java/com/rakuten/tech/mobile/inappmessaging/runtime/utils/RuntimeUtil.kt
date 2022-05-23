@@ -8,7 +8,6 @@ import com.rakuten.tech.mobile.inappmessaging.runtime.data.enums.UserIdentifierT
 import com.rakuten.tech.mobile.inappmessaging.runtime.data.models.UserIdentifier
 import com.rakuten.tech.mobile.inappmessaging.runtime.data.repositories.AccountRepository
 import com.rakuten.tech.mobile.sdkutils.logger.Logger
-import com.squareup.moshi.Moshi
 import okhttp3.OkHttpClient
 import okhttp3.ResponseBody
 import retrofit2.Call
@@ -45,8 +44,6 @@ internal object RuntimeUtil {
             .callbackExecutor(EXECUTOR)
             .build()
     }
-
-    fun getMoshi(): Moshi = Moshi.Builder().build()
 
     /**
      * This method s a thread blocking GET request to retrieve image from server.

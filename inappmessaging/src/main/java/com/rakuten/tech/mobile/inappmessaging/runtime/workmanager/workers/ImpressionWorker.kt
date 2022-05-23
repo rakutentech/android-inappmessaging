@@ -3,19 +3,20 @@ package com.rakuten.tech.mobile.inappmessaging.runtime.workmanager.workers
 import android.content.Context
 import androidx.work.Worker
 import androidx.work.WorkerParameters
-import com.google.gson.Gson
-import com.google.gson.JsonParseException
 import com.rakuten.tech.mobile.inappmessaging.runtime.api.MessageMixerRetrofitService
 import com.rakuten.tech.mobile.inappmessaging.runtime.data.repositories.AccountRepository
 import com.rakuten.tech.mobile.inappmessaging.runtime.data.repositories.ConfigResponseRepository
 import com.rakuten.tech.mobile.inappmessaging.runtime.data.repositories.HostAppInfoRepository
 import com.rakuten.tech.mobile.inappmessaging.runtime.data.requests.ImpressionRequest
+import com.rakuten.tech.mobile.inappmessaging.runtime.fromJson
 import com.rakuten.tech.mobile.inappmessaging.runtime.utils.RuntimeUtil
 import com.rakuten.tech.mobile.inappmessaging.runtime.utils.WorkerUtils
 import com.rakuten.tech.mobile.sdkutils.logger.Logger
+import com.squareup.moshi.Moshi
 import okhttp3.ResponseBody
 import retrofit2.Call
 import retrofit2.Response
+import java.io.IOException
 import java.net.HttpURLConnection
 import java.util.concurrent.atomic.AtomicInteger
 
@@ -45,11 +46,11 @@ internal class ImpressionWorker(
 
         // Convert impressionRequestJsonString to ImpressionRequest object.
         val impressionRequest = try {
-            Gson().fromJson(impressionRequestJsonRequest, ImpressionRequest::class.java)
-        } catch (e: JsonParseException) {
+            Moshi.Builder().build().fromJson<ImpressionRequest>(data = impressionRequestJsonRequest)
+        } catch (e: IOException) {
             Logger(TAG).error(e.message)
             return Result.failure()
-        }
+        } ?: return Result.failure()
 
         AccountRepository.instance().logWarningForUserInfo(TAG)
         return try {

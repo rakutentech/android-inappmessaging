@@ -56,7 +56,7 @@ class DisplayMessageWorkerSpec : BaseTest() {
     private var mockReadyForDisplayRepo = Mockito.mock(ReadyForDisplayMessageRepository::class.java)
     private val onVerifyContexts = Mockito.mock(InAppMessaging.instance().onVerifyContext.javaClass)
     private val configResponseData = Mockito.mock(ConfigResponseData::class.java)
-    private val payload = MessageMixerResponseSpec.response.data[0].campaignData.getMessagePayload()
+    private val payload = MessageMixerResponseSpec.response!!.data[0].campaignData.getMessagePayload()
     private val handler = Mockito.mock(Handler::class.java)
 
     @Before

@@ -1,13 +1,15 @@
 package com.rakuten.tech.mobile.inappmessaging.runtime.data.repositories
 
 import androidx.annotation.VisibleForTesting
-import com.google.gson.Gson
 import com.rakuten.tech.mobile.inappmessaging.runtime.InAppMessaging
 import com.rakuten.tech.mobile.inappmessaging.runtime.data.models.messages.Message
 import com.rakuten.tech.mobile.inappmessaging.runtime.data.responses.ping.CampaignData
+import com.rakuten.tech.mobile.inappmessaging.runtime.fromJson
+import com.rakuten.tech.mobile.inappmessaging.runtime.fromListToJson
 import com.rakuten.tech.mobile.inappmessaging.runtime.manager.ImpressionManager
 import com.rakuten.tech.mobile.sdkutils.PreferencesUtil
 import com.rakuten.tech.mobile.sdkutils.logger.Logger
+import com.squareup.moshi.Moshi
 import org.json.JSONArray
 import java.lang.ClassCastException
 
@@ -109,7 +111,13 @@ internal abstract class ReadyForDisplayMessageRepository : ReadyMessageRepositor
                 try {
                     val jsonArray = JSONArray(listString)
                     for (i in 0 until jsonArray.length()) {
-                        messages.add(Gson().fromJson(jsonArray.getJSONObject(i).toString(), CampaignData::class.java))
+                        Moshi.Builder().build().fromJson<CampaignData>(
+                            data = jsonArray.getJSONObject(i).toString()
+                        )?.let {
+                            messages.add(
+                                it
+                            )
+                        }
                     }
                 } catch (ex: Exception) {
                     Logger(TAG).debug(ex.cause, "Invalid JSON format for $READY_DISPLAY_KEY data")
@@ -126,7 +134,7 @@ internal abstract class ReadyForDisplayMessageRepository : ReadyMessageRepositor
                         context = ctx,
                         name = InAppMessaging.getPreferencesFile(),
                         key = READY_DISPLAY_KEY,
-                        value = Gson().toJson(messages)
+                        Moshi.Builder().build().fromListToJson(data = messages)
                     )
                 } ?: Logger(TAG).debug("failed saving ready data")
             }

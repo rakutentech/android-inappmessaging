@@ -1,7 +1,8 @@
 package com.rakuten.tech.mobile.inappmessaging.runtime.data.responses.displaypermission
 
 import android.os.Build
-import com.google.gson.Gson
+import com.rakuten.tech.mobile.inappmessaging.runtime.fromJson
+import com.squareup.moshi.Moshi
 import org.amshove.kluent.shouldBeEqualTo
 import org.junit.Test
 import org.junit.runner.RunWith
@@ -34,10 +35,10 @@ class DisplayPermissionResponseSpec(
             }"""
 
         private val response =
-            Gson().fromJson(DISPLAY_RESPONSE.trimIndent(), DisplayPermissionResponse::class.java)
+            Moshi.Builder().build().fromJson<DisplayPermissionResponse>(data = DISPLAY_RESPONSE.trimIndent())
 
         private val otherResponse =
-            Gson().fromJson(DISPLAY_OTHER_RESPONSE.trimIndent(), DisplayPermissionResponse::class.java)
+            Moshi.Builder().build().fromJson<DisplayPermissionResponse>(data = DISPLAY_OTHER_RESPONSE.trimIndent())
 
         @JvmStatic
         @ParameterizedRobolectricTestRunner.Parameters(
@@ -46,8 +47,8 @@ class DisplayPermissionResponseSpec(
         @SuppressWarnings("LongMethod")
         fun data(): List<Array<out Any?>> {
             return listOf(
-                arrayOf("display-true", response.display, true),
-                arrayOf("display-false", otherResponse.display, false),
+                arrayOf("display-true", response!!.display, true),
+                arrayOf("display-false", otherResponse!!.display, false),
                 arrayOf("performPing-true", otherResponse.performPing, true),
                 arrayOf("performPing-false", response.performPing, false)
             )

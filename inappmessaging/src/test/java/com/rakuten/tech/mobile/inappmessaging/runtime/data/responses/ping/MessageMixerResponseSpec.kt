@@ -1,7 +1,8 @@
 package com.rakuten.tech.mobile.inappmessaging.runtime.data.responses.ping
 
 import android.os.Build
-import com.google.gson.Gson
+import com.rakuten.tech.mobile.inappmessaging.runtime.fromJson
+import com.squareup.moshi.Moshi
 import org.amshove.kluent.shouldBeEqualTo
 import org.amshove.kluent.shouldHaveSize
 import org.junit.Test
@@ -94,11 +95,10 @@ class MessageMixerResponseSpec(private val testname: String, private val actual:
     }
 
     companion object {
-        internal val response = Gson().fromJson(
-            File("src/test/resources/test_response.json").readText(),
-            MessageMixerResponse::class.java
+        internal val response = Moshi.Builder().build().fromJson<MessageMixerResponse>(
+            data = File("src/test/resources/test_response.json").readText()
         )
-        private val dataItem = DataItem(response.data[0].campaignData)
+        private val dataItem = DataItem(response?.data?.get(0)!!.campaignData)
         private val campaignData = CampaignData(
             dataItem.campaignData.getMessagePayload(),
             dataItem.campaignData.getType(), dataItem.campaignData.getTriggers(),
@@ -180,8 +180,8 @@ class MessageMixerResponseSpec(private val testname: String, private val actual:
         @SuppressWarnings("LongMethod")
         fun data(): List<Array<out Any?>> {
             return listOf(
-                arrayOf("currentPingMills", response.currentPingMillis, 1583890595467),
-                arrayOf("nextPingMillis", response.nextPingMillis, 3600000L),
+                arrayOf("currentPingMills", response?.currentPingMillis, 1583890595467),
+                arrayOf("nextPingMillis", response?.nextPingMillis, 3600000L),
                 arrayOf("type", campaignData.getType(), 2),
                 arrayOf("campaignId", campaignData.getCampaignId(), "1234567890"),
                 arrayOf("isTest", campaignData.isTest(), false),

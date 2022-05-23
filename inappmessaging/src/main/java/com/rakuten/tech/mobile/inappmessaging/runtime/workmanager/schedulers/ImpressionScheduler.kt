@@ -7,7 +7,6 @@ import com.rakuten.tech.mobile.inappmessaging.runtime.InAppMessaging
 import com.rakuten.tech.mobile.inappmessaging.runtime.data.requests.ImpressionRequest
 import com.rakuten.tech.mobile.inappmessaging.runtime.exception.InAppMessagingException
 import com.rakuten.tech.mobile.inappmessaging.runtime.toJson
-import com.rakuten.tech.mobile.inappmessaging.runtime.utils.RuntimeUtil
 import com.rakuten.tech.mobile.inappmessaging.runtime.utils.WorkManagerUtil
 import com.rakuten.tech.mobile.inappmessaging.runtime.workmanager.workers.ImpressionWorker
 import com.rakuten.tech.mobile.inappmessaging.runtime.workmanager.workers.ImpressionWorker.Companion.IMPRESSION_REQUEST_KEY
@@ -52,7 +51,7 @@ internal class ImpressionScheduler {
      */
     private fun getInputData(impressionRequest: ImpressionRequest): Data {
         // Convert ImpressionRequest object into a Json String before setting it as input data.
-        val impressionRequestJsonString = RuntimeUtil.getMoshi().toJson(data = impressionRequest)
+        val impressionRequestJsonString = Moshi.Builder().build().toJson(data = impressionRequest)
         // Create input data objects.
         return Data.Builder()
             .putString(IMPRESSION_REQUEST_KEY, impressionRequestJsonString)

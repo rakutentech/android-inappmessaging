@@ -1,12 +1,14 @@
 package com.rakuten.tech.mobile.inappmessaging.runtime.data.repositories
 
 import androidx.annotation.VisibleForTesting
-import com.google.gson.Gson
 import com.rakuten.tech.mobile.inappmessaging.runtime.InAppMessaging
 import com.rakuten.tech.mobile.inappmessaging.runtime.data.models.messages.Message
 import com.rakuten.tech.mobile.inappmessaging.runtime.data.responses.ping.CampaignData
+import com.rakuten.tech.mobile.inappmessaging.runtime.fromJson
+import com.rakuten.tech.mobile.inappmessaging.runtime.mapAdapter
 import com.rakuten.tech.mobile.sdkutils.PreferencesUtil
 import com.rakuten.tech.mobile.sdkutils.logger.Logger
+import com.squareup.moshi.Moshi
 import org.json.JSONObject
 import java.lang.ClassCastException
 
@@ -114,12 +116,14 @@ internal abstract class PingResponseMessageRepository : MessageRepository {
                 try {
                     val jsonObject = JSONObject(listString)
                     for (key in jsonObject.keys()) {
-                        val campaign = Gson().fromJson(
-                            jsonObject.getJSONObject(key).toString(), CampaignData::class.java
+                        val campaign = Moshi.Builder().build().fromJson<CampaignData>(
+                            data = jsonObject.getJSONObject(key).toString()
                         )
                         // manual setting since not part of constructor
-                        campaign.timesClosed = jsonObject.getJSONObject(key).getInt("timesClosed")
-                        messages[key] = campaign
+                        campaign?.let {
+                            it.timesClosed = jsonObject.getJSONObject(key).getInt("timesClosed")
+                            messages[key] = it
+                        }
                     }
                 } catch (ex: Exception) {
                     Logger(TAG).debug(ex.cause, "Invalid JSON format for $PING_RESPONSE_KEY data")
@@ -130,13 +134,14 @@ internal abstract class PingResponseMessageRepository : MessageRepository {
         private fun saveUpdatedMap() {
             // check if caching is enabled to update persistent data
             if (InAppMessaging.instance().isLocalCachingEnabled()) {
+                val adapter = Moshi.Builder().build().mapAdapter<String, Message>()
                 // save updated message list
                 InAppMessaging.instance().getHostAppContext()?.let {
                     PreferencesUtil.putString(
                         context = it,
                         name = InAppMessaging.getPreferencesFile(),
                         key = PING_RESPONSE_KEY,
-                        value = Gson().toJson(messages)
+                        value = adapter.toJson(messages)
                     )
                 } ?: Logger(TAG).debug("failed saving response data")
             }

@@ -1,9 +1,10 @@
 package com.rakuten.tech.mobile.inappmessaging.runtime.data.repositories
 
-import com.google.gson.Gson
 import com.rakuten.tech.mobile.inappmessaging.runtime.BaseTest
 import com.rakuten.tech.mobile.inappmessaging.runtime.data.responses.config.ConfigResponse
 import com.rakuten.tech.mobile.inappmessaging.runtime.data.responses.config.ConfigResponseData
+import com.rakuten.tech.mobile.inappmessaging.runtime.fromJson
+import com.squareup.moshi.Moshi
 import org.amshove.kluent.*
 import org.junit.Before
 import org.junit.Test
@@ -44,8 +45,10 @@ class ConfigResponseRepositorySpec : BaseTest() {
 
     @Test
     fun `should be empty string for endpoints with no values in response`() {
-        val response = Gson().fromJson(CONFIG_NO_VALUES_RESPONSE.trimIndent(), ConfigResponse::class.java)
-        ConfigResponseRepository.instance().addConfigResponse(response.data)
+        val moshi: Moshi = Moshi.Builder().build()
+        val jsonAdapter = moshi.adapter(ConfigResponse::class.java)
+        val response = jsonAdapter.fromJson(CONFIG_NO_VALUES_RESPONSE.trimIndent())
+        ConfigResponseRepository.instance().addConfigResponse(response?.data)
         ConfigResponseRepository.instance().getImpressionEndpoint() shouldBeEqualTo ""
         ConfigResponseRepository.instance().getDisplayPermissionEndpoint() shouldBeEqualTo ""
         ConfigResponseRepository.instance().getPingEndpoint() shouldBeEqualTo ""
@@ -53,8 +56,8 @@ class ConfigResponseRepositorySpec : BaseTest() {
 
     @Test
     fun `should be empty string for endpoints with no endpoints in response`() {
-        val response = Gson().fromJson(CONFIG_NO_ENDPOINTS_RESPONSE.trimIndent(), ConfigResponse::class.java)
-        ConfigResponseRepository.instance().addConfigResponse(response.data)
+        val response = Moshi.Builder().build().fromJson<ConfigResponse>(data = CONFIG_NO_ENDPOINTS_RESPONSE.trimIndent())
+        ConfigResponseRepository.instance().addConfigResponse(response?.data)
         ConfigResponseRepository.instance().getImpressionEndpoint() shouldBeEqualTo ""
         ConfigResponseRepository.instance().getDisplayPermissionEndpoint() shouldBeEqualTo ""
         ConfigResponseRepository.instance().getPingEndpoint() shouldBeEqualTo ""
@@ -62,34 +65,34 @@ class ConfigResponseRepositorySpec : BaseTest() {
 
     @Test
     fun `should be valid value for impression endpoints with initial values`() {
-        val response = Gson().fromJson(CONFIG_RESPONSE.trimIndent(), ConfigResponse::class.java)
-        ConfigResponseRepository.instance().addConfigResponse(response.data)
-        ConfigResponseRepository.instance().getImpressionEndpoint() shouldBeEqualTo response.data?.endpoints?.impression
+        val response = Moshi.Builder().build().fromJson<ConfigResponse>(data = CONFIG_RESPONSE.trimIndent())
+        ConfigResponseRepository.instance().addConfigResponse(response?.data)
+        ConfigResponseRepository.instance().getImpressionEndpoint() shouldBeEqualTo response?.data?.endpoints?.impression
     }
 
     @Test
     fun `should be valid value for display endpoints with initial values`() {
-        val response = Gson().fromJson(CONFIG_RESPONSE.trimIndent(), ConfigResponse::class.java)
-        ConfigResponseRepository.instance().addConfigResponse(response.data)
+        val response = Moshi.Builder().build().fromJson<ConfigResponse>(data = CONFIG_RESPONSE.trimIndent())
+        ConfigResponseRepository.instance().addConfigResponse(response?.data)
         ConfigResponseRepository.instance()
-            .getDisplayPermissionEndpoint() shouldBeEqualTo response.data?.endpoints?.displayPermission
+            .getDisplayPermissionEndpoint() shouldBeEqualTo response?.data?.endpoints?.displayPermission
     }
 
     @Test
     fun `should be valid value for ping endpoints with initial values`() {
-        val response = Gson().fromJson(CONFIG_RESPONSE.trimIndent(), ConfigResponse::class.java)
-        ConfigResponseRepository.instance().addConfigResponse(response.data)
-        ConfigResponseRepository.instance().getPingEndpoint() shouldBeEqualTo response.data?.endpoints?.ping
+        val response = Moshi.Builder().build().fromJson<ConfigResponse>(data = CONFIG_RESPONSE.trimIndent())
+        ConfigResponseRepository.instance().addConfigResponse(response?.data)
+        ConfigResponseRepository.instance().getPingEndpoint() shouldBeEqualTo response?.data?.endpoints?.ping
     }
 
     @Test
     fun `should return correct enable settings due to roll out percentage`() {
-        var response = Gson().fromJson(CONFIG_RESPONSE.trimIndent(), ConfigResponse::class.java)
-        ConfigResponseRepository.instance().addConfigResponse(response.data)
+        var response = Moshi.Builder().build().fromJson<ConfigResponse>(data = CONFIG_RESPONSE.trimIndent())
+        ConfigResponseRepository.instance().addConfigResponse(response?.data)
         ConfigResponseRepository.instance().isConfigEnabled().shouldBeTrue()
 
-        response = Gson().fromJson(CONFIG_DISABLED_RESPONSE.trimIndent(), ConfigResponse::class.java)
-        ConfigResponseRepository.instance().addConfigResponse(response.data)
+        response = Moshi.Builder().build().fromJson<ConfigResponse>(data = CONFIG_DISABLED_RESPONSE.trimIndent())
+        ConfigResponseRepository.instance().addConfigResponse(response?.data)
         ConfigResponseRepository.instance().isConfigEnabled().shouldBeFalse()
     }
 

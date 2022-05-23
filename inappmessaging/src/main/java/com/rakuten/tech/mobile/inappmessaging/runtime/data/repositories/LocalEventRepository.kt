@@ -1,7 +1,6 @@
 package com.rakuten.tech.mobile.inappmessaging.runtime.data.repositories
 
 import androidx.annotation.VisibleForTesting
-import com.google.gson.Gson
 import com.rakuten.tech.mobile.inappmessaging.runtime.InAppMessaging
 import com.rakuten.tech.mobile.inappmessaging.runtime.data.enums.EventType
 import com.rakuten.tech.mobile.inappmessaging.runtime.data.models.appevents.AppStartEvent
@@ -10,12 +9,14 @@ import com.rakuten.tech.mobile.inappmessaging.runtime.data.models.appevents.Logi
 import com.rakuten.tech.mobile.inappmessaging.runtime.data.models.appevents.PurchaseSuccessfulEvent
 import com.rakuten.tech.mobile.inappmessaging.runtime.data.models.appevents.Event
 import com.rakuten.tech.mobile.inappmessaging.runtime.exception.InAppMessagingException
+import com.rakuten.tech.mobile.inappmessaging.runtime.fromJson
+import com.rakuten.tech.mobile.inappmessaging.runtime.fromListToJson
 import com.rakuten.tech.mobile.sdkutils.PreferencesUtil
 import com.rakuten.tech.mobile.sdkutils.logger.Logger
+import com.squareup.moshi.Moshi
 import org.json.JSONArray
 import java.lang.ClassCastException
 import java.util.Collections
-import kotlin.collections.ArrayList
 
 /**
  * LocalEventRepository will store all incoming events from host app.
@@ -51,7 +52,7 @@ internal interface LocalEventRepository : EventRepository {
     }
 
     private class LocalEventRepositoryImpl : LocalEventRepository {
-        private val events = ArrayList<Event>()
+        private val events = mutableListOf<Event>()
         private var user = ""
 
         init {
@@ -194,12 +195,14 @@ internal interface LocalEventRepository : EventRepository {
                 for (i in 0 until jsonArray.length()) {
                     val item = jsonArray.getJSONObject(i)
                     val event = when (item["eventType"].toString()) {
-                        EventType.APP_START.name -> Gson().fromJson(item.toString(), AppStartEvent::class.java)
+                        EventType.APP_START.name ->
+                            Moshi.Builder().build().fromJson<AppStartEvent>(data = item.toString())
                         EventType.LOGIN_SUCCESSFUL.name ->
-                            Gson().fromJson(item.toString(), LoginSuccessfulEvent::class.java)
+                            Moshi.Builder().build().fromJson<LoginSuccessfulEvent>(data = item.toString())
                         EventType.PURCHASE_SUCCESSFUL.name ->
-                            Gson().fromJson(item.toString(), PurchaseSuccessfulEvent::class.java)
-                        EventType.CUSTOM.name -> Gson().fromJson(item.toString(), CustomEvent::class.java)
+                            Moshi.Builder().build().fromJson<PurchaseSuccessfulEvent>(data = item.toString())
+                        EventType.CUSTOM.name ->
+                            Moshi.Builder().build().fromJson<CustomEvent>(data = item.toString())
                         else -> null
                     }
                     event?.let { events.add(it) }
@@ -216,7 +219,7 @@ internal interface LocalEventRepository : EventRepository {
                         context = it,
                         name = InAppMessaging.getPreferencesFile(),
                         key = LOCAL_EVENT_KEY,
-                        value = Gson().toJson(events)
+                        Moshi.Builder().build().fromListToJson(data = events)
                     )
                 } ?: Logger(TAG).debug("failed saving event data")
             }

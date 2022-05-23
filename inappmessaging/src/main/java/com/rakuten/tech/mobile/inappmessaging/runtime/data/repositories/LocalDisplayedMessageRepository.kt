@@ -1,18 +1,17 @@
 package com.rakuten.tech.mobile.inappmessaging.runtime.data.repositories
 
 import androidx.annotation.VisibleForTesting
-import com.google.gson.Gson
-import com.google.gson.reflect.TypeToken
 import com.rakuten.tech.mobile.inappmessaging.runtime.InAppMessaging
 import com.rakuten.tech.mobile.inappmessaging.runtime.data.models.messages.Message
 import com.rakuten.tech.mobile.inappmessaging.runtime.exception.InAppMessagingException
+import com.rakuten.tech.mobile.inappmessaging.runtime.mapAdapter
 import com.rakuten.tech.mobile.sdkutils.PreferencesUtil
 import com.rakuten.tech.mobile.sdkutils.logger.Logger
+import com.squareup.moshi.Moshi
 import java.lang.ClassCastException
 import java.util.Calendar
 import java.util.concurrent.ConcurrentHashMap
 import kotlin.collections.ArrayList
-import kotlin.collections.HashMap
 import kotlin.collections.set
 
 /**
@@ -153,9 +152,10 @@ internal interface LocalDisplayedMessageRepository {
             }
             messages.clear()
             if (listString.isNotEmpty()) {
-                val type = object : TypeToken<HashMap<String, List<Long>>>() {}.type
                 try {
-                    messages.putAll(Gson().fromJson(listString, type))
+                    Moshi.Builder().build().mapAdapter<String, List<Long>>().fromJson(listString)?.let {
+                        messages.putAll(it)
+                    }
                 } catch (ex: Exception) {
                     Logger(TAG).debug(ex.cause, "Incorrect JSON format for $LOCAL_DISPLAYED_KEY data")
                 }
@@ -165,13 +165,14 @@ internal interface LocalDisplayedMessageRepository {
         private fun saveUpdatedMap() {
             // check if caching is enabled to update persistent data
             if (InAppMessaging.instance().isLocalCachingEnabled()) {
+                val adapter = Moshi.Builder().build().mapAdapter<String, List<Long>>()
                 // reset message list from cached using updated user info
                 InAppMessaging.instance().getHostAppContext()?.let {
                     PreferencesUtil.putString(
                         context = it,
                         name = InAppMessaging.getPreferencesFile(),
                         key = LOCAL_DISPLAYED_KEY,
-                        value = Gson().toJson(messages)
+                        value = adapter.toJson(messages)
                     )
                 } ?: Logger(TAG).debug("failed saving displayed data")
             }
