@@ -11,23 +11,23 @@ import com.rakuten.tech.mobile.inappmessaging.runtime.data.models.messages.Messa
 @JsonClass(generateAdapter = true)
 internal data class CampaignData(
     @Json(name = "messagePayload")
-    private val messagePayload: MessagePayload,
+    val messagePayload: MessagePayload,
     @Json(name = "type")
-    private val type: Int,
+    val type: Int,
     @Json(name = "triggers")
-    private val triggers: List<Trigger>?,
+    val triggers: List<Trigger>?,
     @Json(name = "campaignId")
-    private val campaignId: String,
+    val campaignId: String,
     @Json(name = "isTest")
-    private val isTest: Boolean,
+    val isTest: Boolean,
     @Json(name = "maxImpressions")
-    private var maxImpressions: Int = 0,
+    var maxImpressions: Int = 0,
     @Json(name = "hasNoEndDate")
-    private val hasNoEndDate: Boolean = false,
+    val hasNoEndDate: Boolean = false,
     @Json(name = "isCampaignDismissable")
-    private val isCampaignDismissable: Boolean = true,
+    val isCampaignDismissable: Boolean = true,
     @Json(name = "infiniteImpressions")
-    private val infiniteImpressions: Boolean = false
+    val infiniteImpressions: Boolean = false
 ) : Message {
 
     @Json(name = "timesClosed")
@@ -39,6 +39,7 @@ internal data class CampaignData(
 
     override fun getTriggers(): List<Trigger>? = triggers
 
+    @JvmName("getMessagePayload1")
     override fun getMessagePayload(): MessagePayload = messagePayload
 
     override fun isTest(): Boolean = isTest

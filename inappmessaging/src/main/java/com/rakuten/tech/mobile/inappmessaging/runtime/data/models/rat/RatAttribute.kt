@@ -9,6 +9,6 @@ import com.squareup.moshi.JsonClass
  */
 @JsonClass(generateAdapter = true)
 internal data class RatAttribute(
-    @Json(name = "name") private val name: String,
-    @Json(name = "value") private val value: Any
+    @Json(name = "name") val name: String,
+    @Json(name = "value") val value: Any
 )

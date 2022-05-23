@@ -26,5 +26,5 @@ internal data class DisplayPermissionRequest(
     val userIdentifier: List<UserIdentifier>
 ) {
     @Json(name = "platform")
-    private val platform: Int = InAppMessagingConstants.ANDROID_PLATFORM_ENUM
+    val platform: Int = InAppMessagingConstants.ANDROID_PLATFORM_ENUM
 }

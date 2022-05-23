@@ -30,7 +30,7 @@ internal class DisplayMessageRunnable(
      * which will display message with correct data.
      */
     @UiThread
-    @SuppressWarnings("LongMethod")
+    @SuppressWarnings("LongMethod", "ElseCaseInsteadOfExhaustiveWhen")
     override fun run() {
         // If there's already a message found, don't display another message.
         if (hostActivity.findViewById<View?>(R.id.in_app_message_base_view) != null) {

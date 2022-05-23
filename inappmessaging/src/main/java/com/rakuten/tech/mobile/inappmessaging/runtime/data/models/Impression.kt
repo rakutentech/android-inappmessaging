@@ -9,7 +9,7 @@ import com.rakuten.tech.mobile.inappmessaging.runtime.data.enums.ImpressionType
  */
 @JsonClass(generateAdapter = true)
 internal data class Impression(
-    private val impType: ImpressionType,
+    val impType: ImpressionType,
     @Json(name = "timestamp")
     val timestamp: Long
 ) {

@@ -34,13 +34,6 @@ android {
         }
     }
 
-    compileOptions {
-        // Source code java level(Source code of this project).
-        sourceCompatibility JavaVersion.VERSION_1_8
-        // Target JVM level(JVM on Android devices).
-        targetCompatibility JavaVersion.VERSION_1_8
-    }
-
     flavorDimensions 'version'
 
     def property = { key ->
@@ -57,6 +50,7 @@ android {
 
 dependencies {
     implementation project(':inappmessaging')
+    implementation "io.github.rakutentech.sdkutils:sdk-utils:1.1.0"
 
     implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk7:$CONFIG.versions.kotlin"
     implementation 'androidx.appcompat:appcompat:1.1.0'

@@ -11,15 +11,15 @@ import com.rakuten.tech.mobile.inappmessaging.runtime.data.models.UserIdentifier
 @JsonClass(generateAdapter = true)
 internal data class ImpressionRequest(
     @Json(name = "campaignId")
-    private val campaignId: String?,
+    val campaignId: String?,
     @Json(name = "isTest")
-    private val isTest: Boolean,
+    val isTest: Boolean,
     @Json(name = "appVersion")
-    private val appVersion: String?,
+    val appVersion: String?,
     @Json(name = "sdkVersion")
-    private val sdkVersion: String?,
+    val sdkVersion: String?,
     @Json(name = "userIdentifiers")
-    private val userIdentifiers: List<UserIdentifier>,
+    val userIdentifiers: List<UserIdentifier>,
     @Json(name = "impressions")
     val impressions: List<Impression>
 )

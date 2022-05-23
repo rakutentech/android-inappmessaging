@@ -231,7 +231,10 @@ internal interface MessageEventReconciliationUtil {
          * The method checks if the value from event attribute can satisfy trigger's attribute values according to
          * trigger attribute's operator type.
          */
-        @SuppressWarnings("ReturnCount", "ComplexMethod", "LongMethod", "ComplexCondition")
+        @SuppressWarnings(
+            "ReturnCount", "ComplexMethod", "LongMethod", "ComplexCondition",
+            "ElseCaseInsteadOfExhaustiveWhen"
+        )
         private fun isValueReconciled(
             valueTypeId: Int,
             eventValue: String?,

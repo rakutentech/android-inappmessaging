@@ -22,15 +22,8 @@ android {
     it.java.srcDirs += "src/$it.name/kotlin"
   }
 
-  compileOptions {
-    // Source code java level(Source code of this project).
-    sourceCompatibility JavaVersion.VERSION_1_8
-    // Target JVM level(JVM on Android devices).
-    targetCompatibility JavaVersion.VERSION_1_8
-  }
-
   kotlinOptions {
-    jvmTarget = JavaVersion.VERSION_1_8.toString()
+    jvmTarget = JavaVersion.toVersion(CONFIG.versions.java).toString()
   }
 
   testOptions {
@@ -89,7 +82,7 @@ dependencies {
   testImplementation "com.facebook.soloader:soloader:0.9.0"
   testImplementation "com.squareup.okhttp3:mockwebserver:3.14.7"
 
-  detektPlugins "io.gitlab.arturbosch.detekt:detekt-formatting:1.19.0"
+  detektPlugins "io.gitlab.arturbosch.detekt:detekt-formatting:1.20.0"
 }
 
 task checkUrlPrefixes {

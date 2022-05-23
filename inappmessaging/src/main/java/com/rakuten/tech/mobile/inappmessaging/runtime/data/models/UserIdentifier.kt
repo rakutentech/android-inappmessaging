@@ -9,7 +9,7 @@ import com.squareup.moshi.JsonClass
 @JsonClass(generateAdapter = true)
 internal data class UserIdentifier(
     @Json(name = "id")
-    private val id: String,
+    val id: String,
     @Json(name = "type")
-    private val type: Int
+    val type: Int
 )

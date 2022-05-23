@@ -2,6 +2,7 @@ package com.rakuten.test
 
 import android.app.AlertDialog
 import android.content.Intent
+import android.content.SharedPreferences
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
@@ -14,9 +15,17 @@ import com.rakuten.tech.mobile.inappmessaging.runtime.data.models.appevents.AppS
 import com.rakuten.tech.mobile.inappmessaging.runtime.data.models.appevents.CustomEvent
 import com.rakuten.tech.mobile.inappmessaging.runtime.data.models.appevents.LoginSuccessfulEvent
 import com.rakuten.tech.mobile.inappmessaging.runtime.data.models.appevents.PurchaseSuccessfulEvent
+import com.rakuten.tech.mobile.sdkutils.PreferencesUtil
 
 class MainActivityFragment : Fragment(), View.OnClickListener {
 
+    override fun onCreate(savedInstanceState: Bundle?) {
+        context?.let {
+            updateUser(PreferencesUtil.getString(it, SHARED_FILE, USER_ID, "user1") ?: "user1",
+            PreferencesUtil.getString(it, SHARED_FILE, ACCESS_TOKEN, "accessToken1") ?: "accessToken1")
+        }
+        super.onCreate(savedInstanceState)
+    }
     override fun onCreateView(
             inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
         return inflater.inflate(R.layout.fragment_main, container, false)
@@ -83,9 +92,8 @@ class MainActivityFragment : Fragment(), View.OnClickListener {
                     if (application.provider.userId != userId.text.toString()) {
                         InAppMessaging.instance().closeMessage()
                     }
-                    application.provider.userId = userId.text.toString()
-                    application.provider.accessToken = accessToken.text.toString()
-                    application.provider.idTracking = idTracking.text.toString()
+
+                    updateUser(userId.text.toString(), accessToken.text.toString())
 
                     dialog.dismiss()
                 }
@@ -95,5 +103,26 @@ class MainActivityFragment : Fragment(), View.OnClickListener {
                 .create()
 
         dialog.show()
+    }
+
+    override fun onDestroy() {
+        activity?.let {
+            val application = it.application as MainApplication
+            PreferencesUtil.putString(it, SHARED_FILE, USER_ID, application.provider.userId)
+            PreferencesUtil.putString(it, SHARED_FILE, ACCESS_TOKEN, application.provider.accessToken)
+        }
+        super.onDestroy()
+    }
+
+    private fun updateUser(userId: String, accessToken: String ) {
+        val application = activity?.application as MainApplication
+        application.provider.userId = userId
+        application.provider.accessToken = accessToken
+    }
+
+    companion object {
+        private const val USER_ID: String = "user-id"
+        private const val SHARED_FILE: String = "user-shared-file"
+        private const val ACCESS_TOKEN: String = "access-token"
     }
 }

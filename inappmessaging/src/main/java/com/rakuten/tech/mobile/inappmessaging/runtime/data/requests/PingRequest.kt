@@ -10,7 +10,7 @@ import com.rakuten.tech.mobile.inappmessaging.runtime.data.models.UserIdentifier
 @JsonClass(generateAdapter = true)
 internal data class PingRequest(
     @Json(name = "appVersion")
-    private val appVersion: String?,
+    val appVersion: String?,
     @Json(name = "userIdentifiers")
-    private val userIdentifiers: MutableList<UserIdentifier>?
+    val userIdentifiers: MutableList<UserIdentifier>?
 )

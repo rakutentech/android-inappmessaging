@@ -260,6 +260,8 @@ formatting:
     autoCorrect: true
   ArgumentListWrapping:
     active: false
+  TrailingComma:
+    active: false
 
 naming:
   active: true
