@@ -40,6 +40,7 @@ class DisplayMessageRunnableSpec : BaseTest() {
         super.setup()
         `when`(view!!.id).thenReturn(12343254)
         `when`(hostAppActivity.window).thenReturn(window)
+        `when`(message.getCampaignId()).thenReturn("1234")
     }
 
     @Test
@@ -67,7 +68,7 @@ class DisplayMessageRunnableSpec : BaseTest() {
     }
 
     @Test
-    fun `should throw exception with mock activity for full`() {
+    fun `should not throw exception with mock activity for full`() {
         WorkManagerTestInitHelper.initializeTestWorkManager(ApplicationProvider.getApplicationContext())
         Settings.Secure.putString(
             ApplicationProvider.getApplicationContext<Context>().contentResolver,

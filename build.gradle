@@ -1,5 +1,5 @@
 buildscript {
-    ext.dokka_version = '1.6.10'
+    ext.dokka_version = '1.6.21'
     ext.compose_version = '1.1.1'
 
     // Build Config.

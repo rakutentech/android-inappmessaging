@@ -5,8 +5,11 @@ import com.rakuten.tech.mobile.inappmessaging.runtime.InAppMessagingTestConstant
 import com.rakuten.tech.mobile.inappmessaging.runtime.data.models.HostAppInfo
 import com.rakuten.tech.mobile.inappmessaging.runtime.exception.InAppMessagingException
 import com.rakuten.tech.mobile.inappmessaging.runtime.utils.InAppMessagingConstants
+import org.amshove.kluent.shouldBeEmpty
 import org.amshove.kluent.shouldBeEqualTo
+import org.junit.After
 import org.junit.Assert
+import org.junit.Before
 import org.junit.Test
 import java.util.Locale
 
@@ -14,6 +17,18 @@ import java.util.Locale
  * Test class for HostAppInfoRepository class
  */
 class HostAppInfoRepositorySpec : BaseTest() {
+
+    @Before
+    override fun setup() {
+        super.setup()
+        HostAppInfoRepository.instance().clearInfo()
+    }
+
+    @After
+    override fun tearDown() {
+        super.tearDown()
+        HostAppInfoRepository.instance().clearInfo()
+    }
 
     @Test
     fun `should use correct data`() {
@@ -57,7 +72,9 @@ class HostAppInfoRepositorySpec : BaseTest() {
 
     @Test
     fun `should throw exception for invalid package name`() {
-        val hostAppInfo = HostAppInfo(version = InAppMessagingTestConstants.APP_VERSION)
+        val hostAppInfo = HostAppInfo(
+            version = InAppMessagingTestConstants.APP_VERSION
+        )
         try {
             HostAppInfoRepository.instance().addHostInfo(hostAppInfo)
             Assert.fail()
@@ -99,5 +116,17 @@ class HostAppInfoRepositorySpec : BaseTest() {
             locale = InAppMessagingTestConstants.LOCALE
         )
         HostAppInfoRepository.instance().addHostInfo(hostAppInfo)
+    }
+
+    @Test
+    fun `should return empty or default value for unset host app info`() {
+        val instance = HostAppInfoRepository.instance()
+        instance.getVersion().shouldBeEmpty()
+        instance.getPackageName().shouldBeEmpty()
+        instance.getDeviceLocale() shouldBeEqualTo Locale.getDefault().toString().replace("_", "-")
+            .lowercase(Locale.getDefault())
+        instance.getInAppMessagingSubscriptionKey().shouldBeEmpty()
+        instance.getDeviceId().shouldBeEmpty()
+        instance.getConfigUrl().shouldBeEmpty()
     }
 }

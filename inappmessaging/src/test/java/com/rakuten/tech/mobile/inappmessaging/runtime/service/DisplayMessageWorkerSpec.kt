@@ -76,6 +76,7 @@ class DisplayMessageWorkerSpec : BaseTest() {
     override fun tearDown() {
         super.tearDown()
         ConfigResponseRepository.resetInstance()
+        ReadyForDisplayMessageRepository.instance().clearMessages()
     }
 
     @Test

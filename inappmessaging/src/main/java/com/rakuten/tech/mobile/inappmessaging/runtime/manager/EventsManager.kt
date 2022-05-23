@@ -1,13 +1,11 @@
 package com.rakuten.tech.mobile.inappmessaging.runtime.manager
 
 import com.rakuten.tech.mobile.inappmessaging.runtime.InAppMessaging
-import com.rakuten.tech.mobile.inappmessaging.runtime.EventTrackerHelper
 import com.rakuten.tech.mobile.inappmessaging.runtime.data.models.appevents.Event
 import com.rakuten.tech.mobile.inappmessaging.runtime.data.repositories.AccountRepository
 import com.rakuten.tech.mobile.inappmessaging.runtime.data.repositories.ConfigResponseRepository
 import com.rakuten.tech.mobile.inappmessaging.runtime.data.repositories.LocalEventRepository
 import com.rakuten.tech.mobile.inappmessaging.runtime.data.repositories.PingResponseMessageRepository
-import com.rakuten.tech.mobile.inappmessaging.runtime.utils.InAppMessagingConstants
 import com.rakuten.tech.mobile.inappmessaging.runtime.workmanager.schedulers.EventMessageReconciliationScheduler
 
 /**
@@ -24,7 +22,6 @@ internal object EventsManager {
     @SuppressWarnings("LongMethod")
     fun onEventReceived(
         event: Event,
-        sendEvent: (String, Map<String, *>?) -> Boolean = EventTrackerHelper::sendEvent,
         localEventRepo: LocalEventRepository = LocalEventRepository.instance(),
         eventScheduler: EventMessageReconciliationScheduler = EventMessageReconciliationScheduler.instance(),
         accountRepo: AccountRepository = AccountRepository.instance()
@@ -46,8 +43,5 @@ internal object EventsManager {
             // retain "user updated status" for next non-persistent to trigger ping request
             isUpdated = isUserUpdated
         }
-
-        // Broadcasting host app logged event to Analytics SDK.
-        sendEvent(InAppMessagingConstants.RAT_EVENT_KEY_EVENTS, event.getRatEventMap())
     }
 }
