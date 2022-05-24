@@ -7,8 +7,8 @@ import com.squareup.moshi.JsonClass
 /**
  * Class for parsing Resource, which is a response from MessageMixer.
  */
-@JsonClass(generateAdapter = true)
 @RestrictTo(RestrictTo.Scope.LIBRARY)
+@JsonClass(generateAdapter = true)
 internal data class Resource(
     @Json(name = "assetsUrl")
     val assetsUrl: String? = null,

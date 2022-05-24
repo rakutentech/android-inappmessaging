@@ -7,7 +7,6 @@ import com.squareup.moshi.JsonClass
  * This class contains just name and value attributes.
  * Specially made for broadcasting RAT events.
  */
-@JsonClass(generateAdapter = true)
 internal data class RatAttribute(
     @Json(name = "name") val name: String,
     @Json(name = "value") val value: Any

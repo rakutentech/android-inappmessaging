@@ -102,7 +102,7 @@ internal object Initializer {
 
         initializePicassoInstance(context)
 
-        Logger(TAG).debug(Moshi.Builder().build().toJson(data = hostAppInfo))
+        //Logger(TAG).debug(Moshi.Builder().build().toJson(data = hostAppInfo))
     }
 
     /**

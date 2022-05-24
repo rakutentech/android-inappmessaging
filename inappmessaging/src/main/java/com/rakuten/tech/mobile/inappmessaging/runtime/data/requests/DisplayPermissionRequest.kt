@@ -10,7 +10,6 @@ import com.rakuten.tech.mobile.inappmessaging.runtime.utils.InAppMessagingConsta
  */
 @SuppressWarnings("ObjectToString")
 // toString() method is not needed for this class.
-@JsonClass(generateAdapter = true)
 internal data class DisplayPermissionRequest(
     @Json(name = "campaignId")
     val campaignId: String?,
