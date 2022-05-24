@@ -14,6 +14,7 @@ import java.lang.ClassCastException
 /**
  * Contains all messages are ready for display, but not yet displayed.
  */
+@SuppressWarnings("UnnecessaryAbstractClass")
 internal abstract class ReadyForDisplayMessageRepository : ReadyMessageRepository {
 
     companion object {

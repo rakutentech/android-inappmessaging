@@ -387,6 +387,9 @@ Documents targeting Product Managers:
 
 ## <a name="changelog"></a> Changelog
 
+### NEXT (in progress)
+* SDKCF-4919: Added support for building using Java 11.
+
 ### 7.1.0 (in-progress)
 * SDKCF-5256: Added sending of impression events with campaign details to analytics account.
 * SDKCF-5295: Updated SDK Utils version to update default `initOrder` of content provider.

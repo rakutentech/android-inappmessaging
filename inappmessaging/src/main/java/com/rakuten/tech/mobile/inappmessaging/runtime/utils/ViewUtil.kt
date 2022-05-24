@@ -16,7 +16,7 @@ internal object ViewUtil {
      * This method returns an android.view.animation.Animation object which includes InAppMessage's custom
      * animation.
      */
-    @SuppressWarnings("SwallowedException")
+    @SuppressWarnings("SwallowedException", "ElseCaseInsteadOfExhaustiveWhen")
     fun getSlidingAnimation(
         context: Context,
         direction: SlideFromDirectionType
