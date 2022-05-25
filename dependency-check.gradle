@@ -5,9 +5,8 @@ allprojects {
         skipProjects = [':test']
         // set the Common Vulnerability Scoring System value
         // https://nvd.nist.gov/vuln-metrics/cvss
-        failBuildOnCVSS = System.getenv("DEPENDENCY_CHECK_FAILBUID_CVSS") as Integer
+        failBuildOnCVSS = System.getenv("DEPENDENCY_CHECK_FAILBUID_CVSS") as Float
         suppressionFile = 'dependency_check_suppressions.xml'
-        outputDirectory = 'build/reports/dependency-check'
         formats = ['JSON', 'HTML']
         showSummary true
     }
