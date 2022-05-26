@@ -6,6 +6,7 @@ import com.rakuten.tech.mobile.inappmessaging.runtime.data.models.messages.Messa
 import com.rakuten.tech.mobile.inappmessaging.runtime.data.responses.ping.CampaignData
 import com.rakuten.tech.mobile.inappmessaging.runtime.fromJson
 import com.rakuten.tech.mobile.inappmessaging.runtime.mapAdapter
+import com.rakuten.tech.mobile.inappmessaging.runtime.toJson
 import com.rakuten.tech.mobile.sdkutils.PreferencesUtil
 import com.rakuten.tech.mobile.sdkutils.logger.Logger
 import com.squareup.moshi.Moshi
@@ -134,14 +135,14 @@ internal abstract class PingResponseMessageRepository : MessageRepository {
         private fun saveUpdatedMap() {
             // check if caching is enabled to update persistent data
             if (InAppMessaging.instance().isLocalCachingEnabled()) {
-                val adapter = Moshi.Builder().build().mapAdapter<String, Message>()
+                //val adapter = Moshi.Builder().build().mapAdapter<String, Message>()
                 // save updated message list
                 InAppMessaging.instance().getHostAppContext()?.let {
                     PreferencesUtil.putString(
                         context = it,
                         name = InAppMessaging.getPreferencesFile(),
                         key = PING_RESPONSE_KEY,
-                        value = adapter.toJson(messages)
+                        value = Moshi.Builder().build().toJson(data = messages)
                     )
                 } ?: Logger(TAG).debug("failed saving response data")
             }
