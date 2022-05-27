@@ -219,7 +219,7 @@ internal interface LocalEventRepository : EventRepository {
                         context = it,
                         name = InAppMessaging.getPreferencesFile(),
                         key = LOCAL_EVENT_KEY,
-                        Moshi.Builder().build().fromListToJson(data = events)
+                        value = Moshi.Builder().build().fromListToJson(data = events)
                     )
                 } ?: Logger(TAG).debug("failed saving event data")
             }

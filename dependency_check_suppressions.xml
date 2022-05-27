@@ -120,4 +120,12 @@
     <cpe>cpe:/a:detekt:detekt</cpe>
     <vulnerabilityName>CVE-2022-0272</vulnerabilityName>
   </suppress>
+  <suppress until="2022-09-30Z">
+    <notes><![CDATA[
+   file name: kotlin-analysis-intellij-1.6.21.ja
+   ]]></notes>
+    <packageUrl regex="true">^pkg:maven/com\.google\.code\.gson/gson@.*$</packageUrl>
+    <cpe>cpe:/a:google:gson</cpe>
+    <vulnerabilityName>CVE-2022-25647</vulnerabilityName>
+  </suppress>
 </suppressions>
