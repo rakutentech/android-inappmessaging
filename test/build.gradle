@@ -3,9 +3,14 @@ apply from: "$CONFIG.configDir/android/application.gradle"
 apply from: "../config/quality/gitleaks/build.gradle"
 apply plugin: "kotlin-android"
 apply plugin: 'kotlin-kapt'
+apply plugin: 'com.emergetools.android'
 
 android {
     compileSdkVersion 31
+
+    def property = { key ->
+        return System.getenv(key) ?: (project.hasProperty(key) ? project."$key" : null)
+    }
 
     defaultConfig {
         applicationId "rakuten.com.tech.mobile.test"
@@ -22,6 +27,9 @@ android {
         // "pm clear" command after each test invocation. This command ensures
         // that the app's state is completely cleared between tests.
         testInstrumentationRunnerArguments clearPackageData: 'true'
+
+        manifestPlaceholders.in_app_messaging_sub_id = property("IAM_SUBSCRIPTION_KEY") ?: ""
+        manifestPlaceholders.config_url = property("CONFIG_URL_TEST_PROD") ?: ""
     }
 
     buildTypes {
@@ -35,17 +43,6 @@ android {
     }
 
     flavorDimensions 'version'
-
-    def property = { key ->
-        return System.getenv(key) ?: (project.hasProperty(key) ? project."$key" : null)
-    }
-
-    productFlavors {
-        prodTesting {
-            manifestPlaceholders.in_app_messaging_sub_id = property("IAM_SUBSCRIPTION_KEY") ?: ""
-            manifestPlaceholders.config_url = property("CONFIG_URL_TEST_PROD") ?: ""
-        }
-    }
 }
 
 dependencies {
@@ -62,4 +59,31 @@ dependencies {
 }
 repositories {
     mavenCentral()
+}
+
+def pr = System.getenv("PULL_REQUEST_ID")
+
+emerge {
+    apiToken = System.getenv("EMERGE_API_TOKEN")
+
+    vcsOptions {
+        sha = System.getenv("BITRISE_GIT_COMMIT")
+        branchName = System.getenv("BITRISE_GIT_BRANCH")
+
+        if (pr == "" || !pr) {
+            // not pull request build
+            baseSha = System.getenv("BITRISE_GIT_COMMIT")
+            prNumber = ""
+            // for getting repo used in pull request
+            // need better way to retrieve owner/repo value
+            repoName = System.getenv("BITRISEIO_BASE_REPOSITORY_URL").replace(".git", "").replace("https://github.com/", "")
+        } else {
+            // for getting SHA in destination branch
+            def command = "git ls-remote ${System.getenv("BITRISEIO_BASE_REPOSITORY_URL")} ${System.getenv("BITRISEIO_GIT_BRANCH_DEST")}"
+
+            baseSha = ['sh', '-c', command].execute().text.trim().split("\t")[0]
+            prNumber = pr
+            repoName = System.getenv("BITRISEIO_PULL_REQUEST_REPOSITORY_URL").replace(".git", "").replace("https://github.com/", "")
+        }
+    }
 }

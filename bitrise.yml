@@ -4,6 +4,8 @@ project_type: android
 trigger_map:
 - push_branch: "master"
   workflow: build-and-test
+- push_branch: "inv/emerge-tools"
+  workflow: build-and-test
 - pull_request_source_branch: "*"
   workflow: build-and-test
 - tag: "v*.*.*+*"
@@ -41,6 +43,10 @@ workflows:
         title: Current Version
         inputs:
         - content: ./gradlew currentVersion
+    - script@1:
+        title: Run Emerge Upload
+        inputs:
+          - content: ./gradlew test:bundleEmergeRelease
     - custom-test-results-export@0:
         # this add-on should export test artifacts as well, but currently not displayed.
         inputs:

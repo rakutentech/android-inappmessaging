@@ -23,6 +23,7 @@ buildscript {
         classpath 'com.github.ben-manes:gradle-versions-plugin:0.27.0'
         classpath "org.jetbrains.dokka:dokka-gradle-plugin:${dokka_version}"
         classpath 'org.owasp:dependency-check-gradle:7.1.0.1'
+        classpath 'com.emergetools:emerge-gradle-plugin:1.0.0'
     }
 }
 
@@ -36,6 +37,7 @@ allprojects { proj ->
         google()
         mavenCentral()
         jitpack()
+        gradlePluginPortal()
     }
 
     gradle.projectsEvaluated {
