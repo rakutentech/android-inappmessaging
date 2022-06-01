@@ -69,21 +69,20 @@ emerge {
     vcsOptions {
         sha = System.getenv("BITRISE_GIT_COMMIT")
         branchName = System.getenv("BITRISE_GIT_BRANCH")
+        // for getting repo used in pull request
+        // need better way to retrieve owner/repo value
+        repoName = System.getenv("BITRISEIO_BASE_REPOSITORY_URL").replace(".git", "").replace("https://github.com/", "")
 
         if (pr == "" || !pr) {
             // not pull request build
             baseSha = System.getenv("BITRISE_GIT_COMMIT")
             prNumber = ""
-            // for getting repo used in pull request
-            // need better way to retrieve owner/repo value
-            repoName = System.getenv("BITRISEIO_BASE_REPOSITORY_URL").replace(".git", "").replace("https://github.com/", "")
         } else {
             // for getting SHA in destination branch
             def command = "git ls-remote ${System.getenv("BITRISEIO_BASE_REPOSITORY_URL")} ${System.getenv("BITRISEIO_GIT_BRANCH_DEST")}"
 
             baseSha = ['sh', '-c', command].execute().text.trim().split("\t")[0]
             prNumber = pr
-            repoName = System.getenv("BITRISEIO_PULL_REQUEST_REPOSITORY_URL").replace(".git", "").replace("https://github.com/", "")
         }
     }
 }
