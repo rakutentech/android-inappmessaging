@@ -24,6 +24,11 @@ sonarqube {
         property 'sonar.dependencyCheck.skip', System.getenv("SONAR_DEPENDENCYCHECK_SKIP")
         property 'sonar.dependencyCheck.jsonReportPath', 'build/reports/dependency-check-report.json'
         property 'sonar.dependencyCheck.htmlReportPath', 'build/reports/dependency-check-report.html'
+        /* Dependency Check severity minimum score */
+        property 'sonar.dependencyCheck.severity.blocker', System.getenv("DEPENDENCY_CHECK_FAILBUID_CVSS")
+        property 'sonar.dependencyCheck.severity.critical', System.getenv("DEPENDENCY_CHECK_FAILBUID_CVSS")
+        property 'sonar.dependencyCheck.severity.major', System.getenv("DEPENDENCY_CHECK_FAILBUID_CVSS")
+        property 'sonar.dependencyCheck.severity.minor', System.getenv("DEPENDENCY_CHECK_FAILBUID_CVSS")
     }
 }
 
