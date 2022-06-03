@@ -28,8 +28,13 @@ internal data class CampaignData(
     private val infiniteImpressions: Boolean = false
 ) : Message {
 
-    @SerializedName("timesClosed")
-    internal var timesClosed = 0
+    @SerializedName("impressionsLeft")
+    override var impressionsLeft: Int? = null
+        get() = if (field == null) maxImpressions else field
+
+    @SerializedName("isOptedOut")
+    override var isOptedOut: Boolean? = null
+        get() = if (field == null) false else field
 
     override fun getType(): Int = type
 
@@ -53,25 +58,9 @@ internal data class CampaignData(
         return matches.map { it.groupValues[1] }.toList()
     }
 
-    override fun getNumberOfTimesClosed() = synchronized(timesClosed) {
-        timesClosed
-    }
-
-    override fun incrementTimesClosed() {
-        synchronized(timesClosed) {
-            timesClosed++
-        }
-    }
-
     override fun infiniteImpressions() = infiniteImpressions
 
     override fun hasNoEndDate() = hasNoEndDate
 
     override fun isCampaignDismissable() = isCampaignDismissable
-
-    var impressionsLeft = getMaxImpressions()
-        private set
-
-    var isOptedOut = false
-        private set
 }

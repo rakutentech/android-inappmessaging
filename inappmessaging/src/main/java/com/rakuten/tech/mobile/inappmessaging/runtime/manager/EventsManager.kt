@@ -4,8 +4,7 @@ import com.rakuten.tech.mobile.inappmessaging.runtime.InAppMessaging
 import com.rakuten.tech.mobile.inappmessaging.runtime.data.models.appevents.Event
 import com.rakuten.tech.mobile.inappmessaging.runtime.data.repositories.AccountRepository
 import com.rakuten.tech.mobile.inappmessaging.runtime.data.repositories.ConfigResponseRepository
-import com.rakuten.tech.mobile.inappmessaging.runtime.data.repositories.LocalEventRepository
-import com.rakuten.tech.mobile.inappmessaging.runtime.data.repositories.CampaignMessageRepository
+import com.rakuten.tech.mobile.inappmessaging.runtime.utils.EventMatchingUtil
 import com.rakuten.tech.mobile.inappmessaging.runtime.workmanager.schedulers.EventMessageReconciliationScheduler
 
 /**
@@ -22,14 +21,12 @@ internal object EventsManager {
     @SuppressWarnings("LongMethod")
     fun onEventReceived(
         event: Event,
-        localEventRepo: LocalEventRepository = LocalEventRepository.instance(),
+        eventMatchingUtil: EventMatchingUtil = EventMatchingUtil.instance(),
         eventScheduler: EventMessageReconciliationScheduler = EventMessageReconciliationScheduler.instance(),
         accountRepo: AccountRepository = AccountRepository.instance()
     ) {
         val isUserUpdated = accountRepo.updateUserInfo()
-        // Caching events locally.
-        event.setShouldNotClear(isUserUpdated || isUpdated || CampaignMessageRepository.isInitialLaunch)
-        val isAdded = localEventRepo.addEvent(event)
+        val isAdded = eventMatchingUtil.matchAndStore(event)
         if (isAdded) {
             if (isUserUpdated || isUpdated) {
                 isUpdated = false

@@ -2,11 +2,8 @@ package com.rakuten.tech.mobile.inappmessaging.runtime.manager
 
 import com.rakuten.tech.mobile.inappmessaging.runtime.InAppMessaging
 import com.rakuten.tech.mobile.inappmessaging.runtime.data.models.appevents.Event
-import com.rakuten.tech.mobile.inappmessaging.runtime.data.repositories.LocalDisplayedMessageRepository
-import com.rakuten.tech.mobile.inappmessaging.runtime.data.repositories.LocalEventRepository
-import com.rakuten.tech.mobile.inappmessaging.runtime.data.repositories.LocalOptedOutMessageRepository
-import com.rakuten.tech.mobile.inappmessaging.runtime.data.repositories.CampaignMessageRepository
-import com.rakuten.tech.mobile.inappmessaging.runtime.data.repositories.ReadyForDisplayMessageRepository
+import com.rakuten.tech.mobile.inappmessaging.runtime.data.repositories.CampaignRepository
+import com.rakuten.tech.mobile.inappmessaging.runtime.utils.EventMatchingUtil
 import com.rakuten.tech.mobile.inappmessaging.runtime.utils.RetryDelayUtil
 import com.rakuten.tech.mobile.inappmessaging.runtime.workmanager.schedulers.MessageMixerPingScheduler
 
@@ -22,22 +19,16 @@ internal object SessionManager {
     fun onSessionUpdate(event: Event? = null) {
         if (!InAppMessaging.instance().isLocalCachingEnabled()) {
             // clear locally stored campaigns from ping response
-            CampaignMessageRepository.instance().clearMessages()
+            CampaignRepository.instance().clearMessages()
 
-            // clear locally stored campaigns which are ready for display
-            ReadyForDisplayMessageRepository.instance().clearMessages()
+            // Clear campaigns which are ready for display
+            MessageReadinessManager.instance().clearMessages()
 
-            // clear locally stored campaigns which are already displayed
-            LocalDisplayedMessageRepository.instance().clearMessages()
-
-            // clear locally stored campaigns which are opted out
-            LocalOptedOutMessageRepository.instance().clearMessages()
-
-            // clear locally stored triggered events (non-persistent)
-            LocalEventRepository.instance().clearNonPersistentEvents()
+            // Clear non-persistent matched local events
+            EventMatchingUtil.instance().clearNonPersistentEvents()
             if (event != null && !event.isPersistentType()) {
                 // manually add latest event triggered by new user since it was removed from previous clearing
-                LocalEventRepository.instance().addEvent(event)
+                EventMatchingUtil.instance().matchAndStore(event)
             }
         }
 

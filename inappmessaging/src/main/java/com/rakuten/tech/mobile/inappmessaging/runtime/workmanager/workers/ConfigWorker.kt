@@ -104,7 +104,7 @@ internal class ConfigWorker(
             )
             if (configRepo.isConfigEnabled()) {
                 // move temp data to persistent cache
-                InAppMessaging.instance().saveTempData()
+                InAppMessaging.instance().flushEventList()
                 MessageMixerPingScheduler.currDelay = RetryDelayUtil.INITIAL_BACKOFF_DELAY
                 messagePingScheduler.pingMessageMixerService(0)
             } else {

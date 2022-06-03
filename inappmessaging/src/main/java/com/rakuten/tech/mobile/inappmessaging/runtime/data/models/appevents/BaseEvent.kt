@@ -29,7 +29,6 @@ abstract class BaseEvent(
     @NotNull private val isPersistent: Boolean
 ) : Event {
     private val timestamp: Long
-    private var shouldNotClear = false
 
     init {
         require(this.eventName.isNotEmpty()) { InAppMessagingConstants.EVENT_NAME_EMPTY_EXCEPTION }
@@ -85,12 +84,6 @@ abstract class BaseEvent(
     @RestrictTo(LIBRARY)
     @NotNull
     override fun getAttributeMap(): Map<String, Attribute?> = HashMap()
-
-    override fun shouldNotClear() = shouldNotClear
-
-    override fun setShouldNotClear(shouldNotClear: Boolean) {
-        this.shouldNotClear = shouldNotClear
-    }
 
     companion object {
         private const val MAX_EVENT_NAME_CHARACTER_LENGTH = 255

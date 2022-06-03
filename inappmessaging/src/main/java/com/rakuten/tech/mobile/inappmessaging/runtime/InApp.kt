@@ -9,27 +9,30 @@ import androidx.annotation.VisibleForTesting
 import com.rakuten.tech.mobile.inappmessaging.runtime.data.models.appevents.Event
 import com.rakuten.tech.mobile.inappmessaging.runtime.data.repositories.AccountRepository
 import com.rakuten.tech.mobile.inappmessaging.runtime.data.repositories.ConfigResponseRepository
-import com.rakuten.tech.mobile.inappmessaging.runtime.data.repositories.LocalEventRepository
-import com.rakuten.tech.mobile.inappmessaging.runtime.data.repositories.CampaignMessageRepository
-import com.rakuten.tech.mobile.inappmessaging.runtime.data.repositories.ReadyForDisplayMessageRepository
 import com.rakuten.tech.mobile.inappmessaging.runtime.exception.InAppMessagingException
 import com.rakuten.tech.mobile.inappmessaging.runtime.manager.DisplayManager
 import com.rakuten.tech.mobile.inappmessaging.runtime.manager.EventsManager
-import com.rakuten.tech.mobile.inappmessaging.runtime.manager.SessionManager
+import com.rakuten.tech.mobile.inappmessaging.runtime.manager.MessageReadinessManager
+import com.rakuten.tech.mobile.inappmessaging.runtime.utils.EventMatchingUtil
 import com.rakuten.tech.mobile.sdkutils.logger.Logger
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import java.lang.ref.WeakReference
 
-@SuppressWarnings("TooManyFunctions", "TooGenericExceptionCaught")
+@SuppressWarnings(
+    "TooManyFunctions",
+    "TooGenericExceptionCaught",
+    "LongParameterList"
+)
 internal class InApp(
     private val context: Context,
     isDebugLogging: Boolean,
     private val displayManager: DisplayManager = DisplayManager.instance(),
     private var isCacheHandling: Boolean = BuildConfig.IS_CACHE_HANDLING,
     private val eventsManager: EventsManager = EventsManager,
-    private val sessionManager: SessionManager = SessionManager
+    private val eventMatchingUtil: EventMatchingUtil = EventMatchingUtil.instance(),
+    private val messageReadinessManager: MessageReadinessManager = MessageReadinessManager.instance(),
 ) : InAppMessaging() {
 
     // Used for displaying or removing messages from screen.
@@ -132,13 +135,12 @@ internal class InApp(
 
     override fun isLocalCachingEnabled() = isCacheHandling
 
-    override fun saveTempData() {
+    override fun flushEventList() {
         try {
             AccountRepository.instance().updateUserInfo()
             synchronized(tempEventList) {
                 tempEventList.forEach { ev ->
-                    ev.setShouldNotClear(CampaignMessageRepository.isInitialLaunch)
-                    LocalEventRepository.instance().addEvent(ev)
+                    eventMatchingUtil.matchAndStore(ev)
                 }
                 tempEventList.clear()
             }
@@ -154,9 +156,8 @@ internal class InApp(
         val id = displayManager.removeMessage(getRegisteredActivity())
 
         if (clearQueuedCampaigns) {
-            ReadyForDisplayMessageRepository.instance().clearMessages(true)
+            messageReadinessManager.clearMessages()
         } else if (id != null) {
-            ReadyForDisplayMessageRepository.instance().removeMessage(id as String, true)
             displayManager.displayMessage()
         }
     }

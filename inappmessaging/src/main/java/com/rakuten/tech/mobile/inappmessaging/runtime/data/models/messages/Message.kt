@@ -10,6 +10,18 @@ import com.rakuten.tech.mobile.inappmessaging.runtime.data.responses.ping.Trigge
 @SuppressWarnings("ComplexInterface", "TooManyFunctions")
 internal interface Message {
     /**
+     * The impressions (number of displays) left for this campaign.
+     * Note that this value is obtained from cache only.
+     */
+    var impressionsLeft: Int?
+
+    /**
+     * The opt-out (whether not to show again) status for this campaign.
+     * Note that this value is obtained from cache only.
+     */
+    var isOptedOut: Boolean?
+
+    /**
      * This method returns the message type.
      */
     fun getType(): Int
@@ -46,20 +58,6 @@ internal interface Message {
 
     fun getContexts(): List<String>
 
-    // TODO: Should remove
-    /**
-     * Returns the number of times this message has been queued (ready for display) but was removed
-     * when closeMessage API was called.
-     */
-    fun getNumberOfTimesClosed(): Int
-
-    // TODO: Should remove
-    /**
-     * Increments the number of times this message has been queued (ready for display) but
-     * was removed when closeMessage API was called.
-     */
-    fun incrementTimesClosed()
-
     /**
      * Indicates Impressions should never end.
      */
@@ -74,4 +72,16 @@ internal interface Message {
      * True if close 'X' button should be displayed on campaign.
      */
     fun isCampaignDismissable(): Boolean
+
+    companion object {
+        fun updatedMessage(message: Message, asOptedOut: Boolean): Message {
+            message.isOptedOut = asOptedOut
+            return message
+        }
+
+        fun updatedMessage(message: Message, impressionsLeft: Int): Message {
+            message.impressionsLeft = impressionsLeft
+            return message
+        }
+    }
 }

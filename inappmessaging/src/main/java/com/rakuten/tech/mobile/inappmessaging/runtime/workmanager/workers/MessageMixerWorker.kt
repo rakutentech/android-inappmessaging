@@ -9,10 +9,10 @@ import com.rakuten.tech.mobile.inappmessaging.runtime.data.models.messages.Messa
 import com.rakuten.tech.mobile.inappmessaging.runtime.data.repositories.AccountRepository
 import com.rakuten.tech.mobile.inappmessaging.runtime.data.repositories.ConfigResponseRepository
 import com.rakuten.tech.mobile.inappmessaging.runtime.data.repositories.HostAppInfoRepository
-import com.rakuten.tech.mobile.inappmessaging.runtime.data.repositories.LocalEventRepository
-import com.rakuten.tech.mobile.inappmessaging.runtime.data.repositories.CampaignMessageRepository
+import com.rakuten.tech.mobile.inappmessaging.runtime.data.repositories.CampaignRepository
 import com.rakuten.tech.mobile.inappmessaging.runtime.data.requests.PingRequest
 import com.rakuten.tech.mobile.inappmessaging.runtime.data.responses.ping.MessageMixerResponse
+import com.rakuten.tech.mobile.inappmessaging.runtime.utils.EventMatchingUtil
 import com.rakuten.tech.mobile.inappmessaging.runtime.utils.RetryDelayUtil
 import com.rakuten.tech.mobile.inappmessaging.runtime.utils.RuntimeUtil
 import com.rakuten.tech.mobile.inappmessaging.runtime.utils.WorkerUtils
@@ -100,11 +100,11 @@ internal class MessageMixerWorker(
                 // Parse all data in response.
                 val parsedMessages = parsePingResponseWithTestMessage(messageMixerResponse)
 
-                // Add all parsed messages into PingResponseMessageRepository.
-                CampaignMessageRepository.instance().syncWith(parsedMessages, messageMixerResponse.currentPingMillis)
+                // Add all parsed messages into CampaignRepository.
+                CampaignRepository.instance().syncWith(parsedMessages, messageMixerResponse.currentPingMillis)
 
                 // Clear non-persistent local events triggered before current ping
-                LocalEventRepository.instance().clearNonPersistentEvents(messageMixerResponse.currentPingMillis)
+                EventMatchingUtil.instance().clearNonPersistentEvents(messageMixerResponse.currentPingMillis)
 
                 // Start a new MessageEventReconciliationWorker, there was a new Ping Response to parse.
                 // This worker will attempt to cancel message scheduled but hasn't been displayed yet

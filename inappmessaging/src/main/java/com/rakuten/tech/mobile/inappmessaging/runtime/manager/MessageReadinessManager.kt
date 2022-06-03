@@ -9,10 +9,7 @@ import com.rakuten.tech.mobile.inappmessaging.runtime.data.models.messages.Messa
 import com.rakuten.tech.mobile.inappmessaging.runtime.data.repositories.AccountRepository
 import com.rakuten.tech.mobile.inappmessaging.runtime.data.repositories.ConfigResponseRepository
 import com.rakuten.tech.mobile.inappmessaging.runtime.data.repositories.HostAppInfoRepository
-import com.rakuten.tech.mobile.inappmessaging.runtime.data.repositories.LocalDisplayedMessageRepository
-import com.rakuten.tech.mobile.inappmessaging.runtime.data.repositories.LocalOptedOutMessageRepository
-import com.rakuten.tech.mobile.inappmessaging.runtime.data.repositories.ReadyForDisplayMessageRepository
-import com.rakuten.tech.mobile.inappmessaging.runtime.data.repositories.CampaignMessageRepository
+import com.rakuten.tech.mobile.inappmessaging.runtime.data.repositories.CampaignRepository
 import com.rakuten.tech.mobile.inappmessaging.runtime.data.requests.DisplayPermissionRequest
 import com.rakuten.tech.mobile.inappmessaging.runtime.data.responses.displaypermission.DisplayPermissionResponse
 import com.rakuten.tech.mobile.inappmessaging.runtime.exception.InAppMessagingException
@@ -30,6 +27,17 @@ import java.util.concurrent.atomic.AtomicBoolean
  * Returns the next ready to display message.
  */
 internal interface MessageReadinessManager {
+
+    /**
+     * Adds a message Id to ready for display.
+     */
+    fun addMessageToQueue(id: String)
+
+    /**
+     * Clears all queued messages Ids for display.
+     */
+    fun clearMessages()
+
     /**
      * This method returns the next ready to display message.
      */
@@ -54,18 +62,42 @@ internal interface MessageReadinessManager {
     companion object {
         private const val TAG = "IAM_MsgReadinessManager"
         private const val DISP_TAG = "IAM_DisplayPermission"
-        private var instance: MessageReadinessManager = MessageReadinessManagerImpl()
+        private var instance: MessageReadinessManager = MessageReadinessManagerImpl(
+            CampaignRepository.instance()
+        )
         internal val shouldRetry = AtomicBoolean(true)
         fun instance() = instance
     }
 
-    private class MessageReadinessManagerImpl : MessageReadinessManager {
+    @SuppressWarnings("TooManyFunctions")
+    private class MessageReadinessManagerImpl(private val campaignRepo: CampaignRepository) : MessageReadinessManager {
+        private var queuedMessages = mutableListOf<String>()
+
+        override fun addMessageToQueue(id: String) {
+            synchronized(queuedMessages) {
+                queuedMessages.add(id)
+            }
+        }
+
+        override fun clearMessages() {
+            synchronized(queuedMessages) {
+                queuedMessages.clear()
+            }
+        }
+
         @WorkerThread
-        @SuppressWarnings("LongMethod", "ReturnCount")
+        @SuppressWarnings("LongMethod", "ReturnCount", "ComplexMethod")
         override fun getNextDisplayMessage(): Message? {
             shouldRetry.set(true)
-            val messageList: List<Message> = ReadyForDisplayMessageRepository.instance().getAllMessagesCopy()
-            for (message in messageList) {
+
+            for (messageId in queuedMessages) {
+                val campaignId = queuedMessages.removeFirst()
+                val message = campaignRepo.messages.firstOrNull { it.getCampaignId() == campaignId }
+                if (message == null) {
+                    Logger(TAG).debug("Warning: Queued campaign $campaignId does not exist in the repository anymore")
+                    continue
+                }
+
                 Logger(TAG).debug("checking permission for message: %s", message.getCampaignId())
 
                 // First, check if this message should be displayed.
@@ -103,7 +135,7 @@ internal interface MessageReadinessManager {
                 appVersion = HostAppInfoRepository.instance().getVersion(),
                 sdkVersion = BuildConfig.VERSION_NAME,
                 locale = HostAppInfoRepository.instance().getDeviceLocale(),
-                lastPingInMillis = CampaignMessageRepository.instance().lastSyncMillis,
+                lastPingInMillis = CampaignRepository.instance().lastSyncMillis ?: 0,
                 userIdentifier = RuntimeUtil.getUserIdentifiers()
             )
         }
@@ -129,12 +161,8 @@ internal interface MessageReadinessManager {
          * than its max impressions, or has been opted out.
          */
         private fun shouldDisplayMessage(message: Message): Boolean =
-            (
-                message.infiniteImpressions() ||
-                    LocalDisplayedMessageRepository.instance().numberOfTimesDisplayed(message)
-                    < message.getMaxImpressions()
-                ) &&
-                !LocalOptedOutMessageRepository.instance().hasMessage(message.getCampaignId())
+            (message.infiniteImpressions() || message.impressionsLeft!! > 0) &&
+                !message.isOptedOut!!
 
         /**
          * This methods checks if According to the message display permission response parameter,

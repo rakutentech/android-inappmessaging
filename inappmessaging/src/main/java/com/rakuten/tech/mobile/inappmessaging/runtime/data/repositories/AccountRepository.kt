@@ -2,7 +2,9 @@ package com.rakuten.tech.mobile.inappmessaging.runtime.data.repositories
 
 import android.annotation.SuppressLint
 import com.rakuten.tech.mobile.inappmessaging.runtime.BuildConfig
+import com.rakuten.tech.mobile.inappmessaging.runtime.InAppMessaging
 import com.rakuten.tech.mobile.inappmessaging.runtime.UserInfoProvider
+import com.rakuten.tech.mobile.sdkutils.PreferencesUtil
 import com.rakuten.tech.mobile.sdkutils.logger.Logger
 import java.math.BigInteger
 import java.security.MessageDigest
@@ -69,6 +71,7 @@ internal abstract class AccountRepository {
 
             if (userInfoHash != curr) {
                 userInfoHash = curr
+                clearUserOldCacheStructure()
                 return true
             }
 
@@ -105,6 +108,30 @@ internal abstract class AccountRepository {
             } catch (ex: Exception) {
                 // should never happen since "MD5" is a supported algorithm
                 input
+            }
+        }
+
+        /**
+         * From v7.1.0, the structure of cached data is changed.
+         * Remove old data since it will never be used.
+         */
+        private fun clearUserOldCacheStructure() {
+            if (InAppMessaging.instance().isLocalCachingEnabled()) {
+                clearOldCacheByKey("ping_response_list")
+                clearOldCacheByKey("local_event_list")
+                clearOldCacheByKey("ready_display_list")
+                clearOldCacheByKey("local_displayed_list")
+            }
+        }
+
+        private fun clearOldCacheByKey(key: String) {
+            if (InAppMessaging.instance().isLocalCachingEnabled()) {
+                val prefs = InAppMessaging.getPreferencesFile()
+                InAppMessaging.instance().getHostAppContext()?.let { ctx ->
+                    if (PreferencesUtil.contains(ctx, prefs, key)) {
+                        PreferencesUtil.remove(ctx, prefs, key)
+                    }
+                }
             }
         }
     }

@@ -90,7 +90,7 @@ class ImpressionManagerSpec : BaseTest() {
 
     @Test
     fun `should invoke broadcaster with valid impression content`() {
-        ImpressionManager.impressionMap["1234"] = Impression(ImpressionType.IMPRESSION, Date().time)
+        ImpressionManager.impressionMap["1234"] = Impression(ImpressionType.IMPRESSION, 0)
         val captor = setupEventBroadcaster()
 
         val map = captor.firstValue
@@ -104,7 +104,7 @@ class ImpressionManagerSpec : BaseTest() {
     @Test
     fun `should invoke broadcaster for impression type`() {
         ImpressionManager.sendImpressionEvent(
-            "1234", listOf(Impression(ImpressionType.IMPRESSION, Date().time)), eventTracker::sendEvent
+            "1234", listOf(Impression(ImpressionType.IMPRESSION, 0)), eventTracker::sendEvent
         )
 
         val captor = argumentCaptor<Map<String, Any>>()

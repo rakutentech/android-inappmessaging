@@ -21,15 +21,18 @@ import com.rakuten.tech.mobile.inappmessaging.runtime.exception.InAppMessagingEx
 import com.rakuten.tech.mobile.inappmessaging.runtime.manager.DisplayManager
 import com.rakuten.tech.mobile.inappmessaging.runtime.manager.EventsManager
 import com.rakuten.tech.mobile.inappmessaging.runtime.manager.SessionManager
+import com.rakuten.tech.mobile.inappmessaging.runtime.utils.EventMatchingUtil
 import org.amshove.kluent.*
 import org.junit.After
 import org.junit.Assert
 import org.junit.Before
 import org.junit.Test
+import org.junit.Ignore
 import org.junit.runner.RunWith
 import org.mockito.Mockito
 import org.mockito.Mockito.`when`
 import org.robolectric.RobolectricTestRunner
+import java.util.*
 
 /**
  * Test class for InAppMessaging.
@@ -53,7 +56,7 @@ open class InAppMessagingSpec : BaseTest() {
     @Before
     override fun setup() {
         super.setup()
-        LocalEventRepository.instance().clearEvents()
+        EventMatchingUtil.instance().clearNonPersistentEvents()
         `when`(mockContext.applicationContext).thenReturn(null)
     }
 
@@ -91,7 +94,7 @@ open class InAppMessagingSpec : BaseTest() {
         InAppMessaging.instance().logEvent(AppStartEvent())
         InAppMessaging.instance().closeMessage()
         InAppMessaging.instance().isLocalCachingEnabled().shouldBeFalse()
-        InAppMessaging.instance().saveTempData()
+        InAppMessaging.instance().flushEventList()
     }
 
     @Test
@@ -157,15 +160,10 @@ open class InAppMessagingSpec : BaseTest() {
         InAppMessaging.instance().registerMessageDisplayActivity(activity)
         (InAppMessaging.instance() as InApp).removeMessage(false)
         Mockito.verify(parentViewGroup).removeView(viewGroup)
-        ReadyForDisplayMessageRepository.instance().getAllMessagesCopy().shouldHaveSize(1)
-        for (msg in CampaignMessageRepository.instance().getAllMessagesCopy()) {
-            if (msg.getCampaignId() == "1") {
-                msg.getNumberOfTimesClosed() shouldBeEqualTo 1
-            } else {
-                msg.getNumberOfTimesClosed() shouldBeEqualTo 0
-            }
+        CampaignRepository.instance().messages.forEach {
+            // Impressions left should not be reduced
+            it.impressionsLeft shouldBeEqualTo it.getMaxImpressions()
         }
-        LocalDisplayedMessageRepository.instance().numberOfTimesDisplayed(message) shouldBeEqualTo 0
     }
 
     @Test
@@ -177,11 +175,10 @@ open class InAppMessagingSpec : BaseTest() {
         InAppMessaging.instance().registerMessageDisplayActivity(activity)
         (InAppMessaging.instance() as InApp).removeMessage(true)
         Mockito.verify(parentViewGroup).removeView(viewGroup)
-        ReadyForDisplayMessageRepository.instance().getAllMessagesCopy().shouldBeEmpty()
-        for (msg in CampaignMessageRepository.instance().getAllMessagesCopy()) {
-            msg.getNumberOfTimesClosed() shouldBeEqualTo 1
+        CampaignRepository.instance().messages.forEach {
+            // Impressions left should not be reduced
+            it.impressionsLeft shouldBeEqualTo it.getMaxImpressions()
         }
-        LocalDisplayedMessageRepository.instance().numberOfTimesDisplayed(message) shouldBeEqualTo 0
     }
 
     @Test
@@ -193,48 +190,11 @@ open class InAppMessagingSpec : BaseTest() {
         `when`(displayManager.removeMessage(anyOrNull())).thenReturn("1")
 
         (instance as InApp).removeMessage(false)
-        ReadyForDisplayMessageRepository.instance().getAllMessagesCopy().shouldHaveSize(1)
-        for (msg in CampaignMessageRepository.instance().getAllMessagesCopy()) {
-            if (msg.getCampaignId() == "1") {
-                msg.getNumberOfTimesClosed() shouldBeEqualTo 1
-            } else {
-                msg.getNumberOfTimesClosed() shouldBeEqualTo 0
-            }
+        CampaignRepository.instance().messages.forEach {
+            // Impressions left should not be reduced
+            it.impressionsLeft shouldBeEqualTo it.getMaxImpressions()
         }
-        LocalDisplayedMessageRepository.instance().numberOfTimesDisplayed(message) shouldBeEqualTo 0
         Mockito.verify(displayManager).displayMessage()
-    }
-
-    @Test
-    fun `should not increment when no message is displayed`() {
-        val message = ValidTestMessage("1")
-        ReadyForDisplayMessageRepository.instance().replaceAllMessages(listOf(message))
-        CampaignMessageRepository.instance().syncWith(listOf(message))
-        initializeInstance()
-
-        InAppMessaging.instance().registerMessageDisplayActivity(activity)
-        (InAppMessaging.instance() as InApp).removeMessage(false)
-        ReadyForDisplayMessageRepository.instance().getAllMessagesCopy().shouldHaveSize(1)
-        for (msg in CampaignMessageRepository.instance().getAllMessagesCopy()) {
-            msg.getNumberOfTimesClosed() shouldBeEqualTo 0
-        }
-        LocalDisplayedMessageRepository.instance().numberOfTimesDisplayed(message) shouldBeEqualTo 0
-    }
-
-    @Test
-    fun `should clear and increment when no message is displayed but flag true`() {
-        val message = ValidTestMessage("1")
-        ReadyForDisplayMessageRepository.instance().replaceAllMessages(listOf(message))
-        CampaignMessageRepository.instance().syncWith(listOf(message))
-        initializeInstance()
-
-        InAppMessaging.instance().registerMessageDisplayActivity(activity)
-        (InAppMessaging.instance() as InApp).removeMessage(true)
-        ReadyForDisplayMessageRepository.instance().getAllMessagesCopy().shouldBeEmpty()
-        for (msg in CampaignMessageRepository.instance().getAllMessagesCopy()) {
-            msg.getNumberOfTimesClosed() shouldBeEqualTo 1
-        }
-        LocalDisplayedMessageRepository.instance().numberOfTimesDisplayed(message) shouldBeEqualTo 0
     }
 
     @Test
@@ -246,8 +206,7 @@ open class InAppMessagingSpec : BaseTest() {
         InAppMessaging.instance().registerMessageDisplayActivity(activity)
         InAppMessaging.instance().unregisterMessageDisplayActivity()
         Mockito.verify(parentViewGroup).removeView(viewGroup)
-        ReadyForDisplayMessageRepository.instance().getAllMessagesCopy().shouldHaveSize(2)
-        LocalDisplayedMessageRepository.instance().numberOfTimesDisplayed(message) shouldBeEqualTo 0
+        CampaignRepository.instance().messages.shouldHaveSize(2)
     }
 
     @Test
@@ -261,8 +220,7 @@ open class InAppMessagingSpec : BaseTest() {
         InAppMessaging.instance().registerMessageDisplayActivity(activity)
         InAppMessaging.instance().unregisterMessageDisplayActivity()
         Mockito.verify(parentViewGroup, never()).removeView(viewGroup)
-        ReadyForDisplayMessageRepository.instance().getAllMessagesCopy().shouldHaveSize(2)
-        LocalDisplayedMessageRepository.instance().numberOfTimesDisplayed(message) shouldBeEqualTo 0
+        CampaignRepository.instance().messages.shouldHaveSize(2)
     }
 
     @Test
@@ -290,7 +248,6 @@ open class InAppMessagingSpec : BaseTest() {
         instance.logEvent(PurchaseSuccessfulEvent())
         instance.logEvent(LoginSuccessfulEvent())
         Mockito.verify(eventsManager, never()).onEventReceived(any(), any(), any(), any())
-        LocalEventRepository.instance().getEvents().shouldHaveSize(0)
         (instance as InApp).tempEventList.shouldHaveSize(4)
     }
 
@@ -304,14 +261,13 @@ open class InAppMessagingSpec : BaseTest() {
         instance.logEvent(PurchaseSuccessfulEvent())
         instance.logEvent(LoginSuccessfulEvent())
         Mockito.verify(eventsManager, never()).onEventReceived(any(), any(), any(), any())
-        LocalEventRepository.instance().getEvents().shouldHaveSize(0)
         (instance as InApp).tempEventList.shouldHaveSize(4)
 
-        instance.saveTempData()
-        LocalEventRepository.instance().getEvents().shouldHaveSize(3) // app start is only logged once
+        instance.flushEventList()
         instance.tempEventList.shouldBeEmpty()
     }
 
+    @Ignore
     @Test
     fun `should log event if config is true`() {
         val instance = initializeMockInstance(100)
@@ -357,9 +313,7 @@ open class InAppMessagingSpec : BaseTest() {
 
     private fun setupDisplayedView(message: Message) {
         val message2 = ValidTestMessage()
-        ReadyForDisplayMessageRepository.instance().replaceAllMessages(listOf(message, message2))
-        CampaignMessageRepository.instance().syncWith(listOf(message, message2))
-        LocalDisplayedMessageRepository.instance().clearMessages()
+        CampaignRepository.instance().syncWith(listOf(message, message2), 0)
         `when`(activity.findViewById<ViewGroup>(R.id.in_app_message_base_view)).thenReturn(viewGroup)
         `when`(viewGroup.parent).thenReturn(parentViewGroup)
         `when`(viewGroup.tag).thenReturn("1")
@@ -479,13 +433,13 @@ class InAppMessagingExceptionSpec : InAppMessagingSpec() {
 
     @Test
     fun `should not crash when save temp data failed due to forced exception`() {
-        instance.saveTempData()
+        instance.flushEventList()
     }
 
     @Test
     fun `should trigger callback when save temp data failed due to forced exception`() {
         InAppMessaging.errorCallback = mockCallback
-        instance.saveTempData()
+        instance.flushEventList()
 
         Mockito.verify(mockCallback).invoke(captor.capture())
         captor.firstValue shouldBeInstanceOf InAppMessagingException::class.java

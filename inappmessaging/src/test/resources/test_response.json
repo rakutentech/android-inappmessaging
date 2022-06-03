@@ -7,7 +7,8 @@
         "isTest": false,
         "hasNoEndDate": true,
         "isCampaignDismissable": false,
-        "infiniteImpressions": true,
+        "infiniteImpressions": false,
+        "maxImpressions": 100,
         "messagePayload": {
           "backgroundColor": "#000000",
           "frameColor": "#ffffff",

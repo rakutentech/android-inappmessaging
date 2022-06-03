@@ -12,8 +12,6 @@ import androidx.work.WorkManager
 import com.rakuten.tech.mobile.inappmessaging.runtime.InAppMessaging
 import com.rakuten.tech.mobile.inappmessaging.runtime.utils.ImageUtil
 import com.rakuten.tech.mobile.inappmessaging.runtime.data.models.messages.Message
-import com.rakuten.tech.mobile.inappmessaging.runtime.data.repositories.LocalDisplayedMessageRepository
-import com.rakuten.tech.mobile.inappmessaging.runtime.data.repositories.ReadyForDisplayMessageRepository
 import com.rakuten.tech.mobile.inappmessaging.runtime.manager.MessageReadinessManager
 import com.rakuten.tech.mobile.inappmessaging.runtime.runnable.DisplayMessageRunnable
 import com.rakuten.tech.mobile.inappmessaging.runtime.utils.WorkManagerUtil
@@ -30,8 +28,6 @@ internal class DisplayMessageWorker(
     context: Context,
     params: WorkerParameters
 ) : CoroutineWorker(context, params) {
-    var localDisplayRepo = LocalDisplayedMessageRepository.instance()
-    var readyMessagesRepo = ReadyForDisplayMessageRepository.instance()
     var messageReadinessManager = MessageReadinessManager.instance()
     var handler = Handler(Looper.getMainLooper())
     var picasso: Picasso? = null
@@ -95,9 +91,6 @@ internal class DisplayMessageWorker(
         if (!verifyContexts(message)) {
             // Message display aborted by the host app
             Logger(TAG).debug("message display cancelled by the host app")
-
-            // increment time closed to handle required number of events to be triggered
-            readyMessagesRepo.removeMessage(message.getCampaignId(), true)
 
             prepareNextMessage()
             return

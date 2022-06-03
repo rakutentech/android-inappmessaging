@@ -6,10 +6,16 @@ import com.rakuten.tech.mobile.inappmessaging.runtime.data.responses.ping.*
 internal class ValidTestMessage(
     private val campaignId: String = DEFAULT_CAMPAIGN_ID,
     private val isTest: Boolean = IS_TEST,
-    private val isCampaignDismissable: Boolean = true
+    private val isCampaignDismissable: Boolean = true,
+    private val maxImpressions: Int = 1
 ) : Message {
-    internal var timesClosed = 0
-    private var max = 1
+    private var max = maxImpressions
+
+    override var impressionsLeft: Int? = null
+        get() = if (field == null) max else field
+
+    override var isOptedOut: Boolean? = null
+        get() = if (field == null) false else field
 
     override fun getType(): Int = InAppMessageType.MODAL.typeId
 
@@ -40,12 +46,6 @@ internal class ValidTestMessage(
     }
 
     override fun getContexts(): List<String> = listOf()
-
-    override fun getNumberOfTimesClosed() = timesClosed
-
-    override fun incrementTimesClosed() {
-        timesClosed++
-    }
 
     override fun infiniteImpressions() = false
 
