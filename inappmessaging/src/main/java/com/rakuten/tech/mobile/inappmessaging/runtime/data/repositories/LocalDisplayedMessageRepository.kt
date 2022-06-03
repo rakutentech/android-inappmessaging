@@ -111,7 +111,7 @@ internal interface LocalDisplayedMessageRepository {
          */
         override fun numberOfDisplaysAfterPing(message: Message): Int {
             synchronized(messages) {
-                val lastPingMillis = PingResponseMessageRepository.instance().lastPingMillis
+                val lastPingMillis = CampaignMessageRepository.instance().lastSyncMillis
                 val messageTimeStampList = messages[message.getCampaignId()]?.filter {
                     it >= lastPingMillis
                 } ?: mutableListOf()

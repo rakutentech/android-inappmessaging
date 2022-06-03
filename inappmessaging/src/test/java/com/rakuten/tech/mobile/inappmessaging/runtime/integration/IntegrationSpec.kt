@@ -11,7 +11,7 @@ import com.rakuten.tech.mobile.inappmessaging.runtime.InAppMessaging
 import com.rakuten.tech.mobile.inappmessaging.runtime.UserInfoProvider
 import com.rakuten.tech.mobile.inappmessaging.runtime.data.repositories.ConfigResponseRepository
 import com.rakuten.tech.mobile.inappmessaging.runtime.data.repositories.HostAppInfoRepository
-import com.rakuten.tech.mobile.inappmessaging.runtime.data.repositories.PingResponseMessageRepository
+import com.rakuten.tech.mobile.inappmessaging.runtime.data.repositories.CampaignMessageRepository
 import com.rakuten.tech.mobile.inappmessaging.runtime.utils.Initializer
 import com.rakuten.tech.mobile.inappmessaging.runtime.workmanager.schedulers.EventMessageReconciliationScheduler
 import com.rakuten.tech.mobile.inappmessaging.runtime.workmanager.schedulers.MessageMixerPingScheduler
@@ -78,8 +78,8 @@ class IntegrationSpec {
         if (result == ListenableWorker.Result.success()) {
             val pingWorker = MessageMixerWorker(context, workerParameters, mockEventScheduler, mockMessageScheduler)
             pingWorker.doWork() shouldBeEqualTo ListenableWorker.Result.success()
-            PingResponseMessageRepository.instance().lastPingMillis shouldBeGreaterThan 0
-            PingResponseMessageRepository.instance().getAllMessagesCopy().shouldBeEmpty()
+            CampaignMessageRepository.instance().lastSyncMillis shouldBeGreaterThan 0
+            CampaignMessageRepository.instance().getAllMessagesCopy().shouldBeEmpty()
         } else {
             result shouldBeEqualTo ListenableWorker.Result.retry()
         }

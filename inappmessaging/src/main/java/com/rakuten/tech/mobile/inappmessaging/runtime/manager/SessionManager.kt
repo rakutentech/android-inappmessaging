@@ -5,7 +5,7 @@ import com.rakuten.tech.mobile.inappmessaging.runtime.data.models.appevents.Even
 import com.rakuten.tech.mobile.inappmessaging.runtime.data.repositories.LocalDisplayedMessageRepository
 import com.rakuten.tech.mobile.inappmessaging.runtime.data.repositories.LocalEventRepository
 import com.rakuten.tech.mobile.inappmessaging.runtime.data.repositories.LocalOptedOutMessageRepository
-import com.rakuten.tech.mobile.inappmessaging.runtime.data.repositories.PingResponseMessageRepository
+import com.rakuten.tech.mobile.inappmessaging.runtime.data.repositories.CampaignMessageRepository
 import com.rakuten.tech.mobile.inappmessaging.runtime.data.repositories.ReadyForDisplayMessageRepository
 import com.rakuten.tech.mobile.inappmessaging.runtime.utils.RetryDelayUtil
 import com.rakuten.tech.mobile.inappmessaging.runtime.workmanager.schedulers.MessageMixerPingScheduler
@@ -22,7 +22,7 @@ internal object SessionManager {
     fun onSessionUpdate(event: Event? = null) {
         if (!InAppMessaging.instance().isLocalCachingEnabled()) {
             // clear locally stored campaigns from ping response
-            PingResponseMessageRepository.instance().clearMessages()
+            CampaignMessageRepository.instance().clearMessages()
 
             // clear locally stored campaigns which are ready for display
             ReadyForDisplayMessageRepository.instance().clearMessages()

@@ -12,7 +12,7 @@ import com.rakuten.tech.mobile.inappmessaging.runtime.data.repositories.HostAppI
 import com.rakuten.tech.mobile.inappmessaging.runtime.data.repositories.LocalDisplayedMessageRepository
 import com.rakuten.tech.mobile.inappmessaging.runtime.data.repositories.LocalOptedOutMessageRepository
 import com.rakuten.tech.mobile.inappmessaging.runtime.data.repositories.ReadyForDisplayMessageRepository
-import com.rakuten.tech.mobile.inappmessaging.runtime.data.repositories.PingResponseMessageRepository
+import com.rakuten.tech.mobile.inappmessaging.runtime.data.repositories.CampaignMessageRepository
 import com.rakuten.tech.mobile.inappmessaging.runtime.data.requests.DisplayPermissionRequest
 import com.rakuten.tech.mobile.inappmessaging.runtime.data.responses.displaypermission.DisplayPermissionResponse
 import com.rakuten.tech.mobile.inappmessaging.runtime.exception.InAppMessagingException
@@ -103,7 +103,7 @@ internal interface MessageReadinessManager {
                 appVersion = HostAppInfoRepository.instance().getVersion(),
                 sdkVersion = BuildConfig.VERSION_NAME,
                 locale = HostAppInfoRepository.instance().getDeviceLocale(),
-                lastPingInMillis = PingResponseMessageRepository.instance().lastPingMillis,
+                lastPingInMillis = CampaignMessageRepository.instance().lastSyncMillis,
                 userIdentifier = RuntimeUtil.getUserIdentifiers()
             )
         }

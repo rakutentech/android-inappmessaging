@@ -9,7 +9,7 @@ import androidx.work.WorkerParameters
 import androidx.work.testing.WorkManagerTestInitHelper
 import com.rakuten.tech.mobile.inappmessaging.runtime.BaseTest
 import com.rakuten.tech.mobile.inappmessaging.runtime.data.models.messages.ValidTestMessage
-import com.rakuten.tech.mobile.inappmessaging.runtime.data.repositories.PingResponseMessageRepository
+import com.rakuten.tech.mobile.inappmessaging.runtime.data.repositories.CampaignMessageRepository
 import com.rakuten.tech.mobile.inappmessaging.runtime.utils.MessageEventReconciliationUtil
 import org.amshove.kluent.shouldBeEqualTo
 import org.junit.Before
@@ -29,7 +29,7 @@ class MessageEventReconciliationWorkerSpec : BaseTest() {
 
     private val workerParameters = Mockito.mock(WorkerParameters::class.java)
     private var worker: MessageEventReconciliationWorker? = null
-    private val mockPingResponseRepo = Mockito.mock(PingResponseMessageRepository::class.java)
+    private val mockPingResponseRepo = Mockito.mock(CampaignMessageRepository::class.java)
 
     @Before
     override fun setup() {

@@ -26,7 +26,7 @@ import org.robolectric.RobolectricTestRunner
  */
 @RunWith(RobolectricTestRunner::class)
 @SuppressWarnings("LargeClass")
-class PingResponseMessageRepositorySpec : BaseTest() {
+class CampaignMessageRepositorySpec : BaseTest() {
     private val message0 = ValidTestMessage()
     private val message1 = ValidTestMessage("1234")
     private val messageList = ArrayList<Message>()
@@ -34,7 +34,7 @@ class PingResponseMessageRepositorySpec : BaseTest() {
     @Before
     override fun setup() {
         super.setup()
-        PingResponseMessageRepository.instance().clearMessages()
+        CampaignMessageRepository.instance().clearMessages()
         messageList.clear()
         messageList.add(message0)
         messageList.add(message1)
@@ -42,59 +42,59 @@ class PingResponseMessageRepositorySpec : BaseTest() {
 
     @Test
     fun `should add message list with valid list`() {
-        PingResponseMessageRepository.instance().replaceAllMessages(messageList)
-        PingResponseMessageRepository.instance().getAllMessagesCopy().shouldHaveSize(2)
-        PingResponseMessageRepository.instance().getAllMessagesCopy()[0] shouldBeEqualTo message0
-        PingResponseMessageRepository.instance().getAllMessagesCopy()[1] shouldBeEqualTo message1
+        CampaignMessageRepository.instance().syncWith(messageList)
+        CampaignMessageRepository.instance().getAllMessagesCopy().shouldHaveSize(2)
+        CampaignMessageRepository.instance().getAllMessagesCopy()[0] shouldBeEqualTo message0
+        CampaignMessageRepository.instance().getAllMessagesCopy()[1] shouldBeEqualTo message1
     }
 
     @Test
     fun `should not throw exception when list is empty`() {
-        PingResponseMessageRepository.instance().replaceAllMessages(ArrayList())
+        CampaignMessageRepository.instance().syncWith(ArrayList())
     }
 
     @Test
     fun `should ignore invalid message in the list`() {
-        PingResponseMessageRepository.instance().replaceAllMessages(
+        CampaignMessageRepository.instance().syncWith(
             listOf(InvalidTestMessage(), message0, ValidTestMessage(""))
         )
-        PingResponseMessageRepository.instance().getAllMessagesCopy().shouldHaveSize(1)
+        CampaignMessageRepository.instance().getAllMessagesCopy().shouldHaveSize(1)
     }
 
     @Test
     fun `should be empty after clearing`() {
-        PingResponseMessageRepository.instance().replaceAllMessages(messageList)
-        PingResponseMessageRepository.instance().getAllMessagesCopy().shouldHaveSize(2)
+        CampaignMessageRepository.instance().syncWith(messageList)
+        CampaignMessageRepository.instance().getAllMessagesCopy().shouldHaveSize(2)
 
-        PingResponseMessageRepository.instance().clearMessages()
-        PingResponseMessageRepository.instance().getAllMessagesCopy().shouldHaveSize(0)
+        CampaignMessageRepository.instance().clearMessages()
+        CampaignMessageRepository.instance().getAllMessagesCopy().shouldHaveSize(0)
     }
 
     @Test
     fun `should not crash while clearing messages`() {
         InAppMessaging.setNotConfiguredInstance(true)
-        PingResponseMessageRepository.instance().clearMessages()
-        PingResponseMessageRepository.instance().getAllMessagesCopy().shouldHaveSize(0)
+        CampaignMessageRepository.instance().clearMessages()
+        CampaignMessageRepository.instance().getAllMessagesCopy().shouldHaveSize(0)
     }
 
     @Test
     fun `should contain correct messages after clearing then adding`() {
-        PingResponseMessageRepository.instance().replaceAllMessages(messageList)
-        PingResponseMessageRepository.instance().getAllMessagesCopy().shouldHaveSize(2)
+        CampaignMessageRepository.instance().syncWith(messageList)
+        CampaignMessageRepository.instance().getAllMessagesCopy().shouldHaveSize(2)
 
-        PingResponseMessageRepository.instance().clearMessages()
-        PingResponseMessageRepository.instance().getAllMessagesCopy().shouldHaveSize(0)
+        CampaignMessageRepository.instance().clearMessages()
+        CampaignMessageRepository.instance().getAllMessagesCopy().shouldHaveSize(0)
 
-        PingResponseMessageRepository.instance().replaceAllMessages(messageList)
-        PingResponseMessageRepository.instance().getAllMessagesCopy().shouldHaveSize(2)
+        CampaignMessageRepository.instance().syncWith(messageList)
+        CampaignMessageRepository.instance().getAllMessagesCopy().shouldHaveSize(2)
     }
 
     @Test
     fun `should increment all matching from single item`() {
         initializeInstance(TestUserInfoProvider())
-        PingResponseMessageRepository.instance().replaceAllMessages(messageList)
-        PingResponseMessageRepository.instance().incrementTimesClosed(listOf(message0))
-        for (msg in PingResponseMessageRepository.instance().getAllMessagesCopy()) {
+        CampaignMessageRepository.instance().syncWith(messageList)
+        CampaignMessageRepository.instance().incrementTimesClosed(listOf(message0))
+        for (msg in CampaignMessageRepository.instance().getAllMessagesCopy()) {
             if (msg.getCampaignId() != message1.getCampaignId()) {
                 msg.getNumberOfTimesClosed() shouldBeEqualTo 1
             } else {
@@ -105,18 +105,18 @@ class PingResponseMessageRepositorySpec : BaseTest() {
 
     @Test
     fun `should increment all matching from multiple items`() {
-        PingResponseMessageRepository.instance().replaceAllMessages(messageList)
-        PingResponseMessageRepository.instance().incrementTimesClosed(messageList)
-        for (msg in PingResponseMessageRepository.instance().getAllMessagesCopy()) {
+        CampaignMessageRepository.instance().syncWith(messageList)
+        CampaignMessageRepository.instance().incrementTimesClosed(messageList)
+        for (msg in CampaignMessageRepository.instance().getAllMessagesCopy()) {
             msg.getNumberOfTimesClosed() shouldBeEqualTo 1
         }
     }
 
     @Test
     fun `should not increment if no matching`() {
-        PingResponseMessageRepository.instance().replaceAllMessages(messageList)
-        PingResponseMessageRepository.instance().incrementTimesClosed(listOf(ValidTestMessage("4321")))
-        for (msg in PingResponseMessageRepository.instance().getAllMessagesCopy()) {
+        CampaignMessageRepository.instance().syncWith(messageList)
+        CampaignMessageRepository.instance().incrementTimesClosed(listOf(ValidTestMessage("4321")))
+        for (msg in CampaignMessageRepository.instance().getAllMessagesCopy()) {
             msg.getNumberOfTimesClosed() shouldBeEqualTo 0
         }
     }
@@ -124,16 +124,16 @@ class PingResponseMessageRepositorySpec : BaseTest() {
     @Test
     fun `should save and restore values for different users`() {
         setupAndTestMultipleUser()
-        PingResponseMessageRepository.instance().getAllMessagesCopy().shouldHaveSize(2)
+        CampaignMessageRepository.instance().getAllMessagesCopy().shouldHaveSize(2)
     }
 
     @Test
     fun `should return false when not first launch`() {
         initializeInstance(TestUserInfoProvider(), false)
-        PingResponseMessageRepository.isInitialLaunch = false
-        PingResponseMessageRepository.instance().replaceAllMessages(messageList)
-        for (msg in PingResponseMessageRepository.instance().getAllMessagesCopy()) {
-            PingResponseMessageRepository.instance()
+        CampaignMessageRepository.isInitialLaunch = false
+        CampaignMessageRepository.instance().syncWith(messageList)
+        for (msg in CampaignMessageRepository.instance().getAllMessagesCopy()) {
+            CampaignMessageRepository.instance()
                 .shouldDisplayAppLaunchCampaign(msg.getCampaignId()).shouldBeFalse()
         }
     }
@@ -141,10 +141,10 @@ class PingResponseMessageRepositorySpec : BaseTest() {
     @Test
     fun `should return true when first launch`() {
         initializeInstance(TestUserInfoProvider(), false)
-        PingResponseMessageRepository.isInitialLaunch = true
-        PingResponseMessageRepository.instance().replaceAllMessages(messageList)
-        for (msg in PingResponseMessageRepository.instance().getAllMessagesCopy()) {
-            PingResponseMessageRepository.instance()
+        CampaignMessageRepository.isInitialLaunch = true
+        CampaignMessageRepository.instance().syncWith(messageList)
+        for (msg in CampaignMessageRepository.instance().getAllMessagesCopy()) {
+            CampaignMessageRepository.instance()
                 .shouldDisplayAppLaunchCampaign(msg.getCampaignId()).shouldBeTrue()
         }
     }
@@ -153,7 +153,7 @@ class PingResponseMessageRepositorySpec : BaseTest() {
     @SuppressWarnings("LongMethod")
     fun `should return true to app launch only and false to multiple triggers`() {
         initializeInstance(TestUserInfoProvider(), false)
-        PingResponseMessageRepository.isInitialLaunch = true
+        CampaignMessageRepository.isInitialLaunch = true
         val mockMessage = Mockito.mock(Message::class.java)
         `when`(mockMessage.getCampaignId()).thenReturn("54321")
         `when`(mockMessage.getTriggers()).thenReturn(
@@ -166,13 +166,13 @@ class PingResponseMessageRepositorySpec : BaseTest() {
             )
         )
         messageList.add(mockMessage)
-        PingResponseMessageRepository.instance().replaceAllMessages(messageList)
-        for (msg in PingResponseMessageRepository.instance().getAllMessagesCopy()) {
+        CampaignMessageRepository.instance().syncWith(messageList)
+        for (msg in CampaignMessageRepository.instance().getAllMessagesCopy()) {
             val id = msg.getCampaignId()
             if (id == "54321") {
-                PingResponseMessageRepository.instance().shouldDisplayAppLaunchCampaign(id).shouldBeFalse()
+                CampaignMessageRepository.instance().shouldDisplayAppLaunchCampaign(id).shouldBeFalse()
             } else {
-                PingResponseMessageRepository.instance().shouldDisplayAppLaunchCampaign(id).shouldBeTrue()
+                CampaignMessageRepository.instance().shouldDisplayAppLaunchCampaign(id).shouldBeTrue()
             }
         }
     }
@@ -182,16 +182,16 @@ class PingResponseMessageRepositorySpec : BaseTest() {
         val infoProvider = TestUserInfoProvider()
         initializeInstance(infoProvider)
 
-        PingResponseMessageRepository.instance().replaceAllMessages(messageList)
-        PingResponseMessageRepository.instance().getAllMessagesCopy().shouldHaveSize(2)
-        for (msg in PingResponseMessageRepository.instance().getAllMessagesCopy()) {
+        CampaignMessageRepository.instance().syncWith(messageList)
+        CampaignMessageRepository.instance().getAllMessagesCopy().shouldHaveSize(2)
+        for (msg in CampaignMessageRepository.instance().getAllMessagesCopy()) {
             msg.getMaxImpressions() shouldBeEqualTo 1
         }
 
         message0.setMaxImpression(3)
-        PingResponseMessageRepository.instance().replaceAllMessages(listOf(message0))
-        PingResponseMessageRepository.instance().getAllMessagesCopy().shouldHaveSize(1)
-        for (msg in PingResponseMessageRepository.instance().getAllMessagesCopy()) {
+        CampaignMessageRepository.instance().syncWith(listOf(message0))
+        CampaignMessageRepository.instance().getAllMessagesCopy().shouldHaveSize(1)
+        for (msg in CampaignMessageRepository.instance().getAllMessagesCopy()) {
             msg.getMaxImpressions() shouldBeEqualTo 3
         }
     }
@@ -203,29 +203,29 @@ class PingResponseMessageRepositorySpec : BaseTest() {
         PreferencesUtil.putInt(
             ApplicationProvider.getApplicationContext(),
             InAppMessaging.getPreferencesFile(),
-            PingResponseMessageRepository.PING_RESPONSE_KEY,
+            CampaignMessageRepository.PING_RESPONSE_KEY,
             1
         )
-        PingResponseMessageRepository.instance().getAllMessagesCopy().shouldBeEmpty()
+        CampaignMessageRepository.instance().getAllMessagesCopy().shouldBeEmpty()
     }
 
     @Test
     fun `should not crash and reset map`() {
         setupAndTestMultipleUser()
         InAppMessaging.setNotConfiguredInstance(true)
-        PingResponseMessageRepository.instance().getAllMessagesCopy().shouldBeEmpty()
+        CampaignMessageRepository.instance().getAllMessagesCopy().shouldBeEmpty()
     }
 
     private fun setupAndTestMultipleUser() {
         val infoProvider = TestUserInfoProvider()
         initializeInstance(infoProvider)
 
-        PingResponseMessageRepository.instance().replaceAllMessages(messageList)
-        PingResponseMessageRepository.instance().getAllMessagesCopy().shouldHaveSize(2)
+        CampaignMessageRepository.instance().syncWith(messageList)
+        CampaignMessageRepository.instance().getAllMessagesCopy().shouldHaveSize(2)
 
         infoProvider.userId = "user2"
         AccountRepository.instance().updateUserInfo()
-        PingResponseMessageRepository.instance().getAllMessagesCopy().shouldBeEmpty()
+        CampaignMessageRepository.instance().getAllMessagesCopy().shouldBeEmpty()
 
         // revert to initial user info
         infoProvider.userId = TestUserInfoProvider.TEST_USER_ID

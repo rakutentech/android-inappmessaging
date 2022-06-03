@@ -11,7 +11,7 @@ internal interface MessageRepository {
     /**
      * This method replaces a new list of messages into repository.
      */
-    fun replaceAllMessages(messageList: List<Message>)
+    fun syncWith(messageList: List<Message>, timestampMillis: Long)
 
     /**
      * This method returns a copy of all messages in the repository.

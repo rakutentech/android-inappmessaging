@@ -10,7 +10,7 @@ import com.rakuten.tech.mobile.inappmessaging.runtime.data.repositories.AccountR
 import com.rakuten.tech.mobile.inappmessaging.runtime.data.repositories.ConfigResponseRepository
 import com.rakuten.tech.mobile.inappmessaging.runtime.data.repositories.HostAppInfoRepository
 import com.rakuten.tech.mobile.inappmessaging.runtime.data.repositories.LocalEventRepository
-import com.rakuten.tech.mobile.inappmessaging.runtime.data.repositories.PingResponseMessageRepository
+import com.rakuten.tech.mobile.inappmessaging.runtime.data.repositories.CampaignMessageRepository
 import com.rakuten.tech.mobile.inappmessaging.runtime.data.requests.PingRequest
 import com.rakuten.tech.mobile.inappmessaging.runtime.data.responses.ping.MessageMixerResponse
 import com.rakuten.tech.mobile.inappmessaging.runtime.utils.RetryDelayUtil
@@ -97,14 +97,11 @@ internal class MessageMixerWorker(
             serverErrorCounter.set(0) // reset server error counter
             val messageMixerResponse = response.body()
             if (messageMixerResponse != null) {
-                // Add time data.
-                PingResponseMessageRepository.instance().lastPingMillis = messageMixerResponse.currentPingMillis
-
                 // Parse all data in response.
                 val parsedMessages = parsePingResponseWithTestMessage(messageMixerResponse)
 
                 // Add all parsed messages into PingResponseMessageRepository.
-                PingResponseMessageRepository.instance().replaceAllMessages(parsedMessages)
+                CampaignMessageRepository.instance().syncWith(parsedMessages, messageMixerResponse.currentPingMillis)
 
                 // Clear non-persistent local events triggered before current ping
                 LocalEventRepository.instance().clearNonPersistentEvents(messageMixerResponse.currentPingMillis)

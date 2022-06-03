@@ -168,7 +168,7 @@ class LocalDisplayedMessageRepositorySpec : BaseTest() {
     @Synchronized
     fun `should return valid timestamp list after last ping`() {
         val message = ValidTestMessage()
-        PingResponseMessageRepository.instance().lastPingMillis = Calendar.getInstance().timeInMillis
+        CampaignMessageRepository.instance().lastSyncMillis = Calendar.getInstance().timeInMillis
         LocalDisplayedMessageRepository.instance().addMessage(message)
         LocalDisplayedMessageRepository.instance().numberOfDisplaysAfterPing(message) shouldBeEqualTo 1
     }
@@ -178,7 +178,7 @@ class LocalDisplayedMessageRepositorySpec : BaseTest() {
     fun `should return empty timestamp list after last ping`() {
         val message = ValidTestMessage()
         LocalDisplayedMessageRepository.instance().addMessage(message)
-        PingResponseMessageRepository.instance().lastPingMillis = Calendar.getInstance().timeInMillis + 5
+        CampaignMessageRepository.instance().lastSyncMillis = Calendar.getInstance().timeInMillis + 5
         LocalDisplayedMessageRepository.instance().numberOfDisplaysAfterPing(message) shouldBeEqualTo 0
     }
 
@@ -188,7 +188,7 @@ class LocalDisplayedMessageRepositorySpec : BaseTest() {
         val message = ValidTestMessage()
         LocalDisplayedMessageRepository.instance().addMessage(message)
         Thread.sleep(1)
-        PingResponseMessageRepository.instance().lastPingMillis = Calendar.getInstance().timeInMillis
+        CampaignMessageRepository.instance().lastSyncMillis = Calendar.getInstance().timeInMillis
         LocalDisplayedMessageRepository.instance().addMessage(message)
         LocalDisplayedMessageRepository.instance().numberOfDisplaysAfterPing(message) shouldBeEqualTo 1
     }

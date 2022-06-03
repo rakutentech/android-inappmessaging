@@ -158,7 +158,7 @@ open class InAppMessagingSpec : BaseTest() {
         (InAppMessaging.instance() as InApp).removeMessage(false)
         Mockito.verify(parentViewGroup).removeView(viewGroup)
         ReadyForDisplayMessageRepository.instance().getAllMessagesCopy().shouldHaveSize(1)
-        for (msg in PingResponseMessageRepository.instance().getAllMessagesCopy()) {
+        for (msg in CampaignMessageRepository.instance().getAllMessagesCopy()) {
             if (msg.getCampaignId() == "1") {
                 msg.getNumberOfTimesClosed() shouldBeEqualTo 1
             } else {
@@ -178,7 +178,7 @@ open class InAppMessagingSpec : BaseTest() {
         (InAppMessaging.instance() as InApp).removeMessage(true)
         Mockito.verify(parentViewGroup).removeView(viewGroup)
         ReadyForDisplayMessageRepository.instance().getAllMessagesCopy().shouldBeEmpty()
-        for (msg in PingResponseMessageRepository.instance().getAllMessagesCopy()) {
+        for (msg in CampaignMessageRepository.instance().getAllMessagesCopy()) {
             msg.getNumberOfTimesClosed() shouldBeEqualTo 1
         }
         LocalDisplayedMessageRepository.instance().numberOfTimesDisplayed(message) shouldBeEqualTo 0
@@ -194,7 +194,7 @@ open class InAppMessagingSpec : BaseTest() {
 
         (instance as InApp).removeMessage(false)
         ReadyForDisplayMessageRepository.instance().getAllMessagesCopy().shouldHaveSize(1)
-        for (msg in PingResponseMessageRepository.instance().getAllMessagesCopy()) {
+        for (msg in CampaignMessageRepository.instance().getAllMessagesCopy()) {
             if (msg.getCampaignId() == "1") {
                 msg.getNumberOfTimesClosed() shouldBeEqualTo 1
             } else {
@@ -209,13 +209,13 @@ open class InAppMessagingSpec : BaseTest() {
     fun `should not increment when no message is displayed`() {
         val message = ValidTestMessage("1")
         ReadyForDisplayMessageRepository.instance().replaceAllMessages(listOf(message))
-        PingResponseMessageRepository.instance().replaceAllMessages(listOf(message))
+        CampaignMessageRepository.instance().syncWith(listOf(message))
         initializeInstance()
 
         InAppMessaging.instance().registerMessageDisplayActivity(activity)
         (InAppMessaging.instance() as InApp).removeMessage(false)
         ReadyForDisplayMessageRepository.instance().getAllMessagesCopy().shouldHaveSize(1)
-        for (msg in PingResponseMessageRepository.instance().getAllMessagesCopy()) {
+        for (msg in CampaignMessageRepository.instance().getAllMessagesCopy()) {
             msg.getNumberOfTimesClosed() shouldBeEqualTo 0
         }
         LocalDisplayedMessageRepository.instance().numberOfTimesDisplayed(message) shouldBeEqualTo 0
@@ -225,13 +225,13 @@ open class InAppMessagingSpec : BaseTest() {
     fun `should clear and increment when no message is displayed but flag true`() {
         val message = ValidTestMessage("1")
         ReadyForDisplayMessageRepository.instance().replaceAllMessages(listOf(message))
-        PingResponseMessageRepository.instance().replaceAllMessages(listOf(message))
+        CampaignMessageRepository.instance().syncWith(listOf(message))
         initializeInstance()
 
         InAppMessaging.instance().registerMessageDisplayActivity(activity)
         (InAppMessaging.instance() as InApp).removeMessage(true)
         ReadyForDisplayMessageRepository.instance().getAllMessagesCopy().shouldBeEmpty()
-        for (msg in PingResponseMessageRepository.instance().getAllMessagesCopy()) {
+        for (msg in CampaignMessageRepository.instance().getAllMessagesCopy()) {
             msg.getNumberOfTimesClosed() shouldBeEqualTo 1
         }
         LocalDisplayedMessageRepository.instance().numberOfTimesDisplayed(message) shouldBeEqualTo 0
@@ -358,7 +358,7 @@ open class InAppMessagingSpec : BaseTest() {
     private fun setupDisplayedView(message: Message) {
         val message2 = ValidTestMessage()
         ReadyForDisplayMessageRepository.instance().replaceAllMessages(listOf(message, message2))
-        PingResponseMessageRepository.instance().replaceAllMessages(listOf(message, message2))
+        CampaignMessageRepository.instance().syncWith(listOf(message, message2))
         LocalDisplayedMessageRepository.instance().clearMessages()
         `when`(activity.findViewById<ViewGroup>(R.id.in_app_message_base_view)).thenReturn(viewGroup)
         `when`(viewGroup.parent).thenReturn(parentViewGroup)

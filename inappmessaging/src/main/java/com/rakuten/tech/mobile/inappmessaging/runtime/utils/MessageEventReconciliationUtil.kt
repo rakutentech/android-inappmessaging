@@ -8,7 +8,7 @@ import com.rakuten.tech.mobile.inappmessaging.runtime.data.models.appevents.Even
 import com.rakuten.tech.mobile.inappmessaging.runtime.data.models.messages.Message
 import com.rakuten.tech.mobile.inappmessaging.runtime.data.repositories.LocalDisplayedMessageRepository
 import com.rakuten.tech.mobile.inappmessaging.runtime.data.repositories.LocalEventRepository
-import com.rakuten.tech.mobile.inappmessaging.runtime.data.repositories.PingResponseMessageRepository
+import com.rakuten.tech.mobile.inappmessaging.runtime.data.repositories.CampaignMessageRepository
 import com.rakuten.tech.mobile.inappmessaging.runtime.data.responses.ping.Trigger
 import com.rakuten.tech.mobile.inappmessaging.runtime.data.responses.ping.TriggerAttribute
 import com.rakuten.tech.mobile.sdkutils.logger.Logger
@@ -135,7 +135,7 @@ internal interface MessageEventReconciliationUtil {
                     // Add this event to eventsToBeRemoved list because it can't be used again
                     // to satisfy any more triggers.
                     if (event.isPersistentType() && (
-                        size > 1 || PingResponseMessageRepository
+                        size > 1 || CampaignMessageRepository
                             .instance().shouldDisplayAppLaunchCampaign(id)
                         )
                     ) {

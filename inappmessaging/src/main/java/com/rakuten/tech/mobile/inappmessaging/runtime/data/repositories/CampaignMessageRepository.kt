@@ -14,12 +14,12 @@ import java.lang.ClassCastException
  * Contains all downloaded messages from Ping Message Mixer. Also exposed internal api which can get
  * these messages.
  */
-internal abstract class PingResponseMessageRepository : MessageRepository {
+internal abstract class CampaignMessageRepository : MessageRepository {
     // Server returned UTC time in last `/Ping` request response.
-    var lastPingMillis: Long = 0
+    var lastSyncMillis: Long = 0
 
     companion object {
-        private var instance: PingResponseMessageRepository = PingResponseMessageRepositoryImpl()
+        private var instance: CampaignMessageRepository = CampaignMessageRepositoryImpl()
 
         @VisibleForTesting
         internal const val PING_RESPONSE_KEY = "ping_response_list"
@@ -27,10 +27,10 @@ internal abstract class PingResponseMessageRepository : MessageRepository {
 
         internal var isInitialLaunch = false
 
-        fun instance(): PingResponseMessageRepository = instance
+        fun instance(): CampaignMessageRepository = instance
     }
 
-    private class PingResponseMessageRepositoryImpl : PingResponseMessageRepository() {
+    private class CampaignMessageRepositoryImpl : CampaignMessageRepository() {
         // LinkedHashMap can preserve the message insertion order.
         // Map - Key: Campaign ID, Value: Message object
         private val messages = LinkedHashMap<String, Message>()
@@ -38,15 +38,17 @@ internal abstract class PingResponseMessageRepository : MessageRepository {
         private var user = ""
 
         init {
-            checkAndResetMap(true)
+            loadCachedData(true)
         }
 
         /**
          * Replacing all new messages to the [messageList].
          * If messageList empty, IllegalArgumentException will be thrown.
          */
-        override fun replaceAllMessages(messageList: List<Message>) {
-            checkAndResetMap()
+        override fun syncWith(messageList: List<Message>, timestampMillis: Long) {
+            lastSyncMillis = timestampMillis
+
+            loadCachedData()
 
             messages.clear()
             appLaunchList.clear()
@@ -60,27 +62,28 @@ internal abstract class PingResponseMessageRepository : MessageRepository {
                 }
             }
             isInitialLaunch = false
-            saveUpdatedMap()
+            saveDataToCache()
         }
 
         /**
          * This method returns a copy of all messages are in the current repository.
          */
         override fun getAllMessagesCopy(): List<Message> {
-            checkAndResetMap()
+            loadCachedData()
             return ArrayList(messages.values)
         }
 
         override fun clearMessages() {
             messages.clear()
-            saveUpdatedMap()
+            saveDataToCache()
         }
 
+        // TODO: Should remove
         override fun incrementTimesClosed(messageList: List<Message>) {
-            checkAndResetMap()
+            loadCachedData()
             messages.filter { m -> messageList.any { it.getCampaignId() == m.key } }
                 .forEach { it.value.incrementTimesClosed() }
-            saveUpdatedMap()
+            saveDataToCache()
         }
 
         override fun shouldDisplayAppLaunchCampaign(id: String): Boolean {
@@ -89,8 +92,32 @@ internal abstract class PingResponseMessageRepository : MessageRepository {
             return result ?: false
         }
 
+        /**
+         * Opts out the campaign and updates the repository.
+         * TODO
+         */
+        fun optOutCampaign(campaign: Message): Message? {
+            return null
+        }
+
+        /**
+         * Decrements number of impressionsLeft for provided campaign id in the repository.
+         * TODO
+         */
+        fun decrementImpressionsLeftInCampaign(id: String): Message? {
+            return null
+        }
+
+        /**
+         * Increments number of impressionsLeft for provided campaign id in the repository.
+         * TODO
+         */
+        fun incrementImpressionsLeftInCampaign(id: String): Message? {
+            return null
+        }
+
         @SuppressWarnings("LongMethod", "TooGenericExceptionCaught")
-        private fun checkAndResetMap(onLaunch: Boolean = false) {
+        private fun loadCachedData(onLaunch: Boolean = false) {
             // check if caching is enabled and if there are changes in user info
             if (InAppMessaging.instance().isLocalCachingEnabled() &&
                 (onLaunch || user != AccountRepository.instance().userInfoHash)
@@ -127,7 +154,7 @@ internal abstract class PingResponseMessageRepository : MessageRepository {
             }
         }
 
-        private fun saveUpdatedMap() {
+        private fun saveDataToCache() {
             // check if caching is enabled to update persistent data
             if (InAppMessaging.instance().isLocalCachingEnabled()) {
                 // save updated message list

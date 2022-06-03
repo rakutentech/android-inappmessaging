@@ -10,7 +10,7 @@ import com.rakuten.tech.mobile.inappmessaging.runtime.data.models.appevents.*
 import com.rakuten.tech.mobile.inappmessaging.runtime.data.models.messages.Message
 import com.rakuten.tech.mobile.inappmessaging.runtime.data.repositories.LocalDisplayedMessageRepository
 import com.rakuten.tech.mobile.inappmessaging.runtime.data.repositories.LocalEventRepository
-import com.rakuten.tech.mobile.inappmessaging.runtime.data.repositories.PingResponseMessageRepository
+import com.rakuten.tech.mobile.inappmessaging.runtime.data.repositories.CampaignMessageRepository
 import com.rakuten.tech.mobile.inappmessaging.runtime.data.responses.ping.MessagePayload
 import com.rakuten.tech.mobile.inappmessaging.runtime.data.responses.ping.Trigger
 import com.rakuten.tech.mobile.inappmessaging.runtime.data.responses.ping.DisplaySettings
@@ -283,7 +283,7 @@ class MessageEventReconciliationUtilReconcileSpec : MessageEventReconciliationUt
 
     @Test
     fun `should be called once`() {
-        val mockPingRepo = Mockito.mock(PingResponseMessageRepository::class.java)
+        val mockPingRepo = Mockito.mock(CampaignMessageRepository::class.java)
         val mockReconUtil = Mockito.mock(MessageEventReconciliationUtil::class.java)
         val messageList = ArrayList<Message>()
         messageList.add(message1)

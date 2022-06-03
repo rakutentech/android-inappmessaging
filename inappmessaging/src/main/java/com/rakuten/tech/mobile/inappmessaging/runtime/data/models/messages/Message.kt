@@ -46,12 +46,14 @@ internal interface Message {
 
     fun getContexts(): List<String>
 
+    // TODO: Should remove
     /**
      * Returns the number of times this message has been queued (ready for display) but was removed
      * when closeMessage API was called.
      */
     fun getNumberOfTimesClosed(): Int
 
+    // TODO: Should remove
     /**
      * Increments the number of times this message has been queued (ready for display) but
      * was removed when closeMessage API was called.

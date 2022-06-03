@@ -10,7 +10,7 @@ import com.rakuten.tech.mobile.inappmessaging.runtime.data.models.appevents.Even
 import com.rakuten.tech.mobile.inappmessaging.runtime.data.repositories.AccountRepository
 import com.rakuten.tech.mobile.inappmessaging.runtime.data.repositories.ConfigResponseRepository
 import com.rakuten.tech.mobile.inappmessaging.runtime.data.repositories.LocalEventRepository
-import com.rakuten.tech.mobile.inappmessaging.runtime.data.repositories.PingResponseMessageRepository
+import com.rakuten.tech.mobile.inappmessaging.runtime.data.repositories.CampaignMessageRepository
 import com.rakuten.tech.mobile.inappmessaging.runtime.data.repositories.ReadyForDisplayMessageRepository
 import com.rakuten.tech.mobile.inappmessaging.runtime.exception.InAppMessagingException
 import com.rakuten.tech.mobile.inappmessaging.runtime.manager.DisplayManager
@@ -137,7 +137,7 @@ internal class InApp(
             AccountRepository.instance().updateUserInfo()
             synchronized(tempEventList) {
                 tempEventList.forEach { ev ->
-                    ev.setShouldNotClear(PingResponseMessageRepository.isInitialLaunch)
+                    ev.setShouldNotClear(CampaignMessageRepository.isInitialLaunch)
                     LocalEventRepository.instance().addEvent(ev)
                 }
                 tempEventList.clear()

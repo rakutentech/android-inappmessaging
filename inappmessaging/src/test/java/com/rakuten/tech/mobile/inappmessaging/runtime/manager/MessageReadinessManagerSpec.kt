@@ -60,7 +60,7 @@ open class MessageReadinessManagerSpec : BaseTest() {
             )
         )
         ConfigResponseRepository.instance().addConfigResponse(configResponseData)
-        PingResponseMessageRepository.instance().lastPingMillis = LAST_PING_MILLIS
+        CampaignMessageRepository.instance().lastSyncMillis = LAST_PING_MILLIS
         `when`(configResponseData.endpoints).thenReturn(configResponseEndpoints)
         `when`(configResponseEndpoints.displayPermission).thenReturn(DISPLAY_PERMISSION_URL)
         `when`(testMessage.isTest()).thenReturn(true)

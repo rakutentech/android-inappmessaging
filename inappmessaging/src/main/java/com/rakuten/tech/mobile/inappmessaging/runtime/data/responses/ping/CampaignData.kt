@@ -56,6 +56,7 @@ internal data class CampaignData(
     override fun getNumberOfTimesClosed() = synchronized(timesClosed) {
         timesClosed
     }
+
     override fun incrementTimesClosed() {
         synchronized(timesClosed) {
             timesClosed++
@@ -67,4 +68,10 @@ internal data class CampaignData(
     override fun hasNoEndDate() = hasNoEndDate
 
     override fun isCampaignDismissable() = isCampaignDismissable
+
+    var impressionsLeft = getMaxImpressions()
+        private set
+
+    var isOptedOut = false
+        private set
 }

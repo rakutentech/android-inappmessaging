@@ -30,12 +30,12 @@ class ReadyForDisplayMessageRepositorySpec : BaseTest() {
     override fun setup() {
         super.setup()
         ReadyForDisplayMessageRepository.instance().clearMessages()
-        PingResponseMessageRepository.instance().clearMessages()
+        CampaignMessageRepository.instance().clearMessages()
         message0.timesClosed = 0
         message1.timesClosed = 0
         messageList.add(message0)
         messageList.add(message1)
-        PingResponseMessageRepository.instance().replaceAllMessages(messageList)
+        CampaignMessageRepository.instance().syncWith(messageList)
     }
 
     @Test
@@ -71,7 +71,7 @@ class ReadyForDisplayMessageRepositorySpec : BaseTest() {
         ReadyForDisplayMessageRepository.instance().replaceAllMessages(messageList)
         ReadyForDisplayMessageRepository.instance().removeMessage(message0.getCampaignId(), true)
         ReadyForDisplayMessageRepository.instance().getAllMessagesCopy().shouldHaveSize(1)
-        for (msg in PingResponseMessageRepository.instance().getAllMessagesCopy()) {
+        for (msg in CampaignMessageRepository.instance().getAllMessagesCopy()) {
             if (msg.getCampaignId() == message0.getCampaignId()) {
                 msg.getNumberOfTimesClosed() shouldBeEqualTo 1
             } else {
@@ -85,7 +85,7 @@ class ReadyForDisplayMessageRepositorySpec : BaseTest() {
         ReadyForDisplayMessageRepository.instance().replaceAllMessages(messageList)
         ReadyForDisplayMessageRepository.instance().removeMessage(message0.getCampaignId(), false)
         ReadyForDisplayMessageRepository.instance().getAllMessagesCopy().shouldHaveSize(1)
-        for (msg in PingResponseMessageRepository.instance().getAllMessagesCopy()) {
+        for (msg in CampaignMessageRepository.instance().getAllMessagesCopy()) {
             msg.getNumberOfTimesClosed() shouldBeEqualTo 0
         }
     }
@@ -95,7 +95,7 @@ class ReadyForDisplayMessageRepositorySpec : BaseTest() {
         ReadyForDisplayMessageRepository.instance().replaceAllMessages(messageList)
         ReadyForDisplayMessageRepository.instance().removeMessage("4321", false)
         ReadyForDisplayMessageRepository.instance().getAllMessagesCopy().shouldHaveSize(2)
-        for (msg in PingResponseMessageRepository.instance().getAllMessagesCopy()) {
+        for (msg in CampaignMessageRepository.instance().getAllMessagesCopy()) {
             msg.getNumberOfTimesClosed() shouldBeEqualTo 0
         }
     }
@@ -105,7 +105,7 @@ class ReadyForDisplayMessageRepositorySpec : BaseTest() {
         ReadyForDisplayMessageRepository.instance().replaceAllMessages(messageList)
         ReadyForDisplayMessageRepository.instance().removeMessage("4321", true)
         ReadyForDisplayMessageRepository.instance().getAllMessagesCopy().shouldHaveSize(2)
-        for (msg in PingResponseMessageRepository.instance().getAllMessagesCopy()) {
+        for (msg in CampaignMessageRepository.instance().getAllMessagesCopy()) {
             msg.getNumberOfTimesClosed() shouldBeEqualTo 0
         }
     }
@@ -115,7 +115,7 @@ class ReadyForDisplayMessageRepositorySpec : BaseTest() {
         ReadyForDisplayMessageRepository.instance().replaceAllMessages(messageList)
         ReadyForDisplayMessageRepository.instance().clearMessages(true)
         ReadyForDisplayMessageRepository.instance().getAllMessagesCopy().shouldBeEmpty()
-        for (msg in PingResponseMessageRepository.instance().getAllMessagesCopy()) {
+        for (msg in CampaignMessageRepository.instance().getAllMessagesCopy()) {
             msg.getNumberOfTimesClosed() shouldBeEqualTo 1
         }
     }
@@ -125,7 +125,7 @@ class ReadyForDisplayMessageRepositorySpec : BaseTest() {
         ReadyForDisplayMessageRepository.instance().replaceAllMessages(messageList)
         ReadyForDisplayMessageRepository.instance().clearMessages(false)
         ReadyForDisplayMessageRepository.instance().getAllMessagesCopy().shouldBeEmpty()
-        for (msg in PingResponseMessageRepository.instance().getAllMessagesCopy()) {
+        for (msg in CampaignMessageRepository.instance().getAllMessagesCopy()) {
             msg.getNumberOfTimesClosed() shouldBeEqualTo 0
         }
     }

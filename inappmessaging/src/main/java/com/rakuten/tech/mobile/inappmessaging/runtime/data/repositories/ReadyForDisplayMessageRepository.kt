@@ -63,7 +63,7 @@ internal abstract class ReadyForDisplayMessageRepository : ReadyMessageRepositor
                     if (message.getCampaignId() == campaignId) {
                         // messages contain unique message (no two message have the same campaign id)
                         if (shouldIncrementTimesClosed) {
-                            PingResponseMessageRepository.instance().incrementTimesClosed(listOf(message))
+                            CampaignMessageRepository.instance().incrementTimesClosed(listOf(message))
                         }
                         true
                     } else {
@@ -77,7 +77,7 @@ internal abstract class ReadyForDisplayMessageRepository : ReadyMessageRepositor
         override fun clearMessages(shouldIncrementTimesClosed: Boolean) {
             synchronized(messages) {
                 if (shouldIncrementTimesClosed) {
-                    PingResponseMessageRepository.instance().incrementTimesClosed(messages)
+                    CampaignMessageRepository.instance().incrementTimesClosed(messages)
                 }
                 messages.clear()
                 ImpressionManager.impressionMap.clear() // clear impression map when ready messages are cleared

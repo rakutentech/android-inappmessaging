@@ -49,7 +49,7 @@ class EventsManagerSpec : BaseTest() {
         LocalEventRepository.instance().clearEvents()
         ReadyForDisplayMessageRepository.instance().clearMessages()
         LocalOptedOutMessageRepository.instance().clearMessages()
-        PingResponseMessageRepository.instance().clearMessages()
+        CampaignMessageRepository.instance().clearMessages()
     }
 
     @Test
@@ -135,14 +135,14 @@ class EventsManagerSpec : BaseTest() {
         // Add messages
         val messageList = ArrayList<Message>()
         messageList.add(message)
-        PingResponseMessageRepository.instance().replaceAllMessages(messageList)
+        CampaignMessageRepository.instance().syncWith(messageList)
         ReadyForDisplayMessageRepository.instance().replaceAllMessages(messageList)
         LocalDisplayedMessageRepository.instance().addMessage(message)
         LocalOptedOutMessageRepository.instance().addMessage(message)
     }
 
     private fun verifyTestData(expected: Int) {
-        PingResponseMessageRepository.instance().getAllMessagesCopy().shouldHaveSize(expected)
+        CampaignMessageRepository.instance().getAllMessagesCopy().shouldHaveSize(expected)
         ReadyForDisplayMessageRepository.instance().getAllMessagesCopy()shouldHaveSize(expected)
         LocalDisplayedMessageRepository.instance().numberOfTimesDisplayed(message) shouldBeEqualTo expected
         if (expected > 0) {

@@ -116,14 +116,14 @@ class SessionManagerSpec : BaseTest() {
         // Add messages
         val messageList = ArrayList<Message>()
         messageList.add(message)
-        PingResponseMessageRepository.instance().replaceAllMessages(messageList)
+        CampaignMessageRepository.instance().syncWith(messageList)
         ReadyForDisplayMessageRepository.instance().replaceAllMessages(messageList)
         LocalDisplayedMessageRepository.instance().addMessage(message)
         LocalOptedOutMessageRepository.instance().addMessage(message)
     }
 
     private fun verifyTestData(expected: Int) {
-        PingResponseMessageRepository.instance().getAllMessagesCopy().shouldHaveSize(0)
+        CampaignMessageRepository.instance().getAllMessagesCopy().shouldHaveSize(0)
         ReadyForDisplayMessageRepository.instance().getAllMessagesCopy()shouldHaveSize(0)
         LocalDisplayedMessageRepository.instance().numberOfTimesDisplayed(message) shouldBeEqualTo 0
         LocalOptedOutMessageRepository.instance().hasMessage(message.getCampaignId()).shouldBeFalse()
