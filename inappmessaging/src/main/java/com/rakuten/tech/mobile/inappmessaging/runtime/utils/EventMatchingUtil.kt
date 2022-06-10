@@ -16,7 +16,7 @@ internal interface EventMatchingUtilType {
      * Event won't be stored if it is not categorized as persistent event
      * or there are no campaigns with matching triggers.
      */
-    fun matchAndStore(event: Event): Boolean
+    fun matchAndStore(event: Event)
 
     fun matchedEvents(campaign: Message): List<Event>
 
@@ -53,21 +53,22 @@ internal abstract class EventMatchingUtil : EventMatchingUtilType {
     }
 
     internal class EventMatchingUtilImpl(private val campaignRepo: CampaignRepository) : EventMatchingUtil() {
-        private var persistentEvents = mutableSetOf<Event>()
-        private var matchedEvents = mutableMapOf<String, MutableList<Event>>()
-        private var triggeredPersistentEventOnlyCampaigns = mutableSetOf<String>()
+        private val persistentEvents = mutableSetOf<Event>()
+        private val matchedEvents = mutableMapOf<String, MutableList<Event>>()
+        private val triggeredPersistentEventOnlyCampaigns = mutableSetOf<String>()
 
         @SuppressWarnings("LabeledExpression", "LongMethod")
-        override fun matchAndStore(event: Event): Boolean {
+        override fun matchAndStore(event: Event) {
             if (event.getEventName().isEmpty()) {
                 InAppMessaging.errorCallback?.let {
                     it(InAppMessagingException("In-App Messaging adding event failed due to invalid event name"))
                 }
-                return false
+                return
             }
 
             if (event.isPersistentType()) {
                 persistentEvents.add(event)
+                return
             }
 
             campaignRepo.messages.forEach { campaign ->
@@ -87,7 +88,6 @@ internal abstract class EventMatchingUtil : EventMatchingUtilType {
                         matchedEvents(campaign).map { it.getEventName() }
                 )
             }
-            return true
         }
 
         override fun matchedEvents(campaign: Message) =
@@ -112,8 +112,8 @@ internal abstract class EventMatchingUtil : EventMatchingUtilType {
                 return false
             }
 
-            val persistentEventsOnlyCampaign = campaignEvents.isEmpty()
-            if (persistentEventsOnlyCampaign &&
+            val isCampaignPersistentEventsOnly = campaignEvents.isEmpty()
+            if (isCampaignPersistentEventsOnly &&
                 triggeredPersistentEventOnlyCampaigns.contains(campaign.getCampaignId())
             ) {
                 Logger(TAG).debug("Provided set of events already used")
@@ -132,7 +132,7 @@ internal abstract class EventMatchingUtil : EventMatchingUtilType {
                 campaignEvents.removeAt(index)
             }
 
-            if (persistentEventsOnlyCampaign) {
+            if (isCampaignPersistentEventsOnly) {
                 triggeredPersistentEventOnlyCampaigns.add(campaign.getCampaignId())
             } else {
                 matchedEvents[campaign.getCampaignId()] = campaignEvents
@@ -151,9 +151,9 @@ internal abstract class EventMatchingUtil : EventMatchingUtilType {
         }
 
         private fun isEventMatchingOneOfTriggers(event: Event, triggers: List<Trigger>) =
-            triggers.firstOrNull { event.getEventName() == it.matchingEventName } != null
+            triggers.any { event.getEventName() == it.matchingEventName }
 
         private fun isTriggerMatchingOneOfEvents(trigger: Trigger, events: List<Event>) =
-            events.firstOrNull { it.getEventName() == trigger.matchingEventName } != null
+            events.any { it.getEventName() == trigger.matchingEventName }
     }
 }

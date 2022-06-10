@@ -81,7 +81,7 @@ internal abstract class CampaignRepository : CampaignRepositoryType {
             val oldList = messages
 
             messagesHashMap.clear()
-            val retainImpressionsLeftValue = true
+            val shouldRetainImpressionsValue = true
             for (newCampaign in messageList) {
                 if (newCampaign.getCampaignId().isEmpty()) {
                     continue
@@ -90,12 +90,15 @@ internal abstract class CampaignRepository : CampaignRepositoryType {
                 var updatedCampaign = newCampaign
                 val oldCampaign = oldList.firstOrNull { it.getCampaignId() == newCampaign.getCampaignId() }
                 if (oldCampaign != null) {
-                    updatedCampaign = Message.updatedMessage(updatedCampaign, asOptedOut = oldCampaign.isOptedOut!!)
+                    updatedCampaign = Message.updatedMessage(
+                        updatedCampaign,
+                        asOptedOut = oldCampaign.isOptedOut ?: false
+                    )
 
-                    if (retainImpressionsLeftValue) {
-                        var newImpressionsLeft = oldCampaign.impressionsLeft!!
-                        val wasMaxImpressionsEdited = oldCampaign.getMaxImpressions() != newCampaign.getMaxImpressions()
-                        if (wasMaxImpressionsEdited) {
+                    if (shouldRetainImpressionsValue) {
+                        var newImpressionsLeft = oldCampaign.impressionsLeft ?: oldCampaign.getMaxImpressions()
+                        val isMaxImpressionsEdited = oldCampaign.getMaxImpressions() != newCampaign.getMaxImpressions()
+                        if (isMaxImpressionsEdited) {
                             newImpressionsLeft += newCampaign.getMaxImpressions() - oldCampaign.getMaxImpressions()
                         }
                         updatedCampaign = Message.updatedMessage(updatedCampaign, impressionsLeft = newImpressionsLeft)
@@ -134,12 +137,18 @@ internal abstract class CampaignRepository : CampaignRepositoryType {
 
         override fun decrementImpressions(id: String): Message? {
             val campaign = findCampaign(id) ?: return null
-            return updateImpressions(campaign, max(0, campaign.impressionsLeft!! - 1))
+            return updateImpressions(
+                campaign,
+                max(0, (campaign.impressionsLeft ?: campaign.getMaxImpressions()) - 1)
+            )
         }
 
         override fun incrementImpressions(id: String): Message? {
             val campaign = findCampaign(id) ?: return null
-            return updateImpressions(campaign, campaign.impressionsLeft!! + 1)
+            return updateImpressions(
+                campaign,
+                (campaign.impressionsLeft ?: campaign.getMaxImpressions()) + 1
+            )
         }
 
         @SuppressWarnings("LongMethod", "TooGenericExceptionCaught")

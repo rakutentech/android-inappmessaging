@@ -71,7 +71,7 @@ internal interface MessageReadinessManager {
 
     @SuppressWarnings("TooManyFunctions")
     private class MessageReadinessManagerImpl(private val campaignRepo: CampaignRepository) : MessageReadinessManager {
-        private var queuedMessages = mutableListOf<String>()
+        private val queuedMessages = mutableListOf<String>()
 
         override fun addMessageToQueue(id: String) {
             synchronized(queuedMessages) {
@@ -160,9 +160,11 @@ internal interface MessageReadinessManager {
          * This method checks if the message has infinite impressions, or has been displayed less
          * than its max impressions, or has been opted out.
          */
-        private fun shouldDisplayMessage(message: Message): Boolean =
-            (message.infiniteImpressions() || message.impressionsLeft!! > 0) &&
-                !message.isOptedOut!!
+        private fun shouldDisplayMessage(message: Message): Boolean {
+            val impressions = message.impressionsLeft ?: message.getMaxImpressions()
+            val isOptOut = message.isOptedOut ?: false
+            return (message.infiniteImpressions() || impressions > 0) && !isOptOut
+        }
 
         /**
          * This methods checks if According to the message display permission response parameter,

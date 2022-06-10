@@ -44,7 +44,6 @@ open class InAppMessagingSpec : BaseTest() {
     private val configResponseData = Mockito.mock(ConfigResponseData::class.java)
     private val displayManager = Mockito.mock(DisplayManager::class.java)
     internal val eventsManager = Mockito.mock(EventsManager::class.java)
-    internal val sessionManager = Mockito.mock(SessionManager::class.java)
     private val viewGroup = Mockito.mock(ViewGroup::class.java)
     private val parentViewGroup = Mockito.mock(ViewGroup::class.java)
     private val mockContext = Mockito.mock(Context::class.java)
@@ -337,7 +336,7 @@ open class InAppMessagingSpec : BaseTest() {
 
         return InApp(
             ApplicationProvider.getApplicationContext(), false, manager,
-            eventsManager = eventsManager, sessionManager = sessionManager
+            eventsManager = eventsManager
         )
     }
 
@@ -359,7 +358,6 @@ class InAppMessagingExceptionSpec : InAppMessagingSpec() {
         `when`(dispMgr.displayMessage()).thenThrow(NullPointerException())
         `when`(dispMgr.removeMessage(anyOrNull())).thenThrow(NullPointerException())
         `when`(eventsManager.onEventReceived(any(), any(), any(), any())).thenThrow(NullPointerException())
-        `when`(sessionManager.onSessionUpdate()).thenThrow(NullPointerException())
     }
 
     @After

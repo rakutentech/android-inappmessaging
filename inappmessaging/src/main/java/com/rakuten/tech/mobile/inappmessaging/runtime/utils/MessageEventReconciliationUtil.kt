@@ -49,10 +49,10 @@ internal abstract class MessageEventReconciliationUtil : MessageEventReconciliat
 
                 // Test campaigns always valid
                 if (campaign.isTest()) {
-                    validatedCampaignHandler(campaign, setOf())
+                    validatedCampaignHandler(campaign, emptySet())
                 }
 
-                if (campaign.isOptedOut!!) {
+                if (campaign.isOptedOut == true) {
                     continue
                 }
 
