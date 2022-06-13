@@ -20,19 +20,16 @@ import com.rakuten.tech.mobile.inappmessaging.runtime.data.responses.config.Conf
 import com.rakuten.tech.mobile.inappmessaging.runtime.exception.InAppMessagingException
 import com.rakuten.tech.mobile.inappmessaging.runtime.manager.DisplayManager
 import com.rakuten.tech.mobile.inappmessaging.runtime.manager.EventsManager
-import com.rakuten.tech.mobile.inappmessaging.runtime.manager.SessionManager
 import com.rakuten.tech.mobile.inappmessaging.runtime.utils.EventMatchingUtil
 import org.amshove.kluent.*
 import org.junit.After
 import org.junit.Assert
 import org.junit.Before
 import org.junit.Test
-import org.junit.Ignore
 import org.junit.runner.RunWith
 import org.mockito.Mockito
 import org.mockito.Mockito.`when`
 import org.robolectric.RobolectricTestRunner
-import java.util.*
 
 /**
  * Test class for InAppMessaging.
@@ -266,7 +263,6 @@ open class InAppMessagingSpec : BaseTest() {
         instance.tempEventList.shouldBeEmpty()
     }
 
-    @Ignore
     @Test
     fun `should log event if config is true`() {
         val instance = initializeMockInstance(100)

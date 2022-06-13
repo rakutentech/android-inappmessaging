@@ -1,6 +1,5 @@
 package com.rakuten.tech.mobile.inappmessaging.runtime.manager
 
-import com.rakuten.tech.mobile.inappmessaging.runtime.InAppMessaging
 import com.rakuten.tech.mobile.inappmessaging.runtime.data.models.appevents.Event
 import com.rakuten.tech.mobile.inappmessaging.runtime.data.repositories.AccountRepository
 import com.rakuten.tech.mobile.inappmessaging.runtime.data.repositories.ConfigResponseRepository
@@ -29,7 +28,7 @@ internal object EventsManager {
             // Update session when there are updates in user info
             // event reconciliation worker is already part of session update
             SessionManager.onSessionUpdate(event)
-        } else {
+        } else if (ConfigResponseRepository.instance().isConfigEnabled()) {
             eventScheduler.startEventMessageReconciliationWorker()
         }
     }

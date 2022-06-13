@@ -77,7 +77,6 @@ internal abstract class CampaignRepository : CampaignRepositoryType {
         @SuppressWarnings("LongMethod", "NestedBlockDepth")
         override fun syncWith(messageList: List<Message>, timestampMillis: Long) {
             lastSyncMillis = timestampMillis
-            loadCachedData()
             val oldList = messages
 
             messagesHashMap.clear()
@@ -115,8 +114,6 @@ internal abstract class CampaignRepository : CampaignRepositoryType {
         }
 
         override fun optOutCampaign(campaign: Message): Message? {
-            loadCachedData()
-
             val localCampaign = findCampaign(campaign.getCampaignId())
             if (localCampaign == null) {
                 Logger(TAG).debug(

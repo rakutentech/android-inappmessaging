@@ -90,7 +90,8 @@ internal interface MessageReadinessManager {
         override fun getNextDisplayMessage(): Message? {
             shouldRetry.set(true)
 
-            for (messageId in queuedMessages) {
+            val queuedMessagesCopy = queuedMessages.toList() // Prevent ConcurrentModificationException
+            for (messageId in queuedMessagesCopy) {
                 val campaignId = queuedMessages.removeFirst()
                 val message = campaignRepo.messages.firstOrNull { it.getCampaignId() == campaignId }
                 if (message == null) {
