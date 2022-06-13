@@ -25,9 +25,13 @@ import org.robolectric.annotation.Config
 /**
  * Test class for MessageEventReconciliationUtil.
  */
+@SuppressWarnings(
+    "LargeClass",
+    "ClassOrdering"
+)
 @RunWith(RobolectricTestRunner::class)
 @Config(sdk = [Build.VERSION_CODES.O_MR1])
-class MessageEventReconciliationUtilSpec: BaseTest() {
+class MessageEventReconciliationUtilSpec : BaseTest() {
 
     @Before
     override fun setup() {
@@ -186,6 +190,8 @@ class MessageEventReconciliationUtilSpec: BaseTest() {
 
     // endregion
 
+    // region init mock campaigns
+
     private val testCampaign = CampaignData(
         campaignId = "test",
         maxImpressions = 1,
@@ -253,6 +259,8 @@ class MessageEventReconciliationUtilSpec: BaseTest() {
             )
         )
     )
+
+    //endregion
 }
 
 internal class ValidatorHandler {
