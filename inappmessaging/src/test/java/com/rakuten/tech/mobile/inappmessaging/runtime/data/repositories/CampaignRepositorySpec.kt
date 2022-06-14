@@ -159,6 +159,15 @@ class CampaignRepositorySpec : BaseTest() {
         CampaignRepository.instance().optOutCampaign(testCampaign)
     }
 
+    @Test
+    fun `should return null when opting out unknown campaign`() {
+        val testCampaign = ValidTestMessage("0")
+        val testCampaign1 = ValidTestMessage("1")
+        CampaignRepository.instance().syncWith(listOf(testCampaign), 0)
+
+        CampaignRepository.instance().optOutCampaign(testCampaign1).shouldBeNull()
+    }
+
     // endregion
 
     // region decrementImpressionsLeft

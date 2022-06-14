@@ -1,12 +1,10 @@
 package com.rakuten.tech.mobile.inappmessaging.runtime.utils
 
-import com.rakuten.tech.mobile.inappmessaging.runtime.InAppMessaging
 import com.rakuten.tech.mobile.inappmessaging.runtime.data.models.appevents.Event
 import com.rakuten.tech.mobile.inappmessaging.runtime.data.models.messages.Message
 import com.rakuten.tech.mobile.inappmessaging.runtime.data.repositories.CampaignRepository
 import com.rakuten.tech.mobile.inappmessaging.runtime.data.responses.ping.Trigger
 import com.rakuten.tech.mobile.inappmessaging.runtime.data.responses.ping.matchingEventName
-import com.rakuten.tech.mobile.inappmessaging.runtime.exception.InAppMessagingException
 import com.rakuten.tech.mobile.sdkutils.logger.Logger
 
 internal interface EventMatchingUtilType {
@@ -59,13 +57,6 @@ internal abstract class EventMatchingUtil : EventMatchingUtilType {
 
         @SuppressWarnings("LabeledExpression", "LongMethod")
         override fun matchAndStore(event: Event) {
-            if (event.getEventName().isEmpty()) {
-                InAppMessaging.errorCallback?.let {
-                    it(InAppMessagingException("In-App Messaging adding event failed due to invalid event name"))
-                }
-                return
-            }
-
             if (event.isPersistentType()) {
                 persistentEvents.add(event)
                 return

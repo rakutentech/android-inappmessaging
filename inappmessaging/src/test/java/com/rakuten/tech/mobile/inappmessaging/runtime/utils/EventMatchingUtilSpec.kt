@@ -6,6 +6,7 @@ import com.rakuten.tech.mobile.inappmessaging.runtime.data.models.appevents.AppS
 import com.rakuten.tech.mobile.inappmessaging.runtime.data.models.appevents.LoginSuccessfulEvent
 import com.rakuten.tech.mobile.inappmessaging.runtime.data.models.appevents.PurchaseSuccessfulEvent
 import com.rakuten.tech.mobile.inappmessaging.runtime.data.models.messages.Message
+import com.rakuten.tech.mobile.inappmessaging.runtime.data.models.messages.ValidTestMessage
 import com.rakuten.tech.mobile.inappmessaging.runtime.data.repositories.CampaignRepository
 import com.rakuten.tech.mobile.inappmessaging.runtime.data.responses.ping.Trigger
 import org.amshove.kluent.*
@@ -49,12 +50,22 @@ class EventMatchingUtilSpec : BaseTest() {
 
     @Test
     fun `should return false if one of requested events doesn't match given campaign`() {
-        `when`(mockCampaignRepo.messages).thenReturn(listOf(mockCampaign))
+        `when`(mockCampaignRepo.messages).thenReturn(listOf(mockCampaign)) // login & appstart only
         eventMatchingUtil.matchAndStore(mockLoginEv)
         eventMatchingUtil.matchAndStore(mockAppStartEv)
         eventMatchingUtil.matchAndStore(mockPurchaseEv)
 
         eventMatchingUtil.removeSetOfMatchedEvents(setOf(mockAppStartEv, mockLoginEv, mockPurchaseEv), mockCampaign)
+            .shouldBeFalse()
+    }
+
+    @Test
+    fun `should return false if requested set of event isn't found`() {
+        `when`(mockCampaignRepo.messages).thenReturn(listOf(mockCampaign))
+        eventMatchingUtil.matchAndStore(mockLoginEv)
+        eventMatchingUtil.matchAndStore(mockAppStartEv)
+
+        eventMatchingUtil.removeSetOfMatchedEvents(setOf(mockPurchaseEv), mockCampaign)
             .shouldBeFalse()
     }
 
@@ -177,6 +188,15 @@ class EventMatchingUtilSpec : BaseTest() {
     @Test
     fun `should return false if none of required events were stored`() {
         eventMatchingUtil.containsAllMatchedEvents(mockCampaign).shouldBeFalse()
+    }
+
+    @Test
+    fun `should return false if triggers are null or empty`() {
+        val campaign = ValidTestMessage(
+            campaignId = "test",
+            triggers = listOf(),
+        )
+        eventMatchingUtil.containsAllMatchedEvents(campaign).shouldBeFalse()
     }
 
     // endregion

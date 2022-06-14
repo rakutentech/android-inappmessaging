@@ -203,16 +203,7 @@ internal abstract class CampaignRepository : CampaignRepositoryType {
             return messagesHashMap[id]
         }
 
-        private fun updateImpressions(campaign: Message, newValue: Int): Message? {
-            val localCampaign = findCampaign(campaign.getCampaignId())
-            if (localCampaign == null) {
-                Logger(TAG).debug(
-                    "Campaign (${campaign.getCampaignId()}) could not be updated -" +
-                        "not found in the repository"
-                )
-                return null
-            }
-
+        private fun updateImpressions(campaign: Message, newValue: Int): Message {
             val updatedCampaign = Message.updatedMessage(campaign, impressionsLeft = newValue)
             messagesHashMap[campaign.getCampaignId()] = updatedCampaign
 
