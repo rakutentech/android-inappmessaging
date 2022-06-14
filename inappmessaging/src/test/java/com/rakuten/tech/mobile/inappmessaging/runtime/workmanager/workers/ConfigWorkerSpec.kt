@@ -61,7 +61,6 @@ open class ConfigWorkerSpec : BaseTest() {
         super.setup()
         MockitoAnnotations.initMocks(this)
         ConfigScheduler.currDelay = RetryDelayUtil.INITIAL_BACKOFF_DELAY
-//        LocalEventRepository.instance().clearEvents()
         ConfigResponseRepository.resetInstance()
         ConfigWorker.serverErrorCounter.set(0)
     }
@@ -195,7 +194,6 @@ class ConfigWorkerSuccessSpec : ConfigWorkerSpec() {
         InAppMessaging.instance().logEvent(AppStartEvent())
         InAppMessaging.instance().logEvent(PurchaseSuccessfulEvent())
         (InAppMessaging.instance() as InApp).tempEventList.shouldHaveSize(2)
-//        LocalEventRepository.instance().getEvents().shouldBeEmpty()
 
         val worker = ConfigWorker(
             context, workerParameters, HostAppInfoRepository.instance(),
@@ -203,7 +201,6 @@ class ConfigWorkerSuccessSpec : ConfigWorkerSpec() {
         )
         worker.onResponse(mockResponse!!) shouldBeEqualTo ListenableWorker.Result.Success()
         (InAppMessaging.instance() as InApp).tempEventList.shouldBeEmpty()
-//        LocalEventRepository.instance().getEvents().shouldHaveSize(2)
         Mockito.verify(mockMessageScheduler).pingMessageMixerService(0)
     }
 
@@ -215,7 +212,6 @@ class ConfigWorkerSuccessSpec : ConfigWorkerSpec() {
         InAppMessaging.instance().logEvent(AppStartEvent())
         InAppMessaging.instance().logEvent(PurchaseSuccessfulEvent())
         (InAppMessaging.instance() as InApp).tempEventList.shouldHaveSize(2)
-//        LocalEventRepository.instance().getEvents().shouldBeEmpty()
 
         val worker = ConfigWorker(
             context, workerParameters, HostAppInfoRepository.instance(),
@@ -223,7 +219,6 @@ class ConfigWorkerSuccessSpec : ConfigWorkerSpec() {
         )
         worker.onResponse(mockResponse!!) shouldBeEqualTo ListenableWorker.Result.Success()
         InAppMessaging.instance() shouldBeInstanceOf InAppMessaging.NotConfiguredInAppMessaging::class.java
-//        LocalEventRepository.instance().getEvents().shouldBeEmpty()
         Mockito.verify(mockMessageScheduler, never()).pingMessageMixerService(0)
     }
 

@@ -5,22 +5,22 @@ import com.rakuten.tech.mobile.inappmessaging.runtime.BaseTest
 import com.rakuten.tech.mobile.inappmessaging.runtime.data.enums.EventType
 import com.rakuten.tech.mobile.inappmessaging.runtime.data.enums.InAppMessageType
 import com.rakuten.tech.mobile.inappmessaging.runtime.data.enums.SlideFromDirectionType
+import com.rakuten.tech.mobile.inappmessaging.runtime.data.enums.ValueType
 import com.rakuten.tech.mobile.inappmessaging.runtime.data.models.appevents.AppStartEvent
+import com.rakuten.tech.mobile.inappmessaging.runtime.data.models.appevents.CustomEvent
 import com.rakuten.tech.mobile.inappmessaging.runtime.data.models.appevents.Event
 import com.rakuten.tech.mobile.inappmessaging.runtime.data.models.appevents.LoginSuccessfulEvent
 import com.rakuten.tech.mobile.inappmessaging.runtime.data.models.messages.Message
 import com.rakuten.tech.mobile.inappmessaging.runtime.data.models.messages.ValidTestMessage
 import com.rakuten.tech.mobile.inappmessaging.runtime.data.repositories.CampaignRepository
 import com.rakuten.tech.mobile.inappmessaging.runtime.data.responses.ping.*
-import org.amshove.kluent.shouldBeEmpty
-import org.amshove.kluent.shouldBeEqualTo
-import org.amshove.kluent.shouldContain
-import org.amshove.kluent.shouldNotContain
+import org.amshove.kluent.*
 import org.junit.Before
 import org.junit.Test
 import org.junit.runner.RunWith
 import org.robolectric.RobolectricTestRunner
 import org.robolectric.annotation.Config
+import java.util.*
 
 /**
  * Test class for MessageEventReconciliationUtil.
@@ -190,6 +190,106 @@ class MessageEventReconciliationUtilSpec : BaseTest() {
 
     // endregion
 
+    // region trigger attributes
+
+    @Test
+    fun `should accept message with valid string trigger`() {
+        testValueType(ValueType.STRING)
+    }
+
+    @Test
+    fun `should accept message with valid integer trigger`() {
+        testValueType(ValueType.INTEGER)
+    }
+
+    @Test
+    fun `should accept message with valid double trigger`() {
+        testValueType(ValueType.DOUBLE)
+    }
+
+    @Test
+    fun `should accept message with valid boolean trigger`() {
+        testValueType(ValueType.BOOLEAN)
+    }
+
+    @Test
+    fun `should accept message with valid time trigger`() {
+        testValueType(ValueType.TIME_IN_MILLI)
+    }
+
+    @SuppressWarnings("LongMethod")
+    private fun testValueType(valueType: ValueType) {
+        var trigger: Trigger? = null
+        val customEvent = CustomEvent("custom")
+
+        when (valueType) {
+            ValueType.STRING -> {
+                trigger = Trigger(
+                    0, EventType.CUSTOM.typeId, "custom",
+                    mutableListOf(
+                        TriggerAttribute("name", "value", 1, 1)
+                    )
+                )
+                customEvent.addAttribute("name", "value")
+            }
+            ValueType.INTEGER -> {
+                trigger = Trigger(
+                    0, EventType.CUSTOM.typeId, "custom",
+                    mutableListOf(
+                        TriggerAttribute("name", "1", 2, 1)
+                    )
+                )
+                customEvent.addAttribute("name", 1)
+            }
+            ValueType.DOUBLE -> {
+                trigger = Trigger(
+                    0, EventType.CUSTOM.typeId, "custom",
+                    mutableListOf(
+                        TriggerAttribute("name", "1.0", 3, 1)
+                    )
+                )
+                customEvent.addAttribute("name", 1.0)
+            }
+            ValueType.BOOLEAN -> {
+                trigger = Trigger(
+                    0, EventType.CUSTOM.typeId, "custom",
+                    mutableListOf(
+                        TriggerAttribute("name", "true", 4, 1)
+                    )
+                )
+                customEvent.addAttribute("name", true)
+            }
+            ValueType.TIME_IN_MILLI -> {
+                val currDate = Date()
+                trigger = Trigger(
+                    0, EventType.CUSTOM.typeId, "custom",
+                    mutableListOf(
+                        TriggerAttribute("name", currDate.time.toString(), 5, 1)
+                    )
+                )
+                customEvent.addAttribute("name", currDate)
+            }
+            else -> {}
+        }
+
+        trigger?.let {
+            val campaign = ValidTestMessage(
+                campaignId = "test",
+                isTest = false,
+                maxImpressions = 2,
+                triggers = listOf(it)
+            )
+            CampaignRepository.instance().syncWith(listOf(campaign), 0)
+            EventMatchingUtil.instance().matchAndStore(customEvent)
+            val handler = ValidatorHandler()
+            MessageEventReconciliationUtil.instance().validate(handler.closure)
+
+            handler.validatedElements.shouldHaveSize(1)
+        }
+    }
+
+    // endregion
+
     // region init mock campaigns
 
     private val testCampaign = CampaignData(
@@ -260,7 +360,7 @@ class MessageEventReconciliationUtilSpec : BaseTest() {
         )
     )
 
-    //endregion
+    // endregion
 }
 
 internal class ValidatorHandler {
