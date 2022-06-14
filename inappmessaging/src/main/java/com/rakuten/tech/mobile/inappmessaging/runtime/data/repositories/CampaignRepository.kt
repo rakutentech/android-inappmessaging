@@ -174,7 +174,8 @@ internal abstract class CampaignRepository : CampaignRepositoryType {
                     val jsonObject = JSONObject(listString)
                     for (key in jsonObject.keys()) {
                         messagesHashMap[key] = Gson().fromJson(
-                            jsonObject.getJSONObject(key).toString(), CampaignData::class.java)
+                            jsonObject.getJSONObject(key).toString(), CampaignData::class.java
+                        )
                     }
                 } catch (ex: Exception) {
                     Logger(TAG).debug(ex.cause, "Invalid JSON format for $IAM_USER_CACHE data")
