@@ -28,13 +28,6 @@ internal interface EventMatchingUtilType {
     fun removeSetOfMatchedEvents(eventsToRemove: Set<Event>, campaign: Message): Boolean
 
     fun clearNonPersistentEvents()
-
-    /**
-     * This method removes all stored non-persistent events triggered before the given time [timeMillis].
-     *
-     * @param timeMillis represents the given time in UTC milliseconds from the epoch.
-     */
-    fun clearNonPersistentEvents(timeMillis: Long)
 }
 
 /**
@@ -133,12 +126,6 @@ internal abstract class EventMatchingUtil : EventMatchingUtilType {
 
         override fun clearNonPersistentEvents() {
             matchedEvents.clear()
-        }
-
-        override fun clearNonPersistentEvents(timeMillis: Long) {
-            matchedEvents.forEach { pair ->
-                pair.value.removeAll { ev -> ev.getTimestamp() < timeMillis }
-            }
         }
 
         private fun isEventMatchingOneOfTriggers(event: Event, triggers: List<Trigger>) =

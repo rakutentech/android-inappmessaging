@@ -12,7 +12,6 @@ import com.rakuten.tech.mobile.inappmessaging.runtime.data.repositories.HostAppI
 import com.rakuten.tech.mobile.inappmessaging.runtime.data.repositories.CampaignRepository
 import com.rakuten.tech.mobile.inappmessaging.runtime.data.requests.PingRequest
 import com.rakuten.tech.mobile.inappmessaging.runtime.data.responses.ping.MessageMixerResponse
-import com.rakuten.tech.mobile.inappmessaging.runtime.utils.EventMatchingUtil
 import com.rakuten.tech.mobile.inappmessaging.runtime.utils.RetryDelayUtil
 import com.rakuten.tech.mobile.inappmessaging.runtime.utils.RuntimeUtil
 import com.rakuten.tech.mobile.inappmessaging.runtime.utils.WorkerUtils
@@ -102,9 +101,6 @@ internal class MessageMixerWorker(
 
                 // Add all parsed messages into CampaignRepository.
                 CampaignRepository.instance().syncWith(parsedMessages, messageMixerResponse.currentPingMillis)
-
-                // Clear non-persistent local events triggered before current ping
-                EventMatchingUtil.instance().clearNonPersistentEvents(messageMixerResponse.currentPingMillis)
 
                 // Start a new MessageEventReconciliationWorker, there was a new Ping Response to parse.
                 // This worker will attempt to cancel message scheduled but hasn't been displayed yet

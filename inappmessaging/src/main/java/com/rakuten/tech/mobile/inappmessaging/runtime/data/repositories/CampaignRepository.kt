@@ -149,7 +149,7 @@ internal abstract class CampaignRepository : CampaignRepositoryType {
         }
 
         @SuppressWarnings("LongMethod", "TooGenericExceptionCaught")
-        fun loadCachedData(onLaunch: Boolean = false) {
+        private fun loadCachedData(onLaunch: Boolean = false) {
             if (InAppMessaging.instance().isLocalCachingEnabled() &&
                 (onLaunch || user != AccountRepository.instance().userInfoHash)
             ) {
@@ -173,11 +173,8 @@ internal abstract class CampaignRepository : CampaignRepositoryType {
                 try {
                     val jsonObject = JSONObject(listString)
                     for (key in jsonObject.keys()) {
-                        val campaign = Gson().fromJson(
-                            jsonObject.getJSONObject(key).toString(),
-                            CampaignData::class.java
-                        )
-                        messagesHashMap[key] = campaign
+                        messagesHashMap[key] = Gson().fromJson(
+                            jsonObject.getJSONObject(key).toString(), CampaignData::class.java)
                     }
                 } catch (ex: Exception) {
                     Logger(TAG).debug(ex.cause, "Invalid JSON format for $IAM_USER_CACHE data")
