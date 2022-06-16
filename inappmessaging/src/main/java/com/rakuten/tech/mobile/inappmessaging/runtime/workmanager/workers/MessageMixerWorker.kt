@@ -4,6 +4,7 @@ import android.content.Context
 import androidx.annotation.VisibleForTesting
 import androidx.work.Worker
 import androidx.work.WorkerParameters
+import com.rakuten.tech.mobile.inappmessaging.runtime.InAppMessaging
 import com.rakuten.tech.mobile.inappmessaging.runtime.api.MessageMixerRetrofitService
 import com.rakuten.tech.mobile.inappmessaging.runtime.data.models.messages.Message
 import com.rakuten.tech.mobile.inappmessaging.runtime.data.repositories.AccountRepository
@@ -101,6 +102,9 @@ internal class MessageMixerWorker(
 
                 // Add all parsed messages into CampaignRepository.
                 CampaignRepository.instance().syncWith(parsedMessages, messageMixerResponse.currentPingMillis)
+
+                // Match&Store any temp events using lately synced campaigns.
+                InAppMessaging.instance().flushEventList()
 
                 // Start a new MessageEventReconciliationWorker, there was a new Ping Response to parse.
                 // This worker will attempt to cancel message scheduled but hasn't been displayed yet

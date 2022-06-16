@@ -103,7 +103,7 @@ class EventMessageReconciliationSchedulerSpec : BaseTest() {
         `when`(mockAccount.updateUserInfo()).thenReturn(false)
 
         ConfigResponseRepository.instance().addConfigResponse(configResponseData)
-        EventsManager.onEventReceived(PurchaseSuccessfulEvent(), eventScheduler = mockSched, accountRepo = mockAccount)
+        EventsManager.onEventReceived(PurchaseSuccessfulEvent(), eventScheduler = mockSched)
 
         Mockito.verify(mockSched).startEventMessageReconciliationWorker()
     }

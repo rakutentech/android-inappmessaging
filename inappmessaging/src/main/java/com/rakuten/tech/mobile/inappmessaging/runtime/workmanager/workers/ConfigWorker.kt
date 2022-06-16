@@ -103,8 +103,6 @@ internal class ConfigWorker(
                 response.body()?.data?.rollOutPercentage, configRepo.isConfigEnabled()
             )
             if (configRepo.isConfigEnabled()) {
-                // move temp data to persistent cache
-                InAppMessaging.instance().flushEventList()
                 MessageMixerPingScheduler.currDelay = RetryDelayUtil.INITIAL_BACKOFF_DELAY
                 messagePingScheduler.pingMessageMixerService(0)
             } else {

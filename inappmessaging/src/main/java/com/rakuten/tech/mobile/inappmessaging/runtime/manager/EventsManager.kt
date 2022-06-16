@@ -1,7 +1,6 @@
 package com.rakuten.tech.mobile.inappmessaging.runtime.manager
 
 import com.rakuten.tech.mobile.inappmessaging.runtime.data.models.appevents.Event
-import com.rakuten.tech.mobile.inappmessaging.runtime.data.repositories.AccountRepository
 import com.rakuten.tech.mobile.inappmessaging.runtime.data.repositories.ConfigResponseRepository
 import com.rakuten.tech.mobile.inappmessaging.runtime.utils.EventMatchingUtil
 import com.rakuten.tech.mobile.inappmessaging.runtime.workmanager.schedulers.EventMessageReconciliationScheduler
@@ -19,16 +18,10 @@ internal object EventsManager {
     fun onEventReceived(
         event: Event,
         eventMatchingUtil: EventMatchingUtil = EventMatchingUtil.instance(),
-        eventScheduler: EventMessageReconciliationScheduler = EventMessageReconciliationScheduler.instance(),
-        accountRepo: AccountRepository = AccountRepository.instance()
+        eventScheduler: EventMessageReconciliationScheduler = EventMessageReconciliationScheduler.instance()
     ) {
-        val isUserUpdated = accountRepo.updateUserInfo()
-        eventMatchingUtil.matchAndStore(event)
-        if (isUserUpdated) {
-            // Update session when there are updates in user info
-            // event reconciliation worker is already part of session update
-            SessionManager.onSessionUpdate(event)
-        } else if (ConfigResponseRepository.instance().isConfigEnabled()) {
+        if (ConfigResponseRepository.instance().isConfigEnabled()) {
+            eventMatchingUtil.matchAndStore(event)
             eventScheduler.startEventMessageReconciliationWorker()
         }
     }

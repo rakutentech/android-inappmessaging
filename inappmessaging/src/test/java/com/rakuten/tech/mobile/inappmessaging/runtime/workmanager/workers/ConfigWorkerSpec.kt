@@ -200,7 +200,6 @@ class ConfigWorkerSuccessSpec : ConfigWorkerSpec() {
             ConfigResponseRepository.instance(), mockMessageScheduler, mockConfigScheduler
         )
         worker.onResponse(mockResponse!!) shouldBeEqualTo ListenableWorker.Result.Success()
-        (InAppMessaging.instance() as InApp).tempEventList.shouldBeEmpty()
         Mockito.verify(mockMessageScheduler).pingMessageMixerService(0)
     }
 

@@ -77,30 +77,6 @@ class EventsManagerSpec : BaseTest() {
     }
 
     @Test
-    fun `should clear all messages when user info is updated`() {
-        Settings.Secure.putString(
-            ApplicationProvider.getApplicationContext<Context>().contentResolver,
-            Settings.Secure.ANDROID_ID,
-            "test_device_id"
-        )
-        InAppMessaging.initialize(ApplicationProvider.getApplicationContext())
-        InAppMessaging.instance().registerPreference(TestUserInfoProvider())
-        ConfigResponseRepository.instance().addConfigResponse(configResponseData)
-
-        addTestData()
-
-        `when`(configResponseData.rollOutPercentage).thenReturn(0)
-        `when`(mockAccount.updateUserInfo()).thenReturn(true)
-
-        EventsManager.onEventReceived(
-            event = PurchaseSuccessfulEvent(), eventScheduler = eventRecon,
-            accountRepo = mockAccount
-        )
-
-        verifyTestData(0)
-    }
-
-    @Test
     fun `should not clear messages when user info is not updated`() {
         Settings.Secure.putString(
             ApplicationProvider.getApplicationContext<Context>().contentResolver,
@@ -116,8 +92,7 @@ class EventsManagerSpec : BaseTest() {
         addTestData()
 
         EventsManager.onEventReceived(
-            event = PurchaseSuccessfulEvent(), eventScheduler = eventRecon,
-            accountRepo = mockAccount
+            event = PurchaseSuccessfulEvent(), eventScheduler = eventRecon
         )
 
         verifyTestData(1)

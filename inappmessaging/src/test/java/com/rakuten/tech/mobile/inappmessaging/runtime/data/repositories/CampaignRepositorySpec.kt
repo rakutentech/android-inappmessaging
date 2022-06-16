@@ -194,12 +194,6 @@ class CampaignRepositorySpec : BaseTest() {
     // endregion
 
     @Test
-    fun `should save and restore values for different users`() {
-        setupAndTestMultipleUser()
-        CampaignRepository.instance().messages.shouldHaveSize(2)
-    }
-
-    @Test
     fun `should not update max impression`() {
         val infoProvider = TestUserInfoProvider()
         initializeInstance(infoProvider)
@@ -225,29 +219,6 @@ class CampaignRepositorySpec : BaseTest() {
             1
         )
         CampaignRepository.instance().messages.shouldBeEmpty()
-    }
-
-    @Test
-    fun `should not crash and reset map`() {
-        setupAndTestMultipleUser()
-        InAppMessaging.setNotConfiguredInstance(true)
-        CampaignRepository.instance().messages.shouldBeEmpty()
-    }
-
-    private fun setupAndTestMultipleUser() {
-        val infoProvider = TestUserInfoProvider()
-        initializeInstance(infoProvider)
-
-        CampaignRepository.instance().syncWith(messageList, 0)
-        CampaignRepository.instance().messages.shouldHaveSize(2)
-
-        infoProvider.userId = "user2"
-        AccountRepository.instance().updateUserInfo()
-        CampaignRepository.instance().messages.shouldBeEmpty()
-
-        // revert to initial user info
-        infoProvider.userId = TestUserInfoProvider.TEST_USER_ID
-        AccountRepository.instance().updateUserInfo()
     }
 
     private fun initializeInstance(infoProvider: UserInfoProvider, isCache: Boolean = true) {

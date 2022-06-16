@@ -13,6 +13,7 @@ import com.rakuten.tech.mobile.inappmessaging.runtime.exception.InAppMessagingEx
 import com.rakuten.tech.mobile.inappmessaging.runtime.manager.DisplayManager
 import com.rakuten.tech.mobile.inappmessaging.runtime.manager.EventsManager
 import com.rakuten.tech.mobile.inappmessaging.runtime.manager.MessageReadinessManager
+import com.rakuten.tech.mobile.inappmessaging.runtime.manager.SessionManager
 import com.rakuten.tech.mobile.inappmessaging.runtime.utils.EventMatchingUtil
 import com.rakuten.tech.mobile.sdkutils.logger.Logger
 import kotlinx.coroutines.CoroutineScope
@@ -97,9 +98,14 @@ internal class InApp(
 
     override fun logEvent(event: Event) {
         try {
-            if (ConfigResponseRepository.instance().isConfigEnabled()) {
+            val isEnabled = ConfigResponseRepository.instance().isConfigEnabled()
+            val hasUserChanged = userDidChange()
+
+            if (isEnabled && !hasUserChanged) {
                 eventsManager.onEventReceived(event)
-            } else {
+            } else if (!isEnabled || hasUserChanged) {
+                // Save temp events while config is not enabled yet, or
+                // when there is a change in user (ping in progress)
                 synchronized(tempEventList) {
                     tempEventList.add(event)
                 }
@@ -126,6 +132,18 @@ internal class InApp(
         }
     }
 
+    private fun userDidChange(): Boolean {
+        if (AccountRepository.instance().updateUserInfo()) {
+            // Change in user detected,
+            // Reset any stale cache structure
+            AccountRepository.instance().clearUserOldCacheStructure()
+            // Update user-related data such as cache and ping data
+            SessionManager.onSessionUpdate()
+            return true
+        }
+        return false
+    }
+
     // ------------------------------------Library Internal APIs-------------------------------------
     @RestrictTo(RestrictTo.Scope.LIBRARY)
     override fun getRegisteredActivity() = activityWeakReference?.get()
@@ -136,18 +154,11 @@ internal class InApp(
     override fun isLocalCachingEnabled() = isCacheHandling
 
     override fun flushEventList() {
-        try {
-            AccountRepository.instance().updateUserInfo()
-            synchronized(tempEventList) {
-                tempEventList.forEach { ev ->
-                    eventMatchingUtil.matchAndStore(ev)
-                }
-                tempEventList.clear()
+        synchronized(tempEventList) {
+            tempEventList.forEach { ev ->
+                eventMatchingUtil.matchAndStore(ev)
             }
-        } catch (ex: Exception) {
-            errorCallback?.let {
-                it(InAppMessagingException("In-App Messaging moving temp data to cache failed", ex))
-            }
+            tempEventList.clear()
         }
     }
 

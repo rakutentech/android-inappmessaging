@@ -17,7 +17,7 @@ internal abstract class AccountRepository {
     var userInfoProvider: UserInfoProvider? = null
 
     @get:Synchronized @set:Synchronized
-    internal var userInfoHash = ""
+    internal var userInfoHash: String? = null
 
     /**
      * This method returns access token, or empty String.
@@ -41,6 +41,8 @@ internal abstract class AccountRepository {
     abstract fun updateUserInfo(algo: String? = null): Boolean
 
     abstract fun logWarningForUserInfo(tag: String, logger: Logger = Logger(tag))
+
+    abstract fun clearUserOldCacheStructure()
 
     companion object {
         private const val TOKEN_PREFIX = "OAuth2 "
@@ -67,15 +69,14 @@ internal abstract class AccountRepository {
         override fun getIdTrackingIdentifier() = this.userInfoProvider?.provideIdTrackingIdentifier().orEmpty()
 
         override fun updateUserInfo(algo: String?): Boolean {
-            val curr = hash(getUserId() + getIdTrackingIdentifier(), algo)
-
-            if (userInfoHash != curr) {
-                userInfoHash = curr
-                clearUserOldCacheStructure()
+            val newHash = hash(getUserId() + getIdTrackingIdentifier(), algo)
+            if (userInfoHash == null) {
+                userInfoHash = newHash
                 return true
             }
-
-            return false
+            val currentHash = userInfoHash
+            userInfoHash = newHash
+            return currentHash != userInfoHash
         }
 
         @SuppressLint("BinaryOperationInTimber")
@@ -96,6 +97,19 @@ internal abstract class AccountRepository {
             }
         }
 
+        /**
+         * From v7.1.0, the structure of cached data is changed.
+         * Remove old data since it will never be used.
+         */
+        override fun clearUserOldCacheStructure() {
+            if (InAppMessaging.instance().isLocalCachingEnabled()) {
+                clearOldCacheByKey("ping_response_list")
+                clearOldCacheByKey("local_event_list")
+                clearOldCacheByKey("ready_display_list")
+                clearOldCacheByKey("local_displayed_list")
+            }
+        }
+
         @SuppressWarnings("MagicNumber", "SwallowedException", "TooGenericExceptionCaught")
         private fun hash(input: String, algo: String?): String {
             return try {
@@ -108,19 +122,6 @@ internal abstract class AccountRepository {
             } catch (ex: Exception) {
                 // should never happen since "MD5" is a supported algorithm
                 input
-            }
-        }
-
-        /**
-         * From v7.1.0, the structure of cached data is changed.
-         * Remove old data since it will never be used.
-         */
-        private fun clearUserOldCacheStructure() {
-            if (InAppMessaging.instance().isLocalCachingEnabled()) {
-                clearOldCacheByKey("ping_response_list")
-                clearOldCacheByKey("local_event_list")
-                clearOldCacheByKey("ready_display_list")
-                clearOldCacheByKey("local_displayed_list")
             }
         }
 

@@ -1,7 +1,5 @@
 package com.rakuten.tech.mobile.inappmessaging.runtime.manager
 
-import com.rakuten.tech.mobile.inappmessaging.runtime.InAppMessaging
-import com.rakuten.tech.mobile.inappmessaging.runtime.data.models.appevents.Event
 import com.rakuten.tech.mobile.inappmessaging.runtime.data.repositories.CampaignRepository
 import com.rakuten.tech.mobile.inappmessaging.runtime.utils.EventMatchingUtil
 import com.rakuten.tech.mobile.inappmessaging.runtime.utils.RetryDelayUtil
@@ -16,21 +14,18 @@ internal object SessionManager {
      * Upon login successful or logout, old messages will be discarded, then prepare new messages for the new
      * user.
      */
-    fun onSessionUpdate(event: Event? = null) {
-        if (!InAppMessaging.instance().isLocalCachingEnabled()) {
-            // clear locally stored campaigns from ping response
-            CampaignRepository.instance().clearMessages()
+    fun onSessionUpdate() {
+        // Clear matched events
+        EventMatchingUtil.instance().clearNonPersistentEvents()
 
-            // Clear campaigns which are ready for display
-            MessageReadinessManager.instance().clearMessages()
+        // Clear campaigns which are ready for display
+        MessageReadinessManager.instance().clearMessages()
 
-            // Clear non-persistent matched local events
-            EventMatchingUtil.instance().clearNonPersistentEvents()
-            if (event != null && !event.isPersistentType()) {
-                // manually add latest event triggered by new user since it was removed from previous clearing
-                EventMatchingUtil.instance().matchAndStore(event)
-            }
-        }
+        // Clear locally stored campaigns from ping response
+        CampaignRepository.instance().clearMessages()
+
+        // Load any cached campaigns of new user
+        CampaignRepository.instance().loadCachedData()
 
         // reset current delay to initial
         // future update: possibly add checking if last ping is within a certain threshold before executing the request

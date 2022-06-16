@@ -6,10 +6,7 @@ import android.provider.Settings
 import android.view.ViewGroup
 import androidx.test.core.app.ApplicationProvider
 import androidx.work.testing.WorkManagerTestInitHelper
-import com.nhaarman.mockitokotlin2.any
-import com.nhaarman.mockitokotlin2.anyOrNull
-import com.nhaarman.mockitokotlin2.argumentCaptor
-import com.nhaarman.mockitokotlin2.never
+import com.nhaarman.mockitokotlin2.*
 import com.rakuten.tech.mobile.inappmessaging.runtime.data.models.appevents.AppStartEvent
 import com.rakuten.tech.mobile.inappmessaging.runtime.data.models.appevents.LoginSuccessfulEvent
 import com.rakuten.tech.mobile.inappmessaging.runtime.data.models.appevents.PurchaseSuccessfulEvent
@@ -243,8 +240,7 @@ open class InAppMessagingSpec : BaseTest() {
         instance.logEvent(AppStartEvent())
         instance.logEvent(PurchaseSuccessfulEvent())
         instance.logEvent(LoginSuccessfulEvent())
-        Mockito.verify(eventsManager, never()).onEventReceived(any(), any(), any(), any())
-        (instance as InApp).tempEventList.shouldHaveSize(4)
+        Mockito.verify(eventsManager, never()).onEventReceived(any(), any(), any())
     }
 
     @Test
@@ -256,7 +252,7 @@ open class InAppMessagingSpec : BaseTest() {
         instance.logEvent(AppStartEvent())
         instance.logEvent(PurchaseSuccessfulEvent())
         instance.logEvent(LoginSuccessfulEvent())
-        Mockito.verify(eventsManager, never()).onEventReceived(any(), any(), any(), any())
+        Mockito.verify(eventsManager, never()).onEventReceived(any(), any(), any())
         (instance as InApp).tempEventList.shouldHaveSize(4)
 
         instance.flushEventList()
@@ -266,9 +262,10 @@ open class InAppMessagingSpec : BaseTest() {
     @Test
     fun `should log event if config is true`() {
         val instance = initializeMockInstance(100)
+        instance.registerPreference(TestUserInfoProvider())
 
         instance.logEvent(AppStartEvent())
-        Mockito.verify(eventsManager).onEventReceived(any(), any(), any(), any())
+        Mockito.verify(eventsManager).onEventReceived(any(), any(), any())
     }
 
     @Test
@@ -353,7 +350,7 @@ class InAppMessagingExceptionSpec : InAppMessagingSpec() {
         InAppMessaging.errorCallback = null
         `when`(dispMgr.displayMessage()).thenThrow(NullPointerException())
         `when`(dispMgr.removeMessage(anyOrNull())).thenThrow(NullPointerException())
-        `when`(eventsManager.onEventReceived(any(), any(), any(), any())).thenThrow(NullPointerException())
+        `when`(eventsManager.onEventReceived(any(), any(), any())).thenThrow(NullPointerException())
     }
 
     @After
@@ -428,14 +425,5 @@ class InAppMessagingExceptionSpec : InAppMessagingSpec() {
     @Test
     fun `should not crash when save temp data failed due to forced exception`() {
         instance.flushEventList()
-    }
-
-    @Test
-    fun `should trigger callback when save temp data failed due to forced exception`() {
-        InAppMessaging.errorCallback = mockCallback
-        instance.flushEventList()
-
-        Mockito.verify(mockCallback).invoke(captor.capture())
-        captor.firstValue shouldBeInstanceOf InAppMessagingException::class.java
     }
 }

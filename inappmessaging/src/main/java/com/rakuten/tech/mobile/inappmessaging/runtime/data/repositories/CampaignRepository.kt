@@ -37,6 +37,11 @@ internal interface CampaignRepositoryType {
     fun incrementImpressions(id: String): Message?
 
     /**
+     * Loads campaign data from user cache.
+     */
+    fun loadCachedData()
+
+    /**
      * Clears [messages] for last user.
      */
     fun clearMessages()
@@ -59,15 +64,13 @@ internal abstract class CampaignRepository : CampaignRepositoryType {
         // LinkedHashMap can preserve the message insertion order.
         // Map - Key: Campaign ID, Value: Message object
         private val messagesHashMap = LinkedHashMap<String, Message>()
-        private var user = ""
 
         init {
-            loadCachedData(true)
+            loadCachedData()
         }
 
         override val messages: List<Message>
             get() {
-                loadCachedData()
                 return ArrayList(messagesHashMap.values)
             }
 
@@ -149,12 +152,8 @@ internal abstract class CampaignRepository : CampaignRepositoryType {
         }
 
         @SuppressWarnings("LongMethod", "TooGenericExceptionCaught")
-        private fun loadCachedData(onLaunch: Boolean = false) {
-            if (InAppMessaging.instance().isLocalCachingEnabled() &&
-                (onLaunch || user != AccountRepository.instance().userInfoHash)
-            ) {
-                user = AccountRepository.instance().userInfoHash
-                // reset message list from cached using updated user info
+        override fun loadCachedData() {
+            if (InAppMessaging.instance().isLocalCachingEnabled()) {
                 val listString = try {
                     InAppMessaging.instance().getHostAppContext()?.let { ctx ->
                         PreferencesUtil.getString(
@@ -196,10 +195,7 @@ internal abstract class CampaignRepository : CampaignRepositoryType {
             }
         }
 
-        private fun findCampaign(id: String): Message? {
-            loadCachedData()
-            return messagesHashMap[id]
-        }
+        private fun findCampaign(id: String): Message? = messagesHashMap[id]
 
         private fun updateImpressions(campaign: Message, newValue: Int): Message {
             val updatedCampaign = Message.updatedMessage(campaign, impressionsLeft = newValue)
