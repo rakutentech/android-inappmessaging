@@ -389,6 +389,8 @@ Documents targeting Product Managers:
 
 ### NEXT (in progress)
 * SDKCF-4919: Added support for building using Java 11.
+* SDKCF-5038: Refactored event logging logic and campaign repository to align with iOS.
+  - Impact: Data stored from SharedPreferences is cleared to use the new format. Therefore please ensure that there are no pending campaigns when updating to this version, for the campaign's impressions left will be reset to "max lifetime impressions count" and opt-out status to "not opted out" affecting the visibility of the pending campaign.
 
 ### 7.1.0 (in-progress)
 * SDKCF-5256: Added sending of impression events with campaign details to analytics account.
