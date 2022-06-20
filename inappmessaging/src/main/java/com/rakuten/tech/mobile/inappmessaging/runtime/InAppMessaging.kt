@@ -124,6 +124,7 @@ abstract class InAppMessaging internal constructor() {
         }
 
         @Throws(InAppMessagingException::class)
+        @SuppressWarnings("MagicNumber")
         internal fun initialize(
             context: Context,
             isCacheHandling: Boolean = false,
