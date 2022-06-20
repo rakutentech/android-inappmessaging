@@ -11,7 +11,7 @@ sonarqube {
         property 'sonar.projectName', 'Android In-App Messaging SDK'
         property 'sonar.host.url', System.getenv("SONARQUBE_HOST_URL")
         property 'sonar.login', System.getenv("SONARQUBE_TOKEN")
-        property 'sonar.projectKey', System.getenv("SONARQUBE_PROJ_CODECOV")
+        property 'sonar.projectKey', System.getenv("SONARQUBE_PROJ_KEY")
         property 'sonar.projectVersion', scmVersion.version
         /* Tags */
         if (tagName != null && tagName != "") {

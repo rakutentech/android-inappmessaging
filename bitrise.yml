@@ -173,38 +173,38 @@ workflows:
             fi
   _run-sonarqube-scanner:
     steps:
-      - set-java-version@1:
-          inputs:
-            - set_java_version: '11'
-      - script@1:
-          title: Prepare branches to feed in sonar.gradle
-          description: This step ensures that source and destination branches exist. For sonarqube to work, the current working branch should be the source branch.
-          inputs:
-            - content: |-
-                #!/bin/bash
-                set -e
-                if [[ $BITRISE_GIT_TAG != "" ]]; then
-                  echo "Branch analysis but using tag name. BITRISE_GIT_TAG=$BITRISE_GIT_TAG"
-                  git fetch --no-tags origin $BITRISE_GIT_TAG
-                  git checkout $BITRISE_GIT_TAG
-                elif [[ $BITRISEIO_PULL_REQUEST_REPOSITORY_URL == "" ]]; then
-                  echo "Normal branch analysis. BITRISE_GIT_BRANCH=$BITRISE_GIT_BRANCH"
-                  git fetch --no-tags origin $BITRISE_GIT_BRANCH
-                  git switch $BITRISE_GIT_BRANCH
-                else
-                  # PR analysis
-                  git fetch --no-tags origin $BITRISEIO_GIT_BRANCH_DEST
-                  echo "PR analysis. BITRISEIO_GIT_BRANCH_DEST=$BITRISEIO_GIT_BRANCH_DEST. BITRISE_GIT_BRANCH=$BITRISE_GIT_BRANCH"
-                  if [[ $BITRISEIO_PULL_REQUEST_REPOSITORY_URL != "" && \
-                    $GIT_REPOSITORY_URL != $BITRISEIO_PULL_REQUEST_REPOSITORY_URL ]]; then
-                    # Fork
-                    git switch -C $BITRISE_GIT_BRANCH
-                  else
-                    # Non-fork
-                    git fetch --no-tags origin $BITRISE_GIT_BRANCH
-                    git switch $BITRISE_GIT_BRANCH
-                  fi    
-                fi
+    - set-java-version@1:
+        inputs:
+        - set_java_version: '11'
+    - script@1:
+        title: Prepare branches to feed in sonar.gradle
+        description: This step ensures that source and destination branches exist. For sonarqube to work, the current working branch should be the source branch.
+        inputs:
+        - content: |-
+            #!/bin/bash
+            set -e
+            if [[ $BITRISE_GIT_TAG != "" ]]; then
+              echo "Branch analysis but using tag name. BITRISE_GIT_TAG=$BITRISE_GIT_TAG"
+              git fetch --no-tags origin $BITRISE_GIT_TAG
+              git checkout $BITRISE_GIT_TAG
+            elif [[ $BITRISEIO_PULL_REQUEST_REPOSITORY_URL == "" ]]; then
+              echo "Normal branch analysis. BITRISE_GIT_BRANCH=$BITRISE_GIT_BRANCH"
+              git fetch --no-tags origin $BITRISE_GIT_BRANCH
+              git switch $BITRISE_GIT_BRANCH
+            else
+              # PR analysis
+              git fetch --no-tags origin $BITRISEIO_GIT_BRANCH_DEST
+              echo "PR analysis. BITRISEIO_GIT_BRANCH_DEST=$BITRISEIO_GIT_BRANCH_DEST. BITRISE_GIT_BRANCH=$BITRISE_GIT_BRANCH"
+              if [[ $BITRISEIO_PULL_REQUEST_REPOSITORY_URL != "" && \
+                $GIT_REPOSITORY_URL != $BITRISEIO_PULL_REQUEST_REPOSITORY_URL ]]; then
+                # Fork
+                git switch -C $BITRISE_GIT_BRANCH
+              else
+                # Non-fork
+                git fetch --no-tags origin $BITRISE_GIT_BRANCH
+                git switch $BITRISE_GIT_BRANCH
+              fi    
+            fi
     - script@1:
         run_if: '{{getenv "SONARQUBE_TOKEN" | ne ""}}'
         title: Run SonarQube Scanner
