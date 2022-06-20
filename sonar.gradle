@@ -1,7 +1,9 @@
 apply plugin: 'org.sonarqube'
 
 def branch = System.getenv("BITRISE_GIT_BRANCH")
-def baseBranch = 'master'
+def pRBranch = System.getenv("BITRISE_PULL_REQUEST")
+def pRTargetBranch = System.getenv("BITRISEIO_GIT_BRANCH_DEST")
+def tagName = System.getenv("BITRISE_GIT_TAG")
 
 sonarqube {
     properties {
@@ -9,14 +11,23 @@ sonarqube {
         property 'sonar.projectName', 'Android In-App Messaging SDK'
         property 'sonar.host.url', System.getenv("SONARQUBE_HOST_URL")
         property 'sonar.login', System.getenv("SONARQUBE_TOKEN")
-        property 'sonar.projectKey', System.getenv("SONARQUBE_PROJ_KEY")
+        property 'sonar.projectKey', System.getenv("SONARQUBE_PROJ_CODECOV")
         property 'sonar.projectVersion', scmVersion.version
-        if (branch == baseBranch || branch == "" || !branch) {
-            property 'sonar.branch.name', baseBranch
+        /* Tags */
+        if (tagName != null && tagName != "") {
+            // Since tags don't have an explicit branch and can point to any commit, let us use the tag name
+            // as branch name property. In Sonarqube, the tag is going to appear same level as other branches
+            // with its own analysis.
+            property 'sonar.branch.name', tagName
+        }
+        /* Branch analysis */
+        else if (!pRBranch) {
+            property 'sonar.branch.name', branch
+        /* PR analysis */
         } else {
-            property 'sonar.pullrequest.key', System.getenv("BITRISE_PULL_REQUEST").findAll(/\d+/)*.toInteger().last()
+            property 'sonar.pullrequest.key', pRBranch.findAll(/\d+/)*.toInteger().last()
             property 'sonar.pullrequest.branch', branch
-            property 'sonar.pullrequest.base', baseBranch
+            property 'sonar.pullrequest.base', pRTargetBranch
         }
         property 'sonar.qualitygate.wait', true
 
