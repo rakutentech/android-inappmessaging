@@ -13,7 +13,7 @@ import org.robolectric.RobolectricTestRunner
 import java.util.*
 
 @RunWith(RobolectricTestRunner::class)
-class TriggerAttributesValidatorSpec: BaseTest() {
+class TriggerAttributesValidatorSpec : BaseTest() {
 
     @Test
     fun `should accept message with valid string trigger`() {
