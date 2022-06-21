@@ -17,7 +17,7 @@ internal abstract class AccountRepository {
     var userInfoProvider: UserInfoProvider? = null
 
     @get:Synchronized @set:Synchronized
-    internal var userInfoHash: String? = null
+    internal var userInfoHash = ""
 
     /**
      * This method returns access token, or empty String.
@@ -70,7 +70,7 @@ internal abstract class AccountRepository {
 
         override fun updateUserInfo(algo: String?): Boolean {
             val newHash = hash(getUserId() + getIdTrackingIdentifier(), algo)
-            if (userInfoHash == null) {
+            if (userInfoHash.isEmpty()) {
                 userInfoHash = newHash
                 return true
             }

@@ -93,7 +93,7 @@ internal interface MessageReadinessManager {
             val queuedMessagesCopy = queuedMessages.toList() // Prevent ConcurrentModificationException
             for (messageId in queuedMessagesCopy) {
                 val campaignId = queuedMessages.removeFirst()
-                val message = campaignRepo.messages.firstOrNull { it.getCampaignId() == campaignId }
+                val message = campaignRepo.messages[campaignId]
                 if (message == null) {
                     Logger(TAG).debug("Warning: Queued campaign $campaignId does not exist in the repository anymore")
                     continue

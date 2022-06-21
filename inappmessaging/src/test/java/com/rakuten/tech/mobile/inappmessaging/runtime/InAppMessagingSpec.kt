@@ -153,7 +153,7 @@ open class InAppMessagingSpec : BaseTest() {
         InAppMessaging.instance().registerMessageDisplayActivity(activity)
         (InAppMessaging.instance() as InApp).removeMessage(false)
         Mockito.verify(parentViewGroup).removeView(viewGroup)
-        CampaignRepository.instance().messages.forEach {
+        CampaignRepository.instance().messages.values.forEach {
             // Impressions left should not be reduced
             it.impressionsLeft shouldBeEqualTo it.getMaxImpressions()
         }
@@ -168,7 +168,7 @@ open class InAppMessagingSpec : BaseTest() {
         InAppMessaging.instance().registerMessageDisplayActivity(activity)
         (InAppMessaging.instance() as InApp).removeMessage(true)
         Mockito.verify(parentViewGroup).removeView(viewGroup)
-        CampaignRepository.instance().messages.forEach {
+        CampaignRepository.instance().messages.values.forEach {
             // Impressions left should not be reduced
             it.impressionsLeft shouldBeEqualTo it.getMaxImpressions()
         }
@@ -183,7 +183,7 @@ open class InAppMessagingSpec : BaseTest() {
         `when`(displayManager.removeMessage(anyOrNull())).thenReturn("1")
 
         (instance as InApp).removeMessage(false)
-        CampaignRepository.instance().messages.forEach {
+        CampaignRepository.instance().messages.values.forEach {
             // Impressions left should not be reduced
             it.impressionsLeft shouldBeEqualTo it.getMaxImpressions()
         }

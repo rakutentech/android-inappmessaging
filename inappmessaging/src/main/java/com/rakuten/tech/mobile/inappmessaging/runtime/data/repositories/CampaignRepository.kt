@@ -12,7 +12,7 @@ import java.lang.ClassCastException
 import java.lang.Integer.max
 
 internal interface CampaignRepositoryType {
-    val messages: List<Message>
+    val messages: LinkedHashMap<String, Message>
 
     val lastSyncMillis: Long?
 
@@ -69,10 +69,8 @@ internal abstract class CampaignRepository : CampaignRepositoryType {
             loadCachedData()
         }
 
-        override val messages: List<Message>
-            get() {
-                return ArrayList(messagesHashMap.values)
-            }
+        override val messages: LinkedHashMap<String, Message>
+            get() = LinkedHashMap(messagesHashMap)
 
         override var lastSyncMillis: Long? = null
             private set
@@ -90,7 +88,7 @@ internal abstract class CampaignRepository : CampaignRepositoryType {
                 }
 
                 var updatedCampaign = newCampaign
-                val oldCampaign = oldList.firstOrNull { it.getCampaignId() == newCampaign.getCampaignId() }
+                val oldCampaign = oldList[newCampaign.getCampaignId()]
                 if (oldCampaign != null) {
                     updatedCampaign = Message.updatedMessage(
                         updatedCampaign,
@@ -103,6 +101,7 @@ internal abstract class CampaignRepository : CampaignRepositoryType {
                         if (isMaxImpressionsEdited) {
                             newImpressionsLeft += newCampaign.getMaxImpressions() - oldCampaign.getMaxImpressions()
                         }
+                        newImpressionsLeft = max(0, newImpressionsLeft)
                         updatedCampaign = Message.updatedMessage(updatedCampaign, impressionsLeft = newImpressionsLeft)
                     }
                 }
@@ -143,6 +142,7 @@ internal abstract class CampaignRepository : CampaignRepositoryType {
             )
         }
 
+        // For testing purposes
         override fun incrementImpressions(id: String): Message? {
             val campaign = findCampaign(id) ?: return null
             return updateImpressions(

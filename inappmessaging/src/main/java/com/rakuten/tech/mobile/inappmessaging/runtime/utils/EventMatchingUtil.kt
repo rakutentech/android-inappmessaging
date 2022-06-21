@@ -55,7 +55,7 @@ internal abstract class EventMatchingUtil : EventMatchingUtilType {
                 return
             }
 
-            campaignRepo.messages.forEach { campaign ->
+            campaignRepo.messages.values.forEach { campaign ->
                 val campaignTriggers = campaign.getTriggers()
                 if (campaignTriggers.isNullOrEmpty()) {
                     return@forEach

@@ -91,7 +91,7 @@ internal class MessageActionsCoroutineSpec(
         val currImpressions = message.impressionsLeft!!
         DisplayManager.instance().removeMessage(InAppMessaging.instance().getRegisteredActivity())
         val result = MessageActionsCoroutine().executeTask(message, resourceId, isOpt)
-        val updatedMessage = CampaignRepository.instance().messages[0]
+        val updatedMessage = CampaignRepository.instance().messages.values.first()
 
         result.shouldBeTrue()
         updatedMessage.impressionsLeft shouldBeEqualTo currImpressions - 1

@@ -46,8 +46,8 @@ class CampaignRepositorySpec : BaseTest() {
     fun `should add message list with valid list`() {
         CampaignRepository.instance().syncWith(messageList, 0)
         CampaignRepository.instance().messages.shouldHaveSize(2)
-        CampaignRepository.instance().messages[0] shouldBeEqualTo message0
-        CampaignRepository.instance().messages[1] shouldBeEqualTo message1
+        CampaignRepository.instance().messages.values.first() shouldBeEqualTo message0
+        CampaignRepository.instance().messages.values.last() shouldBeEqualTo message1
     }
 
     @Test
@@ -96,30 +96,30 @@ class CampaignRepositorySpec : BaseTest() {
     fun `should persist impressionsLeft value`() {
         CampaignRepository.instance().syncWith(listOf(message0), 0)
         CampaignRepository.instance().decrementImpressions(message0.getCampaignId())
-        CampaignRepository.instance().messages.first().impressionsLeft shouldBeEqualTo 2
+        CampaignRepository.instance().messages.values.first().impressionsLeft shouldBeEqualTo 2
 
         CampaignRepository.instance().syncWith(listOf(message0), 0)
-        CampaignRepository.instance().messages.first().impressionsLeft shouldBeEqualTo 2
+        CampaignRepository.instance().messages.values.first().impressionsLeft shouldBeEqualTo 2
     }
 
     @Test
     fun `should persist isOptedOut value`() {
         CampaignRepository.instance().syncWith(listOf(message0), 0)
-        CampaignRepository.instance().messages.first().isOptedOut?.shouldBeFalse()
+        CampaignRepository.instance().messages.values.first().isOptedOut?.shouldBeFalse()
 
         CampaignRepository.instance().optOutCampaign(message0)
         CampaignRepository.instance().syncWith(listOf(message0), 0)
-        CampaignRepository.instance().messages.first().isOptedOut?.shouldBeTrue()
+        CampaignRepository.instance().messages.values.first().isOptedOut?.shouldBeTrue()
     }
 
     @Test
     fun `should not override impressionsLeft value even if maxImpressions is smaller`() {
         CampaignRepository.instance().syncWith(listOf(message0), 0)
         CampaignRepository.instance().incrementImpressions(message0.getCampaignId())
-        CampaignRepository.instance().messages.first().impressionsLeft shouldBeEqualTo 4
+        CampaignRepository.instance().messages.values.first().impressionsLeft shouldBeEqualTo 4
 
         CampaignRepository.instance().syncWith(listOf(message0), 0)
-        CampaignRepository.instance().messages.first().impressionsLeft shouldBeEqualTo 4
+        CampaignRepository.instance().messages.values.first().impressionsLeft shouldBeEqualTo 4
     }
 
     @Test
@@ -127,14 +127,14 @@ class CampaignRepositorySpec : BaseTest() {
         CampaignRepository.instance().syncWith(listOf(message0), 0)
         CampaignRepository.instance().decrementImpressions(message0.getCampaignId())
         CampaignRepository.instance().decrementImpressions(message0.getCampaignId())
-        CampaignRepository.instance().messages.first().impressionsLeft shouldBeEqualTo 1
+        CampaignRepository.instance().messages.values.first().impressionsLeft shouldBeEqualTo 1
 
         val updatedCampaign = ValidTestMessage(
             campaignId = message0.getCampaignId(),
             maxImpressions = 6
         )
         CampaignRepository.instance().syncWith(listOf(updatedCampaign), 0)
-        CampaignRepository.instance().messages.first().impressionsLeft shouldBeEqualTo 4
+        CampaignRepository.instance().messages.values.first().impressionsLeft shouldBeEqualTo 4
     }
 
     // endregion
@@ -144,11 +144,11 @@ class CampaignRepositorySpec : BaseTest() {
     @Test
     fun `should mark campaign as opted out`() {
         CampaignRepository.instance().syncWith(listOf(message0), 0)
-        CampaignRepository.instance().messages.first().isOptedOut?.shouldBeFalse()
+        CampaignRepository.instance().messages.values.first().isOptedOut?.shouldBeFalse()
 
         val updatedCampaign = CampaignRepository.instance().optOutCampaign(message0)
         updatedCampaign?.isOptedOut?.shouldBeTrue()
-        CampaignRepository.instance().messages.first().isOptedOut?.shouldBeTrue()
+        CampaignRepository.instance().messages.values.first().isOptedOut?.shouldBeTrue()
     }
 
     @Test
@@ -179,7 +179,7 @@ class CampaignRepositorySpec : BaseTest() {
 
         val updatedCampaign = CampaignRepository.instance().decrementImpressions(message0.getCampaignId())
         updatedCampaign?.impressionsLeft shouldBeEqualTo impressions - 1
-        CampaignRepository.instance().messages.first().impressionsLeft shouldBeEqualTo impressions - 1
+        CampaignRepository.instance().messages.values.first().impressionsLeft shouldBeEqualTo impressions - 1
     }
 
     @Test
@@ -188,24 +188,24 @@ class CampaignRepositorySpec : BaseTest() {
         CampaignRepository.instance().syncWith(listOf(testCampaign), 0)
         CampaignRepository.instance().decrementImpressions(testCampaign.getCampaignId())
 
-        CampaignRepository.instance().messages.first().impressionsLeft shouldBeEqualTo 0
+        CampaignRepository.instance().messages.values.first().impressionsLeft shouldBeEqualTo 0
     }
 
     // endregion
 
     @Test
-    fun `should not update max impression`() {
+    fun `should update max impression`() {
         val infoProvider = TestUserInfoProvider()
         initializeInstance(infoProvider)
 
         CampaignRepository.instance().syncWith(listOf(message0), 0)
         CampaignRepository.instance().messages.shouldHaveSize(1)
-        CampaignRepository.instance().messages.first().getMaxImpressions() shouldBeEqualTo 3
+        CampaignRepository.instance().messages.values.first().getMaxImpressions() shouldBeEqualTo 3
 
         message0.setMaxImpression(6)
         CampaignRepository.instance().syncWith(listOf(message0), 0)
         CampaignRepository.instance().messages.shouldHaveSize(1)
-        CampaignRepository.instance().messages.first().getMaxImpressions() shouldBeEqualTo 6
+        CampaignRepository.instance().messages.values.first().getMaxImpressions() shouldBeEqualTo 6
     }
 
     @Test

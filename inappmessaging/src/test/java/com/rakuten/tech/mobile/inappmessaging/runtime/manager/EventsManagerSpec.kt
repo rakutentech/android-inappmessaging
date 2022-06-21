@@ -109,7 +109,7 @@ class EventsManagerSpec : BaseTest() {
         CampaignRepository.instance().messages.shouldHaveSize(expected)
 
         if (expected > 0) {
-            EventMatchingUtil.instance().matchedEvents(CampaignRepository.instance().messages.first()).shouldNotBeNull()
+            EventMatchingUtil.instance().matchedEvents(CampaignRepository.instance().messages.values.first()).shouldNotBeNull()
         }
 
         Mockito.verify(eventRecon, Mockito.times(expected)).startEventMessageReconciliationWorker()
