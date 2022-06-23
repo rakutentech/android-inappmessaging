@@ -14,7 +14,6 @@ import com.rakuten.tech.mobile.inappmessaging.runtime.data.repositories.HostAppI
 import com.rakuten.tech.mobile.inappmessaging.runtime.exception.InAppMessagingException
 import com.rakuten.tech.mobile.inappmessaging.runtime.utils.CacheUtil.getMemoryCacheSize
 import com.rakuten.tech.mobile.sdkutils.PreferencesUtil
-import com.rakuten.tech.mobile.sdkutils.logger.Logger
 import com.squareup.picasso.LruCache
 import com.squareup.picasso.Picasso
 import java.lang.ClassCastException
@@ -68,7 +67,7 @@ internal object Initializer {
         val packageInfo: PackageInfo = try {
             context.packageManager.getPackageInfo(hostPackageName, 0)
         } catch (e: NameNotFoundException) {
-            Logger(TAG).debug(e.message)
+            InAppLogger(TAG).debug(e.message)
             return ""
         }
 
@@ -101,7 +100,7 @@ internal object Initializer {
 
         initializePicassoInstance(context)
 
-        Logger(TAG).debug(Gson().toJson(hostAppInfo))
+        InAppLogger(TAG).debug(Gson().toJson(hostAppInfo))
     }
 
     /**
@@ -113,7 +112,7 @@ internal object Initializer {
             try {
                 return sharedUtil.getString(context = context, name = "uuid", key = ID_KEY, defValue = "").orEmpty()
             } catch (ex: ClassCastException) {
-                Logger(TAG).debug(ex.cause, "Incorrect type for $ID_KEY data")
+                InAppLogger(TAG).debug(ex.cause, "Incorrect type for $ID_KEY data")
             }
         }
         val id = UUID.randomUUID().toString()

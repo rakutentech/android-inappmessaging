@@ -7,7 +7,6 @@ import com.rakuten.tech.mobile.inappmessaging.runtime.api.MessageMixerRetrofitSe
 import com.rakuten.tech.mobile.inappmessaging.runtime.data.enums.UserIdentifierType
 import com.rakuten.tech.mobile.inappmessaging.runtime.data.models.UserIdentifier
 import com.rakuten.tech.mobile.inappmessaging.runtime.data.repositories.AccountRepository
-import com.rakuten.tech.mobile.sdkutils.logger.Logger
 import com.rakuten.tech.mobile.sdkutils.network.build
 import okhttp3.OkHttpClient
 import okhttp3.ResponseBody
@@ -66,7 +65,7 @@ internal object RuntimeUtil {
                     }
                 }
             } catch (ex: Exception) {
-                Logger(TAG).debug(ex.message)
+                InAppLogger(TAG).debug(ex.message)
             }
         }
         return null

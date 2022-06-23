@@ -7,9 +7,9 @@ import com.rakuten.tech.mobile.inappmessaging.runtime.BuildConfig
 import com.rakuten.tech.mobile.inappmessaging.runtime.data.repositories.PingResponseMessageRepository
 import com.rakuten.tech.mobile.inappmessaging.runtime.data.repositories.ReadyForDisplayMessageRepository
 import com.rakuten.tech.mobile.inappmessaging.runtime.manager.DisplayManager
+import com.rakuten.tech.mobile.inappmessaging.runtime.utils.InAppLogger
 import com.rakuten.tech.mobile.inappmessaging.runtime.utils.MessageEventReconciliationUtil
 import com.rakuten.tech.mobile.inappmessaging.runtime.utils.RuntimeUtil.getCurrentTimeMillis
-import com.rakuten.tech.mobile.sdkutils.logger.Logger
 import java.util.Date
 import kotlin.collections.ArrayList
 
@@ -42,7 +42,7 @@ internal class MessageEventReconciliationWorker(
      */
     @SuppressWarnings("LongMethod")
     override fun doWork(): Result {
-        Logger(TAG).debug("doWork()")
+        InAppLogger(TAG).debug("doWork()")
         var startTime: Long = 0
         if (BuildConfig.DEBUG) {
             startTime = getCurrentTimeMillis()
@@ -71,13 +71,13 @@ internal class MessageEventReconciliationWorker(
         // Schedule to display next message.
         DisplayManager.instance().displayMessage()
         for (message in readyMessageList) {
-            Logger(TAG).debug("Ready Messages: %s", message.getMessagePayload().header)
+            InAppLogger(TAG).debug("Ready Messages: %s", message.getMessagePayload().header)
         }
         var endTime: Long = 0
         if (BuildConfig.DEBUG) {
             endTime = getCurrentTimeMillis()
         }
-        Logger(TAG).debug("Time took to reconcile: %d milliseconds", endTime - startTime)
+        InAppLogger(TAG).debug("Time took to reconcile: %d milliseconds", endTime - startTime)
         return Result.success()
     }
 

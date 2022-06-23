@@ -10,8 +10,8 @@ import com.rakuten.tech.mobile.inappmessaging.runtime.data.models.appevents.Logi
 import com.rakuten.tech.mobile.inappmessaging.runtime.data.models.appevents.PurchaseSuccessfulEvent
 import com.rakuten.tech.mobile.inappmessaging.runtime.data.models.appevents.Event
 import com.rakuten.tech.mobile.inappmessaging.runtime.exception.InAppMessagingException
+import com.rakuten.tech.mobile.inappmessaging.runtime.utils.InAppLogger
 import com.rakuten.tech.mobile.sdkutils.PreferencesUtil
-import com.rakuten.tech.mobile.sdkutils.logger.Logger
 import org.json.JSONArray
 import java.lang.ClassCastException
 import java.util.Collections
@@ -86,10 +86,10 @@ internal interface LocalEventRepository : EventRepository {
         }
 
         private fun debugLog(event: Event) {
-            Logger(TAG).debug(event.getEventName())
+            InAppLogger(TAG).debug(event.getEventName())
             for ((key, value) in event.getAttributeMap()) {
-                Logger(TAG).debug("Key: %s", key)
-                Logger(TAG).debug(
+                InAppLogger(TAG).debug("Key: %s", key)
+                InAppLogger(TAG).debug(
                     "Value name: %s, Value Type: %d, Value data: %s", value?.name, value?.valueType,
                     value?.value
                 )
@@ -174,7 +174,7 @@ internal interface LocalEventRepository : EventRepository {
                         )
                     }.orEmpty()
                 } catch (ex: ClassCastException) {
-                    Logger(TAG).debug(ex.cause, "Incorrect type for $LOCAL_EVENT_KEY data")
+                    InAppLogger(TAG).debug(ex.cause, "Incorrect type for $LOCAL_EVENT_KEY data")
                     ""
                 }
                 if (listString.isNotEmpty()) {
@@ -187,7 +187,7 @@ internal interface LocalEventRepository : EventRepository {
             }
         }
 
-        @SuppressWarnings("TooGenericExceptionCaught", "ComplexMethod")
+        @SuppressWarnings("TooGenericExceptionCaught", "ComplexMethod", "LongMethod")
         private fun deserializeLocalEvents(listString: String) {
             try {
                 val jsonArray = JSONArray(listString)
@@ -204,7 +204,9 @@ internal interface LocalEventRepository : EventRepository {
                     }
                     event?.let { events.add(it) }
                 }
-            } catch (ex: Exception) { Logger(TAG).debug(ex.cause, "Invalid JSON format for $LOCAL_EVENT_KEY data") }
+            } catch (ex: Exception) {
+                InAppLogger(TAG).debug(ex.cause, "Invalid JSON format for $LOCAL_EVENT_KEY data")
+            }
         }
 
         private fun saveUpdatedList() {
@@ -218,7 +220,7 @@ internal interface LocalEventRepository : EventRepository {
                         key = LOCAL_EVENT_KEY,
                         value = Gson().toJson(events)
                     )
-                } ?: Logger(TAG).debug("failed saving event data")
+                } ?: InAppLogger(TAG).debug("failed saving event data")
             }
         }
     }

@@ -13,12 +13,12 @@ import com.rakuten.tech.mobile.inappmessaging.runtime.data.repositories.LocalEve
 import com.rakuten.tech.mobile.inappmessaging.runtime.data.repositories.PingResponseMessageRepository
 import com.rakuten.tech.mobile.inappmessaging.runtime.data.requests.PingRequest
 import com.rakuten.tech.mobile.inappmessaging.runtime.data.responses.ping.MessageMixerResponse
+import com.rakuten.tech.mobile.inappmessaging.runtime.utils.InAppLogger
 import com.rakuten.tech.mobile.inappmessaging.runtime.utils.RetryDelayUtil
 import com.rakuten.tech.mobile.inappmessaging.runtime.utils.RuntimeUtil
 import com.rakuten.tech.mobile.inappmessaging.runtime.utils.WorkerUtils
 import com.rakuten.tech.mobile.inappmessaging.runtime.workmanager.schedulers.EventMessageReconciliationScheduler
 import com.rakuten.tech.mobile.inappmessaging.runtime.workmanager.schedulers.MessageMixerPingScheduler
-import com.rakuten.tech.mobile.sdkutils.logger.Logger
 import retrofit2.Call
 import retrofit2.Response
 import java.net.HttpURLConnection
@@ -79,7 +79,7 @@ internal class MessageMixerWorker(
             // Execute a thread blocking API network call, and handle response.
             onResponse(call.execute())
         } catch (e: Exception) {
-            Logger(TAG).error(e.message)
+            InAppLogger(TAG).error(e.message)
             Result.retry()
         }
     }
@@ -116,7 +116,7 @@ internal class MessageMixerWorker(
 
                 // Schedule next ping.
                 scheduleNextPing(messageMixerResponse.nextPingMillis)
-                Logger(TAG).debug("campaign size: %d", messageMixerResponse.data.size)
+                InAppLogger(TAG).debug("campaign size: %d", messageMixerResponse.data.size)
             }
         } else return when {
             response.code() == RetryDelayUtil.RETRY_ERROR_CODE -> {
@@ -152,7 +152,7 @@ internal class MessageMixerWorker(
         // reset current delay to initial
         MessageMixerPingScheduler.currDelay = RetryDelayUtil.INITIAL_BACKOFF_DELAY
         messageMixerScheduler.pingMessageMixerService(nextPingMillis)
-        Logger(TAG).debug("Next ping scheduled in: %d", nextPingMillis)
+        InAppLogger(TAG).debug("Next ping scheduled in: %d", nextPingMillis)
     }
 
     /**

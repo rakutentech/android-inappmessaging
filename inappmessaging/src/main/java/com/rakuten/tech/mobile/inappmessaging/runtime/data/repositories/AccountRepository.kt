@@ -3,7 +3,7 @@ package com.rakuten.tech.mobile.inappmessaging.runtime.data.repositories
 import android.annotation.SuppressLint
 import com.rakuten.tech.mobile.inappmessaging.runtime.BuildConfig
 import com.rakuten.tech.mobile.inappmessaging.runtime.UserInfoProvider
-import com.rakuten.tech.mobile.sdkutils.logger.Logger
+import com.rakuten.tech.mobile.inappmessaging.runtime.utils.InAppLogger
 import java.math.BigInteger
 import java.security.MessageDigest
 
@@ -38,7 +38,7 @@ internal abstract class AccountRepository {
      */
     abstract fun updateUserInfo(algo: String? = null): Boolean
 
-    abstract fun logWarningForUserInfo(tag: String, logger: Logger = Logger(tag))
+    abstract fun logWarningForUserInfo(tag: String, logger: InAppLogger = InAppLogger(tag))
 
     companion object {
         private const val TOKEN_PREFIX = "OAuth2 "
@@ -76,7 +76,7 @@ internal abstract class AccountRepository {
         }
 
         @SuppressLint("BinaryOperationInTimber")
-        override fun logWarningForUserInfo(tag: String, logger: Logger) {
+        override fun logWarningForUserInfo(tag: String, logger: InAppLogger) {
             if (getAccessToken().isNotEmpty()) {
                 if (getIdTrackingIdentifier().isNotEmpty()) {
                     logger.warn(ID_TRACKING_ERR_MSG)

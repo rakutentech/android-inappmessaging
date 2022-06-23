@@ -7,9 +7,9 @@ import com.nhaarman.mockitokotlin2.never
 import com.rakuten.tech.mobile.inappmessaging.runtime.*
 import com.rakuten.tech.mobile.inappmessaging.runtime.data.models.HostAppInfo
 import com.rakuten.tech.mobile.inappmessaging.runtime.data.requests.ImpressionRequest
+import com.rakuten.tech.mobile.inappmessaging.runtime.utils.InAppLogger
 import com.rakuten.tech.mobile.inappmessaging.runtime.utils.RuntimeUtil
 import com.rakuten.tech.mobile.inappmessaging.runtime.workmanager.workers.ImpressionWorker
-import com.rakuten.tech.mobile.sdkutils.logger.Logger
 import org.amshove.kluent.*
 import org.junit.Assert
 import org.junit.Before
@@ -97,7 +97,7 @@ class AccountRepositoryNullSpec : AccountRepositorySpec() {
 @SuppressWarnings("LargeClass")
 class AccountRepositoryUsageSpec : AccountRepositorySpec() {
 
-    private val mockLogger = Mockito.mock(Logger::class.java)
+    private val mockLogger = Mockito.mock(InAppLogger::class.java)
     private val captor = argumentCaptor<String>()
 
     @Test
