@@ -124,12 +124,16 @@ abstract class InAppMessaging internal constructor() {
         }
 
         @Throws(InAppMessagingException::class)
+        @SuppressWarnings("MagicNumber")
         internal fun initialize(
             context: Context,
             isCacheHandling: Boolean = false,
             configScheduler: ConfigScheduler = ConfigScheduler.instance()
         ) {
             val manifestConfig = InApp.AppManifestConfig(context)
+
+            // startup delay test
+            Thread.sleep(6000)
 
             // `manifestConfig.isDebugging()` is used to enable/disable the debug logging of InAppMessaging SDK.
             // Note: All InAppMessaging SDK logs' tags begins with "IAM_".
