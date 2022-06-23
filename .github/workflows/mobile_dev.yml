@@ -1,0 +1,24 @@
+name: mobile.dev upload
+on:
+  push:
+    branches: [ inv/mobile.dev ]
+  pull_request_target:
+    branches: [ inv/mobile.dev ]
+
+jobs:
+  upload-to-mobile-dev:
+    runs-on: ubuntu-latest
+    name: Upload artifact to mobile.dev
+    steps:
+      - uses: actions/checkout@v3
+      - name: Install dependencies
+        env:
+          CONFIG_URL_TEST_PROD: https://dummy.url
+          IAM_SUBSCRIPTION_KEY: xxxx-xxxx-xxxx-xxxx
+        run: |
+          ./gradlew clean assembleRelease
+      - uses: mobile-dev-inc/action-upload@v1.0.0
+        with:
+          api-key: ${{ secrets.MOBILE_DEV_API_KEY }}
+          name: ${{ github.sha }}
+          app-file: test/build/outputs/apk/prodTesting/release/test-prodTesting-release-unsigned.apk
