@@ -1,6 +1,7 @@
 package com.rakuten.tech.mobile.inappmessaging.runtime.manager
 
 import com.rakuten.tech.mobile.inappmessaging.runtime.data.repositories.CampaignRepository
+import com.rakuten.tech.mobile.inappmessaging.runtime.data.repositories.ConfigResponseRepository
 import com.rakuten.tech.mobile.inappmessaging.runtime.utils.EventMatchingUtil
 import com.rakuten.tech.mobile.inappmessaging.runtime.utils.RetryDelayUtil
 import com.rakuten.tech.mobile.inappmessaging.runtime.workmanager.schedulers.MessageMixerPingScheduler
@@ -15,14 +16,16 @@ internal object SessionManager {
      * user.
      */
     fun onSessionUpdate() {
+        if (!ConfigResponseRepository.instance().isConfigEnabled()) {
+            // Clear locally stored campaigns from ping response
+            CampaignRepository.instance().clearMessages()
+        }
+
         // Clear matched events
         EventMatchingUtil.instance().clearNonPersistentEvents()
 
         // Clear campaigns which are ready for display
         MessageReadinessManager.instance().clearMessages()
-
-        // Clear locally stored campaigns from ping response
-        CampaignRepository.instance().clearMessages()
 
         // Load any cached campaigns of new user
         CampaignRepository.instance().loadCachedData()

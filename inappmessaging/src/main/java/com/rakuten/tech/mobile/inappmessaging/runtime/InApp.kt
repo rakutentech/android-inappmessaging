@@ -34,6 +34,8 @@ internal class InApp(
     private val eventsManager: EventsManager = EventsManager,
     private val eventMatchingUtil: EventMatchingUtil = EventMatchingUtil.instance(),
     private val messageReadinessManager: MessageReadinessManager = MessageReadinessManager.instance(),
+    private val accountRepo: AccountRepository = AccountRepository.instance(),
+    private val sessionManager: SessionManager = SessionManager
 ) : InAppMessaging() {
 
     // Used for displaying or removing messages from screen.
@@ -57,8 +59,8 @@ internal class InApp(
 
     override fun registerPreference(userInfoProvider: UserInfoProvider) {
         try {
-            AccountRepository.instance().userInfoProvider = userInfoProvider
-            AccountRepository.instance().updateUserInfo()
+            accountRepo.userInfoProvider = userInfoProvider
+            accountRepo.updateUserInfo()
         } catch (ex: Exception) {
             errorCallback?.let {
                 it(InAppMessagingException("In-App Messaging register preference failed", ex))
@@ -132,13 +134,14 @@ internal class InApp(
         }
     }
 
-    private fun userDidChange(): Boolean {
-        if (AccountRepository.instance().updateUserInfo()) {
+    @VisibleForTesting
+    internal fun userDidChange(): Boolean {
+        if (accountRepo.updateUserInfo()) {
             // Change in user detected,
             // Reset any stale cache structure
-            AccountRepository.instance().clearUserOldCacheStructure()
+            accountRepo.clearUserOldCacheStructure()
             // Update user-related data such as cache and ping data
-            SessionManager.onSessionUpdate()
+            sessionManager.onSessionUpdate()
             return true
         }
         return false

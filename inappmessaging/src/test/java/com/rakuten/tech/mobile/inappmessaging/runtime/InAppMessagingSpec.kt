@@ -17,6 +17,7 @@ import com.rakuten.tech.mobile.inappmessaging.runtime.data.responses.config.Conf
 import com.rakuten.tech.mobile.inappmessaging.runtime.exception.InAppMessagingException
 import com.rakuten.tech.mobile.inappmessaging.runtime.manager.DisplayManager
 import com.rakuten.tech.mobile.inappmessaging.runtime.manager.EventsManager
+import com.rakuten.tech.mobile.inappmessaging.runtime.manager.SessionManager
 import com.rakuten.tech.mobile.inappmessaging.runtime.utils.EventMatchingUtil
 import org.amshove.kluent.*
 import org.junit.After
@@ -303,6 +304,35 @@ open class InAppMessagingSpec : BaseTest() {
         InAppMessaging.errorCallback = null
     }
 
+    @SuppressWarnings("LongMethod")
+    @Test
+    fun `should call session-related functions on user change`() {
+        WorkManagerTestInitHelper.initializeTestWorkManager(ApplicationProvider.getApplicationContext())
+        Settings.Secure.putString(
+            ApplicationProvider.getApplicationContext<Context>().contentResolver,
+            Settings.Secure.ANDROID_ID, "test_device_id"
+        )
+
+        val accountRepoMock = Mockito.mock(AccountRepository::class.java)
+        val sessionManagerMock = Mockito.mock(SessionManager::class.java)
+        val instance = initializeMockInstance(
+            100, accountRepo = accountRepoMock,
+            sessionManager = sessionManagerMock
+        )
+        val infoProvider = TestUserInfoProvider() // test_user_id
+        instance.registerPreference(infoProvider)
+
+        // Simulate change user
+        infoProvider.userId = "test_user_id_2"
+        `when`(accountRepoMock.updateUserInfo()).thenReturn(true)
+        (instance as InApp).userDidChange()
+
+        // Should call onSessionUpdate
+        Mockito.verify(sessionManagerMock).onSessionUpdate()
+        // Should call clearOldDataStructure
+        Mockito.verify(accountRepoMock).clearUserOldCacheStructure()
+    }
+
     private fun setupDisplayedView(message: Message) {
         val message2 = ValidTestMessage()
         CampaignRepository.instance().syncWith(listOf(message, message2), 0)
@@ -323,13 +353,22 @@ open class InAppMessagingSpec : BaseTest() {
         InAppMessaging.initialize(ApplicationProvider.getApplicationContext(), shouldEnableCaching)
     }
 
-    internal fun initializeMockInstance(rollout: Int, manager: DisplayManager = displayManager): InAppMessaging {
+    internal fun initializeMockInstance(
+        rollout: Int,
+        displayManager: DisplayManager = this.displayManager,
+        accountRepo: AccountRepository = AccountRepository.instance(),
+        sessionManager: SessionManager = SessionManager
+    ): InAppMessaging {
         `when`(configResponseData.rollOutPercentage).thenReturn(rollout)
         ConfigResponseRepository.instance().addConfigResponse(configResponseData)
 
         return InApp(
-            ApplicationProvider.getApplicationContext(), false, manager,
-            eventsManager = eventsManager
+            context = ApplicationProvider.getApplicationContext(),
+            isDebugLogging = false,
+            displayManager = displayManager,
+            eventsManager = eventsManager,
+            accountRepo = accountRepo,
+            sessionManager = sessionManager
         )
     }
 

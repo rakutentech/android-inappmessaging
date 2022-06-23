@@ -8,6 +8,7 @@ import androidx.work.testing.WorkManagerTestInitHelper
 
 import com.rakuten.tech.mobile.inappmessaging.runtime.BaseTest
 import com.rakuten.tech.mobile.inappmessaging.runtime.InAppMessaging
+import com.rakuten.tech.mobile.inappmessaging.runtime.TestUserInfoProvider
 import com.rakuten.tech.mobile.inappmessaging.runtime.data.models.messages.Message
 import com.rakuten.tech.mobile.inappmessaging.runtime.data.models.messages.ValidTestMessage
 import com.rakuten.tech.mobile.inappmessaging.runtime.data.repositories.*
@@ -58,7 +59,7 @@ class SessionManagerSpec : BaseTest() {
     }
 
     @Test
-    fun `should clear repositories with null event`() {
+    fun `should clear repository with null event`() {
         WorkManagerTestInitHelper.initializeTestWorkManager(ApplicationProvider.getApplicationContext())
         Settings.Secure.putString(
             ApplicationProvider.getApplicationContext<Context>().contentResolver,
@@ -76,7 +77,7 @@ class SessionManagerSpec : BaseTest() {
     }
 
     @Test
-    fun `should clear repositories with valid event`() {
+    fun `should clear repository with valid event`() {
         WorkManagerTestInitHelper.initializeTestWorkManager(ApplicationProvider.getApplicationContext())
         Settings.Secure.putString(
             ApplicationProvider.getApplicationContext<Context>().contentResolver,
@@ -94,7 +95,7 @@ class SessionManagerSpec : BaseTest() {
     }
 
     @Test
-    fun `should clear repositories with valid persistent event`() {
+    fun `should clear repository with valid persistent event`() {
         WorkManagerTestInitHelper.initializeTestWorkManager(ApplicationProvider.getApplicationContext())
         Settings.Secure.putString(
             ApplicationProvider.getApplicationContext<Context>().contentResolver,
@@ -109,6 +110,29 @@ class SessionManagerSpec : BaseTest() {
 
         onSessionUpdate()
         verifyTestData()
+    }
+
+    @Test
+    fun `should update repository data when user changes`() {
+        WorkManagerTestInitHelper.initializeTestWorkManager(ApplicationProvider.getApplicationContext())
+        Settings.Secure.putString(
+            ApplicationProvider.getApplicationContext<Context>().contentResolver,
+            Settings.Secure.ANDROID_ID, "test_device_id"
+        )
+        InAppMessaging.initialize(ApplicationProvider.getApplicationContext())
+
+        val infoProvider = TestUserInfoProvider() // test_user_id
+        InAppMessaging.instance().registerPreference(infoProvider)
+
+        CampaignRepository.instance().syncWith(listOf(ValidTestMessage()), 0)
+        CampaignRepository.instance().messages.shouldHaveSize(1)
+
+        // Simulate change user
+        infoProvider.userId = "test_user_id_2"
+        AccountRepository.instance().updateUserInfo()
+        onSessionUpdate()
+
+        CampaignRepository.instance().messages.shouldBeEmpty()
     }
 
     private fun addTestData() {

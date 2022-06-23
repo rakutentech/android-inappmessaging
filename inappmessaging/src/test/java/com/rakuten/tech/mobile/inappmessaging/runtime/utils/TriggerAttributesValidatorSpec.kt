@@ -6,6 +6,7 @@ import com.rakuten.tech.mobile.inappmessaging.runtime.data.enums.ValueType
 import com.rakuten.tech.mobile.inappmessaging.runtime.data.models.appevents.CustomEvent
 import com.rakuten.tech.mobile.inappmessaging.runtime.data.responses.ping.Trigger
 import com.rakuten.tech.mobile.inappmessaging.runtime.data.responses.ping.TriggerAttribute
+import org.amshove.kluent.shouldBeFalse
 import org.amshove.kluent.shouldBeTrue
 import org.junit.Test
 import org.junit.runner.RunWith
@@ -16,28 +17,62 @@ import java.util.*
 class TriggerAttributesValidatorSpec : BaseTest() {
 
     @Test
-    fun `should accept message with valid string trigger`() {
+    fun `should return true with valid string trigger`() {
         testValidValueType(ValueType.STRING)
     }
 
     @Test
-    fun `should accept message with valid integer trigger`() {
+    fun `should return true with valid integer trigger`() {
         testValidValueType(ValueType.INTEGER)
     }
 
     @Test
-    fun `should accept message with valid double trigger`() {
+    fun `should return true with valid double trigger`() {
         testValidValueType(ValueType.DOUBLE)
     }
 
     @Test
-    fun `should accept message with valid boolean trigger`() {
+    fun `should return true with valid boolean trigger`() {
         testValidValueType(ValueType.BOOLEAN)
     }
 
     @Test
-    fun `should accept message with valid time trigger`() {
+    fun `should return true with valid time trigger`() {
         testValidValueType(ValueType.TIME_IN_MILLI)
+    }
+
+    @Test
+    fun `should return false when event type mismatches`() {
+        TriggerAttributesValidator.isTriggerSatisfied(
+            Trigger(1, EventType.APP_START.typeId, "test", mutableListOf()),
+            CustomEvent("custom")
+        ).shouldBeFalse()
+    }
+
+    @Test
+    fun `should return false when attribute name mismatches`() {
+        val trigger = Trigger(
+            0, EventType.CUSTOM.typeId, "custom",
+            mutableListOf(
+                TriggerAttribute("name1", "value", 1, 1)
+            )
+        )
+        val customEvent = CustomEvent("custom")
+        customEvent.addAttribute("name2", "value")
+        TriggerAttributesValidator.isTriggerSatisfied(trigger, customEvent).shouldBeFalse()
+    }
+
+    @Test
+    fun `should return false when attribute value type mismatches`() {
+        val trigger = Trigger(
+            0, EventType.CUSTOM.typeId, "custom",
+            mutableListOf(
+                TriggerAttribute("name", "value", 1, 1)
+            )
+        )
+        val customEvent = CustomEvent("custom")
+        customEvent.addAttribute("name", 1.0)
+        TriggerAttributesValidator.isTriggerSatisfied(trigger, customEvent).shouldBeFalse()
     }
 
     @SuppressWarnings("LongMethod")
