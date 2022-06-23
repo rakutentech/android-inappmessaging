@@ -1,7 +1,7 @@
 apply from: '../config/android/library.gradle'
 apply from: "../config/quality/checkstyle/android.gradle"
 apply from: "../config/quality/detekt/android.gradle"
-apply from: "../config/quality/gitleaks/build.gradle"
+//apply from: "../config/quality/gitleaks/build.gradle"
 
 apply plugin: "kotlin-android"
 
