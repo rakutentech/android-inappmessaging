@@ -61,16 +61,13 @@ internal abstract class CampaignRepository : CampaignRepositoryType {
 
     private class CampaignRepositoryImpl : CampaignRepository() {
 
-        // LinkedHashMap can preserve the message insertion order.
-        // Map - Key: Campaign ID, Value: Message object
-        private val messagesHashMap = LinkedHashMap<String, Message>()
-
         init {
             loadCachedData()
         }
 
-        override val messages: LinkedHashMap<String, Message>
-            get() = LinkedHashMap(messagesHashMap)
+        // LinkedHashMap can preserve the message insertion order.
+        // Map - Key: Campaign ID, Value: Message object
+        override val messages: LinkedHashMap<String, Message> = linkedMapOf()
 
         override var lastSyncMillis: Long? = null
             private set
@@ -78,9 +75,9 @@ internal abstract class CampaignRepository : CampaignRepositoryType {
         @SuppressWarnings("LongMethod", "NestedBlockDepth")
         override fun syncWith(messageList: List<Message>, timestampMillis: Long) {
             lastSyncMillis = timestampMillis
-            val oldList = messages
+            val oldList = LinkedHashMap(messages) // copy
 
-            messagesHashMap.clear()
+            messages.clear()
             val shouldRetainImpressionsValue = true
             for (newCampaign in messageList) {
                 if (newCampaign.getCampaignId().isEmpty()) {
@@ -105,13 +102,13 @@ internal abstract class CampaignRepository : CampaignRepositoryType {
                         updatedCampaign = Message.updatedMessage(updatedCampaign, impressionsLeft = newImpressionsLeft)
                     }
                 }
-                messagesHashMap[updatedCampaign.getCampaignId()] = updatedCampaign
+                messages[updatedCampaign.getCampaignId()] = updatedCampaign
             }
             saveDataToCache()
         }
 
         override fun clearMessages() {
-            messagesHashMap.clear()
+            messages.clear()
             saveDataToCache()
         }
 
@@ -126,7 +123,7 @@ internal abstract class CampaignRepository : CampaignRepositoryType {
             }
 
             val updatedCampaign = Message.updatedMessage(localCampaign, asOptedOut = true)
-            messagesHashMap[campaign.getCampaignId()] = updatedCampaign
+            messages[campaign.getCampaignId()] = updatedCampaign
 
             if (!campaign.isTest()) {
                 saveDataToCache()
@@ -168,11 +165,11 @@ internal abstract class CampaignRepository : CampaignRepositoryType {
                     ""
                 }
 
-                messagesHashMap.clear()
+                messages.clear()
                 try {
                     val jsonObject = JSONObject(listString)
                     for (key in jsonObject.keys()) {
-                        messagesHashMap[key] = Gson().fromJson(
+                        messages[key] = Gson().fromJson(
                             jsonObject.getJSONObject(key).toString(), CampaignData::class.java
                         )
                     }
@@ -189,17 +186,17 @@ internal abstract class CampaignRepository : CampaignRepositoryType {
                         context = it,
                         name = InAppMessaging.getPreferencesFile(),
                         key = IAM_USER_CACHE,
-                        value = Gson().toJson(messagesHashMap)
+                        value = Gson().toJson(messages)
                     )
                 } ?: Logger(TAG).debug("failed saving response data")
             }
         }
 
-        private fun findCampaign(id: String): Message? = messagesHashMap[id]
+        private fun findCampaign(id: String): Message? = messages[id]
 
         private fun updateImpressions(campaign: Message, newValue: Int): Message {
             val updatedCampaign = Message.updatedMessage(campaign, impressionsLeft = newValue)
-            messagesHashMap[campaign.getCampaignId()] = updatedCampaign
+            messages[campaign.getCampaignId()] = updatedCampaign
 
             saveDataToCache()
             return updatedCampaign
