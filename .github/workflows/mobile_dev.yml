@@ -22,4 +22,4 @@ jobs:
         with:
           api-key: ${{ secrets.MOBILE_DEV_API_KEY }}
           name: ${{ github.sha }}
-          app-file: test/build/outputs/apk/prodTesting/release/test-prodTesting-release-unsigned.apk
+          app-file: test/build/outputs/apk/prodTesting/debug/test-prodTesting-debug.apk
