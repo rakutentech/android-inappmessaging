@@ -17,7 +17,7 @@ jobs:
           IAM_SUBSCRIPTION_KEY: xxxx-xxxx-xxxx-xxxx
         run: |
           git submodule update --init
-          ./gradlew clean assembleRelease
+          ./gradlew clean assembleDebug
       - uses: mobile-dev-inc/action-upload@v1.0.0
         with:
           api-key: ${{ secrets.MOBILE_DEV_API_KEY }}
