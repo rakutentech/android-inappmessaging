@@ -306,7 +306,7 @@ open class InAppMessagingSpec : BaseTest() {
 
     @SuppressWarnings("LongMethod")
     @Test
-    fun `should call session-related functions on user change`() {
+    fun `should call onSessionUpdate on user change`() {
         WorkManagerTestInitHelper.initializeTestWorkManager(ApplicationProvider.getApplicationContext())
         Settings.Secure.putString(
             ApplicationProvider.getApplicationContext<Context>().contentResolver,
@@ -329,8 +329,6 @@ open class InAppMessagingSpec : BaseTest() {
 
         // Should call onSessionUpdate
         Mockito.verify(sessionManagerMock).onSessionUpdate()
-        // Should call clearOldDataStructure
-        Mockito.verify(accountRepoMock).clearUserOldCacheStructure()
     }
 
     private fun setupDisplayedView(message: Message) {

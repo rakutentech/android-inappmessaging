@@ -137,9 +137,6 @@ internal class InApp(
     @VisibleForTesting
     internal fun userDidChange(): Boolean {
         if (accountRepo.updateUserInfo()) {
-            // Change in user detected,
-            // Reset any stale cache structure
-            accountRepo.clearUserOldCacheStructure()
             // Update user-related data such as cache and ping data
             sessionManager.onSessionUpdate()
             return true

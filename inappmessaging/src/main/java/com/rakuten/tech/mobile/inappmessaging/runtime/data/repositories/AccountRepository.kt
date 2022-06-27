@@ -42,6 +42,10 @@ internal abstract class AccountRepository {
 
     abstract fun logWarningForUserInfo(tag: String, logger: Logger = Logger(tag))
 
+    /**
+     * Checks whether user cache uses old cache structure (structure until v7.1.0) and clears it since it will no
+     * longer be used.
+     */
     abstract fun clearUserOldCacheStructure()
 
     companion object {
@@ -97,16 +101,15 @@ internal abstract class AccountRepository {
             }
         }
 
-        /**
-         * From v7.1.0, the structure of cached data is changed.
-         * Remove old data since it will never be used.
-         */
         override fun clearUserOldCacheStructure() {
             if (InAppMessaging.instance().isLocalCachingEnabled()) {
-                clearOldCacheByKey("ping_response_list")
-                clearOldCacheByKey("local_event_list")
-                clearOldCacheByKey("ready_display_list")
-                clearOldCacheByKey("local_displayed_list")
+                InAppMessaging.instance().getHostAppContext()?.let { ctx ->
+                    val prefs = InAppMessaging.getPreferencesFile()
+                    // Clear if using old cache structure
+                    if (!PreferencesUtil.contains(ctx, prefs, CampaignRepository.IAM_USER_CACHE)) {
+                        PreferencesUtil.clear(ctx, prefs)
+                    }
+                }
             }
         }
 
@@ -122,17 +125,6 @@ internal abstract class AccountRepository {
             } catch (ex: Exception) {
                 // should never happen since "MD5" is a supported algorithm
                 input
-            }
-        }
-
-        private fun clearOldCacheByKey(key: String) {
-            if (InAppMessaging.instance().isLocalCachingEnabled()) {
-                val prefs = InAppMessaging.getPreferencesFile()
-                InAppMessaging.instance().getHostAppContext()?.let { ctx ->
-                    if (PreferencesUtil.contains(ctx, prefs, key)) {
-                        PreferencesUtil.remove(ctx, prefs, key)
-                    }
-                }
             }
         }
     }
