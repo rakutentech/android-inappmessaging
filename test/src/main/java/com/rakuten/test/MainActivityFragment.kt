@@ -2,8 +2,9 @@ package com.rakuten.test
 
 import android.app.AlertDialog
 import android.content.Intent
-import android.content.SharedPreferences
 import android.os.Bundle
+import android.os.Handler
+import android.os.Looper
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -18,6 +19,8 @@ import com.rakuten.tech.mobile.inappmessaging.runtime.data.models.appevents.Purc
 import com.rakuten.tech.mobile.sdkutils.PreferencesUtil
 
 class MainActivityFragment : Fragment(), View.OnClickListener {
+
+    lateinit var testButton: Button
 
     override fun onCreate(savedInstanceState: Bundle?) {
         context?.let {
@@ -34,6 +37,8 @@ class MainActivityFragment : Fragment(), View.OnClickListener {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
+        testButton = view.findViewById(R.id.close_message)
+
         view.findViewById<Button>(R.id.launch_second_activity).setOnClickListener(this)
         view.findViewById<Button>(R.id.launch_successful).setOnClickListener(this)
         view.findViewById<Button>(R.id.login_successful).setOnClickListener(this)
@@ -43,12 +48,18 @@ class MainActivityFragment : Fragment(), View.OnClickListener {
         view.findViewById<Button>(R.id.login_successful_twice).setOnClickListener(this)
         view.findViewById<Button>(R.id.purchase_successful_twice).setOnClickListener(this)
         view.findViewById<Button>(R.id.login_purchase_successful).setOnClickListener(this)
-        view.findViewById<Button>(R.id.close_message).setOnClickListener(this)
+        testButton.setOnClickListener(this)
     }
 
     override fun onClick(v: View) {
         when (v.id) {
-            R.id.launch_second_activity -> startActivity(Intent(this.activity, SecondActivity::class.java))
+            R.id.launch_second_activity -> {
+                // test memory leak
+                Handler(Looper.getMainLooper()).postDelayed( {
+                    testButton.text = "Leak!!"
+                }, 5000)
+                startActivity(Intent(this.activity, SecondActivity::class.java))
+            }
             R.id.launch_successful -> InAppMessaging.instance().logEvent(AppStartEvent())
             R.id.login_successful -> InAppMessaging.instance().logEvent(LoginSuccessfulEvent())
             R.id.purchase_successful -> InAppMessaging.instance().logEvent(PurchaseSuccessfulEvent().currencyCode("JPY"))
