@@ -133,7 +133,8 @@ abstract class InAppMessaging internal constructor() {
             val manifestConfig = InApp.AppManifestConfig(context)
 
             // startup delay test
-            Thread.sleep(6000)
+//            Thread.sleep(6000)
+            // remove for now to test mem leak
 
             // `manifestConfig.isDebugging()` is used to enable/disable the debug logging of InAppMessaging SDK.
             // Note: All InAppMessaging SDK logs' tags begins with "IAM_".
