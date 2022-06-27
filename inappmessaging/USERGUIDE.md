@@ -395,7 +395,6 @@ Documents targeting Product Managers:
 * SDKCF-4919: Added support for building using Java 11.
 * SDKCF-5173: Updated detekt to stricter check.
 * SDKCF-5295: Updated SDK Utils version to update default `initOrder` of content provider.
-* SDKCF-4919: Added support for building using Java 11.
 
 ### 7.0.0 (2022-04-25)
 * SDKCF-4941: **Breaking Changes:** Updated configuration API to align with iOS.
