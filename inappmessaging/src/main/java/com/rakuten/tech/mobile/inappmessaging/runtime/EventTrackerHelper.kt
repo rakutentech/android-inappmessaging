@@ -2,7 +2,7 @@ package com.rakuten.tech.mobile.inappmessaging.runtime
 
 import android.text.TextUtils
 import androidx.annotation.VisibleForTesting
-import com.rakuten.tech.mobile.sdkutils.logger.Logger
+import com.rakuten.tech.mobile.inappmessaging.runtime.utils.InAppLogger
 
 internal object EventTrackerHelper {
 
@@ -41,7 +41,7 @@ internal object EventTrackerHelper {
             Class.forName(className)
             true
         } catch (e: ClassNotFoundException) {
-            Logger(TAG).info(e.message)
+            InAppLogger(TAG).info(e.message)
             false
         }
     }

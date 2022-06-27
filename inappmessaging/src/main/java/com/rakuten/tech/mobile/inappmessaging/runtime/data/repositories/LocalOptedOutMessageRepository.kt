@@ -3,8 +3,8 @@ package com.rakuten.tech.mobile.inappmessaging.runtime.data.repositories
 import androidx.annotation.VisibleForTesting
 import com.rakuten.tech.mobile.inappmessaging.runtime.InAppMessaging
 import com.rakuten.tech.mobile.inappmessaging.runtime.data.models.messages.Message
+import com.rakuten.tech.mobile.inappmessaging.runtime.utils.InAppLogger
 import com.rakuten.tech.mobile.sdkutils.PreferencesUtil
-import com.rakuten.tech.mobile.sdkutils.logger.Logger
 
 /**
  * This class contains opted out messages that user chose not to see it again.
@@ -104,7 +104,7 @@ internal interface LocalOptedOutMessageRepository {
                         key = LOCAL_OPTED_OUT_KEY,
                         values = optedOutMessages
                     )
-                } ?: Logger(TAG).debug("failed saving opted out data")
+                } ?: InAppLogger(TAG).debug("failed saving opted out data")
             }
         }
     }

@@ -6,8 +6,8 @@ import com.google.gson.reflect.TypeToken
 import com.rakuten.tech.mobile.inappmessaging.runtime.InAppMessaging
 import com.rakuten.tech.mobile.inappmessaging.runtime.data.models.messages.Message
 import com.rakuten.tech.mobile.inappmessaging.runtime.exception.InAppMessagingException
+import com.rakuten.tech.mobile.inappmessaging.runtime.utils.InAppLogger
 import com.rakuten.tech.mobile.sdkutils.PreferencesUtil
-import com.rakuten.tech.mobile.sdkutils.logger.Logger
 import java.lang.ClassCastException
 import java.util.Calendar
 import java.util.concurrent.ConcurrentHashMap
@@ -148,7 +148,7 @@ internal interface LocalDisplayedMessageRepository {
                     )
                 }.orEmpty()
             } catch (ex: ClassCastException) {
-                Logger(TAG).debug(ex.cause, "Incorrect JSON format for $LOCAL_DISPLAYED_KEY data")
+                InAppLogger(TAG).debug(ex.cause, "Incorrect JSON format for $LOCAL_DISPLAYED_KEY data")
                 ""
             }
             messages.clear()
@@ -157,7 +157,7 @@ internal interface LocalDisplayedMessageRepository {
                 try {
                     messages.putAll(Gson().fromJson(listString, type))
                 } catch (ex: Exception) {
-                    Logger(TAG).debug(ex.cause, "Incorrect JSON format for $LOCAL_DISPLAYED_KEY data")
+                    InAppLogger(TAG).debug(ex.cause, "Incorrect JSON format for $LOCAL_DISPLAYED_KEY data")
                 }
             }
         }
@@ -173,7 +173,7 @@ internal interface LocalDisplayedMessageRepository {
                         key = LOCAL_DISPLAYED_KEY,
                         value = Gson().toJson(messages)
                     )
-                } ?: Logger(TAG).debug("failed saving displayed data")
+                } ?: InAppLogger(TAG).debug("failed saving displayed data")
             }
         }
     }

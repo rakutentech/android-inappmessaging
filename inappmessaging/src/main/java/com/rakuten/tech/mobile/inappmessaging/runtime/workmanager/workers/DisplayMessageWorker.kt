@@ -16,8 +16,8 @@ import com.rakuten.tech.mobile.inappmessaging.runtime.data.repositories.LocalDis
 import com.rakuten.tech.mobile.inappmessaging.runtime.data.repositories.ReadyForDisplayMessageRepository
 import com.rakuten.tech.mobile.inappmessaging.runtime.manager.MessageReadinessManager
 import com.rakuten.tech.mobile.inappmessaging.runtime.runnable.DisplayMessageRunnable
+import com.rakuten.tech.mobile.inappmessaging.runtime.utils.InAppLogger
 import com.rakuten.tech.mobile.inappmessaging.runtime.utils.WorkManagerUtil
-import com.rakuten.tech.mobile.sdkutils.logger.Logger
 import com.squareup.picasso.Callback
 import com.squareup.picasso.Picasso
 import java.lang.Exception
@@ -40,9 +40,9 @@ internal class DisplayMessageWorker(
      * This method starts displaying message runnable.
      */
     override suspend fun doWork(): Result {
-        Logger(TAG).debug("onHandleWork() started on thread: %s", Thread.currentThread().name)
+        InAppLogger(TAG).debug("onHandleWork() started on thread: %s", Thread.currentThread().name)
         prepareNextMessage()
-        Logger(TAG).debug("onHandleWork() ended")
+        InAppLogger(TAG).debug("onHandleWork() ended")
         return Result.success()
     }
 
@@ -81,7 +81,7 @@ internal class DisplayMessageWorker(
                 }
 
                 override fun onError(e: Exception?) {
-                    Logger(TAG).debug("Downloading image failed")
+                    InAppLogger(TAG).debug("Downloading image failed")
                 }
             },
             context = hostActivity, picasso = picasso
@@ -94,7 +94,7 @@ internal class DisplayMessageWorker(
     private fun displayMessage(message: Message, hostActivity: Activity) {
         if (!verifyContexts(message)) {
             // Message display aborted by the host app
-            Logger(TAG).debug("message display cancelled by the host app")
+            InAppLogger(TAG).debug("message display cancelled by the host app")
 
             // increment time closed to handle required number of events to be triggered
             readyMessagesRepo.removeMessage(message.getCampaignId(), true)

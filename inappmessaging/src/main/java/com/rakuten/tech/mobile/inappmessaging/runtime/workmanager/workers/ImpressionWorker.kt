@@ -10,9 +10,9 @@ import com.rakuten.tech.mobile.inappmessaging.runtime.data.repositories.AccountR
 import com.rakuten.tech.mobile.inappmessaging.runtime.data.repositories.ConfigResponseRepository
 import com.rakuten.tech.mobile.inappmessaging.runtime.data.repositories.HostAppInfoRepository
 import com.rakuten.tech.mobile.inappmessaging.runtime.data.requests.ImpressionRequest
+import com.rakuten.tech.mobile.inappmessaging.runtime.utils.InAppLogger
 import com.rakuten.tech.mobile.inappmessaging.runtime.utils.RuntimeUtil
 import com.rakuten.tech.mobile.inappmessaging.runtime.utils.WorkerUtils
-import com.rakuten.tech.mobile.sdkutils.logger.Logger
 import okhttp3.ResponseBody
 import retrofit2.Call
 import retrofit2.Response
@@ -47,7 +47,7 @@ internal class ImpressionWorker(
         val impressionRequest = try {
             Gson().fromJson(impressionRequestJsonRequest, ImpressionRequest::class.java)
         } catch (e: JsonParseException) {
-            Logger(TAG).error(e.message)
+            InAppLogger(TAG).error(e.message)
             return Result.failure()
         }
 
@@ -56,13 +56,13 @@ internal class ImpressionWorker(
             // Execute Retrofit API call and handle response.
             onResponse(createReportImpressionCall(impressionEndpoint, impressionRequest).execute())
         } catch (e: Exception) {
-            Logger(TAG).debug(e.message)
+            InAppLogger(TAG).debug(e.message)
             Result.retry()
         }
     }
 
     fun onResponse(response: Response<ResponseBody>): Result {
-        Logger(TAG).debug("Impression Response:%d", response.code())
+        InAppLogger(TAG).debug("Impression Response:%d", response.code())
 
         return when {
             response.code() >= HttpURLConnection.HTTP_INTERNAL_ERROR ->

@@ -6,8 +6,8 @@ import com.rakuten.tech.mobile.inappmessaging.runtime.InAppMessaging
 import com.rakuten.tech.mobile.inappmessaging.runtime.data.models.messages.Message
 import com.rakuten.tech.mobile.inappmessaging.runtime.data.responses.ping.CampaignData
 import com.rakuten.tech.mobile.inappmessaging.runtime.manager.ImpressionManager
+import com.rakuten.tech.mobile.inappmessaging.runtime.utils.InAppLogger
 import com.rakuten.tech.mobile.sdkutils.PreferencesUtil
-import com.rakuten.tech.mobile.sdkutils.logger.Logger
 import org.json.JSONArray
 import java.lang.ClassCastException
 
@@ -102,7 +102,7 @@ internal abstract class ReadyForDisplayMessageRepository : ReadyMessageRepositor
                         )
                     }.orEmpty()
                 } catch (ex: ClassCastException) {
-                    Logger(TAG).debug(ex.cause, "Incorrect type for $READY_DISPLAY_KEY data")
+                    InAppLogger(TAG).debug(ex.cause, "Incorrect type for $READY_DISPLAY_KEY data")
                     ""
                 }
 
@@ -113,7 +113,7 @@ internal abstract class ReadyForDisplayMessageRepository : ReadyMessageRepositor
                         messages.add(Gson().fromJson(jsonArray.getJSONObject(i).toString(), CampaignData::class.java))
                     }
                 } catch (ex: Exception) {
-                    Logger(TAG).debug(ex.cause, "Invalid JSON format for $READY_DISPLAY_KEY data")
+                    InAppLogger(TAG).debug(ex.cause, "Invalid JSON format for $READY_DISPLAY_KEY data")
                 }
             }
         }
@@ -129,7 +129,7 @@ internal abstract class ReadyForDisplayMessageRepository : ReadyMessageRepositor
                         key = READY_DISPLAY_KEY,
                         value = Gson().toJson(messages)
                     )
-                } ?: Logger(TAG).debug("failed saving ready data")
+                } ?: InAppLogger(TAG).debug("failed saving ready data")
             }
         }
     }

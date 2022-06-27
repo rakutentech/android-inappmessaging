@@ -387,6 +387,9 @@ Documents targeting Product Managers:
 
 ## <a name="changelog"></a> Changelog
 
+### 7.2.0 (in progress)
+* SDKCF-5510: Updated SDK Utils dependency to v2.0.0.
+
 ### 7.1.0 (2022-06-24)
 * SDKCF-5256: Added sending of impression events with campaign details to analytics account.
 * SDKCF-4919: Added support for building using Java 11.

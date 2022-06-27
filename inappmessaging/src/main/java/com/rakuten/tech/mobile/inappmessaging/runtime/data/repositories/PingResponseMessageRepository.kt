@@ -5,8 +5,8 @@ import com.google.gson.Gson
 import com.rakuten.tech.mobile.inappmessaging.runtime.InAppMessaging
 import com.rakuten.tech.mobile.inappmessaging.runtime.data.models.messages.Message
 import com.rakuten.tech.mobile.inappmessaging.runtime.data.responses.ping.CampaignData
+import com.rakuten.tech.mobile.inappmessaging.runtime.utils.InAppLogger
 import com.rakuten.tech.mobile.sdkutils.PreferencesUtil
-import com.rakuten.tech.mobile.sdkutils.logger.Logger
 import org.json.JSONObject
 import java.lang.ClassCastException
 
@@ -107,7 +107,7 @@ internal abstract class PingResponseMessageRepository : MessageRepository {
                         )
                     }.orEmpty()
                 } catch (ex: ClassCastException) {
-                    Logger(TAG).debug(ex.cause, "Incorrect type for $PING_RESPONSE_KEY data")
+                    InAppLogger(TAG).debug(ex.cause, "Incorrect type for $PING_RESPONSE_KEY data")
                     ""
                 }
                 messages.clear()
@@ -122,7 +122,7 @@ internal abstract class PingResponseMessageRepository : MessageRepository {
                         messages[key] = campaign
                     }
                 } catch (ex: Exception) {
-                    Logger(TAG).debug(ex.cause, "Invalid JSON format for $PING_RESPONSE_KEY data")
+                    InAppLogger(TAG).debug(ex.cause, "Invalid JSON format for $PING_RESPONSE_KEY data")
                 }
             }
         }
@@ -138,7 +138,7 @@ internal abstract class PingResponseMessageRepository : MessageRepository {
                         key = PING_RESPONSE_KEY,
                         value = Gson().toJson(messages)
                     )
-                } ?: Logger(TAG).debug("failed saving response data")
+                } ?: InAppLogger(TAG).debug("failed saving response data")
             }
         }
     }
