@@ -390,8 +390,10 @@ Documents targeting Product Managers:
 ### 7.2.0 (in progress)
 * SDKCF-5510: Updated SDK Utils dependency to v2.0.0.
 
-### 7.1.0 (in-progress)
+### 7.1.0 (2022-06-24)
 * SDKCF-5256: Added sending of impression events with campaign details to analytics account.
+* SDKCF-4919: Added support for building using Java 11.
+* SDKCF-5173: Updated detekt to stricter check.
 * SDKCF-5295: Updated SDK Utils version to update default `initOrder` of content provider.
 * SDKCF-4919: Added support for building using Java 11.
 
