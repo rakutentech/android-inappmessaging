@@ -11,12 +11,12 @@ import com.rakuten.tech.mobile.inappmessaging.runtime.data.repositories.ConfigRe
 import com.rakuten.tech.mobile.inappmessaging.runtime.data.repositories.HostAppInfoRepository
 import com.rakuten.tech.mobile.inappmessaging.runtime.data.requests.ConfigQueryParamsBuilder
 import com.rakuten.tech.mobile.inappmessaging.runtime.data.responses.config.ConfigResponse
+import com.rakuten.tech.mobile.inappmessaging.runtime.utils.InAppLogger
 import com.rakuten.tech.mobile.inappmessaging.runtime.utils.RetryDelayUtil
 import com.rakuten.tech.mobile.inappmessaging.runtime.utils.RuntimeUtil
 import com.rakuten.tech.mobile.inappmessaging.runtime.utils.WorkerUtils
 import com.rakuten.tech.mobile.inappmessaging.runtime.workmanager.schedulers.ConfigScheduler
 import com.rakuten.tech.mobile.inappmessaging.runtime.workmanager.schedulers.MessageMixerPingScheduler
-import com.rakuten.tech.mobile.sdkutils.logger.Logger
 import retrofit2.Response
 import java.net.HttpURLConnection
 import java.util.concurrent.atomic.AtomicInteger
@@ -52,7 +52,7 @@ internal class ConfigWorker(
      */
     @SuppressWarnings("LongMethod", "TooGenericExceptionCaught")
     override fun doWork(): Result {
-        Logger(TAG).debug(hostRepo.getConfigUrl())
+        InAppLogger(TAG).debug(hostRepo.getConfigUrl())
         val hostAppId = hostRepo.getPackageName()
         val locale = hostRepo.getDeviceLocale()
         val hostAppVersion = hostRepo.getVersion()
@@ -75,7 +75,7 @@ internal class ConfigWorker(
             // Executing the API network call.
             onResponse(configServiceCall.execute())
         } catch (e: Exception) {
-            Logger(TAG).error(e.message)
+            InAppLogger(TAG).error(e.message)
             // RETRY by default has exponential backoff baked in.
             Result.retry()
         }
@@ -98,7 +98,7 @@ internal class ConfigWorker(
             // Schedule a ping request to message mixer. Initial delay is 0
             // reset current delay to initial
             ConfigScheduler.currDelay = RetryDelayUtil.INITIAL_BACKOFF_DELAY
-            Logger(TAG).debug(
+            InAppLogger(TAG).debug(
                 "Config Response: %d (%b)",
                 response.body()?.data?.rollOutPercentage, configRepo.isConfigEnabled()
             )

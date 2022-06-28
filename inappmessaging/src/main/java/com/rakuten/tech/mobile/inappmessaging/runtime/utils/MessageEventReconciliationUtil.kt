@@ -5,7 +5,6 @@ import com.rakuten.tech.mobile.inappmessaging.runtime.data.models.messages.Messa
 import com.rakuten.tech.mobile.inappmessaging.runtime.data.repositories.CampaignRepository
 import com.rakuten.tech.mobile.inappmessaging.runtime.data.responses.ping.Trigger
 import com.rakuten.tech.mobile.inappmessaging.runtime.data.responses.ping.matchingEventName
-import com.rakuten.tech.mobile.sdkutils.logger.Logger
 import java.util.Date
 
 internal interface MessageEventReconciliationUtilType {
@@ -58,7 +57,7 @@ internal abstract class MessageEventReconciliationUtil : MessageEventReconciliat
 
                 val campaignTriggers = campaign.getTriggers()
                 if (campaignTriggers.isNullOrEmpty()) {
-                    Logger(TAG).debug("Campaign (${campaign.getCampaignId()}) has no triggers.")
+                    InAppLogger(TAG).debug("Campaign (${campaign.getCampaignId()}) has no triggers.")
                     continue
                 }
 

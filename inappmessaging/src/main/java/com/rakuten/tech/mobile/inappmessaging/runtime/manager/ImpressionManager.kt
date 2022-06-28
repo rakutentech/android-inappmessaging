@@ -7,13 +7,13 @@ import com.rakuten.tech.mobile.inappmessaging.runtime.data.models.Impression
 import com.rakuten.tech.mobile.inappmessaging.runtime.data.models.rat.RatImpression
 import com.rakuten.tech.mobile.inappmessaging.runtime.data.repositories.HostAppInfoRepository
 import com.rakuten.tech.mobile.inappmessaging.runtime.data.requests.ImpressionRequest
+import com.rakuten.tech.mobile.inappmessaging.runtime.utils.InAppLogger
 import com.rakuten.tech.mobile.inappmessaging.runtime.utils.InAppMessagingConstants.Companion.RAT_EVENT_CAMP_ID
 import com.rakuten.tech.mobile.inappmessaging.runtime.utils.InAppMessagingConstants.Companion.RAT_EVENT_IMP
 import com.rakuten.tech.mobile.inappmessaging.runtime.utils.InAppMessagingConstants.Companion.RAT_EVENT_KEY_IMPRESSION
 import com.rakuten.tech.mobile.inappmessaging.runtime.utils.InAppMessagingConstants.Companion.RAT_EVENT_SUBS_ID
 import com.rakuten.tech.mobile.inappmessaging.runtime.utils.RuntimeUtil
 import com.rakuten.tech.mobile.inappmessaging.runtime.workmanager.schedulers.ImpressionScheduler
-import com.rakuten.tech.mobile.sdkutils.logger.Logger
 import java.util.Date
 import java.util.concurrent.ConcurrentHashMap
 import kotlin.collections.ArrayList
@@ -101,7 +101,7 @@ internal object ImpressionManager {
             }
 
             impressionList.add(Impression(impressionType, currentTimeInMillis))
-            Logger(TAG).debug("impression %s, time: %d", impressionType.name, currentTimeInMillis)
+            InAppLogger(TAG).debug("impression %s, time: %d", impressionType.name, currentTimeInMillis)
         }
         return impressionList
     }

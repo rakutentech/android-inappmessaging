@@ -5,7 +5,6 @@ import com.rakuten.tech.mobile.inappmessaging.runtime.data.models.messages.Messa
 import com.rakuten.tech.mobile.inappmessaging.runtime.data.repositories.CampaignRepository
 import com.rakuten.tech.mobile.inappmessaging.runtime.data.responses.ping.Trigger
 import com.rakuten.tech.mobile.inappmessaging.runtime.data.responses.ping.matchingEventName
-import com.rakuten.tech.mobile.sdkutils.logger.Logger
 
 internal interface EventMatchingUtilType {
 
@@ -67,7 +66,7 @@ internal abstract class EventMatchingUtil : EventMatchingUtilType {
                 val events = matchedEvents[campaign.getCampaignId()] ?: mutableListOf()
                 events.add(event)
                 matchedEvents[campaign.getCampaignId()] = events
-                Logger(TAG).debug(
+                InAppLogger(TAG).debug(
                     "Campaign (${campaign.getCampaignId()}) matched events:" +
                         matchedEvents(campaign).map { it.getEventName() }
                 )
@@ -92,7 +91,7 @@ internal abstract class EventMatchingUtil : EventMatchingUtilType {
             val totalMatchedEvents = campaignEvents.count() + persistentEvents.count()
 
             if (!(totalMatchedEvents > 0 && totalMatchedEvents >= eventsToRemove.size)) {
-                Logger(TAG).debug("Couldn't find set of events")
+                InAppLogger(TAG).debug("Couldn't find set of events")
                 return false
             }
 
@@ -100,7 +99,7 @@ internal abstract class EventMatchingUtil : EventMatchingUtilType {
             if (isCampaignPersistentEventsOnly &&
                 triggeredPersistentEventOnlyCampaigns.contains(campaign.getCampaignId())
             ) {
-                Logger(TAG).debug("Provided set of events already used")
+                InAppLogger(TAG).debug("Provided set of events already used")
                 return false
             }
 
@@ -110,7 +109,7 @@ internal abstract class EventMatchingUtil : EventMatchingUtilType {
                 }
                 val index = campaignEvents.indexOf(eventToRemove)
                 if (index == -1) {
-                    Logger(TAG).debug("Couldn't find requested set of events")
+                    InAppLogger(TAG).debug("Couldn't find requested set of events")
                     return false
                 }
                 campaignEvents.removeAt(index)

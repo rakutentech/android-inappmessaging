@@ -6,10 +6,10 @@ import androidx.work.WorkerParameters
 import com.rakuten.tech.mobile.inappmessaging.runtime.BuildConfig
 import com.rakuten.tech.mobile.inappmessaging.runtime.manager.DisplayManager
 import com.rakuten.tech.mobile.inappmessaging.runtime.manager.MessageReadinessManager
+import com.rakuten.tech.mobile.inappmessaging.runtime.utils.InAppLogger
 import com.rakuten.tech.mobile.inappmessaging.runtime.utils.MessageEventReconciliationUtil
 import com.rakuten.tech.mobile.inappmessaging.runtime.utils.EventMatchingUtil
 import com.rakuten.tech.mobile.inappmessaging.runtime.utils.RuntimeUtil.getCurrentTimeMillis
-import com.rakuten.tech.mobile.sdkutils.logger.Logger
 
 /**
  * This worker's main task is to reconcile messages with local events. This worker must be a unique
@@ -41,7 +41,7 @@ internal class MessageEventReconciliationWorker(
      */
     @SuppressWarnings("LongMethod")
     override fun doWork(): Result {
-        Logger(TAG).debug("doWork()")
+        InAppLogger(TAG).debug("doWork()")
         var startTime: Long = 0
         if (BuildConfig.DEBUG) {
             startTime = getCurrentTimeMillis()
@@ -57,7 +57,7 @@ internal class MessageEventReconciliationWorker(
         if (BuildConfig.DEBUG) {
             endTime = getCurrentTimeMillis()
         }
-        Logger(TAG).debug("Time took to reconcile: %d milliseconds", endTime - startTime)
+        InAppLogger(TAG).debug("Time took to reconcile: %d milliseconds", endTime - startTime)
         return Result.success()
     }
 
@@ -65,7 +65,7 @@ internal class MessageEventReconciliationWorker(
         messageEventReconciliationUtil.validate { campaign, events ->
             if (eventMatchingUtil.removeSetOfMatchedEvents(events, campaign)) {
                 messageReadinessManager.addMessageToQueue(campaign.getCampaignId())
-                Logger(TAG).debug("Ready message: ${campaign.getMessagePayload().header}")
+                InAppLogger(TAG).debug("Ready message: ${campaign.getMessagePayload().header}")
             }
         }
     }

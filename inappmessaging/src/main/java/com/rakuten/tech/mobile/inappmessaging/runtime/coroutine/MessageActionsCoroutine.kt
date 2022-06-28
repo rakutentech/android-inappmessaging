@@ -18,7 +18,7 @@ import com.rakuten.tech.mobile.inappmessaging.runtime.data.responses.ping.OnClic
 import com.rakuten.tech.mobile.inappmessaging.runtime.data.responses.ping.Trigger
 import com.rakuten.tech.mobile.inappmessaging.runtime.manager.EventsManager
 import com.rakuten.tech.mobile.inappmessaging.runtime.manager.ImpressionManager
-import com.rakuten.tech.mobile.sdkutils.logger.Logger
+import com.rakuten.tech.mobile.inappmessaging.runtime.utils.InAppLogger
 import java.util.Date
 import kotlin.collections.ArrayList
 
@@ -139,7 +139,7 @@ internal class MessageActionsCoroutine(private val campaignRepo: CampaignReposit
                 try {
                     activityContext.startActivity(intent)
                 } catch (e: ActivityNotFoundException) {
-                    Logger(TAG).debug(e.message)
+                    InAppLogger(TAG).debug(e.message)
                 }
             }
         }

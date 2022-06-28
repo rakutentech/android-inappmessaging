@@ -5,7 +5,7 @@ import com.rakuten.tech.mobile.inappmessaging.runtime.BuildConfig
 import com.rakuten.tech.mobile.inappmessaging.runtime.InAppMessaging
 import com.rakuten.tech.mobile.inappmessaging.runtime.UserInfoProvider
 import com.rakuten.tech.mobile.sdkutils.PreferencesUtil
-import com.rakuten.tech.mobile.sdkutils.logger.Logger
+import com.rakuten.tech.mobile.inappmessaging.runtime.utils.InAppLogger
 import java.math.BigInteger
 import java.security.MessageDigest
 
@@ -40,7 +40,7 @@ internal abstract class AccountRepository {
      */
     abstract fun updateUserInfo(algo: String? = null): Boolean
 
-    abstract fun logWarningForUserInfo(tag: String, logger: Logger = Logger(tag))
+    abstract fun logWarningForUserInfo(tag: String, logger: InAppLogger = InAppLogger(tag))
 
     /**
      * Checks whether user cache uses old cache structure (structure until v7.1.0) and clears it since it will no
@@ -84,7 +84,7 @@ internal abstract class AccountRepository {
         }
 
         @SuppressLint("BinaryOperationInTimber")
-        override fun logWarningForUserInfo(tag: String, logger: Logger) {
+        override fun logWarningForUserInfo(tag: String, logger: InAppLogger) {
             if (getAccessToken().isNotEmpty()) {
                 if (getIdTrackingIdentifier().isNotEmpty()) {
                     logger.warn(ID_TRACKING_ERR_MSG)

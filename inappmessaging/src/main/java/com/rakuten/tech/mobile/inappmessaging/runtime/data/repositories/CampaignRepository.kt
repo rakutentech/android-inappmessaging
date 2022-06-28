@@ -4,8 +4,8 @@ import com.google.gson.Gson
 import com.rakuten.tech.mobile.inappmessaging.runtime.InAppMessaging
 import com.rakuten.tech.mobile.inappmessaging.runtime.data.models.messages.Message
 import com.rakuten.tech.mobile.inappmessaging.runtime.data.responses.ping.CampaignData
+import com.rakuten.tech.mobile.inappmessaging.runtime.utils.InAppLogger
 import com.rakuten.tech.mobile.sdkutils.PreferencesUtil
-import com.rakuten.tech.mobile.sdkutils.logger.Logger
 import org.json.JSONObject
 import java.lang.ClassCastException
 import java.lang.Integer.max
@@ -113,7 +113,7 @@ internal abstract class CampaignRepository : CampaignRepositoryType {
         override fun optOutCampaign(campaign: Message): Message? {
             val localCampaign = findCampaign(campaign.getCampaignId())
             if (localCampaign == null) {
-                Logger(TAG).debug(
+                InAppLogger(TAG).debug(
                     "Campaign (${campaign.getCampaignId()}) could not be updated -" +
                         "not found in the repository"
                 )
@@ -159,7 +159,7 @@ internal abstract class CampaignRepository : CampaignRepositoryType {
                         )
                     }.orEmpty()
                 } catch (ex: ClassCastException) {
-                    Logger(TAG).debug(ex.cause, "Incorrect type for $IAM_USER_CACHE data")
+                    InAppLogger(TAG).debug(ex.cause, "Incorrect type for $IAM_USER_CACHE data")
                     ""
                 }
 
@@ -172,7 +172,7 @@ internal abstract class CampaignRepository : CampaignRepositoryType {
                         )
                     }
                 } catch (ex: Exception) {
-                    Logger(TAG).debug(ex.cause, "Invalid JSON format for $IAM_USER_CACHE data")
+                    InAppLogger(TAG).debug(ex.cause, "Invalid JSON format for $IAM_USER_CACHE data")
                 }
             }
         }
@@ -186,7 +186,7 @@ internal abstract class CampaignRepository : CampaignRepositoryType {
                         key = IAM_USER_CACHE,
                         value = Gson().toJson(messages)
                     )
-                } ?: Logger(TAG).debug("failed saving response data")
+                } ?: InAppLogger(TAG).debug("failed saving response data")
             }
         }
 

@@ -15,7 +15,7 @@ import com.rakuten.tech.mobile.inappmessaging.runtime.manager.EventsManager
 import com.rakuten.tech.mobile.inappmessaging.runtime.manager.MessageReadinessManager
 import com.rakuten.tech.mobile.inappmessaging.runtime.manager.SessionManager
 import com.rakuten.tech.mobile.inappmessaging.runtime.utils.EventMatchingUtil
-import com.rakuten.tech.mobile.sdkutils.logger.Logger
+import com.rakuten.tech.mobile.inappmessaging.runtime.utils.InAppLogger
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
@@ -46,7 +46,7 @@ internal class InApp(
 
     init {
         // Start logging for debug builds.
-        Logger.setDebug(isDebugLogging)
+        InAppLogger.isDebug = isDebugLogging
     }
 
     // ------------------------------------Public APIs-----------------------------------------------
@@ -90,7 +90,7 @@ internal class InApp(
             }
             activityWeakReference?.clear()
 
-            Logger(TAG).debug("unregisterMessageDisplayActivity()")
+            InAppLogger(TAG).debug("unregisterMessageDisplayActivity()")
         } catch (ex: Exception) {
             errorCallback?.let {
                 it(InAppMessagingException("In-App Messaging unregister activity failed", ex))

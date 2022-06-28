@@ -13,11 +13,11 @@ import com.rakuten.tech.mobile.inappmessaging.runtime.data.repositories.Campaign
 import com.rakuten.tech.mobile.inappmessaging.runtime.data.requests.DisplayPermissionRequest
 import com.rakuten.tech.mobile.inappmessaging.runtime.data.responses.displaypermission.DisplayPermissionResponse
 import com.rakuten.tech.mobile.inappmessaging.runtime.exception.InAppMessagingException
+import com.rakuten.tech.mobile.inappmessaging.runtime.utils.InAppLogger
 import com.rakuten.tech.mobile.inappmessaging.runtime.utils.RetryDelayUtil
 import com.rakuten.tech.mobile.inappmessaging.runtime.utils.RuntimeUtil
 import com.rakuten.tech.mobile.inappmessaging.runtime.utils.WorkerUtils
 import com.rakuten.tech.mobile.inappmessaging.runtime.workmanager.schedulers.MessageMixerPingScheduler
-import com.rakuten.tech.mobile.sdkutils.logger.Logger
 import retrofit2.Call
 import java.net.HttpURLConnection
 import java.util.concurrent.atomic.AtomicBoolean
@@ -95,22 +95,24 @@ internal interface MessageReadinessManager {
                 val campaignId = queuedMessages.removeFirst()
                 val message = campaignRepo.messages[campaignId]
                 if (message == null) {
-                    Logger(TAG).debug("Warning: Queued campaign $campaignId does not exist in the repository anymore")
+                    InAppLogger(TAG).debug(
+                        "Warning: Queued campaign $campaignId does not exist in the repository anymore"
+                    )
                     continue
                 }
 
-                Logger(TAG).debug("checking permission for message: %s", message.getCampaignId())
+                InAppLogger(TAG).debug("checking permission for message: %s", message.getCampaignId())
 
                 // First, check if this message should be displayed.
                 if (!shouldDisplayMessage(message)) {
-                    Logger(TAG).debug("skipping message: %s", message.getCampaignId())
+                    InAppLogger(TAG).debug("skipping message: %s", message.getCampaignId())
                     // Skip to next message.
                     continue
                 }
 
                 // If message is test message, no need to do more checks.
                 if (message.isTest()) {
-                    Logger(TAG).debug("skipping test message: %s", message.getCampaignId())
+                    InAppLogger(TAG).debug("skipping test message: %s", message.getCampaignId())
                     return message
                 }
 
@@ -204,7 +206,7 @@ internal interface MessageReadinessManager {
                 val response = call.execute()
                 return when {
                     response.isSuccessful -> {
-                        Logger(DISP_TAG).debug(
+                        InAppLogger(DISP_TAG).debug(
                             "display: %b performPing: %b", response.body()?.display, response.body()?.performPing
                         )
                         response.body()
@@ -219,7 +221,7 @@ internal interface MessageReadinessManager {
                 }
             } catch (e: Exception) {
                 return checkAndRetry(call.clone()) {
-                    Logger(DISP_TAG).error(e.message)
+                    InAppLogger(DISP_TAG).error(e.message)
                     InAppMessaging.errorCallback?.let {
                         it(InAppMessagingException("In-App Messaging display permission request failed", e))
                     }
