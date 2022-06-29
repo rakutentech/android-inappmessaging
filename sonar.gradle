@@ -4,6 +4,7 @@ def branch = System.getenv("BITRISE_GIT_BRANCH")
 def pRBranch = System.getenv("BITRISE_PULL_REQUEST")
 def pRTargetBranch = System.getenv("BITRISEIO_GIT_BRANCH_DEST")
 def tagName = System.getenv("BITRISE_GIT_TAG")
+def isRelease = tagName != null && tagName != ""
 
 sonarqube {
     properties {
@@ -14,7 +15,7 @@ sonarqube {
         property 'sonar.projectKey', System.getenv("SONARQUBE_PROJ_KEY")
         property 'sonar.projectVersion', scmVersion.version
         /* Tags */
-        if (tagName != null && tagName != "") {
+        if (isRelease) {
             // Since tags don't have an explicit branch and can point to any commit, let us use the tag name
             // as branch name property. In Sonarqube, the tag is going to appear same level as other branches
             // with its own analysis.
@@ -55,8 +56,12 @@ subprojects { subproject ->
                                             '**/.gradle/**, ' +
                                             '**/R.class'
             property 'sonar.test.inclusions', '**/test/**'
-            property 'sonar.coverage.jacoco.xmlReportPaths', 'build/reports/jacoco/jacocoReleaseReport/jacocoReleaseReport.xml'
-            property 'sonar.junit.reportPaths', 'build/test-results/testReleaseUnitTest'
+            property 'sonar.coverage.jacoco.xmlReportPaths', 
+                    isRelease ? 'build/reports/jacoco/jacocoReleaseReport/jacocoReleaseReport.xml' :
+                                'build/reports/jacoco/jacocoDebugReport/jacocoDebugReport.xml'
+            property 'sonar.junit.reportPaths',
+                    isRelease ? 'build/test-results/testReleaseUnitTest' :
+                                'build/test-results/testDebugUnitTest'
         }
     }
 }
