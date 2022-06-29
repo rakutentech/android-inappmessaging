@@ -30,7 +30,6 @@ workflows:
         inputs:
         - content: "./gradlew detektRelease lintAnalyzeDebug lintDebug lintReportDebug testDebugUnitTest jacocoDebugReport"
     - custom-test-results-export@0:
-        # this add-on should export test artifacts as well, but currently not displayed.
         inputs:
         - test_name: Unit Tests (Debug)
         - base_path: "$SDK_PATH/build/test-results/testDebugUnitTest/"
