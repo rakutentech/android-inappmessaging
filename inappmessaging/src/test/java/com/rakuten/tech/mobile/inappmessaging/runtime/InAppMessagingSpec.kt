@@ -6,10 +6,7 @@ import android.provider.Settings
 import android.view.ViewGroup
 import androidx.test.core.app.ApplicationProvider
 import androidx.work.testing.WorkManagerTestInitHelper
-import com.nhaarman.mockitokotlin2.any
-import com.nhaarman.mockitokotlin2.anyOrNull
-import com.nhaarman.mockitokotlin2.argumentCaptor
-import com.nhaarman.mockitokotlin2.never
+import com.nhaarman.mockitokotlin2.*
 import com.rakuten.tech.mobile.inappmessaging.runtime.data.models.appevents.AppStartEvent
 import com.rakuten.tech.mobile.inappmessaging.runtime.data.models.appevents.LoginSuccessfulEvent
 import com.rakuten.tech.mobile.inappmessaging.runtime.data.models.appevents.PurchaseSuccessfulEvent
@@ -21,6 +18,7 @@ import com.rakuten.tech.mobile.inappmessaging.runtime.exception.InAppMessagingEx
 import com.rakuten.tech.mobile.inappmessaging.runtime.manager.DisplayManager
 import com.rakuten.tech.mobile.inappmessaging.runtime.manager.EventsManager
 import com.rakuten.tech.mobile.inappmessaging.runtime.manager.SessionManager
+import com.rakuten.tech.mobile.inappmessaging.runtime.utils.EventMatchingUtil
 import org.amshove.kluent.*
 import org.junit.After
 import org.junit.Assert
@@ -41,7 +39,6 @@ open class InAppMessagingSpec : BaseTest() {
     private val configResponseData = Mockito.mock(ConfigResponseData::class.java)
     private val displayManager = Mockito.mock(DisplayManager::class.java)
     internal val eventsManager = Mockito.mock(EventsManager::class.java)
-    internal val sessionManager = Mockito.mock(SessionManager::class.java)
     private val viewGroup = Mockito.mock(ViewGroup::class.java)
     private val parentViewGroup = Mockito.mock(ViewGroup::class.java)
     private val mockContext = Mockito.mock(Context::class.java)
@@ -53,7 +50,7 @@ open class InAppMessagingSpec : BaseTest() {
     @Before
     override fun setup() {
         super.setup()
-        LocalEventRepository.instance().clearEvents()
+        EventMatchingUtil.instance().clearNonPersistentEvents()
         `when`(mockContext.applicationContext).thenReturn(null)
     }
 
@@ -91,7 +88,7 @@ open class InAppMessagingSpec : BaseTest() {
         InAppMessaging.instance().logEvent(AppStartEvent())
         InAppMessaging.instance().closeMessage()
         InAppMessaging.instance().isLocalCachingEnabled().shouldBeFalse()
-        InAppMessaging.instance().saveTempData()
+        InAppMessaging.instance().flushEventList()
     }
 
     @Test
@@ -157,15 +154,10 @@ open class InAppMessagingSpec : BaseTest() {
         InAppMessaging.instance().registerMessageDisplayActivity(activity)
         (InAppMessaging.instance() as InApp).removeMessage(false)
         Mockito.verify(parentViewGroup).removeView(viewGroup)
-        ReadyForDisplayMessageRepository.instance().getAllMessagesCopy().shouldHaveSize(1)
-        for (msg in PingResponseMessageRepository.instance().getAllMessagesCopy()) {
-            if (msg.getCampaignId() == "1") {
-                msg.getNumberOfTimesClosed() shouldBeEqualTo 1
-            } else {
-                msg.getNumberOfTimesClosed() shouldBeEqualTo 0
-            }
+        CampaignRepository.instance().messages.values.forEach {
+            // Impressions left should not be reduced
+            it.impressionsLeft shouldBeEqualTo it.getMaxImpressions()
         }
-        LocalDisplayedMessageRepository.instance().numberOfTimesDisplayed(message) shouldBeEqualTo 0
     }
 
     @Test
@@ -177,11 +169,10 @@ open class InAppMessagingSpec : BaseTest() {
         InAppMessaging.instance().registerMessageDisplayActivity(activity)
         (InAppMessaging.instance() as InApp).removeMessage(true)
         Mockito.verify(parentViewGroup).removeView(viewGroup)
-        ReadyForDisplayMessageRepository.instance().getAllMessagesCopy().shouldBeEmpty()
-        for (msg in PingResponseMessageRepository.instance().getAllMessagesCopy()) {
-            msg.getNumberOfTimesClosed() shouldBeEqualTo 1
+        CampaignRepository.instance().messages.values.forEach {
+            // Impressions left should not be reduced
+            it.impressionsLeft shouldBeEqualTo it.getMaxImpressions()
         }
-        LocalDisplayedMessageRepository.instance().numberOfTimesDisplayed(message) shouldBeEqualTo 0
     }
 
     @Test
@@ -193,48 +184,11 @@ open class InAppMessagingSpec : BaseTest() {
         `when`(displayManager.removeMessage(anyOrNull())).thenReturn("1")
 
         (instance as InApp).removeMessage(false)
-        ReadyForDisplayMessageRepository.instance().getAllMessagesCopy().shouldHaveSize(1)
-        for (msg in PingResponseMessageRepository.instance().getAllMessagesCopy()) {
-            if (msg.getCampaignId() == "1") {
-                msg.getNumberOfTimesClosed() shouldBeEqualTo 1
-            } else {
-                msg.getNumberOfTimesClosed() shouldBeEqualTo 0
-            }
+        CampaignRepository.instance().messages.values.forEach {
+            // Impressions left should not be reduced
+            it.impressionsLeft shouldBeEqualTo it.getMaxImpressions()
         }
-        LocalDisplayedMessageRepository.instance().numberOfTimesDisplayed(message) shouldBeEqualTo 0
         Mockito.verify(displayManager).displayMessage()
-    }
-
-    @Test
-    fun `should not increment when no message is displayed`() {
-        val message = ValidTestMessage("1")
-        ReadyForDisplayMessageRepository.instance().replaceAllMessages(listOf(message))
-        PingResponseMessageRepository.instance().replaceAllMessages(listOf(message))
-        initializeInstance()
-
-        InAppMessaging.instance().registerMessageDisplayActivity(activity)
-        (InAppMessaging.instance() as InApp).removeMessage(false)
-        ReadyForDisplayMessageRepository.instance().getAllMessagesCopy().shouldHaveSize(1)
-        for (msg in PingResponseMessageRepository.instance().getAllMessagesCopy()) {
-            msg.getNumberOfTimesClosed() shouldBeEqualTo 0
-        }
-        LocalDisplayedMessageRepository.instance().numberOfTimesDisplayed(message) shouldBeEqualTo 0
-    }
-
-    @Test
-    fun `should clear and increment when no message is displayed but flag true`() {
-        val message = ValidTestMessage("1")
-        ReadyForDisplayMessageRepository.instance().replaceAllMessages(listOf(message))
-        PingResponseMessageRepository.instance().replaceAllMessages(listOf(message))
-        initializeInstance()
-
-        InAppMessaging.instance().registerMessageDisplayActivity(activity)
-        (InAppMessaging.instance() as InApp).removeMessage(true)
-        ReadyForDisplayMessageRepository.instance().getAllMessagesCopy().shouldBeEmpty()
-        for (msg in PingResponseMessageRepository.instance().getAllMessagesCopy()) {
-            msg.getNumberOfTimesClosed() shouldBeEqualTo 1
-        }
-        LocalDisplayedMessageRepository.instance().numberOfTimesDisplayed(message) shouldBeEqualTo 0
     }
 
     @Test
@@ -246,8 +200,7 @@ open class InAppMessagingSpec : BaseTest() {
         InAppMessaging.instance().registerMessageDisplayActivity(activity)
         InAppMessaging.instance().unregisterMessageDisplayActivity()
         Mockito.verify(parentViewGroup).removeView(viewGroup)
-        ReadyForDisplayMessageRepository.instance().getAllMessagesCopy().shouldHaveSize(2)
-        LocalDisplayedMessageRepository.instance().numberOfTimesDisplayed(message) shouldBeEqualTo 0
+        CampaignRepository.instance().messages.shouldHaveSize(2)
     }
 
     @Test
@@ -261,8 +214,7 @@ open class InAppMessagingSpec : BaseTest() {
         InAppMessaging.instance().registerMessageDisplayActivity(activity)
         InAppMessaging.instance().unregisterMessageDisplayActivity()
         Mockito.verify(parentViewGroup, never()).removeView(viewGroup)
-        ReadyForDisplayMessageRepository.instance().getAllMessagesCopy().shouldHaveSize(2)
-        LocalDisplayedMessageRepository.instance().numberOfTimesDisplayed(message) shouldBeEqualTo 0
+        CampaignRepository.instance().messages.shouldHaveSize(2)
     }
 
     @Test
@@ -289,9 +241,7 @@ open class InAppMessagingSpec : BaseTest() {
         instance.logEvent(AppStartEvent())
         instance.logEvent(PurchaseSuccessfulEvent())
         instance.logEvent(LoginSuccessfulEvent())
-        Mockito.verify(eventsManager, never()).onEventReceived(any(), any(), any(), any())
-        LocalEventRepository.instance().getEvents().shouldHaveSize(0)
-        (instance as InApp).tempEventList.shouldHaveSize(4)
+        Mockito.verify(eventsManager, never()).onEventReceived(any(), any(), any())
     }
 
     @Test
@@ -303,21 +253,20 @@ open class InAppMessagingSpec : BaseTest() {
         instance.logEvent(AppStartEvent())
         instance.logEvent(PurchaseSuccessfulEvent())
         instance.logEvent(LoginSuccessfulEvent())
-        Mockito.verify(eventsManager, never()).onEventReceived(any(), any(), any(), any())
-        LocalEventRepository.instance().getEvents().shouldHaveSize(0)
+        Mockito.verify(eventsManager, never()).onEventReceived(any(), any(), any())
         (instance as InApp).tempEventList.shouldHaveSize(4)
 
-        instance.saveTempData()
-        LocalEventRepository.instance().getEvents().shouldHaveSize(3) // app start is only logged once
+        instance.flushEventList()
         instance.tempEventList.shouldBeEmpty()
     }
 
     @Test
     fun `should log event if config is true`() {
         val instance = initializeMockInstance(100)
+        instance.registerPreference(TestUserInfoProvider())
 
         instance.logEvent(AppStartEvent())
-        Mockito.verify(eventsManager).onEventReceived(any(), any(), any(), any())
+        Mockito.verify(eventsManager).onEventReceived(any(), any(), any())
     }
 
     @Test
@@ -355,11 +304,36 @@ open class InAppMessagingSpec : BaseTest() {
         InAppMessaging.errorCallback = null
     }
 
+    @SuppressWarnings("LongMethod")
+    @Test
+    fun `should call onSessionUpdate on user change`() {
+        WorkManagerTestInitHelper.initializeTestWorkManager(ApplicationProvider.getApplicationContext())
+        Settings.Secure.putString(
+            ApplicationProvider.getApplicationContext<Context>().contentResolver,
+            Settings.Secure.ANDROID_ID, "test_device_id"
+        )
+
+        val accountRepoMock = Mockito.mock(AccountRepository::class.java)
+        val sessionManagerMock = Mockito.mock(SessionManager::class.java)
+        val instance = initializeMockInstance(
+            100, accountRepo = accountRepoMock,
+            sessionManager = sessionManagerMock
+        )
+        val infoProvider = TestUserInfoProvider() // test_user_id
+        instance.registerPreference(infoProvider)
+
+        // Simulate change user
+        infoProvider.userId = "test_user_id_2"
+        `when`(accountRepoMock.updateUserInfo()).thenReturn(true)
+        (instance as InApp).userDidChange()
+
+        // Should call onSessionUpdate
+        Mockito.verify(sessionManagerMock).onSessionUpdate()
+    }
+
     private fun setupDisplayedView(message: Message) {
         val message2 = ValidTestMessage()
-        ReadyForDisplayMessageRepository.instance().replaceAllMessages(listOf(message, message2))
-        PingResponseMessageRepository.instance().replaceAllMessages(listOf(message, message2))
-        LocalDisplayedMessageRepository.instance().clearMessages()
+        CampaignRepository.instance().syncWith(listOf(message, message2), 0)
         `when`(activity.findViewById<ViewGroup>(R.id.in_app_message_base_view)).thenReturn(viewGroup)
         `when`(viewGroup.parent).thenReturn(parentViewGroup)
         `when`(viewGroup.tag).thenReturn("1")
@@ -377,13 +351,22 @@ open class InAppMessagingSpec : BaseTest() {
         InAppMessaging.initialize(ApplicationProvider.getApplicationContext(), shouldEnableCaching)
     }
 
-    internal fun initializeMockInstance(rollout: Int, manager: DisplayManager = displayManager): InAppMessaging {
+    internal fun initializeMockInstance(
+        rollout: Int,
+        displayManager: DisplayManager = this.displayManager,
+        accountRepo: AccountRepository = AccountRepository.instance(),
+        sessionManager: SessionManager = SessionManager
+    ): InAppMessaging {
         `when`(configResponseData.rollOutPercentage).thenReturn(rollout)
         ConfigResponseRepository.instance().addConfigResponse(configResponseData)
 
         return InApp(
-            ApplicationProvider.getApplicationContext(), false, manager,
-            eventsManager = eventsManager, sessionManager = sessionManager
+            context = ApplicationProvider.getApplicationContext(),
+            isDebugLogging = false,
+            displayManager = displayManager,
+            eventsManager = eventsManager,
+            accountRepo = accountRepo,
+            sessionManager = sessionManager
         )
     }
 
@@ -404,8 +387,7 @@ class InAppMessagingExceptionSpec : InAppMessagingSpec() {
         InAppMessaging.errorCallback = null
         `when`(dispMgr.displayMessage()).thenThrow(NullPointerException())
         `when`(dispMgr.removeMessage(anyOrNull())).thenThrow(NullPointerException())
-        `when`(eventsManager.onEventReceived(any(), any(), any(), any())).thenThrow(NullPointerException())
-        `when`(sessionManager.onSessionUpdate()).thenThrow(NullPointerException())
+        `when`(eventsManager.onEventReceived(any(), any(), any())).thenThrow(NullPointerException())
     }
 
     @After
@@ -479,15 +461,6 @@ class InAppMessagingExceptionSpec : InAppMessagingSpec() {
 
     @Test
     fun `should not crash when save temp data failed due to forced exception`() {
-        instance.saveTempData()
-    }
-
-    @Test
-    fun `should trigger callback when save temp data failed due to forced exception`() {
-        InAppMessaging.errorCallback = mockCallback
-        instance.saveTempData()
-
-        Mockito.verify(mockCallback).invoke(captor.capture())
-        captor.firstValue shouldBeInstanceOf InAppMessagingException::class.java
+        instance.flushEventList()
     }
 }

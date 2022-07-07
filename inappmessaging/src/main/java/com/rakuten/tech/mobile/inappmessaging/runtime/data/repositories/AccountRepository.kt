@@ -2,7 +2,9 @@ package com.rakuten.tech.mobile.inappmessaging.runtime.data.repositories
 
 import android.annotation.SuppressLint
 import com.rakuten.tech.mobile.inappmessaging.runtime.BuildConfig
+import com.rakuten.tech.mobile.inappmessaging.runtime.InAppMessaging
 import com.rakuten.tech.mobile.inappmessaging.runtime.UserInfoProvider
+import com.rakuten.tech.mobile.sdkutils.PreferencesUtil
 import com.rakuten.tech.mobile.inappmessaging.runtime.utils.InAppLogger
 import java.math.BigInteger
 import java.security.MessageDigest
@@ -40,6 +42,12 @@ internal abstract class AccountRepository {
 
     abstract fun logWarningForUserInfo(tag: String, logger: InAppLogger = InAppLogger(tag))
 
+    /**
+     * Checks whether user cache uses old cache structure (structure until v7.1.0) and clears it since it will no
+     * longer be used.
+     */
+    abstract fun clearUserOldCacheStructure()
+
     companion object {
         private const val TOKEN_PREFIX = "OAuth2 "
         internal const val ID_TRACKING_ERR_MSG = "Both an access token and a user tracking id have been set. " +
@@ -65,14 +73,14 @@ internal abstract class AccountRepository {
         override fun getIdTrackingIdentifier() = this.userInfoProvider?.provideIdTrackingIdentifier().orEmpty()
 
         override fun updateUserInfo(algo: String?): Boolean {
-            val curr = hash(getUserId() + getIdTrackingIdentifier(), algo)
-
-            if (userInfoHash != curr) {
-                userInfoHash = curr
+            val newHash = hash(getUserId() + getIdTrackingIdentifier(), algo)
+            if (userInfoHash.isEmpty()) {
+                userInfoHash = newHash
                 return true
             }
-
-            return false
+            val currentHash = userInfoHash
+            userInfoHash = newHash
+            return currentHash != userInfoHash
         }
 
         @SuppressLint("BinaryOperationInTimber")
@@ -88,6 +96,18 @@ internal abstract class AccountRepository {
                     logger.warn(TOKEN_USER_ERR_MSG)
                     if (BuildConfig.DEBUG) {
                         error(TOKEN_USER_ERR_MSG)
+                    }
+                }
+            }
+        }
+
+        override fun clearUserOldCacheStructure() {
+            if (InAppMessaging.instance().isLocalCachingEnabled()) {
+                InAppMessaging.instance().getHostAppContext()?.let { ctx ->
+                    val prefs = InAppMessaging.getPreferencesFile()
+                    // Clear if using old cache structure
+                    if (!PreferencesUtil.contains(ctx, prefs, CampaignRepository.IAM_USER_CACHE)) {
+                        PreferencesUtil.clear(ctx, prefs)
                     }
                 }
             }

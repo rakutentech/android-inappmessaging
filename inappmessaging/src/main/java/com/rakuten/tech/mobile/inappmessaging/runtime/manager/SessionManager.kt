@@ -1,12 +1,9 @@
 package com.rakuten.tech.mobile.inappmessaging.runtime.manager
 
 import com.rakuten.tech.mobile.inappmessaging.runtime.InAppMessaging
-import com.rakuten.tech.mobile.inappmessaging.runtime.data.models.appevents.Event
-import com.rakuten.tech.mobile.inappmessaging.runtime.data.repositories.LocalDisplayedMessageRepository
-import com.rakuten.tech.mobile.inappmessaging.runtime.data.repositories.LocalEventRepository
-import com.rakuten.tech.mobile.inappmessaging.runtime.data.repositories.LocalOptedOutMessageRepository
-import com.rakuten.tech.mobile.inappmessaging.runtime.data.repositories.PingResponseMessageRepository
-import com.rakuten.tech.mobile.inappmessaging.runtime.data.repositories.ReadyForDisplayMessageRepository
+import com.rakuten.tech.mobile.inappmessaging.runtime.data.repositories.AccountRepository
+import com.rakuten.tech.mobile.inappmessaging.runtime.data.repositories.CampaignRepository
+import com.rakuten.tech.mobile.inappmessaging.runtime.utils.EventMatchingUtil
 import com.rakuten.tech.mobile.inappmessaging.runtime.utils.RetryDelayUtil
 import com.rakuten.tech.mobile.inappmessaging.runtime.workmanager.schedulers.MessageMixerPingScheduler
 
@@ -19,27 +16,23 @@ internal object SessionManager {
      * Upon login successful or logout, old messages will be discarded, then prepare new messages for the new
      * user.
      */
-    fun onSessionUpdate(event: Event? = null) {
+    fun onSessionUpdate() {
         if (!InAppMessaging.instance().isLocalCachingEnabled()) {
-            // clear locally stored campaigns from ping response
-            PingResponseMessageRepository.instance().clearMessages()
-
-            // clear locally stored campaigns which are ready for display
-            ReadyForDisplayMessageRepository.instance().clearMessages()
-
-            // clear locally stored campaigns which are already displayed
-            LocalDisplayedMessageRepository.instance().clearMessages()
-
-            // clear locally stored campaigns which are opted out
-            LocalOptedOutMessageRepository.instance().clearMessages()
-
-            // clear locally stored triggered events (non-persistent)
-            LocalEventRepository.instance().clearNonPersistentEvents()
-            if (event != null && !event.isPersistentType()) {
-                // manually add latest event triggered by new user since it was removed from previous clearing
-                LocalEventRepository.instance().addEvent(event)
-            }
+            // Clear locally stored campaigns from ping response
+            CampaignRepository.instance().clearMessages()
         }
+
+        // Clear matched events
+        EventMatchingUtil.instance().clearNonPersistentEvents()
+
+        // Clear campaigns which are ready for display
+        MessageReadinessManager.instance().clearMessages()
+
+        // Clear any stale user cache structure if applicable
+        AccountRepository.instance().clearUserOldCacheStructure()
+
+        // Load any cached campaigns of new user
+        CampaignRepository.instance().loadCachedData()
 
         // reset current delay to initial
         // future update: possibly add checking if last ping is within a certain threshold before executing the request

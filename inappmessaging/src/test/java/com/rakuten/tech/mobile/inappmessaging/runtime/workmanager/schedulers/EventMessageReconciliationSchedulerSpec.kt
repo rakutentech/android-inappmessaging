@@ -14,7 +14,6 @@ import com.rakuten.tech.mobile.inappmessaging.runtime.InAppMessaging
 import com.rakuten.tech.mobile.inappmessaging.runtime.data.models.appevents.PurchaseSuccessfulEvent
 import com.rakuten.tech.mobile.inappmessaging.runtime.data.repositories.AccountRepository
 import com.rakuten.tech.mobile.inappmessaging.runtime.data.repositories.ConfigResponseRepository
-import com.rakuten.tech.mobile.inappmessaging.runtime.data.repositories.LocalEventRepository
 import com.rakuten.tech.mobile.inappmessaging.runtime.data.responses.config.ConfigResponseData
 import com.rakuten.tech.mobile.inappmessaging.runtime.exception.InAppMessagingException
 import com.rakuten.tech.mobile.inappmessaging.runtime.manager.EventsManager
@@ -104,8 +103,7 @@ class EventMessageReconciliationSchedulerSpec : BaseTest() {
         `when`(mockAccount.updateUserInfo()).thenReturn(false)
 
         ConfigResponseRepository.instance().addConfigResponse(configResponseData)
-        LocalEventRepository.instance().clearEvents()
-        EventsManager.onEventReceived(PurchaseSuccessfulEvent(), eventScheduler = mockSched, accountRepo = mockAccount)
+        EventsManager.onEventReceived(PurchaseSuccessfulEvent(), eventScheduler = mockSched)
 
         Mockito.verify(mockSched).startEventMessageReconciliationWorker()
     }

@@ -4,13 +4,13 @@ import android.content.Context
 import androidx.annotation.VisibleForTesting
 import androidx.work.Worker
 import androidx.work.WorkerParameters
+import com.rakuten.tech.mobile.inappmessaging.runtime.InAppMessaging
 import com.rakuten.tech.mobile.inappmessaging.runtime.api.MessageMixerRetrofitService
 import com.rakuten.tech.mobile.inappmessaging.runtime.data.models.messages.Message
 import com.rakuten.tech.mobile.inappmessaging.runtime.data.repositories.AccountRepository
 import com.rakuten.tech.mobile.inappmessaging.runtime.data.repositories.ConfigResponseRepository
 import com.rakuten.tech.mobile.inappmessaging.runtime.data.repositories.HostAppInfoRepository
-import com.rakuten.tech.mobile.inappmessaging.runtime.data.repositories.LocalEventRepository
-import com.rakuten.tech.mobile.inappmessaging.runtime.data.repositories.PingResponseMessageRepository
+import com.rakuten.tech.mobile.inappmessaging.runtime.data.repositories.CampaignRepository
 import com.rakuten.tech.mobile.inappmessaging.runtime.data.requests.PingRequest
 import com.rakuten.tech.mobile.inappmessaging.runtime.data.responses.ping.MessageMixerResponse
 import com.rakuten.tech.mobile.inappmessaging.runtime.utils.InAppLogger
@@ -97,17 +97,14 @@ internal class MessageMixerWorker(
             serverErrorCounter.set(0) // reset server error counter
             val messageMixerResponse = response.body()
             if (messageMixerResponse != null) {
-                // Add time data.
-                PingResponseMessageRepository.instance().lastPingMillis = messageMixerResponse.currentPingMillis
-
                 // Parse all data in response.
                 val parsedMessages = parsePingResponseWithTestMessage(messageMixerResponse)
 
-                // Add all parsed messages into PingResponseMessageRepository.
-                PingResponseMessageRepository.instance().replaceAllMessages(parsedMessages)
+                // Add all parsed messages into CampaignRepository.
+                CampaignRepository.instance().syncWith(parsedMessages, messageMixerResponse.currentPingMillis)
 
-                // Clear non-persistent local events triggered before current ping
-                LocalEventRepository.instance().clearNonPersistentEvents(messageMixerResponse.currentPingMillis)
+                // Match&Store any temp events using lately synced campaigns.
+                InAppMessaging.instance().flushEventList()
 
                 // Start a new MessageEventReconciliationWorker, there was a new Ping Response to parse.
                 // This worker will attempt to cancel message scheduled but hasn't been displayed yet

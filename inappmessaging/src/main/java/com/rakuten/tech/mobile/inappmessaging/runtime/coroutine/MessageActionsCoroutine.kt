@@ -13,9 +13,7 @@ import com.rakuten.tech.mobile.inappmessaging.runtime.data.enums.ValueType
 import com.rakuten.tech.mobile.inappmessaging.runtime.data.models.appevents.CustomEvent
 import com.rakuten.tech.mobile.inappmessaging.runtime.data.models.appevents.Event
 import com.rakuten.tech.mobile.inappmessaging.runtime.data.models.messages.Message
-import com.rakuten.tech.mobile.inappmessaging.runtime.data.repositories.LocalDisplayedMessageRepository
-import com.rakuten.tech.mobile.inappmessaging.runtime.data.repositories.LocalOptedOutMessageRepository
-import com.rakuten.tech.mobile.inappmessaging.runtime.data.repositories.ReadyForDisplayMessageRepository
+import com.rakuten.tech.mobile.inappmessaging.runtime.data.repositories.CampaignRepository
 import com.rakuten.tech.mobile.inappmessaging.runtime.data.responses.ping.OnClickBehavior
 import com.rakuten.tech.mobile.inappmessaging.runtime.data.responses.ping.Trigger
 import com.rakuten.tech.mobile.inappmessaging.runtime.manager.EventsManager
@@ -28,24 +26,20 @@ import kotlin.collections.ArrayList
  * Task which should be ran in the background.
  */
 @SuppressWarnings("TooGenericExceptionCaught")
-internal class MessageActionsCoroutine(
-    private val localDisplayRepo: LocalDisplayedMessageRepository = LocalDisplayedMessageRepository.instance()
-) {
+internal class MessageActionsCoroutine(private val campaignRepo: CampaignRepository = CampaignRepository.instance()) {
 
     fun executeTask(message: Message?, viewResourceId: Int, optOut: Boolean): Boolean {
         if (message == null || message.getCampaignId().isEmpty()) {
             return false
         }
-
-        // First, update data repositories.
-        updateRepositories(message, optOut)
-
         // Getting ImpressionType, which represents which button was pressed:
         val buttonType = getOnClickBehaviorType(viewResourceId)
         // Add event in the button if exist.
         addEmbeddedEvent(buttonType, message)
         // Handling onclick action for deep link, redirect, etc.
         handleDeepLink(getOnClickBehavior(buttonType, message))
+        // Update campaign status in repository
+        updateCampaignInRepository(message, optOut)
         // Schedule to report impression.
         scheduleReportImpression(message, getImpressionTypes(optOut, buttonType))
 
@@ -53,24 +47,13 @@ internal class MessageActionsCoroutine(
     }
 
     /**
-     * After InApp message was displayed and removed from screen, it should be removed from
-     * ReadyForDisplayMessageRepository, then added to LocalDisplayedMessageRepository. If message was
-     * opted out by user, add it to LocalOptedOutMessageRepository.
+     * After InApp message was displayed and removed from screen, update it's impressions left and opt-out status.
      */
-    private fun updateRepositories(
-        message: Message,
-        optOut: Boolean
-    ) {
-        // Remove message from ReadyForDisplayMessageRepository.
-        ReadyForDisplayMessageRepository.instance().removeMessage(message.getCampaignId())
-
-        // Adding message to LocalDisplayedMessageRepository.
-        localDisplayRepo.addMessage(message)
-
-        // If message is opted out, add it to LocalOptedOutMessageRepository.
-        if (optOut) {
-            LocalOptedOutMessageRepository.instance().addMessage(message)
+    private fun updateCampaignInRepository(message: Message, isOptedOut: Boolean) {
+        if (isOptedOut) {
+            campaignRepo.optOutCampaign(message)
         }
+        campaignRepo.decrementImpressions(message.getCampaignId())
     }
 
     /**

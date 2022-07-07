@@ -18,8 +18,6 @@ import com.rakuten.tech.mobile.inappmessaging.runtime.BaseTest
 import com.rakuten.tech.mobile.inappmessaging.runtime.InAppMessaging
 import com.rakuten.tech.mobile.inappmessaging.runtime.data.models.messages.Message
 import com.rakuten.tech.mobile.inappmessaging.runtime.data.repositories.ConfigResponseRepository
-import com.rakuten.tech.mobile.inappmessaging.runtime.data.repositories.LocalDisplayedMessageRepository
-import com.rakuten.tech.mobile.inappmessaging.runtime.data.repositories.ReadyForDisplayMessageRepository
 import com.rakuten.tech.mobile.inappmessaging.runtime.data.responses.config.ConfigResponseData
 import com.rakuten.tech.mobile.inappmessaging.runtime.data.responses.ping.MessageMixerResponseSpec
 import com.rakuten.tech.mobile.inappmessaging.runtime.data.responses.ping.MessagePayload
@@ -52,8 +50,7 @@ class DisplayMessageWorkerSpec : BaseTest() {
     private val activity = Mockito.mock(Activity::class.java)
     private val displayWorker = TestListenableWorkerBuilder<DisplayMessageWorker>(getApplicationContext()).build()
     private val mockMessageManager = Mockito.mock(MessageReadinessManager::class.java)
-    private var mockLocalDisplayRepo = Mockito.mock(LocalDisplayedMessageRepository::class.java)
-    private var mockReadyForDisplayRepo = Mockito.mock(ReadyForDisplayMessageRepository::class.java)
+
     private val onVerifyContexts = Mockito.mock(InAppMessaging.instance().onVerifyContext.javaClass)
     private val configResponseData = Mockito.mock(ConfigResponseData::class.java)
     private val payload = MessageMixerResponseSpec.response.data[0].campaignData.getMessagePayload()
@@ -63,8 +60,6 @@ class DisplayMessageWorkerSpec : BaseTest() {
     override fun setup() {
         super.setup()
         displayWorker.messageReadinessManager = mockMessageManager
-        displayWorker.localDisplayRepo = mockLocalDisplayRepo
-        displayWorker.readyMessagesRepo = mockReadyForDisplayRepo
         displayWorker.handler = handler
         `when`(configResponseData.rollOutPercentage).thenReturn(100)
         ConfigResponseRepository.instance().addConfigResponse(configResponseData)
@@ -76,7 +71,7 @@ class DisplayMessageWorkerSpec : BaseTest() {
     override fun tearDown() {
         super.tearDown()
         ConfigResponseRepository.resetInstance()
-        ReadyForDisplayMessageRepository.instance().clearMessages()
+        MessageReadinessManager.instance().clearMessages()
     }
 
     @Test
@@ -190,23 +185,6 @@ class DisplayMessageWorkerSpec : BaseTest() {
         setupNextCampaign()
 
         Mockito.verify(mockMessageManager, Mockito.times(2)).getNextDisplayMessage()
-    }
-
-    @Test
-    fun `should not add message to LocalDisplayedMessageRepository when its context was rejected`() {
-        setupNextCampaign()
-
-        Mockito.verify(mockLocalDisplayRepo, never()).addMessage(any())
-    }
-
-    @Test
-    fun `should remove message from ReadyForDisplayMessageRepository when its context was rejected`() {
-        val message = setupNextCampaign()
-
-        argumentCaptor<String>().apply {
-            Mockito.verify(mockReadyForDisplayRepo).removeMessage(capture(), eq(true))
-            firstValue shouldBeEqualTo message.getCampaignId()
-        }
     }
 
     @Test
