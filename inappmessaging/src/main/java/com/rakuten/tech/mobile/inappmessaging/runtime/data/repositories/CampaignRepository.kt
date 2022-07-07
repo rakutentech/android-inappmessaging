@@ -48,6 +48,7 @@ internal interface CampaignRepositoryType {
 
 @SuppressWarnings("UnnecessaryAbstractClass")
 internal abstract class CampaignRepository : CampaignRepositoryType {
+
     companion object {
         private var instance: CampaignRepository = CampaignRepositoryImpl()
 
