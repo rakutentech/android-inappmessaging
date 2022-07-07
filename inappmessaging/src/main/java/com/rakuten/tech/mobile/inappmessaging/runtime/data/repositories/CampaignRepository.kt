@@ -36,11 +36,6 @@ internal interface CampaignRepositoryType {
     fun incrementImpressions(id: String): Message?
 
     /**
-     * Loads campaign data from user cache.
-     */
-    fun loadCachedData()
-
-    /**
      * Clears [messages] for last user.
      */
     fun clearMessages()
@@ -74,6 +69,7 @@ internal abstract class CampaignRepository : CampaignRepositoryType {
         @SuppressWarnings("LongMethod", "NestedBlockDepth")
         override fun syncWith(messageList: List<Message>, timestampMillis: Long) {
             lastSyncMillis = timestampMillis
+            loadCachedData() // ensure we're using latest cache data for syncing below
             val oldList = LinkedHashMap(messages) // copy
 
             messages.clear()
@@ -148,7 +144,7 @@ internal abstract class CampaignRepository : CampaignRepositoryType {
         }
 
         @SuppressWarnings("LongMethod", "TooGenericExceptionCaught")
-        override fun loadCachedData() {
+        private fun loadCachedData() {
             if (InAppMessaging.instance().isLocalCachingEnabled()) {
                 val listString = try {
                     InAppMessaging.instance().getHostAppContext()?.let { ctx ->
