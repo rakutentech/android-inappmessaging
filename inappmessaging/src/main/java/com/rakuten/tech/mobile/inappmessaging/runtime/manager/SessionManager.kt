@@ -31,9 +31,6 @@ internal object SessionManager {
         // Clear any stale user cache structure if applicable
         AccountRepository.instance().clearUserOldCacheStructure()
 
-        // Load any cached campaigns of new user
-        CampaignRepository.instance().loadCachedData()
-
         // reset current delay to initial
         // future update: possibly add checking if last ping is within a certain threshold before executing the request
         MessageMixerPingScheduler.currDelay = RetryDelayUtil.INITIAL_BACKOFF_DELAY
