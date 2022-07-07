@@ -1,7 +1,7 @@
 tag_name = ENV['BITRISE_GIT_TAG']
 is_release = tag_name != nil && tag_name != ""
 
-message "Tag Name: #{tag_name}, Is Release: #{is_release}"
+message "Tag: #{tag_name}, Is Release: #{is_release}"
 
 # Warn when there is a big PR
 warn("Big PR") if git.lines_of_code > 1000
