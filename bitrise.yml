@@ -20,66 +20,24 @@ workflows:
   build-and-test:
     before_run:
     - _setup-env
+    - _common-start
     after_run:
-    - _run-sonarqube-scanner
+    - _common-end
     steps:
     - cache-pull@2: {}
     - script@1:
-        title: Download Dependencies
+        title: Run some verification tasks
         inputs:
-        - content: ./gradlew androidDependencies
-    - script@1:
-        title: Dependency Check
-        inputs:
-        - content: ./gradlew dependencyCheckAggregate
-    - script@1:
-        title: Run Check
-        inputs:
-        - content: ./gradlew check
-    - danger@2:
-        inputs:
-        - github_api_token: "$DANGER_GITHUB_API_TOKEN"
-    - script@1:
-        title: Assemble
-        inputs:
-        - content: ./gradlew assemble
-    - script@1:
-        title: Current Version
-        inputs:
-        - content: ./gradlew currentVersion
+        - content: "./gradlew detektRelease lintAnalyzeDebug lintDebug lintReportDebug testDebugUnitTest jacocoDebugReport"
     - custom-test-results-export@0:
-        # this add-on should export test artifacts as well, but currently not displayed.
         inputs:
         - test_name: Unit Tests (Debug)
         - base_path: "$SDK_PATH/build/test-results/testDebugUnitTest/"
         - search_pattern: "*"
-    - custom-test-results-export@0:
-        inputs:
-        - test_name: Unit Tests (Release)
-        - base_path: "$SDK_PATH/build/test-results/testReleaseUnitTest/"
-        - search_pattern: "*"
-    - deploy-to-bitrise-io@2:
-        inputs:
-        - deploy_path: $SDK_PATH/build/outputs/aar
-        - is_enable_public_page: 'false'
-    - cache-push@2:
-        inputs:
-        - cache_paths: |-
-            $HOME/.gradle
-            ./.gradle
-            $HOME/.m2
-        - ignore_check_on_paths: |-
-            $HOME/.gradle/caches/*.lock
-            ./.gradle/*.lock
-            ./.gradle/*.bin
   integration-test:
     before_run:
     - _setup-env
     steps:
-    - script@1:
-        title: Download Dependencies
-        inputs:
-        - content: ./gradlew androidDependencies
     - script@1:
         title: Dependency Check
         inputs:
@@ -123,10 +81,33 @@ workflows:
         - color_on_error: "#d10b20"
   release:
     before_run:
-    - build-and-test
+    - _setup-env
+    - _common-start
     after_run:
+    - _common-end
     - _publish-doc
     steps:
+    - script@1:
+        title: Run Check
+        inputs:
+        - content: "./gradlew check"
+    - script@1:
+        title: Assemble
+        inputs:
+        - content: "./gradlew assemble"
+    - script@1:
+        title: Current Version
+        inputs:
+        - content: "./gradlew currentVersion"
+    - custom-test-results-export@0:
+        inputs:
+        - test_name: Unit Tests (Release)
+        - base_path: "$SDK_PATH/build/test-results/testReleaseUnitTest/"
+        - search_pattern: "*"
+    - deploy-to-bitrise-io@2:
+        inputs:
+        - deploy_path: "$SDK_PATH/build/outputs/aar"
+        - is_enable_public_page: 'false'
     - script@1:
         title: Retrieve Base64 PGP Key and save to file
         inputs:
@@ -173,9 +154,6 @@ workflows:
             fi
   _run-sonarqube-scanner:
     steps:
-    - set-java-version@1:
-        inputs:
-        - set_java_version: '11'
     - script@1:
         title: Prepare branches to feed in sonar.gradle
         description: This step ensures that source and destination branches exist. For sonarqube to work, the current working branch should be the source branch.
@@ -210,6 +188,31 @@ workflows:
         title: Run SonarQube Scanner
         inputs:
         - content: ./gradlew sonarqube
+  _common-start:
+    steps:
+    - cache-pull@2: {}
+    - script@1:
+        title: Run Dependency Check
+        inputs:
+        - timeout: 1800
+        - content: "./gradlew dependencyCheckAggregate"
+  _common-end:
+    after_run:
+    - _run-sonarqube-scanner
+    steps:
+    - danger@2:
+        inputs:
+        - github_api_token: "$DANGER_GITHUB_API_TOKEN"
+    - cache-push@2:
+        inputs:
+        - cache_paths: |-
+            $HOME/.gradle
+            ./.gradle
+            $HOME/.m2
+        - ignore_check_on_paths: |-
+            $HOME/.gradle/caches/*.lock
+            ./.gradle/*.lock
+            ./.gradle/*.bin
 meta:
   bitrise.io:
     stack: linux-docker-android-20.04
