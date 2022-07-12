@@ -32,7 +32,7 @@ import kotlin.math.round
 /**
  * Base class of all custom views.
  */
-@SuppressWarnings("LargeClass")
+@SuppressWarnings("LargeClass", "TooManyFunctions")
 internal open class InAppMessageBaseView(context: Context, attrs: AttributeSet?) :
     FrameLayout(context, attrs), InAppMessageView {
 
@@ -139,6 +139,11 @@ internal open class InAppMessageBaseView(context: Context, attrs: AttributeSet?)
         // Display opt-out checkbox.
         if (this.displayOptOut) {
             val checkBox = findViewById<CheckBox>(R.id.opt_out_checkbox)
+            val brightness = getBrightness(bgColor)
+            if (brightness < BRIGHTNESS_LEVEL) {
+                checkBox.buttonTintList = ColorStateList.valueOf(Color.WHITE)
+                checkBox.setTextColor(Color.WHITE)
+            }
             checkBox?.setOnClickListener(this.listener)
             checkBox?.visibility = View.VISIBLE
         }
@@ -247,20 +252,24 @@ internal open class InAppMessageBaseView(context: Context, attrs: AttributeSet?)
     }
 
     // Set close button to black background if the campaign background color is dark.
-    // Brightness is computed based on [Darel Rex Finley's HSP Colour Model](http://alienryderflex.com/hsp.html).
-    // Computed value is from 0 (black) to 255 (white), and is considered dark if less than 130.
-    @SuppressWarnings("MagicNumber")
     internal fun setCloseButton(button: ImageButton? = null) {
         if (isDismissable) {
-            val red = Color.red(bgColor)
-            val green = Color.green(bgColor)
-            val blue = Color.blue(bgColor)
-            val brightness = sqrt((red * red * .241) + (green * green * .691) + (blue * blue * .068)).toInt()
-            if (brightness < 130) {
+            val brightness = getBrightness(bgColor)
+            if (brightness < BRIGHTNESS_LEVEL) {
                 (button ?: findViewById(R.id.message_close_button))
                     ?.setImageResource(R.drawable.close_button_white)
             }
         }
+    }
+
+    // Brightness is computed based on [Darel Rex Finley's HSP Colour Model](http://alienryderflex.com/hsp.html).
+    // Computed value is from 0 (black) to 255 (white), and is considered dark if less than 130.
+    @SuppressWarnings("MagicNumber")
+    private fun getBrightness(color: Int): Int {
+        val red = Color.red(color)
+        val green = Color.green(color)
+        val blue = Color.blue(color)
+        return sqrt((red * red * .241) + (green * green * .691) + (blue * blue * .068)).toInt()
     }
 
     // Set button's border based on similarity between its background color and campaign's background color.
@@ -319,5 +328,6 @@ internal open class InAppMessageBaseView(context: Context, attrs: AttributeSet?)
         private const val BUTTON_FONT = "iam_custom_font_button"
         private const val HEADER_FONT = "iam_custom_font_header"
         private const val BODY_FONT = "iam_custom_font_body"
+        private const val BRIGHTNESS_LEVEL = 130
     }
 }

@@ -120,6 +120,16 @@ class BaseViewSpec : BaseTest() {
         verifyCloseButton(WHITE_HEX, never())
     }
 
+    @Test
+    fun `should set check box to white color`() {
+        verifyCheckBox(BLACK_HEX, Color.WHITE)
+    }
+
+    @Test
+    fun `should set check box to black color`() {
+        verifyCheckBox(WHITE_HEX, Color.BLACK)
+    }
+
     private fun verifyCloseButton(color: String, mode: VerificationMode) {
         `when`(mockPayload.headerColor).thenReturn(color)
         `when`(mockPayload.messageBodyColor).thenReturn(color)
@@ -128,6 +138,16 @@ class BaseViewSpec : BaseTest() {
         val mockButton = Mockito.mock(ImageButton::class.java)
         view?.setCloseButton(mockButton)
         Mockito.verify(mockButton, mode).setImageResource(R.drawable.close_button_white)
+    }
+
+    private fun verifyCheckBox(color: String, expectedColor: Int) {
+        `when`(mockPayload.headerColor).thenReturn(color)
+        `when`(mockPayload.messageBodyColor).thenReturn(color)
+        `when`(mockPayload.backgroundColor).thenReturn(color)
+        `when`(mockDisplaySettings.optOut).thenReturn(true)
+
+        view?.populateViewData(mockMessage)
+        view?.findViewById<CheckBox>(R.id.opt_out_checkbox)?.textColors?.defaultColor shouldBeEqualTo expectedColor
     }
 
     @Test
