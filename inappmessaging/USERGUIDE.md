@@ -389,6 +389,7 @@ Documents targeting Product Managers:
 
 ### 7.2.0 (in progress)
 * SDKCF-5510: Updated SDK Utils dependency to v2.0.0.
+* SDKCF-5242: Added handling to change opt-out color when background is dark.
 
 ### 7.1.0 (2022-06-24)
 * SDKCF-5256: Added sending of impression events with campaign details to analytics account.
