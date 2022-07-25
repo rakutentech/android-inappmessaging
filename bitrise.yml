@@ -28,7 +28,7 @@ workflows:
     - script@1:
         title: Run some verification tasks
         inputs:
-        - content: "./gradlew detektRelease lintAnalyzeDebug lintDebug lintReportDebug testDebugUnitTest jacocoDebugReport"
+        - content: "./gradlew detekt detektRelease lintAnalyzeDebug lintDebug lintReportDebug testDebugUnitTest jacocoDebugReport"
     - custom-test-results-export@0:
         inputs:
         - test_name: Unit Tests (Debug)
@@ -200,9 +200,12 @@ workflows:
     after_run:
     - _run-sonarqube-scanner
     steps:
-    - danger@2:
+    - script@1:
+        title: Danger
         inputs:
-        - github_api_token: "$DANGER_GITHUB_API_TOKEN"
+        - content: |-
+          bundle install
+          bundle exec danger --dangerfile=config/danger/Dangerfile
     - cache-push@2:
         inputs:
         - cache_paths: |-
