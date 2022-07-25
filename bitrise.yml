@@ -204,8 +204,8 @@ workflows:
         title: Danger
         inputs:
         - content: |-
-          bundle install
-          bundle exec danger --dangerfile=config/danger/Dangerfile
+            bundle install
+            bundle exec danger --dangerfile=config/danger/Dangerfile
     - cache-push@2:
         inputs:
         - cache_paths: |-
