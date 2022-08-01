@@ -7,7 +7,6 @@ import androidx.annotation.Nullable
 import androidx.annotation.RestrictTo
 import com.rakuten.tech.mobile.inappmessaging.runtime.data.models.appevents.Event
 import com.rakuten.tech.mobile.inappmessaging.runtime.data.repositories.AccountRepository
-import com.rakuten.tech.mobile.inappmessaging.runtime.data.repositories.PingResponseMessageRepository
 import com.rakuten.tech.mobile.inappmessaging.runtime.exception.InAppMessagingException
 import com.rakuten.tech.mobile.inappmessaging.runtime.utils.Initializer
 import com.rakuten.tech.mobile.inappmessaging.runtime.workmanager.schedulers.ConfigScheduler
@@ -75,7 +74,7 @@ abstract class InAppMessaging internal constructor() {
      * This method moves temp data to persistent cache.
      */
     @RestrictTo(RestrictTo.Scope.LIBRARY)
-    internal abstract fun saveTempData()
+    internal abstract fun flushEventList()
 
     /**
      * Close the currently displayed message.
@@ -141,9 +140,6 @@ abstract class InAppMessaging internal constructor() {
                 configUrl = manifestConfig.configUrl()
             )
 
-            // inform repositories that it is initial launch to display app launch campaign at least once
-            PingResponseMessageRepository.isInitialLaunch = true
-
             configScheduler.startConfig()
         }
 
@@ -175,6 +171,6 @@ abstract class InAppMessaging internal constructor() {
 
         override fun closeMessage(clearQueuedCampaigns: Boolean) = Unit
 
-        override fun saveTempData() = Unit
+        override fun flushEventList() = Unit
     }
 }

@@ -49,14 +49,4 @@ interface Event {
     @RestrictTo(LIBRARY)
     @NotNull
     fun getAttributeMap(): Map<String, Attribute?>
-
-    /**
-     * This method returns true if the event was logged when user info was updated, or before/during ping request.
-     */
-    fun shouldNotClear(): Boolean
-
-    /**
-     * Set to true if the event was logged when user information was updated, or before/during ping request..
-     */
-    fun setShouldNotClear(shouldNotClear: Boolean)
 }

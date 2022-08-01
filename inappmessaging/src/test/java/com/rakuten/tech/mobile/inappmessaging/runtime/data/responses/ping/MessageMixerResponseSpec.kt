@@ -67,19 +67,6 @@ class MessageMixerResponseSpec(private val testname: String, private val actual:
         campaign.getContexts() shouldHaveSize 0
     }
 
-    @Test
-    fun `should not always start times closed to zero`() {
-        val campaign = generateDummyCampaign("id", "")
-        campaign.getNumberOfTimesClosed() shouldBeEqualTo 0
-    }
-
-    @Test
-    fun `should have correct incremented value`() {
-        val campaign = generateDummyCampaign("id", "")
-        campaign.incrementTimesClosed()
-        campaign.getNumberOfTimesClosed() shouldBeEqualTo 1
-    }
-
     private fun generateDummyCampaign(id: String, title: String): CampaignData {
         val messagePayload = MessagePayload(
             "#000000", "#ffffff",
@@ -187,8 +174,8 @@ class MessageMixerResponseSpec(private val testname: String, private val actual:
                 arrayOf("isTest", campaignData.isTest(), false),
                 arrayOf("hasNoEndDate", campaignData.hasNoEndDate(), true),
                 arrayOf("isCampaignDismissable", campaignData.isCampaignDismissable(), false),
-                arrayOf("infiniteImpressions", campaignData.infiniteImpressions(), true),
-                arrayOf("maxImpressions", campaignData.getMaxImpressions(), 0), // default value
+                arrayOf("infiniteImpressions", campaignData.infiniteImpressions(), false),
+                arrayOf("maxImpressions", campaignData.getMaxImpressions(), 100),
                 arrayOf("headerColor", messagePayload.headerColor, "#ffffff"),
                 arrayOf("backgroundColor", messagePayload.backgroundColor, "#000000"),
                 arrayOf("messageBody", messagePayload.messageBody, "Response Test"),

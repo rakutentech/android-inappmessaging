@@ -9,7 +9,9 @@ import androidx.work.WorkerParameters
 import androidx.work.testing.WorkManagerTestInitHelper
 import com.rakuten.tech.mobile.inappmessaging.runtime.BaseTest
 import com.rakuten.tech.mobile.inappmessaging.runtime.data.models.messages.ValidTestMessage
-import com.rakuten.tech.mobile.inappmessaging.runtime.data.repositories.PingResponseMessageRepository
+import com.rakuten.tech.mobile.inappmessaging.runtime.data.repositories.CampaignRepository
+import com.rakuten.tech.mobile.inappmessaging.runtime.manager.MessageReadinessManager
+import com.rakuten.tech.mobile.inappmessaging.runtime.utils.EventMatchingUtil
 import com.rakuten.tech.mobile.inappmessaging.runtime.utils.MessageEventReconciliationUtil
 import org.amshove.kluent.shouldBeEqualTo
 import org.junit.Before
@@ -29,7 +31,6 @@ class MessageEventReconciliationWorkerSpec : BaseTest() {
 
     private val workerParameters = Mockito.mock(WorkerParameters::class.java)
     private var worker: MessageEventReconciliationWorker? = null
-    private val mockPingResponseRepo = Mockito.mock(PingResponseMessageRepository::class.java)
 
     @Before
     override fun setup() {
@@ -50,10 +51,13 @@ class MessageEventReconciliationWorkerSpec : BaseTest() {
         val message = ValidTestMessage()
         val notTestMessage = ValidTestMessage(isTest = false)
         worker = MessageEventReconciliationWorker(
-            ApplicationProvider.getApplicationContext(), workerParameters,
-            mockPingResponseRepo, MessageEventReconciliationUtil.instance()
+            ApplicationProvider.getApplicationContext(),
+            workerParameters,
+            EventMatchingUtil.instance(),
+            MessageEventReconciliationUtil.instance(),
+            MessageReadinessManager.instance()
         )
-        `when`(mockPingResponseRepo.getAllMessagesCopy()).thenReturn(listOf(message, notTestMessage))
+        CampaignRepository.instance().syncWith(listOf(message, notTestMessage), 0)
         worker?.doWork() shouldBeEqualTo ListenableWorker.Result.success()
     }
 }

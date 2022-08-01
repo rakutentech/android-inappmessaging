@@ -6,25 +6,36 @@ import com.rakuten.tech.mobile.inappmessaging.runtime.data.responses.ping.*
 internal class ValidTestMessage(
     private val campaignId: String = DEFAULT_CAMPAIGN_ID,
     private val isTest: Boolean = IS_TEST,
-    private val isCampaignDismissable: Boolean = true
+    private val isCampaignDismissable: Boolean = true,
+    private val maxImpressions: Int = 1,
+    private val infiniteImpressions: Boolean = false,
+    private val triggers: List<Trigger>? = null
 ) : Message {
-    internal var timesClosed = 0
-    private var max = 1
+    private var max = maxImpressions
+
+    override var impressionsLeft: Int? = null
+        get() = if (field == null) max else field
+
+    override var isOptedOut: Boolean? = null
+        get() = if (field == null) false else field
 
     override fun getType(): Int = InAppMessageType.MODAL.typeId
 
     override fun getCampaignId() = campaignId
 
     override fun getTriggers(): List<Trigger> {
-        val triggerList = ArrayList<Trigger>()
-        triggerList.add(Trigger(1, 1, "test", mutableListOf()))
-        return triggerList
+        if (triggers == null) {
+            val triggerList = ArrayList<Trigger>()
+            triggerList.add(Trigger(1, 1, "test", mutableListOf()))
+            return triggerList
+        }
+        return triggers
     }
 
     override fun getMessagePayload(): MessagePayload = MessagePayload(
         DEFAULT_COLOR, "#ffffff",
         MessageSettings(
-            DisplaySettings(1, 1, 1, 1, false, 1, false),
+            DisplaySettings(1, 1, Long.MAX_VALUE, 1, false, 1, false),
             ControlSettings(listOf())
         ),
         null, Resource(cropType = 2), DEFAULT_COLOR, null, "#ffffff", "title",
@@ -41,13 +52,7 @@ internal class ValidTestMessage(
 
     override fun getContexts(): List<String> = listOf()
 
-    override fun getNumberOfTimesClosed() = timesClosed
-
-    override fun incrementTimesClosed() {
-        timesClosed++
-    }
-
-    override fun infiniteImpressions() = false
+    override fun infiniteImpressions() = infiniteImpressions
 
     override fun hasNoEndDate() = false
 
