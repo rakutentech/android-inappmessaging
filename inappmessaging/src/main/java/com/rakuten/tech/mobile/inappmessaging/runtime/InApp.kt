@@ -9,26 +9,32 @@ import androidx.annotation.VisibleForTesting
 import com.rakuten.tech.mobile.inappmessaging.runtime.data.models.appevents.Event
 import com.rakuten.tech.mobile.inappmessaging.runtime.data.repositories.AccountRepository
 import com.rakuten.tech.mobile.inappmessaging.runtime.data.repositories.ConfigResponseRepository
-import com.rakuten.tech.mobile.inappmessaging.runtime.data.repositories.LocalEventRepository
-import com.rakuten.tech.mobile.inappmessaging.runtime.data.repositories.PingResponseMessageRepository
-import com.rakuten.tech.mobile.inappmessaging.runtime.data.repositories.ReadyForDisplayMessageRepository
 import com.rakuten.tech.mobile.inappmessaging.runtime.exception.InAppMessagingException
 import com.rakuten.tech.mobile.inappmessaging.runtime.manager.DisplayManager
 import com.rakuten.tech.mobile.inappmessaging.runtime.manager.EventsManager
+import com.rakuten.tech.mobile.inappmessaging.runtime.manager.MessageReadinessManager
 import com.rakuten.tech.mobile.inappmessaging.runtime.manager.SessionManager
+import com.rakuten.tech.mobile.inappmessaging.runtime.utils.EventMatchingUtil
 import com.rakuten.tech.mobile.inappmessaging.runtime.utils.InAppLogger
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import java.lang.ref.WeakReference
 
-@SuppressWarnings("TooManyFunctions", "TooGenericExceptionCaught")
+@SuppressWarnings(
+    "TooManyFunctions",
+    "TooGenericExceptionCaught",
+    "LongParameterList"
+)
 internal class InApp(
     private val context: Context,
     isDebugLogging: Boolean,
     private val displayManager: DisplayManager = DisplayManager.instance(),
     private var isCacheHandling: Boolean = BuildConfig.IS_CACHE_HANDLING,
     private val eventsManager: EventsManager = EventsManager,
+    private val eventMatchingUtil: EventMatchingUtil = EventMatchingUtil.instance(),
+    private val messageReadinessManager: MessageReadinessManager = MessageReadinessManager.instance(),
+    private val accountRepo: AccountRepository = AccountRepository.instance(),
     private val sessionManager: SessionManager = SessionManager
 ) : InAppMessaging() {
 
@@ -53,8 +59,8 @@ internal class InApp(
 
     override fun registerPreference(userInfoProvider: UserInfoProvider) {
         try {
-            AccountRepository.instance().userInfoProvider = userInfoProvider
-            AccountRepository.instance().updateUserInfo()
+            accountRepo.userInfoProvider = userInfoProvider
+            accountRepo.updateUserInfo()
         } catch (ex: Exception) {
             errorCallback?.let {
                 it(InAppMessagingException("In-App Messaging register preference failed", ex))
@@ -94,9 +100,14 @@ internal class InApp(
 
     override fun logEvent(event: Event) {
         try {
-            if (ConfigResponseRepository.instance().isConfigEnabled()) {
+            val isEnabled = ConfigResponseRepository.instance().isConfigEnabled()
+            val hasUserChanged = userDidChange()
+
+            if (isEnabled && !hasUserChanged) {
                 eventsManager.onEventReceived(event)
-            } else {
+            } else if (!isEnabled || hasUserChanged) {
+                // Save temp events while config is not enabled yet, or
+                // when there is a change in user (ping in progress)
                 synchronized(tempEventList) {
                     tempEventList.add(event)
                 }
@@ -123,6 +134,16 @@ internal class InApp(
         }
     }
 
+    @VisibleForTesting
+    internal fun userDidChange(): Boolean {
+        if (accountRepo.updateUserInfo()) {
+            // Update user-related data such as cache and ping data
+            sessionManager.onSessionUpdate()
+            return true
+        }
+        return false
+    }
+
     // ------------------------------------Library Internal APIs-------------------------------------
     @RestrictTo(RestrictTo.Scope.LIBRARY)
     override fun getRegisteredActivity() = activityWeakReference?.get()
@@ -132,20 +153,12 @@ internal class InApp(
 
     override fun isLocalCachingEnabled() = isCacheHandling
 
-    override fun saveTempData() {
-        try {
-            AccountRepository.instance().updateUserInfo()
-            synchronized(tempEventList) {
-                tempEventList.forEach { ev ->
-                    ev.setShouldNotClear(PingResponseMessageRepository.isInitialLaunch)
-                    LocalEventRepository.instance().addEvent(ev)
-                }
-                tempEventList.clear()
+    override fun flushEventList() {
+        synchronized(tempEventList) {
+            tempEventList.forEach { ev ->
+                eventMatchingUtil.matchAndStore(ev)
             }
-        } catch (ex: Exception) {
-            errorCallback?.let {
-                it(InAppMessagingException("In-App Messaging moving temp data to cache failed", ex))
-            }
+            tempEventList.clear()
         }
     }
 
@@ -154,9 +167,8 @@ internal class InApp(
         val id = displayManager.removeMessage(getRegisteredActivity())
 
         if (clearQueuedCampaigns) {
-            ReadyForDisplayMessageRepository.instance().clearMessages(true)
+            messageReadinessManager.clearMessages()
         } else if (id != null) {
-            ReadyForDisplayMessageRepository.instance().removeMessage(id as String, true)
             displayManager.displayMessage()
         }
     }

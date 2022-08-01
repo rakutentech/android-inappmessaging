@@ -16,6 +16,7 @@ import com.rakuten.tech.mobile.inappmessaging.runtime.data.models.messages.Messa
 import com.rakuten.tech.mobile.inappmessaging.runtime.data.models.messages.ValidTestMessage
 import com.rakuten.tech.mobile.inappmessaging.runtime.data.repositories.*
 import com.rakuten.tech.mobile.inappmessaging.runtime.data.responses.config.ConfigResponseData
+import com.rakuten.tech.mobile.inappmessaging.runtime.utils.EventMatchingUtil
 import com.rakuten.tech.mobile.inappmessaging.runtime.workmanager.schedulers.EventMessageReconciliationScheduler
 import org.amshove.kluent.*
 import org.junit.Before
@@ -25,6 +26,8 @@ import org.mockito.Mockito
 import org.mockito.Mockito.`when`
 import org.robolectric.RobolectricTestRunner
 import java.util.concurrent.ExecutionException
+import kotlin.collections.ArrayList
+import kotlin.collections.HashMap
 
 /**
  * Test class for EventsManager.
@@ -45,18 +48,7 @@ class EventsManagerSpec : BaseTest() {
         WorkManagerTestInitHelper.initializeTestWorkManager(context)
         `when`(mockEvent.getEventName()).thenReturn(EVENT_NAME)
         `when`(mockEvent.getRatEventMap()).thenReturn(map)
-        LocalDisplayedMessageRepository.instance().clearMessages()
-        LocalEventRepository.instance().clearEvents()
-        ReadyForDisplayMessageRepository.instance().clearMessages()
-        LocalOptedOutMessageRepository.instance().clearMessages()
-        PingResponseMessageRepository.instance().clearMessages()
-    }
-
-    @Test
-    fun `should receive event`() {
-        LocalEventRepository.instance().clearEvents()
-        EventsManager.onEventReceived(mockEvent)
-        LocalEventRepository.instance().getEvents()[0].getEventName() shouldBeEqualTo EVENT_NAME
+        CampaignRepository.instance().clearMessages()
     }
 
     @Test
@@ -85,30 +77,6 @@ class EventsManagerSpec : BaseTest() {
     }
 
     @Test
-    fun `should clear all messages when user info is updated`() {
-        Settings.Secure.putString(
-            ApplicationProvider.getApplicationContext<Context>().contentResolver,
-            Settings.Secure.ANDROID_ID,
-            "test_device_id"
-        )
-        InAppMessaging.initialize(ApplicationProvider.getApplicationContext())
-        InAppMessaging.instance().registerPreference(TestUserInfoProvider())
-        ConfigResponseRepository.instance().addConfigResponse(configResponseData)
-
-        addTestData()
-
-        `when`(configResponseData.rollOutPercentage).thenReturn(0)
-        `when`(mockAccount.updateUserInfo()).thenReturn(true)
-
-        EventsManager.onEventReceived(
-            event = PurchaseSuccessfulEvent(), eventScheduler = eventRecon,
-            accountRepo = mockAccount
-        )
-
-        verifyTestData(0)
-    }
-
-    @Test
     fun `should not clear messages when user info is not updated`() {
         Settings.Secure.putString(
             ApplicationProvider.getApplicationContext<Context>().contentResolver,
@@ -124,8 +92,7 @@ class EventsManagerSpec : BaseTest() {
         addTestData()
 
         EventsManager.onEventReceived(
-            event = PurchaseSuccessfulEvent(), eventScheduler = eventRecon,
-            accountRepo = mockAccount
+            event = PurchaseSuccessfulEvent(), eventScheduler = eventRecon
         )
 
         verifyTestData(1)
@@ -135,22 +102,17 @@ class EventsManagerSpec : BaseTest() {
         // Add messages
         val messageList = ArrayList<Message>()
         messageList.add(message)
-        PingResponseMessageRepository.instance().replaceAllMessages(messageList)
-        ReadyForDisplayMessageRepository.instance().replaceAllMessages(messageList)
-        LocalDisplayedMessageRepository.instance().addMessage(message)
-        LocalOptedOutMessageRepository.instance().addMessage(message)
+        CampaignRepository.instance().syncWith(messageList, 0)
     }
 
     private fun verifyTestData(expected: Int) {
-        PingResponseMessageRepository.instance().getAllMessagesCopy().shouldHaveSize(expected)
-        ReadyForDisplayMessageRepository.instance().getAllMessagesCopy()shouldHaveSize(expected)
-        LocalDisplayedMessageRepository.instance().numberOfTimesDisplayed(message) shouldBeEqualTo expected
+        CampaignRepository.instance().messages.shouldHaveSize(expected)
+
         if (expected > 0) {
-            LocalOptedOutMessageRepository.instance().hasMessage(message.getCampaignId()).shouldBeTrue()
-        } else {
-            LocalOptedOutMessageRepository.instance().hasMessage(message.getCampaignId()).shouldBeFalse()
+            EventMatchingUtil.instance().matchedEvents(
+                CampaignRepository.instance().messages.values.first()
+            ).shouldNotBeNull()
         }
-        LocalEventRepository.instance().getEvents().shouldHaveSize(1)
 
         Mockito.verify(eventRecon, Mockito.times(expected)).startEventMessageReconciliationWorker()
     }

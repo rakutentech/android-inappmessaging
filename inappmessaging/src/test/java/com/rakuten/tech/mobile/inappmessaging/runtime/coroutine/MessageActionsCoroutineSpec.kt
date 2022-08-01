@@ -11,10 +11,9 @@ import com.rakuten.tech.mobile.inappmessaging.runtime.InAppMessaging
 import com.rakuten.tech.mobile.inappmessaging.runtime.R
 import com.rakuten.tech.mobile.inappmessaging.runtime.TestUserInfoProvider
 import com.rakuten.tech.mobile.inappmessaging.runtime.data.models.messages.InvalidTestMessage
-import com.rakuten.tech.mobile.inappmessaging.runtime.data.models.messages.Message
 import com.rakuten.tech.mobile.inappmessaging.runtime.data.models.messages.ValidTestMessage
-import com.rakuten.tech.mobile.inappmessaging.runtime.data.repositories.LocalDisplayedMessageRepository
-import com.rakuten.tech.mobile.inappmessaging.runtime.data.repositories.ReadyForDisplayMessageRepository
+import com.rakuten.tech.mobile.inappmessaging.runtime.data.repositories.CampaignRepository
+import com.rakuten.tech.mobile.inappmessaging.runtime.data.responses.ping.CampaignData
 import com.rakuten.tech.mobile.inappmessaging.runtime.data.responses.ping.MessageMixerResponseSpec
 import com.rakuten.tech.mobile.inappmessaging.runtime.manager.DisplayManager
 import org.amshove.kluent.*
@@ -38,12 +37,16 @@ internal class MessageActionsCoroutineSpec(
     private val isOpt: Boolean
 ) : BaseTest() {
 
-    private val message = MessageMixerResponseSpec.response.data[0].campaignData
+    private lateinit var message: CampaignData
     private val activity = Mockito.mock(Activity::class.java)
 
     @Before
     override fun setup() {
         super.setup()
+
+        // Copy object to not modify internal properties when testing
+        message = MessageMixerResponseSpec.response.data[0].campaignData.copy()
+
         `when`(activity.packageManager).thenReturn(
             ApplicationProvider
                 .getApplicationContext<Context>().packageManager
@@ -82,28 +85,17 @@ internal class MessageActionsCoroutineSpec(
     }
 
     @Test
-    fun `should add message to display repo`() {
-        val numberOfTimesDisplayed: Int = LocalDisplayedMessageRepository.instance().numberOfTimesDisplayed(message)
+    fun `should update repo after campaign is displayed`() {
+        CampaignRepository.instance().clearMessages()
+        CampaignRepository.instance().syncWith(listOf(message), 0)
+        val currImpressions = message.impressionsLeft!!
         DisplayManager.instance().removeMessage(InAppMessaging.instance().getRegisteredActivity())
         val result = MessageActionsCoroutine().executeTask(message, resourceId, isOpt)
+        val updatedMessage = CampaignRepository.instance().messages.values.first()
+
         result.shouldBeTrue()
-        LocalDisplayedMessageRepository.instance()
-            .numberOfTimesDisplayed(message) shouldBeEqualTo numberOfTimesDisplayed + 1
-    }
-
-    @Test
-    fun `should remove message from ready repo`() {
-        val messageList = ArrayList<Message>()
-        messageList.add(message)
-        ReadyForDisplayMessageRepository.instance().replaceAllMessages(messageList)
-        ReadyForDisplayMessageRepository.instance().getAllMessagesCopy().shouldHaveSize(1)
-
-        DisplayManager.instance().removeMessage(InAppMessaging.instance().getRegisteredActivity())
-        val result = MessageActionsCoroutine().executeTask(message, resourceId, isOpt)
-        if (result) {
-            DisplayManager.instance().displayMessage()
-        }
-        ReadyForDisplayMessageRepository.instance().getAllMessagesCopy().shouldHaveSize(0)
+        updatedMessage.impressionsLeft shouldBeEqualTo currImpressions - 1
+        updatedMessage.isOptedOut shouldBeEqualTo isOpt
     }
 
     companion object {

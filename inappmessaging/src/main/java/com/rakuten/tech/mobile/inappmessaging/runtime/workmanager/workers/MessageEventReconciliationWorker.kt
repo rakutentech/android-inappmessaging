@@ -4,14 +4,12 @@ import android.content.Context
 import androidx.work.Worker
 import androidx.work.WorkerParameters
 import com.rakuten.tech.mobile.inappmessaging.runtime.BuildConfig
-import com.rakuten.tech.mobile.inappmessaging.runtime.data.repositories.PingResponseMessageRepository
-import com.rakuten.tech.mobile.inappmessaging.runtime.data.repositories.ReadyForDisplayMessageRepository
 import com.rakuten.tech.mobile.inappmessaging.runtime.manager.DisplayManager
+import com.rakuten.tech.mobile.inappmessaging.runtime.manager.MessageReadinessManager
 import com.rakuten.tech.mobile.inappmessaging.runtime.utils.InAppLogger
 import com.rakuten.tech.mobile.inappmessaging.runtime.utils.MessageEventReconciliationUtil
+import com.rakuten.tech.mobile.inappmessaging.runtime.utils.EventMatchingUtil
 import com.rakuten.tech.mobile.inappmessaging.runtime.utils.RuntimeUtil.getCurrentTimeMillis
-import java.util.Date
-import kotlin.collections.ArrayList
 
 /**
  * This worker's main task is to reconcile messages with local events. This worker must be a unique
@@ -21,8 +19,9 @@ import kotlin.collections.ArrayList
 internal class MessageEventReconciliationWorker(
     context: Context,
     workerParams: WorkerParameters,
-    private val pingRepo: PingResponseMessageRepository,
-    private val messageUtil: MessageEventReconciliationUtil
+    private val eventMatchingUtil: EventMatchingUtil,
+    private val messageEventReconciliationUtil: MessageEventReconciliationUtil,
+    private val messageReadinessManager: MessageReadinessManager
 ) :
     Worker(context, workerParams) {
 
@@ -31,8 +30,8 @@ internal class MessageEventReconciliationWorker(
      */
     constructor(context: Context, workerParams: WorkerParameters) :
         this(
-            context, workerParams, PingResponseMessageRepository.instance(),
-            MessageEventReconciliationUtil.instance()
+            context, workerParams, EventMatchingUtil.instance(), MessageEventReconciliationUtil.instance(),
+            MessageReadinessManager.instance()
         )
 
     /**
@@ -48,37 +47,27 @@ internal class MessageEventReconciliationWorker(
             startTime = getCurrentTimeMillis()
         }
 
-        // Messages list shouldn't be empty, if it is, then there's no more work to be done.
-        val messageListCopy = pingRepo.getAllMessagesCopy().filter {
-            // Keep only non-outdated (or has no end date) messages
-            it.hasNoEndDate() ||
-                it.getMessagePayload().messageSettings.displaySettings.endTimeMillis >= Date().time
-        }
-        if (messageListCopy.isEmpty()) {
-            // Job is done!
-            return Result.success()
-        }
-
-        // Move test messages(ready to display) from messageList to a new list readyMessageList.
-        val readyMessageList = ArrayList(messageUtil.extractTestMessages(messageListCopy))
-
-        // Add a list of ready messages reconciled messages' triggers with existing local events.
-        readyMessageList.addAll(messageUtil.reconcileMessagesAndEvents(messageListCopy))
-
-        // Finally, add all ready messages into ReadyForDisplayMessageRepository.
-        ReadyForDisplayMessageRepository.instance().replaceAllMessages(readyMessageList)
+        // Validate campaigns against current events.
+        reconcileMessagesAndEvents()
 
         // Schedule to display next message.
         DisplayManager.instance().displayMessage()
-        for (message in readyMessageList) {
-            InAppLogger(TAG).debug("Ready Messages: %s", message.getMessagePayload().header)
-        }
+
         var endTime: Long = 0
         if (BuildConfig.DEBUG) {
             endTime = getCurrentTimeMillis()
         }
         InAppLogger(TAG).debug("Time took to reconcile: %d milliseconds", endTime - startTime)
         return Result.success()
+    }
+
+    private fun reconcileMessagesAndEvents() {
+        messageEventReconciliationUtil.validate { campaign, events ->
+            if (eventMatchingUtil.removeSetOfMatchedEvents(events, campaign)) {
+                messageReadinessManager.addMessageToQueue(campaign.getCampaignId())
+                InAppLogger(TAG).debug("Ready message: ${campaign.getMessagePayload().header}")
+            }
+        }
     }
 
     companion object {
