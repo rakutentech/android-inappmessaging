@@ -46,9 +46,10 @@ internal abstract class MessageEventReconciliationUtil : MessageEventReconciliat
                     continue
                 }
 
-                // Test campaigns always valid
+                // Triggers and target duration always satisfied for test campaigns
                 if (campaign.isTest()) {
                     validatedCampaignHandler(campaign, emptySet())
+                    continue
                 }
 
                 if (campaign.isOptedOut == true || campaign.isOutdated) {
