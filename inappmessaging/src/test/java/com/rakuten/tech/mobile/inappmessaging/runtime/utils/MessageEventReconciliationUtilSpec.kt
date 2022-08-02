@@ -53,12 +53,16 @@ class MessageEventReconciliationUtilSpec : BaseTest() {
     }
 
     @Test
-    fun `should not accept outdated test campaign`() {
+    fun `should accept outdated test campaign`() {
         CampaignRepository.instance().syncWith(listOf(outdatedTestCampaign), 0)
         val handler = ValidatorHandler()
         MessageEventReconciliationUtil.instance().validate(handler.closure)
 
-        handler.validatedElements.shouldBeEmpty()
+        handler.validatedElements.shouldBeEqualTo(
+            listOf(
+                ValidatorHandler.Element(outdatedTestCampaign, emptySet())
+            )
+        )
     }
 
     @Test
