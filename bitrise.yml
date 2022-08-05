@@ -46,6 +46,10 @@ workflows:
         title: Run Tests
         inputs:
         - content: ./gradlew clean testRelease --tests com.rakuten.tech.mobile.inappmessaging.runtime.integration.IntegrationSpec
+    - deploy-to-bitrise-io@2:
+        inputs:
+        - deploy_path: "$SDK_PATH/build/test-results/testReleaseUnitTest/"
+        - is_enable_public_page: 'false'
     - custom-test-results-export@0:
         inputs:
         - test_name: Integration Tests
