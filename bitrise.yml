@@ -54,31 +54,31 @@ workflows:
     - deploy-to-bitrise-io@2:
         inputs:
         - deploy_path: "$SDK_PATH/build/test-results/testReleaseUnitTest/"
-        - is_enable_public_page: 'false'
-    - slack@3:
-        inputs:
-        - channel: ''
-        - webhook_url: "$SLACK_CHANNEL_WEBHOOK"
-        - text: ''
-        - title: ''
-        - author_name: ''
-        - channel_on_error: ''
-        - pretext: ''
-        - pretext_on_error: ''
-        - message_on_error: |+
-            $BITRISE_APP_TITLE » $BITRISE_TRIGGERED_WORKFLOW_TITLE - #$BITRISE_BUILD_NUMBER *Failure*
-            <$BITRISE_BUILD_URL|Open>
-        - message: |+
-            $BITRISE_APP_TITLE » $BITRISE_TRIGGERED_WORKFLOW_TITLE - #$BITRISE_BUILD_NUMBER *Success*
-            <$BITRISE_BUILD_URL|Open>
-        - fields: ''
-        - buttons: ''
-        - footer: ''
-        - footer_icon: ''
-        - timestamp: 'no'
-        - icon_url_on_error: ''
-        - from_username_on_error: ''
-        - color_on_error: "#d10b20"
+        - is_enable_public_page: 'true'
+    # - slack@3:
+    #     inputs:
+    #     - channel: ''
+    #     - webhook_url: "$SLACK_CHANNEL_WEBHOOK"
+    #     - text: ''
+    #     - title: ''
+    #     - author_name: ''
+    #     - channel_on_error: ''
+    #     - pretext: ''
+    #     - pretext_on_error: ''
+    #     - message_on_error: |+
+    #         $BITRISE_APP_TITLE » $BITRISE_TRIGGERED_WORKFLOW_TITLE - #$BITRISE_BUILD_NUMBER *Failure*
+    #         <$BITRISE_BUILD_URL|Open>
+    #     - message: |+
+    #         $BITRISE_APP_TITLE » $BITRISE_TRIGGERED_WORKFLOW_TITLE - #$BITRISE_BUILD_NUMBER *Success*
+    #         <$BITRISE_BUILD_URL|Open>
+    #     - fields: ''
+    #     - buttons: ''
+    #     - footer: ''
+    #     - footer_icon: ''
+    #     - timestamp: 'no'
+    #     - icon_url_on_error: ''
+    #     - from_username_on_error: ''
+    #     - color_on_error: "#d10b20"
   release:
     before_run:
     - _setup-env
@@ -104,10 +104,6 @@ workflows:
         - test_name: "${SDK_PATH}_release"
         - base_path: "$SDK_PATH/build/test-results/testReleaseUnitTest/"
         - search_pattern: "*"
-    - deploy-to-bitrise-io@2:
-        inputs:
-        - deploy_path: "$SDK_PATH/build/outputs/aar"
-        - is_enable_public_page: 'false'
     - script@1:
         title: Retrieve Base64 PGP Key and save to file
         inputs:
@@ -206,7 +202,10 @@ workflows:
         - content: |-
             bundle install
             bundle exec danger --dangerfile=config/danger/Dangerfile
-    - deploy-to-bitrise-io@2: {}
+    - deploy-to-bitrise-io@2:
+        inputs:
+        - deploy_path: "$SDK_PATH/build/test-results/"
+        - is_enable_public_page: 'true'
     - cache-push@2:
         inputs:
         - cache_paths: |-
