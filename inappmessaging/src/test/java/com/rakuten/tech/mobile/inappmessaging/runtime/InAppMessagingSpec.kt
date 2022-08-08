@@ -331,11 +331,6 @@ open class InAppMessagingSpec : BaseTest() {
         Mockito.verify(sessionManagerMock).onSessionUpdate()
     }
 
-    @Test
-    fun `should fail`() {
-        true.shouldBeFalse()
-    }
-
     private fun setupDisplayedView(message: Message) {
         val message2 = ValidTestMessage()
         CampaignRepository.instance().syncWith(listOf(message, message2), 0)
