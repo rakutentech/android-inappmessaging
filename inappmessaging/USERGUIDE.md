@@ -392,6 +392,7 @@ Documents targeting Product Managers:
   - **Impact**: Data stored from SharedPreferences is cleared to use the new format. Therefore please ensure that there are no pending campaigns when updating to this version, for the campaign's impressions left will be reset to "max lifetime impressions count" and opt-out status to "not opted out" affecting the visibility of the pending campaign.
 * SDKCF-5510: Updated SDK Utils dependency to v2.0.0.
 * SDKCF-5242: Added handling to change opt-out color when background is dark.
+* SDKCF-5637: Fixed issue where test campaigns are not being displayed.
 
 ### 7.1.0 (2022-06-24)
 * SDKCF-5256: Added sending of impression events with campaign details to analytics account.

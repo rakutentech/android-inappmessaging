@@ -42,16 +42,17 @@ internal abstract class MessageEventReconciliationUtil : MessageEventReconciliat
         @SuppressWarnings("ComplexMethod", "LongMethod")
         override fun validate(validatedCampaignHandler: (campaign: Message, events: Set<Event>) -> Unit) {
             for (campaign in campaignRepo.messages.values) {
-                if (campaign.impressionsLeft == 0 || campaign.isOutdated) {
+                if (campaign.impressionsLeft == 0) {
                     continue
                 }
 
-                // Test campaigns always valid
+                // Triggers and target duration always satisfied for test campaigns
                 if (campaign.isTest()) {
                     validatedCampaignHandler(campaign, emptySet())
+                    continue
                 }
 
-                if (campaign.isOptedOut == true) {
+                if (campaign.isOptedOut == true || campaign.isOutdated) {
                     continue
                 }
 
