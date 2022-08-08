@@ -54,7 +54,7 @@ workflows:
     - deploy-to-bitrise-io@2:
         inputs:
         - deploy_path: "$SDK_PATH/build/test-results/testReleaseUnitTest/"
-        - is_enable_public_page: 'true'
+        - is_enable_public_page: 'false'
     # - slack@3:
     #     inputs:
     #     - channel: ''
@@ -202,10 +202,7 @@ workflows:
         - content: |-
             bundle install
             bundle exec danger --dangerfile=config/danger/Dangerfile
-    - deploy-to-bitrise-io@2:
-        inputs:
-        - deploy_path: "$SDK_PATH/build/test-results/"
-        - is_enable_public_page: 'true'
+    - deploy-to-bitrise-io@2: {}
     - cache-push@2:
         inputs:
         - cache_paths: |-
