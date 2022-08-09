@@ -31,7 +31,7 @@ workflows:
         - content: "./gradlew detekt detektRelease lintAnalyzeDebug lintDebug lintReportDebug testDebugUnitTest jacocoDebugReport"
     - custom-test-results-export@0:
         inputs:
-        - test_name: Unit Tests (Debug)
+        - test_name: "${SDK_PATH}_debug"
         - base_path: "$SDK_PATH/build/test-results/testDebugUnitTest/"
         - search_pattern: "*"
   integration-test:
@@ -101,13 +101,9 @@ workflows:
         - content: "./gradlew currentVersion"
     - custom-test-results-export@0:
         inputs:
-        - test_name: Unit Tests (Release)
+        - test_name: "${SDK_PATH}_release"
         - base_path: "$SDK_PATH/build/test-results/testReleaseUnitTest/"
         - search_pattern: "*"
-    - deploy-to-bitrise-io@2:
-        inputs:
-        - deploy_path: "$SDK_PATH/build/outputs/aar"
-        - is_enable_public_page: 'false'
     - script@1:
         title: Retrieve Base64 PGP Key and save to file
         inputs:
@@ -206,6 +202,7 @@ workflows:
         - content: |-
             bundle install
             bundle exec danger --dangerfile=config/danger/Dangerfile
+    - deploy-to-bitrise-io@2: {}
     - cache-push@2:
         inputs:
         - cache_paths: |-
