@@ -42,18 +42,22 @@ internal abstract class MessageEventReconciliationUtil : MessageEventReconciliat
         @SuppressWarnings("ComplexMethod", "LongMethod", "ComplexCondition")
         override fun validate(validatedCampaignHandler: (campaign: Message, events: Set<Event>) -> Unit) {
             for (campaign in campaignRepo.messages.values) {
+                // should have impressions left
+                // should not be opted out and within the target schedule (checking disabled for test campaigns)
                 if (campaign.impressionsLeft == 0 ||
                     (!campaign.isTest() && (campaign.isOptedOut == true || campaign.isOutdated))
                 ) {
                     continue
                 }
 
+                // should have triggers
                 val campaignTriggers = campaign.getTriggers()
                 if (campaignTriggers.isNullOrEmpty()) {
                     InAppLogger(TAG).debug("Campaign (${campaign.getCampaignId()}) has no triggers.")
                     continue
                 }
 
+                // all campaign triggers should exist in the logged events
                 if (!eventMatchingUtil.containsAllMatchedEvents(campaign)) {
                     continue
                 }
