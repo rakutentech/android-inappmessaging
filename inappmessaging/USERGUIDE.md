@@ -393,6 +393,7 @@ Documents targeting Product Managers:
 * SDKCF-5510: Updated SDK Utils dependency to v2.0.0.
 * SDKCF-5242: Added handling to change opt-out color when background is dark.
 * SDKCF-5637: Fixed issue where test campaigns are not being displayed.
+* SDKCF-5777: Enabled triggers validation for test campaigns.
 
 ### 7.1.0 (2022-06-24)
 * SDKCF-5256: Added sending of impression events with campaign details to analytics account.
