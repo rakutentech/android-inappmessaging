@@ -3,6 +3,7 @@ package com.rakuten.tech.mobile.inappmessaging.runtime
 import android.app.Activity
 import android.content.Context
 import android.content.pm.PackageManager
+import android.os.Build
 import androidx.annotation.NonNull
 import androidx.annotation.RestrictTo
 import androidx.annotation.VisibleForTesting
@@ -175,8 +176,16 @@ internal class InApp(
 
     internal class AppManifestConfig(val context: Context) {
 
-        private val metadata = context.packageManager
-            .getApplicationInfo(context.packageName, PackageManager.GET_META_DATA).metaData
+        @SuppressWarnings("Deprecation")
+        private val metadata = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+            context.packageManager.getApplicationInfo(
+                context.packageName,
+                PackageManager.ApplicationInfoFlags.of(PackageManager.GET_META_DATA.toLong())
+            ).metaData
+        } else {
+            context.packageManager
+                .getApplicationInfo(context.packageName, PackageManager.GET_META_DATA).metaData
+        }
 
         /**
          * Subscription Key from the InAppMessaging Dashboard.

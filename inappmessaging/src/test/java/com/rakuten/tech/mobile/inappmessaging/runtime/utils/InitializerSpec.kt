@@ -1,6 +1,7 @@
 package com.rakuten.tech.mobile.inappmessaging.runtime.utils
 
 import android.content.Context
+import android.os.Build
 import android.provider.Settings
 import androidx.test.core.app.ApplicationProvider
 import androidx.work.Data
@@ -20,6 +21,7 @@ import org.junit.runner.RunWith
 import org.mockito.Mockito
 import org.mockito.Mockito.`when`
 import org.robolectric.RobolectricTestRunner
+import org.robolectric.annotation.Config
 
 /**
  * Test class for InitializationWorker.
@@ -38,16 +40,15 @@ class InitializerSpec : BaseTest() {
 
     @Test
     fun `should add host app info with basic attributes`() {
-        WorkManagerTestInitHelper.initializeTestWorkManager(context!!)
-        InAppMessaging.initialize(context, true)
-        InAppMessaging.instance().registerPreference(TestUserInfoProvider())
-        HostAppInfoRepository.instance().getInAppMessagingSubscriptionKey().shouldNotBeNullOrEmpty()
-        HostAppInfoRepository.instance()
-            .getInAppMessagingSubscriptionKey() shouldBeEqualTo AppManifestConfig(context).subscriptionKey()
-        HostAppInfoRepository.instance()
-            .getPackageName() shouldBeEqualTo "com.rakuten.tech.mobile.inappmessaging.runtime.test"
-        HostAppInfoRepository.instance().getVersion() shouldBeEqualTo "1.0.2"
+        verifyHostAppInfo()
     }
+
+    // API 33 is not yet supported in Robolectric v4.8.1
+//    @Test
+//    @Config(sdk = [Build.VERSION_CODES.TIRAMISU])
+//    fun `should add host app info with basic attributes in API 33`() {
+//        verifyHostAppInfo()
+//    }
 
     @Test
     fun `should not throw exception`() {
@@ -103,5 +104,17 @@ class InitializerSpec : BaseTest() {
         Initializer.initializeSdk(appCtx, "test", "")
 
         HostAppInfoRepository.instance().getDeviceId() shouldBeEqualTo "test_uuid"
+    }
+
+    private fun verifyHostAppInfo() {
+        WorkManagerTestInitHelper.initializeTestWorkManager(context!!)
+        InAppMessaging.initialize(context, true)
+        InAppMessaging.instance().registerPreference(TestUserInfoProvider())
+        HostAppInfoRepository.instance().getInAppMessagingSubscriptionKey().shouldNotBeNullOrEmpty()
+        HostAppInfoRepository.instance()
+            .getInAppMessagingSubscriptionKey() shouldBeEqualTo AppManifestConfig(context).subscriptionKey()
+        HostAppInfoRepository.instance()
+            .getPackageName() shouldBeEqualTo "com.rakuten.tech.mobile.inappmessaging.runtime.test"
+        HostAppInfoRepository.instance().getVersion() shouldBeEqualTo "1.0.2"
     }
 }

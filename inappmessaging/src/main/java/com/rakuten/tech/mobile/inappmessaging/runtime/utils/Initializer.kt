@@ -4,6 +4,7 @@ import android.annotation.SuppressLint
 import android.annotation.TargetApi
 import android.content.Context
 import android.content.pm.PackageInfo
+import android.content.pm.PackageManager
 import android.content.pm.PackageManager.NameNotFoundException
 import android.os.Build
 import android.provider.Settings
@@ -61,11 +62,16 @@ internal object Initializer {
     /**
      * This method retrieves host app's app version.
      */
-    @TargetApi(Build.VERSION_CODES.P)
+    @SuppressWarnings("Deprecation")
     private fun getHostAppVersion(context: Context): String {
         val hostPackageName = getHostAppPackageName(context)
         val packageInfo: PackageInfo = try {
-            context.packageManager.getPackageInfo(hostPackageName, 0)
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+                System.out.println("Tiramisu")
+                context.packageManager.getPackageInfo(hostPackageName, PackageManager.PackageInfoFlags.of(0))
+            } else {
+                context.packageManager.getPackageInfo(hostPackageName, 0)
+            }
         } catch (e: NameNotFoundException) {
             InAppLogger(TAG).debug(e.message)
             return ""
