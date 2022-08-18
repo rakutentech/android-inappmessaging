@@ -67,7 +67,6 @@ internal object Initializer {
         val hostPackageName = getHostAppPackageName(context)
         val packageInfo: PackageInfo = try {
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
-                System.out.println("Tiramisu")
                 context.packageManager.getPackageInfo(hostPackageName, PackageManager.PackageInfoFlags.of(0))
             } else {
                 context.packageManager.getPackageInfo(hostPackageName, 0)
