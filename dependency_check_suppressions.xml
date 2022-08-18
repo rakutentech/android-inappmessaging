@@ -134,5 +134,6 @@
    ]]></notes>
     <packageUrl regex="true">^pkg:maven/com\.google\.android\.gms/play\-services\-basement@.*$</packageUrl>
     <vulnerabilityName>CVE-2022-1799</vulnerabilityName>
+    <vulnerabilityName>CVE-2022-2390</vulnerabilityName>
   </suppress>
 </suppressions>

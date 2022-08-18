@@ -5,7 +5,7 @@ apply plugin: "kotlin-android"
 apply plugin: 'kotlin-kapt'
 
 android {
-    compileSdkVersion 31
+    compileSdkVersion 33
 
     defaultConfig {
         applicationId "rakuten.com.tech.mobile.test"
@@ -14,7 +14,7 @@ android {
         // Defines the minimum API level required to run the app.
         minSdkVersion CONFIG.versions.android.sdk.min
         // Specifies the API level used to test the app.
-        targetSdkVersion 31
+        targetSdkVersion 33
 
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
 
@@ -22,6 +22,13 @@ android {
         // "pm clear" command after each test invocation. This command ensures
         // that the app's state is completely cleared between tests.
         testInstrumentationRunnerArguments clearPackageData: 'true'
+        
+        def property = { key ->
+            return System.getenv(key) ?: (project.hasProperty(key) ? project."$key" : null)
+        }
+
+        manifestPlaceholders.in_app_messaging_sub_id = property("IAM_SUBSCRIPTION_KEY") ?: ""
+        manifestPlaceholders.config_url = property("CONFIG_URL_TEST_PROD") ?: ""
     }
 
     buildTypes {
@@ -35,17 +42,6 @@ android {
     }
 
     flavorDimensions 'version'
-
-    def property = { key ->
-        return System.getenv(key) ?: (project.hasProperty(key) ? project."$key" : null)
-    }
-
-    productFlavors {
-        prodTesting {
-            manifestPlaceholders.in_app_messaging_sub_id = property("IAM_SUBSCRIPTION_KEY") ?: ""
-            manifestPlaceholders.config_url = property("CONFIG_URL_TEST_PROD") ?: ""
-        }
-    }
 }
 
 dependencies {

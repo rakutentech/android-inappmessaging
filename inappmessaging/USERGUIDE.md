@@ -46,18 +46,18 @@ dependencies {
 ```
 Please refer to [Changelog](#changelog) section for the latest version.
 
-### #3 Target and compile SDK version to 31 or above.
-Note: It is required to target and compile to SDK version 31 or above.
+### #3 Target and compile SDK version to 33 or above.
+Note: It is required to target and compile to SDK version 33 or above.
 
 ```groovy
 android {
-    compileSdkVersion 31
+    compileSdkVersion 33
 
     defaultConfig {
     // Defines the minimum API level required to run the app.
     minSdkVersion 23
     // Specifies the API level used to test the app.
-    targetSdkVersion 31
+    targetSdkVersion 33
     }
 }
 ```
@@ -390,9 +390,10 @@ Documents targeting Product Managers:
 ### 7.2.0 (in progress)
 * SDKCF-5038: Refactored event logging logic and campaign repository to align with iOS.
   - **Impact**: Data stored from SharedPreferences is cleared to use the new format. Therefore please ensure that there are no pending campaigns when updating to this version, for the campaign's impressions left will be reset to "max lifetime impressions count" and opt-out status to "not opted out" affecting the visibility of the pending campaign.
-* SDKCF-5510: Updated SDK Utils dependency to v2.0.0.
+* SDKCF-5510: Updated SDK Utils dependency to v2.1.1.
 * SDKCF-5242: Added handling to change opt-out color when background is dark.
 * SDKCF-5637: Fixed issue where test campaigns are not being displayed.
+* SDKCF-5778: Updated compile and target SDK to API 33 (Android 13).
 
 ### 7.1.0 (2022-06-24)
 * SDKCF-5256: Added sending of impression events with campaign details to analytics account.
