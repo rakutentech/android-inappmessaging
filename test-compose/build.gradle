@@ -4,19 +4,26 @@ apply plugin: "kotlin-android"
 apply plugin: 'kotlin-kapt'
 
 android {
-    compileSdkVersion 31
+    compileSdkVersion 33
 
     defaultConfig {
         applicationId "com.rakuten.tech.mobile.test_compose"
         versionCode 1
         versionName "0.0"
         minSdkVersion CONFIG.versions.android.sdk.min
-        targetSdkVersion 31
+        targetSdkVersion 33
 
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
         vectorDrawables {
             useSupportLibrary true
         }
+
+        def property = { key ->
+            return System.getenv(key) ?: (project.hasProperty(key) ? project."$key" : null)
+        }
+
+        manifestPlaceholders.in_app_messaging_sub_id = property("IAM_SUBSCRIPTION_KEY") ?: ""
+        manifestPlaceholders.config_url = property("CONFIG_URL_TEST_PROD") ?: ""
     }
 
     buildTypes {
@@ -40,17 +47,6 @@ android {
         kotlinCompilerExtensionVersion compose_version
     }
     flavorDimensions 'version'
-
-    def property = { key ->
-        return System.getenv(key) ?: (project.hasProperty(key) ? project."$key" : null)
-    }
-
-    productFlavors {
-        prodTesting {
-            manifestPlaceholders.in_app_messaging_sub_id = property("IAM_SUBSCRIPTION_KEY") ?: ""
-            manifestPlaceholders.config_url = property("CONFIG_URL_TEST_PROD") ?: ""
-        }
-    }
 }
 
 dependencies {
