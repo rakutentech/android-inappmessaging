@@ -15,6 +15,7 @@ import com.rakuten.tech.mobile.inappmessaging.runtime.exception.InAppMessagingEx
 import com.rakuten.tech.mobile.sdkutils.PreferencesUtil
 import org.amshove.kluent.*
 import org.junit.Before
+import org.junit.Ignore
 import org.junit.Test
 import org.junit.runner.RunWith
 import org.mockito.Mockito
@@ -38,15 +39,13 @@ class InitializerSpec : BaseTest() {
 
     @Test
     fun `should add host app info with basic attributes`() {
-        WorkManagerTestInitHelper.initializeTestWorkManager(context!!)
-        InAppMessaging.initialize(context, true)
-        InAppMessaging.instance().registerPreference(TestUserInfoProvider())
-        HostAppInfoRepository.instance().getInAppMessagingSubscriptionKey().shouldNotBeNullOrEmpty()
-        HostAppInfoRepository.instance()
-            .getInAppMessagingSubscriptionKey() shouldBeEqualTo AppManifestConfig(context).subscriptionKey()
-        HostAppInfoRepository.instance()
-            .getPackageName() shouldBeEqualTo "com.rakuten.tech.mobile.inappmessaging.runtime.test"
-        HostAppInfoRepository.instance().getVersion() shouldBeEqualTo "1.0.2"
+        verifyHostAppInfo()
+    }
+
+    @Test
+    @Ignore("API 33 is not yet supported in Robolectric v4.8.1")
+    fun `should add host app info with basic attributes in API 33`() {
+        verifyHostAppInfo()
     }
 
     @Test
@@ -103,5 +102,17 @@ class InitializerSpec : BaseTest() {
         Initializer.initializeSdk(appCtx, "test", "")
 
         HostAppInfoRepository.instance().getDeviceId() shouldBeEqualTo "test_uuid"
+    }
+
+    private fun verifyHostAppInfo() {
+        WorkManagerTestInitHelper.initializeTestWorkManager(context!!)
+        InAppMessaging.initialize(context, true)
+        InAppMessaging.instance().registerPreference(TestUserInfoProvider())
+        HostAppInfoRepository.instance().getInAppMessagingSubscriptionKey().shouldNotBeNullOrEmpty()
+        HostAppInfoRepository.instance()
+            .getInAppMessagingSubscriptionKey() shouldBeEqualTo AppManifestConfig(context).subscriptionKey()
+        HostAppInfoRepository.instance()
+            .getPackageName() shouldBeEqualTo "com.rakuten.tech.mobile.inappmessaging.runtime.test"
+        HostAppInfoRepository.instance().getVersion() shouldBeEqualTo "1.0.2"
     }
 }
