@@ -361,6 +361,7 @@ override fun onRequestPermissionsResult(requestCode: Int, permissions: Array<Str
 
 **<font color="red">Note:</font>** Please make sure that Push Primer Campaigns are only triggered for devices with Android 13 or higher OS since push notification permission request is not available for devices running in lower OS versions.
 * If push primer campaign is displayed in lower OS versions, tapping the push primer button in the campaign will just close the campaign.
+* Don't forget to [declare the push notification permission](https://developer.android.com/guide/topics/ui/notifiers/notification-permission#declare) in your app's manifest file.
 
 ## <a name="troubleshooting"></a> Troubleshooting
 ### Proguard ParseException

@@ -290,7 +290,7 @@ class MessageActionsCoroutineTiramisuSpec {
     }
 
     @Test
-    fun `should not request push permission for unergistered activity`() {
+    fun `should not request push permission for unregistered activity`() {
         val activity = setupActivity()
         InAppMessaging.instance().onPushPrimer = null
         InAppMessaging.instance().unregisterMessageDisplayActivity()
