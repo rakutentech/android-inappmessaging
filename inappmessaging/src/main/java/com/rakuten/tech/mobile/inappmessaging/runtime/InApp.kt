@@ -58,6 +58,8 @@ internal class InApp(
         true
     }
 
+    override var onPushPrimer: (() -> Unit)? = null
+
     override fun registerPreference(userInfoProvider: UserInfoProvider) {
         try {
             accountRepo.userInfoProvider = userInfoProvider

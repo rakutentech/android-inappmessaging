@@ -1,9 +1,12 @@
 package com.rakuten.tech.mobile.inappmessaging.runtime.coroutine
 
+import android.Manifest
 import android.content.ActivityNotFoundException
 import android.content.Intent
 import android.net.Uri
-import androidx.annotation.WorkerThread
+import android.os.Build
+import androidx.annotation.VisibleForTesting
+import androidx.core.app.ActivityCompat
 import com.rakuten.tech.mobile.inappmessaging.runtime.InAppMessaging
 import com.rakuten.tech.mobile.inappmessaging.runtime.R
 import com.rakuten.tech.mobile.inappmessaging.runtime.data.enums.ButtonActionType
@@ -25,7 +28,7 @@ import kotlin.collections.ArrayList
 /**
  * Task which should be ran in the background.
  */
-@SuppressWarnings("TooGenericExceptionCaught")
+@SuppressWarnings("TooGenericExceptionCaught", "TooManyFunctions")
 internal class MessageActionsCoroutine(private val campaignRepo: CampaignRepository = CampaignRepository.instance()) {
 
     fun executeTask(message: Message?, viewResourceId: Int, optOut: Boolean): Boolean {
@@ -37,7 +40,7 @@ internal class MessageActionsCoroutine(private val campaignRepo: CampaignReposit
         // Add event in the button if exist.
         addEmbeddedEvent(buttonType, message)
         // Handling onclick action for deep link, redirect, etc.
-        handleDeepLink(getOnClickBehavior(buttonType, message))
+        handleAction(getOnClickBehavior(buttonType, message))
         // Update campaign status in repository
         updateCampaignInRepository(message, optOut)
         // Schedule to report impression.
@@ -73,8 +76,8 @@ internal class MessageActionsCoroutine(private val campaignRepo: CampaignReposit
     /**
      * This method returns which button was clicked which is represented by ImpressionType object.
      */
-    @WorkerThread
-    private fun getOnClickBehaviorType(viewResourceId: Int): ImpressionType {
+    @VisibleForTesting
+    internal fun getOnClickBehaviorType(viewResourceId: Int): ImpressionType {
         return when (viewResourceId) {
             R.id.message_close_button -> ImpressionType.EXIT
             R.id.message_single_button, R.id.message_button_left -> ImpressionType.ACTION_ONE
@@ -89,8 +92,8 @@ internal class MessageActionsCoroutine(private val campaignRepo: CampaignReposit
      * This method returns a OnClickBehavior object which is retrieved from the message argument
      * according to which content or button was clicked.
      */
-    @WorkerThread
-    private fun getOnClickBehavior(impressionType: ImpressionType, message: Message): OnClickBehavior? {
+    @VisibleForTesting
+    internal fun getOnClickBehavior(impressionType: ImpressionType, message: Message): OnClickBehavior? {
         val controlSettings = message.getMessagePayload().messageSettings.controlSettings
 
         return when {
@@ -119,27 +122,47 @@ internal class MessageActionsCoroutine(private val campaignRepo: CampaignReposit
 
     /**
      * This method handles button's actions accordingly, such as close message, redirect to webview, etc. Deep
-     * link to another activity or app. Context of the app is needed in order to use PackageManager to
-     * check if there are browser apps installed.
+     * link to another activity or app, or push permission. Context of the app is needed in order to use PackageManager
+     * to check if there are browser apps installed, or request for push permission.
      */
-    private fun handleDeepLink(onClickBehavior: OnClickBehavior?) {
+    @VisibleForTesting
+    internal fun handleAction(onClickBehavior: OnClickBehavior?) {
         if (onClickBehavior == null) {
             return
         }
         val buttonActionType = ButtonActionType.getById(onClickBehavior.action)
         // Redirect is a special type of deep link, but no special handling is needed.
         if (ButtonActionType.DEEPLINK == buttonActionType || ButtonActionType.REDIRECT == buttonActionType) {
-            // Always use activity context.
-            val activityContext = InAppMessaging.instance().getRegisteredActivity()
-            val uri = onClickBehavior.uri
-            if (!uri.isNullOrEmpty() && activityContext != null) {
-                // Build an implicit intent.
-                val intent = Intent(Intent.ACTION_DEFAULT, Uri.parse(uri))
+            handleDeeplinkRedirection(onClickBehavior.uri)
+        } else if (ButtonActionType.PUSH_PRIMER == buttonActionType) {
+            handlePushPrimer()
+        }
+    }
 
-                try {
-                    activityContext.startActivity(intent)
-                } catch (e: ActivityNotFoundException) {
-                    InAppLogger(TAG).debug(e.message)
+    private fun handleDeeplinkRedirection(uri: String?) {
+        // Always use activity context.
+        val activityContext = InAppMessaging.instance().getRegisteredActivity()
+        if (!uri.isNullOrEmpty() && activityContext != null) {
+            // Build an implicit intent.
+            val intent = Intent(Intent.ACTION_DEFAULT, Uri.parse(uri))
+
+            try {
+                activityContext.startActivity(intent)
+            } catch (e: ActivityNotFoundException) {
+                InAppLogger(TAG).debug(e.message)
+            }
+        }
+    }
+
+    private fun handlePushPrimer() {
+        InAppMessaging.instance().onPushPrimer.let {
+            if (it != null) {
+                it.invoke()
+            } else if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+                InAppMessaging.instance().getRegisteredActivity()?.let { act ->
+                    ActivityCompat.requestPermissions(
+                        act, arrayOf(Manifest.permission.POST_NOTIFICATIONS), InAppMessaging.PUSH_PRIMER_REQ_CODE
+                    )
                 }
             }
         }

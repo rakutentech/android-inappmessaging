@@ -8,7 +8,8 @@ internal enum class ButtonActionType(val typeId: Int) {
     INVALID(0),
     REDIRECT(1),
     DEEPLINK(2),
-    CLOSE(3);
+    CLOSE(3),
+    PUSH_PRIMER(4);
 
     companion object {
 

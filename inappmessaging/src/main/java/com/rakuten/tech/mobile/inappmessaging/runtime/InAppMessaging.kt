@@ -24,6 +24,11 @@ abstract class InAppMessaging internal constructor() {
     abstract var onVerifyContext: (contexts: List<String>, campaignTitle: String) -> Boolean
 
     /**
+     * This callback is called if a push primer button is tapped. If not set, SDK will request push permission.
+     */
+    abstract var onPushPrimer: (() -> Unit)?
+
+    /**
      * This method registers provider containing user information [userInfoProvider], like Access Token and User ID.
      */
     abstract fun registerPreference(@NonNull userInfoProvider: UserInfoProvider)
@@ -86,6 +91,12 @@ abstract class InAppMessaging internal constructor() {
     abstract fun closeMessage(clearQueuedCampaigns: Boolean = false)
 
     companion object {
+
+        /**
+         * This is the request code that will be used when requesting push permission.
+         */
+        const val PUSH_PRIMER_REQ_CODE = 999
+
         /**
          * This optional callback function is for app to receive the exception that caused failed configuration
          * or non-fatal failures in the SDK.
@@ -153,6 +164,8 @@ abstract class InAppMessaging internal constructor() {
     @SuppressWarnings("EmptyFunctionBlock", "TooManyFunctions")
     internal class NotConfiguredInAppMessaging(private var isCacheHandling: Boolean = false) : InAppMessaging() {
         override var onVerifyContext: (contexts: List<String>, campaignTitle: String) -> Boolean = { _, _ -> true }
+
+        override var onPushPrimer: (() -> Unit)? = null
 
         override fun registerPreference(userInfoProvider: UserInfoProvider) = Unit
 

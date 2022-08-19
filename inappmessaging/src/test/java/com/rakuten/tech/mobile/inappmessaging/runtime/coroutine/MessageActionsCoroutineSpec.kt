@@ -1,28 +1,35 @@
 package com.rakuten.tech.mobile.inappmessaging.runtime.coroutine
 
 import android.app.Activity
+import android.content.ActivityNotFoundException
 import android.content.Context
 import android.os.Build
 import android.provider.Settings
 import androidx.test.core.app.ApplicationProvider
 import androidx.work.testing.WorkManagerTestInitHelper
+import com.nhaarman.mockitokotlin2.any
 import com.rakuten.tech.mobile.inappmessaging.runtime.BaseTest
 import com.rakuten.tech.mobile.inappmessaging.runtime.InAppMessaging
 import com.rakuten.tech.mobile.inappmessaging.runtime.R
 import com.rakuten.tech.mobile.inappmessaging.runtime.TestUserInfoProvider
+import com.rakuten.tech.mobile.inappmessaging.runtime.data.enums.ImpressionType
 import com.rakuten.tech.mobile.inappmessaging.runtime.data.models.messages.InvalidTestMessage
+import com.rakuten.tech.mobile.inappmessaging.runtime.data.models.messages.Message
 import com.rakuten.tech.mobile.inappmessaging.runtime.data.models.messages.ValidTestMessage
 import com.rakuten.tech.mobile.inappmessaging.runtime.data.repositories.CampaignRepository
-import com.rakuten.tech.mobile.inappmessaging.runtime.data.responses.ping.CampaignData
-import com.rakuten.tech.mobile.inappmessaging.runtime.data.responses.ping.MessageMixerResponseSpec
+import com.rakuten.tech.mobile.inappmessaging.runtime.data.responses.ping.*
 import com.rakuten.tech.mobile.inappmessaging.runtime.manager.DisplayManager
 import org.amshove.kluent.*
+import org.junit.After
 import org.junit.Before
+import org.junit.Ignore
 import org.junit.Test
 import org.junit.runner.RunWith
 import org.mockito.Mockito
 import org.mockito.Mockito.`when`
+import org.mockito.Mockito.never
 import org.robolectric.ParameterizedRobolectricTestRunner
+import org.robolectric.RobolectricTestRunner
 import org.robolectric.annotation.Config
 
 /**
@@ -119,5 +126,161 @@ internal class MessageActionsCoroutineSpec(
                 arrayOf("Back - isOpt false", MessageActionsCoroutine.BACK_BUTTON, false)
             )
         }
+    }
+}
+
+@RunWith(RobolectricTestRunner::class)
+class MessageActionsCoroutineFuncSpec : BaseTest() {
+    private val action = MessageActionsCoroutine()
+    private val message = Mockito.mock(Message::class.java)
+    private val mockCtrl = Mockito.mock(ControlSettings::class.java)
+
+    @Before
+    override fun setup() {
+        super.setup()
+        val mockPayload = Mockito.mock(MessagePayload::class.java)
+        `when`(message.getMessagePayload()).thenReturn(mockPayload)
+        val mockSettings = Mockito.mock(MessageSettings::class.java)
+        `when`(mockPayload.messageSettings).thenReturn(mockSettings)
+        `when`(mockSettings.controlSettings).thenReturn(mockCtrl)
+    }
+
+    @After
+    override fun tearDown() {
+        super.setup()
+        InAppMessaging.setNotConfiguredInstance(true)
+        InAppMessaging.instance().onPushPrimer = null
+        InAppMessaging.instance().onVerifyContext = { _, _ -> true }
+    }
+
+    @Test
+    fun `should return invalid impression type`() {
+        action.getOnClickBehaviorType(-2) shouldBeEqualTo ImpressionType.INVALID
+    }
+
+    @Test
+    fun `should return null for action one with empty buttons`() {
+        `when`(mockCtrl.buttons).thenReturn(listOf())
+        action.getOnClickBehavior(ImpressionType.ACTION_ONE, message).shouldBeNull()
+    }
+
+    @Test
+    fun `should return null for action two with invalid button size`() {
+        `when`(mockCtrl.buttons).thenReturn(listOf())
+        action.getOnClickBehavior(ImpressionType.ACTION_TWO, message).shouldBeNull()
+    }
+
+    @Test
+    fun `should return null for click with null content`() {
+        `when`(mockCtrl.content).thenReturn(null)
+        action.getOnClickBehavior(ImpressionType.CLICK_CONTENT, message).shouldBeNull()
+    }
+
+    @Test
+    fun `should return null for invalid impression`() {
+        `when`(mockCtrl.content).thenReturn(null)
+        action.getOnClickBehavior(ImpressionType.INVALID, message).shouldBeNull()
+    }
+
+    @Test
+    fun `should start activity for redirect`() {
+        val activity = setupActivity()
+        action.handleAction(OnClickBehavior(1, "https://test"))
+
+        Mockito.verify(activity).startActivity(any())
+    }
+
+    @Test
+    fun `should start activity for deeplink`() {
+        val activity = setupActivity()
+        val onClick = OnClickBehavior(2, "https://test")
+        action.handleAction(onClick)
+        Mockito.verify(activity).startActivity(any())
+
+        InAppMessaging.instance().unregisterMessageDisplayActivity()
+        action.handleAction(onClick)
+        Mockito.verify(activity).startActivity(any())
+    }
+
+    @Test
+    fun `should not start activity for exit`() {
+        val activity = setupActivity()
+        action.handleAction(OnClickBehavior(3, "https://test"))
+
+        Mockito.verify(activity, never()).startActivity(any())
+    }
+
+    @Test
+    fun `should not start activity for null url and activity`() {
+        val activity = setupActivity()
+        val onClick = OnClickBehavior(2, null)
+        action.handleAction(onClick)
+        Mockito.verify(activity, never()).startActivity(any())
+
+        InAppMessaging.instance().unregisterMessageDisplayActivity()
+        action.handleAction(onClick)
+        Mockito.verify(activity, never()).startActivity(any())
+    }
+
+    @Test
+    fun `should not start activity for empty url and null activity`() {
+        val activity = setupActivity()
+        val onClick = OnClickBehavior(2, "")
+        action.handleAction(onClick)
+        Mockito.verify(activity, never()).startActivity(any())
+
+        InAppMessaging.instance().unregisterMessageDisplayActivity()
+        action.handleAction(onClick)
+        Mockito.verify(activity, never()).startActivity(any())
+    }
+
+    @Test
+    fun `should not crash on activity not found`() {
+        val activity = setupActivity()
+        `when`(activity.startActivity(any())).thenThrow(ActivityNotFoundException())
+        action.handleAction(OnClickBehavior(2, "https://test"))
+    }
+
+    @Test
+    fun `should invoke callback for primer`() {
+        setupActivity()
+        val function: () -> Unit = {}
+        val mockCallback = Mockito.mock(function.javaClass)
+
+        InAppMessaging.instance().onPushPrimer = mockCallback
+        action.handleAction(OnClickBehavior(4, ""))
+
+        Mockito.verify(mockCallback).invoke()
+    }
+
+    @Test
+    fun `should not invoke callback for primer`() {
+        setupActivity()
+        val function: () -> Unit = {}
+        val mockCallback = Mockito.mock(function.javaClass)
+        InAppMessaging.instance().onPushPrimer = null
+        action.handleAction(OnClickBehavior(4, ""))
+
+        Mockito.verify(mockCallback, never()).invoke()
+    }
+
+    @Test
+    @Config(sdk = [Build.VERSION_CODES.TIRAMISU])
+    @Ignore("API 33 is not yet supported in Robolectric v4.8.1")
+    fun `should request push permission`() {
+        val activity = setupActivity()
+        InAppMessaging.instance().onPushPrimer = null
+        action.handleAction(OnClickBehavior(4, ""))
+
+        Mockito.verify(activity).requestPermissions(any(), any())
+    }
+
+    private fun setupActivity(): Activity {
+        val activity = Mockito.mock(Activity::class.java)
+        InAppMessaging.initialize(ApplicationProvider.getApplicationContext(), true)
+        InAppMessaging.instance().registerMessageDisplayActivity(activity)
+        InAppMessaging.instance().registerPreference(TestUserInfoProvider())
+
+        return activity
     }
 }
