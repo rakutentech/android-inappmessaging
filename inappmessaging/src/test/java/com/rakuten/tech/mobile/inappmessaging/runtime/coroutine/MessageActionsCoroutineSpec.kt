@@ -6,6 +6,7 @@ import android.content.Context
 import android.os.Build
 import android.provider.Settings
 import androidx.test.core.app.ApplicationProvider
+import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.work.testing.WorkManagerTestInitHelper
 import com.nhaarman.mockitokotlin2.any
 import com.rakuten.tech.mobile.inappmessaging.runtime.BaseTest
@@ -19,10 +20,10 @@ import com.rakuten.tech.mobile.inappmessaging.runtime.data.models.messages.Valid
 import com.rakuten.tech.mobile.inappmessaging.runtime.data.repositories.CampaignRepository
 import com.rakuten.tech.mobile.inappmessaging.runtime.data.responses.ping.*
 import com.rakuten.tech.mobile.inappmessaging.runtime.manager.DisplayManager
+import com.rakuten.tech.mobile.inappmessaging.runtime.utils.BuildVersionChecker
 import org.amshove.kluent.*
 import org.junit.After
 import org.junit.Before
-import org.junit.Ignore
 import org.junit.Test
 import org.junit.runner.RunWith
 import org.mockito.Mockito
@@ -264,15 +265,40 @@ class MessageActionsCoroutineFuncSpec : BaseTest() {
         Mockito.verify(mockCallback, never()).invoke()
     }
 
+    private fun setupActivity(): Activity {
+        val activity = Mockito.mock(Activity::class.java)
+        InAppMessaging.initialize(ApplicationProvider.getApplicationContext(), true)
+        InAppMessaging.instance().registerMessageDisplayActivity(activity)
+        InAppMessaging.instance().registerPreference(TestUserInfoProvider())
+
+        return activity
+    }
+}
+
+@RunWith(AndroidJUnit4::class)
+class MessageActionsCoroutineTiramisuSpec {
+
     @Test
-    @Config(sdk = [Build.VERSION_CODES.TIRAMISU])
-    @Ignore("API 33 is not yet supported in Robolectric v4.8.1")
     fun `should request push permission`() {
         val activity = setupActivity()
         InAppMessaging.instance().onPushPrimer = null
-        action.handleAction(OnClickBehavior(4, ""))
+        val mockChecker = Mockito.mock(BuildVersionChecker::class.java)
+        `when`(mockChecker.isAndroidTAndAbove()).thenReturn(true)
+        MessageActionsCoroutine().handlePushPrimer(mockChecker)
 
         Mockito.verify(activity).requestPermissions(any(), any())
+    }
+
+    @Test
+    fun `should not request push permission for unergistered activity`() {
+        val activity = setupActivity()
+        InAppMessaging.instance().onPushPrimer = null
+        InAppMessaging.instance().unregisterMessageDisplayActivity()
+        val mockChecker = Mockito.mock(BuildVersionChecker::class.java)
+        `when`(mockChecker.isAndroidTAndAbove()).thenReturn(true)
+        MessageActionsCoroutine().handlePushPrimer(mockChecker)
+
+        Mockito.verify(activity, never()).requestPermissions(any(), any())
     }
 
     private fun setupActivity(): Activity {

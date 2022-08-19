@@ -1,10 +1,10 @@
 package com.rakuten.tech.mobile.inappmessaging.runtime.coroutine
 
 import android.Manifest
+import android.annotation.SuppressLint
 import android.content.ActivityNotFoundException
 import android.content.Intent
 import android.net.Uri
-import android.os.Build
 import androidx.annotation.VisibleForTesting
 import androidx.core.app.ActivityCompat
 import com.rakuten.tech.mobile.inappmessaging.runtime.InAppMessaging
@@ -21,6 +21,7 @@ import com.rakuten.tech.mobile.inappmessaging.runtime.data.responses.ping.OnClic
 import com.rakuten.tech.mobile.inappmessaging.runtime.data.responses.ping.Trigger
 import com.rakuten.tech.mobile.inappmessaging.runtime.manager.EventsManager
 import com.rakuten.tech.mobile.inappmessaging.runtime.manager.ImpressionManager
+import com.rakuten.tech.mobile.inappmessaging.runtime.utils.BuildVersionChecker
 import com.rakuten.tech.mobile.inappmessaging.runtime.utils.InAppLogger
 import java.util.Date
 import kotlin.collections.ArrayList
@@ -154,11 +155,12 @@ internal class MessageActionsCoroutine(private val campaignRepo: CampaignReposit
         }
     }
 
-    private fun handlePushPrimer() {
+    @SuppressLint("InlinedApi")
+    internal fun handlePushPrimer(buildChecker: BuildVersionChecker = BuildVersionChecker.instance()) {
         InAppMessaging.instance().onPushPrimer.let {
             if (it != null) {
                 it.invoke()
-            } else if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+            } else if (buildChecker.isAndroidTAndAbove()) {
                 InAppMessaging.instance().getRegisteredActivity()?.let { act ->
                     ActivityCompat.requestPermissions(
                         act, arrayOf(Manifest.permission.POST_NOTIFICATIONS), InAppMessaging.PUSH_PRIMER_REQ_CODE
