@@ -14,12 +14,14 @@ import com.rakuten.tech.mobile.inappmessaging.runtime.BaseTest
 import com.rakuten.tech.mobile.inappmessaging.runtime.InAppMessaging
 import com.rakuten.tech.mobile.inappmessaging.runtime.InAppMessagingTestConstants
 import com.rakuten.tech.mobile.inappmessaging.runtime.UserInfoProvider
+import com.rakuten.tech.mobile.inappmessaging.runtime.data.enums.CampaignType
 import com.rakuten.tech.mobile.inappmessaging.runtime.data.models.HostAppInfo
 import com.rakuten.tech.mobile.inappmessaging.runtime.data.repositories.AccountRepository
 import com.rakuten.tech.mobile.inappmessaging.runtime.data.repositories.ConfigResponseRepository
 import com.rakuten.tech.mobile.inappmessaging.runtime.data.repositories.HostAppInfoRepository
 import com.rakuten.tech.mobile.inappmessaging.runtime.data.responses.ping.MessageMixerResponse
 import com.rakuten.tech.mobile.inappmessaging.runtime.data.responses.ping.MessageMixerResponseSpec
+import com.rakuten.tech.mobile.inappmessaging.runtime.utils.BuildVersionChecker
 import com.rakuten.tech.mobile.inappmessaging.runtime.utils.RetryDelayUtil
 import com.rakuten.tech.mobile.inappmessaging.runtime.workmanager.schedulers.EventMessageReconciliationScheduler
 import com.rakuten.tech.mobile.inappmessaging.runtime.workmanager.schedulers.MessageMixerPingScheduler
@@ -210,6 +212,28 @@ class MessageMixerWorkerSpec : BaseTest() {
             "\"id\":\"tracking1\",\"type\":2",
             "\"id\":\"user1\",\"type\":3"
         )
+    }
+
+    @Test
+    fun `should return regular type only`() {
+        val list = setupWorker(false)
+        list.shouldHaveSize(1)
+        list[0] shouldBeEqualTo CampaignType.REGULAR.typeId
+    }
+
+    @Test
+    fun `should return both types`() {
+        val list = setupWorker(true)
+        list.shouldHaveSize(2)
+        list[0] shouldBeEqualTo CampaignType.REGULAR.typeId
+        list[1] shouldBeEqualTo CampaignType.PUSH_PRIMER.typeId
+    }
+
+    private fun setupWorker(isTiramisu: Boolean): ArrayList<Int> {
+        val worker = MessageMixerWorker(context!!, workerParameters!!)
+        val mockChecker = Mockito.mock(BuildVersionChecker::class.java)
+        `when`(mockChecker.isAndroidTAndAbove()).thenReturn(isTiramisu)
+        return worker.getSupportedCampaign(mockChecker)
     }
 
     private fun verifyBackoff() {
