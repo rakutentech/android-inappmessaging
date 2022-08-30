@@ -18,7 +18,6 @@ import org.junit.Test
 import org.junit.runner.RunWith
 import org.robolectric.RobolectricTestRunner
 import org.robolectric.annotation.Config
-import java.util.*
 
 /**
  * Test class for MessageEventReconciliationUtil.
@@ -40,27 +39,16 @@ class MessageEventReconciliationUtilSpec : BaseTest() {
     // region validating campaigns
 
     @Test
-    fun `should accept test campaign (not looking at triggers)`() {
-        CampaignRepository.instance().syncWith(listOf(testCampaign), 0)
-        val handler = ValidatorHandler()
-        MessageEventReconciliationUtil.instance().validate(handler.closure)
-
-        handler.validatedElements.shouldBeEqualTo(
-            listOf(
-                ValidatorHandler.Element(testCampaign, emptySet())
-            )
-        )
-    }
-
-    @Test
     fun `should accept outdated test campaign`() {
         CampaignRepository.instance().syncWith(listOf(outdatedTestCampaign), 0)
+        val event = LoginSuccessfulEvent()
+        EventMatchingUtil.instance().matchAndStore(event)
         val handler = ValidatorHandler()
         MessageEventReconciliationUtil.instance().validate(handler.closure)
 
         handler.validatedElements.shouldBeEqualTo(
             listOf(
-                ValidatorHandler.Element(outdatedTestCampaign, emptySet())
+                ValidatorHandler.Element(outdatedTestCampaign, setOf(event))
             )
         )
     }
@@ -136,7 +124,7 @@ class MessageEventReconciliationUtilSpec : BaseTest() {
     // region triggers
 
     @Test
-    fun `should accept campaign when triggers are satisfied`() {
+    fun `should accept normal campaign when triggers are satisfied`() {
         val campaign = ValidTestMessage(
             campaignId = "test",
             isTest = false,
@@ -156,10 +144,46 @@ class MessageEventReconciliationUtilSpec : BaseTest() {
     }
 
     @Test
-    fun `should not accept campaign with no triggers`() {
+    fun `should accept test campaign when triggers are satisfied`() {
+        val campaign = ValidTestMessage(
+            campaignId = "test",
+            isTest = true,
+            maxImpressions = 2,
+            triggers = listOf(
+                Trigger(0, EventType.LOGIN_SUCCESSFUL.typeId, "testEvent", mutableListOf()),
+                Trigger(0, EventType.APP_START.typeId, "testEvent2", mutableListOf())
+            ),
+        )
+        CampaignRepository.instance().syncWith(listOf(campaign), 0)
+        EventMatchingUtil.instance().matchAndStore(LoginSuccessfulEvent())
+        EventMatchingUtil.instance().matchAndStore(AppStartEvent())
+        val handler = ValidatorHandler()
+        MessageEventReconciliationUtil.instance().validate(handler.closure)
+
+        handler.validatedCampaigns.shouldContain(campaign)
+    }
+
+    @Test
+    fun `should not accept normal campaign with no triggers`() {
         val campaign = ValidTestMessage(
             campaignId = "test",
             isTest = false,
+            maxImpressions = 2,
+            triggers = listOf()
+        )
+        CampaignRepository.instance().syncWith(listOf(campaign), 0)
+        EventMatchingUtil.instance().matchAndStore(LoginSuccessfulEvent())
+        val handler = ValidatorHandler()
+        MessageEventReconciliationUtil.instance().validate(handler.closure)
+
+        handler.validatedCampaigns.shouldNotContain(campaign)
+    }
+
+    @Test
+    fun `should not accept test campaign with no triggers`() {
+        val campaign = ValidTestMessage(
+            campaignId = "test",
+            isTest = true,
             maxImpressions = 2,
             triggers = listOf()
         )
@@ -198,7 +222,7 @@ class MessageEventReconciliationUtilSpec : BaseTest() {
         campaignId = "test",
         maxImpressions = 1,
         type = InAppMessageType.MODAL.typeId,
-        triggers = listOf(),
+        triggers = listOf(Trigger(0, EventType.LOGIN_SUCCESSFUL.typeId, "testEvent", mutableListOf())),
         isTest = true,
         infiniteImpressions = false,
         hasNoEndDate = false,
@@ -232,7 +256,7 @@ class MessageEventReconciliationUtilSpec : BaseTest() {
         campaignId = "test",
         maxImpressions = 1,
         type = InAppMessageType.MODAL.typeId,
-        triggers = listOf(),
+        triggers = listOf(Trigger(0, EventType.LOGIN_SUCCESSFUL.typeId, "testEvent", mutableListOf())),
         isTest = true,
         infiniteImpressions = false,
         hasNoEndDate = false,

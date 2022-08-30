@@ -393,6 +393,7 @@ Documents targeting Product Managers:
 * SDKCF-5510: Updated SDK Utils dependency to v2.1.1.
 * SDKCF-5242: Added handling to change opt-out color when background is dark.
 * SDKCF-5637: Fixed issue where test campaigns are not being displayed.
+* SDKCF-5777: Enabled triggers validation for test campaigns.
 * SDKCF-5778: Updated compile and target SDK to API 33 (Android 13).
 
 ### 7.1.0 (2022-06-24)

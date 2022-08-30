@@ -39,20 +39,12 @@ internal abstract class MessageEventReconciliationUtil : MessageEventReconciliat
         private val eventMatchingUtil: EventMatchingUtil
     ) : MessageEventReconciliationUtil() {
 
-        @SuppressWarnings("ComplexMethod", "LongMethod")
+        @SuppressWarnings("ComplexMethod", "LongMethod", "ComplexCondition")
         override fun validate(validatedCampaignHandler: (campaign: Message, events: Set<Event>) -> Unit) {
             for (campaign in campaignRepo.messages.values) {
-                if (campaign.impressionsLeft == 0) {
-                    continue
-                }
-
-                // Triggers and target duration always satisfied for test campaigns
-                if (campaign.isTest()) {
-                    validatedCampaignHandler(campaign, emptySet())
-                    continue
-                }
-
-                if (campaign.isOptedOut == true || campaign.isOutdated) {
+                if (campaign.impressionsLeft == 0 ||
+                    (!campaign.isTest() && (campaign.isOptedOut == true || campaign.isOutdated))
+                ) {
                     continue
                 }
 
