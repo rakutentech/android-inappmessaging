@@ -115,7 +115,7 @@ internal class DisplayMessageRunnable(
             )
             // scrollview only have one child
             val parent = scroll.getChildAt(0)
-            scroll.removeView(parent as ViewGroup)
+            scroll.removeView(parent)
             frame.addView(parent)
             frame.addView(toolTipView)
             scroll.addView(frame)
