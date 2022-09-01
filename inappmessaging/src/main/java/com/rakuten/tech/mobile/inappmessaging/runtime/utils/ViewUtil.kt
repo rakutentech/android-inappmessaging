@@ -7,7 +7,9 @@ import android.view.View
 import android.view.ViewGroup
 import android.view.animation.Animation
 import android.view.animation.AnimationUtils
+import android.widget.FrameLayout
 import android.widget.ScrollView
+import androidx.appcompat.widget.Toolbar
 import androidx.core.widget.NestedScrollView
 import androidx.swiperefreshlayout.widget.SwipeRefreshLayout
 import com.rakuten.tech.mobile.inappmessaging.runtime.R
@@ -148,6 +150,43 @@ internal object ViewUtil {
             currView = currView.parent
         }
         return null
+    }
+
+    fun getFrameLayout(view: View): FrameLayout? {
+        var currView = view.parent
+        while (currView != null) {
+            if (currView is FrameLayout) {
+                return currView
+            }
+
+            currView = currView.parent
+        }
+        return null
+    }
+
+    fun getFirstLayoutChild(group: ViewGroup): Int {
+        var layoutIdx = -1
+        for (i in 0 until group.childCount) {
+            val child = group.getChildAt(i)
+            if (child is ViewGroup) {
+                layoutIdx = i
+                break
+            }
+        }
+
+        return layoutIdx
+    }
+
+    fun getToolBarIndex(parent: FrameLayout): Int {
+        var idx = parent.childCount
+
+        for (i in 0 until parent.childCount) {
+            if (parent.getChildAt(i) is Toolbar) {
+                idx = i
+            }
+        }
+
+        return idx
     }
 
     private const val TAG = "IAM_ViewUtil"
