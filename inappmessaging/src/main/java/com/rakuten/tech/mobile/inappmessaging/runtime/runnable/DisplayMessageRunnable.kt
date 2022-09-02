@@ -5,6 +5,7 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.FrameLayout
 import androidx.annotation.UiThread
+import androidx.coordinatorlayout.widget.CoordinatorLayout
 import com.rakuten.tech.mobile.inappmessaging.runtime.R
 import com.rakuten.tech.mobile.inappmessaging.runtime.data.enums.InAppMessageType
 import com.rakuten.tech.mobile.inappmessaging.runtime.data.models.Tooltip
@@ -85,7 +86,7 @@ internal class DisplayMessageRunnable(
         ResourceUtils.findViewByName<View>(hostActivity, tooltip.id)?.let { target ->
             val scroll = ViewUtil.getScrollView(target)
             if (scroll != null) {
-                displayInScrollView(scroll, toolTipView)
+                displayInScrollView(scroll, toolTipView, target)
             } else {
                 val params = ViewGroup.LayoutParams(
                     ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT
@@ -103,7 +104,8 @@ internal class DisplayMessageRunnable(
 
     internal var testLayout: FrameLayout? = null
 
-    private fun displayInScrollView(scroll: ViewGroup, toolTipView: InAppMessagingTooltipView) {
+    @SuppressWarnings("LongMethod")
+    private fun displayInScrollView(scroll: ViewGroup, toolTipView: InAppMessagingTooltipView, target: View) {
         var frame = hostActivity.findViewById<FrameLayout>(R.id.in_app_message_tooltip_layout)
         // use existing tooltip layout if already available
         if (frame == null) {
@@ -113,12 +115,23 @@ internal class DisplayMessageRunnable(
                 FrameLayout.LayoutParams.MATCH_PARENT,
                 FrameLayout.LayoutParams.MATCH_PARENT
             )
-            // scrollview only have one child
-            val parent = scroll.getChildAt(0)
-            scroll.removeView(parent as ViewGroup)
-            frame.addView(parent)
-            frame.addView(toolTipView)
-            scroll.addView(frame)
+
+            val layoutIdx = ViewUtil.getFirstLayoutChild(scroll)
+            if (layoutIdx < 0) {
+                return
+            }
+            val parent = scroll.getChildAt(layoutIdx)
+
+            if (parent is CoordinatorLayout) {
+                ViewUtil.getFrameLayout(target)?.let {
+                    it.addView(toolTipView, ViewUtil.getToolBarIndex(it))
+                }
+            } else {
+                scroll.removeView(parent as ViewGroup)
+                frame.addView(parent)
+                frame.addView(toolTipView)
+                scroll.addView(frame)
+            }
         } else {
             frame.addView(toolTipView)
         }
