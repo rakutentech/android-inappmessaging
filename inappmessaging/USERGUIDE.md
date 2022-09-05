@@ -384,6 +384,9 @@ Documents targeting Product Managers:
 
 ## <a name="changelog"></a> Changelog
 
+### 6.2.1-TOOLTIP (2022-09-05)
+* Fixed handling for scroll views with CoordinatorLayout
+
 ### 6.2.0-TOOLTIP (2022-03-10)
 * SDKCF-4715: Added PoC implementation of Tooltip campaigns feature.
 
