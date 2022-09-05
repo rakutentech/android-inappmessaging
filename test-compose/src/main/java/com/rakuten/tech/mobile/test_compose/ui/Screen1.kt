@@ -2,6 +2,7 @@ package com.rakuten.tech.mobile.test_compose.ui
 
 import MyButton
 import android.app.Activity
+import android.content.Context
 import android.content.Intent
 import androidx.compose.foundation.layout.*
 import androidx.compose.material.*
@@ -29,7 +30,8 @@ fun Screen1() {
     ) {
         // State & MutableState are interfaces that hold value and trigger re-compositions (UI updates).
         // To preserve the state across recompositions, remember the mutable state.
-        val showDialog = remember { mutableStateOf(false) }
+        val showUserDialog = remember { mutableStateOf(false) }
+        val showConfigDialog = remember { mutableStateOf(false) }
         val context = LocalContext.current
         MyButton(
             text = "Close Message",
@@ -39,7 +41,7 @@ fun Screen1() {
             onClick = { context.startActivity(Intent(context, SecondActivity::class.java)) })
         MyButton(
             text = "Change User",
-            onClick = { showDialog.value = true } )
+            onClick = { showUserDialog.value = true } )
         MyButton(
             text = "Launch Successful",
             onClick = { InAppMessaging.instance().logEvent(AppStartEvent()) })
@@ -71,9 +73,16 @@ fun Screen1() {
             text = "Custom Event: newUser",
             onClick = { InAppMessaging.instance().logEvent(
                 CustomEvent("search_event").addAttribute("KEYWORD", "BASKETBALL").addAttribute("foo", 2)) })
+        MyButton(
+            text = "Change Configuration",
+            onClick = { showConfigDialog.value = true } )
 
-        if (showDialog.value) {
-            UserInfo(showDialog = showDialog)
+        if (showUserDialog.value) {
+            UserInfo(showDialog = showUserDialog)
+        }
+
+        if (showConfigDialog.value) {
+            Configuration(context = context, showDialog = showConfigDialog)
         }
     }
 }
@@ -115,6 +124,46 @@ private fun UserInfo(showDialog: MutableState<Boolean>) {
                 app.provider.userId = userId
                 app.provider.accessToken = accessToken
                 app.provider.idTracking = idTracking
+                showDialog.value = false
+            }) {
+                Text(text = "OK")
+            } },
+        dismissButton = {
+            TextButton(onClick = { showDialog.value = false }) {
+                Text(text = "Cancel")
+            }
+        }
+    )
+}
+
+// Alert dialog to show configuration details.
+@Composable
+private fun Configuration(context: Context, showDialog: MutableState<Boolean>) {
+    val app = (LocalContext.current as Activity).application as MainApplication
+    var configUrl by remember { mutableStateOf(app.realConfigUrl) }
+    var subsKey by remember { mutableStateOf(app.realSubscriptionKey) }
+
+    AlertDialog(
+        title = { Text(text = "Change configuration") },
+        text = {
+            Column {
+                OutlinedTextField(
+                    value = configUrl,
+                    onValueChange = { configUrl = it },
+                    label = { Text("Config URL") }
+                )
+                OutlinedTextField(
+                    value = subsKey,
+                    onValueChange = { subsKey = it },
+                    label = { Text("Subscription Key") }
+                )
+            } },
+        onDismissRequest = { showDialog.value = false },
+        confirmButton = {
+            TextButton(onClick = {
+                app.realConfigUrl = configUrl
+                app.realSubscriptionKey = subsKey
+                InAppMessaging.configure(context, app.realConfigUrl, app.realSubscriptionKey)
                 showDialog.value = false
             }) {
                 Text(text = "OK")

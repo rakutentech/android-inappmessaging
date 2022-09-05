@@ -15,4 +15,7 @@
   <string name="label_idtracking">Tracking ID</string>
   <string name="dialog_title_user">User Information</string>
   <string name="close_message">Close message</string>
+  <string name="label_reconfigure">Change configuration</string>
+  <string name="label_config_url">Config URL</string>
+  <string name="label_subs_key">Subscription\nKey</string>
 </resources>

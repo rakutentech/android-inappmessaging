@@ -92,7 +92,9 @@ abstract class InAppMessaging internal constructor() {
          */
         var errorCallback: ((ex: Exception) -> Unit)? = null
 
-        private var instance: InAppMessaging = NotConfiguredInAppMessaging()
+        private val notConfiguredInAppMessaging = NotConfiguredInAppMessaging()
+
+        private var instance: InAppMessaging = notConfiguredInAppMessaging
 
         /**
          * Instance of [InAppMessaging].
@@ -105,12 +107,19 @@ abstract class InAppMessaging internal constructor() {
         /**
          * Configures the In-App Messaging SDK.
          *
+         * @param context Context object.
+         * @param configUrl An optional config URL. Default is the value set in your app's AndroidManifest.
+         * @param subscriptionKey An optional subscription key. Default is the value set in your app's AndroidManifest.
+         *
          * @return `true` if configuration is successful, and `false` otherwise.
          */
         @SuppressWarnings("TooGenericExceptionCaught")
-        fun configure(context: Context): Boolean {
+        fun configure(context: Context, configUrl: String? = null, subscriptionKey: String? = null): Boolean {
             return try {
-                initialize(context, isCacheHandling = BuildConfig.IS_CACHE_HANDLING)
+                initialize(
+                    context = context, configUrl = configUrl,
+                    subscriptionKey = subscriptionKey, isCacheHandling = BuildConfig.IS_CACHE_HANDLING
+                )
                 true
             } catch (ex: Exception) {
                 // reset instance when configuration failed
@@ -125,6 +134,8 @@ abstract class InAppMessaging internal constructor() {
         @Throws(InAppMessagingException::class)
         internal fun initialize(
             context: Context,
+            configUrl: String? = null,
+            subscriptionKey: String? = null,
             isCacheHandling: Boolean = false,
             configScheduler: ConfigScheduler = ConfigScheduler.instance()
         ) {
@@ -132,12 +143,17 @@ abstract class InAppMessaging internal constructor() {
 
             // `manifestConfig.isDebugging()` is used to enable/disable the debug logging of InAppMessaging SDK.
             // Note: All InAppMessaging SDK logs' tags begins with "IAM_".
-            instance = InApp(context, manifestConfig.isDebugging(), isCacheHandling = isCacheHandling)
+            if (instance == notConfiguredInAppMessaging) {
+                instance = InApp(context, manifestConfig.isDebugging(), isCacheHandling = isCacheHandling)
+            }
+
+            val realSubscriptionKey = subscriptionKey ?: manifestConfig.subscriptionKey()
+            val realConfigUrl = configUrl ?: manifestConfig.configUrl()
 
             Initializer.initializeSdk(
                 context = context,
-                subscriptionKey = manifestConfig.subscriptionKey(),
-                configUrl = manifestConfig.configUrl()
+                subscriptionKey = realSubscriptionKey?.trim(),
+                configUrl = realConfigUrl?.trim()
             )
 
             configScheduler.startConfig()
