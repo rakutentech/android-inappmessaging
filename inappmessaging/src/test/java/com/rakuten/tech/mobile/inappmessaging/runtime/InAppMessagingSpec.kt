@@ -375,6 +375,71 @@ open class InAppMessagingSpec : BaseTest() {
     }
 }
 
+class InAppMessagingConfigureSpec: InAppMessagingSpec() {
+    private val context: Context = ApplicationProvider.getApplicationContext()
+
+    @Test
+    fun `should use subscription key from AndroidManifest by default`() {
+        InAppMessaging.configure(context)
+        HostAppInfoRepository.instance().getInAppMessagingSubscriptionKey() shouldBeEqualTo
+                InApp.AppManifestConfig(context).subscriptionKey()
+    }
+
+    @Test
+    fun `should use config Url from AndroidManifest by default`() {
+        InAppMessaging.configure(context)
+        HostAppInfoRepository.instance().getConfigUrl() shouldBeEqualTo InApp.AppManifestConfig(context).configUrl()
+    }
+
+    @Test
+    fun `should use subscription key from AndroidManifest when configured to null`() {
+        InAppMessaging.configure(context, subscriptionKey = null)
+        HostAppInfoRepository.instance().getInAppMessagingSubscriptionKey() shouldBeEqualTo
+                InApp.AppManifestConfig(context).subscriptionKey()
+    }
+
+    @Test
+    fun `should use config Url from AndroidManifest when configured to null`() {
+        InAppMessaging.configure(context, configUrl = null)
+        HostAppInfoRepository.instance().getConfigUrl() shouldBeEqualTo InApp.AppManifestConfig(context).configUrl()
+    }
+
+    @Test
+    fun `should use the updated subscription key when re-configured`() {
+        InAppMessaging.configure(context)
+        HostAppInfoRepository.instance().getInAppMessagingSubscriptionKey() shouldBeEqualTo
+                InApp.AppManifestConfig(context).subscriptionKey()
+
+        val newSubsKey = "abcd-efgh-ijkl"
+        InAppMessaging.configure(context, subscriptionKey = newSubsKey)
+        HostAppInfoRepository.instance().getInAppMessagingSubscriptionKey() shouldBeEqualTo newSubsKey
+    }
+
+    @Test
+    fun `should use the updated config Url when re-configured`() {
+        InAppMessaging.configure(context)
+        HostAppInfoRepository.instance().getConfigUrl() shouldBeEqualTo InApp.AppManifestConfig(context).configUrl()
+
+        val newConfigUrl = "https://test-config"
+        InAppMessaging.configure(context, configUrl = newConfigUrl)
+        HostAppInfoRepository.instance().getConfigUrl() shouldBeEqualTo newConfigUrl
+    }
+
+    @Test
+    fun `should use trimmed subscription key`() {
+        val newSubsKey = "    abcd-efgh-ijkl        "
+        InAppMessaging.configure(context, subscriptionKey = newSubsKey)
+        HostAppInfoRepository.instance().getInAppMessagingSubscriptionKey() shouldBeEqualTo newSubsKey.trim()
+    }
+
+    @Test
+    fun `should use trimmed config url`() {
+        val newConfigUrl = "   https://test-config "
+        InAppMessaging.configure(context, configUrl = newConfigUrl)
+        HostAppInfoRepository.instance().getConfigUrl() shouldBeEqualTo newConfigUrl.trim()
+    }
+}
+
 class InAppMessagingExceptionSpec : InAppMessagingSpec() {
 
     private val mockActivity = Mockito.mock(Activity::class.java)
