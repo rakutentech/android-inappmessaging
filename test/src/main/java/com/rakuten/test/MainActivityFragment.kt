@@ -109,21 +109,21 @@ class MainActivityFragment : Fragment(), View.OnClickListener {
 
     private fun showConfiguration() {
         val contentView = LayoutInflater.from(activity).inflate(R.layout.dialog_configure, null)
-        val application = activity?.application as MainApplication
+        val settings = (activity?.application as MainApplication).settings
 
         val configUrl = contentView.findViewById<EditText>(R.id.edit_config_url)
-        configUrl.setText(application.realConfigUrl)
+        configUrl.setText(settings.configUrl)
         val subsKey = contentView.findViewById<EditText>(R.id.edit_subs_key)
-        subsKey.setText(application.realSubscriptionKey)
+        subsKey.setText(settings.subscriptionKey)
 
         val dialog =  AlertDialog.Builder(activity)
             .setView(contentView)
             .setTitle(R.string.label_reconfigure)
             .setPositiveButton(android.R.string.ok) { dialog, _ ->
                 context?.let {
-                    application.realConfigUrl = configUrl.text.toString()
-                    application.realSubscriptionKey = subsKey.text.toString()
-                    InAppMessaging.configure(it, application.realConfigUrl, application.realSubscriptionKey)
+                    settings.subscriptionKey = subsKey.text.toString()
+                    settings.configUrl = configUrl.text.toString()
+                    InAppMessaging.configure(it, settings.subscriptionKey, settings.configUrl)
                 }
                 dialog.dismiss()
             }

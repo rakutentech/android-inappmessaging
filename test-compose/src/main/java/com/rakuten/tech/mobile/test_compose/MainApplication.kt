@@ -8,9 +8,7 @@ import com.rakuten.tech.mobile.inappmessaging.runtime.InAppMessaging
 class MainApplication : Application() {
 
     val provider = AppUserInfoProvider()
-    // For display purposes only
-    lateinit var realConfigUrl: String
-    lateinit var realSubscriptionKey: String
+    val settings = Settings()
 
     override fun onCreate() {
         super.onCreate()
@@ -21,7 +19,7 @@ class MainApplication : Application() {
 
     private fun getConfigurationMetadata(context: Context) {
         val metadata = context.packageManager.getApplicationInfo(context.packageName, PackageManager.GET_META_DATA).metaData
-        realConfigUrl = metadata.getString("com.rakuten.tech.mobile.inappmessaging.configurl") ?: ""
-        realSubscriptionKey = metadata.getString("com.rakuten.tech.mobile.inappmessaging.subscriptionkey") ?: ""
+        settings.configUrl = metadata.getString("com.rakuten.tech.mobile.inappmessaging.configurl") ?: ""
+        settings.subscriptionKey = metadata.getString("com.rakuten.tech.mobile.inappmessaging.subscriptionkey") ?: ""
     }
 }

@@ -139,9 +139,9 @@ private fun UserInfo(showDialog: MutableState<Boolean>) {
 // Alert dialog to show configuration details.
 @Composable
 private fun Configuration(context: Context, showDialog: MutableState<Boolean>) {
-    val app = (LocalContext.current as Activity).application as MainApplication
-    var configUrl by remember { mutableStateOf(app.realConfigUrl) }
-    var subsKey by remember { mutableStateOf(app.realSubscriptionKey) }
+    val settings = ((LocalContext.current as Activity).application as MainApplication).settings
+    var subsKey by remember { mutableStateOf(settings.subscriptionKey) }
+    var configUrl by remember { mutableStateOf(settings.configUrl) }
 
     AlertDialog(
         title = { Text(text = "Change configuration") },
@@ -161,9 +161,9 @@ private fun Configuration(context: Context, showDialog: MutableState<Boolean>) {
         onDismissRequest = { showDialog.value = false },
         confirmButton = {
             TextButton(onClick = {
-                app.realConfigUrl = configUrl
-                app.realSubscriptionKey = subsKey
-                InAppMessaging.configure(context, app.realConfigUrl, app.realSubscriptionKey)
+                settings.subscriptionKey = subsKey
+                settings.configUrl = configUrl
+                InAppMessaging.configure(context, settings.subscriptionKey, settings.configUrl)
                 showDialog.value = false
             }) {
                 Text(text = "OK")
