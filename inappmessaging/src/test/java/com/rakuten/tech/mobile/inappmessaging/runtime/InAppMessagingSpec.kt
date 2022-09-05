@@ -375,14 +375,14 @@ open class InAppMessagingSpec : BaseTest() {
     }
 }
 
-class InAppMessagingConfigureSpec: InAppMessagingSpec() {
+class InAppMessagingConfigureSpec : InAppMessagingSpec() {
     private val context: Context = ApplicationProvider.getApplicationContext()
 
     @Test
     fun `should use subscription key from AndroidManifest by default`() {
         InAppMessaging.configure(context)
         HostAppInfoRepository.instance().getInAppMessagingSubscriptionKey() shouldBeEqualTo
-                InApp.AppManifestConfig(context).subscriptionKey()
+            InApp.AppManifestConfig(context).subscriptionKey()
     }
 
     @Test
@@ -395,7 +395,7 @@ class InAppMessagingConfigureSpec: InAppMessagingSpec() {
     fun `should use subscription key from AndroidManifest when configured to null`() {
         InAppMessaging.configure(context, subscriptionKey = null)
         HostAppInfoRepository.instance().getInAppMessagingSubscriptionKey() shouldBeEqualTo
-                InApp.AppManifestConfig(context).subscriptionKey()
+            InApp.AppManifestConfig(context).subscriptionKey()
     }
 
     @Test
@@ -408,7 +408,7 @@ class InAppMessagingConfigureSpec: InAppMessagingSpec() {
     fun `should use the updated subscription key when re-configured`() {
         InAppMessaging.configure(context)
         HostAppInfoRepository.instance().getInAppMessagingSubscriptionKey() shouldBeEqualTo
-                InApp.AppManifestConfig(context).subscriptionKey()
+            InApp.AppManifestConfig(context).subscriptionKey()
 
         val newSubsKey = "abcd-efgh-ijkl"
         InAppMessaging.configure(context, subscriptionKey = newSubsKey)

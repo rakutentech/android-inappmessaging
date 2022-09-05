@@ -106,8 +106,8 @@ abstract class InAppMessaging internal constructor() {
          * Configures the In-App Messaging SDK.
          *
          * @param context Context object.
-         * @param configUrl An optional config URL. Default is the value set in your app's AndroidManifest.
          * @param subscriptionKey An optional subscription key. Default is the value set in your app's AndroidManifest.
+         * @param configUrl An optional config URL. Default is the value set in your app's AndroidManifest.
          *
          * @return `true` if configuration is successful, and `false` otherwise.
          */
