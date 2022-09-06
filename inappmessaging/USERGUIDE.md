@@ -147,9 +147,10 @@ InAppMessaging.errorCallback = {
 
 // Configure API: configure(context: Context): Boolean
 // In a Java app, this API is callable via `InAppMessaging.Companion.configure(context: Context)`.
+val iamFlag = InAppMessaging.configure(this)
 // Note that the subscription ID and config URL set from AndroidManifest.xml can also be overriden at runtime
 // using the extended configure API: configure (context: Context, subscriptionKey: String, configUrl: String).
-val iamFlag = InAppMessaging.configure(this)
+val iamFlag = InAppMessaging.configure(this, "change-to-your-subsrcription-key", "change-to-config-url")
 
 // use flag to enable/disable IAM feature in your app.
 if (iamFlag) {
