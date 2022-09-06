@@ -10,5 +10,7 @@ internal data class PingRequest(
     @SerializedName("appVersion")
     private val appVersion: String?,
     @SerializedName("userIdentifiers")
-    private val userIdentifiers: MutableList<UserIdentifier>?
+    private val userIdentifiers: MutableList<UserIdentifier>?,
+    @SerializedName("supportedCampaignTypes")
+    private val supportedTypes: MutableList<Int>,
 )
