@@ -9,10 +9,10 @@ import org.robolectric.annotation.Config
 
 @RunWith(ParameterizedRobolectricTestRunner::class)
 @Config(sdk = [Build.VERSION_CODES.O_MR1])
-class ButtonActionTypeSpec(private val id: Int, private val expected: Any?) {
+class CampaignTypeSpec(private val id: Int, private val expected: Any?) {
     @Test
     fun `should return correct type from id`() {
-        ButtonActionType.getById(id) shouldBeEqualTo expected
+        CampaignType.getById(id) shouldBeEqualTo expected
     }
 
     companion object {
@@ -22,12 +22,10 @@ class ButtonActionTypeSpec(private val id: Int, private val expected: Any?) {
         )
         fun data(): List<Array<out Any?>> {
             return listOf(
-                arrayOf(0, ButtonActionType.INVALID),
-                arrayOf(1, ButtonActionType.REDIRECT),
-                arrayOf(2, ButtonActionType.DEEPLINK),
-                arrayOf(3, ButtonActionType.CLOSE),
-                arrayOf(4, ButtonActionType.PUSH_PRIMER),
-                arrayOf(5, null)
+                arrayOf(0, CampaignType.INVALID),
+                arrayOf(1, CampaignType.REGULAR),
+                arrayOf(2, CampaignType.PUSH_PRIMER),
+                arrayOf(3, null)
             )
         }
     }

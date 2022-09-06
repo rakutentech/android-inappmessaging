@@ -89,6 +89,7 @@ open class InAppMessagingSpec : BaseTest() {
         InAppMessaging.instance().closeMessage()
         InAppMessaging.instance().isLocalCachingEnabled().shouldBeFalse()
         InAppMessaging.instance().flushEventList()
+        InAppMessaging.instance().onPushPrimer.shouldBeNull()
     }
 
     @Test

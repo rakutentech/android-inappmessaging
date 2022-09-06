@@ -6,6 +6,7 @@ import androidx.work.Worker
 import androidx.work.WorkerParameters
 import com.rakuten.tech.mobile.inappmessaging.runtime.InAppMessaging
 import com.rakuten.tech.mobile.inappmessaging.runtime.api.MessageMixerRetrofitService
+import com.rakuten.tech.mobile.inappmessaging.runtime.data.enums.CampaignType
 import com.rakuten.tech.mobile.inappmessaging.runtime.data.models.messages.Message
 import com.rakuten.tech.mobile.inappmessaging.runtime.data.repositories.AccountRepository
 import com.rakuten.tech.mobile.inappmessaging.runtime.data.repositories.ConfigResponseRepository
@@ -13,6 +14,7 @@ import com.rakuten.tech.mobile.inappmessaging.runtime.data.repositories.HostAppI
 import com.rakuten.tech.mobile.inappmessaging.runtime.data.repositories.CampaignRepository
 import com.rakuten.tech.mobile.inappmessaging.runtime.data.requests.PingRequest
 import com.rakuten.tech.mobile.inappmessaging.runtime.data.responses.ping.MessageMixerResponse
+import com.rakuten.tech.mobile.inappmessaging.runtime.utils.BuildVersionChecker
 import com.rakuten.tech.mobile.inappmessaging.runtime.utils.InAppLogger
 import com.rakuten.tech.mobile.inappmessaging.runtime.utils.RetryDelayUtil
 import com.rakuten.tech.mobile.inappmessaging.runtime.utils.RuntimeUtil
@@ -62,7 +64,11 @@ internal class MessageMixerWorker(
             RuntimeUtil.getRetrofit().create(MessageMixerRetrofitService::class.java)
 
         // Create an pingRequest for the API.
-        val pingRequest = PingRequest(HostAppInfoRepository.instance().getVersion(), RuntimeUtil.getUserIdentifiers())
+        val pingRequest = PingRequest(
+            HostAppInfoRepository.instance().getVersion(),
+            RuntimeUtil.getUserIdentifiers(),
+            getSupportedCampaign()
+        )
 
         // Create an retrofit API network call.
         val call = serviceApi.performPing(
@@ -163,6 +169,16 @@ internal class MessageMixerWorker(
             parsedMessages.add(message)
         }
         return parsedMessages
+    }
+
+    @VisibleForTesting
+    internal fun getSupportedCampaign(checker: BuildVersionChecker = BuildVersionChecker.instance()): ArrayList<Int> {
+        val list = arrayListOf(CampaignType.REGULAR.typeId)
+        if (checker.isAndroidTAndAbove()) {
+            list.add(CampaignType.PUSH_PRIMER.typeId)
+        }
+
+        return list
     }
 
     companion object {

@@ -316,6 +316,57 @@ in strings.xml:
     <string name="iam_custom_font_button">your_app_other_font</string>
 ```
 
+### <a name="push-primer"></a> #4 Push Primer
+
+Starting v7.2.0, campaigns can be used [as push primer](https://developer.android.com/guide/topics/ui/notifiers/notification-permission#wait-to-show-prompt) to explain to users the context and advantages of enabling push notification in your app.
+
+When the user taps the push primer button in the campaign, this will trigger the app to display the runtime push permission request.
+
+There are two ways to handle the push primer button:
+
+1. Add a push primer callback
+
+Add a callback in the the activity that you want to display the permission request dialog. The callback is called by the SDK when a push primer button is tapped by the user.
+
+```kotlin
+override fun onStart() {
+  InAppMessaging.instance().onPushPrimer = {
+    // add push permission request or other handlings here
+    ActivityCompat.requestPermissions(this, arrayOf(Manifest.permission.POST_NOTIFICATIONS), <your request code>)
+  }
+}
+
+// need to override this function to notify app when the user granted or denied the permission request
+override fun onRequestPermissionsResult(requestCode: Int, permissions: Array<String>, grantResults: IntArray) {
+  when(requestCode) {
+    <your request code> -> {
+      // add checking if the permission request was granted or denied here
+    }
+  }
+}
+```
+
+2. Let SDK handle the permission request
+
+If the push primer callback is not set, the SDK will send the push permission request if the device is running on Android 13 or higher.
+
+The app only needs to override the `onRequestPermissionsResult` function to be notified when the user granted or denied the permission request. Please note the SDK uses its own request code (i.e. `InAppMessaging.PUSH_PRIMER_REQ_CODE`).
+
+```kotlin
+// need to override this function to notify app when the user granted or denied the permission request
+override fun onRequestPermissionsResult(requestCode: Int, permissions: Array<String>, grantResults: IntArray) {
+  when(requestCode) {
+    InAppMessaging.PUSH_PRIMER_REQ_CODE -> {
+      // add checking if the permission request was granted or denied here
+    }
+  }
+}
+```
+
+**<font color="red">Note:</font>** Please make sure that Push Primer Campaigns are only triggered for devices with Android 13 or higher OS since push notification permission request is not available for devices running in lower OS versions.
+* If push primer campaign is displayed in lower OS versions, tapping the push primer button in the campaign will just close the campaign.
+* Don't forget to [declare the push notification permission](https://developer.android.com/guide/topics/ui/notifiers/notification-permission#declare) in your app's manifest file.
+
 ## <a name="troubleshooting"></a> Troubleshooting
 ### Proguard ParseException
 ```kotlin
@@ -402,6 +453,7 @@ Documents targeting Product Managers:
 * SDKCF-5637: Fixed issue where test campaigns are not being displayed.
 * SDKCF-5777: Enabled triggers validation for test campaigns.
 * SDKCF-5778: Updated compile and target SDK to API 33 (Android 13).
+* SDKCF-5565: Added Push Primer feature for Android 13 and up devices. Please see [usage](#push-primer) section for details.
 
 ### 7.1.0 (2022-06-24)
 * SDKCF-5256: Added sending of impression events with campaign details to analytics account.

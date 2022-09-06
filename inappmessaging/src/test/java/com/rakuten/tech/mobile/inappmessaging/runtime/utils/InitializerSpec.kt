@@ -1,6 +1,7 @@
 package com.rakuten.tech.mobile.inappmessaging.runtime.utils
 
 import android.content.Context
+import android.os.Build
 import android.provider.Settings
 import androidx.test.core.app.ApplicationProvider
 import androidx.work.Data
@@ -21,6 +22,7 @@ import org.junit.runner.RunWith
 import org.mockito.Mockito
 import org.mockito.Mockito.`when`
 import org.robolectric.RobolectricTestRunner
+import org.robolectric.annotation.Config
 
 /**
  * Test class for InitializationWorker.
@@ -43,6 +45,7 @@ class InitializerSpec : BaseTest() {
     }
 
     @Test
+    @Config(sdk = [Build.VERSION_CODES.TIRAMISU])
     @Ignore("API 33 is not yet supported in Robolectric v4.8.1")
     fun `should add host app info with basic attributes in API 33`() {
         verifyHostAppInfo()
