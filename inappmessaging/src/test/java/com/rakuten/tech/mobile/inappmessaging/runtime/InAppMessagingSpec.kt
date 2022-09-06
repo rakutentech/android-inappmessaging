@@ -412,7 +412,7 @@ class InAppMessagingConfigureSpec : InAppMessagingSpec() {
     }
 
     @Test
-    fun `should use config Url from AndroidManifest when configured to to empty after trim`() {
+    fun `should use config Url from AndroidManifest when configured to empty after trim`() {
         InAppMessaging.configure(context, configUrl = " ")
         HostAppInfoRepository.instance().getConfigUrl() shouldBeEqualTo InApp.AppManifestConfig(context).configUrl()
     }
