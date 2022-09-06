@@ -405,6 +405,19 @@ class InAppMessagingConfigureSpec : InAppMessagingSpec() {
     }
 
     @Test
+    fun `should use subscription key from AndroidManifest when configured to empty after trim`() {
+        InAppMessaging.configure(context, subscriptionKey = "  ")
+        HostAppInfoRepository.instance().getInAppMessagingSubscriptionKey() shouldBeEqualTo
+            InApp.AppManifestConfig(context).subscriptionKey()
+    }
+
+    @Test
+    fun `should use config Url from AndroidManifest when configured to to empty after trim`() {
+        InAppMessaging.configure(context, configUrl = " ")
+        HostAppInfoRepository.instance().getConfigUrl() shouldBeEqualTo InApp.AppManifestConfig(context).configUrl()
+    }
+
+    @Test
     fun `should use the updated subscription key when re-configured`() {
         InAppMessaging.configure(context)
         HostAppInfoRepository.instance().getInAppMessagingSubscriptionKey() shouldBeEqualTo

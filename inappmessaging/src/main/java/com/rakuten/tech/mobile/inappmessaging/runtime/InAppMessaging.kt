@@ -111,6 +111,7 @@ abstract class InAppMessaging internal constructor() {
          *
          * @return `true` if configuration is successful, and `false` otherwise.
          */
+        @JvmOverloads
         @SuppressWarnings("TooGenericExceptionCaught")
         fun configure(context: Context, subscriptionKey: String? = null, configUrl: String? = null): Boolean {
             return try {
@@ -145,10 +146,12 @@ abstract class InAppMessaging internal constructor() {
                 instance = InApp(context, manifestConfig.isDebugging(), isCacheHandling = isCacheHandling)
             }
 
+            val subsKeyTrim = subscriptionKey?.trim()
+            val configUrlTrim = configUrl?.trim()
             Initializer.initializeSdk(
                 context = context,
-                subscriptionKey = subscriptionKey ?: manifestConfig.subscriptionKey(),
-                configUrl = configUrl ?: manifestConfig.configUrl()
+                subscriptionKey = if (!subsKeyTrim.isNullOrEmpty()) subsKeyTrim else manifestConfig.subscriptionKey(),
+                configUrl = if (!configUrlTrim.isNullOrEmpty()) configUrlTrim else manifestConfig.configUrl()
             )
 
             configScheduler.startConfig()
