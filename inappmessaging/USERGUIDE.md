@@ -454,9 +454,6 @@ Documents targeting Product Managers:
 
 ## <a name="changelog"></a> Changelog
 
-### 7.3.0 (in progress)
-* SDKCF-5612: Updated `configure()` API to optionally override subscription ID and config URL at runtime.
-
 ### 7.2.0 (in progress)
 * SDKCF-5038: Refactored event logging logic and campaign repository to align with iOS.
   - **Impact**: Data stored from SharedPreferences is cleared to use the new format. Therefore please ensure that there are no pending campaigns when updating to this version, for the campaign's impressions left will be reset to "max lifetime impressions count" and opt-out status to "not opted out" affecting the visibility of the pending campaign.
@@ -466,6 +463,7 @@ Documents targeting Product Managers:
 * SDKCF-5777: Enabled triggers validation for test campaigns.
 * SDKCF-5778: Updated compile and target SDK to API 33 (Android 13).
 * SDKCF-5565: Added Push Primer feature for Android 13 and up devices. Please see [usage](#push-primer) section for details.
+* SDKCF-5612: Updated `configure()` API to optionally override subscription ID and config URL at runtime.
 
 ### 7.1.0 (2022-06-24)
 * SDKCF-5256: Added sending of impression events with campaign details to analytics account.
