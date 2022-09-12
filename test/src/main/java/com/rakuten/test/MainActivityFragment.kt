@@ -2,7 +2,6 @@ package com.rakuten.test
 
 import android.app.AlertDialog
 import android.content.Intent
-import android.content.SharedPreferences
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
@@ -26,6 +25,7 @@ class MainActivityFragment : Fragment(), View.OnClickListener {
         }
         super.onCreate(savedInstanceState)
     }
+
     override fun onCreateView(
             inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
         return inflater.inflate(R.layout.fragment_main, container, false)
@@ -44,6 +44,7 @@ class MainActivityFragment : Fragment(), View.OnClickListener {
         view.findViewById<Button>(R.id.purchase_successful_twice).setOnClickListener(this)
         view.findViewById<Button>(R.id.login_purchase_successful).setOnClickListener(this)
         view.findViewById<Button>(R.id.close_message).setOnClickListener(this)
+        view.findViewById<Button>(R.id.reconfigure).setOnClickListener(this)
     }
 
     override fun onClick(v: View) {
@@ -70,6 +71,7 @@ class MainActivityFragment : Fragment(), View.OnClickListener {
             R.id.close_message -> {
                 InAppMessaging.instance().closeMessage()
             }
+            R.id.reconfigure -> showConfiguration()
             else -> Any()
         }
     }
@@ -101,6 +103,34 @@ class MainActivityFragment : Fragment(), View.OnClickListener {
                     dialog.dismiss()
                 }
                 .create()
+
+        dialog.show()
+    }
+
+    private fun showConfiguration() {
+        val contentView = LayoutInflater.from(activity).inflate(R.layout.dialog_configure, null)
+        val settings = (activity?.application as MainApplication).settings
+
+        val configUrl = contentView.findViewById<EditText>(R.id.edit_config_url)
+        configUrl.setText(settings.configUrl)
+        val subsKey = contentView.findViewById<EditText>(R.id.edit_subs_key)
+        subsKey.setText(settings.subscriptionKey)
+
+        val dialog =  AlertDialog.Builder(activity)
+            .setView(contentView)
+            .setTitle(R.string.label_reconfigure)
+            .setPositiveButton(android.R.string.ok) { dialog, _ ->
+                context?.let {
+                    settings.subscriptionKey = subsKey.text.toString()
+                    settings.configUrl = configUrl.text.toString()
+                    InAppMessaging.configure(it, settings.subscriptionKey, settings.configUrl)
+                }
+                dialog.dismiss()
+            }
+            .setNegativeButton(android.R.string.cancel) {dialog, _ ->
+                dialog.dismiss()
+            }
+            .create()
 
         dialog.show()
     }

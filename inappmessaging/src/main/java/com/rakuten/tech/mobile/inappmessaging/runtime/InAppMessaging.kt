@@ -116,12 +116,20 @@ abstract class InAppMessaging internal constructor() {
         /**
          * Configures the In-App Messaging SDK.
          *
+         * @param context Context object.
+         * @param subscriptionKey An optional subscription key. Default is the value set in your app's AndroidManifest.
+         * @param configUrl An optional config URL. Default is the value set in your app's AndroidManifest.
+         *
          * @return `true` if configuration is successful, and `false` otherwise.
          */
+        @JvmOverloads
         @SuppressWarnings("TooGenericExceptionCaught")
-        fun configure(context: Context): Boolean {
+        fun configure(context: Context, subscriptionKey: String? = null, configUrl: String? = null): Boolean {
             return try {
-                initialize(context, isCacheHandling = BuildConfig.IS_CACHE_HANDLING)
+                initialize(
+                    context = context, isCacheHandling = BuildConfig.IS_CACHE_HANDLING,
+                    subscriptionKey = subscriptionKey, configUrl = configUrl
+                )
                 true
             } catch (ex: Exception) {
                 // reset instance when configuration failed
@@ -137,18 +145,24 @@ abstract class InAppMessaging internal constructor() {
         internal fun initialize(
             context: Context,
             isCacheHandling: Boolean = false,
+            subscriptionKey: String? = null,
+            configUrl: String? = null,
             configScheduler: ConfigScheduler = ConfigScheduler.instance()
         ) {
             val manifestConfig = InApp.AppManifestConfig(context)
 
             // `manifestConfig.isDebugging()` is used to enable/disable the debug logging of InAppMessaging SDK.
             // Note: All InAppMessaging SDK logs' tags begins with "IAM_".
-            instance = InApp(context, manifestConfig.isDebugging(), isCacheHandling = isCacheHandling)
+            if (instance is NotConfiguredInAppMessaging) {
+                instance = InApp(context, manifestConfig.isDebugging(), isCacheHandling = isCacheHandling)
+            }
 
+            val subsKeyTrim = subscriptionKey?.trim()
+            val configUrlTrim = configUrl?.trim()
             Initializer.initializeSdk(
                 context = context,
-                subscriptionKey = manifestConfig.subscriptionKey(),
-                configUrl = manifestConfig.configUrl()
+                subscriptionKey = if (!subsKeyTrim.isNullOrEmpty()) subsKeyTrim else manifestConfig.subscriptionKey(),
+                configUrl = if (!configUrlTrim.isNullOrEmpty()) configUrlTrim else manifestConfig.configUrl()
             )
 
             configScheduler.startConfig()

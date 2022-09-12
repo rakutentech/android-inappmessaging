@@ -62,8 +62,12 @@ android {
 }
 ```
 
-### #4 Adding subscription ID and config URL to your app's AndroidManifest.xml file.
+### #4 Adding subscription ID and config URL.
 
+It is required set your app's subscription key and config endpoint URL using one of these methods:
+
+* Build-time configuration
+  - Add the following in your app's AndroidManifest.xml:
 ```xml
 <meta-data
     android:name="com.rakuten.tech.mobile.inappmessaging.subscriptionkey"
@@ -73,6 +77,14 @@ android {
     android:name="com.rakuten.tech.mobile.inappmessaging.configurl"
     android:value="change-to-config-url"/>
 ```
+* Runtime configuration
+  - Provide values for `subscriptionKey` and `configUrl` when initializing the SDK (more details in [#6 Configuring In-App Messaging SDK](#configure-sdk)):
+```kotlin
+InAppMessaging.configure(context = this,
+                         subscriptionKey = "change-to-your-subsrcription-key",
+                         configUrl = "change-to-config-url")
+```
+Note: The runtime configuration takes precedence over build-time configuration.  
 
 If you want to enable debug logging in In-App Messaging SDK (tags begins with "IAM_"), add the following meta-data in AndroidManifest.xml file.
 ```xml
@@ -81,11 +93,11 @@ If you want to enable debug logging in In-App Messaging SDK (tags begins with "I
     android:value="true"/>
 ```
 
-| Field            | Datatype| Manifest Key                                             | Optional   | Default |
-|------------------|---------|----------------------------------------------------------|------------|---------|
-| Subscription Key | String  | `com.rakuten.tech.mobile.inappmessaging.subscriptionkey` | ❌         | 🚫      |
-| Config URL       | String  | `com.rakuten.tech.mobile.inappmessaging.configurl`       | ❌         | 🚫      |
-| Debugging        | boolean | `com.rakuten.tech.mobile.inappmessaging.debugging`       | ✅         | `false` |
+| Field            | Datatype| Manifest Key                                             | Optional                             | Default |
+|------------------|---------|----------------------------------------------------------|--------------------------------------|---------|
+| Subscription Key | String  | `com.rakuten.tech.mobile.inappmessaging.subscriptionkey` | ✅  (if using runtime configuration) | 🚫      |
+| Config URL       | String  | `com.rakuten.tech.mobile.inappmessaging.configurl`       | ✅  (if using runtime configuration) | 🚫      |
+| Debugging        | boolean | `com.rakuten.tech.mobile.inappmessaging.debugging`       | ✅                                   | `false` |
 
 #### **Enable and disable the SDK remotely**
 We recommend, as good engineering practice, that you integrate with a remote config service so that you can fetch a feature flag, e.g. `Enable_IAM_SDK`, and use its value to dynamically enable/disable the SDK without making an app release. There are many remote config services on the market, both free and paid.
@@ -146,7 +158,11 @@ InAppMessaging.errorCallback = {
 }
 
 // Configure API: configure(context: Context): Boolean
+// In a Java app, this API is callable via `InAppMessaging.Companion.configure(context: Context)`.
 val iamFlag = InAppMessaging.configure(this)
+// Note that the subscription ID and config URL set from AndroidManifest.xml can also be overriden at runtime
+// using the extended configure API: configure (context: Context, subscriptionKey: String, configUrl: String).
+val iamFlag = InAppMessaging.configure(this, "change-to-your-subsrcription-key", "change-to-config-url")
 
 // use flag to enable/disable IAM feature in your app.
 if (iamFlag) {
@@ -447,6 +463,7 @@ Documents targeting Product Managers:
 * SDKCF-5777: Enabled triggers validation for test campaigns.
 * SDKCF-5778: Updated compile and target SDK to API 33 (Android 13).
 * SDKCF-5565: Added Push Primer feature for Android 13 and up devices. Please see [usage](#push-primer) section for details.
+* SDKCF-5612: Updated `configure()` API to optionally override subscription ID and config URL at runtime.
 
 ### 7.1.0 (2022-06-24)
 * SDKCF-5256: Added sending of impression events with campaign details to analytics account.
