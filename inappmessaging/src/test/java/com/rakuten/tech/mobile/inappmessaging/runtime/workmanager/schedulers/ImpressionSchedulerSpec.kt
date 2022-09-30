@@ -57,7 +57,8 @@ class ImpressionSchedulerSpec : BaseTest() {
         InAppMessaging.initialize(ApplicationProvider.getApplicationContext(), true)
         setupImpressionScheduler()
         WorkManager.getInstance(ApplicationProvider.getApplicationContext())
-            .getWorkInfosByTag(IMPRESSION_WORKER_NAME).get()[0].shouldNotBeNull()
+            .getWorkInfosByTag(IMPRESSION_WORKER_NAME)
+            .get()[0].shouldNotBeNull()
     }
 
     @Test
@@ -85,7 +86,9 @@ class ImpressionSchedulerSpec : BaseTest() {
         WorkManagerTestInitHelper.initializeTestWorkManager(ApplicationProvider.getApplicationContext())
         setupImpressionScheduler()
         WorkManager.getInstance(ApplicationProvider.getApplicationContext())
-            .getWorkInfosByTag(IMPRESSION_WORKER_NAME).get().shouldBeEmpty()
+            .getWorkInfosByTag(IMPRESSION_WORKER_NAME)
+            .get()
+            .shouldBeEmpty()
     }
 
     private fun setupImpressionScheduler(mockManager: WorkManager? = null) {

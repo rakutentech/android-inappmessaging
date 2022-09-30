@@ -84,7 +84,7 @@ internal abstract class CampaignRepository : CampaignRepositoryType {
                 if (oldCampaign != null) {
                     updatedCampaign = Message.updatedMessage(
                         updatedCampaign,
-                        asOptedOut = oldCampaign.isOptedOut ?: false
+                        asOptedOut = oldCampaign.isOptedOut == true
                     )
 
                     if (shouldRetainImpressionsValue) {

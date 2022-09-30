@@ -1,6 +1,7 @@
 buildscript {
-    ext.dokka_version = '1.6.21'
+    ext.dokka_version = '1.7.10'
     ext.compose_version = '1.1.1'
+    ext.detekt_version = '1.21.0'
 
     // Build Config.
     apply from: 'config/index.gradle'
@@ -22,12 +23,12 @@ buildscript {
         classpath 'pl.allegro.tech.build:axion-release-plugin:1.13.6'
         classpath 'com.github.ben-manes:gradle-versions-plugin:0.27.0'
         classpath "org.jetbrains.dokka:dokka-gradle-plugin:${dokka_version}"
-        classpath 'org.owasp:dependency-check-gradle:7.1.0.1'
+        classpath 'org.owasp:dependency-check-gradle:7.2.1'
     }
 }
 
 plugins {
-    id 'io.gitlab.arturbosch.detekt' version '1.20.0'
+    id 'io.gitlab.arturbosch.detekt' version "${detekt_version}"
     id 'org.sonarqube' version '3.3'
 }
 

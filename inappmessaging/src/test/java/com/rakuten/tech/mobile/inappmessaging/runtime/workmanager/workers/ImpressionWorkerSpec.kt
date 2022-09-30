@@ -76,7 +76,8 @@ class ImpressionWorkerSpec : BaseTest() {
             // Set log level to Log.DEBUG to make it easier to debug
             .setMinimumLoggingLevel(Log.DEBUG)
             // Use a SynchronousExecutor here to make it easier to write tests
-            .setExecutor(SynchronousExecutor()).build()
+            .setExecutor(SynchronousExecutor())
+            .build()
 
         // Initialize WorkManager for instrumentation tests.
         WorkManagerTestInitHelper.initializeTestWorkManager(ApplicationProvider.getApplicationContext(), config)
