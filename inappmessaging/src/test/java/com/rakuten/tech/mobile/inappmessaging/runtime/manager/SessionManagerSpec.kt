@@ -55,7 +55,9 @@ class SessionManagerSpec : BaseTest() {
         ConfigResponseRepository.instance().addConfigResponse(configResponseData)
         onSessionUpdate()
         WorkManager.getInstance(ApplicationProvider.getApplicationContext())
-            .getWorkInfosByTag(MESSAGE_MIXER_PING_WORKER).get().shouldHaveSize(1)
+            .getWorkInfosByTag(MESSAGE_MIXER_PING_WORKER)
+            .get()
+            .shouldHaveSize(1)
     }
 
     @Test

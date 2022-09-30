@@ -32,7 +32,7 @@ import kotlin.math.round
 /**
  * Base class of all custom views.
  */
-@SuppressWarnings("LargeClass", "TooManyFunctions")
+@SuppressWarnings("LargeClass", "TooManyFunctions", "NestedScopeFunctions")
 internal open class InAppMessageBaseView(context: Context, attrs: AttributeSet?) :
     FrameLayout(context, attrs), InAppMessageView {
 

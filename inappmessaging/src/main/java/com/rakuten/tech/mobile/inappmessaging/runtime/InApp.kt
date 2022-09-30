@@ -186,7 +186,8 @@ internal class InApp(
             ).metaData
         } else {
             context.packageManager
-                .getApplicationInfo(context.packageName, PackageManager.GET_META_DATA).metaData
+                .getApplicationInfo(context.packageName, PackageManager.GET_META_DATA)
+                .metaData
         }
 
         /**

@@ -57,7 +57,8 @@ internal class MessageActionsCoroutineSpec(
 
         `when`(activity.packageManager).thenReturn(
             ApplicationProvider
-                .getApplicationContext<Context>().packageManager
+                .getApplicationContext<Context>()
+                .packageManager
         )
 
         WorkManagerTestInitHelper.initializeTestWorkManager(ApplicationProvider.getApplicationContext())

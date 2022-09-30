@@ -454,6 +454,9 @@ Documents targeting Product Managers:
 
 ## <a name="changelog"></a> Changelog
 
+### 7.3.0 (In-progress)
+* SDKCF-5835: Updated dependencies to remove vulnerabilities.
+
 ### 7.2.0 (2022-09-28)
 * SDKCF-5038: Refactored event logging logic and campaign repository to align with iOS.
   - **Impact**: Data stored from SharedPreferences is cleared to use the new format. Therefore please ensure that there are no pending campaigns when updating to this version, for the campaign's impressions left will be reset to "max lifetime impressions count" and opt-out status to "not opted out" affecting the visibility of the pending campaign.
