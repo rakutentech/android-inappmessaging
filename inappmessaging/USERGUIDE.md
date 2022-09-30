@@ -454,7 +454,7 @@ Documents targeting Product Managers:
 
 ## <a name="changelog"></a> Changelog
 
-### 7.3.0 (In-progress)
+### 7.3.0 (In-Progress)
 * SDKCF-5835: Updated dependencies to remove vulnerabilities.
 
 ### 7.2.0 (2022-09-28)
