@@ -51,7 +51,7 @@
   </suppress>
 
   <!-- SDK Utils -->
-  <suppress>
+  <suppress until="2022-12-31Z">
     <notes><![CDATA[
    file name: play-services-basement-17.0.0.aar
    ]]></notes>
@@ -61,7 +61,7 @@
   </suppress>
 
   <!-- Retrofit -->
-  <suppress>
+  <suppress until="2022-12-31Z">
     <notes><![CDATA[
    file name: okhttp-3.14.9.jar
    ]]></notes>
@@ -72,7 +72,7 @@
   </suppress>
 
   <!-- WorkManager -->
-  <suppress>
+  <suppress until="2022-12-31Z">
     <notes><![CDATA[
    file name: work-runtime-2.7.1.aar: inspector.jar (shaded: com.google.protobuf:protobuf-javalite:3.10.0)
    ]]></notes>
@@ -82,7 +82,7 @@
   </suppress>
 
   <!-- Compose -->
-  <suppress>
+  <suppress until="2022-12-31Z">
     <notes><![CDATA[
    file name: kotlin-annotation-processing-gradle-1.6.21.jar
    ]]></notes>
