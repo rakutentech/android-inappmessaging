@@ -91,4 +91,14 @@
     <cpe>cpe:/a:processing:processing</cpe>
     <vulnerabilityName>CVE-2018-1000840</vulnerabilityName>
   </suppress>
+
+  <!-- Dokka -->
+  <suppress>
+    <notes><![CDATA[
+   file name: jackson-databind-2.12.7.jar
+   ]]></notes>
+    <packageUrl regex="true">^pkg:maven/com\.fasterxml\.jackson\.core/jackson\-databind@.*$</packageUrl>
+    <cpe>cpe:/a:fasterxml:jackson-databind</cpe>
+    <vulnerabilityName>CVE-2022-42003</vulnerabilityName>
+  </suppress>
 </suppressions>
