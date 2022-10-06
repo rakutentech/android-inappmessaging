@@ -43,7 +43,8 @@ class HostAppInfoRepositorySpec : BaseTest() {
         HostAppInfoRepository.instance().getVersion() shouldBeEqualTo InAppMessagingTestConstants.APP_VERSION
         HostAppInfoRepository.instance().getPackageName() shouldBeEqualTo InAppMessagingTestConstants.APP_ID
         HostAppInfoRepository.instance().getDeviceLocale() shouldBeEqualTo InAppMessagingTestConstants.LOCALE.toString()
-            .replace("_", "-").lowercase(Locale.getDefault())
+            .replace("_", "-")
+            .lowercase(Locale.getDefault())
         HostAppInfoRepository.instance()
             .getInAppMessagingSubscriptionKey() shouldBeEqualTo InAppMessagingTestConstants.SUB_KEY
         HostAppInfoRepository.instance().getDeviceId() shouldBeEqualTo InAppMessagingTestConstants.DEVICE_ID

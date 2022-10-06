@@ -29,7 +29,7 @@ import kotlin.collections.ArrayList
 /**
  * Task which should be ran in the background.
  */
-@SuppressWarnings("TooGenericExceptionCaught", "TooManyFunctions")
+@SuppressWarnings("TooGenericExceptionCaught", "TooManyFunctions", "MaxChainedCallsOnSameLine")
 internal class MessageActionsCoroutine(private val campaignRepo: CampaignRepository = CampaignRepository.instance()) {
 
     fun executeTask(message: Message?, viewResourceId: Int, optOut: Boolean): Boolean {
@@ -127,6 +127,7 @@ internal class MessageActionsCoroutine(private val campaignRepo: CampaignReposit
      * to check if there are browser apps installed, or request for push permission.
      */
     @VisibleForTesting
+    @SuppressWarnings("CanBeNonNullable")
     internal fun handleAction(onClickBehavior: OnClickBehavior?) {
         if (onClickBehavior == null) {
             return
@@ -156,6 +157,7 @@ internal class MessageActionsCoroutine(private val campaignRepo: CampaignReposit
     }
 
     @SuppressLint("InlinedApi")
+    @SuppressWarnings("NestedScopeFunctions")
     internal fun handlePushPrimer(buildChecker: BuildVersionChecker = BuildVersionChecker.instance()) {
         InAppMessaging.instance().onPushPrimer.let {
             if (it != null) {

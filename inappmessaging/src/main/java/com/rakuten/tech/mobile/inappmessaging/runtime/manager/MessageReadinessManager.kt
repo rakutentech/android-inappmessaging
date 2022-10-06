@@ -165,7 +165,7 @@ internal interface MessageReadinessManager {
          */
         private fun shouldDisplayMessage(message: Message): Boolean {
             val impressions = message.impressionsLeft ?: message.getMaxImpressions()
-            val isOptOut = message.isOptedOut ?: false
+            val isOptOut = message.isOptedOut == true
             return (message.infiniteImpressions() || impressions > 0) && !isOptOut
         }
 

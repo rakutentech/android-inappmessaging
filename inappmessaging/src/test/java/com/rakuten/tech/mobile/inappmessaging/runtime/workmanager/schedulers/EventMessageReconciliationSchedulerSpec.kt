@@ -60,7 +60,8 @@ class EventMessageReconciliationSchedulerSpec : BaseTest() {
         InAppMessaging.initialize(ApplicationProvider.getApplicationContext(), true)
         EventMessageReconciliationScheduler.instance().startEventMessageReconciliationWorker()
         WorkManager.getInstance(ApplicationProvider.getApplicationContext())
-            .getWorkInfosByTag(MESSAGES_EVENTS_WORKER_NAME).get()[0].shouldNotBeNull()
+            .getWorkInfosByTag(MESSAGES_EVENTS_WORKER_NAME)
+            .get()[0].shouldNotBeNull()
     }
 
     @Test

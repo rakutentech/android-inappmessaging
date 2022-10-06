@@ -1,136 +1,73 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <suppressions xmlns="https://jeremylong.github.io/DependencyCheck/dependency-suppression.1.3.xsd">
-  <suppress until="2022-09-30Z">
+  <!-- Robolectric -->
+  <suppress until="2022-12-31Z">
     <notes><![CDATA[
-   file name: jsoup-1.13.1.jar
-   ]]></notes>
-    <packageUrl regex="true">^pkg:maven/org\.jsoup/jsoup@.*$</packageUrl>
-    <cpe>cpe:/a:jsoup:jsoup</cpe>
-  </suppress>
-  <suppress until="2022-09-30Z">
-    <notes><![CDATA[
-   file name: jsoup-1.13.1.jar
-   ]]></notes>
-    <packageUrl regex="true">^pkg:maven/org\.jsoup/jsoup@.*$</packageUrl>
-    <vulnerabilityName>CVE-2021-37714</vulnerabilityName>
-    <vulnerabilityName>CVE-2022-36033</vulnerabilityName>
-  </suppress>
-  <suppress until="2022-09-30Z">
-    <notes><![CDATA[
-   file name: jackson-databind-2.12.4.jar
-   ]]></notes>
-    <packageUrl regex="true">^pkg:maven/com\.fasterxml\.jackson\.core/jackson\-databind@.*$</packageUrl>
-    <cpe>cpe:/a:fasterxml:jackson-databind</cpe>
-  </suppress>
-  <suppress until="2022-09-30Z">
-    <notes><![CDATA[
-   file name: work-runtime-2.7.1.aar: inspector.jar (shaded: com.google.protobuf:protobuf-javalite:3.10.0)
-   ]]></notes>
-    <packageUrl regex="true">^pkg:maven/com\.google\.protobuf/protobuf\-javalite@.*$</packageUrl>
-    <cpe>cpe:/a:google:protobuf-java</cpe>
-  </suppress>
-  <suppress until="2022-09-30Z">
-    <notes><![CDATA[
-   file name: kotlin-stdlib-common-1.5.31.jar
-   ]]></notes>
-    <packageUrl regex="true">^pkg:maven/org\.jetbrains\.kotlin/kotlin\-stdlib\-common@.*$</packageUrl>
-    <cpe>cpe:/a:jetbrains:kotlin</cpe>
-  </suppress>
-  <suppress until="2022-09-30Z">
-    <notes><![CDATA[
-   file name: kotlin-stdlib-1.5.31.jar
-   ]]></notes>
-    <packageUrl regex="true">^pkg:maven/org\.jetbrains\.kotlin/kotlin\-stdlib@.*$</packageUrl>
-    <cpe>cpe:/a:jetbrains:kotlin</cpe>
-  </suppress>
-  <suppress until="2022-09-30Z">
-    <notes><![CDATA[
-   file name: kotlin-script-runtime-1.5.31.jar
-   ]]></notes>
-    <packageUrl regex="true">^pkg:maven/org\.jetbrains\.kotlin/kotlin\-script\-runtime@.*$</packageUrl>
-    <cpe>cpe:/a:jetbrains:kotlin</cpe>
-  </suppress>
-  <suppress until="2022-09-30Z">
-    <notes><![CDATA[
-   file name: kotlin-reflect-1.5.31.jar
-   ]]></notes>
-    <packageUrl regex="true">^pkg:maven/org\.jetbrains\.kotlin/kotlin\-reflect@.*$</packageUrl>
-    <cpe>cpe:/a:jetbrains:kotlin</cpe>
-  </suppress>
-  <suppress until="2022-09-30Z">
-    <notes><![CDATA[
-   file name: kotlin-daemon-embeddable-1.5.31.jar
-   ]]></notes>
-    <packageUrl regex="true">^pkg:maven/org\.jetbrains\.kotlin/kotlin\-daemon\-embeddable@.*$</packageUrl>
-    <cpe>cpe:/a:jetbrains:kotlin</cpe>
-  </suppress>
-  <suppress until="2022-09-30Z">
-    <notes><![CDATA[
-   file name: kotlin-compiler-embeddable-1.5.31.jar
-   ]]></notes>
-    <packageUrl regex="true">^pkg:maven/org\.jetbrains\.kotlin/kotlin\-compiler\-embeddable@.*$</packageUrl>
-    <cpe>cpe:/a:jetbrains:kotlin</cpe>
-  </suppress>
-  <suppress until="2022-09-30Z">
-    <notes><![CDATA[
-   file name: guava-27.0.1-jre.jar
-   ]]></notes>
+     file name: guava-27.0.1-jre.jar
+     ]]></notes>
     <packageUrl regex="true">^pkg:maven/com\.google\.guava/guava@.*$</packageUrl>
     <cpe>cpe:/a:google:guava</cpe>
   </suppress>
-  <suppress until="2022-09-30Z">
+
+  <!-- Dokka -->
+  <suppress until="2022-12-31Z">
     <notes><![CDATA[
-   file name: guava-27.0.1-jre.jar
+   file name: jsoup-1.14.3.jar
    ]]></notes>
-    <packageUrl regex="true">^pkg:maven/com\.google\.guava/guava@.*$</packageUrl>
-    <vulnerabilityName>CVE-2020-8908</vulnerabilityName>
+    <packageUrl regex="true">^pkg:maven/org\.jsoup/jsoup@.*$</packageUrl>
+    <cpe>cpe:/a:jsoup:jsoup</cpe>
+    <vulnerabilityName>CVE-2022-36033</vulnerabilityName>
   </suppress>
-  <suppress until="2022-09-30Z">
+  <suppress until="2022-12-31Z">
     <notes><![CDATA[
-   file name: kotlin-stdlib-jdk7-1.5.30.jar
-   ]]></notes>
-    <packageUrl regex="true">^pkg:maven/org\.jetbrains\.kotlin/kotlin\-stdlib\-jdk7@.*$</packageUrl>
-    <cpe>cpe:/a:jetbrains:kotlin</cpe>
-  </suppress>
-  <suppress until="2022-09-30Z">
-    <notes><![CDATA[
-   file name: kotlin-stdlib-jdk8-1.5.30.jar
-   ]]></notes>
-    <packageUrl regex="true">^pkg:maven/org\.jetbrains\.kotlin/kotlin\-stdlib\-jdk8@.*$</packageUrl>
-    <cpe>cpe:/a:jetbrains:kotlin</cpe>
-  </suppress>
-  <suppress until="2022-09-30Z">
-    <notes><![CDATA[
-   file name: sarif4k-0.0.1.jar
-   ]]></notes>
-    <packageUrl regex="true">^pkg:maven/io\.github\.detekt\.sarif4k/sarif4k@.*$</packageUrl>
-    <cpe>cpe:/a:detekt:detekt</cpe>
-    <vulnerabilityName>CVE-2022-0272</vulnerabilityName>
-  </suppress>
-  <suppress until="2022-09-30Z">
-    <notes><![CDATA[
-   file name: kotlin-analysis-intellij-1.6.21.jar (shaded: org.jetbrains.intellij.deps:log4j:1.2.17.2)
-   ]]></notes>
-    <packageUrl regex="true">^pkg:maven/org\.jetbrains\.intellij\.deps/log4j@.*$</packageUrl>
-    <cpe>cpe:/a:apache:log4j</cpe>
-  </suppress>
-  <suppress until="2022-09-30Z">
-    <notes><![CDATA[
-   file name: kotlin-analysis-intellij-1.6.21.jar (shaded: com.google.code.gson:gson:2.8.6)
+   file name: kotlin-analysis-intellij-1.7.10.jar (shaded: com.google.code.gson:gson:2.8.8)
    ]]></notes>
     <packageUrl regex="true">^pkg:maven/com\.google\.code\.gson/gson@.*$</packageUrl>
     <cpe>cpe:/a:google:gson</cpe>
     <vulnerabilityName>CVE-2022-25647</vulnerabilityName>
   </suppress>
-  <suppress until="2022-09-30Z">
+  <suppress until="2022-12-31Z">
     <notes><![CDATA[
-   file name: kotlin-analysis-intellij-1.6.21.jar (shaded: com.google.protobuf:protobuf-java:2.6.1)
+   file name: kotlin-analysis-intellij-1.7.10.jar (shaded: com.google.protobuf:protobuf-java:2.6.1)
    ]]></notes>
     <packageUrl regex="true">^pkg:maven/com\.google\.protobuf/protobuf\-java@.*$</packageUrl>
     <cpe>cpe:/a:google:protobuf-java</cpe>
     <vulnerabilityName>CVE-2021-22569</vulnerabilityName>
   </suppress>
-  <suppress until="2022-09-30Z">
+  <suppress until="2022-12-31Z">
+    <notes><![CDATA[
+   file name: jackson-databind-2.12.7.jar
+   ]]></notes>
+    <packageUrl regex="true">^pkg:maven/com\.fasterxml\.jackson\.core/jackson\-databind@.*$</packageUrl>
+    <cpe>cpe:/a:fasterxml:jackson-databind</cpe>
+    <vulnerabilityName>CVE-2022-42003</vulnerabilityName>
+  </suppress>
+  <suppress until="2022-12-31Z">
+    <notes><![CDATA[
+   file name: jackson-databind-2.12.7.jar
+   ]]></notes>
+    <packageUrl regex="true">^pkg:maven/com\.fasterxml\.jackson\.core/jackson\-databind@.*$</packageUrl>
+    <cpe>cpe:/a:fasterxml:jackson-modules-java8</cpe>
+    <vulnerabilityName>CVE-2022-42004</vulnerabilityName>
+  </suppress>
+
+  <!-- Detekt -->
+  <suppress until="2022-12-31Z">
+    <notes><![CDATA[
+   file name: snakeyaml-1.30.jar
+   ]]></notes>
+    <packageUrl regex="true">^pkg:maven/org\.yaml/snakeyaml@.*$</packageUrl>
+    <cpe>cpe:/a:snakeyaml_project:snakeyaml</cpe>
+    <cpe>cpe:/a:yaml_project:yaml</cpe>
+    <vulnerabilityName>CVE-2022-25857</vulnerabilityName>
+    <vulnerabilityName>CVE-2022-38749</vulnerabilityName>
+    <vulnerabilityName>CVE-2022-38751</vulnerabilityName>
+    <vulnerabilityName>CVE-2022-38752</vulnerabilityName>
+    <vulnerabilityName>CVE-2022-38750</vulnerabilityName>
+  </suppress>
+
+  <!-- SDK Utils -->
+  <suppress until="2022-12-31Z">
     <notes><![CDATA[
    file name: play-services-basement-17.0.0.aar
    ]]></notes>
@@ -138,36 +75,36 @@
     <vulnerabilityName>CVE-2022-1799</vulnerabilityName>
     <vulnerabilityName>CVE-2022-2390</vulnerabilityName>
   </suppress>
-  <suppress until="2022-09-30Z">
+
+  <!-- Retrofit -->
+  <suppress until="2022-12-31Z">
     <notes><![CDATA[
-   file name: jackson-databind-2.12.4.jar
-   ]]></notes>
-    <packageUrl regex="true">^pkg:maven/com\.fasterxml\.jackson\.core/jackson\-databind@.*$</packageUrl>
-    <vulnerabilityName>CVE-2020-36518</vulnerabilityName>
-  </suppress>
-  <suppress until="2022-09-30Z">
-    <notes><![CDATA[
-   file name: kotlin-annotation-processing-gradle-1.6.10.jar
-   ]]></notes>
-    <packageUrl regex="true">^pkg:maven/org\.jetbrains\.kotlin/kotlin\-annotation\-processing\-gradle@.*$</packageUrl>
-    <cve>CVE-2018-1000840</cve>
-  </suppress>
-  <suppress  until="2022-09-30Z">
-    <notes><![CDATA[
-   file name: okhttp-*.jar
+   file name: okhttp-3.14.9.jar
    ]]></notes>
     <packageUrl regex="true">^pkg:maven/com\.squareup\.okhttp3/okhttp@.*$</packageUrl>
+    <cpe>cpe:/a:squareup:okhttp</cpe>
+    <cpe>cpe:/a:squareup:okhttp3</cpe>
     <vulnerabilityName>CVE-2021-0341</vulnerabilityName>
   </suppress>
-  <suppress until="2022-09-30Z">
+
+  <!-- WorkManager -->
+  <suppress until="2022-12-31Z">
     <notes><![CDATA[
-   file name: snakeyaml-1.30.jar
+   file name: work-runtime-2.7.1.aar: inspector.jar (shaded: com.google.protobuf:protobuf-javalite:3.10.0)
    ]]></notes>
-    <packageUrl regex="true">^pkg:maven/org\.yaml/snakeyaml@.*$</packageUrl>
-    <cve>CVE-2022-25857</cve>
-    <cve>CVE-2022-38749</cve>
-    <cve>CVE-2022-38750</cve>
-    <cve>CVE-2022-38751</cve>
-    <vulnerabilityName>CVE-2022-38752</vulnerabilityName>
+    <packageUrl regex="true">^pkg:maven/com\.google\.protobuf/protobuf\-javalite@.*$</packageUrl>
+    <cpe>cpe:/a:google:protobuf-java</cpe>
+    <vulnerabilityName>CVE-2021-22569</vulnerabilityName>
+  </suppress>
+
+  <!-- Compose -->
+  <suppress until="2022-12-31Z">
+    <notes><![CDATA[
+   file name: kotlin-annotation-processing-gradle-1.6.21.jar
+   ]]></notes>
+    <packageUrl regex="true">^pkg:maven/org\.jetbrains\.kotlin/kotlin\-annotation\-processing\-gradle@.*$</packageUrl>
+    <cpe>cpe:/a:jetbrains:kotlin</cpe>
+    <cpe>cpe:/a:processing:processing</cpe>
+    <vulnerabilityName>CVE-2018-1000840</vulnerabilityName>
   </suppress>
 </suppressions>
