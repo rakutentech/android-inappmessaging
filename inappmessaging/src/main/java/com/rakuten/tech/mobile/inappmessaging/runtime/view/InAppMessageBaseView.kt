@@ -191,6 +191,7 @@ internal open class InAppMessageBaseView(context: Context, attrs: AttributeSet?)
     @SuppressWarnings("LongMethod")
     private fun setButtonInfo(buttonView: MaterialButton, button: MessageButton) {
         buttonView.text = button.buttonText
+        buttonView.hyphenationFrequency = getHyphenationFreq()
         val textColor = try {
             Color.parseColor(button.buttonTextColor)
         } catch (e: IllegalArgumentException) {
@@ -223,7 +224,7 @@ internal open class InAppMessageBaseView(context: Context, attrs: AttributeSet?)
     /**
      * This method binds data to message header.
      */
-    @SuppressLint("ClickableViewAccessibility", "InlinedApi")
+    @SuppressLint("ClickableViewAccessibility")
     @SuppressWarnings("LongMethod")
     private fun bindText() {
         if (!header.isNullOrEmpty() || !messageBody.isNullOrEmpty()) {
@@ -235,11 +236,7 @@ internal open class InAppMessageBaseView(context: Context, attrs: AttributeSet?)
                 textView.setTextColor(headerColor)
                 textView.setOnTouchListener(listener)
                 textView.visibility = View.VISIBLE
-                textView.hyphenationFrequency =
-                    if (BuildVersionChecker.instance().isAndroidTAndAbove())
-                        Layout.HYPHENATION_FREQUENCY_FULL_FAST
-                    else
-                        Layout.HYPHENATION_FREQUENCY_FULL
+                textView.hyphenationFrequency = getHyphenationFreq() // Word break
                 getFont(HEADER_FONT)?.let { font ->
                     textView.typeface = font
                 }
@@ -251,11 +248,7 @@ internal open class InAppMessageBaseView(context: Context, attrs: AttributeSet?)
                 textView.setTextColor(messageBodyColor)
                 textView.setOnTouchListener(listener)
                 textView.visibility = View.VISIBLE
-                textView.hyphenationFrequency =
-                    if (BuildVersionChecker.instance().isAndroidTAndAbove())
-                        Layout.HYPHENATION_FREQUENCY_FULL_FAST
-                    else
-                        Layout.HYPHENATION_FREQUENCY_FULL
+                textView.hyphenationFrequency = getHyphenationFreq() // Word break
                 getFont(BODY_FONT)?.let { font ->
                     textView.typeface = font
                 }
@@ -333,6 +326,15 @@ internal open class InAppMessageBaseView(context: Context, attrs: AttributeSet?)
         }
 
         return null
+    }
+
+    @SuppressLint("InlinedApi")
+    private fun getHyphenationFreq(): Int {
+        return if (BuildVersionChecker.instance().isAndroidTAndAbove()) {
+            Layout.HYPHENATION_FREQUENCY_FULL_FAST
+        } else {
+            Layout.HYPHENATION_FREQUENCY_FULL
+        }
     }
 
     companion object {

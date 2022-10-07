@@ -1,6 +1,11 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
 
+    <!--
+    Overrides for Android 13 devices:
+    - lineBreakWordStyle (improved Japanese text wrapping)
+    -->
+
     <style name="InAppMessaging.Button">
         <item name="android:paddingLeft">@dimen/modal_button_padding_left_right</item>
         <item name="android:paddingRight">@dimen/modal_button_padding_left_right</item>

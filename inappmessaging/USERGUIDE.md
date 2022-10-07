@@ -456,6 +456,9 @@ Documents targeting Product Managers:
 
 ### 7.3.0 (In-Progress)
 * SDKCF-5835: Updated dependencies to remove vulnerabilities.
+* SDKCF-5893: Added campaign UX Improvements related to texts' wrapping for readability:
+  - For Android 13 devices using Japanese language, wrapping by Bunsetsu is applied
+  - For devices using English language, hyphenation is applied
 
 ### 7.2.0 (2022-09-28)
 * SDKCF-5038: Refactored event logging logic and campaign repository to align with iOS.
