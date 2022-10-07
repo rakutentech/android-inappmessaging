@@ -36,6 +36,7 @@ import com.rakuten.tech.mobile.inappmessaging.runtime.utils.ResourceUtils
 import org.amshove.kluent.*
 import org.mockito.Mockito
 import org.mockito.Mockito.`when`
+import org.robolectric.util.ReflectionHelpers
 
 @Config(sdk = [Build.VERSION_CODES.O_MR1])
 @RunWith(RobolectricTestRunner::class)
@@ -240,6 +241,8 @@ class BaseViewSpec : BaseTest() {
 
     @Test
     fun `should set button hyphenation`() {
+        // Use "@Config" instead of setting SDK_INT once we upgrade robolectric with Tiramisu support
+        ReflectionHelpers.setStaticField(Build.VERSION::class.java, "SDK_INT", Build.VERSION_CODES.TIRAMISU)
         setupMockContext()
 
         val btn = view?.findViewById<MaterialButton>(R.id.message_single_button)
