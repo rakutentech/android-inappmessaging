@@ -198,6 +198,7 @@ workflows:
     steps:
     - script@1:
         title: Danger
+        run_if: '{{enveq "RUN_DANGER" "true"}}'
         inputs:
         - content: |-
             bundle install
