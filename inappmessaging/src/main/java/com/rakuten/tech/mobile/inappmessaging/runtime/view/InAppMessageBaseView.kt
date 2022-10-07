@@ -6,6 +6,7 @@ import android.content.res.ColorStateList
 import android.content.res.Resources
 import android.graphics.Color
 import android.graphics.Typeface
+import android.text.Layout
 import android.util.AttributeSet
 import android.view.View
 import android.widget.CheckBox
@@ -20,6 +21,7 @@ import com.google.android.material.button.MaterialButton
 import com.rakuten.tech.mobile.inappmessaging.runtime.R
 import com.rakuten.tech.mobile.inappmessaging.runtime.data.models.messages.Message
 import com.rakuten.tech.mobile.inappmessaging.runtime.data.responses.ping.MessageButton
+import com.rakuten.tech.mobile.inappmessaging.runtime.utils.BuildVersionChecker
 import com.rakuten.tech.mobile.inappmessaging.runtime.utils.InAppLogger
 import com.rakuten.tech.mobile.inappmessaging.runtime.utils.ResourceUtils
 import com.rakuten.tech.mobile.inappmessaging.runtime.utils.ViewUtil
@@ -221,7 +223,7 @@ internal open class InAppMessageBaseView(context: Context, attrs: AttributeSet?)
     /**
      * This method binds data to message header.
      */
-    @SuppressLint("ClickableViewAccessibility")
+    @SuppressLint("ClickableViewAccessibility", "InlinedApi")
     @SuppressWarnings("LongMethod")
     private fun bindText() {
         if (!header.isNullOrEmpty() || !messageBody.isNullOrEmpty()) {
@@ -233,6 +235,11 @@ internal open class InAppMessageBaseView(context: Context, attrs: AttributeSet?)
                 textView.setTextColor(headerColor)
                 textView.setOnTouchListener(listener)
                 textView.visibility = View.VISIBLE
+                textView.hyphenationFrequency =
+                    if (BuildVersionChecker.instance().isAndroidTAndAbove())
+                        Layout.HYPHENATION_FREQUENCY_FULL_FAST
+                    else
+                        Layout.HYPHENATION_FREQUENCY_FULL
                 getFont(HEADER_FONT)?.let { font ->
                     textView.typeface = font
                 }
@@ -244,6 +251,11 @@ internal open class InAppMessageBaseView(context: Context, attrs: AttributeSet?)
                 textView.setTextColor(messageBodyColor)
                 textView.setOnTouchListener(listener)
                 textView.visibility = View.VISIBLE
+                textView.hyphenationFrequency =
+                    if (BuildVersionChecker.instance().isAndroidTAndAbove())
+                        Layout.HYPHENATION_FREQUENCY_FULL_FAST
+                    else
+                        Layout.HYPHENATION_FREQUENCY_FULL
                 getFont(BODY_FONT)?.let { font ->
                     textView.typeface = font
                 }
