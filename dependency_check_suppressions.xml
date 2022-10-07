@@ -33,6 +33,7 @@
     <packageUrl regex="true">^pkg:maven/com\.google\.protobuf/protobuf\-java@.*$</packageUrl>
     <cpe>cpe:/a:google:protobuf-java</cpe>
     <vulnerabilityName>CVE-2021-22569</vulnerabilityName>
+    <vulnerabilityName>CVE-2022-3171</vulnerabilityName>
   </suppress>
   <suppress until="2022-12-31Z">
     <notes><![CDATA[
@@ -95,6 +96,7 @@
     <packageUrl regex="true">^pkg:maven/com\.google\.protobuf/protobuf\-javalite@.*$</packageUrl>
     <cpe>cpe:/a:google:protobuf-java</cpe>
     <vulnerabilityName>CVE-2021-22569</vulnerabilityName>
+    <vulnerabilityName>CVE-2022-3171</vulnerabilityName>
   </suppress>
 
   <!-- Compose -->
