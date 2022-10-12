@@ -28,6 +28,7 @@ import android.widget.CheckBox
 import android.content.Context
 import android.content.res.Resources
 import android.graphics.Typeface
+import android.text.Layout
 import com.nhaarman.mockitokotlin2.any
 import com.nhaarman.mockitokotlin2.eq
 import com.nhaarman.mockitokotlin2.times
@@ -35,6 +36,7 @@ import com.rakuten.tech.mobile.inappmessaging.runtime.utils.ResourceUtils
 import org.amshove.kluent.*
 import org.mockito.Mockito
 import org.mockito.Mockito.`when`
+import org.robolectric.util.ReflectionHelpers
 
 @Config(sdk = [Build.VERSION_CODES.O_MR1])
 @RunWith(RobolectricTestRunner::class)
@@ -238,6 +240,16 @@ class BaseViewSpec : BaseTest() {
     }
 
     @Test
+    fun `should set button hyphenation`() {
+        // Use "@Config" instead of setting SDK_INT once we upgrade robolectric with Tiramisu support
+        ReflectionHelpers.setStaticField(Build.VERSION::class.java, "SDK_INT", Build.VERSION_CODES.TIRAMISU)
+        setupMockContext()
+
+        val btn = view?.findViewById<MaterialButton>(R.id.message_single_button)
+        btn?.hyphenationFrequency shouldNotBeEqualTo Layout.HYPHENATION_FREQUENCY_NONE
+    }
+
+    @Test
     fun `should set button border for identical bg colors`() {
         val bgColor = "#AA00BB"
         `when`(mockPayload.headerColor).thenReturn(WHITE_HEX)
@@ -344,8 +356,13 @@ class BaseViewSpec : BaseTest() {
     }
 
     private fun verifyDefault() {
-        view?.findViewById<TextView>(R.id.header_text)?.textColors shouldBeEqualTo ColorStateList.valueOf(Color.BLACK)
-        view?.findViewById<TextView>(R.id.message_body)?.textColors shouldBeEqualTo ColorStateList.valueOf(Color.BLACK)
+        val header = view?.findViewById<TextView>(R.id.header_text)
+        header?.textColors shouldBeEqualTo ColorStateList.valueOf(Color.BLACK)
+        header?.hyphenationFrequency shouldNotBeEqualTo Layout.HYPHENATION_FREQUENCY_NONE
+
+        val body = view?.findViewById<TextView>(R.id.message_body)
+        body?.textColors shouldBeEqualTo ColorStateList.valueOf(Color.BLACK)
+        body?.hyphenationFrequency shouldNotBeEqualTo Layout.HYPHENATION_FREQUENCY_NONE
     }
 
     companion object {
