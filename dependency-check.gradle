@@ -6,7 +6,7 @@ allprojects {
         // set the Common Vulnerability Scoring System value
         // https://nvd.nist.gov/vuln-metrics/cvss
         def cvss = System.getenv("DEPENDENCY_CHECK_FAILBUID_CVSS")
-        failBuildOnCVSS = cvss?.isInteger() ? cvss as Integer : 11
+        failBuildOnCVSS = cvss?.isFloat() ? cvss as Float : 11
         suppressionFile = 'dependency_check_suppressions.xml'
         formats = ['JSON', 'HTML']
         showSummary true
