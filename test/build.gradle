@@ -28,7 +28,7 @@ android {
         }
 
         manifestPlaceholders.in_app_messaging_sub_id = property("IAM_SUBSCRIPTION_KEY") ?: ""
-        manifestPlaceholders.config_url = property("CONFIG_URL_TEST_PROD") ?: ""
+        manifestPlaceholders.config_url = property("CONFIG_URL") ?: ""
     }
 
     buildTypes {

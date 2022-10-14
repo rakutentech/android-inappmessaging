@@ -8,12 +8,23 @@ Provides in-app messaging for Android applications. See the [User Guide](./inapp
 
 ## How to build
 
-This repository uses submodules for some configuration, so they must be initialized first.
+```bash
+$ brew install gitleaks # install the secrets scanner to be used by this repository
+$ git clone git@github.com:rakutentech/android-inappmessaging.git
+$ cd android-inappmessaging
+$ git submodule update --init
+$ ./gradlew check # should pass
+```
+
+## Repository Structure
 
 ```bash
-$ git submodule init
-$ git submodule update
-$ ./gradlew assemble
+├── README.md                     # guide for developers
+├── inappmessaging                # the main inappmessaging project
+├── inappmessaging/USERGUIDE.md   # guide for SDK users
+├── test                          # sample app using View-based UI
+├── test-compose                  # sample app using Jetpack Compose
+├── config                        # submodule: public config
 ```
 
 ## How to test the Sample app
