@@ -1,18 +1,34 @@
 package com.rakuten.test.helpers
 
+import okhttp3.mockwebserver.Dispatcher
 import okhttp3.mockwebserver.MockResponse
-import okhttp3.mockwebserver.MockWebServer
+import okhttp3.mockwebserver.RecordedRequest
 
 object MockServerHelper {
+    var pingJsonFilename = ""
 
-    fun doIamRequest(server: MockWebServer, jsonFilename: String) {
-        server.enqueue(MockResponse()
-            .setBody(JsonFileReader("${Constants.RESP_STUB_DIR}/config.json").content))
-        server.enqueue(MockResponse()
-            .setBody(JsonFileReader("${Constants.RESP_STUB_DIR}/$jsonFilename").content))
-        server.enqueue(MockResponse()
-            .setBody(JsonFileReader("${Constants.RESP_STUB_DIR}/display-permission.json").content))
+    val dispatcher: Dispatcher = object : Dispatcher() {
 
-        Thread.sleep(1000)
+        @Throws(InterruptedException::class)
+        override fun dispatch(request: RecordedRequest): MockResponse {
+            System.out.println("[Mau]: ${request.path}")
+            with(request.path) {
+                when {
+                    contains("/config") ->
+                        return MockResponse()
+                            .setBody(JsonFileReader("${Constants.RESP_STUB_DIR}/config.json").content)
+                    contains("/ping") ->
+                        return MockResponse()
+                            .setBody(JsonFileReader("${Constants.RESP_STUB_DIR}/$pingJsonFilename").content)
+                    contains("/display_permission") ->
+                        return MockResponse()
+                            .setBody(JsonFileReader("${Constants.RESP_STUB_DIR}/display-permission.json").content)
+                    contains("/impression") ->
+                        return MockResponse().setResponseCode(200)
+                    else ->
+                        return MockResponse().setResponseCode(500)
+                }
+            }
+        }
     }
 }

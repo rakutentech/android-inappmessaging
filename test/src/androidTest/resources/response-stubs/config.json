@@ -2,9 +2,9 @@
   "data": {
     "rolloutPercentage": 100,
     "endpoints": {
-      "ping": "http://localhost:6789/ping",
-      "impression": "http://localhost:6789/impression",
-      "displayPermission": "http://localhost:6789/display_permission"
+      "ping": "http://127.0.0.1:6789/ping",
+      "impression": "http://127.0.0.1:6789/impression",
+      "displayPermission": "http://127.0.0.1:6789/display_permission"
     }
   }
 }
