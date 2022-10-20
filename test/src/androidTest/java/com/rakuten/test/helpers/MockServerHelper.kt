@@ -11,7 +11,6 @@ object MockServerHelper {
 
         @Throws(InterruptedException::class)
         override fun dispatch(request: RecordedRequest): MockResponse {
-            System.out.println("[Mau]: ${request.path}")
             with(request.path) {
                 when {
                     contains("/config") ->
