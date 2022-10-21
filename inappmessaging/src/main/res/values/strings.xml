@@ -1,6 +1,6 @@
 <resources>
   <!-- UI components text -->
   <string name="in_app_message_image">in-app message image</string>
-  <string name="close_button">close button</string>
+  <string name="close_button">close message</string>
   <string name="message_opt_out_text">Do not show me this message again</string>
 </resources>
