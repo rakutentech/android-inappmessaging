@@ -459,6 +459,7 @@ Documents targeting Product Managers:
 * SDKCF-5893: Added campaign UX Improvements related to texts' wrapping for readability:
   - For Android 13 devices using Japanese language, wrapping by Bunsetsu is applied
   - For devices using English language, hyphenation is applied
+* SDKCF-5601: Fixed close button's content label accessibility warnings.
 
 ### 7.2.0 (2022-09-28)
 * SDKCF-5038: Refactored event logging logic and campaign repository to align with iOS.
