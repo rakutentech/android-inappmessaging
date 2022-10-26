@@ -31,7 +31,6 @@ internal interface MessageMixerPingScheduler {
         fun instance(): MessageMixerPingScheduler = instance
     }
 
-    @SuppressWarnings("LongMethod")
     private class MessageMixerPingSchedulerImpl : MessageMixerPingScheduler {
         override fun pingMessageMixerService(initialDelay: Long, workManager: WorkManager?) {
             // Do not continue if config is disabled.
@@ -40,8 +39,8 @@ internal interface MessageMixerPingScheduler {
             }
 
             // this is just to handle possible overflow but should never occur
-            val delay = if (Long.MAX_VALUE - System.currentTimeMillis()
-                <= TimeUnit.MILLISECONDS.toMillis(initialDelay)
+            val delay = if (
+                Long.MAX_VALUE - System.currentTimeMillis() <= TimeUnit.MILLISECONDS.toMillis(initialDelay)
             ) {
                 // reset current delay
                 currDelay = RetryDelayUtil.INITIAL_BACKOFF_DELAY
@@ -60,6 +59,10 @@ internal interface MessageMixerPingScheduler {
                 .build()
 
             // Enqueue work request in the background.
+            enqueueRequest(workManager, periodicMessageMixerFetch)
+        }
+
+        private fun enqueueRequest(workManager: WorkManager?, periodicMessageMixerFetch: OneTimeWorkRequest) {
             try {
                 val context = InAppMessaging.instance().getHostAppContext()
                 context?.let { ctx ->

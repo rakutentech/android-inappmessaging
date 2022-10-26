@@ -19,6 +19,7 @@ import com.rakuten.tech.mobile.inappmessaging.runtime.utils.RuntimeUtil
 import com.rakuten.tech.mobile.inappmessaging.runtime.utils.WorkerUtils
 import com.rakuten.tech.mobile.inappmessaging.runtime.workmanager.schedulers.MessageMixerPingScheduler
 import retrofit2.Call
+import retrofit2.Response
 import java.net.HttpURLConnection
 import java.util.concurrent.atomic.AtomicBoolean
 
@@ -42,7 +43,6 @@ internal interface MessageReadinessManager {
      * This method returns the next ready to display message.
      */
     @WorkerThread
-    @SuppressWarnings("LongMethod", "ReturnCount")
     fun getNextDisplayMessage(): Message?
 
     /**
@@ -55,8 +55,7 @@ internal interface MessageReadinessManager {
      * This method returns a DisplayPermissionResponse object.
      */
     @VisibleForTesting
-    @SuppressWarnings("FunctionMaxLength")
-    fun getDisplayPermissionResponseCall(displayPermissionUrl: String, request: DisplayPermissionRequest):
+    fun getDisplayCall(displayPermissionUrl: String, request: DisplayPermissionRequest):
         Call<DisplayPermissionResponse>
 
     companion object {
@@ -86,7 +85,7 @@ internal interface MessageReadinessManager {
         }
 
         @WorkerThread
-        @SuppressWarnings("LongMethod", "ReturnCount", "ComplexMethod")
+        @SuppressWarnings("LongMethod", "ComplexMethod", "ReturnCount")
         override fun getNextDisplayMessage(): Message? {
             shouldRetry.set(true)
 
@@ -95,9 +94,7 @@ internal interface MessageReadinessManager {
                 val campaignId = queuedMessages.removeFirst()
                 val message = campaignRepo.messages[campaignId]
                 if (message == null) {
-                    InAppLogger(TAG).debug(
-                        "Warning: Queued campaign $campaignId does not exist in the repository anymore"
-                    )
+                    InAppLogger(TAG).debug("Queued campaign $campaignId does not exist in the repository anymore")
                     continue
                 }
 
@@ -119,7 +116,7 @@ internal interface MessageReadinessManager {
                 // Check message display permission with server.
                 val displayPermissionResponse = getMessagePermission(message)
                 // If server wants SDK to ping for updated messages, do a new ping request and break this loop.
-                if (isPingServerNeeded(displayPermissionResponse)) {
+                if ((displayPermissionResponse != null) && displayPermissionResponse.performPing) {
                     // reset current delay to initial
                     MessageMixerPingScheduler.currDelay = RetryDelayUtil.INITIAL_BACKOFF_DELAY
                     MessageMixerPingScheduler.instance().pingMessageMixerService(0)
@@ -144,8 +141,7 @@ internal interface MessageReadinessManager {
         }
 
         @VisibleForTesting
-        @SuppressWarnings("FunctionMaxLength")
-        override fun getDisplayPermissionResponseCall(
+        override fun getDisplayCall(
             displayPermissionUrl: String,
             request: DisplayPermissionRequest
         ):
@@ -153,7 +149,7 @@ internal interface MessageReadinessManager {
             RuntimeUtil.getRetrofit()
                 .create(MessageMixerRetrofitService::class.java)
                 .getDisplayPermissionService(
-                    subscriptionId = HostAppInfoRepository.instance().getInAppMessagingSubscriptionKey(),
+                    subscriptionId = HostAppInfoRepository.instance().getSubscriptionKey(),
                     accessToken = AccountRepository.instance().getAccessToken(),
                     url = displayPermissionUrl,
                     request = request
@@ -168,13 +164,6 @@ internal interface MessageReadinessManager {
             val isOptOut = message.isOptedOut == true
             return (message.infiniteImpressions() || impressions > 0) && !isOptOut
         }
-
-        /**
-         * This methods checks if According to the message display permission response parameter,
-         * return if message is outdated.
-         */
-        private fun isPingServerNeeded(response: DisplayPermissionResponse?): Boolean =
-            (response != null) && response.performPing
 
         /**
          * This method returns if message is permissible to be displayed according to the message.
@@ -195,36 +184,43 @@ internal interface MessageReadinessManager {
             // Prepare network request.
             val request = getDisplayPermissionRequest(message)
             val permissionCall: Call<DisplayPermissionResponse> =
-                getDisplayPermissionResponseCall(displayPermissionUrl, request)
+                getDisplayCall(displayPermissionUrl, request)
             AccountRepository.instance().logWarningForUserInfo(TAG)
             return executeDisplayRequest(permissionCall)
         }
 
-        @SuppressWarnings("TooGenericExceptionCaught", "LongMethod")
+        @SuppressWarnings("TooGenericExceptionCaught")
         private fun executeDisplayRequest(call: Call<DisplayPermissionResponse>): DisplayPermissionResponse? {
-            try {
+            return try {
                 val response = call.execute()
-                return when {
-                    response.isSuccessful -> {
-                        InAppLogger(DISP_TAG).debug(
-                            "display: %b performPing: %b", response.body()?.display, response.body()?.performPing
-                        )
-                        response.body()
-                    }
-                    response.code() >= HttpURLConnection.HTTP_INTERNAL_ERROR -> checkAndRetry(call.clone()) {
-                        WorkerUtils.logRequestError(DISP_TAG, response.code(), response.errorBody()?.string())
-                    }
-                    else -> {
-                        WorkerUtils.logRequestError(DISP_TAG, response.code(), response.errorBody()?.string())
-                        null
-                    }
-                }
+                handleResponse(response, call.clone())
             } catch (e: Exception) {
-                return checkAndRetry(call.clone()) {
+                checkAndRetry(call.clone()) {
                     InAppLogger(DISP_TAG).error(e.message)
                     InAppMessaging.errorCallback?.let {
                         it(InAppMessagingException("In-App Messaging display permission request failed", e))
                     }
+                }
+            }
+        }
+
+        private fun handleResponse(
+            response: Response<DisplayPermissionResponse>,
+            callClone: Call<DisplayPermissionResponse>
+        ): DisplayPermissionResponse? {
+            return when {
+                response.isSuccessful -> {
+                    InAppLogger(DISP_TAG).debug(
+                        "display: %b performPing: %b", response.body()?.display, response.body()?.performPing
+                    )
+                    response.body()
+                }
+                response.code() >= HttpURLConnection.HTTP_INTERNAL_ERROR -> checkAndRetry(callClone) {
+                    WorkerUtils.logRequestError(DISP_TAG, response.code(), response.errorBody()?.string())
+                }
+                else -> {
+                    WorkerUtils.logRequestError(DISP_TAG, response.code(), response.errorBody()?.string())
+                    null
                 }
             }
         }

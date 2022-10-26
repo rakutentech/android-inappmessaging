@@ -15,7 +15,6 @@ import com.rakuten.tech.mobile.inappmessaging.runtime.workmanager.schedulers.Con
  * Main entry point for the IAM SDK.
  * Should be accessed via [InAppMessaging.instance].
  */
-@SuppressWarnings("UnnecessaryAbstractClass", "TooManyFunctions")
 abstract class InAppMessaging internal constructor() {
     /**
      * This callback is called just before showing a message of campaign that has registered contexts.
@@ -122,8 +121,8 @@ abstract class InAppMessaging internal constructor() {
          *
          * @return `true` if configuration is successful, and `false` otherwise.
          */
-        @JvmOverloads
         @SuppressWarnings("TooGenericExceptionCaught")
+        @JvmOverloads
         fun configure(context: Context, subscriptionKey: String? = null, configUrl: String? = null): Boolean {
             return try {
                 initialize(
@@ -175,7 +174,6 @@ abstract class InAppMessaging internal constructor() {
         internal fun getPreferencesFile() = "internal_shared_prefs_" + AccountRepository.instance().userInfoHash
     }
 
-    @SuppressWarnings("EmptyFunctionBlock", "TooManyFunctions")
     internal class NotConfiguredInAppMessaging(private var isCacheHandling: Boolean = false) : InAppMessaging() {
         override var onVerifyContext: (contexts: List<String>, campaignTitle: String) -> Boolean = { _, _ -> true }
 

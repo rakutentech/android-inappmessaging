@@ -14,6 +14,7 @@ import com.rakuten.tech.mobile.inappmessaging.runtime.data.repositories.Campaign
 import com.rakuten.tech.mobile.inappmessaging.runtime.data.responses.ping.*
 import org.amshove.kluent.*
 import org.junit.Before
+import org.junit.Ignore
 import org.junit.Test
 import org.junit.runner.RunWith
 import org.robolectric.RobolectricTestRunner
@@ -22,21 +23,66 @@ import org.robolectric.annotation.Config
 /**
  * Test class for MessageEventReconciliationUtil.
  */
-@SuppressWarnings(
-    "LargeClass",
-    "ClassOrdering"
-)
 @RunWith(RobolectricTestRunner::class)
 @Config(sdk = [Build.VERSION_CODES.O_MR1])
-class MessageEventReconciliationUtilSpec : BaseTest() {
+@Ignore("base class")
+open class MessageEventReconciliationUtilSpec : BaseTest() {
+    internal val outdatedTestCampaign = CampaignData(
+        messagePayload = MessagePayload(
+            title = "testTitle",
+            messageBody = "testBody",
+            header = "testHeader",
+            titleColor = "#000000",
+            headerColor = "#444444",
+            messageBodyColor = "#FAFAFA",
+            backgroundColor = "#FAFAFA",
+            frameColor = "#FF2222",
+            resource = Resource(cropType = 0),
+            messageSettings = MessageSettings(
+                displaySettings = DisplaySettings(
+                    orientation = 0,
+                    slideFrom = SlideFromDirectionType.BOTTOM.typeId,
+                    endTimeMillis = 0,
+                    textAlign = 0,
+                    optOut = false,
+                    html = false,
+                    delay = 0,
+                ),
+                controlSettings = ControlSettings(listOf())
+            )
+        ),
+        type = InAppMessageType.MODAL.typeId,
+        triggers = listOf(Trigger(0, EventType.LOGIN_SUCCESSFUL.typeId, "testEvent", mutableListOf())),
+        campaignId = "test",
+        isTest = true,
+        maxImpressions = 1,
+        hasNoEndDate = false,
+        isCampaignDismissable = true,
+        infiniteImpressions = false
+    )
 
     @Before
     override fun setup() {
         CampaignRepository.instance().clearMessages()
         EventMatchingUtil.instance().clearNonPersistentEvents()
     }
+}
 
-    // region validating campaigns
+internal class ValidatorHandler {
+    data class Element(
+        val campaign: Message,
+        val events: Set<Event>
+    )
+    var validatedElements = mutableListOf<Element>()
+    val validatedCampaigns: List<Message>
+        get() = this.validatedElements.map { it.campaign }
+
+    var closure: (Message, Set<Event>) -> Unit = { campaign: Message, events: Set<Event> ->
+        this.validatedElements.add(Element(campaign, events))
+    }
+}
+
+class MessageEventReconciliationUtilCampaignsSpec : MessageEventReconciliationUtilSpec() {
 
     @Test
     fun `should accept outdated test campaign`() {
@@ -118,11 +164,9 @@ class MessageEventReconciliationUtilSpec : BaseTest() {
 
         handler.validatedCampaigns.shouldNotContain(campaign)
     }
+}
 
-    // endregion
-
-    // region triggers
-
+class MessageEventReconciliationUtilTriggerSpec : MessageEventReconciliationUtilSpec() {
     @Test
     fun `should accept normal campaign when triggers are satisfied`() {
         val campaign = ValidTestMessage(
@@ -212,93 +256,5 @@ class MessageEventReconciliationUtilSpec : BaseTest() {
         MessageEventReconciliationUtil.instance().validate(handler.closure)
 
         handler.validatedCampaigns.shouldNotContain(campaign)
-    }
-
-    // endregion
-
-    // region init mock campaigns
-
-    private val testCampaign = CampaignData(
-        campaignId = "test",
-        maxImpressions = 1,
-        type = InAppMessageType.MODAL.typeId,
-        triggers = listOf(Trigger(0, EventType.LOGIN_SUCCESSFUL.typeId, "testEvent", mutableListOf())),
-        isTest = true,
-        infiniteImpressions = false,
-        hasNoEndDate = false,
-        isCampaignDismissable = true,
-        messagePayload = MessagePayload(
-            title = "testTitle",
-            messageBody = "testBody",
-            header = "testHeader",
-            titleColor = "#000000",
-            headerColor = "#444444",
-            messageBodyColor = "#FAFAFA",
-            backgroundColor = "#FAFAFA",
-            frameColor = "#FF2222",
-            resource = Resource(cropType = 0),
-            messageSettings = MessageSettings(
-                displaySettings = DisplaySettings(
-                    orientation = 0,
-                    slideFrom = SlideFromDirectionType.BOTTOM.typeId,
-                    endTimeMillis = Long.MAX_VALUE,
-                    textAlign = 0,
-                    optOut = false,
-                    html = false,
-                    delay = 0,
-                ),
-                controlSettings = ControlSettings(listOf())
-            )
-        )
-    )
-
-    private val outdatedTestCampaign = CampaignData(
-        campaignId = "test",
-        maxImpressions = 1,
-        type = InAppMessageType.MODAL.typeId,
-        triggers = listOf(Trigger(0, EventType.LOGIN_SUCCESSFUL.typeId, "testEvent", mutableListOf())),
-        isTest = true,
-        infiniteImpressions = false,
-        hasNoEndDate = false,
-        isCampaignDismissable = true,
-        messagePayload = MessagePayload(
-            title = "testTitle",
-            messageBody = "testBody",
-            header = "testHeader",
-            titleColor = "#000000",
-            headerColor = "#444444",
-            messageBodyColor = "#FAFAFA",
-            backgroundColor = "#FAFAFA",
-            frameColor = "#FF2222",
-            resource = Resource(cropType = 0),
-            messageSettings = MessageSettings(
-                displaySettings = DisplaySettings(
-                    orientation = 0,
-                    slideFrom = SlideFromDirectionType.BOTTOM.typeId,
-                    endTimeMillis = 0,
-                    textAlign = 0,
-                    optOut = false,
-                    html = false,
-                    delay = 0,
-                ),
-                controlSettings = ControlSettings(listOf())
-            )
-        )
-    )
-
-    // endregion
-}
-
-internal class ValidatorHandler {
-    data class Element(
-        val campaign: Message,
-        val events: Set<Event>
-    )
-    var validatedElements = mutableListOf<Element>()
-    var validatedCampaigns: List<Message> = listOf()
-        get() = this.validatedElements.map { it.campaign }
-
-    var closure: (Message, Set<Event>) -> Unit = { campaign: Message, events: Set<Event> ->
-        this.validatedElements.add(Element(campaign, events))
     }
 }

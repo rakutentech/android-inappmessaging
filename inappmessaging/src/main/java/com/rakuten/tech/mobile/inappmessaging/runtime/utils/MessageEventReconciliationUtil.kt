@@ -7,21 +7,16 @@ import com.rakuten.tech.mobile.inappmessaging.runtime.data.responses.ping.Trigge
 import com.rakuten.tech.mobile.inappmessaging.runtime.data.responses.ping.matchingEventName
 import java.util.Date
 
-internal interface MessageEventReconciliationUtilType {
+internal abstract class MessageEventReconciliationUtil(
+    internal val campaignRepo: CampaignRepository,
+    internal val eventMatchingUtil: EventMatchingUtil
+) {
 
     /**
      * Validates whether a campaign is ready to be displayed by cross-referencing [CampaignRepository.messages]
      * and the list of [EventMatchingUtil.matchedEvents].
      */
-    fun validate(validatedCampaignHandler: (campaign: Message, events: Set<Event>) -> Unit)
-}
-
-/**
- * Utility class helping MessageEventReconciliationWorker, handling the logic for checking if a campaign is ready
- * to be displayed.
- */
-@SuppressWarnings("UnnecessaryAbstractClass")
-internal abstract class MessageEventReconciliationUtil : MessageEventReconciliationUtilType {
+    abstract fun validate(validatedCampaignHandler: (campaign: Message, events: Set<Event>) -> Unit)
 
     companion object {
         private var instance: MessageEventReconciliationUtil = MessageEventReconciliationUtilImpl(
@@ -34,34 +29,31 @@ internal abstract class MessageEventReconciliationUtil : MessageEventReconciliat
         fun instance(): MessageEventReconciliationUtil = instance
     }
 
+    /**
+     * Utility class helping MessageEventReconciliationWorker, handling the logic for checking if a campaign is ready
+     * to be displayed.
+     */
     private class MessageEventReconciliationUtilImpl(
-        private val campaignRepo: CampaignRepository,
-        private val eventMatchingUtil: EventMatchingUtil
-    ) : MessageEventReconciliationUtil() {
+        campaignRepo: CampaignRepository,
+        eventMatchingUtil: EventMatchingUtil
+    ) : MessageEventReconciliationUtil(campaignRepo, eventMatchingUtil) {
 
-        @SuppressWarnings("ComplexMethod", "LongMethod", "ComplexCondition")
+        @SuppressWarnings("ComplexMethod", "ComplexCondition")
         override fun validate(validatedCampaignHandler: (campaign: Message, events: Set<Event>) -> Unit) {
             for (campaign in campaignRepo.messages.values) {
                 if (campaign.impressionsLeft == 0 ||
                     (!campaign.isTest() && (campaign.isOptedOut == true || campaign.isOutdated))
-                ) {
-                    continue
-                }
+                ) { continue }
 
-                val campaignTriggers = campaign.getTriggers()
-                if (campaignTriggers.isNullOrEmpty()) {
+                val triggers = campaign.getTriggers()
+                if (triggers.isNullOrEmpty()) {
                     InAppLogger(TAG).debug("Campaign (${campaign.getCampaignId()}) has no triggers.")
                     continue
                 }
 
-                if (!eventMatchingUtil.containsAllMatchedEvents(campaign)) {
-                    continue
-                }
+                if (!eventMatchingUtil.containsAllMatchedEvents(campaign)) { continue }
 
-                val triggeredEvents = triggerEvents(
-                    campaignTriggers,
-                    eventMatchingUtil.matchedEvents(campaign)
-                ) ?: continue
+                val triggeredEvents = triggerEvents(triggers, eventMatchingUtil.matchedEvents(campaign)) ?: continue
 
                 validatedCampaignHandler(campaign, triggeredEvents)
             }

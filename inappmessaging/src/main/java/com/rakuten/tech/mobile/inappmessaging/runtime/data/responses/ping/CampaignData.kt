@@ -32,7 +32,6 @@ internal data class CampaignData(
     override var impressionsLeft: Int? = null
         get() = if (field == null) maxImpressions else field
 
-    @SuppressWarnings("kotlin:S1125")
     @SerializedName("isOptedOut")
     override var isOptedOut: Boolean? = null
         get() = if (field == null) false else field

@@ -37,30 +37,15 @@ import kotlin.collections.ArrayList
  */
 @RunWith(RobolectricTestRunner::class)
 @Config(sdk = [Build.VERSION_CODES.O_MR1])
-@SuppressWarnings("LargeClass")
 open class MessageReadinessManagerSpec : BaseTest() {
-
-    private var mockRequest = Mockito.mock(DisplayPermissionRequest::class.java)
     private var configResponseData = Mockito.mock(ConfigResponseData::class.java)
     private var configResponseEndpoints = Mockito.mock(ConfigResponseEndpoints::class.java)
 
     @Before
-    @SuppressWarnings("LongMethod")
     override fun setup() {
         super.setup()
         AccountRepository.instance().userInfoProvider = TestUserInfoProvider()
-        HostAppInfoRepository.instance().addHostInfo(
-            HostAppInfo(
-                InAppMessagingTestConstants.APP_ID,
-                InAppMessagingTestConstants.DEVICE_ID,
-                InAppMessagingTestConstants.APP_VERSION,
-                InAppMessagingTestConstants.SUB_KEY,
-                InAppMessagingTestConstants.LOCALE
-            )
-        )
-        ConfigResponseRepository.instance().addConfigResponse(configResponseData)
-        `when`(configResponseData.endpoints).thenReturn(configResponseEndpoints)
-        `when`(configResponseEndpoints.displayPermission).thenReturn(DISPLAY_PERMISSION_URL)
+        setupRepo()
 
         MessageReadinessManager.instance().clearMessages()
     }
@@ -120,29 +105,6 @@ open class MessageReadinessManagerSpec : BaseTest() {
     }
 
     @Test
-    fun `should response call contain two headers`() {
-        val responseCall: Call<DisplayPermissionResponse> =
-            MessageReadinessManager.instance().getDisplayPermissionResponseCall(DISPLAY_PERMISSION_URL, mockRequest)
-        responseCall.request().headers().size() shouldBeEqualTo 2
-    }
-
-    @Test
-    fun `should add token to header`() {
-        val responseCall: Call<DisplayPermissionResponse> =
-            MessageReadinessManager.instance().getDisplayPermissionResponseCall(DISPLAY_PERMISSION_URL, mockRequest)
-        responseCall.request().header(MessageMixerRetrofitService.ACCESS_TOKEN_HEADER) shouldBeEqualTo
-            "OAuth2 " + TestUserInfoProvider.TEST_USER_ACCESS_TOKEN
-    }
-
-    @Test
-    fun `should add sub id header`() {
-        val responseCall: Call<DisplayPermissionResponse> =
-            MessageReadinessManager.instance().getDisplayPermissionResponseCall(DISPLAY_PERMISSION_URL, mockRequest)
-        responseCall.request().header(MessageMixerRetrofitService.SUBSCRIPTION_ID_HEADER) shouldBeEqualTo
-            InAppMessagingTestConstants.SUB_KEY
-    }
-
-    @Test
     fun `should next ready message be null when no events and opted out`() {
         val messageList = ArrayList<Message>()
         val message = ValidTestMessage("1", false).apply {
@@ -192,6 +154,21 @@ open class MessageReadinessManagerSpec : BaseTest() {
         MessageReadinessManager.instance().getNextDisplayMessage().shouldBeNull()
     }
 
+    private fun setupRepo() {
+        HostAppInfoRepository.instance().addHostInfo(
+            HostAppInfo(
+                InAppMessagingTestConstants.APP_ID,
+                InAppMessagingTestConstants.DEVICE_ID,
+                InAppMessagingTestConstants.APP_VERSION,
+                InAppMessagingTestConstants.SUB_KEY,
+                InAppMessagingTestConstants.LOCALE
+            )
+        )
+        ConfigResponseRepository.instance().addConfigResponse(configResponseData)
+        `when`(configResponseData.endpoints).thenReturn(configResponseEndpoints)
+        `when`(configResponseEndpoints.displayPermission).thenReturn(DISPLAY_PERMISSION_URL)
+    }
+
     private fun createMessageList() {
         val messageList = ArrayList<Message>()
         messageList.add(ValidTestMessage("1", false))
@@ -205,9 +182,7 @@ open class MessageReadinessManagerSpec : BaseTest() {
         CampaignRepository.instance().syncWith(messages, LAST_PING_MILLIS)
 
         MessageReadinessManager.instance().clearMessages()
-        for (message in messages) {
-            MessageReadinessManager.instance().addMessageToQueue(message.getCampaignId())
-        }
+        for (message in messages) { MessageReadinessManager.instance().addMessageToQueue(message.getCampaignId()) }
     }
 
     @Test
@@ -229,7 +204,7 @@ open class MessageReadinessManagerSpec : BaseTest() {
     }
 
     companion object {
-        private const val DISPLAY_PERMISSION_URL = "https:/host/display_permission/"
+        internal const val DISPLAY_PERMISSION_URL = "https:/host/display_permission/"
         private const val LAST_PING_MILLIS = 123456L
         private const val CONFIG_RESPONSE = """{
             "data":{
@@ -260,7 +235,6 @@ class MessageReadinessManagerRequestSpec : BaseTest() {
     private var endpoint = Mockito.mock(ConfigResponseEndpoints::class.java)
 
     @Before
-    @SuppressWarnings("LongMethod")
     override fun setup() {
         super.setup()
         AccountRepository.instance().userInfoProvider = TestUserInfoProvider()
@@ -366,5 +340,32 @@ class MessageReadinessManagerRequestSpec : BaseTest() {
         private const val NOT_DISPLAY_RESPONSE = "{\"display\":false, \"performPing\":false}"
         private const val DISPLAY_PING_RESPONSE = "{\"display\":true, \"performPing\":true}"
         private const val CAMPAIGN_ID = "1"
+    }
+}
+
+class MessageReadinessManagerCallSpec : MessageReadinessManagerSpec() {
+    private var mockRequest = Mockito.mock(DisplayPermissionRequest::class.java)
+
+    @Test
+    fun `should response call contain two headers`() {
+        val responseCall: Call<DisplayPermissionResponse> =
+            MessageReadinessManager.instance().getDisplayCall(DISPLAY_PERMISSION_URL, mockRequest)
+        responseCall.request().headers().size() shouldBeEqualTo 2
+    }
+
+    @Test
+    fun `should add token to header`() {
+        val responseCall: Call<DisplayPermissionResponse> =
+            MessageReadinessManager.instance().getDisplayCall(DISPLAY_PERMISSION_URL, mockRequest)
+        responseCall.request().header(MessageMixerRetrofitService.ACCESS_TOKEN_HEADER) shouldBeEqualTo
+            "OAuth2 " + TestUserInfoProvider.TEST_USER_ACCESS_TOKEN
+    }
+
+    @Test
+    fun `should add sub id header`() {
+        val responseCall: Call<DisplayPermissionResponse> =
+            MessageReadinessManager.instance().getDisplayCall(DISPLAY_PERMISSION_URL, mockRequest)
+        responseCall.request().header(MessageMixerRetrofitService.SUBSCRIPTION_ID_HEADER) shouldBeEqualTo
+            InAppMessagingTestConstants.SUB_KEY
     }
 }

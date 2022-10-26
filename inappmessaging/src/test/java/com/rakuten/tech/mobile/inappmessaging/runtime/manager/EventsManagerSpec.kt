@@ -114,7 +114,7 @@ class EventsManagerSpec : BaseTest() {
             ).shouldNotBeNull()
         }
 
-        Mockito.verify(eventRecon, Mockito.times(expected)).startEventMessageReconciliationWorker()
+        Mockito.verify(eventRecon, Mockito.times(expected)).startReconciliationWorker()
     }
 
     companion object {

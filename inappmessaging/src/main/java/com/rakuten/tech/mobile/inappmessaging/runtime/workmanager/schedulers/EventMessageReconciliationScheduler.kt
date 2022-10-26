@@ -16,8 +16,7 @@ internal interface EventMessageReconciliationScheduler {
      * A chain work requests, first reconcile messages and events. After work has been successfully
      * completed, schedule to display next ready message.
      */
-    @SuppressWarnings("FunctionMaxLength")
-    fun startEventMessageReconciliationWorker(workManager: WorkManager? = null, delay: Long = 0)
+    fun startReconciliationWorker(workManager: WorkManager? = null, delay: Long = 0)
 
     companion object {
         private const val MESSAGES_EVENTS_WORKER_NAME = "iam_messages_events_worker"
@@ -28,8 +27,7 @@ internal interface EventMessageReconciliationScheduler {
 
     private class EventMessageReconciliationSchedulerImpl : EventMessageReconciliationScheduler {
 
-        @SuppressWarnings("FunctionMaxLength", "LongMethod")
-        override fun startEventMessageReconciliationWorker(workManager: WorkManager?, delay: Long) {
+        override fun startReconciliationWorker(workManager: WorkManager?, delay: Long) {
             // Starts MessageEventReconciliationWorker as a unique worker.
             // This worker must be a unique worker, but it can be replaced with a new one. Because we don't
             // want the same worker working in parallel which will result bad data, and unwanted behaviour.
@@ -43,10 +41,8 @@ internal interface EventMessageReconciliationScheduler {
                 context?.let { ctx ->
                     val manager = workManager ?: WorkManager.getInstance(ctx)
                     manager.beginUniqueWork(
-                        MESSAGES_EVENTS_WORKER_NAME,
-                        ExistingWorkPolicy.REPLACE, reconciliationWorkRequest
-                    )
-                        .enqueue()
+                        MESSAGES_EVENTS_WORKER_NAME, ExistingWorkPolicy.REPLACE, reconciliationWorkRequest
+                    ).enqueue()
                 }
             } catch (ie: IllegalStateException) {
                 // this should not occur since work manager is initialized during SDK initialization

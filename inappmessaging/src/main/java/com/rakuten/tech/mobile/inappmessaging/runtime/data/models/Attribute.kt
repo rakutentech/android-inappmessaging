@@ -9,10 +9,11 @@ import java.util.Locale
 /**
  * This class represents InAppMessaging's custom event attribute.
  *
- * @param value attribute value.
+ * @property nm attribute name.
+ * @property value attribute value.
+ * @property type attribute type.
  */
 @RestrictTo(LIBRARY)
-@SuppressWarnings("OutdatedDocumentation")
 data class Attribute(
     @NotNull private val nm: String,
     @NotNull val value: String,

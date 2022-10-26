@@ -65,9 +65,9 @@ internal object TriggerAttributesValidator {
             // If trigger's attribute value type is different from event's, value can't be reconciled.
             false
         } else isValueReconciled(
-            valueTypeId = valueTypeId,
+            valueId = valueTypeId,
             eventValue = eventAttribute.value,
-            operatorTypeId = triggerAttribute.operator,
+            operatorId = triggerAttribute.operator,
             triggerValue = triggerAttribute.value
         )
     }
@@ -76,29 +76,18 @@ internal object TriggerAttributesValidator {
      * The method checks if the value from event attribute can satisfy trigger's attribute values according to
      * trigger attribute's operator type.
      */
-    @SuppressWarnings(
-        "ReturnCount", "ComplexMethod", "LongMethod", "ComplexCondition",
-        "ElseCaseInsteadOfExhaustiveWhen"
-    )
-    private fun isValueReconciled(
-        valueTypeId: Int,
-        eventValue: String?,
-        operatorTypeId: Int,
-        triggerValue: String?
-    ): Boolean {
+    @SuppressWarnings("LongMethod", "ComplexMethod", "ReturnCount")
+    private fun isValueReconciled(valueId: Int, eventValue: String?, operatorId: Int, triggerValue: String?): Boolean {
         // Validate value strings. They shouldn't be null, but empty string is OK.
         if (eventValue == null || triggerValue == null) return false
 
         // Validate attribute's operator type and value type.
-        val operatorType = OperatorType.getById(operatorTypeId)
-        val valueType = ValueType.getById(valueTypeId)
-        if (operatorType == null || operatorType == OperatorType.INVALID ||
-            valueType == null || valueType == ValueType.INVALID
-        ) return false
+        val operatorType = OperatorType.getById(operatorId) ?: return false
+        val valueType = ValueType.getById(valueId) ?: return false
+        if (operatorType == OperatorType.INVALID || valueType == ValueType.INVALID) return false
 
         return when (valueType) {
-            ValueType.STRING ->
-                ValueMatchingUtil.isOperatorConditionSatisfied(eventValue, operatorType, triggerValue)
+            ValueType.STRING -> ValueMatchingUtil.isOperatorConditionSatisfied(eventValue, operatorType, triggerValue)
             ValueType.DOUBLE ->
                 ValueMatchingUtil.isOperatorConditionSatisfied(
                     eventValue.toDoubleOrNull(), operatorType, triggerValue.toDoubleOrNull()
@@ -109,9 +98,7 @@ internal object TriggerAttributesValidator {
                 )
             ValueType.INTEGER ->
                 ValueMatchingUtil.isOperatorConditionSatisfied(
-                    eventValue = eventValue.toIntOrNull(),
-                    operatorType = operatorType,
-                    triggerValue = triggerValue.toIntOrNull()
+                    eventValue.toIntOrNull(), operatorType, triggerValue.toIntOrNull()
                 )
             ValueType.TIME_IN_MILLI ->
                 ValueMatchingUtil.isOperatorConditionSatisfied(
@@ -120,7 +107,7 @@ internal object TriggerAttributesValidator {
                     triggerValue = triggerValue.toLongOrNull(),
                     isTime = true
                 )
-            else -> false
+            ValueType.INVALID -> false
         }
     }
 }

@@ -46,7 +46,7 @@ class HostAppInfoRepositorySpec : BaseTest() {
             .replace("_", "-")
             .lowercase(Locale.getDefault())
         HostAppInfoRepository.instance()
-            .getInAppMessagingSubscriptionKey() shouldBeEqualTo InAppMessagingTestConstants.SUB_KEY
+            .getSubscriptionKey() shouldBeEqualTo InAppMessagingTestConstants.SUB_KEY
         HostAppInfoRepository.instance().getDeviceId() shouldBeEqualTo InAppMessagingTestConstants.DEVICE_ID
     }
 
@@ -126,7 +126,7 @@ class HostAppInfoRepositorySpec : BaseTest() {
         instance.getPackageName().shouldBeEmpty()
         instance.getDeviceLocale() shouldBeEqualTo Locale.getDefault().toString().replace("_", "-")
             .lowercase(Locale.getDefault())
-        instance.getInAppMessagingSubscriptionKey().shouldBeEmpty()
+        instance.getSubscriptionKey().shouldBeEmpty()
         instance.getDeviceId().shouldBeEmpty()
         instance.getConfigUrl().shouldBeEmpty()
     }

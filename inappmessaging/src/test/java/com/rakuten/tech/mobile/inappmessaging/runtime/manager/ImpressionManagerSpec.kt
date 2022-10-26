@@ -65,7 +65,6 @@ class ImpressionManagerSpec : BaseTest() {
     }
 
     @Test
-    @SuppressWarnings("LongMethod")
     fun `should invoke broadcaster`() {
         val captor = setupEventBroadcaster()
 
@@ -126,7 +125,6 @@ class ImpressionManagerSpec : BaseTest() {
         Mockito.verify(eventTracker, never()).sendEvent(eq(InAppMessagingConstants.RAT_EVENT_KEY_IMPRESSION), any())
     }
 
-    @SuppressWarnings("LongMethod")
     private fun setupEventBroadcaster(): KArgumentCaptor<Map<String, Any>> {
         WorkManagerTestInitHelper.initializeTestWorkManager(ApplicationProvider.getApplicationContext())
         Settings.Secure.putString(
@@ -136,16 +134,9 @@ class ImpressionManagerSpec : BaseTest() {
         )
         InAppMessaging.initialize(ApplicationProvider.getApplicationContext(), true)
         InAppMessaging.instance().registerPreference(TestUserInfoProvider())
-        ImpressionManager.scheduleReportImpression(
-            impressionList!!,
-            "1234",
-            false,
-            eventTracker::sendEvent
-        )
+        ImpressionManager.scheduleReportImpression(impressionList!!, "1234", false, eventTracker::sendEvent)
         val captor = argumentCaptor<Map<String, Any>>()
-        Mockito.verify(eventTracker).sendEvent(
-            eq(InAppMessagingConstants.RAT_EVENT_KEY_IMPRESSION), captor.capture()
-        )
+        Mockito.verify(eventTracker).sendEvent(eq(InAppMessagingConstants.RAT_EVENT_KEY_IMPRESSION), captor.capture())
         return captor
     }
 

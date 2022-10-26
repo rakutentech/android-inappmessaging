@@ -94,14 +94,12 @@ class AccountRepositoryNullSpec : AccountRepositorySpec() {
     }
 }
 
-@SuppressWarnings("LargeClass")
 class AccountRepositoryUsageSpec : AccountRepositorySpec() {
 
     private val mockLogger = Mockito.mock(InAppLogger::class.java)
     private val captor = argumentCaptor<String>()
 
     @Test
-    @SuppressWarnings("LongMethod")
     fun `should get be called once for get access token`() {
         val mockAcctRepo = Mockito.mock(AccountRepository::class.java)
 
@@ -118,10 +116,7 @@ class AccountRepositoryUsageSpec : AccountRepositorySpec() {
         val workerParameters = Mockito.mock(WorkerParameters::class.java)
         val impressionRequest = Mockito.mock(ImpressionRequest::class.java)
         val worker = ImpressionWorker(context, workerParameters)
-        worker.createReportImpressionCall(
-            "https://host/impression/", impressionRequest,
-            accountRepo = mockAcctRepo
-        )
+        worker.createReportImpressionCall("https://host/impression/", impressionRequest, mockAcctRepo)
         Mockito.verify(mockAcctRepo).getAccessToken()
     }
 

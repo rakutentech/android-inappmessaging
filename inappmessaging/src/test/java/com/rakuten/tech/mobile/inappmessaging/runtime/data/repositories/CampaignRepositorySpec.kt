@@ -23,13 +23,10 @@ import kotlin.collections.ArrayList
  * Test class for CampaignRepository.
  */
 @RunWith(RobolectricTestRunner::class)
-@SuppressWarnings("LargeClass")
-class CampaignRepositorySpec : BaseTest() {
-    private val message0 = ValidTestMessage(
-        maxImpressions = 3
-    )
-    private val message1 = ValidTestMessage("1234")
-    private val messageList = ArrayList<Message>()
+open class CampaignRepositorySpec : BaseTest() {
+    internal val message0 = ValidTestMessage(maxImpressions = 3)
+    internal val message1 = ValidTestMessage("1234")
+    internal val messageList = ArrayList<Message>()
 
     @Before
     override fun setup() {
@@ -39,105 +36,6 @@ class CampaignRepositorySpec : BaseTest() {
         messageList.add(message0)
         messageList.add(message1)
     }
-
-    // region syncWith
-
-    @Test
-    fun `should add message list with valid list`() {
-        CampaignRepository.instance().syncWith(messageList, 0)
-        CampaignRepository.instance().messages.shouldHaveSize(2)
-        CampaignRepository.instance().messages.values.first() shouldBeEqualTo message0
-        CampaignRepository.instance().messages.values.last() shouldBeEqualTo message1
-    }
-
-    @Test
-    fun `should not throw exception when list is empty`() {
-        CampaignRepository.instance().syncWith(ArrayList(), 0)
-    }
-
-    @Test
-    fun `should ignore invalid message in the list`() {
-        CampaignRepository.instance().syncWith(
-            listOf(InvalidTestMessage(), message0, ValidTestMessage("")),
-            0
-        )
-        CampaignRepository.instance().messages.shouldHaveSize(1)
-    }
-
-    @Test
-    fun `should be empty after clearing`() {
-        CampaignRepository.instance().syncWith(messageList, 0)
-        CampaignRepository.instance().messages.shouldHaveSize(2)
-
-        CampaignRepository.instance().clearMessages()
-        CampaignRepository.instance().messages.shouldHaveSize(0)
-    }
-
-    @Test
-    fun `should not crash while clearing messages`() {
-        InAppMessaging.setNotConfiguredInstance(true)
-        CampaignRepository.instance().clearMessages()
-        CampaignRepository.instance().messages.shouldHaveSize(0)
-    }
-
-    @Test
-    fun `should contain correct messages after clearing then adding`() {
-        CampaignRepository.instance().syncWith(messageList, 0)
-        CampaignRepository.instance().messages.shouldHaveSize(2)
-
-        CampaignRepository.instance().clearMessages()
-        CampaignRepository.instance().messages.shouldHaveSize(0)
-
-        CampaignRepository.instance().syncWith(messageList, 0)
-        CampaignRepository.instance().messages.shouldHaveSize(2)
-    }
-
-    @Test
-    fun `should persist impressionsLeft value`() {
-        CampaignRepository.instance().syncWith(listOf(message0), 0)
-        CampaignRepository.instance().decrementImpressions(message0.getCampaignId())
-        CampaignRepository.instance().messages.values.first().impressionsLeft shouldBeEqualTo 2
-
-        CampaignRepository.instance().syncWith(listOf(message0), 0)
-        CampaignRepository.instance().messages.values.first().impressionsLeft shouldBeEqualTo 2
-    }
-
-    @Test
-    fun `should persist isOptedOut value`() {
-        CampaignRepository.instance().syncWith(listOf(message0), 0)
-        CampaignRepository.instance().messages.values.first().isOptedOut?.shouldBeFalse()
-
-        CampaignRepository.instance().optOutCampaign(message0)
-        CampaignRepository.instance().syncWith(listOf(message0), 0)
-        CampaignRepository.instance().messages.values.first().isOptedOut?.shouldBeTrue()
-    }
-
-    @Test
-    fun `should not override impressionsLeft value even if maxImpressions is smaller`() {
-        CampaignRepository.instance().syncWith(listOf(message0), 0)
-        CampaignRepository.instance().incrementImpressions(message0.getCampaignId())
-        CampaignRepository.instance().messages.values.first().impressionsLeft shouldBeEqualTo 4
-
-        CampaignRepository.instance().syncWith(listOf(message0), 0)
-        CampaignRepository.instance().messages.values.first().impressionsLeft shouldBeEqualTo 4
-    }
-
-    @Test
-    fun `should modify impressionsLeft if maxImpressions was updated (campaign modified)`() {
-        CampaignRepository.instance().syncWith(listOf(message0), 0)
-        CampaignRepository.instance().decrementImpressions(message0.getCampaignId())
-        CampaignRepository.instance().decrementImpressions(message0.getCampaignId())
-        CampaignRepository.instance().messages.values.first().impressionsLeft shouldBeEqualTo 1
-
-        val updatedCampaign = ValidTestMessage(
-            campaignId = message0.getCampaignId(),
-            maxImpressions = 6
-        )
-        CampaignRepository.instance().syncWith(listOf(updatedCampaign), 0)
-        CampaignRepository.instance().messages.values.first().impressionsLeft shouldBeEqualTo 4
-    }
-
-    // endregion
 
     // region optOutCampaign
 
@@ -229,5 +127,96 @@ class CampaignRepositorySpec : BaseTest() {
         )
         InAppMessaging.initialize(ApplicationProvider.getApplicationContext(), isCache)
         InAppMessaging.instance().registerPreference(infoProvider)
+    }
+}
+
+class CampaignRepositorySyncSpec : CampaignRepositorySpec() {
+    @Test
+    fun `should add message list with valid list`() {
+        CampaignRepository.instance().syncWith(messageList, 0)
+        CampaignRepository.instance().messages.shouldHaveSize(2)
+        CampaignRepository.instance().messages.values.first() shouldBeEqualTo message0
+        CampaignRepository.instance().messages.values.last() shouldBeEqualTo message1
+    }
+
+    @Test
+    fun `should not throw exception when list is empty`() {
+        CampaignRepository.instance().syncWith(ArrayList(), 0)
+    }
+
+    @Test
+    fun `should ignore invalid message in the list`() {
+        CampaignRepository.instance().syncWith(listOf(InvalidTestMessage(), message0, ValidTestMessage("")), 0)
+        CampaignRepository.instance().messages.shouldHaveSize(1)
+    }
+
+    @Test
+    fun `should be empty after clearing`() {
+        CampaignRepository.instance().syncWith(messageList, 0)
+        CampaignRepository.instance().messages.shouldHaveSize(2)
+
+        CampaignRepository.instance().clearMessages()
+        CampaignRepository.instance().messages.shouldHaveSize(0)
+    }
+
+    @Test
+    fun `should not crash while clearing messages`() {
+        InAppMessaging.setNotConfiguredInstance(true)
+        CampaignRepository.instance().clearMessages()
+        CampaignRepository.instance().messages.shouldHaveSize(0)
+    }
+
+    @Test
+    fun `should contain correct messages after clearing then adding`() {
+        CampaignRepository.instance().syncWith(messageList, 0)
+        CampaignRepository.instance().messages.shouldHaveSize(2)
+
+        CampaignRepository.instance().clearMessages()
+        CampaignRepository.instance().messages.shouldHaveSize(0)
+
+        CampaignRepository.instance().syncWith(messageList, 0)
+        CampaignRepository.instance().messages.shouldHaveSize(2)
+    }
+
+    @Test
+    fun `should persist impressionsLeft value`() {
+        CampaignRepository.instance().syncWith(listOf(message0), 0)
+        CampaignRepository.instance().decrementImpressions(message0.getCampaignId())
+        CampaignRepository.instance().messages.values.first().impressionsLeft shouldBeEqualTo 2
+
+        CampaignRepository.instance().syncWith(listOf(message0), 0)
+        CampaignRepository.instance().messages.values.first().impressionsLeft shouldBeEqualTo 2
+    }
+
+    @Test
+    fun `should persist isOptedOut value`() {
+        CampaignRepository.instance().syncWith(listOf(message0), 0)
+        CampaignRepository.instance().messages.values.first().isOptedOut?.shouldBeFalse()
+
+        CampaignRepository.instance().optOutCampaign(message0)
+        CampaignRepository.instance().syncWith(listOf(message0), 0)
+        CampaignRepository.instance().messages.values.first().isOptedOut?.shouldBeTrue()
+    }
+
+    @Test
+    fun `should not override impressionsLeft value even if maxImpressions is smaller`() {
+        CampaignRepository.instance().syncWith(listOf(message0), 0)
+        CampaignRepository.instance().incrementImpressions(message0.getCampaignId())
+        CampaignRepository.instance().messages.values.first().impressionsLeft shouldBeEqualTo 4
+
+        CampaignRepository.instance().syncWith(listOf(message0), 0)
+        CampaignRepository.instance().messages.values.first().impressionsLeft shouldBeEqualTo 4
+    }
+
+    @Test
+    fun `should modify impressionsLeft if maxImpressions was updated (campaign modified)`() {
+        CampaignRepository.instance().syncWith(listOf(message0), 0)
+        CampaignRepository.instance().decrementImpressions(message0.getCampaignId())
+        CampaignRepository.instance().decrementImpressions(message0.getCampaignId())
+        CampaignRepository.instance().messages.values.first().impressionsLeft shouldBeEqualTo 1
+
+        val updatedCampaign = ValidTestMessage(campaignId = message0.getCampaignId(), maxImpressions = 6)
+        CampaignRepository.instance().syncWith(listOf(updatedCampaign), 0)
+        CampaignRepository.instance().messages.values.first().impressionsLeft shouldBeEqualTo 4
     }
 }

@@ -22,11 +22,7 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import java.lang.ref.WeakReference
 
-@SuppressWarnings(
-    "TooManyFunctions",
-    "TooGenericExceptionCaught",
-    "LongParameterList"
-)
+@SuppressWarnings("LongParameterList", "TooManyFunctions")
 internal class InApp(
     private val context: Context,
     isDebugLogging: Boolean,
@@ -60,6 +56,7 @@ internal class InApp(
 
     override var onPushPrimer: (() -> Unit)? = null
 
+    @SuppressWarnings("TooGenericExceptionCaught")
     override fun registerPreference(userInfoProvider: UserInfoProvider) {
         try {
             accountRepo.userInfoProvider = userInfoProvider
@@ -71,6 +68,7 @@ internal class InApp(
         }
     }
 
+    @SuppressWarnings("TooGenericExceptionCaught")
     override fun registerMessageDisplayActivity(activity: Activity) {
         try {
             activityWeakReference = WeakReference(activity)
@@ -85,7 +83,7 @@ internal class InApp(
         }
     }
 
-    @SuppressWarnings("FunctionMaxLength")
+    @SuppressWarnings("FunctionMaxLength", "TooGenericExceptionCaught")
     override fun unregisterMessageDisplayActivity() {
         try {
             if (ConfigResponseRepository.instance().isConfigEnabled()) {
@@ -101,6 +99,7 @@ internal class InApp(
         }
     }
 
+    @SuppressWarnings("TooGenericExceptionCaught")
     override fun logEvent(event: Event) {
         try {
             val isEnabled = ConfigResponseRepository.instance().isConfigEnabled()
@@ -122,6 +121,7 @@ internal class InApp(
         }
     }
 
+    @SuppressWarnings("TooGenericExceptionCaught")
     override fun closeMessage(clearQueuedCampaigns: Boolean) {
         try {
             if (ConfigResponseRepository.instance().isConfigEnabled()) {
