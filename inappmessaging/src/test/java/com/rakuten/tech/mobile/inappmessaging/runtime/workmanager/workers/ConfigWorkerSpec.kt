@@ -48,13 +48,13 @@ open class ConfigWorkerSpec : BaseTest() {
 
     @Mock
     internal val mockResponse: Response<ConfigResponse?>? = null
-    internal val context = Mockito.mock(Context::class.java)
-    internal val workerParameters = Mockito.mock(WorkerParameters::class.java)
-    internal val mockHostRepository = Mockito.mock(HostAppInfoRepository::class.java)
-    internal val mockConfigRepository = Mockito.mock(ConfigResponseRepository::class.java)
-    internal val mockMessageScheduler = Mockito.mock(MessageMixerPingScheduler::class.java)
+    internal val ctx = Mockito.mock(Context::class.java)
+    internal val workParam = Mockito.mock(WorkerParameters::class.java)
+    internal val mockHostRepo = Mockito.mock(HostAppInfoRepository::class.java)
+    internal val mockConfigRepo = Mockito.mock(ConfigResponseRepository::class.java)
+    internal val mockMsgSched = Mockito.mock(MessageMixerPingScheduler::class.java)
     internal val mockRetry = Mockito.mock(RetryDelayUtil::class.java)
-    internal val mockConfigScheduler = Mockito.mock(ConfigScheduler::class.java)
+    internal val mockConfigSched = Mockito.mock(ConfigScheduler::class.java)
 
     @Before
     override fun setup() {
@@ -100,32 +100,22 @@ open class ConfigWorkerSpec : BaseTest() {
 
     companion object {
         internal const val CONFIG_KEY = "com.rakuten.tech.mobile.inappmessaging.configurl"
-        internal const val SUBSCRIPTION_KEY = "com.rakuten.tech.mobile.inappmessaging.subscriptionkey"
+        internal const val SUB_KEY = "com.rakuten.tech.mobile.inappmessaging.subscriptionkey"
     }
 }
 
 class ConfigWorkerSuccessSpec : ConfigWorkerSpec() {
     @Test
-    @SuppressWarnings("LongMethod")
     fun `should return success with valid values`() {
         val ctx = ApplicationProvider.getApplicationContext<Context>()
-        val app = ctx.packageManager.getApplicationInfo(
-            ctx.packageName,
-            PackageManager.GET_META_DATA
-        )
+        val app = ctx.packageManager.getApplicationInfo(ctx.packageName, PackageManager.GET_META_DATA)
         val bundle = app.metaData
-        `when`(mockHostRepository.getPackageName()).thenReturn(ctx.packageName)
+        `when`(mockHostRepo.getPackageName()).thenReturn(ctx.packageName)
         val version = ctx.packageManager.getPackageInfo(ctx.packageName, 0).versionName
-        `when`(mockHostRepository.getVersion()).thenReturn(version)
-        `when`(mockHostRepository.getConfigUrl()).thenReturn(bundle.getString(CONFIG_KEY, ""))
-        `when`(
-            mockHostRepository
-                .getInAppMessagingSubscriptionKey()
-        ).thenReturn(bundle.getString(SUBSCRIPTION_KEY, ""))
-        val worker = ConfigWorker(
-            context, workerParameters, mockHostRepository, mockConfigRepository,
-            mockMessageScheduler
-        )
+        `when`(mockHostRepo.getVersion()).thenReturn(version)
+        `when`(mockHostRepo.getConfigUrl()).thenReturn(bundle.getString(CONFIG_KEY, ""))
+        `when`(mockHostRepo.getSubscriptionKey()).thenReturn(bundle.getString(SUB_KEY, ""))
+        val worker = ConfigWorker(this.ctx, workParam, mockHostRepo, mockConfigRepo, mockMsgSched)
         val expected = if (bundle.getString(CONFIG_KEY, "").isNullOrEmpty()) {
             ListenableWorker.Result.retry()
         } else ListenableWorker.Result.success()
@@ -136,7 +126,7 @@ class ConfigWorkerSuccessSpec : ConfigWorkerSpec() {
     fun `should return success with valid values not mock`() {
         initializeInstance()
 
-        val worker = ConfigWorker(context, workerParameters)
+        val worker = ConfigWorker(ctx, workParam)
         val expected = if (HostAppInfoRepository.instance().getConfigUrl().isNullOrEmpty()) {
             ListenableWorker.Result.retry()
         } else ListenableWorker.Result.success()
@@ -148,12 +138,12 @@ class ConfigWorkerSuccessSpec : ConfigWorkerSpec() {
         `when`(mockResponse?.isSuccessful).thenReturn(false)
         `when`(mockResponse?.code()).thenReturn(RetryDelayUtil.RETRY_ERROR_CODE)
         ConfigWorker(
-            context, workerParameters, HostAppInfoRepository.instance(), ConfigResponseRepository.instance(),
-            MessageMixerPingScheduler.instance(), mockConfigScheduler, mockRetry
+            ctx, workParam, HostAppInfoRepository.instance(), ConfigResponseRepository.instance(),
+            MessageMixerPingScheduler.instance(), mockConfigSched, mockRetry
         )
             .onResponse(mockResponse!!) shouldBeEqualTo ListenableWorker.Result.Success()
 
-        Mockito.verify(mockConfigScheduler).startConfig(eq(RetryDelayUtil.INITIAL_BACKOFF_DELAY), anyOrNull())
+        Mockito.verify(mockConfigSched).startConfig(eq(RetryDelayUtil.INITIAL_BACKOFF_DELAY), anyOrNull())
         Mockito.verify(mockRetry).getNextDelay(eq(RetryDelayUtil.INITIAL_BACKOFF_DELAY))
     }
 
@@ -162,8 +152,8 @@ class ConfigWorkerSuccessSpec : ConfigWorkerSpec() {
         `when`(mockResponse?.isSuccessful).thenReturn(false)
         `when`(mockResponse?.code()).thenReturn(RetryDelayUtil.RETRY_ERROR_CODE)
         val worker = ConfigWorker(
-            context, workerParameters, HostAppInfoRepository.instance(),
-            ConfigResponseRepository.instance(), MessageMixerPingScheduler.instance(), mockConfigScheduler
+            ctx, workParam, HostAppInfoRepository.instance(),
+            ConfigResponseRepository.instance(), MessageMixerPingScheduler.instance(), mockConfigSched
         )
         verifyBackoff(worker)
     }
@@ -174,11 +164,11 @@ class ConfigWorkerSuccessSpec : ConfigWorkerSpec() {
         `when`(mockResponse?.code()).thenReturn(RetryDelayUtil.RETRY_ERROR_CODE)
         setupErrorBody()
         val worker = ConfigWorker(
-            context, workerParameters, mockHostRepository,
-            mockConfigRepository, mockMessageScheduler, mockConfigScheduler
+            ctx, workParam, mockHostRepo,
+            mockConfigRepo, mockMsgSched, mockConfigSched
         )
         worker.onResponse(mockResponse!!) shouldBeEqualTo ListenableWorker.Result.Success()
-        Mockito.verify(mockConfigScheduler).startConfig(eq(RetryDelayUtil.INITIAL_BACKOFF_DELAY), anyOrNull())
+        Mockito.verify(mockConfigSched).startConfig(eq(RetryDelayUtil.INITIAL_BACKOFF_DELAY), anyOrNull())
 
         `when`(mockResponse.isSuccessful).thenReturn(true)
         `when`(mockResponse.code()).thenReturn(200)
@@ -196,11 +186,11 @@ class ConfigWorkerSuccessSpec : ConfigWorkerSpec() {
         (InAppMessaging.instance() as InApp).tempEventList.shouldHaveSize(2)
 
         val worker = ConfigWorker(
-            context, workerParameters, HostAppInfoRepository.instance(),
-            ConfigResponseRepository.instance(), mockMessageScheduler, mockConfigScheduler
+            ctx, workParam, HostAppInfoRepository.instance(),
+            ConfigResponseRepository.instance(), mockMsgSched, mockConfigSched
         )
         worker.onResponse(mockResponse!!) shouldBeEqualTo ListenableWorker.Result.Success()
-        Mockito.verify(mockMessageScheduler).pingMessageMixerService(0)
+        Mockito.verify(mockMsgSched).pingMessageMixerService(0)
     }
 
     @Test
@@ -213,12 +203,12 @@ class ConfigWorkerSuccessSpec : ConfigWorkerSpec() {
         (InAppMessaging.instance() as InApp).tempEventList.shouldHaveSize(2)
 
         val worker = ConfigWorker(
-            context, workerParameters, HostAppInfoRepository.instance(),
-            ConfigResponseRepository.instance(), mockMessageScheduler, mockConfigScheduler
+            ctx, workParam, HostAppInfoRepository.instance(),
+            ConfigResponseRepository.instance(), mockMsgSched, mockConfigSched
         )
         worker.onResponse(mockResponse!!) shouldBeEqualTo ListenableWorker.Result.Success()
         InAppMessaging.instance() shouldBeInstanceOf InAppMessaging.NotConfiguredInAppMessaging::class.java
-        Mockito.verify(mockMessageScheduler, never()).pingMessageMixerService(0)
+        Mockito.verify(mockMsgSched, never()).pingMessageMixerService(0)
     }
 
     @Test
@@ -229,8 +219,8 @@ class ConfigWorkerSuccessSpec : ConfigWorkerSpec() {
         `when`(mockResponse?.code()).thenReturn(HttpURLConnection.HTTP_INTERNAL_ERROR)
         setupErrorBody()
         val worker = ConfigWorker(
-            context, workerParameters, HostAppInfoRepository.instance(),
-            ConfigResponseRepository.instance(), MessageMixerPingScheduler.instance(), mockConfigScheduler
+            ctx, workParam, HostAppInfoRepository.instance(),
+            ConfigResponseRepository.instance(), MessageMixerPingScheduler.instance(), mockConfigSched
         )
 
         verifyBackoff(worker)
@@ -241,11 +231,11 @@ class ConfigWorkerSuccessSpec : ConfigWorkerSpec() {
 
     private fun verifyBackoff(worker: ConfigWorker) {
         worker.onResponse(mockResponse!!) shouldBeEqualTo ListenableWorker.Result.Success()
-        Mockito.verify(mockConfigScheduler).startConfig(eq(RetryDelayUtil.INITIAL_BACKOFF_DELAY), anyOrNull())
+        Mockito.verify(mockConfigSched).startConfig(eq(RetryDelayUtil.INITIAL_BACKOFF_DELAY), anyOrNull())
         ConfigScheduler.currDelay shouldBeGreaterThan (RetryDelayUtil.INITIAL_BACKOFF_DELAY * 2)
 
         worker.onResponse(mockResponse) shouldBeEqualTo ListenableWorker.Result.Success()
-        Mockito.verify(mockConfigScheduler).startConfig(
+        Mockito.verify(mockConfigSched).startConfig(
             AdditionalMatchers.gt(RetryDelayUtil.INITIAL_BACKOFF_DELAY * 2), anyOrNull()
         )
         ConfigScheduler.currDelay shouldBeGreaterThan (RetryDelayUtil.INITIAL_BACKOFF_DELAY * 4)
@@ -261,8 +251,8 @@ class ConfigWorkerFailSpec : ConfigWorkerSpec() {
         `when`(mockResponse?.code()).thenReturn(HttpURLConnection.HTTP_INTERNAL_ERROR)
         `when`(mockResponse?.body()).thenReturn(null)
         val worker = ConfigWorker(
-            context, workerParameters, HostAppInfoRepository.instance(),
-            ConfigResponseRepository.instance(), MessageMixerPingScheduler.instance(), mockConfigScheduler
+            ctx, workParam, HostAppInfoRepository.instance(),
+            ConfigResponseRepository.instance(), MessageMixerPingScheduler.instance(), mockConfigSched
         )
         repeat(3) {
             worker.onResponse(mockResponse!!) shouldBeEqualTo ListenableWorker.Result.success()
@@ -279,7 +269,7 @@ class ConfigWorkerFailSpec : ConfigWorkerSpec() {
         InAppMessaging.instance() shouldBeInstanceOf InApp::class.java
         `when`(mockResponse?.isSuccessful).thenReturn(false)
         `when`(mockResponse?.code()).thenReturn(HttpURLConnection.HTTP_BAD_REQUEST)
-        val worker = ConfigWorker(context, workerParameters)
+        val worker = ConfigWorker(ctx, workParam)
         worker.onResponse(mockResponse!!) shouldBeEqualTo ListenableWorker.Result.failure()
 
         setupErrorBody()
@@ -291,9 +281,9 @@ class ConfigWorkerFailSpec : ConfigWorkerSpec() {
 
     @Test
     fun `should fail if hostapp id is empty`() {
-        `when`(mockHostRepository.getPackageName()).thenReturn("")
+        `when`(mockHostRepo.getPackageName()).thenReturn("")
         val worker = ConfigWorker(
-            context, workerParameters, mockHostRepository, ConfigResponseRepository.instance(),
+            ctx, workParam, mockHostRepo, ConfigResponseRepository.instance(),
             MessageMixerPingScheduler.instance()
         )
         worker.doWork() shouldBeEqualTo ListenableWorker.Result.failure()
@@ -301,10 +291,10 @@ class ConfigWorkerFailSpec : ConfigWorkerSpec() {
 
     @Test
     fun `should fail if hostapp version is empty`() {
-        `when`(mockHostRepository.getPackageName()).thenReturn("valid.package.name")
-        `when`(mockHostRepository.getVersion()).thenReturn("")
+        `when`(mockHostRepo.getPackageName()).thenReturn("valid.package.name")
+        `when`(mockHostRepo.getVersion()).thenReturn("")
         val worker = ConfigWorker(
-            context, workerParameters, mockHostRepository, ConfigResponseRepository.instance(),
+            ctx, workParam, mockHostRepo, ConfigResponseRepository.instance(),
             MessageMixerPingScheduler.instance()
         )
         worker.doWork() shouldBeEqualTo ListenableWorker.Result.failure()
@@ -312,11 +302,11 @@ class ConfigWorkerFailSpec : ConfigWorkerSpec() {
 
     @Test
     fun `should fail if subscription key is empty`() {
-        `when`(mockHostRepository.getPackageName()).thenReturn("valid.package.name")
-        `when`(mockHostRepository.getVersion()).thenReturn("valid.version")
-        `when`(mockHostRepository.getInAppMessagingSubscriptionKey()).thenReturn("")
+        `when`(mockHostRepo.getPackageName()).thenReturn("valid.package.name")
+        `when`(mockHostRepo.getVersion()).thenReturn("valid.version")
+        `when`(mockHostRepo.getSubscriptionKey()).thenReturn("")
         val worker = ConfigWorker(
-            context, workerParameters, mockHostRepository, ConfigResponseRepository.instance(),
+            ctx, workParam, mockHostRepo, ConfigResponseRepository.instance(),
             MessageMixerPingScheduler.instance()
         )
         worker.doWork() shouldBeEqualTo ListenableWorker.Result.failure()

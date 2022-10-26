@@ -54,62 +54,70 @@ class CustomEventParameterizedSpec(
 ) {
 
     @Test
-    @SuppressWarnings("LongMethod")
     fun `should add correct attribute type and value`() {
         when (attrType) {
-            ValueType.STRING -> {
-                confirmValues(
-                    CustomEvent(EVENT_NAME).addAttribute(STRING_ATTRIBUTE, attrValue),
-                    STRING_ATTRIBUTE, STRING_ATTRIBUTE, attrValue, ValueType.STRING.typeId
-                )
-                confirmValues(
-                    CustomEvent(EVENT_NAME).addAttribute(STRING_ATTRIBUTE_UPPER, attrValue),
-                    STRING_ATTRIBUTE, STRING_ATTRIBUTE, attrValue, ValueType.STRING.typeId
-                )
-            }
-            ValueType.INTEGER -> {
-                confirmValues(
-                    CustomEvent(EVENT_NAME).addAttribute(INTEGER_ATTRIBUTE, attrValue.toInt()),
-                    INTEGER_ATTRIBUTE, INTEGER_ATTRIBUTE, attrValue, ValueType.INTEGER.typeId
-                )
-                confirmValues(
-                    CustomEvent(EVENT_NAME).addAttribute(INTEGER_ATTRIBUTE_UPPER, attrValue.toInt()),
-                    INTEGER_ATTRIBUTE, INTEGER_ATTRIBUTE, attrValue, ValueType.INTEGER.typeId
-                )
-            }
-            ValueType.DOUBLE -> {
-                confirmValues(
-                    CustomEvent(EVENT_NAME).addAttribute(DOUBLE_ATTRIBUTE, attrValue.toDouble()),
-                    DOUBLE_ATTRIBUTE, DOUBLE_ATTRIBUTE, attrValue, ValueType.DOUBLE.typeId
-                )
-                confirmValues(
-                    CustomEvent(EVENT_NAME).addAttribute(DOUBLE_ATTRIBUTE_UPPER, attrValue.toDouble()),
-                    DOUBLE_ATTRIBUTE, DOUBLE_ATTRIBUTE, attrValue, ValueType.DOUBLE.typeId
-                )
-            }
-            ValueType.BOOLEAN -> {
-                confirmValues(
-                    CustomEvent(EVENT_NAME).addAttribute(BOOLEAN_ATTRIBUTE, attrValue.toBoolean()),
-                    BOOLEAN_ATTRIBUTE, BOOLEAN_ATTRIBUTE, attrValue, ValueType.BOOLEAN.typeId
-                )
-                confirmValues(
-                    CustomEvent(EVENT_NAME).addAttribute(BOOLEAN_ATTRIBUTE_UPPER, attrValue.toBoolean()),
-                    BOOLEAN_ATTRIBUTE, BOOLEAN_ATTRIBUTE, attrValue, ValueType.BOOLEAN.typeId
-                )
-            }
-            ValueType.TIME_IN_MILLI -> {
-                confirmValues(
-                    CustomEvent(EVENT_NAME).addAttribute(DATE_ATTRIBUTE, Date(attrValue.toLong())),
-                    DATE_ATTRIBUTE, DATE_ATTRIBUTE, attrValue, ValueType.TIME_IN_MILLI.typeId
-                )
-                confirmValues(
-                    CustomEvent(EVENT_NAME).addAttribute(DATE_ATTRIBUTE_UPPER, Date(attrValue.toLong())),
-                    DATE_ATTRIBUTE, DATE_ATTRIBUTE, attrValue, ValueType.TIME_IN_MILLI.typeId
-                )
-            }
-            else -> {
-            }
+            ValueType.STRING -> confirmString()
+            ValueType.INTEGER -> confirmInt()
+            ValueType.DOUBLE -> confirmDouble()
+            ValueType.BOOLEAN -> confirmBoolean()
+            ValueType.TIME_IN_MILLI -> confirmMilli()
+            else -> {}
         }
+    }
+
+    private fun confirmMilli() {
+        confirmValues(
+            CustomEvent(EVENT_NAME).addAttribute(DATE_ATTRIBUTE, Date(attrValue.toLong())),
+            DATE_ATTRIBUTE, DATE_ATTRIBUTE, attrValue, ValueType.TIME_IN_MILLI.typeId
+        )
+        confirmValues(
+            CustomEvent(EVENT_NAME).addAttribute(DATE_ATTRIBUTE_UPPER, Date(attrValue.toLong())),
+            DATE_ATTRIBUTE, DATE_ATTRIBUTE, attrValue, ValueType.TIME_IN_MILLI.typeId
+        )
+    }
+
+    private fun confirmBoolean() {
+        confirmValues(
+            CustomEvent(EVENT_NAME).addAttribute(BOOLEAN_ATTRIBUTE, attrValue.toBoolean()),
+            BOOLEAN_ATTRIBUTE, BOOLEAN_ATTRIBUTE, attrValue, ValueType.BOOLEAN.typeId
+        )
+        confirmValues(
+            CustomEvent(EVENT_NAME).addAttribute(BOOLEAN_ATTRIBUTE_UPPER, attrValue.toBoolean()),
+            BOOLEAN_ATTRIBUTE, BOOLEAN_ATTRIBUTE, attrValue, ValueType.BOOLEAN.typeId
+        )
+    }
+
+    private fun confirmDouble() {
+        confirmValues(
+            CustomEvent(EVENT_NAME).addAttribute(DOUBLE_ATTRIBUTE, attrValue.toDouble()),
+            DOUBLE_ATTRIBUTE, DOUBLE_ATTRIBUTE, attrValue, ValueType.DOUBLE.typeId
+        )
+        confirmValues(
+            CustomEvent(EVENT_NAME).addAttribute(DOUBLE_ATTRIBUTE_UPPER, attrValue.toDouble()),
+            DOUBLE_ATTRIBUTE, DOUBLE_ATTRIBUTE, attrValue, ValueType.DOUBLE.typeId
+        )
+    }
+
+    private fun confirmInt() {
+        confirmValues(
+            CustomEvent(EVENT_NAME).addAttribute(INTEGER_ATTRIBUTE, attrValue.toInt()),
+            INTEGER_ATTRIBUTE, INTEGER_ATTRIBUTE, attrValue, ValueType.INTEGER.typeId
+        )
+        confirmValues(
+            CustomEvent(EVENT_NAME).addAttribute(INTEGER_ATTRIBUTE_UPPER, attrValue.toInt()),
+            INTEGER_ATTRIBUTE, INTEGER_ATTRIBUTE, attrValue, ValueType.INTEGER.typeId
+        )
+    }
+
+    private fun confirmString() {
+        confirmValues(
+            CustomEvent(EVENT_NAME).addAttribute(STRING_ATTRIBUTE, attrValue),
+            STRING_ATTRIBUTE, STRING_ATTRIBUTE, attrValue, ValueType.STRING.typeId
+        )
+        confirmValues(
+            CustomEvent(EVENT_NAME).addAttribute(STRING_ATTRIBUTE_UPPER, attrValue),
+            STRING_ATTRIBUTE, STRING_ATTRIBUTE, attrValue, ValueType.STRING.typeId
+        )
     }
 
     private fun confirmValues(event: CustomEvent, key: String, name: String, value: String, type: Int) {

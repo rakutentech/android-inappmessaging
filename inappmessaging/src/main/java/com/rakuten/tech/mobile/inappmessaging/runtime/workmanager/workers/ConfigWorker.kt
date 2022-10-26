@@ -17,6 +17,7 @@ import com.rakuten.tech.mobile.inappmessaging.runtime.utils.RuntimeUtil
 import com.rakuten.tech.mobile.inappmessaging.runtime.utils.WorkerUtils
 import com.rakuten.tech.mobile.inappmessaging.runtime.workmanager.schedulers.ConfigScheduler
 import com.rakuten.tech.mobile.inappmessaging.runtime.workmanager.schedulers.MessageMixerPingScheduler
+import retrofit2.Call
 import retrofit2.Response
 import java.net.HttpURLConnection
 import java.util.concurrent.atomic.AtomicInteger
@@ -50,35 +51,40 @@ internal class ConfigWorker(
      * Main method to do the work. Make Config Service network call is the main work.
      * Retries sending the request with default backoff when network error is encountered.
      */
-    @SuppressWarnings("LongMethod", "TooGenericExceptionCaught")
+    @SuppressWarnings("TooGenericExceptionCaught")
     override fun doWork(): Result {
         InAppLogger(TAG).debug(hostRepo.getConfigUrl())
         val hostAppId = hostRepo.getPackageName()
-        val locale = hostRepo.getDeviceLocale()
         val hostAppVersion = hostRepo.getVersion()
-        val subscriptionId = hostRepo.getInAppMessagingSubscriptionKey()
+        val subscriptionId = hostRepo.getSubscriptionKey()
         // Terminate request if any of the following values are empty: appId, appVersion or subscription key.
         if (hostAppId.isEmpty() || hostAppVersion.isEmpty() || subscriptionId.isEmpty()) {
             return Result.failure()
         }
 
-        val configUrl = hostRepo.getConfigUrl()
-        val sdkVersion = BuildConfig.VERSION_NAME
-        val params = ConfigQueryParamsBuilder(
-            appId = hostAppId, locale = locale, appVersion = hostAppVersion, sdkVersion = sdkVersion
-        ).queryParams
-        val configServiceCall = RuntimeUtil.getRetrofit()
-            .create(ConfigRetrofitService::class.java)
-            .getConfigService(configUrl, subscriptionId, params)
-
         return try {
             // Executing the API network call.
-            onResponse(configServiceCall.execute())
+            onResponse(setupCall(hostAppId, hostAppVersion, subscriptionId).execute())
         } catch (e: Exception) {
             InAppLogger(TAG).error(e.message)
             // RETRY by default has exponential backoff baked in.
             Result.retry()
         }
+    }
+
+    private fun setupCall(hostAppId: String, hostAppVersion: String, subscriptionId: String): Call<ConfigResponse> {
+        val locale = hostRepo.getDeviceLocale()
+        val configUrl = hostRepo.getConfigUrl()
+        val sdkVersion = BuildConfig.VERSION_NAME
+        val params = ConfigQueryParamsBuilder(
+            appId = hostAppId,
+            locale = locale,
+            appVersion = hostAppVersion,
+            sdkVersion = sdkVersion
+        ).queryParams
+        return RuntimeUtil.getRetrofit()
+            .create(ConfigRetrofitService::class.java)
+            .getConfigService(configUrl, subscriptionId, params)
     }
 
     /**
@@ -88,37 +94,13 @@ internal class ConfigWorker(
      * else -> returns failure
      */
     @VisibleForTesting
-    @SuppressWarnings("LongMethod")
     @Throws(IllegalArgumentException::class)
     fun onResponse(response: Response<ConfigResponse?>): Result {
         if (response.isSuccessful && response.body() != null) {
-            serverErrorCounter.set(0) // reset server error counter
-            // Adding config data to its repo.
-            configRepo.addConfigResponse(response.body()?.data)
-            // Schedule a ping request to message mixer. Initial delay is 0
-            // reset current delay to initial
-            ConfigScheduler.currDelay = RetryDelayUtil.INITIAL_BACKOFF_DELAY
-            InAppLogger(TAG).debug(
-                "Config Response: %d (%b)",
-                response.body()?.data?.rollOutPercentage, configRepo.isConfigEnabled()
-            )
-            if (configRepo.isConfigEnabled()) {
-                MessageMixerPingScheduler.currDelay = RetryDelayUtil.INITIAL_BACKOFF_DELAY
-                messagePingScheduler.pingMessageMixerService(0)
-            } else {
-                // reset IAM instance which will clear temp data
-                InAppMessaging.setNotConfiguredInstance()
-            }
+            handleResponse(response)
         } else return when {
-            response.code() == RetryDelayUtil.RETRY_ERROR_CODE -> {
-                serverErrorCounter.set(0) // reset server error counter
-                WorkerUtils.logSilentRequestError(TAG, response.code(), response.errorBody()?.string())
-                retryConfigRequest()
-            }
-            response.code() >= HttpURLConnection.HTTP_INTERNAL_ERROR -> {
-                WorkerUtils.logRequestError(TAG, response.code(), response.errorBody()?.string())
-                WorkerUtils.checkRetry(serverErrorCounter.getAndIncrement()) { retryConfigRequest() }
-            }
+            response.code() == RetryDelayUtil.RETRY_ERROR_CODE -> handleRetry(response)
+            response.code() >= HttpURLConnection.HTTP_INTERNAL_ERROR -> handleInternalError(response)
             else -> {
                 serverErrorCounter.set(0) // reset server error counter
                 // clear temp data (ignore all temp data stored during config request)
@@ -128,6 +110,37 @@ internal class ConfigWorker(
             }
         }
         return Result.success()
+    }
+
+    private fun handleInternalError(response: Response<ConfigResponse?>): Result {
+        WorkerUtils.logRequestError(TAG, response.code(), response.errorBody()?.string())
+        return WorkerUtils.checkRetry(serverErrorCounter.getAndIncrement()) { retryConfigRequest() }
+    }
+
+    private fun handleRetry(response: Response<ConfigResponse?>): Result {
+        serverErrorCounter.set(0) // reset server error counter
+        WorkerUtils.logSilentRequestError(TAG, response.code(), response.errorBody()?.string())
+        return retryConfigRequest()
+    }
+
+    private fun handleResponse(response: Response<ConfigResponse?>) {
+        serverErrorCounter.set(0) // reset server error counter
+        // Adding config data to its repo.
+        configRepo.addConfigResponse(response.body()?.data)
+        // Schedule a ping request to message mixer. Initial delay is 0
+        // reset current delay to initial
+        ConfigScheduler.currDelay = RetryDelayUtil.INITIAL_BACKOFF_DELAY
+        InAppLogger(TAG).debug(
+            "Config Response: %d (%b)",
+            response.body()?.data?.rollOutPercentage, configRepo.isConfigEnabled()
+        )
+        if (configRepo.isConfigEnabled()) {
+            MessageMixerPingScheduler.currDelay = RetryDelayUtil.INITIAL_BACKOFF_DELAY
+            messagePingScheduler.pingMessageMixerService(0)
+        } else {
+            // reset IAM instance which will clear temp data
+            InAppMessaging.setNotConfiguredInstance()
+        }
     }
 
     private fun retryConfigRequest(): Result {

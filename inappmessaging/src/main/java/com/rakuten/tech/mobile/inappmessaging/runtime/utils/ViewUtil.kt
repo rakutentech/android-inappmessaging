@@ -16,7 +16,7 @@ internal object ViewUtil {
      * This method returns an android.view.animation.Animation object which includes InAppMessage's custom
      * animation.
      */
-    @SuppressWarnings("SwallowedException", "ElseCaseInsteadOfExhaustiveWhen")
+    @SuppressWarnings("SwallowedException")
     fun getSlidingAnimation(
         context: Context,
         direction: SlideFromDirectionType
@@ -26,7 +26,8 @@ internal object ViewUtil {
                 SlideFromDirectionType.RIGHT -> AnimationUtils.loadAnimation(context, R.anim.slide_from_right)
                 SlideFromDirectionType.LEFT -> AnimationUtils.loadAnimation(context, R.anim.slide_from_left)
                 SlideFromDirectionType.BOTTOM -> AnimationUtils.loadAnimation(context, R.anim.slide_from_bottom)
-                else -> AnimationUtils.loadAnimation(context, R.anim.slide_from_bottom)
+                SlideFromDirectionType.TOP, SlideFromDirectionType.INVALID ->
+                    AnimationUtils.loadAnimation(context, R.anim.slide_from_bottom)
             }
         } catch (e: Resources.NotFoundException) {
             // should never occur unless there is an issue with the animation resource format

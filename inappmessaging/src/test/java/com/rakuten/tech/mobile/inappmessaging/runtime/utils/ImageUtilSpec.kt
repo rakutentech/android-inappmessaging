@@ -72,7 +72,6 @@ class ImageUtilSpec {
             }
         }
 
-        @SuppressWarnings("LongMethod")
         internal fun setupMockPicasso(isException: Boolean = false): Picasso {
             val picasso = Mockito.mock(Picasso::class.java)
             val requestCreator = Mockito.mock(RequestCreator::class.java)
@@ -84,12 +83,8 @@ class ImageUtilSpec {
             if (isException) {
                 `when`(requestCreator.into(any(), any())).thenThrow(NullPointerException("test error"))
             } else {
-                doAnswer {
-                    setCallback(it.getArgument(0))
-                }.`when`(requestCreator).fetch(any())
-                doAnswer {
-                    setCallback(it.getArgument(1))
-                }.`when`(requestCreator).into(any(), any())
+                doAnswer { setCallback(it.getArgument(0)) }.`when`(requestCreator).fetch(any())
+                doAnswer { setCallback(it.getArgument(1)) }.`when`(requestCreator).into(any(), any())
             }
 
             return picasso

@@ -8,7 +8,6 @@ import kotlin.math.abs
  * Value matching utility class, it contains utility methods which compare values of the same type
  * by its operator.
  */
-@SuppressWarnings("ElseCaseInsteadOfExhaustiveWhen", "ComplexMethod")
 internal object ValueMatchingUtil {
     private const val TIME_IN_MILLIS_TOLERANCE = 1000
 
@@ -16,6 +15,7 @@ internal object ValueMatchingUtil {
      * This method compares two integer values (i.e. [eventValue] and [triggerValue]) using the [operatorType].
      * Supported operators are: EQUALS, DOES_NOT_EQUAL, GREATER_THAN, LESS_THAN.
      */
+    @SuppressWarnings("ComplexMethod")
     fun isOperatorConditionSatisfied(eventValue: Int?, operatorType: OperatorType?, triggerValue: Int?): Boolean {
         return if (eventValue == null || operatorType == null || triggerValue == null) {
             false
@@ -25,8 +25,7 @@ internal object ValueMatchingUtil {
             OperatorType.GREATER_THAN -> eventValue > triggerValue
             OperatorType.LESS_THAN -> eventValue < triggerValue
             OperatorType.IS_BLANK, OperatorType.IS_NOT_BLANK,
-            OperatorType.MATCHES_REGEX, OperatorType.DOES_NOT_MATCH_REGEX -> false
-            else -> false
+            OperatorType.MATCHES_REGEX, OperatorType.DOES_NOT_MATCH_REGEX, OperatorType.INVALID -> false
         }
     }
 
@@ -34,6 +33,7 @@ internal object ValueMatchingUtil {
      * This method compares two Double values (i.e. [eventValue] and [triggerValue]) using the [operatorType].
      * Supported operators are: EQUALS, DOES_NOT_EQUAL, GREATER_THAN, LESS_THAN.
      */
+    @SuppressWarnings("ComplexMethod")
     fun isOperatorConditionSatisfied(eventValue: Double?, operatorType: OperatorType?, triggerValue: Double?): Boolean {
         if (eventValue == null || operatorType == null || triggerValue == null) {
             return false
@@ -46,8 +46,7 @@ internal object ValueMatchingUtil {
             OperatorType.GREATER_THAN -> eventValueDecimal > triggerValueDecimal
             OperatorType.LESS_THAN -> eventValueDecimal < triggerValueDecimal
             OperatorType.IS_BLANK, OperatorType.IS_NOT_BLANK,
-            OperatorType.MATCHES_REGEX, OperatorType.DOES_NOT_MATCH_REGEX -> false
-            else -> false
+            OperatorType.MATCHES_REGEX, OperatorType.DOES_NOT_MATCH_REGEX, OperatorType.INVALID -> false
         }
     }
 
@@ -79,7 +78,8 @@ internal object ValueMatchingUtil {
             OperatorType.DOES_NOT_EQUAL -> eventValue.compareTo(triggerValue) != 0
             OperatorType.GREATER_THAN -> eventValue > triggerValue
             OperatorType.LESS_THAN -> eventValue < triggerValue
-            else -> false
+            OperatorType.IS_BLANK, OperatorType.IS_NOT_BLANK,
+            OperatorType.MATCHES_REGEX, OperatorType.DOES_NOT_MATCH_REGEX, OperatorType.INVALID -> false
         }
     }
 
@@ -89,7 +89,8 @@ internal object ValueMatchingUtil {
             OperatorType.DOES_NOT_EQUAL -> abs(eventValue - triggerValue) > TIME_IN_MILLIS_TOLERANCE
             OperatorType.GREATER_THAN -> eventValue - triggerValue > TIME_IN_MILLIS_TOLERANCE
             OperatorType.LESS_THAN -> eventValue - triggerValue < -TIME_IN_MILLIS_TOLERANCE
-            else -> false
+            OperatorType.IS_BLANK, OperatorType.IS_NOT_BLANK,
+            OperatorType.MATCHES_REGEX, OperatorType.DOES_NOT_MATCH_REGEX, OperatorType.INVALID -> false
         }
     }
 
@@ -106,8 +107,7 @@ internal object ValueMatchingUtil {
             OperatorType.DOES_NOT_EQUAL -> eventValue != triggerValue
             OperatorType.GREATER_THAN, OperatorType.LESS_THAN, OperatorType.IS_BLANK,
             OperatorType.IS_NOT_BLANK, OperatorType.MATCHES_REGEX,
-            OperatorType.DOES_NOT_MATCH_REGEX -> false
-            else -> false
+            OperatorType.DOES_NOT_MATCH_REGEX, OperatorType.INVALID -> false
         }
     }
 
@@ -117,6 +117,7 @@ internal object ValueMatchingUtil {
      * Supported operators are: EQUALS, DOES_NOT_EQUAL, IS_BLANK, IS_NOT_BLANK, MATCHES_REGEX,
      * DOES_NOT_MATCH_REGEX.
      */
+    @SuppressWarnings("ComplexMethod")
     fun isOperatorConditionSatisfied(eventValue: String?, operatorType: OperatorType?, triggerValue: String?): Boolean {
         return if (eventValue == null || operatorType == null || triggerValue == null) {
             false
@@ -127,8 +128,7 @@ internal object ValueMatchingUtil {
             OperatorType.IS_NOT_BLANK -> eventValue.isNotEmpty()
             OperatorType.MATCHES_REGEX -> eventValue.matches(triggerValue.toRegex())
             OperatorType.DOES_NOT_MATCH_REGEX -> !eventValue.matches(triggerValue.toRegex())
-            OperatorType.GREATER_THAN, OperatorType.LESS_THAN -> false
-            else -> false
+            OperatorType.GREATER_THAN, OperatorType.LESS_THAN, OperatorType.INVALID -> false
         }
     }
 }

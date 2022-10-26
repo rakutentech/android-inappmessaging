@@ -68,9 +68,9 @@ class EventSpec(
     }
 
     companion object {
+        @SuppressWarnings("LongMethod")
         @JvmStatic
         @ParameterizedRobolectricTestRunner.Parameters(name = "{0} event type")
-        @SuppressWarnings("LongMethod")
         fun data(): Collection<Array<Any>> {
             return listOf(
                 arrayOf(

@@ -58,13 +58,12 @@ internal interface ConfigResponseRepository {
         private var isEnabled = false
 
         @Throws(IllegalArgumentException::class)
-        @SuppressWarnings("MagicNumber")
         override fun addConfigResponse(data: ConfigResponseData?) {
             requireNotNull(data)
             configResponseData = data
             val rollOut = configResponseData?.rollOutPercentage ?: 0
             isEnabled = if (rollOut > 0) {
-                randomizer.nextInt(1, 101) <= rollOut
+                randomizer.nextInt(1, RANGE_MAX) <= rollOut
             } else {
                 false
             }
@@ -77,5 +76,9 @@ internal interface ConfigResponseRepository {
         override fun getImpressionEndpoint(): String = configResponseData?.endpoints?.impression.orEmpty()
 
         override fun getDisplayPermissionEndpoint(): String = configResponseData?.endpoints?.displayPermission.orEmpty()
+
+        companion object {
+            private const val RANGE_MAX = 101
+        }
     }
 }

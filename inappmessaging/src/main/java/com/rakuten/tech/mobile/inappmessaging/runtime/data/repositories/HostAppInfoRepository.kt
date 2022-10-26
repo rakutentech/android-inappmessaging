@@ -41,8 +41,7 @@ internal interface HostAppInfoRepository {
     /**
      * This method returns IAM subscription key.
      */
-    @SuppressWarnings("FunctionMaxLength")
-    fun getInAppMessagingSubscriptionKey(): String
+    fun getSubscriptionKey(): String
 
     /**
      * This method returns Android device ID or empty String if not set.
@@ -71,12 +70,10 @@ internal interface HostAppInfoRepository {
         @Volatile
         private var hostAppInfo: HostAppInfo? = null
 
-        @SuppressWarnings("LongMethod", "FunctionMaxLength")
         @Throws(InAppMessagingException::class)
         override fun addHostInfo(hostAppInfo: HostAppInfo?) {
-            if (hostAppInfo == null) {
-                throw InAppMessagingException(ARGUMENT_IS_NULL_EXCEPTION)
-            }
+            if (hostAppInfo == null) { throw InAppMessagingException(ARGUMENT_IS_NULL_EXCEPTION) }
+
             synchronized(hostAppInfo) {
                 var message = ""
                 when {
@@ -105,8 +102,7 @@ internal interface HostAppInfoRepository {
             return locale.toString().replace("_", "-").lowercase(Locale.getDefault())
         }
 
-        @SuppressWarnings("FunctionMaxLength")
-        override fun getInAppMessagingSubscriptionKey(): String = hostAppInfo?.subscriptionKey?.trim().orEmpty()
+        override fun getSubscriptionKey(): String = hostAppInfo?.subscriptionKey?.trim().orEmpty()
 
         override fun getDeviceId(): String = hostAppInfo?.deviceId.orEmpty()
 

@@ -34,7 +34,7 @@ import kotlin.math.round
 /**
  * Base class of all custom views.
  */
-@SuppressWarnings("LargeClass", "TooManyFunctions", "NestedScopeFunctions")
+@SuppressWarnings("LargeClass", "TooManyFunctions")
 internal open class InAppMessageBaseView(context: Context, attrs: AttributeSet?) :
     FrameLayout(context, attrs), InAppMessageView {
 
@@ -62,8 +62,20 @@ internal open class InAppMessageBaseView(context: Context, attrs: AttributeSet?)
     /**
      * Sets campaign message data onto the view.
      */
-    @SuppressWarnings("LongMethod")
     override fun populateViewData(message: Message) {
+        setColor(message)
+        this.header = message.getMessagePayload().header
+        this.messageBody = message.getMessagePayload().messageBody
+        this.buttons = message.getMessagePayload().messageSettings.controlSettings.buttons
+        this.imageUrl = message.getMessagePayload().resource.imageUrl
+        this.listener = InAppMessageViewListener(message)
+        this.displayOptOut = message.getMessagePayload().messageSettings.displaySettings.optOut
+        this.isDismissable = message.isCampaignDismissable()
+        bindViewData()
+        this.tag = message.getCampaignId()
+    }
+
+    private fun setColor(message: Message) {
         try {
             this.headerColor = Color.parseColor(message.getMessagePayload().headerColor)
             this.messageBodyColor = Color.parseColor(message.getMessagePayload().messageBodyColor)
@@ -76,15 +88,6 @@ internal open class InAppMessageBaseView(context: Context, attrs: AttributeSet?)
             this.messageBodyColor = Color.BLACK
             this.bgColor = Color.WHITE
         }
-        this.header = message.getMessagePayload().header
-        this.messageBody = message.getMessagePayload().messageBody
-        this.buttons = message.getMessagePayload().messageSettings.controlSettings.buttons
-        this.imageUrl = message.getMessagePayload().resource.imageUrl
-        this.listener = InAppMessageViewListener(message)
-        this.displayOptOut = message.getMessagePayload().messageSettings.displaySettings.optOut
-        this.isDismissable = message.isCampaignDismissable()
-        bindViewData()
-        this.tag = message.getCampaignId()
     }
 
     /**
@@ -106,7 +109,6 @@ internal open class InAppMessageBaseView(context: Context, attrs: AttributeSet?)
     /**
      * This method binds data to buttons.
      */
-    @SuppressWarnings("LongMethod")
     private fun bindButtons() {
         // Set onClick listener to close button.
         val closeButton = findViewById<ImageButton>(R.id.message_close_button)
@@ -118,6 +120,10 @@ internal open class InAppMessageBaseView(context: Context, attrs: AttributeSet?)
             }
         }
 
+        setupButton()
+    }
+
+    private fun setupButton() {
         when (this.buttons.size) {
             1 -> {
                 // Set bigger layout_margin if there's only one button.
@@ -188,20 +194,22 @@ internal open class InAppMessageBaseView(context: Context, attrs: AttributeSet?)
     /**
      * This method adds button information, then set it to visible.
      */
-    @SuppressWarnings("LongMethod")
     private fun setButtonInfo(buttonView: MaterialButton, button: MessageButton) {
         buttonView.text = button.buttonText
         buttonView.hyphenationFrequency = getHyphenationFreq()
-        val textColor = try {
-            Color.parseColor(button.buttonTextColor)
-        } catch (e: IllegalArgumentException) {
-            // values are from backend
-            InAppLogger(TAG).error(e.message)
-            // set to default color
-            Color.parseColor("#1D1D1D")
-        }
-        buttonView.setTextColor(textColor)
+        val textColor = setTextColor(button, buttonView)
+        val bgColor = setBgColor(button, buttonView)
 
+        setButtonBorder(buttonView, bgColor, textColor)
+
+        buttonView.setOnClickListener(this.listener)
+
+        getFont(BUTTON_FONT)?.let { buttonView.typeface = it }
+        buttonView.visibility = VISIBLE
+        findViewById<LinearLayout>(R.id.message_buttons)?.visibility = VISIBLE
+    }
+
+    private fun setBgColor(button: MessageButton, buttonView: MaterialButton): Int {
         val bgColor = try {
             Color.parseColor(button.buttonBackgroundColor)
         } catch (e: IllegalArgumentException) {
@@ -212,44 +220,60 @@ internal open class InAppMessageBaseView(context: Context, attrs: AttributeSet?)
         }
 
         buttonView.backgroundTintList = ColorStateList.valueOf(bgColor)
-        setButtonBorder(buttonView, bgColor, textColor)
+        return bgColor
+    }
 
-        buttonView.setOnClickListener(this.listener)
-
-        getFont(BUTTON_FONT)?.let { buttonView.typeface = it }
-        buttonView.visibility = VISIBLE
-        findViewById<LinearLayout>(R.id.message_buttons)?.visibility = VISIBLE
+    private fun setTextColor(button: MessageButton, buttonView: MaterialButton): Int {
+        val textColor = try {
+            Color.parseColor(button.buttonTextColor)
+        } catch (e: IllegalArgumentException) {
+            // values are from backend
+            InAppLogger(TAG).error(e.message)
+            // set to default color
+            Color.parseColor("#1D1D1D")
+        }
+        buttonView.setTextColor(textColor)
+        return textColor
     }
 
     /**
      * This method binds data to message header.
      */
     @SuppressLint("ClickableViewAccessibility")
-    @SuppressWarnings("LongMethod")
     private fun bindText() {
+        bindHeader()
+        bindBody()
+    }
+
+    private fun bindBody() {
+        if (!messageBody.isNullOrEmpty()) {
+            findViewById<TextView>(R.id.message_body)?.let { textView ->
+                textView.text = messageBody
+                textView.setTextColor(messageBodyColor)
+                textView.setOnTouchListener(listener)
+                textView.visibility = VISIBLE
+                textView.hyphenationFrequency = getHyphenationFreq() // Word break
+                val font = getFont(BODY_FONT)
+                if (font != null) {
+                    textView.typeface = font
+                }
+            }
+        }
+    }
+
+    private fun bindHeader() {
         if (!header.isNullOrEmpty() || !messageBody.isNullOrEmpty()) {
-            findViewById<NestedScrollView>(R.id.message_scrollview)?.visibility = View.VISIBLE
+            findViewById<NestedScrollView>(R.id.message_scrollview)?.visibility = VISIBLE
         }
         if (!header.isNullOrEmpty()) {
             findViewById<TextView>(R.id.header_text)?.let { textView ->
                 textView.text = header
                 textView.setTextColor(headerColor)
                 textView.setOnTouchListener(listener)
-                textView.visibility = View.VISIBLE
+                textView.visibility = VISIBLE
                 textView.hyphenationFrequency = getHyphenationFreq() // Word break
-                getFont(HEADER_FONT)?.let { font ->
-                    textView.typeface = font
-                }
-            }
-        }
-        if (!messageBody.isNullOrEmpty()) {
-            findViewById<TextView>(R.id.message_body)?.let { textView ->
-                textView.text = messageBody
-                textView.setTextColor(messageBodyColor)
-                textView.setOnTouchListener(listener)
-                textView.visibility = View.VISIBLE
-                textView.hyphenationFrequency = getHyphenationFreq() // Word break
-                getFont(BODY_FONT)?.let { font ->
+                val font = getFont(HEADER_FONT)
+                if (font != null) {
                     textView.typeface = font
                 }
             }
@@ -269,12 +293,11 @@ internal open class InAppMessageBaseView(context: Context, attrs: AttributeSet?)
 
     // Brightness is computed based on [Darel Rex Finley's HSP Colour Model](http://alienryderflex.com/hsp.html).
     // Computed value is from 0 (black) to 255 (white), and is considered dark if less than 130.
-    @SuppressWarnings("MagicNumber")
     private fun getBrightness(color: Int): Int {
         val red = Color.red(color)
         val green = Color.green(color)
         val blue = Color.blue(color)
-        return sqrt((red * red * .241) + (green * green * .691) + (blue * blue * .068)).toInt()
+        return sqrt((red * red * RED_DEGREE) + (green * green * GREEN_DEGREE) + (blue * blue * BLUE_DEGREE)).toInt()
     }
 
     // Set button's border based on similarity between its background color and campaign's background color.
@@ -282,26 +305,12 @@ internal open class InAppMessageBaseView(context: Context, attrs: AttributeSet?)
     // from [](https://www.compuphase.com/cmetric.htm).
     // The distance value is compared against a threshold constant to decide if the colors
     // are visually similar or not.
-    @SuppressWarnings("MagicNumber", "LongMethod")
     @VisibleForTesting
-    internal fun setButtonBorder(
-        buttonView: MaterialButton,
-        buttonBackgroundColor: Int,
-        defaultStrokeColor: Int
-    ) {
-        val redMean = (Color.red(bgColor) + Color.red(buttonBackgroundColor)) / 2.0
-        val dRed = Color.red(bgColor) - Color.red(buttonBackgroundColor)
-        val dGreen = Color.green(bgColor) - Color.green(buttonBackgroundColor)
-        val dBlue = Color.blue(bgColor) - Color.blue(buttonBackgroundColor)
-        val distance = round(
-            sqrt(
-                (2 + redMean / 256) * dRed * dRed + 4 * dGreen * dGreen + (2 + (255 - redMean) / 256) * dBlue * dBlue
-            )
-        ).toInt()
+    internal fun setButtonBorder(buttonView: MaterialButton, buttonBackgroundColor: Int, defaultStrokeColor: Int) {
+        val distance = computeDistance(buttonBackgroundColor)
 
-        if (distance <= 15) {
-            buttonView.strokeWidth =
-                resources.getDimension(R.dimen.modal_button_border_stroke_width).toInt()
+        if (distance <= DIST_THRESHOLD) {
+            buttonView.strokeWidth = resources.getDimension(R.dimen.modal_button_border_stroke_width).toInt()
             if (buttonBackgroundColor == Color.WHITE) {
                 val strokeColor = resources.getColorStateList(R.color.modal_border_color_light_grey, context.theme)
                 buttonView.strokeColor = strokeColor
@@ -309,6 +318,19 @@ internal open class InAppMessageBaseView(context: Context, attrs: AttributeSet?)
                 buttonView.strokeColor = ColorStateList.valueOf(defaultStrokeColor)
             }
         }
+    }
+
+    private fun computeDistance(buttonBackgroundColor: Int): Int {
+        val redMean = (Color.red(bgColor) + Color.red(buttonBackgroundColor)) / 2.0
+        val dRed = Color.red(bgColor) - Color.red(buttonBackgroundColor)
+        val dGreen = Color.green(bgColor) - Color.green(buttonBackgroundColor)
+        val dBlue = Color.blue(bgColor) - Color.blue(buttonBackgroundColor)
+        return round(
+            sqrt(
+                (2 + redMean / COLOR_RANGE) * dRed * dRed + GREEN_MULTI * dGreen * dGreen +
+                    (2 + (COLOR_MAX - redMean) / COLOR_RANGE) * dBlue * dBlue
+            )
+        ).toInt()
     }
 
     private fun getFont(name: String): Typeface? {
@@ -343,5 +365,12 @@ internal open class InAppMessageBaseView(context: Context, attrs: AttributeSet?)
         private const val HEADER_FONT = "iam_custom_font_header"
         private const val BODY_FONT = "iam_custom_font_body"
         private const val BRIGHTNESS_LEVEL = 130
+        private const val DIST_THRESHOLD = 15
+        private const val COLOR_RANGE = 256
+        private const val COLOR_MAX = 255
+        private const val RED_DEGREE = 0.241
+        private const val GREEN_DEGREE = 0.691
+        private const val BLUE_DEGREE = 0.068
+        private const val GREEN_MULTI = 4
     }
 }

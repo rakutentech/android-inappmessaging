@@ -19,6 +19,7 @@ import com.rakuten.tech.mobile.inappmessaging.runtime.data.models.messages.Messa
 import com.rakuten.tech.mobile.inappmessaging.runtime.data.repositories.CampaignRepository
 import com.rakuten.tech.mobile.inappmessaging.runtime.data.responses.ping.OnClickBehavior
 import com.rakuten.tech.mobile.inappmessaging.runtime.data.responses.ping.Trigger
+import com.rakuten.tech.mobile.inappmessaging.runtime.data.responses.ping.TriggerAttribute
 import com.rakuten.tech.mobile.inappmessaging.runtime.manager.EventsManager
 import com.rakuten.tech.mobile.inappmessaging.runtime.manager.ImpressionManager
 import com.rakuten.tech.mobile.inappmessaging.runtime.utils.BuildVersionChecker
@@ -29,7 +30,7 @@ import kotlin.collections.ArrayList
 /**
  * Task which should be ran in the background.
  */
-@SuppressWarnings("TooGenericExceptionCaught", "TooManyFunctions", "MaxChainedCallsOnSameLine")
+@SuppressWarnings("TooManyFunctions")
 internal class MessageActionsCoroutine(private val campaignRepo: CampaignRepository = CampaignRepository.instance()) {
 
     fun executeTask(message: Message?, viewResourceId: Int, optOut: Boolean): Boolean {
@@ -156,19 +157,22 @@ internal class MessageActionsCoroutine(private val campaignRepo: CampaignReposit
         }
     }
 
-    @SuppressLint("InlinedApi")
-    @SuppressWarnings("NestedScopeFunctions")
     internal fun handlePushPrimer(buildChecker: BuildVersionChecker = BuildVersionChecker.instance()) {
         InAppMessaging.instance().onPushPrimer.let {
             if (it != null) {
                 it.invoke()
             } else if (buildChecker.isAndroidTAndAbove()) {
-                InAppMessaging.instance().getRegisteredActivity()?.let { act ->
-                    ActivityCompat.requestPermissions(
-                        act, arrayOf(Manifest.permission.POST_NOTIFICATIONS), InAppMessaging.PUSH_PRIMER_REQ_CODE
-                    )
-                }
+                requestPushPrimer()
             }
+        }
+    }
+
+    @SuppressLint("InlinedApi")
+    private fun requestPushPrimer() {
+        InAppMessaging.instance().getRegisteredActivity()?.let { act ->
+            ActivityCompat.requestPermissions(
+                act, arrayOf(Manifest.permission.POST_NOTIFICATIONS), InAppMessaging.PUSH_PRIMER_REQ_CODE
+            )
         }
     }
 
@@ -187,47 +191,49 @@ internal class MessageActionsCoroutine(private val campaignRepo: CampaignReposit
     /**
      * This method retrieves embedded event object from message based on impressionType.
      */
-    @SuppressWarnings("LongMethod", "ComplexCondition", "ReturnCount", "MaxLineLength", "MaximumLineLength")
     private fun getEmbeddedEvent(impressionType: ImpressionType, message: Message): Trigger? {
-        if (ImpressionType.ACTION_ONE == impressionType || ImpressionType.ACTION_TWO == impressionType) {
+        val payload = message.getMessagePayload()
+        return if (ImpressionType.ACTION_ONE == impressionType || ImpressionType.ACTION_TWO == impressionType) {
             val index = if (impressionType == ImpressionType.ACTION_ONE) 0 else 1
-            return if (message.getMessagePayload().messageSettings.controlSettings.buttons.isEmpty()) {
+            val buttons = payload.messageSettings.controlSettings.buttons
+            if (buttons.isEmpty()) {
                 null
             } else {
-                message.getMessagePayload().messageSettings.controlSettings.buttons[index].embeddedEvent
+                buttons[index].embeddedEvent
             }
         } else if (ImpressionType.CLICK_CONTENT == impressionType) {
-            return message.getMessagePayload().messageSettings.controlSettings.content?.embeddedEvent
+            payload.messageSettings.controlSettings.content?.embeddedEvent
+        } else {
+            null
         }
-        return null
     }
 
     /**
      * This method creates a local custom event based on argument.
      */
-    @SuppressWarnings("LongMethod", "ReturnCount", "ComplexMethod", "ElseCaseInsteadOfExhaustiveWhen")
+    @SuppressWarnings("ReturnCount")
     private fun createLocalCustomEvent(embeddedEvent: Trigger): Event? {
         val type = embeddedEvent.eventType
         if (EventType.CUSTOM != EventType.getById(type)) {
             return null
         }
-
-        val eventName = embeddedEvent.eventName
-
-        val customEvent = CustomEvent(eventName)
-        val attributes = embeddedEvent.triggerAttributes
-        for (attribute in attributes) {
+        val customEvent = CustomEvent(embeddedEvent.eventName)
+        for (attribute in embeddedEvent.triggerAttributes) {
             val valueType = ValueType.getById(attribute.type) ?: return customEvent
-            when (valueType) {
-                ValueType.STRING -> customEvent.addAttribute(attribute.name, attribute.value)
-                ValueType.INTEGER -> customEvent.addAttribute(attribute.name, attribute.value.toInt())
-                ValueType.DOUBLE -> customEvent.addAttribute(attribute.name, attribute.value.toDouble())
-                ValueType.BOOLEAN -> customEvent.addAttribute(attribute.name, attribute.value.toBoolean())
-                ValueType.TIME_IN_MILLI -> customEvent.addAttribute(attribute.name, Date(attribute.value.toLong()))
-                else -> Unit
-            }
+            handleAttriType(valueType, customEvent, attribute)
         }
         return customEvent
+    }
+
+    private fun handleAttriType(valueType: ValueType, customEvent: CustomEvent, attribute: TriggerAttribute) {
+        when (valueType) {
+            ValueType.STRING -> customEvent.addAttribute(attribute.name, attribute.value)
+            ValueType.INTEGER -> customEvent.addAttribute(attribute.name, attribute.value.toInt())
+            ValueType.DOUBLE -> customEvent.addAttribute(attribute.name, attribute.value.toDouble())
+            ValueType.BOOLEAN -> customEvent.addAttribute(attribute.name, attribute.value.toBoolean())
+            ValueType.TIME_IN_MILLI -> customEvent.addAttribute(attribute.name, Date(attribute.value.toLong()))
+            ValueType.INVALID -> Unit
+        }
     }
 
     companion object {

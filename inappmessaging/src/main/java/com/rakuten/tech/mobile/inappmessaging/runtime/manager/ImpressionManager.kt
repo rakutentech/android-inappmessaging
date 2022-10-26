@@ -76,7 +76,7 @@ internal object ImpressionManager {
 
         val params: MutableMap<String, Any?> = HashMap()
         params[RAT_EVENT_CAMP_ID] = campaignId
-        params[RAT_EVENT_SUBS_ID] = HostAppInfoRepository.instance().getInAppMessagingSubscriptionKey()
+        params[RAT_EVENT_SUBS_ID] = HostAppInfoRepository.instance().getSubscriptionKey()
         params[RAT_EVENT_IMP] = createRatImpressionList(impressionList)
 
         sendEvent(RAT_EVENT_KEY_IMPRESSION, params)

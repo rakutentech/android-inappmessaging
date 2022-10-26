@@ -58,7 +58,6 @@ class InitializerSpec : BaseTest() {
     }
 
     @Test(expected = InAppMessagingException::class)
-    @SuppressWarnings("LongMethod")
     fun `should throw exception with null package name`() {
         val context = Mockito.mock(Context::class.java)
         Settings.Secure.putString(
@@ -66,18 +65,9 @@ class InitializerSpec : BaseTest() {
             Settings.Secure.ANDROID_ID,
             "test_device_id"
         )
-        `when`(context.contentResolver).thenReturn(
-            ApplicationProvider.getApplicationContext<Context>()
-                .contentResolver
-        )
-        `when`(context.packageManager).thenReturn(
-            ApplicationProvider.getApplicationContext<Context>()
-                .packageManager
-        )
-        `when`(context.resources).thenReturn(
-            ApplicationProvider.getApplicationContext<Context>()
-                .resources
-        )
+        `when`(context.contentResolver).thenReturn(ApplicationProvider.getApplicationContext<Context>().contentResolver)
+        `when`(context.packageManager).thenReturn(ApplicationProvider.getApplicationContext<Context>().packageManager)
+        `when`(context.resources).thenReturn(ApplicationProvider.getApplicationContext<Context>().resources)
         Initializer.initializeSdk(context, "test", "")
     }
 
@@ -111,9 +101,9 @@ class InitializerSpec : BaseTest() {
         WorkManagerTestInitHelper.initializeTestWorkManager(context!!)
         InAppMessaging.initialize(context, true)
         InAppMessaging.instance().registerPreference(TestUserInfoProvider())
-        HostAppInfoRepository.instance().getInAppMessagingSubscriptionKey().shouldNotBeNullOrEmpty()
+        HostAppInfoRepository.instance().getSubscriptionKey().shouldNotBeNullOrEmpty()
         HostAppInfoRepository.instance()
-            .getInAppMessagingSubscriptionKey() shouldBeEqualTo AppManifestConfig(context).subscriptionKey()
+            .getSubscriptionKey() shouldBeEqualTo AppManifestConfig(context).subscriptionKey()
         HostAppInfoRepository.instance()
             .getPackageName() shouldBeEqualTo "com.rakuten.tech.mobile.inappmessaging.runtime.test"
         HostAppInfoRepository.instance().getVersion() shouldBeEqualTo "1.0.2"

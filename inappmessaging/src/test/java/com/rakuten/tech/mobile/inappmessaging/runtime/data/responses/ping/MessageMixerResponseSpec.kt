@@ -12,7 +12,6 @@ import java.io.File
 
 @RunWith(ParameterizedRobolectricTestRunner::class)
 @Config(sdk = [Build.VERSION_CODES.O_MR1])
-@SuppressWarnings("LargeClass")
 class MessageMixerResponseSpec(private val testname: String, private val actual: Any?, private val expected: Any?) {
     @Test
     fun `should be correct value after parsing`() {
@@ -160,11 +159,9 @@ class MessageMixerResponseSpec(private val testname: String, private val actual:
             campaignTrigger.triggerAttributes[0].operator
         )
 
-        @JvmStatic
-        @ParameterizedRobolectricTestRunner.Parameters(
-            name = "{0} type test"
-        )
         @SuppressWarnings("LongMethod")
+        @JvmStatic
+        @ParameterizedRobolectricTestRunner.Parameters(name = "{0} type test")
         fun data(): List<Array<out Any?>> {
             return listOf(
                 arrayOf("currentPingMills", response.currentPingMillis, 1583890595467),

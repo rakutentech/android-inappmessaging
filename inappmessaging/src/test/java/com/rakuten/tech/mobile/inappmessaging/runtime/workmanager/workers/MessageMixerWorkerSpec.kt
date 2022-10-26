@@ -46,14 +46,13 @@ import java.net.HttpURLConnection
  */
 @RunWith(RobolectricTestRunner::class)
 @Config(sdk = [Build.VERSION_CODES.O_MR1])
-@SuppressWarnings("LargeClass")
-class MessageMixerWorkerSpec : BaseTest() {
+open class MessageMixerWorkerSpec : BaseTest() {
     @Mock
-    private val mockResponse: Response<MessageMixerResponse>? = null
-    private val context = Mockito.mock(Context::class.java)
-    private val workerParameters = Mockito.mock(WorkerParameters::class.java)
-    private val mockRetry = Mockito.mock(RetryDelayUtil::class.java)
-    private val mockScheduler = Mockito.mock(MessageMixerPingScheduler::class.java)
+    internal val mockResp: Response<MessageMixerResponse>? = null
+    internal val ctx = Mockito.mock(Context::class.java)
+    internal val workParam = Mockito.mock(WorkerParameters::class.java)
+    internal val mockRetry = Mockito.mock(RetryDelayUtil::class.java)
+    internal val mockSched = Mockito.mock(MessageMixerPingScheduler::class.java)
 
     @Before
     override fun setup() {
@@ -72,146 +71,52 @@ class MessageMixerWorkerSpec : BaseTest() {
 
     @Test
     fun `should fail if request fail`() {
-        `when`(mockResponse?.isSuccessful).thenReturn(false)
-        MessageMixerWorker(context, workerParameters!!)
-            .onResponse(mockResponse!!) shouldBeEqualTo ListenableWorker.Result.failure()
+        `when`(mockResp?.isSuccessful).thenReturn(false)
+        MessageMixerWorker(ctx, workParam!!).onResponse(mockResp!!) shouldBeEqualTo ListenableWorker.Result.failure()
     }
 
     @Test
     fun `should return success`() {
-        `when`(mockResponse?.isSuccessful).thenReturn(true)
-        `when`(mockResponse?.body() as Any?).thenReturn(null)
-        MessageMixerWorker(context!!, workerParameters!!)
-            .onResponse(mockResponse!!) shouldBeEqualTo ListenableWorker.Result.success()
+        `when`(mockResp?.isSuccessful).thenReturn(true)
+        `when`(mockResp?.body() as Any?).thenReturn(null)
+        MessageMixerWorker(ctx!!, workParam!!).onResponse(mockResp!!) shouldBeEqualTo ListenableWorker.Result.success()
     }
 
     @Test
     fun `should return retry`() {
-        `when`(mockResponse?.isSuccessful).thenReturn(true)
-        `when`(mockResponse?.body() as Any?).thenReturn(null)
-        MessageMixerWorker(context!!, workerParameters!!)
-            .onResponse(mockResponse!!) shouldBeEqualTo ListenableWorker.Result.success()
+        `when`(mockResp?.isSuccessful).thenReturn(true)
+        `when`(mockResp?.body() as Any?).thenReturn(null)
+        MessageMixerWorker(ctx!!, workParam!!).onResponse(mockResp!!) shouldBeEqualTo ListenableWorker.Result.success()
     }
 
     @Test
     fun `should return success with valid response`() {
-        `when`(mockResponse?.isSuccessful).thenReturn(true)
-        `when`(mockResponse?.body()).thenReturn(MessageMixerResponseSpec.response)
-        MessageMixerWorker(context!!, workerParameters!!)
-            .onResponse(mockResponse!!) shouldBeEqualTo ListenableWorker.Result.success()
-    }
-
-    @Test
-    fun `should use correct backoff delay if server fail less than 3 times`() {
-        setupResponse(HttpURLConnection.HTTP_INTERNAL_ERROR)
-        verifyBackoff()
-    }
-
-    @Test
-    fun `should return failure if server fail more than 3 times`() {
-        setupResponse(HttpURLConnection.HTTP_INTERNAL_ERROR)
-        setupErrorBody()
-        val worker = MessageMixerWorker(
-            context!!, workerParameters!!, EventMessageReconciliationScheduler.instance(),
-            mockScheduler
-        )
-        repeat(3) {
-            worker.onResponse(mockResponse!!) shouldBeEqualTo ListenableWorker.Result.Success()
-        }
-        worker.onResponse(mockResponse!!) shouldBeEqualTo ListenableWorker.Result.failure()
-    }
-
-    @Test
-    fun `should return success but will trigger next config when too many request error`() {
-        setupResponse(RetryDelayUtil.RETRY_ERROR_CODE)
-        setupErrorBody()
-        `when`(mockRetry.getNextDelay(any())).thenReturn(1000)
-
-        MessageMixerWorker(
-            context!!, workerParameters!!, EventMessageReconciliationScheduler.instance(),
-            mockScheduler, mockRetry
-        )
-            .onResponse(mockResponse!!) shouldBeEqualTo ListenableWorker.Result.Success()
-
-        Mockito.verify(mockScheduler).pingMessageMixerService(eq(RetryDelayUtil.INITIAL_BACKOFF_DELAY), anyOrNull())
-        Mockito.verify(mockRetry).getNextDelay(eq(RetryDelayUtil.INITIAL_BACKOFF_DELAY))
-    }
-
-    @Test
-    fun `should use correct backoff delay`() {
-        setupResponse(RetryDelayUtil.RETRY_ERROR_CODE)
-        verifyBackoff()
-    }
-
-    @Test
-    fun `should return failure on bad request`() {
-        setupResponse(HttpURLConnection.HTTP_BAD_REQUEST)
-        setupErrorBody()
-        val worker = MessageMixerWorker(
-            context!!, workerParameters!!, EventMessageReconciliationScheduler.instance(),
-            mockScheduler
-        )
-        worker.onResponse(mockResponse!!) shouldBeEqualTo ListenableWorker.Result.failure()
-    }
-
-    @Test
-    fun `should reset initial delay`() {
-        setupResponse(RetryDelayUtil.RETRY_ERROR_CODE)
-        `when`(mockResponse?.body()).thenReturn(Mockito.mock(MessageMixerResponse::class.java))
-
-        val worker = MessageMixerWorker(
-            context!!, workerParameters!!, EventMessageReconciliationScheduler.instance(),
-            mockScheduler
-        )
-        worker.onResponse(mockResponse!!) shouldBeEqualTo ListenableWorker.Result.Success()
-        Mockito.verify(mockScheduler).pingMessageMixerService(eq(RetryDelayUtil.INITIAL_BACKOFF_DELAY), anyOrNull())
-        MessageMixerPingScheduler.currDelay shouldBeGreaterThan (RetryDelayUtil.INITIAL_BACKOFF_DELAY * 2)
-
-        `when`(mockResponse.isSuccessful).thenReturn(true)
-        `when`(mockResponse.code()).thenReturn(200)
-        worker.onResponse(mockResponse) shouldBeEqualTo ListenableWorker.Result.Success()
-        MessageMixerPingScheduler.currDelay shouldBeEqualTo RetryDelayUtil.INITIAL_BACKOFF_DELAY
+        `when`(mockResp?.isSuccessful).thenReturn(true)
+        `when`(mockResp?.body()).thenReturn(MessageMixerResponseSpec.response)
+        MessageMixerWorker(ctx!!, workParam!!).onResponse(mockResp!!) shouldBeEqualTo ListenableWorker.Result.success()
     }
 
     @Test
     fun `should return success in api call`() {
-        HostAppInfoRepository.instance().addHostInfo(
-            HostAppInfo(
-                "rakuten.com.tech.mobile.test",
-                InAppMessagingTestConstants.DEVICE_ID,
-                InAppMessagingTestConstants.APP_VERSION,
-                "test-key",
-                InAppMessagingTestConstants.LOCALE
-            )
-        )
+        setupHostApp()
         retrieveValidConfig()
-        MessageMixerWorker(context!!, workerParameters!!).doWork() shouldBeEqualTo ListenableWorker.Result.retry()
+        MessageMixerWorker(ctx!!, workParam!!).doWork() shouldBeEqualTo ListenableWorker.Result.retry()
     }
 
     @Test
-    @SuppressWarnings("LongMethod")
     fun `should have valid request payload`() {
-        HostAppInfoRepository.instance().addHostInfo(
-            HostAppInfo(
-                "rakuten.com.tech.mobile.test", InAppMessagingTestConstants.DEVICE_ID,
-                InAppMessagingTestConstants.APP_VERSION, "test-key",
-                InAppMessagingTestConstants.LOCALE
-            )
-        )
+        setupHostApp()
         AccountRepository.instance().userInfoProvider = object : UserInfoProvider {
             override fun provideAccessToken() = ""
             override fun provideUserId() = "user1"
             override fun provideIdTrackingIdentifier() = "tracking1"
         }
         retrieveValidConfig()
-        val worker = MessageMixerWorker(context!!, workerParameters!!)
+        val worker = MessageMixerWorker(ctx!!, workParam!!)
         worker.doWork() shouldBeEqualTo ListenableWorker.Result.retry()
         val buffer = Buffer()
         worker.testResponse!!.request().body()!!.writeTo(buffer)
-        buffer.readUtf8().shouldContainAll(
-            "\"id\":\"tracking1\",\"type\":2",
-            "\"id\":\"user1\",\"type\":3"
-        )
+        buffer.readUtf8().shouldContainAll("\"id\":\"tracking1\",\"type\":2", "\"id\":\"user1\",\"type\":3")
     }
 
     @Test
@@ -230,45 +135,113 @@ class MessageMixerWorkerSpec : BaseTest() {
     }
 
     private fun setupWorker(isTiramisu: Boolean): ArrayList<Int> {
-        val worker = MessageMixerWorker(context!!, workerParameters!!)
+        val worker = MessageMixerWorker(ctx!!, workParam!!)
         val mockChecker = Mockito.mock(BuildVersionChecker::class.java)
         `when`(mockChecker.isAndroidTAndAbove()).thenReturn(isTiramisu)
         return worker.getSupportedCampaign(mockChecker)
     }
 
-    private fun verifyBackoff() {
-        val worker = MessageMixerWorker(
-            context!!, workerParameters!!, EventMessageReconciliationScheduler.instance(),
-            mockScheduler
-        )
-        worker.onResponse(mockResponse!!) shouldBeEqualTo ListenableWorker.Result.Success()
-        Mockito.verify(mockScheduler).pingMessageMixerService(eq(RetryDelayUtil.INITIAL_BACKOFF_DELAY), anyOrNull())
-        MessageMixerPingScheduler.currDelay shouldBeGreaterThan (RetryDelayUtil.INITIAL_BACKOFF_DELAY * 2)
-
-        worker.onResponse(mockResponse) shouldBeEqualTo ListenableWorker.Result.Success()
-        Mockito.verify(mockScheduler).pingMessageMixerService(
-            AdditionalMatchers.gt(RetryDelayUtil.INITIAL_BACKOFF_DELAY * 2), anyOrNull()
-        )
-        MessageMixerPingScheduler.currDelay shouldBeGreaterThan (RetryDelayUtil.INITIAL_BACKOFF_DELAY * 4)
-    }
-
     private fun retrieveValidConfig() {
         val mockMessageScheduler = Mockito.mock(MessageMixerPingScheduler::class.java)
         val worker = ConfigWorker(
-            context, workerParameters, HostAppInfoRepository.instance(),
+            ctx, workParam, HostAppInfoRepository.instance(),
             ConfigResponseRepository.instance(), mockMessageScheduler
         )
         worker.doWork()
     }
 
+    private fun setupHostApp() {
+        HostAppInfoRepository.instance().addHostInfo(
+            HostAppInfo(
+                "rakuten.com.tech.mobile.test", InAppMessagingTestConstants.DEVICE_ID,
+                InAppMessagingTestConstants.APP_VERSION, "test-key", InAppMessagingTestConstants.LOCALE
+            )
+        )
+    }
+}
+
+class MessageMixerWorkerFailSpec : MessageMixerWorkerSpec() {
+    @Test
+    fun `should use correct backoff delay if server fail less than 3 times`() {
+        setupResponse(HttpURLConnection.HTTP_INTERNAL_ERROR)
+        verifyBackoff()
+    }
+
+    @Test
+    fun `should return failure if server fail more than 3 times`() {
+        setupResponse(HttpURLConnection.HTTP_INTERNAL_ERROR)
+        setupErrorBody()
+        val worker = MessageMixerWorker(ctx!!, workParam!!, EventMessageReconciliationScheduler.instance(), mockSched)
+        repeat(3) {
+            worker.onResponse(mockResp!!) shouldBeEqualTo ListenableWorker.Result.Success()
+        }
+        worker.onResponse(mockResp!!) shouldBeEqualTo ListenableWorker.Result.failure()
+    }
+
+    @Test
+    fun `should return success but will trigger next config when too many request error`() {
+        setupResponse(RetryDelayUtil.RETRY_ERROR_CODE)
+        setupErrorBody()
+        `when`(mockRetry.getNextDelay(any())).thenReturn(1000)
+
+        MessageMixerWorker(ctx!!, workParam!!, EventMessageReconciliationScheduler.instance(), mockSched, mockRetry)
+            .onResponse(mockResp!!) shouldBeEqualTo ListenableWorker.Result.Success()
+
+        Mockito.verify(mockSched).pingMessageMixerService(eq(RetryDelayUtil.INITIAL_BACKOFF_DELAY), anyOrNull())
+        Mockito.verify(mockRetry).getNextDelay(eq(RetryDelayUtil.INITIAL_BACKOFF_DELAY))
+    }
+
+    @Test
+    fun `should use correct backoff delay`() {
+        setupResponse(RetryDelayUtil.RETRY_ERROR_CODE)
+        verifyBackoff()
+    }
+
+    @Test
+    fun `should return failure on bad request`() {
+        setupResponse(HttpURLConnection.HTTP_BAD_REQUEST)
+        setupErrorBody()
+        val worker = MessageMixerWorker(ctx!!, workParam!!, EventMessageReconciliationScheduler.instance(), mockSched)
+        worker.onResponse(mockResp!!) shouldBeEqualTo ListenableWorker.Result.failure()
+    }
+
+    @Test
+    fun `should reset initial delay`() {
+        setupResponse(RetryDelayUtil.RETRY_ERROR_CODE)
+        `when`(mockResp?.body()).thenReturn(Mockito.mock(MessageMixerResponse::class.java))
+
+        val worker = MessageMixerWorker(ctx!!, workParam!!, EventMessageReconciliationScheduler.instance(), mockSched)
+        worker.onResponse(mockResp!!) shouldBeEqualTo ListenableWorker.Result.Success()
+        Mockito.verify(mockSched).pingMessageMixerService(eq(RetryDelayUtil.INITIAL_BACKOFF_DELAY), anyOrNull())
+        MessageMixerPingScheduler.currDelay shouldBeGreaterThan (RetryDelayUtil.INITIAL_BACKOFF_DELAY * 2)
+
+        `when`(mockResp.isSuccessful).thenReturn(true)
+        `when`(mockResp.code()).thenReturn(200)
+        worker.onResponse(mockResp) shouldBeEqualTo ListenableWorker.Result.Success()
+        MessageMixerPingScheduler.currDelay shouldBeEqualTo RetryDelayUtil.INITIAL_BACKOFF_DELAY
+    }
+
+    private fun verifyBackoff() {
+        val worker = MessageMixerWorker(ctx!!, workParam!!, EventMessageReconciliationScheduler.instance(), mockSched)
+        worker.onResponse(mockResp!!) shouldBeEqualTo ListenableWorker.Result.Success()
+        Mockito.verify(mockSched).pingMessageMixerService(eq(RetryDelayUtil.INITIAL_BACKOFF_DELAY), anyOrNull())
+        MessageMixerPingScheduler.currDelay shouldBeGreaterThan (RetryDelayUtil.INITIAL_BACKOFF_DELAY * 2)
+
+        worker.onResponse(mockResp) shouldBeEqualTo ListenableWorker.Result.Success()
+        Mockito.verify(mockSched).pingMessageMixerService(
+            AdditionalMatchers.gt(RetryDelayUtil.INITIAL_BACKOFF_DELAY * 2), anyOrNull()
+        )
+        MessageMixerPingScheduler.currDelay shouldBeGreaterThan (RetryDelayUtil.INITIAL_BACKOFF_DELAY * 4)
+    }
+
     private fun setupResponse(code: Int) {
-        `when`(mockResponse?.isSuccessful).thenReturn(false)
-        `when`(mockResponse?.code()).thenReturn(code)
+        `when`(mockResp?.isSuccessful).thenReturn(false)
+        `when`(mockResp?.code()).thenReturn(code)
     }
 
     private fun setupErrorBody() {
         val errorBody = Mockito.mock(ResponseBody::class.java)
-        `when`(mockResponse?.errorBody()).thenReturn(errorBody)
+        `when`(mockResp?.errorBody()).thenReturn(errorBody)
         `when`(errorBody.string()).thenReturn("error")
     }
 }

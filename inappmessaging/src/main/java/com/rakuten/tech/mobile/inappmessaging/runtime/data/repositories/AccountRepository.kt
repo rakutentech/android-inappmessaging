@@ -113,7 +113,7 @@ internal abstract class AccountRepository {
             }
         }
 
-        @SuppressWarnings("MagicNumber", "SwallowedException", "TooGenericExceptionCaught")
+        @SuppressWarnings("TooGenericExceptionCaught")
         private fun hash(input: String, algo: String?): String {
             return try {
                 // MD5 hashing
@@ -121,11 +121,18 @@ internal abstract class AccountRepository {
                     .getInstance(algo ?: "MD5")
                     .digest(input.toByteArray())
 
-                BigInteger(1, bytes).toString(16).padStart(32, '0')
+                BigInteger(1, bytes).toString(RADIX).padStart(PAD_LENGTH, '0')
             } catch (ex: Exception) {
                 // should never happen since "MD5" is a supported algorithm
+                InAppLogger(TAG).debug(ex.message)
                 input
             }
+        }
+
+        companion object {
+            private const val TAG = "AccountRepository"
+            private const val RADIX = 16
+            private const val PAD_LENGTH = 32
         }
     }
 }

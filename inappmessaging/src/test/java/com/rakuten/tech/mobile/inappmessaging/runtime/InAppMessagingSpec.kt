@@ -33,15 +33,14 @@ import org.robolectric.RobolectricTestRunner
  * Test class for InAppMessaging.
  */
 @RunWith(RobolectricTestRunner::class)
-@SuppressWarnings("LargeClass")
 open class InAppMessagingSpec : BaseTest() {
-    private val activity = Mockito.mock(Activity::class.java)
-    private val configResponseData = Mockito.mock(ConfigResponseData::class.java)
-    private val displayManager = Mockito.mock(DisplayManager::class.java)
+    internal val activity = Mockito.mock(Activity::class.java)
+    internal val configResponseData = Mockito.mock(ConfigResponseData::class.java)
+    internal val displayManager = Mockito.mock(DisplayManager::class.java)
     internal val eventsManager = Mockito.mock(EventsManager::class.java)
-    private val viewGroup = Mockito.mock(ViewGroup::class.java)
-    private val parentViewGroup = Mockito.mock(ViewGroup::class.java)
-    private val mockContext = Mockito.mock(Context::class.java)
+    internal val viewGroup = Mockito.mock(ViewGroup::class.java)
+    internal val parentViewGroup = Mockito.mock(ViewGroup::class.java)
+    internal val mockContext = Mockito.mock(Context::class.java)
 
     private val function: (ex: Exception) -> Unit = {}
     internal val mockCallback = Mockito.mock(function.javaClass)
@@ -66,45 +65,6 @@ open class InAppMessagingSpec : BaseTest() {
     }
 
     @Test
-    fun `should unregister activity not crash when no activity is registered for uninitialized instance`() {
-        InAppMessaging.setNotConfiguredInstance()
-        InAppMessaging.instance().unregisterMessageDisplayActivity()
-    }
-
-    @Test
-    fun `should not display message if config is true for uninitialized instance`() {
-        InAppMessaging.setNotConfiguredInstance()
-        `when`(configResponseData.rollOutPercentage).thenReturn(100)
-        ConfigResponseRepository.instance().addConfigResponse(configResponseData)
-
-        InAppMessaging.instance().registerMessageDisplayActivity(activity)
-        Mockito.verify(displayManager, never()).displayMessage()
-    }
-
-    @Test
-    fun `should not crash when using uninitialized instance`() {
-        InAppMessaging.setNotConfiguredInstance()
-        InAppMessaging.instance().registerPreference(TestUserInfoProvider())
-        InAppMessaging.instance().logEvent(AppStartEvent())
-        InAppMessaging.instance().closeMessage()
-        InAppMessaging.instance().isLocalCachingEnabled().shouldBeFalse()
-        InAppMessaging.instance().flushEventList()
-        InAppMessaging.instance().onPushPrimer.shouldBeNull()
-    }
-
-    @Test
-    fun `should return null activity using uninitialized instance`() {
-        InAppMessaging.setNotConfiguredInstance()
-        InAppMessaging.instance().getRegisteredActivity().shouldBeNull()
-    }
-
-    @Test
-    fun `should return null context using uninitialized instance`() {
-        InAppMessaging.setNotConfiguredInstance()
-        InAppMessaging.instance().getHostAppContext() shouldBeEqualTo null
-    }
-
-    @Test
     fun `should display message using initialized instance`() {
         val inApp = initializeMockInstance(100)
         inApp.registerMessageDisplayActivity(activity)
@@ -121,8 +81,8 @@ open class InAppMessagingSpec : BaseTest() {
         InAppMessaging.instance().getRegisteredActivity().shouldBeNull()
     }
 
-    @Test
     @SuppressWarnings("SwallowedException")
+    @Test
     fun `should not crash logging event for initialized instance`() {
         initializeInstance()
 
@@ -133,8 +93,8 @@ open class InAppMessagingSpec : BaseTest() {
         }
     }
 
-    @Test
     @SuppressWarnings("SwallowedException")
+    @Test
     fun `should not crash close message for initialized instance`() {
         initializeInstance()
 
@@ -144,78 +104,6 @@ open class InAppMessagingSpec : BaseTest() {
         } catch (e: Exception) {
             Assert.fail(EXCEPTION_MSG)
         }
-    }
-
-    @Test
-    fun `should remove message from host activity and not clear queue`() {
-        val message = ValidTestMessage("1")
-        setupDisplayedView(message)
-        initializeInstance()
-
-        InAppMessaging.instance().registerMessageDisplayActivity(activity)
-        (InAppMessaging.instance() as InApp).removeMessage(false)
-        Mockito.verify(parentViewGroup).removeView(viewGroup)
-        CampaignRepository.instance().messages.values.forEach {
-            // Impressions left should not be reduced
-            it.impressionsLeft shouldBeEqualTo it.getMaxImpressions()
-        }
-    }
-
-    @Test
-    fun `should remove message from host activity and clear queue`() {
-        val message = ValidTestMessage("1")
-        setupDisplayedView(message)
-        initializeInstance()
-
-        InAppMessaging.instance().registerMessageDisplayActivity(activity)
-        (InAppMessaging.instance() as InApp).removeMessage(true)
-        Mockito.verify(parentViewGroup).removeView(viewGroup)
-        CampaignRepository.instance().messages.values.forEach {
-            // Impressions left should not be reduced
-            it.impressionsLeft shouldBeEqualTo it.getMaxImpressions()
-        }
-    }
-
-    @Test
-    fun `should call display manager when removing campaign but not clear queue`() {
-        val message = ValidTestMessage("1")
-        setupDisplayedView(message)
-        val instance = initializeMockInstance(100)
-
-        `when`(displayManager.removeMessage(anyOrNull())).thenReturn("1")
-
-        (instance as InApp).removeMessage(false)
-        CampaignRepository.instance().messages.values.forEach {
-            // Impressions left should not be reduced
-            it.impressionsLeft shouldBeEqualTo it.getMaxImpressions()
-        }
-        Mockito.verify(displayManager).displayMessage()
-    }
-
-    @Test
-    fun `should remove message but not clear repo when activity is unregistered`() {
-        val message = ValidTestMessage("1")
-        setupDisplayedView(message)
-        initializeInstance()
-
-        InAppMessaging.instance().registerMessageDisplayActivity(activity)
-        InAppMessaging.instance().unregisterMessageDisplayActivity()
-        Mockito.verify(parentViewGroup).removeView(viewGroup)
-        CampaignRepository.instance().messages.shouldHaveSize(2)
-    }
-
-    @Test
-    fun `should not crash when unregister activity without displayed message`() {
-        val message = ValidTestMessage("1")
-        setupDisplayedView(message)
-        initializeInstance()
-
-        `when`(activity.findViewById<ViewGroup>(R.id.in_app_message_base_view)).thenReturn(null)
-
-        InAppMessaging.instance().registerMessageDisplayActivity(activity)
-        InAppMessaging.instance().unregisterMessageDisplayActivity()
-        Mockito.verify(parentViewGroup, never()).removeView(viewGroup)
-        CampaignRepository.instance().messages.shouldHaveSize(2)
     }
 
     @Test
@@ -278,75 +166,30 @@ open class InAppMessagingSpec : BaseTest() {
     }
 
     @Test
-    fun `should return true when initialization have no issues`() {
-        InAppMessaging.configure(ApplicationProvider.getApplicationContext()).shouldBeTrue()
-    }
-
-    @Test
-    fun `should return true when initialization have no issues with callback`() {
-        InAppMessaging.errorCallback = {
-            Assert.fail()
-        }
-        InAppMessaging.configure(ApplicationProvider.getApplicationContext()).shouldBeTrue()
-        InAppMessaging.errorCallback = null
-    }
-
-    @Test
-    fun `should return false when initialization failed`() {
-        InAppMessaging.configure(mockContext).shouldBeFalse()
-    }
-
-    @Test
-    fun `should return false when initialization failed with callback`() {
-        InAppMessaging.errorCallback = mockCallback
-        InAppMessaging.configure(mockContext).shouldBeFalse()
-
-        Mockito.verify(mockCallback).invoke(any())
-        InAppMessaging.errorCallback = null
-    }
-
-    @SuppressWarnings("LongMethod")
-    @Test
     fun `should call onSessionUpdate on user change`() {
-        WorkManagerTestInitHelper.initializeTestWorkManager(ApplicationProvider.getApplicationContext())
-        Settings.Secure.putString(
-            ApplicationProvider.getApplicationContext<Context>().contentResolver,
-            Settings.Secure.ANDROID_ID, "test_device_id"
-        )
+        val ctx = ApplicationProvider.getApplicationContext<Context>()
+        WorkManagerTestInitHelper.initializeTestWorkManager(ctx)
+        Settings.Secure.putString(ctx.contentResolver, Settings.Secure.ANDROID_ID, "test_device_id")
 
-        val accountRepoMock = Mockito.mock(AccountRepository::class.java)
-        val sessionManagerMock = Mockito.mock(SessionManager::class.java)
-        val instance = initializeMockInstance(
-            100, accountRepo = accountRepoMock,
-            sessionManager = sessionManagerMock
-        )
+        val accMock = Mockito.mock(AccountRepository::class.java)
+        val sessMock = Mockito.mock(SessionManager::class.java)
+        val instance = initializeMockInstance(100, accountRepo = accMock, sessionManager = sessMock)
         val infoProvider = TestUserInfoProvider() // test_user_id
         instance.registerPreference(infoProvider)
 
         // Simulate change user
         infoProvider.userId = "test_user_id_2"
-        `when`(accountRepoMock.updateUserInfo()).thenReturn(true)
+        `when`(accMock.updateUserInfo()).thenReturn(true)
         (instance as InApp).userDidChange()
 
         // Should call onSessionUpdate
-        Mockito.verify(sessionManagerMock).onSessionUpdate()
+        verify(sessMock).onSessionUpdate()
     }
 
-    private fun setupDisplayedView(message: Message) {
-        val message2 = ValidTestMessage()
-        CampaignRepository.instance().syncWith(listOf(message, message2), 0)
-        `when`(activity.findViewById<ViewGroup>(R.id.in_app_message_base_view)).thenReturn(viewGroup)
-        `when`(viewGroup.parent).thenReturn(parentViewGroup)
-        `when`(viewGroup.tag).thenReturn("1")
-    }
-
-    private fun initializeInstance(shouldEnableCaching: Boolean = false) {
-        WorkManagerTestInitHelper.initializeTestWorkManager(ApplicationProvider.getApplicationContext())
-        Settings.Secure.putString(
-            ApplicationProvider.getApplicationContext<Context>().contentResolver,
-            Settings.Secure.ANDROID_ID,
-            "test_device_id"
-        )
+    internal fun initializeInstance(shouldEnableCaching: Boolean = false) {
+        val ctx = ApplicationProvider.getApplicationContext<Context>()
+        WorkManagerTestInitHelper.initializeTestWorkManager(ctx)
+        Settings.Secure.putString(ctx.contentResolver, Settings.Secure.ANDROID_ID, "test_device_id")
         `when`(configResponseData.rollOutPercentage).thenReturn(100)
         ConfigResponseRepository.instance().addConfigResponse(configResponseData)
         InAppMessaging.initialize(ApplicationProvider.getApplicationContext(), shouldEnableCaching)
@@ -380,9 +223,39 @@ class InAppMessagingConfigureSpec : InAppMessagingSpec() {
     private val context: Context = ApplicationProvider.getApplicationContext()
 
     @Test
+    fun `should return true when initialization have no issues`() {
+        InAppMessaging.configure(ApplicationProvider.getApplicationContext()).shouldBeTrue()
+    }
+
+    @Test
+    fun `should return true when initialization have no issues with callback`() {
+        InAppMessaging.errorCallback = {
+            Assert.fail()
+        }
+        val ctx = ApplicationProvider.getApplicationContext<Context>()
+        WorkManagerTestInitHelper.initializeTestWorkManager(ctx)
+        InAppMessaging.configure(ctx).shouldBeTrue()
+        InAppMessaging.errorCallback = null
+    }
+
+    @Test
+    fun `should return false when initialization failed`() {
+        InAppMessaging.configure(mockContext).shouldBeFalse()
+    }
+
+    @Test
+    fun `should return false when initialization failed with callback`() {
+        InAppMessaging.errorCallback = mockCallback
+        InAppMessaging.configure(mockContext).shouldBeFalse()
+
+        Mockito.verify(mockCallback).invoke(any())
+        InAppMessaging.errorCallback = null
+    }
+
+    @Test
     fun `should use subscription key from AndroidManifest by default`() {
         InAppMessaging.configure(context)
-        HostAppInfoRepository.instance().getInAppMessagingSubscriptionKey() shouldBeEqualTo
+        HostAppInfoRepository.instance().getSubscriptionKey() shouldBeEqualTo
             InApp.AppManifestConfig(context).subscriptionKey()
     }
 
@@ -395,7 +268,7 @@ class InAppMessagingConfigureSpec : InAppMessagingSpec() {
     @Test
     fun `should use subscription key from AndroidManifest when configured to null`() {
         InAppMessaging.configure(context, subscriptionKey = null)
-        HostAppInfoRepository.instance().getInAppMessagingSubscriptionKey() shouldBeEqualTo
+        HostAppInfoRepository.instance().getSubscriptionKey() shouldBeEqualTo
             InApp.AppManifestConfig(context).subscriptionKey()
     }
 
@@ -408,7 +281,7 @@ class InAppMessagingConfigureSpec : InAppMessagingSpec() {
     @Test
     fun `should use subscription key from AndroidManifest when configured to empty after trim`() {
         InAppMessaging.configure(context, subscriptionKey = "  ")
-        HostAppInfoRepository.instance().getInAppMessagingSubscriptionKey() shouldBeEqualTo
+        HostAppInfoRepository.instance().getSubscriptionKey() shouldBeEqualTo
             InApp.AppManifestConfig(context).subscriptionKey()
     }
 
@@ -421,12 +294,12 @@ class InAppMessagingConfigureSpec : InAppMessagingSpec() {
     @Test
     fun `should use the updated subscription key when re-configured`() {
         InAppMessaging.configure(context)
-        HostAppInfoRepository.instance().getInAppMessagingSubscriptionKey() shouldBeEqualTo
+        HostAppInfoRepository.instance().getSubscriptionKey() shouldBeEqualTo
             InApp.AppManifestConfig(context).subscriptionKey()
 
         val newSubsKey = "abcd-efgh-ijkl"
         InAppMessaging.configure(context, subscriptionKey = newSubsKey)
-        HostAppInfoRepository.instance().getInAppMessagingSubscriptionKey() shouldBeEqualTo newSubsKey
+        HostAppInfoRepository.instance().getSubscriptionKey() shouldBeEqualTo newSubsKey
     }
 
     @Test
@@ -443,7 +316,7 @@ class InAppMessagingConfigureSpec : InAppMessagingSpec() {
     fun `should use trimmed subscription key`() {
         val newSubsKey = "    abcd-efgh-ijkl        "
         InAppMessaging.configure(context, subscriptionKey = newSubsKey)
-        HostAppInfoRepository.instance().getInAppMessagingSubscriptionKey() shouldBeEqualTo newSubsKey.trim()
+        HostAppInfoRepository.instance().getSubscriptionKey() shouldBeEqualTo newSubsKey.trim()
     }
 
     @Test
@@ -541,5 +414,128 @@ class InAppMessagingExceptionSpec : InAppMessagingSpec() {
     @Test
     fun `should not crash when save temp data failed due to forced exception`() {
         instance.flushEventList()
+    }
+}
+
+class InAppMessagingUnInitSpec : InAppMessagingSpec() {
+    @Test
+    fun `should unregister activity not crash when no activity is registered for uninitialized instance`() {
+        InAppMessaging.setNotConfiguredInstance()
+        InAppMessaging.instance().unregisterMessageDisplayActivity()
+    }
+
+    @Test
+    fun `should not display message if config is true for uninitialized instance`() {
+        InAppMessaging.setNotConfiguredInstance()
+        `when`(configResponseData.rollOutPercentage).thenReturn(100)
+        ConfigResponseRepository.instance().addConfigResponse(configResponseData)
+
+        InAppMessaging.instance().registerMessageDisplayActivity(activity)
+        Mockito.verify(displayManager, never()).displayMessage()
+    }
+
+    @Test
+    fun `should not crash when using uninitialized instance`() {
+        InAppMessaging.setNotConfiguredInstance()
+        InAppMessaging.instance().registerPreference(TestUserInfoProvider())
+        InAppMessaging.instance().logEvent(AppStartEvent())
+        InAppMessaging.instance().closeMessage()
+        InAppMessaging.instance().isLocalCachingEnabled().shouldBeFalse()
+        InAppMessaging.instance().flushEventList()
+        InAppMessaging.instance().onPushPrimer.shouldBeNull()
+    }
+
+    @Test
+    fun `should return null activity using uninitialized instance`() {
+        InAppMessaging.setNotConfiguredInstance()
+        InAppMessaging.instance().getRegisteredActivity().shouldBeNull()
+    }
+
+    @Test
+    fun `should return null context using uninitialized instance`() {
+        InAppMessaging.setNotConfiguredInstance()
+        InAppMessaging.instance().getHostAppContext() shouldBeEqualTo null
+    }
+}
+
+class InAppMessagingRemoveSpec : InAppMessagingSpec() {
+    @Test
+    fun `should remove message but not clear repo when activity is unregistered`() {
+        val message = ValidTestMessage("1")
+        setupDisplayedView(message)
+        initializeInstance()
+
+        InAppMessaging.instance().registerMessageDisplayActivity(activity)
+        InAppMessaging.instance().unregisterMessageDisplayActivity()
+        Mockito.verify(parentViewGroup).removeView(viewGroup)
+        CampaignRepository.instance().messages.shouldHaveSize(2)
+    }
+
+    @Test
+    fun `should not crash when unregister activity without displayed message`() {
+        val message = ValidTestMessage("1")
+        setupDisplayedView(message)
+        initializeInstance()
+
+        `when`(activity.findViewById<ViewGroup>(R.id.in_app_message_base_view)).thenReturn(null)
+
+        InAppMessaging.instance().registerMessageDisplayActivity(activity)
+        InAppMessaging.instance().unregisterMessageDisplayActivity()
+        Mockito.verify(parentViewGroup, never()).removeView(viewGroup)
+        CampaignRepository.instance().messages.shouldHaveSize(2)
+    }
+
+    @Test
+    fun `should remove message from host activity and not clear queue`() {
+        val message = ValidTestMessage("1")
+        setupDisplayedView(message)
+        initializeInstance()
+
+        InAppMessaging.instance().registerMessageDisplayActivity(activity)
+        (InAppMessaging.instance() as InApp).removeMessage(false)
+        verifyMaxImpression()
+    }
+
+    @Test
+    fun `should remove message from host activity and clear queue`() {
+        val message = ValidTestMessage("1")
+        setupDisplayedView(message)
+        initializeInstance()
+
+        InAppMessaging.instance().registerMessageDisplayActivity(activity)
+        (InAppMessaging.instance() as InApp).removeMessage(true)
+        verifyMaxImpression()
+    }
+
+    @Test
+    fun `should call display manager when removing campaign but not clear queue`() {
+        val message = ValidTestMessage("1")
+        setupDisplayedView(message)
+        val instance = initializeMockInstance(100)
+
+        `when`(displayManager.removeMessage(anyOrNull())).thenReturn("1")
+
+        (instance as InApp).removeMessage(false)
+        CampaignRepository.instance().messages.values.forEach {
+            // Impressions left should not be reduced
+            it.impressionsLeft shouldBeEqualTo it.getMaxImpressions()
+        }
+        Mockito.verify(displayManager).displayMessage()
+    }
+
+    private fun setupDisplayedView(message: Message) {
+        val message2 = ValidTestMessage()
+        CampaignRepository.instance().syncWith(listOf(message, message2), 0)
+        `when`(activity.findViewById<ViewGroup>(R.id.in_app_message_base_view)).thenReturn(viewGroup)
+        `when`(viewGroup.parent).thenReturn(parentViewGroup)
+        `when`(viewGroup.tag).thenReturn("1")
+    }
+
+    private fun verifyMaxImpression() {
+        Mockito.verify(parentViewGroup).removeView(viewGroup)
+        CampaignRepository.instance().messages.values.forEach {
+            // Impressions left should not be reduced
+            it.impressionsLeft shouldBeEqualTo it.getMaxImpressions()
+        }
     }
 }

@@ -50,7 +50,7 @@ internal object Initializer {
     /**
      * This method gets device's locale based on API level.
      */
-    @SuppressWarnings("DEPRECATION", "kotlin:S1874")
+    @SuppressWarnings("Deprecation", "kotlin:S1874")
     @TargetApi(Build.VERSION_CODES.N)
     private fun getLocale(context: Context): Locale? =
         if (BuildVersionChecker.instance().isNougatAndAbove()) {
@@ -86,7 +86,6 @@ internal object Initializer {
     private fun getHostAppPackageName(context: Context): String =
         if (context.packageName != null) context.packageName else ""
 
-    @SuppressWarnings("LongParameterList")
     @Throws(InAppMessagingException::class)
     fun initializeSdk(
         context: Context,

@@ -14,27 +14,46 @@ import org.junit.Test
 import org.mockito.Mockito
 import org.mockito.Mockito.`when`
 
-@SuppressWarnings("LargeClass")
-class EventMatchingUtilSpec : BaseTest() {
+open class EventMatchingUtilSpec : BaseTest() {
 
     // Mocks
-    private val mockCampaignRepo = Mockito.mock(CampaignRepository::class.java)
-    private val mockCampaign = Mockito.mock(Message::class.java)
-    private val mockPersistentOnlyCampaign = Mockito.mock(Message::class.java)
-    private val mockAppStartEv = AppStartEvent()
-    private val mockLoginEv = LoginSuccessfulEvent()
-    private val mockPurchaseEv = PurchaseSuccessfulEvent()
-    private val mockCampaignMap = linkedMapOf("1" to mockCampaign)
+    internal val mockCampaignRepo = Mockito.mock(CampaignRepository::class.java)
+    internal val mockCampaign = Mockito.mock(Message::class.java)
+    internal val mockPersistentOnlyCampaign = Mockito.mock(Message::class.java)
+    internal val mockAppStartEv = AppStartEvent()
+    internal val mockLoginEv = LoginSuccessfulEvent()
+    internal val mockPurchaseEv = PurchaseSuccessfulEvent()
+    internal val mockCampaignMap = linkedMapOf("1" to mockCampaign)
 
     // In Test
-    private val eventMatchingUtil = EventMatchingUtil.EventMatchingUtilImpl(mockCampaignRepo)
+    internal val eventMatchingUtil = EventMatchingUtil.EventMatchingUtilImpl(mockCampaignRepo)
 
     init {
         setupTestCampaigns()
     }
 
-    // region removeSetOfMatchedEvents
+    private fun setupTestCampaigns() {
+        `when`(mockCampaign.getCampaignId()).thenReturn("test")
+        `when`(mockCampaign.getTriggers()).thenReturn(
+            listOf(
+                Trigger(0, EventType.APP_START.typeId, "appStartTest", mutableListOf()),
+                Trigger(0, EventType.LOGIN_SUCCESSFUL.typeId, "loginSuccessfulTest", mutableListOf())
+            )
+        )
 
+        `when`(mockPersistentOnlyCampaign.getCampaignId()).thenReturn("test")
+        `when`(mockPersistentOnlyCampaign.getMaxImpressions()).thenReturn(2)
+        `when`(mockPersistentOnlyCampaign.getTriggers()).thenReturn(
+            listOf(
+                Trigger(
+                    0, EventType.APP_START.typeId, "appStartTest", mutableListOf()
+                )
+            )
+        )
+    }
+}
+
+class EventMatchingUtilSetSpec : EventMatchingUtilSpec() {
     @Test
     fun `should return false if events for a given campaign weren't found`() {
         eventMatchingUtil.removeSetOfMatchedEvents(setOf(mockAppStartEv), mockCampaign).shouldBeFalse()
@@ -133,11 +152,9 @@ class EventMatchingUtilSpec : BaseTest() {
         eventMatchingUtil.removeSetOfMatchedEvents(setOf(AppStartEvent()), mockPersistentOnlyCampaign)
             .shouldBeFalse()
     }
+}
 
-    // endregion
-
-    // region matchedEvents
-
+class EventMatchingUtilEventsSpec : EventMatchingUtilSpec() {
     @Test
     fun `should properly match persistent events`() {
         `when`(mockCampaignRepo.messages).thenReturn(mockCampaignMap)
@@ -153,11 +170,9 @@ class EventMatchingUtilSpec : BaseTest() {
 
         eventMatchingUtil.matchedEvents(mockCampaign).shouldContain(mockLoginEv)
     }
+}
 
-    // endregion
-
-    // region containsAllMatchedEvents
-
+class EventMatchingUtilContainsSpec : EventMatchingUtilSpec() {
     @Test
     fun `should return true if all required events were stored`() {
         `when`(mockCampaignRepo.messages).thenReturn(mockCampaignMap)
@@ -199,11 +214,9 @@ class EventMatchingUtilSpec : BaseTest() {
         )
         eventMatchingUtil.containsAllMatchedEvents(campaign).shouldBeFalse()
     }
+}
 
-    // endregion
-
-    // region clearNonPersistentEvents
-
+class EventMatchingUtilClearSpec : EventMatchingUtilSpec() {
     @Test
     fun `should clear all matched non-persistent events`() {
         `when`(mockCampaignRepo.messages).thenReturn(mockCampaignMap)
@@ -222,27 +235,5 @@ class EventMatchingUtilSpec : BaseTest() {
 
         eventMatchingUtil.clearNonPersistentEvents()
         eventMatchingUtil.matchedEvents(mockCampaign).shouldNotBeEmpty()
-    }
-
-    // endregion
-
-    private fun setupTestCampaigns() {
-        `when`(mockCampaign.getCampaignId()).thenReturn("test")
-        `when`(mockCampaign.getTriggers()).thenReturn(
-            listOf(
-                Trigger(0, EventType.APP_START.typeId, "appStartTest", mutableListOf()),
-                Trigger(0, EventType.LOGIN_SUCCESSFUL.typeId, "loginSuccessfulTest", mutableListOf())
-            )
-        )
-
-        `when`(mockPersistentOnlyCampaign.getCampaignId()).thenReturn("test")
-        `when`(mockPersistentOnlyCampaign.getMaxImpressions()).thenReturn(2)
-        `when`(mockPersistentOnlyCampaign.getTriggers()).thenReturn(
-            listOf(
-                Trigger(
-                    0, EventType.APP_START.typeId, "appStartTest", mutableListOf()
-                )
-            )
-        )
     }
 }

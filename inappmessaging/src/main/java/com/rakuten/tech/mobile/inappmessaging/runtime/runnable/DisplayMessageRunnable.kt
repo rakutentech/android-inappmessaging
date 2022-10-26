@@ -30,7 +30,6 @@ internal class DisplayMessageRunnable(
      * which will display message with correct data.
      */
     @UiThread
-    @SuppressWarnings("LongMethod", "ElseCaseInsteadOfExhaustiveWhen")
     override fun run() {
         // If there's already a message found, don't display another message.
         if (hostActivity.findViewById<View?>(R.id.in_app_message_base_view) != null) {
@@ -40,50 +39,47 @@ internal class DisplayMessageRunnable(
         val messageType = InAppMessageType.getById(message.getType())
         if (messageType != null) {
             when (messageType) {
-                InAppMessageType.MODAL -> {
-                    val modalView = hostActivity
-                        .layoutInflater
-                        .inflate(R.layout.in_app_message_modal, null) as InAppMessageModalView
-                    modalView.populateViewData(message)
-                    hostActivity.addContentView(modalView, hostActivity.window.attributes)
-                    ImpressionManager.sendImpressionEvent(
-                        message.getCampaignId(),
-                        listOf(Impression(ImpressionType.IMPRESSION, Date().time)),
-                        impressionTypeOnly = true
-                    )
-                }
-                InAppMessageType.FULL -> {
-                    val fullScreenView = hostActivity
-                        .layoutInflater
-                        .inflate(
-                            R.layout.in_app_message_full_screen,
-                            null
-                        ) as InAppMessageFullScreenView
-                    fullScreenView.populateViewData(message)
-                    hostActivity.addContentView(fullScreenView, hostActivity.window.attributes)
-                    ImpressionManager.sendImpressionEvent(
-                        message.getCampaignId(),
-                        listOf(Impression(ImpressionType.IMPRESSION, Date().time)),
-                        impressionTypeOnly = true
-                    )
-                }
-                InAppMessageType.SLIDE -> {
-                    val slideUpView = hostActivity
-                        .layoutInflater
-                        .inflate(
-                            R.layout.in_app_message_slide_up,
-                            null
-                        ) as InAppMessageSlideUpView
-                    slideUpView.populateViewData(message)
-                    hostActivity.addContentView(slideUpView, hostActivity.window.attributes)
-                    ImpressionManager.sendImpressionEvent(
-                        message.getCampaignId(),
-                        listOf(Impression(ImpressionType.IMPRESSION, Date().time)),
-                        impressionTypeOnly = true
-                    )
-                }
-                else -> Any()
+                InAppMessageType.MODAL -> handleModal()
+                InAppMessageType.FULL -> handleFull()
+                InAppMessageType.SLIDE -> handleSlide()
+                InAppMessageType.HTML, InAppMessageType.INVALID -> Any()
             }
         }
+    }
+
+    private fun handleSlide() {
+        val slideUpView = hostActivity.layoutInflater.inflate(R.layout.in_app_message_slide_up, null)
+            as InAppMessageSlideUpView
+        slideUpView.populateViewData(message)
+        hostActivity.addContentView(slideUpView, hostActivity.window.attributes)
+        ImpressionManager.sendImpressionEvent(
+            message.getCampaignId(),
+            listOf(Impression(ImpressionType.IMPRESSION, Date().time)),
+            impressionTypeOnly = true
+        )
+    }
+
+    private fun handleFull() {
+        val fullScreenView = hostActivity.layoutInflater.inflate(R.layout.in_app_message_full_screen, null)
+            as InAppMessageFullScreenView
+        fullScreenView.populateViewData(message)
+        hostActivity.addContentView(fullScreenView, hostActivity.window.attributes)
+        ImpressionManager.sendImpressionEvent(
+            message.getCampaignId(),
+            listOf(Impression(ImpressionType.IMPRESSION, Date().time)),
+            impressionTypeOnly = true
+        )
+    }
+
+    private fun handleModal() {
+        val modalView = hostActivity.layoutInflater.inflate(R.layout.in_app_message_modal, null)
+            as InAppMessageModalView
+        modalView.populateViewData(message)
+        hostActivity.addContentView(modalView, hostActivity.window.attributes)
+        ImpressionManager.sendImpressionEvent(
+            message.getCampaignId(),
+            listOf(Impression(ImpressionType.IMPRESSION, Date().time)),
+            impressionTypeOnly = true
+        )
     }
 }

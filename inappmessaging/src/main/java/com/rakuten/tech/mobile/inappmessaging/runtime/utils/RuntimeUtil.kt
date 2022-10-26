@@ -46,27 +46,32 @@ internal object RuntimeUtil {
     }
 
     /**
-     * This method s a thread blocking GET request to retrieve image from server.
+     * This method is a thread blocking GET request to retrieve image from server.
      * Returns null if call was failed.
      * Throws IOException if an error occur when making Get request, or converting image data
      * into bytes.
      */
-    @SuppressWarnings("TooGenericExceptionCaught", "NestedBlockDepth")
     fun getImage(imageUrl: String): Bitmap? {
         if (URLUtil.isNetworkUrl(imageUrl)) {
-            val getImageCall: Call<ResponseBody> =
-                getRetrofit().create(MessageMixerRetrofitService::class.java).getImage(imageUrl)
-            try {
-                val imageResponse = getImageCall.execute()
-                if (imageResponse.isSuccessful) {
-                    imageResponse.body()?.let { body ->
-                        val bytes = body.bytes() // should no longer be null
-                        return BitmapFactory.decodeByteArray(bytes, 0, bytes.size)
-                    }
+            return fetchImage(imageUrl)
+        }
+        return null
+    }
+
+    @SuppressWarnings("TooGenericExceptionCaught")
+    private fun fetchImage(imageUrl: String): Bitmap? {
+        val getImageCall: Call<ResponseBody> =
+            getRetrofit().create(MessageMixerRetrofitService::class.java).getImage(imageUrl)
+        try {
+            val imageResponse = getImageCall.execute()
+            if (imageResponse.isSuccessful) {
+                imageResponse.body()?.let { body ->
+                    val bytes = body.bytes() // should no longer be null
+                    return BitmapFactory.decodeByteArray(bytes, 0, bytes.size)
                 }
-            } catch (ex: Exception) {
-                InAppLogger(TAG).debug(ex.message)
             }
+        } catch (ex: Exception) {
+            InAppLogger(TAG).debug(ex.message)
         }
         return null
     }

@@ -43,19 +43,11 @@ internal class InAppMessageViewListener(
      * Callback When touch event occurred. Which will trigger to magnify message view content.
      */
     @SuppressLint("NewApi")
-    @SuppressWarnings("LongMethod")
     override fun onTouch(view: View, event: MotionEvent): Boolean {
         if (buildChecker.isAndroidQAndAbove()) {
             when (event.actionMasked) {
                 MotionEvent.ACTION_DOWN -> this.magnifier = Magnifier.Builder(view).build()
-                MotionEvent.ACTION_MOVE -> if (this.magnifier != null) {
-                    val viewPosition = IntArray(2)
-                    view.getLocationOnScreen(viewPosition)
-                    this.magnifier?.show(
-                        event.rawX - viewPosition[0],
-                        event.rawY - viewPosition[1]
-                    )
-                }
+                MotionEvent.ACTION_MOVE -> handleMagnifier(view, event)
                 MotionEvent.ACTION_CANCEL, MotionEvent.ACTION_UP -> if (this.magnifier != null) {
                     this.magnifier?.dismiss()
                 }
@@ -83,18 +75,19 @@ internal class InAppMessageViewListener(
         }
     }
 
-    @SuppressWarnings("ReturnCount")
     override fun onKey(v: View?, keyCode: Int, event: KeyEvent?): Boolean {
-        if (event != null && event.action == KeyEvent.ACTION_UP && keyCode == KeyEvent.KEYCODE_BACK) {
+        return if (event != null && event.action == KeyEvent.ACTION_UP && keyCode == KeyEvent.KEYCODE_BACK) {
             // Disable closing the message if not dismissable.
             if (message != null && !message.isCampaignDismissable()) {
-                return false
+                false
+            } else {
+                // Handling back button click in coroutine.
+                handleClick(MessageActionsCoroutine.BACK_BUTTON)
+                true
             }
-            // Handling back button click in coroutine.
-            handleClick(MessageActionsCoroutine.BACK_BUTTON)
-            return true
+        } else {
+            false
         }
-        return false
     }
 
     private fun handleClick(id: Int, dispatcher: CoroutineDispatcher = Dispatchers.Default) {
@@ -109,8 +102,20 @@ internal class InAppMessageViewListener(
     internal fun handleMessage(id: Int) {
         val result = messageCoroutine.executeTask(message, id, isOptOutChecked)
         if (result) {
-            eventScheduler.startEventMessageReconciliationWorker(
+            eventScheduler.startReconciliationWorker(
                 delay = (message?.run { getMessagePayload().messageSettings.displaySettings.delay } ?: 0).toLong()
+            )
+        }
+    }
+
+    @SuppressLint("NewApi")
+    private fun handleMagnifier(view: View, event: MotionEvent) {
+        if (this.magnifier != null) {
+            val viewPosition = IntArray(2)
+            view.getLocationOnScreen(viewPosition)
+            this.magnifier?.show(
+                event.rawX - viewPosition[0],
+                event.rawY - viewPosition[1]
             )
         }
     }

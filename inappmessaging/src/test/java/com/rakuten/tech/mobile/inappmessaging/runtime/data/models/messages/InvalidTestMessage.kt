@@ -27,7 +27,6 @@ internal class InvalidTestMessage : Message {
 
     override fun getMaxImpressions(): Int = 0
 
-    @SuppressWarnings("EmptyFunctionBlock")
     override fun setMaxImpression(maxImpression: Int) {}
 
     override fun getContexts(): List<String> = listOf()

@@ -7,7 +7,6 @@ import com.rakuten.tech.mobile.inappmessaging.runtime.utils.InAppMessagingConsta
 /**
  * This class represents the request body for message display permission request.
  */
-@SuppressWarnings("ObjectToString") // toString() method is not needed for this class.
 internal data class DisplayPermissionRequest(
     @SerializedName("campaignId")
     val campaignId: String?,

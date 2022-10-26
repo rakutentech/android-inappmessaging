@@ -58,7 +58,7 @@ class EventMessageReconciliationSchedulerSpec : BaseTest() {
             "test_device_id"
         )
         InAppMessaging.initialize(ApplicationProvider.getApplicationContext(), true)
-        EventMessageReconciliationScheduler.instance().startEventMessageReconciliationWorker()
+        EventMessageReconciliationScheduler.instance().startReconciliationWorker()
         WorkManager.getInstance(ApplicationProvider.getApplicationContext())
             .getWorkInfosByTag(MESSAGES_EVENTS_WORKER_NAME)
             .get()[0].shouldNotBeNull()
@@ -67,12 +67,12 @@ class EventMessageReconciliationSchedulerSpec : BaseTest() {
     @Test
     fun `should not crash when workmanager is not initialized`() {
         InAppMessaging.initialize(ApplicationProvider.getApplicationContext(), true)
-        EventMessageReconciliationScheduler.instance().startEventMessageReconciliationWorker(mockWorkManager)
+        EventMessageReconciliationScheduler.instance().startReconciliationWorker(mockWorkManager)
     }
 
     @Test
     fun `should not crash when context is null`() {
-        EventMessageReconciliationScheduler.instance().startEventMessageReconciliationWorker()
+        EventMessageReconciliationScheduler.instance().startReconciliationWorker()
     }
 
     @Test
@@ -82,7 +82,7 @@ class EventMessageReconciliationSchedulerSpec : BaseTest() {
         InAppMessaging.errorCallback = mockCallback
 
         InAppMessaging.initialize(ApplicationProvider.getApplicationContext(), true)
-        EventMessageReconciliationScheduler.instance().startEventMessageReconciliationWorker(mockWorkManager)
+        EventMessageReconciliationScheduler.instance().startReconciliationWorker(mockWorkManager)
 
         val captor = argumentCaptor<InAppMessagingException>()
         Mockito.verify(mockCallback).invoke(captor.capture())
@@ -106,7 +106,7 @@ class EventMessageReconciliationSchedulerSpec : BaseTest() {
         ConfigResponseRepository.instance().addConfigResponse(configResponseData)
         EventsManager.onEventReceived(PurchaseSuccessfulEvent(), eventScheduler = mockSched)
 
-        Mockito.verify(mockSched).startEventMessageReconciliationWorker()
+        Mockito.verify(mockSched).startReconciliationWorker()
     }
 
     companion object {

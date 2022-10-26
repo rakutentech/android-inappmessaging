@@ -13,7 +13,6 @@ import org.robolectric.annotation.Config
 
 @RunWith(ParameterizedRobolectricTestRunner::class)
 @Config(sdk = [Build.VERSION_CODES.O_MR1])
-@SuppressWarnings("kotlin:S100")
 class SendEventSpec(
     private val eventName: String,
     private val data: Map<String, *>?,
@@ -43,7 +42,6 @@ class SendEventSpec(
 
 @RunWith(ParameterizedRobolectricTestRunner::class)
 @Config(sdk = [Build.VERSION_CODES.O_MR1])
-@SuppressWarnings("kotlin:S100")
 class HasClassSpec(
     private val className: String,
     private val expected: Boolean

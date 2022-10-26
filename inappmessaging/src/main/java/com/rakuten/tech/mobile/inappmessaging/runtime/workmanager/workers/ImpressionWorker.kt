@@ -32,7 +32,6 @@ internal class ImpressionWorker(
      * This method makes a thread blocking network call to post impression.
      * If server responding a non-successful response, work will be retried again with exponential backoff.
      */
-    @SuppressWarnings("LongMethod", "ReturnCount", "TooGenericExceptionCaught")
     override fun doWork(): Result {
         // Retrieve input data.
         val impressionEndpoint = ConfigResponseRepository.instance().getImpressionEndpoint()
@@ -43,6 +42,11 @@ internal class ImpressionWorker(
             return Result.failure()
         }
 
+        return executeRequest(impressionRequestJsonRequest, impressionEndpoint)
+    }
+
+    @SuppressWarnings("TooGenericExceptionCaught")
+    private fun executeRequest(impressionRequestJsonRequest: String?, impressionEndpoint: String): Result {
         // Convert impressionRequestJsonString to ImpressionRequest object.
         val impressionRequest = try {
             Gson().fromJson(impressionRequestJsonRequest, ImpressionRequest::class.java)
@@ -90,7 +94,7 @@ internal class ImpressionWorker(
         RuntimeUtil.getRetrofit()
             .create(MessageMixerRetrofitService::class.java)
             .reportImpression(
-                subscriptionId = HostAppInfoRepository.instance().getInAppMessagingSubscriptionKey(),
+                subscriptionId = HostAppInfoRepository.instance().getSubscriptionKey(),
                 deviceId = HostAppInfoRepository.instance().getDeviceId(),
                 accessToken = accountRepo.getAccessToken(),
                 impressionUrl = impressionEndpoint,
