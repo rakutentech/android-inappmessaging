@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-  <string name="in_app_message_image">クローズボタン</string>
-  <string name="close_button">アプリ内メッセージングのイメージ</string>
+  <string name="in_app_message_image">アプリ内メッセージングのイメージ</string>
+  <string name="close_button">メッセージを閉じる</string>
   <string name="message_opt_out_text">次回から表示しない</string>
 </resources>
