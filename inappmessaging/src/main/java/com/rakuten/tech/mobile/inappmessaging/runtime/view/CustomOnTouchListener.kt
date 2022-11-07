@@ -14,14 +14,13 @@ abstract class CustomOnTouchListener : View.OnTouchListener {
 
     override fun onTouch(v: View, event: MotionEvent): Boolean {
         when (event.actionMasked) {
-            MotionEvent.ACTION_CANCEL, MotionEvent.ACTION_UP -> {
+            MotionEvent.ACTION_CANCEL, MotionEvent.ACTION_UP ->
                 if (v is ScrollView) {
                     // remove tooltip if target was hidden
                     displayManager.removeHiddenTargets(v)
                     // run another display image
                     displayManager.displayMessage()
                 }
-            }
         }
         return v.performClick()
     }

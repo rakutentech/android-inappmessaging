@@ -1,7 +1,6 @@
 package com.rakuten.tech.mobile.inappmessaging.runtime.manager
 
 import android.app.Activity
-import android.content.Intent
 import android.graphics.Rect
 import android.os.Handler
 import android.os.Looper
@@ -10,10 +9,10 @@ import android.view.ViewGroup
 import android.widget.FrameLayout
 import com.rakuten.tech.mobile.inappmessaging.runtime.InAppMessaging
 import com.rakuten.tech.mobile.inappmessaging.runtime.R
+import com.rakuten.tech.mobile.inappmessaging.runtime.data.repositories.CampaignRepository
 import com.rakuten.tech.mobile.inappmessaging.runtime.utils.InAppLogger
 import com.rakuten.tech.mobile.inappmessaging.runtime.utils.ResourceUtils
 import com.rakuten.tech.mobile.inappmessaging.runtime.workmanager.workers.DisplayMessageWorker
-import com.rakuten.tech.mobile.sdkutils.logger.Logger
 
 /**
  * Display manager, which controls displaying message, or removing message from the screen.
@@ -71,9 +70,9 @@ internal interface DisplayManager {
         private fun removeWithId(activity: Activity, id: String?, delay: Int) {
             activity.findViewById<ViewGroup>(R.id.in_app_message_tooltip_view)?.let {
                 if (it.tag == id) {
-                    scheduleRemoval(delay, it, id, activity)
+                    scheduleRemoval(delay = delay, view = it, id = id, activity = activity)
                 } else {
-                    scheduleTargetChild(it, id, delay, activity)
+                    scheduleTargetChild(it = it, id = id, delay = delay, activity = activity)
                 }
             }
         }
@@ -83,7 +82,7 @@ internal interface DisplayManager {
                 for (i in 0 until (parent as ViewGroup).childCount) {
                     val child = parent.getChildAt(i)
                     if (child?.id == R.id.in_app_message_tooltip_view && child.tag == id) {
-                        scheduleRemoval(delay, child as ViewGroup, id, activity)
+                        scheduleRemoval(delay = delay, view = child as ViewGroup, id = id, activity = activity)
                         break
                     }
                 }
@@ -100,7 +99,10 @@ internal interface DisplayManager {
                     }
                 }
                 for (view in viewList) {
-                    scheduleRemoval(delay, view as ViewGroup, view.tag as String?, activity)
+                    scheduleRemoval(
+                        delay = delay, view = view as ViewGroup, id = view.tag as String?,
+                        activity = activity
+                    )
                 }
             }
         }
@@ -131,7 +133,7 @@ internal interface DisplayManager {
                 parent.requestFocus()
                 parent.removeView(inAppMessageBaseView)
             }
-            Logger(TAG).debug("View removed")
+            InAppLogger(TAG).debug("View removed")
         }
 
         private fun removeTooltip(parent: ViewGroup, id: String?, activity: Activity) {
@@ -166,26 +168,23 @@ internal interface DisplayManager {
                 }
                 for (view in removeList) {
                     (view.tag as String?)?.let {
-                        // TODO
-//                        TooltipMessageRepository.instance().removeMessage(it)
-                        scheduleRemoval(0, view as ViewGroup, it, activity)
+                        scheduleRemoval(delay = 0, view = view as ViewGroup, id = it, activity = activity)
                     }
                 }
             }
         }
 
         private fun addToList(child: View, activity: Activity, parent: ViewGroup, removeList: MutableList<View>) {
-            // TODO
-//            val message = TooltipMessageRepository.instance().getCampaign(child.tag as String)
-//            val target = message?.getTooltipConfig()?.id?.let {
-//                ResourceUtils.findViewByName<View>(activity, it)
-//            }
-//            val scrollBounds = Rect()
-//            parent.getHitRect(scrollBounds)
-//            if (target != null && !target.getLocalVisibleRect(scrollBounds)) {
-//                // no longer visible
-//                removeList.add(child)
-//            }
+            val message = CampaignRepository.instance().messages[child.tag as String]
+            val target = message?.getTooltipConfig()?.id?.let {
+                ResourceUtils.findViewByName<View>(activity, it)
+            }
+            val scrollBounds = Rect()
+            parent.getHitRect(scrollBounds)
+            if (target != null && !target.getLocalVisibleRect(scrollBounds)) {
+                // no longer visible
+                removeList.add(child)
+            }
         }
     }
 }

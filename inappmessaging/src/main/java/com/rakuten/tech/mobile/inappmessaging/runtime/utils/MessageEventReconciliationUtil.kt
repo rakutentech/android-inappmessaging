@@ -12,8 +12,6 @@ internal abstract class MessageEventReconciliationUtil(
     internal val eventMatchingUtil: EventMatchingUtil
 ) {
 
-    // TODO: Here
-
     /**
      * Validates whether a campaign is ready to be displayed by cross-referencing [CampaignRepository.messages]
      * and the list of [EventMatchingUtil.matchedEvents].

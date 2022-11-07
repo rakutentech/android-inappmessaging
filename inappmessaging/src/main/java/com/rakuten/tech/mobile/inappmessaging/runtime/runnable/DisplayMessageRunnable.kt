@@ -32,6 +32,7 @@ internal class DisplayMessageRunnable(
     private val hostActivity: Activity,
     private val displayManager: DisplayManager = DisplayManager.instance()
 ) : Runnable {
+    internal var testLayout: FrameLayout? = null
 
     /**
      * Interface method which will be invoked by the Virtual Machine. This is also the actual method
@@ -91,12 +92,14 @@ internal class DisplayMessageRunnable(
 
     private fun handleTooltip() {
         val toolTipView = hostActivity.layoutInflater.inflate(R.layout.in_app_message_tooltip, null)
-                as InAppMessagingTooltipView
+            as InAppMessagingTooltipView
         toolTipView.populateViewData(message)
         message.getTooltipConfig()?.let { displayTooltip(it, toolTipView) }
     }
 
-    private fun displayTooltip(tooltip: Tooltip, toolTipView: InAppMessagingTooltipView
+    private fun displayTooltip(
+        tooltip: Tooltip,
+        toolTipView: InAppMessagingTooltipView
     ) {
         ResourceUtils.findViewByName<View>(hostActivity, tooltip.id)?.let { target ->
             val scroll = ViewUtil.getScrollView(target)
@@ -113,8 +116,6 @@ internal class DisplayMessageRunnable(
             }
         }
     }
-
-    internal var testLayout: FrameLayout? = null
 
     private fun displayInScrollView(scroll: FrameLayout, toolTipView: InAppMessagingTooltipView) {
         var frame = hostActivity.findViewById<FrameLayout>(R.id.in_app_message_tooltip_layout)

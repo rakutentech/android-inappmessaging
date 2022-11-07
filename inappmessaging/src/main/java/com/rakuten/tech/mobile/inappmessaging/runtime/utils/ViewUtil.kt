@@ -55,9 +55,9 @@ internal object ViewUtil {
         return displayMetrics.widthPixels + 1
     }
 
-    @SuppressWarnings("LongParameterList", "MagicNumber")
+    @SuppressWarnings("LongParameterList", "MagicNumber", "LongMethod")
     fun getPosition(view: View, type: PositionType, width: Int, height: Int, marginH: Int, marginV: Int):
-            Pair<Int, Int> {
+        Pair<Int, Int> {
         val rect = Rect()
         view.getHitRect(rect)
         return when (type) {
@@ -65,13 +65,19 @@ internal object ViewUtil {
             PositionType.TOP_CENTER -> Pair(rect.left + view.width / 2 - width / 2, rect.top - height - marginV)
             PositionType.TOP_LEFT -> Pair(rect.left - width - marginH, rect.top - height - marginV)
             PositionType.BOTTOM_RIGHT -> Pair(rect.left + view.width + PADDING / 4, rect.top + view.height - marginV)
-            PositionType.BOTTOM_CENTER -> Pair(rect.left + view.width / 2 - width / 2,
-                rect.top + view.height - TRI_SIZE / 2)
+            PositionType.BOTTOM_CENTER -> Pair(
+                rect.left + view.width / 2 - width / 2,
+                rect.top + view.height - TRI_SIZE / 2
+            )
             PositionType.BOTTOM_LEFT -> Pair(rect.left - width - marginH, rect.top + view.height - marginV)
-            PositionType.RIGHT -> Pair(rect.left + view.width - TRI_SIZE / 2,
-                rect.top - (height - marginV + PADDING) / 2)
-            PositionType.LEFT -> Pair(rect.left - width - marginH - TRI_SIZE / 2,
-                rect.top - (height - marginV + PADDING) / 2)
+            PositionType.RIGHT -> Pair(
+                rect.left + view.width - TRI_SIZE / 2,
+                rect.top - (height - marginV + PADDING) / 2
+            )
+            PositionType.LEFT -> Pair(
+                rect.left - width - marginH - TRI_SIZE / 2,
+                rect.top - (height - marginV + PADDING) / 2
+            )
         }
     }
 
@@ -85,5 +91,16 @@ internal object ViewUtil {
             currView = currView.parent
         }
         return null
+    }
+
+    fun isViewVisible(view: View): Boolean {
+        val scrollView = getScrollView(view)
+        return if (scrollView != null) {
+            val scrollBounds = Rect()
+            scrollView.getHitRect(scrollBounds)
+            view.getLocalVisibleRect(scrollBounds)
+        } else {
+            true
+        }
     }
 }

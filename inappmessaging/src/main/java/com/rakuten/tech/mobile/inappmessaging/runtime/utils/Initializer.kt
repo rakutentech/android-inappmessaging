@@ -17,7 +17,6 @@ import com.rakuten.tech.mobile.inappmessaging.runtime.utils.CacheUtil.getMemoryC
 import com.rakuten.tech.mobile.sdkutils.PreferencesUtil
 import com.squareup.picasso.LruCache
 import com.squareup.picasso.Picasso
-import java.lang.ClassCastException
 import java.lang.IllegalStateException
 import java.util.Locale
 import java.util.UUID

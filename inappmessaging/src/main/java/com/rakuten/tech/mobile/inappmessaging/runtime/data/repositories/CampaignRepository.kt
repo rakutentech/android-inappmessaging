@@ -7,7 +7,6 @@ import com.rakuten.tech.mobile.inappmessaging.runtime.data.responses.ping.Campai
 import com.rakuten.tech.mobile.inappmessaging.runtime.utils.InAppLogger
 import com.rakuten.tech.mobile.sdkutils.PreferencesUtil
 import org.json.JSONObject
-import java.lang.ClassCastException
 import java.lang.Integer.max
 
 internal abstract class CampaignRepository {

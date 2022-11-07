@@ -1,6 +1,5 @@
 package com.rakuten.tech.mobile.inappmessaging.runtime.manager
 
-import android.graphics.Rect
 import android.view.View
 import androidx.annotation.VisibleForTesting
 import androidx.annotation.WorkerThread
@@ -73,7 +72,7 @@ internal interface MessageReadinessManager {
         fun instance() = instance
     }
 
-    @SuppressWarnings("TooManyFunctions")
+    @SuppressWarnings("TooManyFunctions", "LargeClass")
     private class MessageReadinessManagerImpl(private val campaignRepo: CampaignRepository) : MessageReadinessManager {
         private val queuedMessages = mutableListOf<String>()
         private val triggeredTooltips = mutableListOf<String>()
@@ -177,42 +176,30 @@ internal interface MessageReadinessManager {
         /**
          * This method checks if the message has infinite impressions, or has been displayed less
          * than its max impressions, or has been opted out.
-         * Additional checks are performed if message is a tooltip.
+         * Additional checks are performed depending on message type.
          */
         private fun shouldDisplayMessage(message: Message): Boolean {
             val impressions = message.impressionsLeft ?: message.getMaxImpressions()
             val isOptOut = message.isOptedOut == true
-            val basicCheck = (message.infiniteImpressions() || impressions > 0) && !isOptOut
-            val isTooltip = message.getType() == InAppMessageType.TOOLTIP.typeId
+            val hasPassedBasicCheck = (message.infiniteImpressions() || impressions > 0) && !isOptOut
 
-            return if (!isTooltip) basicCheck
-            else {
-                val shouldDisplayTooltip = basicCheck &&
-                        !triggeredTooltips.contains(message.getCampaignId()) && // only display once per app session
-                        isTooltipParentVisible(message) // if view where to attach tooltip is indeed visible
-                if (shouldDisplayTooltip) triggeredTooltips.add(message.getCampaignId())
-                shouldDisplayTooltip
+            return when(message.getType()) {
+                InAppMessageType.TOOLTIP.typeId -> {
+                    val shouldDisplayTooltip = hasPassedBasicCheck &&
+                            !triggeredTooltips.contains(message.getCampaignId()) && // only display once per app session
+                            isTooltipTargetViewVisible(message) // if view where to attach tooltip is indeed visible
+                    if (shouldDisplayTooltip) triggeredTooltips.add(message.getCampaignId())
+                    shouldDisplayTooltip
+                }
+                else -> hasPassedBasicCheck
             }
         }
 
-        private fun isTooltipParentVisible(message: Message): Boolean {
-            val activity = InAppMessaging.instance().getRegisteredActivity()
-            activity?.let {
-                val view = message.getTooltipConfig()?.id?.let { ResourceUtils.findViewByName<View>(activity, it) }
-                view?.let { return isViewVisible(it) }
-            }
+        private fun isTooltipTargetViewVisible(message: Message): Boolean {
+            val activity = InAppMessaging.instance().getRegisteredActivity() ?: return false
+            val view = message.getTooltipConfig()?.id?.let { ResourceUtils.findViewByName<View>(activity, it) }
+            view?.let { return ViewUtil.isViewVisible(it) }
             return false
-        }
-
-        private fun isViewVisible(view: View): Boolean {
-            val scrollView = ViewUtil.getScrollView(view)
-            return if (scrollView != null) {
-                val scrollBounds = Rect()
-                scrollView.getHitRect(scrollBounds)
-                view.getLocalVisibleRect(scrollBounds)
-            } else {
-                true
-            }
         }
 
         /**

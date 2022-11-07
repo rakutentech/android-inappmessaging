@@ -63,7 +63,6 @@ internal class MessageActionsCoroutine(private val campaignRepo: CampaignReposit
             campaignRepo.optOutCampaign(message)
         }
         campaignRepo.decrementImpressions(message.getCampaignId())
-        // TODO: Maybe OK
     }
 
     /**

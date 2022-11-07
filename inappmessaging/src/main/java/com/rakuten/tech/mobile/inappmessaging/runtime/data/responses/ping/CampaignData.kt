@@ -6,7 +6,7 @@ import com.google.gson.annotations.SerializedName
 import com.rakuten.tech.mobile.inappmessaging.runtime.data.enums.InAppMessageType
 import com.rakuten.tech.mobile.inappmessaging.runtime.data.models.Tooltip
 import com.rakuten.tech.mobile.inappmessaging.runtime.data.models.messages.Message
-import com.rakuten.tech.mobile.sdkutils.logger.Logger
+import com.rakuten.tech.mobile.inappmessaging.runtime.utils.InAppLogger
 
 /**
  * Class for parsing CampaignData, which is a response from MessageMixer.
@@ -84,7 +84,7 @@ internal data class CampaignData(
                     tooltip = null
                 }
             } catch (je: JsonParseException) {
-                Logger(TAG).debug("Invalid format for tooltip config.", je)
+                InAppLogger(TAG).debug("Invalid format for tooltip config.", je)
             }
         }
         return tooltip

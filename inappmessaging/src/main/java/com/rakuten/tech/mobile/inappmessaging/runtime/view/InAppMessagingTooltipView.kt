@@ -27,9 +27,9 @@ import com.rakuten.tech.mobile.inappmessaging.runtime.InAppMessaging
 import com.rakuten.tech.mobile.inappmessaging.runtime.R
 import com.rakuten.tech.mobile.inappmessaging.runtime.data.enums.PositionType
 import com.rakuten.tech.mobile.inappmessaging.runtime.data.models.messages.Message
+import com.rakuten.tech.mobile.inappmessaging.runtime.utils.InAppLogger
 import com.rakuten.tech.mobile.inappmessaging.runtime.utils.ResourceUtils
 import com.rakuten.tech.mobile.inappmessaging.runtime.utils.ViewUtil
-import com.rakuten.tech.mobile.sdkutils.logger.Logger
 import com.squareup.picasso.Callback
 import com.squareup.picasso.Picasso
 
@@ -75,7 +75,6 @@ internal class InAppMessagingTooltipView(
     @Suppress("ClickableViewAccessibility", "TooGenericExceptionCaught", "LongMethod")
     private fun bindImage() { // Display image.
         if (!this.imageUrl.isNullOrEmpty()) {
-
             // load the image then display the view
             this.visibility = INVISIBLE
             findViewById<ImageView>(R.id.message_tooltip_image_view).let {
@@ -87,7 +86,7 @@ internal class InAppMessagingTooltipView(
                         }
 
                         override fun onError(e: Exception?) {
-                            Logger(TAG).debug(e?.cause, "Downloading image failed $imageUrl")
+                            InAppLogger(TAG).debug(e?.cause, "Downloading image failed $imageUrl")
                         }
                     }
 
@@ -113,14 +112,13 @@ internal class InAppMessagingTooltipView(
                         .centerInside()
                         .into(it, callback)
                 } catch (ex: Exception) {
-                    Logger(TAG).debug(ex, "Downloading image failed $imageUrl")
+                    InAppLogger(TAG).debug(ex, "Downloading image failed $imageUrl")
                 }
             }
         }
     }
 
     private fun setBackground(width: Int, height: Int) {
-
         val imageView = findViewById<ShapeableImageView>(R.id.message_tooltip_image_view)
         imageView.layoutParams.width = width + PADDING
         imageView.layoutParams.height = height + PADDING
@@ -300,7 +298,8 @@ internal class InAppMessagingTooltipView(
             ResourceUtils.findViewByName<View>(activity, it)?.let { view ->
                 val buttonSize = findViewById<ImageButton>(R.id.message_close_button).layoutParams.height
                 ViewUtil.getPosition(
-                    view, type, imageView.layoutParams.width, imageView.layoutParams.height, buttonSize, buttonSize
+                    view = view, type = type, width = imageView.layoutParams.width,
+                    height = imageView.layoutParams.height, marginH = buttonSize, marginV = buttonSize
                 )
                     .let { pos ->
                         params.topMargin = pos.second
