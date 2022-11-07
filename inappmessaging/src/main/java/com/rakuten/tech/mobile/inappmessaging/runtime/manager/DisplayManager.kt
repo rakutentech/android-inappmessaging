@@ -166,7 +166,8 @@ internal interface DisplayManager {
                 }
                 for (view in removeList) {
                     (view.tag as String?)?.let {
-                        TooltipMessageRepository.instance().removeMessage(it)
+                        // TODO
+//                        TooltipMessageRepository.instance().removeMessage(it)
                         scheduleRemoval(0, view as ViewGroup, it, activity)
                     }
                 }
@@ -174,16 +175,17 @@ internal interface DisplayManager {
         }
 
         private fun addToList(child: View, activity: Activity, parent: ViewGroup, removeList: MutableList<View>) {
-            val message = TooltipMessageRepository.instance().getCampaign(child.tag as String)
-            val target = message?.getTooltipConfig()?.id?.let {
-                ResourceUtils.findViewByName<View>(activity, it)
-            }
-            val scrollBounds = Rect()
-            parent.getHitRect(scrollBounds)
-            if (target != null && !target.getLocalVisibleRect(scrollBounds)) {
-                // no longer visible
-                removeList.add(child)
-            }
+            // TODO
+//            val message = TooltipMessageRepository.instance().getCampaign(child.tag as String)
+//            val target = message?.getTooltipConfig()?.id?.let {
+//                ResourceUtils.findViewByName<View>(activity, it)
+//            }
+//            val scrollBounds = Rect()
+//            parent.getHitRect(scrollBounds)
+//            if (target != null && !target.getLocalVisibleRect(scrollBounds)) {
+//                // no longer visible
+//                removeList.add(child)
+//            }
         }
     }
 }

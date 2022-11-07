@@ -98,21 +98,12 @@ internal class InAppMessageViewListener(
         dispatcher: CoroutineDispatcher = Dispatchers.Default
     ) {
         CoroutineScope(mainDispatcher).launch {
-            val type = MessageActionsCoroutine.getOnClickBehaviorType(id)
-            val delay = if (message.getType() == InAppMessageType.TOOLTIP.typeId &&
-                (type != ImpressionType.CLICK_CONTENT || message.getTooltipConfig()?.url == null)
-            ) {
-                // should only add delay if set and not redirect (i.e. close button or content + no url)
-                message.getTooltipConfig()?.autoDisappear ?: 0
-            } else {
-                0
-            }
             displayManager.removeMessage(
-                inApp.getRegisteredActivity(), delay = delay,
+                inApp.getRegisteredActivity(),
                 id = if (message.getType() == InAppMessageType.TOOLTIP.typeId) message.getCampaignId() else null
             )
             withContext(dispatcher) {
-                handleMessage(type)
+                handleMessage(MessageActionsCoroutine.getOnClickBehaviorType(id))
             }
         }
     }
@@ -120,7 +111,7 @@ internal class InAppMessageViewListener(
     internal fun handleMessage(type: ImpressionType) {
         val result = messageCoroutine.executeTask(message, type, isOptOutChecked)
         if (result) {
-            eventScheduler.startEventMessageReconciliationWorker(
+            eventScheduler.startReconciliationWorker(
                 delay = (message.getMessagePayload().messageSettings.displaySettings.delay).toLong()
             )
         }

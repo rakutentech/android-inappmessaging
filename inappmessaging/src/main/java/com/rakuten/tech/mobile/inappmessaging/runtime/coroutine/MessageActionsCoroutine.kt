@@ -13,6 +13,7 @@ import com.rakuten.tech.mobile.inappmessaging.runtime.data.enums.ButtonActionTyp
 import com.rakuten.tech.mobile.inappmessaging.runtime.data.enums.EventType
 import com.rakuten.tech.mobile.inappmessaging.runtime.data.enums.ImpressionType
 import com.rakuten.tech.mobile.inappmessaging.runtime.data.enums.ValueType
+import com.rakuten.tech.mobile.inappmessaging.runtime.data.enums.InAppMessageType
 import com.rakuten.tech.mobile.inappmessaging.runtime.data.models.appevents.CustomEvent
 import com.rakuten.tech.mobile.inappmessaging.runtime.data.models.appevents.Event
 import com.rakuten.tech.mobile.inappmessaging.runtime.data.models.messages.Message
@@ -33,7 +34,7 @@ import kotlin.collections.ArrayList
 @SuppressWarnings("TooManyFunctions")
 internal class MessageActionsCoroutine(private val campaignRepo: CampaignRepository = CampaignRepository.instance()) {
 
-    fun executeTask(message: Message?, buttonType: ImpressionType, viewResourceId: Int, optOut: Boolean): Boolean {
+    fun executeTask(message: Message?, buttonType: ImpressionType, optOut: Boolean): Boolean {
         if (message == null || message.getCampaignId().isEmpty()) {
             return false
         }
@@ -62,7 +63,7 @@ internal class MessageActionsCoroutine(private val campaignRepo: CampaignReposit
             campaignRepo.optOutCampaign(message)
         }
         campaignRepo.decrementImpressions(message.getCampaignId())
-        // TODO: Processing TooltipMessageRepository?
+        // TODO: Maybe OK
     }
 
     /**

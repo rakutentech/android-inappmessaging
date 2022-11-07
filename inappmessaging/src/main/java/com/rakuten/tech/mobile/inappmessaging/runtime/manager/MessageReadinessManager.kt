@@ -1,11 +1,13 @@
 package com.rakuten.tech.mobile.inappmessaging.runtime.manager
 
+import android.graphics.Rect
+import android.view.View
 import androidx.annotation.VisibleForTesting
 import androidx.annotation.WorkerThread
 import com.rakuten.tech.mobile.inappmessaging.runtime.BuildConfig
 import com.rakuten.tech.mobile.inappmessaging.runtime.InAppMessaging
 import com.rakuten.tech.mobile.inappmessaging.runtime.api.MessageMixerRetrofitService
-import com.rakuten.tech.mobile.inappmessaging.runtime.data.models.Tooltip
+import com.rakuten.tech.mobile.inappmessaging.runtime.data.enums.InAppMessageType
 import com.rakuten.tech.mobile.inappmessaging.runtime.data.models.messages.Message
 import com.rakuten.tech.mobile.inappmessaging.runtime.data.repositories.AccountRepository
 import com.rakuten.tech.mobile.inappmessaging.runtime.data.repositories.ConfigResponseRepository
@@ -15,9 +17,11 @@ import com.rakuten.tech.mobile.inappmessaging.runtime.data.requests.DisplayPermi
 import com.rakuten.tech.mobile.inappmessaging.runtime.data.responses.displaypermission.DisplayPermissionResponse
 import com.rakuten.tech.mobile.inappmessaging.runtime.exception.InAppMessagingException
 import com.rakuten.tech.mobile.inappmessaging.runtime.utils.InAppLogger
+import com.rakuten.tech.mobile.inappmessaging.runtime.utils.ResourceUtils
 import com.rakuten.tech.mobile.inappmessaging.runtime.utils.RetryDelayUtil
 import com.rakuten.tech.mobile.inappmessaging.runtime.utils.RuntimeUtil
 import com.rakuten.tech.mobile.inappmessaging.runtime.utils.WorkerUtils
+import com.rakuten.tech.mobile.inappmessaging.runtime.utils.ViewUtil
 import com.rakuten.tech.mobile.inappmessaging.runtime.workmanager.schedulers.MessageMixerPingScheduler
 import retrofit2.Call
 import retrofit2.Response
@@ -72,6 +76,7 @@ internal interface MessageReadinessManager {
     @SuppressWarnings("TooManyFunctions")
     private class MessageReadinessManagerImpl(private val campaignRepo: CampaignRepository) : MessageReadinessManager {
         private val queuedMessages = mutableListOf<String>()
+        private val triggeredTooltips = mutableListOf<String>()
 
         override fun addMessageToQueue(id: String) {
             synchronized(queuedMessages) {
@@ -89,8 +94,7 @@ internal interface MessageReadinessManager {
         @SuppressWarnings("LongMethod", "ComplexMethod", "ReturnCount")
         override fun getNextDisplayMessage(isTooltip: Boolean): List<Message> {
             shouldRetry.set(true)
-
-            // TODO: Here
+            val result = mutableListOf<Message>()
 
             val queuedMessagesCopy = queuedMessages.toList() // Prevent ConcurrentModificationException
             for (messageId in queuedMessagesCopy) {
@@ -111,24 +115,36 @@ internal interface MessageReadinessManager {
                 }
 
                 // If message is test message, no need to do more checks.
-                if (message.isTest()) {
-                    InAppLogger(TAG).debug("skipping test message: %s", message.getCampaignId())
-                    return message
-                }
+                if (shouldPing(message, result)) break
 
-                // Check message display permission with server.
-                val displayPermissionResponse = getMessagePermission(message)
-                // If server wants SDK to ping for updated messages, do a new ping request and break this loop.
-                if ((displayPermissionResponse != null) && displayPermissionResponse.performPing) {
+                // Check if other tooltips can be displayed
+                if (isTooltip) continue
+                else if (result.isNotEmpty()) return result
+            }
+            return result
+        }
+
+        private fun shouldPing(message: Message, result: MutableList<Message>) = if (message.isTest()) {
+            InAppLogger(TAG).debug("skipping test message: %s", message.getCampaignId())
+            result.add(message)
+            false
+        } else {
+            // Check message display permission with server.
+            val displayPermissionResponse = getMessagePermission(message)
+            // If server wants SDK to ping for updated messages, do a new ping request and break this loop.
+            when {
+                (displayPermissionResponse != null) && displayPermissionResponse.performPing -> {
                     // reset current delay to initial
                     MessageMixerPingScheduler.currDelay = RetryDelayUtil.INITIAL_BACKOFF_DELAY
                     MessageMixerPingScheduler.instance().pingMessageMixerService(0)
-                    break
-                } else if (isMessagePermissibleToDisplay(displayPermissionResponse)) {
-                    return message
+                    true
                 }
+                isMessagePermissibleToDisplay(displayPermissionResponse) -> {
+                    result.add(message)
+                    false
+                }
+                else -> false
             }
-            return null
         }
 
         @VisibleForTesting
@@ -161,11 +177,42 @@ internal interface MessageReadinessManager {
         /**
          * This method checks if the message has infinite impressions, or has been displayed less
          * than its max impressions, or has been opted out.
+         * Additional checks are performed if message is a tooltip.
          */
         private fun shouldDisplayMessage(message: Message): Boolean {
             val impressions = message.impressionsLeft ?: message.getMaxImpressions()
             val isOptOut = message.isOptedOut == true
-            return (message.infiniteImpressions() || impressions > 0) && !isOptOut
+            val basicCheck = (message.infiniteImpressions() || impressions > 0) && !isOptOut
+            val isTooltip = message.getType() == InAppMessageType.TOOLTIP.typeId
+
+            return if (!isTooltip) basicCheck
+            else {
+                val shouldDisplayTooltip = basicCheck &&
+                        !triggeredTooltips.contains(message.getCampaignId()) && // only display once per app session
+                        isTooltipParentVisible(message) // if view where to attach tooltip is indeed visible
+                if (shouldDisplayTooltip) triggeredTooltips.add(message.getCampaignId())
+                shouldDisplayTooltip
+            }
+        }
+
+        private fun isTooltipParentVisible(message: Message): Boolean {
+            val activity = InAppMessaging.instance().getRegisteredActivity()
+            activity?.let {
+                val view = message.getTooltipConfig()?.id?.let { ResourceUtils.findViewByName<View>(activity, it) }
+                view?.let { return isViewVisible(it) }
+            }
+            return false
+        }
+
+        private fun isViewVisible(view: View): Boolean {
+            val scrollView = ViewUtil.getScrollView(view)
+            return if (scrollView != null) {
+                val scrollBounds = Rect()
+                scrollView.getHitRect(scrollBounds)
+                view.getLocalVisibleRect(scrollBounds)
+            } else {
+                true
+            }
         }
 
         /**

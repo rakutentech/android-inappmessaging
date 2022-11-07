@@ -2,16 +2,23 @@ package com.rakuten.tech.mobile.inappmessaging.runtime.runnable
 
 import android.app.Activity
 import android.view.View
+import android.view.ViewGroup
+import android.widget.FrameLayout
 import androidx.annotation.UiThread
 import com.rakuten.tech.mobile.inappmessaging.runtime.R
 import com.rakuten.tech.mobile.inappmessaging.runtime.data.enums.ImpressionType
 import com.rakuten.tech.mobile.inappmessaging.runtime.data.enums.InAppMessageType
 import com.rakuten.tech.mobile.inappmessaging.runtime.data.models.Impression
+import com.rakuten.tech.mobile.inappmessaging.runtime.data.models.Tooltip
 import com.rakuten.tech.mobile.inappmessaging.runtime.data.models.messages.Message
+import com.rakuten.tech.mobile.inappmessaging.runtime.manager.DisplayManager
 import com.rakuten.tech.mobile.inappmessaging.runtime.manager.ImpressionManager
+import com.rakuten.tech.mobile.inappmessaging.runtime.utils.ResourceUtils
+import com.rakuten.tech.mobile.inappmessaging.runtime.utils.ViewUtil
 import com.rakuten.tech.mobile.inappmessaging.runtime.view.InAppMessageFullScreenView
 import com.rakuten.tech.mobile.inappmessaging.runtime.view.InAppMessageModalView
 import com.rakuten.tech.mobile.inappmessaging.runtime.view.InAppMessageSlideUpView
+import com.rakuten.tech.mobile.inappmessaging.runtime.view.InAppMessagingTooltipView
 import kotlinx.coroutines.Runnable
 import java.util.Date
 
@@ -22,7 +29,8 @@ import java.util.Date
 @UiThread
 internal class DisplayMessageRunnable(
     private val message: Message,
-    private val hostActivity: Activity
+    private val hostActivity: Activity,
+    private val displayManager: DisplayManager = DisplayManager.instance()
 ) : Runnable {
 
     /**
@@ -85,14 +93,12 @@ internal class DisplayMessageRunnable(
         val toolTipView = hostActivity.layoutInflater.inflate(R.layout.in_app_message_tooltip, null)
                 as InAppMessagingTooltipView
         toolTipView.populateViewData(message)
-        message.getTooltipConfig()?.let {
-            displayTooltip(it, toolTipView)
-        }
+        message.getTooltipConfig()?.let { displayTooltip(it, toolTipView) }
     }
 
-    private fun displayTooltip(it: Tooltip, toolTipView: InAppMessagingTooltipView
+    private fun displayTooltip(tooltip: Tooltip, toolTipView: InAppMessagingTooltipView
     ) {
-        ResourceUtils.findViewByName<View>(hostActivity, it.id)?.let { target ->
+        ResourceUtils.findViewByName<View>(hostActivity, tooltip.id)?.let { target ->
             val scroll = ViewUtil.getScrollView(target)
             if (scroll != null) {
                 displayInScrollView(scroll, toolTipView)
@@ -102,7 +108,9 @@ internal class DisplayMessageRunnable(
                 )
                 hostActivity.addContentView(toolTipView, params)
             }
-            LocalDisplayedMessageRepository.instance().addTooltipMessage(message.getCampaignId())
+            tooltip.autoDisappear?.let {
+                if (it > 0) displayManager.removeMessage(hostActivity, delay = it, id = message.getCampaignId())
+            }
         }
     }
 

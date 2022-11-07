@@ -148,21 +148,15 @@ internal abstract class CampaignRepository {
             }
         }
 
-        @SuppressWarnings("TooGenericExceptionCaught")
         private fun retrieveData(): String {
-            return try {
-                InAppMessaging.instance().getHostAppContext()?.let { ctx ->
-                    PreferencesUtil.getString(
-                        context = ctx,
-                        name = InAppMessaging.getPreferencesFile(),
-                        key = IAM_USER_CACHE,
-                        defValue = ""
-                    )
-                }.orEmpty()
-            } catch (ex: ClassCastException) {
-                InAppLogger(TAG).debug(ex.cause, "Incorrect type for $IAM_USER_CACHE data")
-                ""
-            }
+            return InAppMessaging.instance().getHostAppContext()?.let { ctx ->
+                PreferencesUtil.getString(
+                    context = ctx,
+                    name = InAppMessaging.getPreferencesFile(),
+                    key = IAM_USER_CACHE,
+                    defValue = ""
+                )
+            }.orEmpty()
         }
 
         private fun saveDataToCache() {

@@ -2,7 +2,6 @@ package com.rakuten.tech.mobile.inappmessaging.runtime.workmanager.workers
 
 import android.app.Activity
 import android.content.Context
-import android.content.Intent
 import android.os.Handler
 import android.os.Looper
 import androidx.work.CoroutineWorker
@@ -95,8 +94,6 @@ internal class DisplayMessageWorker(
         if (!verifyContexts(message)) {
             // Message display aborted by the host app
             InAppLogger(TAG).debug("message display cancelled by the host app")
-
-            TooltipMessageRepository.instance().removeMessage(message.getCampaignId(), true)
             prepareNextMessage()
             return
         }
