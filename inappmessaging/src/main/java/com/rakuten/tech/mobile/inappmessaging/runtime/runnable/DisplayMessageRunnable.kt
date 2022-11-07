@@ -31,18 +31,16 @@ internal class DisplayMessageRunnable(
      */
     @UiThread
     override fun run() {
-        // If there's already a message found, don't display another message.
-        if (hostActivity.findViewById<View?>(R.id.in_app_message_base_view) != null) {
-            return
-        }
-
         val messageType = InAppMessageType.getById(message.getType())
+        if (shouldNotDisplay(messageType)) return
+
         if (messageType != null) {
             when (messageType) {
                 InAppMessageType.MODAL -> handleModal()
                 InAppMessageType.FULL -> handleFull()
                 InAppMessageType.SLIDE -> handleSlide()
                 InAppMessageType.HTML, InAppMessageType.INVALID -> Any()
+                InAppMessageType.TOOLTIP -> handleTooltip()
             }
         }
     }
@@ -81,5 +79,80 @@ internal class DisplayMessageRunnable(
             listOf(Impression(ImpressionType.IMPRESSION, Date().time)),
             impressionTypeOnly = true
         )
+    }
+
+    private fun handleTooltip() {
+        val toolTipView = hostActivity.layoutInflater.inflate(R.layout.in_app_message_tooltip, null)
+                as InAppMessagingTooltipView
+        toolTipView.populateViewData(message)
+        message.getTooltipConfig()?.let {
+            displayTooltip(it, toolTipView)
+        }
+    }
+
+    private fun displayTooltip(it: Tooltip, toolTipView: InAppMessagingTooltipView
+    ) {
+        ResourceUtils.findViewByName<View>(hostActivity, it.id)?.let { target ->
+            val scroll = ViewUtil.getScrollView(target)
+            if (scroll != null) {
+                displayInScrollView(scroll, toolTipView)
+            } else {
+                val params = ViewGroup.LayoutParams(
+                    ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT
+                )
+                hostActivity.addContentView(toolTipView, params)
+            }
+            LocalDisplayedMessageRepository.instance().addTooltipMessage(message.getCampaignId())
+        }
+    }
+
+    internal var testLayout: FrameLayout? = null
+
+    private fun displayInScrollView(scroll: FrameLayout, toolTipView: InAppMessagingTooltipView) {
+        var frame = hostActivity.findViewById<FrameLayout>(R.id.in_app_message_tooltip_layout)
+        // use existing tooltip layout if already available
+        if (frame == null) {
+            frame = testLayout ?: FrameLayout(hostActivity)
+            frame.id = R.id.in_app_message_tooltip_layout
+            frame.layoutParams = FrameLayout.LayoutParams(
+                FrameLayout.LayoutParams.MATCH_PARENT,
+                FrameLayout.LayoutParams.MATCH_PARENT
+            )
+            // scrollview only have one child
+            val parent = scroll.getChildAt(0)
+            scroll.removeView(parent as ViewGroup)
+            frame.addView(parent)
+            frame.addView(toolTipView)
+            scroll.addView(frame)
+        } else {
+            frame.addView(toolTipView)
+        }
+    }
+
+    private fun shouldNotDisplay(messageType: InAppMessageType?): Boolean {
+        val normalCampaign = hostActivity.findViewById<View?>(R.id.in_app_message_base_view)
+        return if (messageType == InAppMessageType.TOOLTIP) {
+            // if normal non-slide-up campaign is displayed, don't display tooltip on top of normal campaign
+            if (normalCampaign != null && normalCampaign !is InAppMessageSlideUpView) {
+                true
+            } else {
+                checkTooltipDisplay()
+            }
+        } else {
+            normalCampaign != null
+        }
+    }
+
+    private fun checkTooltipDisplay(): Boolean {
+        hostActivity.findViewById<View?>(R.id.in_app_message_tooltip_view)?.parent?.let {
+            for (i in 0 until (it as ViewGroup).childCount) {
+                val child = it.getChildAt(i)
+                if (child?.id == R.id.in_app_message_tooltip_view && child.tag == message.getCampaignId()) {
+                    // tool campaign is already displayed, no need to display again
+                    return true
+                }
+            }
+        }
+        return false
     }
 }

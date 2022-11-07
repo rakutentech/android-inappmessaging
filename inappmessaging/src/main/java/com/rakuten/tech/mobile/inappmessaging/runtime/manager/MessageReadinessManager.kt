@@ -5,6 +5,7 @@ import androidx.annotation.WorkerThread
 import com.rakuten.tech.mobile.inappmessaging.runtime.BuildConfig
 import com.rakuten.tech.mobile.inappmessaging.runtime.InAppMessaging
 import com.rakuten.tech.mobile.inappmessaging.runtime.api.MessageMixerRetrofitService
+import com.rakuten.tech.mobile.inappmessaging.runtime.data.models.Tooltip
 import com.rakuten.tech.mobile.inappmessaging.runtime.data.models.messages.Message
 import com.rakuten.tech.mobile.inappmessaging.runtime.data.repositories.AccountRepository
 import com.rakuten.tech.mobile.inappmessaging.runtime.data.repositories.ConfigResponseRepository
@@ -43,7 +44,7 @@ internal interface MessageReadinessManager {
      * This method returns the next ready to display message.
      */
     @WorkerThread
-    fun getNextDisplayMessage(): Message?
+    fun getNextDisplayMessage(isTooltip: Boolean): List<Message>
 
     /**
      * This method returns a DisplayPermissionRequest object.
@@ -86,8 +87,10 @@ internal interface MessageReadinessManager {
 
         @WorkerThread
         @SuppressWarnings("LongMethod", "ComplexMethod", "ReturnCount")
-        override fun getNextDisplayMessage(): Message? {
+        override fun getNextDisplayMessage(isTooltip: Boolean): List<Message> {
             shouldRetry.set(true)
+
+            // TODO: Here
 
             val queuedMessagesCopy = queuedMessages.toList() // Prevent ConcurrentModificationException
             for (messageId in queuedMessagesCopy) {

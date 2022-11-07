@@ -87,7 +87,7 @@ internal class InApp(
     override fun unregisterMessageDisplayActivity() {
         try {
             if (ConfigResponseRepository.instance().isConfigEnabled()) {
-                displayManager.removeMessage(getRegisteredActivity())
+                displayManager.removeMessage(getRegisteredActivity(), removeAll = true)
             }
             activityWeakReference?.clear()
 

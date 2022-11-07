@@ -9,7 +9,8 @@ internal enum class InAppMessageType(val typeId: Int) {
     MODAL(1),
     FULL(2),
     SLIDE(3),
-    HTML(4);
+    HTML(4),
+    TOOLTIP(5);
 
     companion object {
         /**
