@@ -13,7 +13,6 @@ import com.rakuten.tech.mobile.inappmessaging.runtime.data.enums.ButtonActionTyp
 import com.rakuten.tech.mobile.inappmessaging.runtime.data.enums.EventType
 import com.rakuten.tech.mobile.inappmessaging.runtime.data.enums.ImpressionType
 import com.rakuten.tech.mobile.inappmessaging.runtime.data.enums.ValueType
-import com.rakuten.tech.mobile.inappmessaging.runtime.data.enums.InAppMessageType
 import com.rakuten.tech.mobile.inappmessaging.runtime.data.models.appevents.CustomEvent
 import com.rakuten.tech.mobile.inappmessaging.runtime.data.models.appevents.Event
 import com.rakuten.tech.mobile.inappmessaging.runtime.data.models.messages.Message
@@ -38,19 +37,14 @@ internal class MessageActionsCoroutine(private val campaignRepo: CampaignReposit
         if (message == null || message.getCampaignId().isEmpty()) {
             return false
         }
-        // Update campaign status in repository
-        updateCampaignInRepository(message, optOut)
-
         // Getting ImpressionType, which represents which button was pressed:
         val buttonType = getOnClickBehaviorType(viewResourceId)
-        if (message.getType() != InAppMessageType.TOOLTIP.typeId) {
-            // Add event in the button if exist.
-            addEmbeddedEvent(buttonType, message)
-            // Handling onclick action for deep link, redirect, etc.
-            handleAction(getOnClickBehavior(buttonType, message))
-        } else if (buttonType == ImpressionType.CLICK_CONTENT) {
-            handleAction(OnClickBehavior(2, message.getTooltipConfig()?.url))
-        }
+        // Add event in the button if exist.
+        addEmbeddedEvent(buttonType, message)
+        // Handling onclick action for deep link, redirect, etc.
+        handleAction(getOnClickBehavior(buttonType, message))
+        // Update campaign status in repository
+        updateCampaignInRepository(message, optOut)
         // Schedule to report impression.
         scheduleReportImpression(message, getImpressionTypes(optOut, buttonType))
 

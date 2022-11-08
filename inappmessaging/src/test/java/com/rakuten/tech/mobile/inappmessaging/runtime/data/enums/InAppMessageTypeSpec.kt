@@ -27,7 +27,8 @@ class InAppMessageTypeSpec(private val id: Int, private val expected: Any?) {
                 arrayOf(2, InAppMessageType.FULL),
                 arrayOf(3, InAppMessageType.SLIDE),
                 arrayOf(4, InAppMessageType.HTML),
-                arrayOf(5, null)
+                arrayOf(5, InAppMessageType.TOOLTIP),
+                arrayOf(-1, null)
             )
         }
     }
