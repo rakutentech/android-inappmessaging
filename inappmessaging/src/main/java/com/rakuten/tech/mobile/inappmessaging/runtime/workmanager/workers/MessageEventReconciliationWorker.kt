@@ -4,6 +4,7 @@ import android.content.Context
 import androidx.work.Worker
 import androidx.work.WorkerParameters
 import com.rakuten.tech.mobile.inappmessaging.runtime.BuildConfig
+import com.rakuten.tech.mobile.inappmessaging.runtime.data.enums.InAppMessageType
 import com.rakuten.tech.mobile.inappmessaging.runtime.manager.DisplayManager
 import com.rakuten.tech.mobile.inappmessaging.runtime.manager.MessageReadinessManager
 import com.rakuten.tech.mobile.inappmessaging.runtime.utils.InAppLogger
@@ -63,7 +64,11 @@ internal class MessageEventReconciliationWorker(
     private fun reconcileMessagesAndEvents() {
         messageEventReconciliationUtil.validate { campaign, events ->
             if (eventMatchingUtil.removeSetOfMatchedEvents(events, campaign)) {
-                messageReadinessManager.addMessageToQueue(campaign.getCampaignId())
+                if (campaign.getType() == InAppMessageType.TOOLTIP.typeId) {
+                    messageReadinessManager.addTooltipToQueue(campaign.getCampaignId())
+                } else {
+                    messageReadinessManager.addCampaignToQueue(campaign.getCampaignId())
+                }
                 InAppLogger(TAG).debug("Ready message: ${campaign.getMessagePayload().header}")
             }
         }

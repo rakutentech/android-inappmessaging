@@ -26,14 +26,12 @@ internal class DisplayMessageWorker(
     var messageReadinessManager = MessageReadinessManager.instance()
     var handler = Handler(Looper.getMainLooper())
     var picasso: Picasso? = null
-    private var isTooltip = false
 
     /**
      * This method starts displaying message runnable.
      */
     override suspend fun doWork(): Result {
         InAppLogger(TAG).debug("onHandleWork() started on thread: %s", Thread.currentThread().name)
-        isTooltip = tags.contains(DISPLAY_TOOLTIP_WORKER)
         prepareNextMessage()
         InAppLogger(TAG).debug("onHandleWork() ended")
         return Result.success()
@@ -44,7 +42,7 @@ internal class DisplayMessageWorker(
      */
     private fun prepareNextMessage() {
         // Retrieving the next ready message, and its display permission been checked.
-        val messages = messageReadinessManager.getNextDisplayMessage(isTooltip)
+        val messages = messageReadinessManager.getNextDisplayMessage()
         val hostActivity = InAppMessaging.instance().getRegisteredActivity()
         if (hostActivity != null) {
             for (message in messages) {
@@ -56,10 +54,6 @@ internal class DisplayMessageWorker(
                     displayMessage(message, hostActivity)
                 }
             }
-        }
-        if (isTooltip) {
-            // start normal campaign queue
-            enqueueWork(false)
         }
     }
 
@@ -117,7 +111,6 @@ internal class DisplayMessageWorker(
     companion object {
         private const val TAG = "IAM_JobIntentService"
         private const val DISPLAY_WORKER = "iam_message_display_worker"
-        internal const val DISPLAY_TOOLTIP_WORKER = "iam_tooltip_display_worker"
 
         /**
          * This method enqueues work in to this service.
@@ -126,7 +119,7 @@ internal class DisplayMessageWorker(
             InAppMessaging.instance().getHostAppContext()?.let { context ->
                 val displayRequest = OneTimeWorkRequest.Builder(DisplayMessageWorker::class.java)
                     .setConstraints(WorkManagerUtil.getNetworkConnectedConstraint())
-                    .addTag(if (isTooltip) DISPLAY_TOOLTIP_WORKER else DISPLAY_WORKER)
+                    .addTag(DISPLAY_WORKER)
                     .build()
                 WorkManager.getInstance(context).enqueue(displayRequest)
             }

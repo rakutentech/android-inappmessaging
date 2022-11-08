@@ -133,6 +133,7 @@ internal interface DisplayManager {
                 parent.requestFocus()
                 parent.removeView(inAppMessageBaseView)
             }
+
             InAppLogger(TAG).debug("View removed")
         }
 

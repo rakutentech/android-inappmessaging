@@ -34,9 +34,15 @@ import java.util.concurrent.atomic.AtomicBoolean
 internal interface MessageReadinessManager {
 
     /**
-     * Adds a message Id to ready for display.
+     * Adds a campaign Id to ready for display.
      */
-    fun addMessageToQueue(id: String)
+    fun addCampaignToQueue(id: String)
+
+    /**
+     * Adds a tooltip campaign Id to ready for display.
+     * For improvement, create a separate class specific to tooltip operations.
+     */
+    fun addTooltipToQueue(id: String)
 
     /**
      * Clears all queued messages Ids for display.
@@ -47,7 +53,7 @@ internal interface MessageReadinessManager {
      * This method returns the next ready to display message.
      */
     @WorkerThread
-    fun getNextDisplayMessage(isTooltip: Boolean): List<Message>
+    fun getNextDisplayMessage(): List<Message>
 
     /**
      * This method returns a DisplayPermissionRequest object.
@@ -75,11 +81,17 @@ internal interface MessageReadinessManager {
     @SuppressWarnings("TooManyFunctions", "LargeClass")
     private class MessageReadinessManagerImpl(private val campaignRepo: CampaignRepository) : MessageReadinessManager {
         private val queuedMessages = mutableListOf<String>()
-        private val triggeredTooltips = mutableListOf<String>()
+        private val queuedTooltips = mutableListOf<String>()
 
-        override fun addMessageToQueue(id: String) {
+        override fun addCampaignToQueue(id: String) {
             synchronized(queuedMessages) {
                 queuedMessages.add(id)
+            }
+        }
+
+        override fun addTooltipToQueue(id: String) {
+            synchronized(queuedTooltips) {
+                queuedTooltips.add(id)
             }
         }
 
@@ -91,13 +103,14 @@ internal interface MessageReadinessManager {
 
         @WorkerThread
         @SuppressWarnings("LongMethod", "ComplexMethod", "ReturnCount")
-        override fun getNextDisplayMessage(isTooltip: Boolean): List<Message> {
+        override fun getNextDisplayMessage(): List<Message> {
             shouldRetry.set(true)
             val result = mutableListOf<Message>()
-
-            val queuedMessagesCopy = queuedMessages.toList() // Prevent ConcurrentModificationException
+            val hasCampaignsInQueue = queuedMessages.isNotEmpty()
+            // toList() prevents ConcurrentModificationException
+            val queuedMessagesCopy = if (hasCampaignsInQueue) queuedMessages.toList() else queuedTooltips.toList()
             for (messageId in queuedMessagesCopy) {
-                val campaignId = queuedMessages.removeFirst()
+                val campaignId = if (hasCampaignsInQueue) queuedMessages.removeFirst() else queuedTooltips.removeFirst()
                 val message = campaignRepo.messages[campaignId]
                 if (message == null) {
                     InAppLogger(TAG).debug("Queued campaign $campaignId does not exist in the repository anymore")
@@ -116,8 +129,8 @@ internal interface MessageReadinessManager {
                 // If message is test message, no need to do more checks.
                 if (shouldPing(message, result)) break
 
-                // Check if other tooltips can be displayed
-                if (isTooltip) continue
+                // Multiple tooltips can be displayed, checked other from queue.
+                if (queuedTooltips.isNotEmpty()) continue
                 else if (result.isNotEmpty()) return result
             }
             return result
@@ -185,9 +198,7 @@ internal interface MessageReadinessManager {
 
             return if (message.getType() == InAppMessageType.TOOLTIP.typeId) {
                 val shouldDisplayTooltip = hasPassedBasicCheck &&
-                    !triggeredTooltips.contains(message.getCampaignId()) && // only display once per app session
                     isTooltipTargetViewVisible(message) // if view where to attach tooltip is indeed visible
-                if (shouldDisplayTooltip) triggeredTooltips.add(message.getCampaignId())
                 shouldDisplayTooltip
             } else {
                 hasPassedBasicCheck
