@@ -60,9 +60,9 @@ internal interface DisplayManager {
                     removeAllTooltip(activity, delay)
                 }
                 // remove normal campaign
-                activity.findViewById<ViewGroup>(R.id.in_app_message_base_view)?.let {
-                    scheduleRemoval(delay, it, activity = activity)
-                    it.tag
+                activity.findViewById<ViewGroup>(R.id.in_app_message_base_view)?.let { viewGroup ->
+                    scheduleRemoval(delay, viewGroup, activity = activity)
+                    viewGroup.tag
                 }
             }
         }
@@ -90,10 +90,10 @@ internal interface DisplayManager {
         }
 
         private fun removeAllTooltip(activity: Activity, delay: Int) {
-            activity.findViewById<ViewGroup>(R.id.in_app_message_tooltip_view)?.parent?.let {
+            activity.findViewById<ViewGroup>(R.id.in_app_message_tooltip_view)?.parent?.let { viewParent ->
                 val viewList = mutableListOf<View>()
-                for (i in 0 until (it as ViewGroup).childCount) {
-                    val child = it.getChildAt(i)
+                for (i in 0 until (viewParent as ViewGroup).childCount) {
+                    val child = viewParent.getChildAt(i)
                     if (child?.id == R.id.in_app_message_tooltip_view) {
                         viewList.add(child)
                     }
@@ -158,22 +158,24 @@ internal interface DisplayManager {
 
         override fun removeHiddenTargets(parent: ViewGroup) {
             val activity = InAppMessaging.instance().getRegisteredActivity() ?: return
-            activity.findViewById<FrameLayout>(R.id.in_app_message_tooltip_layout)?.let { it ->
+            activity.findViewById<FrameLayout>(R.id.in_app_message_tooltip_layout)?.let { frameLayout ->
                 val removeList = mutableListOf<View>()
-                for (i in 0 until it.childCount) {
-                    val child = it.getChildAt(i)
+                for (i in 0 until frameLayout.childCount) {
+                    val child = frameLayout.getChildAt(i)
                     if (child?.id == R.id.in_app_message_tooltip_view) {
-                        addToList(child, activity, parent, removeList)
+                        addToList(child = child, activity = activity, parent = parent, removeList = removeList)
                     }
                 }
                 for (view in removeList) {
-                    (view.tag as String?)?.let {
-                        scheduleRemoval(delay = 0, view = view as ViewGroup, id = it, activity = activity)
+                    val viewId = view.tag as String?
+                    if (viewId != null) {
+                        scheduleRemoval(delay = 0, view = view as ViewGroup, id = viewId, activity = activity)
                     }
                 }
             }
         }
 
+        @SuppressWarnings("ReplaceSafeCallChainWithRun")
         private fun addToList(child: View, activity: Activity, parent: ViewGroup, removeList: MutableList<View>) {
             val message = CampaignRepository.instance().messages[child.tag as String]
             val target = message?.getTooltipConfig()?.id?.let {

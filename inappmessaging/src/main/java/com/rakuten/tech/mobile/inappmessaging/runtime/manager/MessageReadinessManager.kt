@@ -183,22 +183,24 @@ internal interface MessageReadinessManager {
             val isOptOut = message.isOptedOut == true
             val hasPassedBasicCheck = (message.infiniteImpressions() || impressions > 0) && !isOptOut
 
-            return when(message.getType()) {
-                InAppMessageType.TOOLTIP.typeId -> {
-                    val shouldDisplayTooltip = hasPassedBasicCheck &&
-                            !triggeredTooltips.contains(message.getCampaignId()) && // only display once per app session
-                            isTooltipTargetViewVisible(message) // if view where to attach tooltip is indeed visible
-                    if (shouldDisplayTooltip) triggeredTooltips.add(message.getCampaignId())
-                    shouldDisplayTooltip
-                }
-                else -> hasPassedBasicCheck
+            return if (message.getType() == InAppMessageType.TOOLTIP.typeId) {
+                val shouldDisplayTooltip = hasPassedBasicCheck &&
+                    !triggeredTooltips.contains(message.getCampaignId()) && // only display once per app session
+                    isTooltipTargetViewVisible(message) // if view where to attach tooltip is indeed visible
+                if (shouldDisplayTooltip) triggeredTooltips.add(message.getCampaignId())
+                shouldDisplayTooltip
+            } else {
+                hasPassedBasicCheck
             }
         }
 
+        @SuppressWarnings("ReplaceSafeCallChainWithRun")
         private fun isTooltipTargetViewVisible(message: Message): Boolean {
-            val activity = InAppMessaging.instance().getRegisteredActivity() ?: return false
-            val view = message.getTooltipConfig()?.id?.let { ResourceUtils.findViewByName<View>(activity, it) }
-            view?.let { return ViewUtil.isViewVisible(it) }
+            val activity = InAppMessaging.instance().getRegisteredActivity()
+            if (activity != null) {
+                val view = message.getTooltipConfig()?.id?.let { ResourceUtils.findViewByName<View>(activity, it) }
+                view?.let { return ViewUtil.isViewVisible(it) }
+            }
             return false
         }
 

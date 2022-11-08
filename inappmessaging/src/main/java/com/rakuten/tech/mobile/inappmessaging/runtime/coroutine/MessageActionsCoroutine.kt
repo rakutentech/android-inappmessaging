@@ -34,13 +34,15 @@ import kotlin.collections.ArrayList
 @SuppressWarnings("TooManyFunctions")
 internal class MessageActionsCoroutine(private val campaignRepo: CampaignRepository = CampaignRepository.instance()) {
 
-    fun executeTask(message: Message?, buttonType: ImpressionType, optOut: Boolean): Boolean {
+    fun executeTask(message: Message?, viewResourceId: Int, optOut: Boolean): Boolean {
         if (message == null || message.getCampaignId().isEmpty()) {
             return false
         }
         // Update campaign status in repository
         updateCampaignInRepository(message, optOut)
 
+        // Getting ImpressionType, which represents which button was pressed:
+        val buttonType = getOnClickBehaviorType(viewResourceId)
         if (message.getType() != InAppMessageType.TOOLTIP.typeId) {
             // Add event in the button if exist.
             addEmbeddedEvent(buttonType, message)
@@ -77,6 +79,20 @@ internal class MessageActionsCoroutine(private val campaignRepo: CampaignReposit
         }
 
         return impressionTypes
+    }
+
+    /**
+     * This method returns which button was clicked which is represented by ImpressionType object.
+     */
+    @VisibleForTesting
+    internal fun getOnClickBehaviorType(viewResourceId: Int): ImpressionType {
+        return when (viewResourceId) {
+            R.id.message_close_button, BACK_BUTTON -> ImpressionType.EXIT
+            R.id.message_single_button, R.id.message_button_left -> ImpressionType.ACTION_ONE
+            R.id.message_button_right -> ImpressionType.ACTION_TWO
+            R.id.slide_up, R.id.message_tooltip_image_view, R.id.message_tip -> ImpressionType.CLICK_CONTENT
+            else -> ImpressionType.INVALID
+        }
     }
 
     /**
@@ -228,18 +244,5 @@ internal class MessageActionsCoroutine(private val campaignRepo: CampaignReposit
     companion object {
         const val BACK_BUTTON = -1
         private const val TAG = "IAM_MessageActions"
-
-        /**
-         * This method returns which button was clicked which is represented by ImpressionType object.
-         */
-        internal fun getOnClickBehaviorType(viewResourceId: Int): ImpressionType {
-            return when (viewResourceId) {
-                R.id.message_close_button, BACK_BUTTON -> ImpressionType.EXIT
-                R.id.message_single_button, R.id.message_button_left -> ImpressionType.ACTION_ONE
-                R.id.message_button_right -> ImpressionType.ACTION_TWO
-                R.id.slide_up, R.id.message_tooltip_image_view, R.id.message_tip -> ImpressionType.CLICK_CONTENT
-                else -> ImpressionType.INVALID
-            }
-        }
     }
 }

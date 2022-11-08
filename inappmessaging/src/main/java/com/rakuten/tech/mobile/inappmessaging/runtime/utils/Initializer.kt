@@ -112,7 +112,7 @@ internal object Initializer {
      */
     private fun getUuid(context: Context, sharedUtil: PreferencesUtil): String {
         if (sharedUtil.contains(context, "uuid", ID_KEY)) {
-            return sharedUtil.getString(context = context, name = "uuid", key = ID_KEY, defValue = "").toString()
+            return sharedUtil.getString(context = context, name = "uuid", key = ID_KEY, defValue = "").orEmpty()
         }
         val id = UUID.randomUUID().toString()
         sharedUtil.putString(context = context, name = "uuid", key = ID_KEY, value = id)

@@ -123,12 +123,12 @@ internal class DisplayMessageWorker(
          * This method enqueues work in to this service.
          */
         fun enqueueWork(isTooltip: Boolean) {
-            InAppMessaging.instance().getHostAppContext()?.let {
+            InAppMessaging.instance().getHostAppContext()?.let { context ->
                 val displayRequest = OneTimeWorkRequest.Builder(DisplayMessageWorker::class.java)
                     .setConstraints(WorkManagerUtil.getNetworkConnectedConstraint())
                     .addTag(if (isTooltip) DISPLAY_TOOLTIP_WORKER else DISPLAY_WORKER)
                     .build()
-                WorkManager.getInstance(it).enqueue(displayRequest)
+                WorkManager.getInstance(context).enqueue(displayRequest)
             }
         }
     }

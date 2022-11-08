@@ -59,11 +59,12 @@ internal class InAppMessagingTooltipView(
         tag = message.getCampaignId()
         this.imageUrl = message.getMessagePayload().resource.imageUrl
         this.bgColor = message.getMessagePayload().backgroundColor
-        message.getTooltipConfig()?.let {
-            PositionType.getById(it.position)?.let { posType ->
-                type = posType
+        message.getTooltipConfig()?.let { tooltip ->
+            val position = PositionType.getById(tooltip.position)
+            if (position != null) {
+                type = position
             }
-            viewId = it.id
+            viewId = tooltip.id
         }
         listener = InAppMessageViewListener(message)
         bindImage()
@@ -288,14 +289,15 @@ internal class InAppMessagingTooltipView(
         (tip.layoutParams as LayoutParams).addRule(ALIGN_END, R.id.message_tooltip_image_view)
     }
 
+    @SuppressWarnings("NestedScopeFunctions")
     private fun showView() {
         val params = this.layoutParams as MarginLayoutParams
         (parent as ViewGroup).clipChildren = false
         (parent as ViewGroup).clipToPadding = false
         val imageView = findViewById<ImageView>(R.id.message_tooltip_image_view)
-        viewId?.let {
+        viewId?.let { id ->
             val activity = InAppMessaging.instance().getRegisteredActivity() ?: return
-            ResourceUtils.findViewByName<View>(activity, it)?.let { view ->
+            ResourceUtils.findViewByName<View>(activity, id)?.let { view ->
                 val buttonSize = findViewById<ImageButton>(R.id.message_close_button).layoutParams.height
                 ViewUtil.getPosition(
                     view = view, type = type, width = imageView.layoutParams.width,

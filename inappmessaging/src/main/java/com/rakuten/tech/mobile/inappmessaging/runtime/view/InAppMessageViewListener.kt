@@ -11,7 +11,6 @@ import androidx.annotation.VisibleForTesting
 import com.rakuten.tech.mobile.inappmessaging.runtime.InAppMessaging
 import com.rakuten.tech.mobile.inappmessaging.runtime.R
 import com.rakuten.tech.mobile.inappmessaging.runtime.coroutine.MessageActionsCoroutine
-import com.rakuten.tech.mobile.inappmessaging.runtime.data.enums.ImpressionType
 import com.rakuten.tech.mobile.inappmessaging.runtime.data.enums.InAppMessageType
 import com.rakuten.tech.mobile.inappmessaging.runtime.data.models.messages.Message
 import com.rakuten.tech.mobile.inappmessaging.runtime.manager.DisplayManager
@@ -103,13 +102,13 @@ internal class InAppMessageViewListener(
                 id = if (message.getType() == InAppMessageType.TOOLTIP.typeId) message.getCampaignId() else null
             )
             withContext(dispatcher) {
-                handleMessage(MessageActionsCoroutine.getOnClickBehaviorType(id))
+                handleMessage(id)
             }
         }
     }
 
-    internal fun handleMessage(type: ImpressionType) {
-        val result = messageCoroutine.executeTask(message, type, isOptOutChecked)
+    internal fun handleMessage(id: Int) {
+        val result = messageCoroutine.executeTask(message, id, isOptOutChecked)
         if (result) {
             eventScheduler.startReconciliationWorker(
                 delay = (message.getMessagePayload().messageSettings.displaySettings.delay).toLong()

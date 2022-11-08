@@ -111,8 +111,8 @@ internal class DisplayMessageRunnable(
                 )
                 hostActivity.addContentView(toolTipView, params)
             }
-            tooltip.autoDisappear?.let {
-                if (it > 0) displayManager.removeMessage(hostActivity, delay = it, id = message.getCampaignId())
+            if (tooltip.autoDisappear != null && tooltip.autoDisappear > 0) {
+                displayManager.removeMessage(hostActivity, delay = tooltip.autoDisappear, id = message.getCampaignId())
             }
         }
     }
