@@ -180,7 +180,7 @@ open class MessageReadinessManagerSpec : BaseTest() {
         CampaignRepository.instance().syncWith(messages, LAST_PING_MILLIS)
 
         MessageReadinessManager.instance().clearMessages()
-        for (message in messages) { MessageReadinessManager.instance().addMessageToQueue(message.getCampaignId()) }
+        for (message in messages) { MessageReadinessManager.instance().addCampaignToQueue(message.getCampaignId()) }
     }
 
 //    @Test
@@ -319,7 +319,7 @@ class MessageReadinessManagerRequestSpec : BaseTest() {
 
         MessageReadinessManager.instance().clearMessages()
         for (message in messages) {
-            MessageReadinessManager.instance().addMessageToQueue(message.getCampaignId())
+            MessageReadinessManager.instance().addCampaignToQueue(message.getCampaignId())
         }
     }
 

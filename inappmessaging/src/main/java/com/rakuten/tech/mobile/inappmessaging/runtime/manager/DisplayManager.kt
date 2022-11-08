@@ -43,8 +43,7 @@ internal interface DisplayManager {
     private class DisplayManagerImpl : DisplayManager {
 
         override fun displayMessage() {
-            // start with tooltip queue to make sure the all tooltip campaigns are displayed first
-            DisplayMessageWorker.enqueueWork(true)
+            DisplayMessageWorker.enqueueWork()
         }
 
         override fun removeMessage(activity: Activity?, removeAll: Boolean, delay: Int, id: String?): Any? {
@@ -133,6 +132,7 @@ internal interface DisplayManager {
                 parent.requestFocus()
                 parent.removeView(inAppMessageBaseView)
             }
+
             InAppLogger(TAG).debug("View removed")
         }
 
