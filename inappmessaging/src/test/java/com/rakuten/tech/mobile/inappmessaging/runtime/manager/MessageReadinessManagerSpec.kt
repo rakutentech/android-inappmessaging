@@ -82,17 +82,6 @@ open class MessageReadinessManagerSpec : BaseTest() {
         MessageReadinessManager.instance().getNextDisplayMessage() shouldBeEqualTo listOf(messageList[1])
     }
 
-//    @Test
-//    fun `should return test message for tooltip`() {
-//        val messageList = ArrayList<Message>()
-//        messageList.add(ValidTestMessage("1", false,
-//            tooltip = Tooltip("target", "bottom-center", "url", 0),
-//            type = InAppMessageType.TOOLTIP.typeId))
-//        setMessagesList(messageList, isTooltipList = true)
-//
-//        MessageReadinessManager.instance().getNextDisplayMessage()
-//    }
-
     @Test
     fun `should return test message when impressions is infinite`() {
         val messageList = ArrayList<Message>()
