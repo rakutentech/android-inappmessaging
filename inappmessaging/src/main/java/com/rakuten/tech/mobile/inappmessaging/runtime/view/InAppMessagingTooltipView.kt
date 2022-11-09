@@ -311,6 +311,18 @@ internal class InAppMessagingTooltipView(
         }
     }
 
+    internal fun setPosition(params: MarginLayoutParams, pos: Pair<Int, Int>, width: Int, height: Int) {
+        params.topMargin = pos.second
+        params.leftMargin = pos.first
+        val edgePos = ViewUtil.getEdgePosition(width, height, pos)
+        edgePos.first?.let { right ->
+            params.rightMargin = right
+        }
+        edgePos.second?.let { bottom ->
+            params.bottomMargin = bottom
+        }
+    }
+
     companion object {
         private const val TAG = "IAM_ToolTipView"
         internal const val PADDING = 40

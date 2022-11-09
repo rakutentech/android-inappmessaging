@@ -61,6 +61,8 @@ dependencies {
   implementation 'com.google.code.gson:gson:2.9.1'
   implementation "com.squareup.picasso:picasso:2.71828"
   implementation "io.github.rakutentech.sdkutils:sdk-utils:2.1.1"
+  implementation 'androidx.swiperefreshlayout:swiperefreshlayout:1.1.0'
+  implementation 'androidx.appcompat:appcompat:1.1.0'
 
   // Doclava needs an annotation class from this package (used by Retrofit)
   compileOnly 'org.codehaus.mojo:animal-sniffer-annotations:1.18'

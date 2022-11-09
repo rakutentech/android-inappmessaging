@@ -338,7 +338,7 @@ class InAppMessagingExceptionSpec : InAppMessagingSpec() {
         super.setup()
         InAppMessaging.errorCallback = null
         `when`(dispMgr.displayMessage()).thenThrow(NullPointerException())
-        `when`(dispMgr.removeMessage(any(), any(), any(), any())).thenThrow(NullPointerException())
+        `when`(dispMgr.removeMessage(anyOrNull(), anyOrNull(), any(), anyOrNull())).thenThrow(NullPointerException())
         `when`(eventsManager.onEventReceived(any(), any(), any())).thenThrow(NullPointerException())
     }
 
@@ -390,11 +390,11 @@ class InAppMessagingExceptionSpec : InAppMessagingSpec() {
 
     @Test
     fun `should trigger callback when unregister activity failed due to forced exception`() {
-//        InAppMessaging.errorCallback = mockCallback
-//        instance.unregisterMessageDisplayActivity()
-//
-//        Mockito.verify(mockCallback).invoke(captor.capture())
-//        captor.firstValue shouldBeInstanceOf InAppMessagingException::class.java
+        InAppMessaging.errorCallback = mockCallback
+        instance.unregisterMessageDisplayActivity()
+
+        Mockito.verify(mockCallback).invoke(captor.capture())
+        captor.firstValue shouldBeInstanceOf InAppMessagingException::class.java
     }
 
     @Test

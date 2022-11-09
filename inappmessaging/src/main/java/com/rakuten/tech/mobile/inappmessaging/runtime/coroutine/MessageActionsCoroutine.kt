@@ -38,9 +38,7 @@ internal class MessageActionsCoroutine(private val campaignRepo: CampaignReposit
         if (message == null || message.getCampaignId().isEmpty()) {
             return false
         }
-        // Update campaign status in repository
-        updateCampaignInRepository(message, optOut)
-
+        // Getting ImpressionType, which represents which button was pressed:
         val buttonType = getOnClickBehaviorType(viewResourceId)
         if (message.getType() != InAppMessageType.TOOLTIP.typeId) {
             // Add event in the button if exist.
@@ -50,7 +48,8 @@ internal class MessageActionsCoroutine(private val campaignRepo: CampaignReposit
         } else if (buttonType == ImpressionType.CLICK_CONTENT) {
             handleAction(OnClickBehavior(2, message.getTooltipConfig()?.url))
         }
-
+        // Update campaign status in repository
+        updateCampaignInRepository(message, optOut)
         // Schedule to report impression.
         scheduleReportImpression(message, getImpressionTypes(optOut, buttonType))
 

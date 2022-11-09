@@ -27,7 +27,7 @@ class ButtonActionTypeSpec(private val id: Int, private val expected: Any?) {
                 arrayOf(2, ButtonActionType.DEEPLINK),
                 arrayOf(3, ButtonActionType.CLOSE),
                 arrayOf(4, ButtonActionType.PUSH_PRIMER),
-                arrayOf(5, null)
+                arrayOf(-1, null)
             )
         }
     }

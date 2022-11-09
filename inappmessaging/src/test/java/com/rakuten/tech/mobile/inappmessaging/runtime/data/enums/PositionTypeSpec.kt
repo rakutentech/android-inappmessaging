@@ -9,10 +9,11 @@ import org.robolectric.annotation.Config
 
 @RunWith(ParameterizedRobolectricTestRunner::class)
 @Config(sdk = [Build.VERSION_CODES.O_MR1])
-class EventTypeSpec(private val id: Int, private val expected: Any?) {
+class PositionTypeSpec(private val id: String, private val expected: Any?) {
+
     @Test
     fun `should return correct type from id`() {
-        EventType.getById(id) shouldBeEqualTo expected
+        PositionType.getById(id) shouldBeEqualTo expected
     }
 
     companion object {
@@ -22,12 +23,15 @@ class EventTypeSpec(private val id: Int, private val expected: Any?) {
         )
         fun data(): List<Array<out Any?>> {
             return listOf(
-                arrayOf(0, EventType.INVALID),
-                arrayOf(1, EventType.APP_START),
-                arrayOf(2, EventType.LOGIN_SUCCESSFUL),
-                arrayOf(3, EventType.PURCHASE_SUCCESSFUL),
-                arrayOf(4, EventType.CUSTOM),
-                arrayOf(-1, null)
+                arrayOf("top-right", PositionType.TOP_RIGHT),
+                arrayOf("top-center", PositionType.TOP_CENTER),
+                arrayOf("top-left", PositionType.TOP_LEFT),
+                arrayOf("bottom-right", PositionType.BOTTOM_RIGHT),
+                arrayOf("bottom-center", PositionType.BOTTOM_CENTER),
+                arrayOf("bottom-left", PositionType.BOTTOM_LEFT),
+                arrayOf("right", PositionType.RIGHT),
+                arrayOf("left", PositionType.LEFT),
+                arrayOf("invalid", null)
             )
         }
     }

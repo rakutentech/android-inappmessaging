@@ -107,7 +107,7 @@ internal interface MessageReadinessManager {
             shouldRetry.set(true)
             val result = mutableListOf<Message>()
             val hasCampaignsInQueue = queuedMessages.isNotEmpty()
-            // toList() prevents ConcurrentModificationException
+            // toList() to prevent ConcurrentModificationException
             val queuedMessagesCopy = if (hasCampaignsInQueue) queuedMessages.toList() else queuedTooltips.toList()
             for (messageId in queuedMessagesCopy) {
                 val campaignId = if (hasCampaignsInQueue) queuedMessages.removeFirst() else queuedTooltips.removeFirst()

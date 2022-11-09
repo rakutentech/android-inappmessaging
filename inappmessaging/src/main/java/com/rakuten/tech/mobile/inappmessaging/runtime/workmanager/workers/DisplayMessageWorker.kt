@@ -19,6 +19,10 @@ import com.squareup.picasso.Callback
 import com.squareup.picasso.Picasso
 import java.lang.Exception
 
+/**
+ * Since one service is essentially one worker thread, so there's no chance multiple worker threads
+ * can dispatch Runnables to Android's message queue. Only one at a time.
+ */
 internal class DisplayMessageWorker(
     context: Context,
     params: WorkerParameters
@@ -88,6 +92,7 @@ internal class DisplayMessageWorker(
         if (!verifyContexts(message)) {
             // Message display aborted by the host app
             InAppLogger(TAG).debug("message display cancelled by the host app")
+
             prepareNextMessage()
             return
         }
@@ -116,12 +121,12 @@ internal class DisplayMessageWorker(
          * This method enqueues work in to this service.
          */
         fun enqueueWork() {
-            InAppMessaging.instance().getHostAppContext()?.let { context ->
+            InAppMessaging.instance().getHostAppContext()?.let { ctx ->
                 val displayRequest = OneTimeWorkRequest.Builder(DisplayMessageWorker::class.java)
                     .setConstraints(WorkManagerUtil.getNetworkConnectedConstraint())
                     .addTag(DISPLAY_WORKER)
                     .build()
-                WorkManager.getInstance(context).enqueue(displayRequest)
+                WorkManager.getInstance(ctx).enqueue(displayRequest)
             }
         }
     }
