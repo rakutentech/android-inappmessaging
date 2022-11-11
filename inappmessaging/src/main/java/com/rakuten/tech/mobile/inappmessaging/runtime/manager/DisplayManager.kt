@@ -10,7 +10,6 @@ import android.widget.FrameLayout
 import com.rakuten.tech.mobile.inappmessaging.runtime.InAppMessaging
 import com.rakuten.tech.mobile.inappmessaging.runtime.R
 import com.rakuten.tech.mobile.inappmessaging.runtime.coroutine.MessageActionsCoroutine
-import com.rakuten.tech.mobile.inappmessaging.runtime.data.enums.ImpressionType
 import com.rakuten.tech.mobile.inappmessaging.runtime.data.repositories.CampaignRepository
 import com.rakuten.tech.mobile.inappmessaging.runtime.utils.InAppLogger
 import com.rakuten.tech.mobile.inappmessaging.runtime.utils.ResourceUtils
@@ -116,7 +115,8 @@ internal interface DisplayManager {
                         // to handle repo update and impression request for auto disappear,
                         // simulate a close action
                         MessageActionsCoroutine().executeTask(
-                            CampaignRepository.instance().messages[id], R.id.message_close_button, false)
+                            CampaignRepository.instance().messages[id], R.id.message_close_button, false
+                        )
                     }, delay * MS_MULTIPLIER
                 )
             } else {

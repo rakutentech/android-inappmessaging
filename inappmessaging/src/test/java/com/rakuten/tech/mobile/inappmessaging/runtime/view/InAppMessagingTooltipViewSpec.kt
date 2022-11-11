@@ -13,6 +13,7 @@ import androidx.test.core.app.ApplicationProvider
 import com.google.android.material.imageview.ShapeableImageView
 import com.nhaarman.mockitokotlin2.any
 import com.nhaarman.mockitokotlin2.eq
+import com.rakuten.tech.mobile.inappmessaging.runtime.InAppMessaging
 import com.rakuten.tech.mobile.inappmessaging.runtime.R
 import com.rakuten.tech.mobile.inappmessaging.runtime.data.enums.PositionType
 import com.rakuten.tech.mobile.inappmessaging.runtime.data.models.Tooltip
@@ -218,6 +219,8 @@ class InAppMessagingTooltipViewSpec {
     private fun showImage(type: PositionType, withId: Boolean = true, activity: Activity? = hostAppActivity) {
         if (withId) {
             Mockito.`when`(mockTooltip.id).thenReturn("target")
+            InAppMessaging.initialize(ApplicationProvider.getApplicationContext())
+            activity?.let { InAppMessaging.instance().registerMessageDisplayActivity(it) }
         }
         Mockito.`when`(mockTooltip.position).thenReturn(type.typeId)
         verifyImageFetch(true)
@@ -228,7 +231,7 @@ class InAppMessagingTooltipViewSpec {
         image?.viewTreeObserver?.dispatchOnGlobalLayout()
 
         if (withId && activity != null) {
-//            Mockito.verify(hostAppActivity).findViewById<View>(any())
+            Mockito.verify(hostAppActivity).findViewById<View>(any())
         }
     }
 }

@@ -12,6 +12,7 @@ import android.view.ViewGroup
 import android.view.Window
 import android.widget.FrameLayout
 import android.widget.ScrollView
+import androidx.coordinatorlayout.widget.CoordinatorLayout
 import androidx.test.core.app.ApplicationProvider
 import androidx.work.testing.WorkManagerTestInitHelper
 import com.nhaarman.mockitokotlin2.*
@@ -26,10 +27,8 @@ import com.rakuten.tech.mobile.inappmessaging.runtime.manager.DisplayManager
 import com.rakuten.tech.mobile.inappmessaging.runtime.view.InAppMessageModalView
 import com.rakuten.tech.mobile.inappmessaging.runtime.view.InAppMessageSlideUpView
 import org.junit.Before
-import org.junit.Ignore
 import org.junit.Test
 import org.junit.runner.RunWith
-import org.mockito.Mockito
 import org.mockito.Mockito.`when`
 import org.mockito.Mockito.mock
 import org.robolectric.RobolectricTestRunner
@@ -217,17 +216,29 @@ class DisplayMessageRunnableSpec : BaseTest() {
         verify(mockDisplay, never()).removeMessage(any(), any(), any(), any())
     }
 
-    @Ignore
     @Test
     fun `should display for tooltip with valid details in scroll`() {
         setupActivity()
         setupTooltip()
         val scroll = setupTooltipDetails(true)
-        `when`(scroll?.getChildAt(0)).thenReturn(Mockito.mock(ViewGroup::class.java))
+        `when`(scroll?.childCount).thenReturn(1)
+        `when`(scroll?.getChildAt(0)).thenReturn(mock(ViewGroup::class.java))
         val mockFrame = mock(FrameLayout::class.java)
         verifyShouldDisplayTooltip(mockFrame)
         verify(scroll)?.addView(any())
         verify(mockFrame, times(2))?.addView(any())
+    }
+
+    @Test
+    fun `should display for tooltip with valid details in scroll with CoordinatorLayout`() {
+        setupActivity()
+        setupTooltip()
+        val scroll = setupTooltipDetails(true)
+        `when`(scroll?.childCount).thenReturn(1)
+        `when`(scroll?.getChildAt(0)).thenReturn(mock(CoordinatorLayout::class.java))
+        val mockFrame = mock(FrameLayout::class.java)
+        `when`(scroll?.parent).thenReturn(mockFrame)
+        verifyShouldDisplayTooltip(mockFrame)
     }
 
     @Test(expected = NullPointerException::class)

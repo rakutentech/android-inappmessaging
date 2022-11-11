@@ -7,7 +7,10 @@ import android.os.Build
 import android.view.View
 import android.view.ViewGroup
 import android.view.ViewParent
+import android.widget.FrameLayout
+import android.widget.LinearLayout
 import android.widget.ScrollView
+import androidx.appcompat.widget.Toolbar
 import androidx.core.widget.NestedScrollView
 import androidx.swiperefreshlayout.widget.SwipeRefreshLayout
 import androidx.test.core.app.ApplicationProvider
@@ -193,6 +196,100 @@ class ViewUtilSpec : BaseTest() {
         val pos = ViewUtil.getEdgePosition(10, 10, POS)
         pos.first.shouldBeNull()
         pos.second.shouldBeNull()
+    }
+
+    @Test
+    fun `should return parent FrameLayout`() {
+        val mockView = Mockito.mock(View::class.java)
+        val mockView2 = Mockito.mock(FrameLayout::class.java)
+        `when`(mockView.parent).thenReturn(mockView2)
+
+        ViewUtil.getFrameLayout(mockView).shouldBeEqualTo(mockView2)
+    }
+
+    @Test
+    fun `should return parent FrameLayout (multiple hierarchy)`() {
+        val mockView = Mockito.mock(View::class.java)
+        val mockView2 = Mockito.mock(LinearLayout::class.java)
+        val mockView3 = Mockito.mock(FrameLayout::class.java)
+        `when`(mockView.parent).thenReturn(mockView2)
+        `when`(mockView2.parent).thenReturn(mockView3)
+
+        ViewUtil.getFrameLayout(mockView).shouldBeEqualTo(mockView3)
+    }
+
+    @Test
+    fun `should return null if no FrameLayout`() {
+        val mockView = Mockito.mock(View::class.java)
+        val mockView2 = Mockito.mock(LinearLayout::class.java)
+        `when`(mockView.parent).thenReturn(mockView2)
+
+        ViewUtil.getFrameLayout(mockView).shouldBeNull()
+    }
+
+    @Test
+    fun `should return -1 layout child index if view has no child`() {
+        val mockGroup = Mockito.mock(ViewGroup::class.java)
+        `when`(mockGroup.childCount).thenReturn(0)
+
+        ViewUtil.getFirstLayoutChild(mockGroup).shouldBeEqualTo(-1)
+    }
+
+    @Test
+    fun `should return -1 layout child index if child is not a ViewGroup`() {
+        val mockGroup = Mockito.mock(ViewGroup::class.java)
+        val mockView = Mockito.mock(View::class.java)
+        `when`(mockGroup.childCount).thenReturn(1)
+        `when`(mockGroup.getChildAt(0)).thenReturn(mockView)
+
+        ViewUtil.getFirstLayoutChild(mockGroup).shouldBeEqualTo(-1)
+    }
+
+    @Test
+    fun `should return layout child index if child is a ViewGroup`() {
+        val mockGroup = Mockito.mock(ViewGroup::class.java)
+        val mockGroup2 = Mockito.mock(ViewGroup::class.java)
+        `when`(mockGroup.childCount).thenReturn(1)
+        `when`(mockGroup.getChildAt(0)).thenReturn(mockGroup2)
+
+        ViewUtil.getFirstLayoutChild(mockGroup).shouldBeEqualTo(0)
+    }
+
+    @Test
+    fun `should return toolbar index`() {
+        val mockFrameLayout = Mockito.mock(FrameLayout::class.java)
+        val mockToolbar = Mockito.mock(Toolbar::class.java)
+        `when`(mockFrameLayout.childCount).thenReturn(1)
+        `when`(mockFrameLayout.getChildAt(0)).thenReturn(mockToolbar)
+
+        ViewUtil.getToolBarIndex(mockFrameLayout).shouldBeEqualTo(0)
+    }
+
+    @Test
+    fun `should return visible if view is not scrollable`() {
+        val mockView = Mockito.mock(View::class.java)
+
+        ViewUtil.isViewVisible(mockView).shouldBeTrue()
+    }
+
+    @Test
+    fun `should return true (visible) if scrollable area target is visible`() {
+        val mockView = Mockito.mock(View::class.java)
+        val mockScrollView = Mockito.mock(ScrollView::class.java)
+        `when`(mockView.parent).thenReturn(mockScrollView)
+        `when`(mockView.getLocalVisibleRect(any())).thenReturn(true)
+
+        ViewUtil.isViewVisible(mockView).shouldBeTrue()
+    }
+
+    @Test
+    fun `should return false (not visible) if scrollable area target is not visible`() {
+        val mockView = Mockito.mock(View::class.java)
+        val mockScrollView = Mockito.mock(ScrollView::class.java)
+        `when`(mockView.parent).thenReturn(mockScrollView)
+        `when`(mockView.getLocalVisibleRect(any())).thenReturn(false)
+
+        ViewUtil.isViewVisible(mockView).shouldBeFalse()
     }
 
     private fun setupPosition(type: PositionType, isScroll: Boolean = false): Pair<Int, Int> {
