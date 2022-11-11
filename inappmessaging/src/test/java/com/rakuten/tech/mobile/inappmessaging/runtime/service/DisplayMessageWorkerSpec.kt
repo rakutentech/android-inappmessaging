@@ -2,8 +2,11 @@ package com.rakuten.tech.mobile.inappmessaging.runtime.service
 
 import android.app.Activity
 import android.content.Context
+import android.content.res.Resources
 import android.os.Build
 import android.os.Handler
+import android.util.DisplayMetrics
+import android.view.View
 import androidx.test.core.app.ApplicationProvider.getApplicationContext
 import androidx.work.ListenableWorker
 import androidx.work.WorkerParameters
@@ -13,10 +16,15 @@ import androidx.work.testing.TestListenableWorkerBuilder
 import com.nhaarman.mockitokotlin2.*
 import com.rakuten.tech.mobile.inappmessaging.runtime.BaseTest
 import com.rakuten.tech.mobile.inappmessaging.runtime.InAppMessaging
+import com.rakuten.tech.mobile.inappmessaging.runtime.data.models.messages.Message
 import com.rakuten.tech.mobile.inappmessaging.runtime.data.repositories.ConfigResponseRepository
 import com.rakuten.tech.mobile.inappmessaging.runtime.data.responses.config.ConfigResponseData
 import com.rakuten.tech.mobile.inappmessaging.runtime.data.responses.ping.MessageMixerResponseSpec
+import com.rakuten.tech.mobile.inappmessaging.runtime.data.responses.ping.MessagePayload
+import com.rakuten.tech.mobile.inappmessaging.runtime.data.responses.ping.Resource
 import com.rakuten.tech.mobile.inappmessaging.runtime.manager.MessageReadinessManager
+import com.rakuten.tech.mobile.inappmessaging.runtime.runnable.DisplayMessageRunnable
+import com.rakuten.tech.mobile.inappmessaging.runtime.utils.ImageUtilSpec
 import com.rakuten.tech.mobile.inappmessaging.runtime.workmanager.workers.DisplayMessageWorker
 import kotlinx.coroutines.runBlocking
 import org.amshove.kluent.shouldBeEqualTo
@@ -24,8 +32,10 @@ import org.junit.After
 import org.junit.Before
 import org.junit.Test
 import org.junit.runner.RunWith
+import org.mockito.ArgumentMatchers
 import org.mockito.Mockito
 import org.mockito.Mockito.`when`
+import org.mockito.verification.VerificationMode
 import org.robolectric.RobolectricTestRunner
 import org.robolectric.annotation.Config
 
@@ -79,225 +89,225 @@ open class DisplayMessageWorkerSpec : BaseTest() {
         Mockito.verify(handler, never()).post(any())
     }
 
-//    @Test
-//    fun `should return successful with valid message with empty string url`() {
-//        val message = setupValidMessage()
-//        val mockPayload = Mockito.mock(MessagePayload::class.java)
-//        val mockResource = Mockito.mock(Resource::class.java)
-//        `when`(message.getMessagePayload()).thenReturn(mockPayload)
-//        `when`(mockPayload.resource).thenReturn(mockResource)
-//        `when`(mockResource.imageUrl).thenReturn("")
-//        runBlocking { displayWorker.doWork() shouldBeEqualTo ListenableWorker.Result.success() }
-//        Mockito.verify(handler).post(any())
-//    }
+    @Test
+    fun `should return successful with valid message with empty string url`() {
+        val message = setupValidMessage()
+        val mockPayload = Mockito.mock(MessagePayload::class.java)
+        val mockResource = Mockito.mock(Resource::class.java)
+        `when`(message.getMessagePayload()).thenReturn(mockPayload)
+        `when`(mockPayload.resource).thenReturn(mockResource)
+        `when`(mockResource.imageUrl).thenReturn("")
+        runBlocking { displayWorker.doWork() shouldBeEqualTo ListenableWorker.Result.success() }
+        Mockito.verify(handler).post(any())
+    }
 
-//    @Test
-//    fun `should return successful with valid message and null url`() {
-//        val message = setupValidMessage()
-//        `when`(message.getMessagePayload()).thenReturn(payload)
-//        runBlocking { displayWorker.doWork() shouldBeEqualTo ListenableWorker.Result.success() }
-//        Mockito.verify(handler).post(any())
-//    }
+    @Test
+    fun `should return successful with valid message and null url`() {
+        val message = setupValidMessage()
+        `when`(message.getMessagePayload()).thenReturn(payload)
+        runBlocking { displayWorker.doWork() shouldBeEqualTo ListenableWorker.Result.success() }
+        Mockito.verify(handler).post(any())
+    }
 
-//    @Test
-//    fun `should display campaign if onVerifyContext was not set (default value)`() {
-//        verifyHandlerCalled(true)
-//    }
+    @Test
+    fun `should display campaign if onVerifyContext was not set (default value)`() {
+        verifyHandlerCalled(true)
+    }
 
-//    @Test
-//    fun `should not display campaign if activity is not registered`() {
-//        InAppMessaging.instance().unregisterMessageDisplayActivity()
-//        Mockito.verify(activity).findViewById<View?>(ArgumentMatchers.anyInt())
-//        verifyHandlerCalled()
-//    }
+    @Test
+    fun `should not display campaign if activity is not registered`() {
+        InAppMessaging.instance().unregisterMessageDisplayActivity()
+        Mockito.verify(activity, atLeastOnce()).findViewById<View?>(ArgumentMatchers.anyInt())
+        verifyHandlerCalled()
+    }
 
-//    @Test
-//    fun `should not display campaign if payload is null`() {
-//        `when`(mockMessageManager.getNextDisplayMessage()).thenReturn(null)
-//        runBlocking { displayWorker.doWork() shouldBeEqualTo ListenableWorker.Result.success() }
-//
-//        Mockito.verify(activity, never()).findViewById<View?>(ArgumentMatchers.anyInt())
-//    }
+    @Test
+    fun `should not display campaign if payload is null`() {
+        `when`(mockMessageManager.getNextDisplayMessage()).thenReturn(listOf())
+        runBlocking { displayWorker.doWork() shouldBeEqualTo ListenableWorker.Result.success() }
 
-//    @Test
-//    fun `should try to display message with valid image`() {
-//        verifyFetchImage(true, times(1))
-//    }
+        Mockito.verify(activity, never()).findViewById<View?>(ArgumentMatchers.anyInt())
+    }
 
-//    @Test
-//    fun `should not try to display message with invalid image`() {
-//        verifyFetchImage(false, never())
-//    }
+    @Test
+    fun `should try to display message with valid image`() {
+        verifyFetchImage(true, times(1))
+    }
 
-//    private fun verifyFetchImage(isValid: Boolean, mode: VerificationMode) {
-//        val worker = TestListenableWorkerBuilder<DisplayMessageWorker>(getApplicationContext()).build()
-//        worker.messageReadinessManager = mockMessageManager
-//        val message = setupMessageWithImage("https://imageurl.jpg")
-//        `when`(mockMessageManager.getNextDisplayMessage()).thenReturn(message).thenReturn(null)
-//        `when`(mockMessageManager.getNextDisplayMessage()).thenReturn(message)
-//        val mockResource = Mockito.mock(Resources::class.java)
-//        `when`(activity.resources).thenReturn(mockResource)
-//        `when`(mockResource.displayMetrics).thenReturn(Mockito.mock(DisplayMetrics::class.java))
-//        ImageUtilSpec.IS_VALID = isValid
-//        worker.picasso = ImageUtilSpec.setupMockPicasso()
-//        worker.handler = handler
-//        runBlocking { worker.doWork() shouldBeEqualTo ListenableWorker.Result.success() }
-//
-//        Mockito.verify(handler, mode).post(ArgumentMatchers.any(DisplayMessageRunnable::class.java))
-//    }
+    @Test
+    fun `should not try to display message with invalid image`() {
+        verifyFetchImage(false, never())
+    }
 
-//    @Test
-//    fun `should display the message if null image url`() {
-//        val message = setupMessageWithImage(null)
-//        `when`(mockMessageManager.getNextDisplayMessage()).thenReturn(message)
-//        runBlocking { displayWorker.doWork() shouldBeEqualTo ListenableWorker.Result.success() }
-//
-//        Mockito.verify(handler).post(ArgumentMatchers.any(DisplayMessageRunnable::class.java))
-//    }
+    private fun verifyFetchImage(isValid: Boolean, mode: VerificationMode) {
+        val worker = TestListenableWorkerBuilder<DisplayMessageWorker>(getApplicationContext()).build()
+        worker.messageReadinessManager = mockMessageManager
+        val message = setupMessageWithImage("https://imageurl.jpg")
+        `when`(mockMessageManager.getNextDisplayMessage()).thenReturn(listOf(message)).thenReturn(null)
+        `when`(mockMessageManager.getNextDisplayMessage()).thenReturn(listOf(message))
+        val mockResource = Mockito.mock(Resources::class.java)
+        `when`(activity.resources).thenReturn(mockResource)
+        `when`(mockResource.displayMetrics).thenReturn(Mockito.mock(DisplayMetrics::class.java))
+        ImageUtilSpec.IS_VALID = isValid
+        worker.picasso = ImageUtilSpec.setupMockPicasso()
+        worker.handler = handler
+        runBlocking { worker.doWork() shouldBeEqualTo ListenableWorker.Result.success() }
 
-//    private fun setupMessageWithImage(imageUrl: String?): Message {
-//        val message = Mockito.mock(Message::class.java)
-//        val payload = Mockito.mock(MessagePayload::class.java)
-//        val resource = Mockito.mock(Resource::class.java)
-//
-//        `when`(resource.imageUrl).thenReturn(imageUrl)
-//        `when`(payload.resource).thenReturn(resource)
-//        `when`(message.getMessagePayload()).thenReturn(payload)
-//        `when`(message.getCampaignId()).thenReturn("1")
-//        `when`(message.isTest()).thenReturn(true)
-//        `when`(message.getMaxImpressions()).thenReturn(1)
-//        `when`(message.getMessagePayload()).thenReturn(payload)
-//        `when`(message.getContexts()).thenReturn(listOf("ctx"))
-//        return message
-//    }
+        Mockito.verify(handler, mode).post(ArgumentMatchers.any(DisplayMessageRunnable::class.java))
+    }
 
-//    private fun setupValidMessage(): Message {
-//        val message = Mockito.mock(Message::class.java)
-//        `when`(mockMessageManager.getNextDisplayMessage()).thenReturn(message)
-//        `when`(message.getCampaignId()).thenReturn("1")
-//        `when`(message.isTest()).thenReturn(true)
-//        `when`(message.getMaxImpressions()).thenReturn(10)
-//        return message
-//    }
+    @Test
+    fun `should display the message if null image url`() {
+        val message = setupMessageWithImage(null)
+        `when`(mockMessageManager.getNextDisplayMessage()).thenReturn(listOf(message))
+        runBlocking { displayWorker.doWork() shouldBeEqualTo ListenableWorker.Result.success() }
 
-//    private fun verifyHandlerCalled(shouldCall: Boolean = false) {
-//        val message = Mockito.mock(Message::class.java)
-//
-//        setupMocking(message)
-//        runBlocking { displayWorker.doWork() shouldBeEqualTo ListenableWorker.Result.success() }
-//
-//        if (shouldCall) {
-//            Mockito.verify(handler).post(any())
-//        } else {
-//            Mockito.verify(handler, never()).post(any())
-//        }
-//    }
+        Mockito.verify(handler).post(ArgumentMatchers.any(DisplayMessageRunnable::class.java))
+    }
 
-//    internal fun setupMocking(message: Message) {
-//        `when`(message.getCampaignId()).thenReturn("1")
-//        `when`(message.isTest()).thenReturn(false)
-//        `when`(message.getMaxImpressions()).thenReturn(1)
-//        `when`(message.getMessagePayload()).thenReturn(payload)
-//        `when`(message.getContexts()).thenReturn(listOf("ctx"))
-//        `when`(mockMessageManager.getNextDisplayMessage()).thenReturn(message).thenReturn(null)
-//    }
-// }
+    private fun setupMessageWithImage(imageUrl: String?): Message {
+        val message = Mockito.mock(Message::class.java)
+        val payload = Mockito.mock(MessagePayload::class.java)
+        val resource = Mockito.mock(Resource::class.java)
 
-    class DisplayMessageWorkerVerifyContextSpec : DisplayMessageWorkerSpec() {
+        `when`(resource.imageUrl).thenReturn(imageUrl)
+        `when`(payload.resource).thenReturn(resource)
+        `when`(message.getMessagePayload()).thenReturn(payload)
+        `when`(message.getCampaignId()).thenReturn("1")
+        `when`(message.isTest()).thenReturn(true)
+        `when`(message.getMaxImpressions()).thenReturn(1)
+        `when`(message.getMessagePayload()).thenReturn(payload)
+        `when`(message.getContexts()).thenReturn(listOf("ctx"))
+        return message
+    }
 
-        private val onVerifyContexts = Mockito.mock(InAppMessaging.instance().onVerifyContext.javaClass)
+    private fun setupValidMessage(): Message {
+        val message = Mockito.mock(Message::class.java)
+        `when`(mockMessageManager.getNextDisplayMessage()).thenReturn(listOf(message))
+        `when`(message.getCampaignId()).thenReturn("1")
+        `when`(message.isTest()).thenReturn(true)
+        `when`(message.getMaxImpressions()).thenReturn(10)
+        return message
+    }
 
-//    @Test
-//    fun `should call onVerifyContext for non-test campaign with contexts`() {
-//        setupCampaign()
-//
-//        Mockito.verify(onVerifyContexts).invoke(listOf("ctx"), "DEV-Test (Android In-App-Test)")
-//    }
+    private fun verifyHandlerCalled(shouldCall: Boolean = false) {
+        val message = Mockito.mock(Message::class.java)
 
-//    @Test
-//    fun `should not call onVerifyContext for non-test campaign without contexts`() {
-//        val message = Mockito.mock(Message::class.java)
-//
-//        `when`(onVerifyContexts.invoke(any(), any())).thenReturn(true)
-//        InAppMessaging.instance().onVerifyContext = onVerifyContexts
-//
-//        `when`(message.getCampaignId()).thenReturn("1")
-//        `when`(message.isTest()).thenReturn(false)
-//        `when`(message.getMaxImpressions()).thenReturn(1)
-//        `when`(message.getMessagePayload()).thenReturn(payload)
-//        `when`(message.getContexts()).thenReturn(listOf())
-//        `when`(mockMessageManager.getNextDisplayMessage()).thenReturn(message)
-//        runBlocking {
-//            displayWorker.doWork() shouldBeEqualTo ListenableWorker.Result.success()
-//        }
-//
-//        Mockito.verify(onVerifyContexts, never()).invoke(any(), any())
-//    }
+        setupMocking(message)
+        runBlocking { displayWorker.doWork() shouldBeEqualTo ListenableWorker.Result.success() }
 
-//    @Test
-//    fun `should not call onVerifyContext for test campaign with contexts`() {
-//        val message = Mockito.mock(Message::class.java)
-//
-//        `when`(onVerifyContexts.invoke(any(), any())).thenReturn(true)
-//        InAppMessaging.instance().onVerifyContext = onVerifyContexts
-//
-//        `when`(message.getCampaignId()).thenReturn("1")
-//        `when`(message.isTest()).thenReturn(true)
-//        `when`(message.getMaxImpressions()).thenReturn(1)
-//        `when`(message.getMessagePayload()).thenReturn(payload)
-//        `when`(message.getContexts()).thenReturn(listOf("ctx"))
-//        `when`(mockMessageManager.getNextDisplayMessage()).thenReturn(message)
-//        runBlocking {
-//            displayWorker.doWork() shouldBeEqualTo ListenableWorker.Result.success()
-//        }
-//
-//        Mockito.verify(onVerifyContexts, never()).invoke(any(), any())
-//    }
+        if (shouldCall) {
+            Mockito.verify(handler).post(any())
+        } else {
+            Mockito.verify(handler, never()).post(any())
+        }
+    }
 
-//    @Test
-//    fun `should call onVerifyContext with proper parameters`() {
-//        setupCampaign()
-//
-//        argumentCaptor<List<String>>().apply {
-//            Mockito.verify(onVerifyContexts).invoke(capture(), any())
-//            firstValue shouldBeEqualTo listOf("ctx")
-//        }
-//        argumentCaptor<String>().apply {
-//            Mockito.verify(onVerifyContexts).invoke(any(), capture())
-//            firstValue shouldBeEqualTo "DEV-Test (Android In-App-Test)"
-//        }
-//    }
+    internal fun setupMocking(message: Message) {
+        `when`(message.getCampaignId()).thenReturn("1")
+        `when`(message.isTest()).thenReturn(false)
+        `when`(message.getMaxImpressions()).thenReturn(1)
+        `when`(message.getMessagePayload()).thenReturn(payload)
+        `when`(message.getContexts()).thenReturn(listOf("ctx"))
+        `when`(mockMessageManager.getNextDisplayMessage()).thenReturn(listOf(message)).thenReturn(listOf())
+    }
+}
 
-//    @Test
-//    fun `should call getMessagePayload again when message's context was rejected`() {
-//        setupNextCampaign()
-//
-//        Mockito.verify(mockMessageManager, Mockito.times(2)).getNextDisplayMessage()
-//    }
+class DisplayMessageWorkerVerifyContextSpec : DisplayMessageWorkerSpec() {
 
-//    private fun setupNextCampaign(): Message {
-//        val message = Mockito.mock(Message::class.java)
-//
-//        `when`(onVerifyContexts.invoke(any(), any())).thenReturn(false)
-//        InAppMessaging.instance().onVerifyContext = onVerifyContexts
-//
-//        setupMocking(message)
-//        runBlocking {
-//            displayWorker.doWork() shouldBeEqualTo ListenableWorker.Result.success()
-//        }
-//
-//        return message
-//    }
+    private val onVerifyContexts = Mockito.mock(InAppMessaging.instance().onVerifyContext.javaClass)
 
-//    private fun setupCampaign() {
-//        val message = Mockito.mock(Message::class.java)
-//
-//        `when`(onVerifyContexts.invoke(any(), any())).thenReturn(true)
-//        InAppMessaging.instance().onVerifyContext = onVerifyContexts
-//
-//        setupMocking(message)
-//        runBlocking {
-//            displayWorker.doWork() shouldBeEqualTo ListenableWorker.Result.success()
-//        }
+    @Test
+    fun `should call onVerifyContext for non-test campaign with contexts`() {
+        setupCampaign()
+
+        Mockito.verify(onVerifyContexts).invoke(listOf("ctx"), "DEV-Test (Android In-App-Test)")
+    }
+
+    @Test
+    fun `should not call onVerifyContext for non-test campaign without contexts`() {
+        val message = Mockito.mock(Message::class.java)
+
+        `when`(onVerifyContexts.invoke(any(), any())).thenReturn(true)
+        InAppMessaging.instance().onVerifyContext = onVerifyContexts
+
+        `when`(message.getCampaignId()).thenReturn("1")
+        `when`(message.isTest()).thenReturn(false)
+        `when`(message.getMaxImpressions()).thenReturn(1)
+        `when`(message.getMessagePayload()).thenReturn(payload)
+        `when`(message.getContexts()).thenReturn(listOf())
+        `when`(mockMessageManager.getNextDisplayMessage()).thenReturn(listOf(message))
+        runBlocking {
+            displayWorker.doWork() shouldBeEqualTo ListenableWorker.Result.success()
+        }
+
+        Mockito.verify(onVerifyContexts, never()).invoke(any(), any())
+    }
+
+    @Test
+    fun `should not call onVerifyContext for test campaign with contexts`() {
+        val message = Mockito.mock(Message::class.java)
+
+        `when`(onVerifyContexts.invoke(any(), any())).thenReturn(true)
+        InAppMessaging.instance().onVerifyContext = onVerifyContexts
+
+        `when`(message.getCampaignId()).thenReturn("1")
+        `when`(message.isTest()).thenReturn(true)
+        `when`(message.getMaxImpressions()).thenReturn(1)
+        `when`(message.getMessagePayload()).thenReturn(payload)
+        `when`(message.getContexts()).thenReturn(listOf("ctx"))
+        `when`(mockMessageManager.getNextDisplayMessage()).thenReturn(listOf(message))
+        runBlocking {
+            displayWorker.doWork() shouldBeEqualTo ListenableWorker.Result.success()
+        }
+
+        Mockito.verify(onVerifyContexts, never()).invoke(any(), any())
+    }
+
+    @Test
+    fun `should call onVerifyContext with proper parameters`() {
+        setupCampaign()
+
+        argumentCaptor<List<String>>().apply {
+            Mockito.verify(onVerifyContexts).invoke(capture(), any())
+            firstValue shouldBeEqualTo listOf("ctx")
+        }
+        argumentCaptor<String>().apply {
+            Mockito.verify(onVerifyContexts).invoke(any(), capture())
+            firstValue shouldBeEqualTo "DEV-Test (Android In-App-Test)"
+        }
+    }
+
+    @Test
+    fun `should call getMessagePayload again when message's context was rejected`() {
+        setupNextCampaign()
+
+        Mockito.verify(mockMessageManager, Mockito.times(2)).getNextDisplayMessage()
+    }
+
+    private fun setupNextCampaign(): Message {
+        val message = Mockito.mock(Message::class.java)
+
+        `when`(onVerifyContexts.invoke(any(), any())).thenReturn(false)
+        InAppMessaging.instance().onVerifyContext = onVerifyContexts
+
+        setupMocking(message)
+        runBlocking {
+            displayWorker.doWork() shouldBeEqualTo ListenableWorker.Result.success()
+        }
+
+        return message
+    }
+
+    private fun setupCampaign() {
+        val message = Mockito.mock(Message::class.java)
+
+        `when`(onVerifyContexts.invoke(any(), any())).thenReturn(true)
+        InAppMessaging.instance().onVerifyContext = onVerifyContexts
+
+        setupMocking(message)
+        runBlocking {
+            displayWorker.doWork() shouldBeEqualTo ListenableWorker.Result.success()
+        }
     }
 }
