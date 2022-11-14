@@ -66,6 +66,7 @@
     <vulnerabilityName>CVE-2022-38751</vulnerabilityName>
     <vulnerabilityName>CVE-2022-38752</vulnerabilityName>
     <vulnerabilityName>CVE-2022-38750</vulnerabilityName>
+    <vulnerabilityName>CVE-2022-41854</vulnerabilityName>
   </suppress>
 
   <!-- SDK Utils -->
