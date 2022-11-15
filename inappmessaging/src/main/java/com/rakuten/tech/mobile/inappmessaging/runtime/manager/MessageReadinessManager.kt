@@ -35,6 +35,11 @@ internal interface MessageReadinessManager {
     fun addMessageToQueue(id: String)
 
     /**
+     * Removes a message Id to ready for display.
+     */
+    fun removeMessageToQueue(id: String)
+
+    /**
      * Clears all queued messages Ids for display.
      */
     fun clearMessages()
@@ -69,12 +74,18 @@ internal interface MessageReadinessManager {
     }
 
     @SuppressWarnings("TooManyFunctions")
-    private class MessageReadinessManagerImpl(private val campaignRepo: CampaignRepository) : MessageReadinessManager {
-        private val queuedMessages = mutableListOf<String>()
+    class MessageReadinessManagerImpl(private val campaignRepo: CampaignRepository) : MessageReadinessManager {
+        internal val queuedMessages = mutableListOf<String>()
 
         override fun addMessageToQueue(id: String) {
             synchronized(queuedMessages) {
                 queuedMessages.add(id)
+            }
+        }
+
+        override fun removeMessageToQueue(id: String) {
+            synchronized(queuedMessages) {
+                queuedMessages.remove(id)
             }
         }
 
@@ -91,10 +102,9 @@ internal interface MessageReadinessManager {
 
             val queuedMessagesCopy = queuedMessages.toList() // Prevent ConcurrentModificationException
             for (messageId in queuedMessagesCopy) {
-                val campaignId = queuedMessages.removeFirst()
-                val message = campaignRepo.messages[campaignId]
+                val message = campaignRepo.messages[messageId]
                 if (message == null) {
-                    InAppLogger(TAG).debug("Queued campaign $campaignId does not exist in the repository anymore")
+                    InAppLogger(TAG).debug("Queued campaign $messageId does not exist in the repository anymore")
                     continue
                 }
 

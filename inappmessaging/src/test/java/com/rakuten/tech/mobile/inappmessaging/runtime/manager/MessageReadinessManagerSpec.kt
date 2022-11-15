@@ -299,6 +299,31 @@ class MessageReadinessManagerRequestSpec : BaseTest() {
         val mockResponse = MockResponse().setResponseCode(200).setBody(DISPLAY_RESPONSE)
         server.enqueue(mockResponse)
         verifyValidResponse(MessageReadinessManager.instance().getNextDisplayMessage())
+        val mgr = MessageReadinessManager.instance()
+        (mgr as MessageReadinessManager.MessageReadinessManagerImpl).queuedMessages.shouldHaveSize(1)
+    }
+
+    @Test
+    fun `should return null for invalid id`() {
+        val mockResponse = MockResponse().setResponseCode(200).setBody(DISPLAY_RESPONSE)
+        server.enqueue(mockResponse)
+        val mgr = MessageReadinessManager.instance()
+        mgr.clearMessages()
+        (mgr as MessageReadinessManager.MessageReadinessManagerImpl).queuedMessages.add("invalid")
+        MessageReadinessManager.instance().getNextDisplayMessage().shouldBeNull()
+        mgr.clearMessages()
+    }
+
+    @Test
+    fun `should return remove message`() {
+        val mockResponse = MockResponse().setResponseCode(200).setBody(DISPLAY_RESPONSE)
+        server.enqueue(mockResponse)
+        val message = MessageReadinessManager.instance().getNextDisplayMessage()
+        verifyValidResponse(message)
+        val readinessMgr = MessageReadinessManager.instance()
+        (readinessMgr as MessageReadinessManager.MessageReadinessManagerImpl).queuedMessages.shouldHaveSize(1)
+        MessageReadinessManager.instance().removeMessageToQueue(message!!.getCampaignId())
+        readinessMgr.queuedMessages.shouldBeEmpty()
     }
 
     @Test

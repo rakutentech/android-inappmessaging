@@ -22,6 +22,7 @@ import com.rakuten.tech.mobile.inappmessaging.runtime.data.responses.ping.Trigge
 import com.rakuten.tech.mobile.inappmessaging.runtime.data.responses.ping.TriggerAttribute
 import com.rakuten.tech.mobile.inappmessaging.runtime.manager.EventsManager
 import com.rakuten.tech.mobile.inappmessaging.runtime.manager.ImpressionManager
+import com.rakuten.tech.mobile.inappmessaging.runtime.manager.MessageReadinessManager
 import com.rakuten.tech.mobile.inappmessaging.runtime.utils.BuildVersionChecker
 import com.rakuten.tech.mobile.inappmessaging.runtime.utils.InAppLogger
 import java.util.Date
@@ -31,7 +32,10 @@ import kotlin.collections.ArrayList
  * Task which should be ran in the background.
  */
 @SuppressWarnings("TooManyFunctions")
-internal class MessageActionsCoroutine(private val campaignRepo: CampaignRepository = CampaignRepository.instance()) {
+internal class MessageActionsCoroutine(
+    private val campaignRepo: CampaignRepository = CampaignRepository.instance(),
+    private val readinessManager: MessageReadinessManager = MessageReadinessManager.instance()
+) {
 
     fun executeTask(message: Message?, viewResourceId: Int, optOut: Boolean): Boolean {
         if (message == null || message.getCampaignId().isEmpty()) {
@@ -58,6 +62,7 @@ internal class MessageActionsCoroutine(private val campaignRepo: CampaignReposit
         if (isOptedOut) {
             campaignRepo.optOutCampaign(message)
         }
+        readinessManager.removeMessageToQueue(message.getCampaignId())
         campaignRepo.decrementImpressions(message.getCampaignId())
     }
 
