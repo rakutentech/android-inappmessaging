@@ -34,6 +34,7 @@
     <cpe>cpe:/a:google:protobuf-java</cpe>
     <vulnerabilityName>CVE-2021-22569</vulnerabilityName>
     <vulnerabilityName>CVE-2022-3171</vulnerabilityName>
+    <vulnerabilityName>CVE-2022-3509</vulnerabilityName>
   </suppress>
   <suppress until="2022-12-31Z">
     <notes><![CDATA[
@@ -65,6 +66,7 @@
     <vulnerabilityName>CVE-2022-38751</vulnerabilityName>
     <vulnerabilityName>CVE-2022-38752</vulnerabilityName>
     <vulnerabilityName>CVE-2022-38750</vulnerabilityName>
+    <vulnerabilityName>CVE-2022-41854</vulnerabilityName>
   </suppress>
 
   <!-- SDK Utils -->
