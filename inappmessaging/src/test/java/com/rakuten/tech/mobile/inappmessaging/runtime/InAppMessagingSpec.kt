@@ -1,7 +1,10 @@
 package com.rakuten.tech.mobile.inappmessaging.runtime
 
+import android.Manifest
 import android.app.Activity
 import android.content.Context
+import android.content.pm.PackageManager
+import android.os.Build
 import android.provider.Settings
 import android.view.ViewGroup
 import androidx.test.core.app.ApplicationProvider
@@ -15,25 +18,21 @@ import com.rakuten.tech.mobile.inappmessaging.runtime.data.models.messages.Valid
 import com.rakuten.tech.mobile.inappmessaging.runtime.data.repositories.*
 import com.rakuten.tech.mobile.inappmessaging.runtime.data.responses.config.ConfigResponseData
 import com.rakuten.tech.mobile.inappmessaging.runtime.exception.InAppMessagingException
-import com.rakuten.tech.mobile.inappmessaging.runtime.manager.DisplayManager
-import com.rakuten.tech.mobile.inappmessaging.runtime.manager.EventsManager
-import com.rakuten.tech.mobile.inappmessaging.runtime.manager.MessageReadinessManager
-import com.rakuten.tech.mobile.inappmessaging.runtime.manager.SessionManager
+import com.rakuten.tech.mobile.inappmessaging.runtime.manager.*
 import com.rakuten.tech.mobile.inappmessaging.runtime.utils.EventMatchingUtil
 import org.amshove.kluent.*
-import org.junit.After
-import org.junit.Assert
-import org.junit.Before
-import org.junit.Test
+import org.junit.*
 import org.junit.runner.RunWith
 import org.mockito.Mockito
 import org.mockito.Mockito.`when`
 import org.robolectric.RobolectricTestRunner
+import org.robolectric.annotation.Config
 
 /**
  * Test class for InAppMessaging.
  */
 @RunWith(RobolectricTestRunner::class)
+@Ignore("base class")
 open class InAppMessagingSpec : BaseTest() {
     internal val activity = Mockito.mock(Activity::class.java)
     internal val configResponseData = Mockito.mock(ConfigResponseData::class.java)
@@ -60,6 +59,40 @@ open class InAppMessagingSpec : BaseTest() {
         ConfigResponseRepository.resetInstance()
     }
 
+    internal fun initializeInstance(shouldEnableCaching: Boolean = false) {
+        val ctx = ApplicationProvider.getApplicationContext<Context>()
+        WorkManagerTestInitHelper.initializeTestWorkManager(ctx)
+        Settings.Secure.putString(ctx.contentResolver, Settings.Secure.ANDROID_ID, "test_device_id")
+        `when`(configResponseData.rollOutPercentage).thenReturn(100)
+        ConfigResponseRepository.instance().addConfigResponse(configResponseData)
+        InAppMessaging.initialize(ApplicationProvider.getApplicationContext(), shouldEnableCaching)
+    }
+
+    internal fun initializeMockInstance(
+        rollout: Int = 100,
+        displayManager: DisplayManager = this.displayManager,
+        accountRepo: AccountRepository = AccountRepository.instance(),
+        sessionManager: SessionManager = SessionManager,
+        readinessManager: MessageReadinessManager = MessageReadinessManager.instance(),
+        primerManager: PushPrimerTrackerManager = PushPrimerTrackerManager
+    ): InAppMessaging {
+        `when`(configResponseData.rollOutPercentage).thenReturn(rollout)
+        ConfigResponseRepository.instance().addConfigResponse(configResponseData)
+
+        return InApp(
+            context = ApplicationProvider.getApplicationContext(),
+            isDebugLogging = false,
+            displayManager = displayManager,
+            eventsManager = eventsManager,
+            accountRepo = accountRepo,
+            sessionManager = sessionManager,
+            messageReadinessManager = readinessManager,
+            primerManager = primerManager
+        )
+    }
+}
+
+class InAppMessagingBasicSpec : InAppMessagingSpec() {
     @Test
     fun `should unregister activity not crash when no activity is registered`() {
         InAppMessaging.instance().unregisterMessageDisplayActivity()
@@ -181,36 +214,6 @@ open class InAppMessagingSpec : BaseTest() {
 
         // Should call onSessionUpdate
         verify(sessMock).onSessionUpdate()
-    }
-
-    internal fun initializeInstance(shouldEnableCaching: Boolean = false) {
-        val ctx = ApplicationProvider.getApplicationContext<Context>()
-        WorkManagerTestInitHelper.initializeTestWorkManager(ctx)
-        Settings.Secure.putString(ctx.contentResolver, Settings.Secure.ANDROID_ID, "test_device_id")
-        `when`(configResponseData.rollOutPercentage).thenReturn(100)
-        ConfigResponseRepository.instance().addConfigResponse(configResponseData)
-        InAppMessaging.initialize(ApplicationProvider.getApplicationContext(), shouldEnableCaching)
-    }
-
-    internal fun initializeMockInstance(
-        rollout: Int,
-        displayManager: DisplayManager = this.displayManager,
-        accountRepo: AccountRepository = AccountRepository.instance(),
-        sessionManager: SessionManager = SessionManager,
-        readinessManager: MessageReadinessManager = MessageReadinessManager.instance()
-    ): InAppMessaging {
-        `when`(configResponseData.rollOutPercentage).thenReturn(rollout)
-        ConfigResponseRepository.instance().addConfigResponse(configResponseData)
-
-        return InApp(
-            context = ApplicationProvider.getApplicationContext(),
-            isDebugLogging = false,
-            displayManager = displayManager,
-            eventsManager = eventsManager,
-            accountRepo = accountRepo,
-            sessionManager = sessionManager,
-            messageReadinessManager = readinessManager
-        )
     }
 
     companion object {
@@ -440,6 +443,7 @@ class InAppMessagingUnInitSpec : InAppMessagingSpec() {
         InAppMessaging.instance().logEvent(AppStartEvent())
         InAppMessaging.instance().closeMessage()
         InAppMessaging.instance().isLocalCachingEnabled().shouldBeFalse()
+        InAppMessaging.instance().trackPushPrimer(arrayOf(""), intArrayOf(1))
         InAppMessaging.instance().flushEventList()
         InAppMessaging.instance().onPushPrimer.shouldBeNull()
     }
@@ -550,5 +554,80 @@ class InAppMessagingRemoveSpec : InAppMessagingSpec() {
             // Impressions left should not be reduced
             it.impressionsLeft shouldBeEqualTo it.getMaxImpressions()
         }
+    }
+}
+
+@Config(sdk = [Build.VERSION_CODES.TIRAMISU])
+class InAppMessagingPrimerTrackerSpec : InAppMessagingSpec() {
+    private val mockMgr = Mockito.mock(PushPrimerTrackerManager::class.java)
+
+    @Test
+    fun `should call primer manager with granted result`() {
+        val inApp = initializeMockInstance(primerManager = mockMgr)
+
+        inApp.trackPushPrimer(
+            arrayOf(Manifest.permission.POST_NOTIFICATIONS), intArrayOf(PackageManager.PERMISSION_GRANTED)
+        )
+
+        verify(mockMgr).sendPrimerEvent(eq(1), any())
+    }
+
+    @Test
+    fun `should call primer manager with denied result`() {
+        val inApp = initializeMockInstance(primerManager = mockMgr)
+
+        inApp.trackPushPrimer(
+            arrayOf(Manifest.permission.POST_NOTIFICATIONS), intArrayOf(PackageManager.PERMISSION_DENIED)
+        )
+
+        verify(mockMgr).sendPrimerEvent(eq(0), any())
+    }
+
+    @Test
+    fun `should not call primer manager other permission`() {
+        val inApp = initializeMockInstance(primerManager = mockMgr)
+
+        inApp.trackPushPrimer(
+            arrayOf(Manifest.permission.ACCESS_FINE_LOCATION), intArrayOf(PackageManager.PERMISSION_DENIED)
+        )
+
+        verify(mockMgr, never()).sendPrimerEvent(any(), any())
+    }
+
+    @Test
+    fun `should not call primer manager other permission and result higher size`() {
+        val inApp = initializeMockInstance(primerManager = mockMgr)
+
+        inApp.trackPushPrimer(
+            arrayOf(Manifest.permission.ACCESS_FINE_LOCATION),
+            intArrayOf(PackageManager.PERMISSION_DENIED, PackageManager.PERMISSION_GRANTED)
+        )
+
+        verify(mockMgr, never()).sendPrimerEvent(any(), any())
+    }
+
+    @Test
+    fun `should not call primer manager other permission and permission higher size`() {
+        val inApp = initializeMockInstance(primerManager = mockMgr)
+
+        inApp.trackPushPrimer(
+            arrayOf(Manifest.permission.ACCESS_FINE_LOCATION, Manifest.permission.ACCESS_COARSE_LOCATION),
+            intArrayOf(PackageManager.PERMISSION_DENIED)
+        )
+
+        verify(mockMgr, never()).sendPrimerEvent(any(), any())
+    }
+
+    @Test
+    @Config(sdk = [Build.VERSION_CODES.S])
+    fun `should not call primer manager if lower than tiramisu`() {
+        val inApp = initializeMockInstance(primerManager = mockMgr)
+
+        inApp.trackPushPrimer(
+            arrayOf(Manifest.permission.ACCESS_FINE_LOCATION),
+            intArrayOf(PackageManager.PERMISSION_DENIED, PackageManager.PERMISSION_GRANTED)
+        )
+
+        verify(mockMgr, never()).sendPrimerEvent(any(), any())
     }
 }

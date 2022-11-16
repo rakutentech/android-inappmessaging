@@ -23,6 +23,7 @@ import com.rakuten.tech.mobile.inappmessaging.runtime.data.responses.ping.Trigge
 import com.rakuten.tech.mobile.inappmessaging.runtime.manager.EventsManager
 import com.rakuten.tech.mobile.inappmessaging.runtime.manager.ImpressionManager
 import com.rakuten.tech.mobile.inappmessaging.runtime.manager.MessageReadinessManager
+import com.rakuten.tech.mobile.inappmessaging.runtime.manager.PushPrimerTrackerManager
 import com.rakuten.tech.mobile.inappmessaging.runtime.utils.BuildVersionChecker
 import com.rakuten.tech.mobile.inappmessaging.runtime.utils.InAppLogger
 import java.util.Date
@@ -46,7 +47,7 @@ internal class MessageActionsCoroutine(
         // Add event in the button if exist.
         addEmbeddedEvent(buttonType, message)
         // Handling onclick action for deep link, redirect, etc.
-        handleAction(getOnClickBehavior(buttonType, message))
+        handleAction(getOnClickBehavior(buttonType, message), message.getCampaignId())
         // Update campaign status in repository
         updateCampaignInRepository(message, optOut)
         // Schedule to report impression.
@@ -134,7 +135,7 @@ internal class MessageActionsCoroutine(
      */
     @VisibleForTesting
     @SuppressWarnings("CanBeNonNullable")
-    internal fun handleAction(onClickBehavior: OnClickBehavior?) {
+    internal fun handleAction(onClickBehavior: OnClickBehavior?, campaignId: String) {
         if (onClickBehavior == null) {
             return
         }
@@ -143,7 +144,7 @@ internal class MessageActionsCoroutine(
         if (ButtonActionType.DEEPLINK == buttonActionType || ButtonActionType.REDIRECT == buttonActionType) {
             handleDeeplinkRedirection(onClickBehavior.uri)
         } else if (ButtonActionType.PUSH_PRIMER == buttonActionType) {
-            handlePushPrimer()
+            handlePushPrimer(campaignId)
         }
     }
 
@@ -162,11 +163,13 @@ internal class MessageActionsCoroutine(
         }
     }
 
-    internal fun handlePushPrimer(buildChecker: BuildVersionChecker = BuildVersionChecker.instance()) {
+    internal fun handlePushPrimer(campaignId: String, checker: BuildVersionChecker = BuildVersionChecker.instance()) {
         InAppMessaging.instance().onPushPrimer.let {
             if (it != null) {
+                PushPrimerTrackerManager.campaignId = campaignId
                 it.invoke()
-            } else if (buildChecker.isAndroidTAndAbove()) {
+            } else if (checker.isAndroidTAndAbove()) {
+                PushPrimerTrackerManager.campaignId = campaignId
                 requestPushPrimer()
             }
         }

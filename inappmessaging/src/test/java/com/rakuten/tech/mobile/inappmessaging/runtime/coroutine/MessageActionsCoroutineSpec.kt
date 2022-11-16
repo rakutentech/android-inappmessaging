@@ -4,6 +4,7 @@ import android.app.Activity
 import android.content.ActivityNotFoundException
 import android.content.Context
 import android.os.Build
+import android.os.Bundle
 import android.provider.Settings
 import androidx.test.core.app.ApplicationProvider
 import androidx.test.ext.junit.runners.AndroidJUnit4
@@ -21,6 +22,7 @@ import com.rakuten.tech.mobile.inappmessaging.runtime.data.repositories.Campaign
 import com.rakuten.tech.mobile.inappmessaging.runtime.data.responses.ping.*
 import com.rakuten.tech.mobile.inappmessaging.runtime.manager.DisplayManager
 import com.rakuten.tech.mobile.inappmessaging.runtime.manager.MessageReadinessManager
+import com.rakuten.tech.mobile.inappmessaging.runtime.manager.PushPrimerTrackerManager
 import com.rakuten.tech.mobile.inappmessaging.runtime.utils.BuildVersionChecker
 import org.amshove.kluent.*
 import org.junit.After
@@ -193,7 +195,7 @@ class MessageActionsCoroutineFuncSpec : BaseTest() {
     @Test
     fun `should start activity for redirect`() {
         val activity = setupActivity()
-        action.handleAction(OnClickBehavior(1, "https://test"))
+        action.handleAction(OnClickBehavior(1, "https://test"), "")
 
         Mockito.verify(activity).startActivity(any())
     }
@@ -202,18 +204,18 @@ class MessageActionsCoroutineFuncSpec : BaseTest() {
     fun `should start activity for deeplink`() {
         val activity = setupActivity()
         val onClick = OnClickBehavior(2, "https://test")
-        action.handleAction(onClick)
+        action.handleAction(onClick, "")
         Mockito.verify(activity).startActivity(any())
 
         InAppMessaging.instance().unregisterMessageDisplayActivity()
-        action.handleAction(onClick)
+        action.handleAction(onClick, "")
         Mockito.verify(activity).startActivity(any())
     }
 
     @Test
     fun `should not start activity for exit`() {
         val activity = setupActivity()
-        action.handleAction(OnClickBehavior(3, "https://test"))
+        action.handleAction(OnClickBehavior(3, "https://test"), "")
 
         Mockito.verify(activity, never()).startActivity(any())
     }
@@ -222,11 +224,11 @@ class MessageActionsCoroutineFuncSpec : BaseTest() {
     fun `should not start activity for null url and activity`() {
         val activity = setupActivity()
         val onClick = OnClickBehavior(2, null)
-        action.handleAction(onClick)
+        action.handleAction(onClick, "")
         Mockito.verify(activity, never()).startActivity(any())
 
         InAppMessaging.instance().unregisterMessageDisplayActivity()
-        action.handleAction(onClick)
+        action.handleAction(onClick, "")
         Mockito.verify(activity, never()).startActivity(any())
     }
 
@@ -234,11 +236,11 @@ class MessageActionsCoroutineFuncSpec : BaseTest() {
     fun `should not start activity for empty url and null activity`() {
         val activity = setupActivity()
         val onClick = OnClickBehavior(2, "")
-        action.handleAction(onClick)
+        action.handleAction(onClick, "")
         Mockito.verify(activity, never()).startActivity(any())
 
         InAppMessaging.instance().unregisterMessageDisplayActivity()
-        action.handleAction(onClick)
+        action.handleAction(onClick, "")
         Mockito.verify(activity, never()).startActivity(any())
     }
 
@@ -246,7 +248,7 @@ class MessageActionsCoroutineFuncSpec : BaseTest() {
     fun `should not crash on activity not found`() {
         val activity = setupActivity()
         `when`(activity.startActivity(any())).thenThrow(ActivityNotFoundException())
-        action.handleAction(OnClickBehavior(2, "https://test"))
+        action.handleAction(OnClickBehavior(2, "https://test"), "")
     }
 
     @Test
@@ -256,29 +258,60 @@ class MessageActionsCoroutineFuncSpec : BaseTest() {
         val mockCallback = Mockito.mock(function.javaClass)
 
         InAppMessaging.instance().onPushPrimer = mockCallback
-        action.handleAction(OnClickBehavior(4, ""))
+        action.handleAction(OnClickBehavior(4, ""), "test")
 
+        PushPrimerTrackerManager.campaignId shouldBeEqualTo "test"
         Mockito.verify(mockCallback).invoke()
+
+        PushPrimerTrackerManager.campaignId = ""
     }
 
     @Test
     fun `should not invoke callback for primer`() {
-        setupActivity()
-        val function: () -> Unit = {}
-        val mockCallback = Mockito.mock(function.javaClass)
-        InAppMessaging.instance().onPushPrimer = null
-        action.handleAction(OnClickBehavior(4, ""))
-
-        Mockito.verify(mockCallback, never()).invoke()
+        verifyPushPrimer(false)
     }
 
-    private fun setupActivity(): Activity {
+    @Test
+    @Config(sdk = [Build.VERSION_CODES.TIRAMISU])
+    fun `should not invoke callback for primer in tiramisu`() {
+        verifyPushPrimer(true)
+    }
+
+    @Test
+    @Config(sdk = [Build.VERSION_CODES.TIRAMISU])
+    fun `should request permission in tiramisu`() {
+        val mockAct = setupActivity(true)
+        InAppMessaging.instance().onPushPrimer = null
+        action.handleAction(OnClickBehavior(4, ""), "test")
+
+        PushPrimerTrackerManager.campaignId shouldBeEqualTo "test"
+        Mockito.verify(mockAct).requestPermissions(any(), any())
+    }
+
+    private fun setupActivity(isTiramisu: Boolean = false): Activity {
         val activity = Mockito.mock(Activity::class.java)
-        InAppMessaging.initialize(ApplicationProvider.getApplicationContext(), true)
+        val context = ApplicationProvider.getApplicationContext<Context>()
+        if (isTiramisu) {
+            val bundle = Bundle()
+            bundle.putString("com.rakuten.tech.mobile.inappmessaging.subscriptionkey", "test")
+            context.applicationInfo.metaData = bundle
+        }
+        InAppMessaging.initialize(context, true)
         InAppMessaging.instance().registerMessageDisplayActivity(activity)
         InAppMessaging.instance().registerPreference(TestUserInfoProvider())
 
         return activity
+    }
+
+    private fun verifyPushPrimer(isTiramisu: Boolean) {
+        setupActivity(true)
+        val function: () -> Unit = {}
+        val mockCallback = Mockito.mock(function.javaClass)
+        InAppMessaging.instance().onPushPrimer = null
+        action.handleAction(OnClickBehavior(4, ""), "test")
+
+        PushPrimerTrackerManager.campaignId shouldBeEqualTo if (isTiramisu)"test" else ""
+        Mockito.verify(mockCallback, never()).invoke()
     }
 }
 
@@ -291,9 +324,11 @@ class MessageActionsCoroutineTiramisuSpec {
         InAppMessaging.instance().onPushPrimer = null
         val mockChecker = Mockito.mock(BuildVersionChecker::class.java)
         `when`(mockChecker.isAndroidTAndAbove()).thenReturn(true)
-        MessageActionsCoroutine().handlePushPrimer(mockChecker)
+        MessageActionsCoroutine().handlePushPrimer("test", mockChecker)
 
         Mockito.verify(activity).requestPermissions(any(), any())
+        PushPrimerTrackerManager.campaignId shouldBeEqualTo "test"
+        PushPrimerTrackerManager.campaignId = ""
     }
 
     @Test
@@ -303,9 +338,12 @@ class MessageActionsCoroutineTiramisuSpec {
         InAppMessaging.instance().unregisterMessageDisplayActivity()
         val mockChecker = Mockito.mock(BuildVersionChecker::class.java)
         `when`(mockChecker.isAndroidTAndAbove()).thenReturn(true)
-        MessageActionsCoroutine().handlePushPrimer(mockChecker)
+        MessageActionsCoroutine().handlePushPrimer("test", mockChecker)
 
         Mockito.verify(activity, never()).requestPermissions(any(), any())
+
+        PushPrimerTrackerManager.campaignId shouldBeEqualTo "test"
+        PushPrimerTrackerManager.campaignId = ""
     }
 
     private fun setupActivity(): Activity {
