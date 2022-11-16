@@ -1,11 +1,14 @@
 package com.rakuten.tech.mobile.inappmessaging.runtime.data.models.messages
 
 import com.rakuten.tech.mobile.inappmessaging.runtime.data.enums.InAppMessageType
+import com.rakuten.tech.mobile.inappmessaging.runtime.data.models.Tooltip
 import com.rakuten.tech.mobile.inappmessaging.runtime.data.responses.ping.*
 
 internal class ValidTestMessage(
     private val campaignId: String = DEFAULT_CAMPAIGN_ID,
     private val isTest: Boolean = IS_TEST,
+    private val type: Int = InAppMessageType.MODAL.typeId,
+    private val tooltip: Tooltip? = null,
     private val isCampaignDismissable: Boolean = true,
     private val maxImpressions: Int = 1,
     private val infiniteImpressions: Boolean = false,
@@ -19,7 +22,7 @@ internal class ValidTestMessage(
     override var isOptedOut: Boolean? = null
         get() = if (field == null) false else field
 
-    override fun getType(): Int = InAppMessageType.MODAL.typeId
+    override fun getType(): Int = type
 
     override fun getCampaignId() = campaignId
 
@@ -51,6 +54,8 @@ internal class ValidTestMessage(
     }
 
     override fun getContexts(): List<String> = listOf()
+
+    override fun getTooltipConfig(): Tooltip? = tooltip
 
     override fun infiniteImpressions() = infiniteImpressions
 

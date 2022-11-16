@@ -87,7 +87,7 @@ internal class InApp(
     override fun unregisterMessageDisplayActivity() {
         try {
             if (ConfigResponseRepository.instance().isConfigEnabled()) {
-                displayManager.removeMessage(getRegisteredActivity())
+                displayManager.removeMessage(getRegisteredActivity(), removeAll = true)
             }
             activityWeakReference?.clear()
 
@@ -172,7 +172,7 @@ internal class InApp(
         if (clearQueuedCampaigns) {
             messageReadinessManager.clearMessages()
         } else if (id != null) {
-            messageReadinessManager.removeMessageToQueue(id as String)
+            messageReadinessManager.removeMessageFromQueue(id as String)
             displayManager.displayMessage()
         }
     }

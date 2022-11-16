@@ -1,5 +1,6 @@
 package com.rakuten.tech.mobile.inappmessaging.runtime.data.models.messages
 
+import com.rakuten.tech.mobile.inappmessaging.runtime.data.models.Tooltip
 import com.rakuten.tech.mobile.inappmessaging.runtime.data.responses.ping.MessagePayload
 import com.rakuten.tech.mobile.inappmessaging.runtime.data.responses.ping.Trigger
 
@@ -57,6 +58,8 @@ internal interface Message {
     fun setMaxImpression(maxImpression: Int)
 
     fun getContexts(): List<String>
+
+    fun getTooltipConfig(): Tooltip?
 
     /**
      * Indicates Impressions should never end.

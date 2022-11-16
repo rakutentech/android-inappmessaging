@@ -117,13 +117,13 @@ open class DisplayMessageWorkerSpec : BaseTest() {
     @Test
     fun `should not display campaign if activity is not registered`() {
         InAppMessaging.instance().unregisterMessageDisplayActivity()
-        Mockito.verify(activity).findViewById<View?>(ArgumentMatchers.anyInt())
+        Mockito.verify(activity, atLeastOnce()).findViewById<View?>(ArgumentMatchers.anyInt())
         verifyHandlerCalled()
     }
 
     @Test
     fun `should not display campaign if payload is null`() {
-        `when`(mockMessageManager.getNextDisplayMessage()).thenReturn(null)
+        `when`(mockMessageManager.getNextDisplayMessage()).thenReturn(listOf())
         runBlocking { displayWorker.doWork() shouldBeEqualTo ListenableWorker.Result.success() }
 
         Mockito.verify(activity, never()).findViewById<View?>(ArgumentMatchers.anyInt())
@@ -143,8 +143,8 @@ open class DisplayMessageWorkerSpec : BaseTest() {
         val worker = TestListenableWorkerBuilder<DisplayMessageWorker>(getApplicationContext()).build()
         worker.messageReadinessManager = mockMessageManager
         val message = setupMessageWithImage("https://imageurl.jpg")
-        `when`(mockMessageManager.getNextDisplayMessage()).thenReturn(message).thenReturn(null)
-        `when`(mockMessageManager.getNextDisplayMessage()).thenReturn(message)
+        `when`(mockMessageManager.getNextDisplayMessage()).thenReturn(listOf(message)).thenReturn(null)
+        `when`(mockMessageManager.getNextDisplayMessage()).thenReturn(listOf(message))
         val mockResource = Mockito.mock(Resources::class.java)
         `when`(activity.resources).thenReturn(mockResource)
         `when`(mockResource.displayMetrics).thenReturn(Mockito.mock(DisplayMetrics::class.java))
@@ -159,7 +159,7 @@ open class DisplayMessageWorkerSpec : BaseTest() {
     @Test
     fun `should display the message if null image url`() {
         val message = setupMessageWithImage(null)
-        `when`(mockMessageManager.getNextDisplayMessage()).thenReturn(message)
+        `when`(mockMessageManager.getNextDisplayMessage()).thenReturn(listOf(message))
         runBlocking { displayWorker.doWork() shouldBeEqualTo ListenableWorker.Result.success() }
 
         Mockito.verify(handler).post(ArgumentMatchers.any(DisplayMessageRunnable::class.java))
@@ -183,7 +183,7 @@ open class DisplayMessageWorkerSpec : BaseTest() {
 
     private fun setupValidMessage(): Message {
         val message = Mockito.mock(Message::class.java)
-        `when`(mockMessageManager.getNextDisplayMessage()).thenReturn(message)
+        `when`(mockMessageManager.getNextDisplayMessage()).thenReturn(listOf(message))
         `when`(message.getCampaignId()).thenReturn("1")
         `when`(message.isTest()).thenReturn(true)
         `when`(message.getMaxImpressions()).thenReturn(10)
@@ -209,7 +209,7 @@ open class DisplayMessageWorkerSpec : BaseTest() {
         `when`(message.getMaxImpressions()).thenReturn(1)
         `when`(message.getMessagePayload()).thenReturn(payload)
         `when`(message.getContexts()).thenReturn(listOf("ctx"))
-        `when`(mockMessageManager.getNextDisplayMessage()).thenReturn(message).thenReturn(null)
+        `when`(mockMessageManager.getNextDisplayMessage()).thenReturn(listOf(message)).thenReturn(listOf())
     }
 }
 
@@ -236,7 +236,7 @@ class DisplayMessageWorkerVerifyContextSpec : DisplayMessageWorkerSpec() {
         `when`(message.getMaxImpressions()).thenReturn(1)
         `when`(message.getMessagePayload()).thenReturn(payload)
         `when`(message.getContexts()).thenReturn(listOf())
-        `when`(mockMessageManager.getNextDisplayMessage()).thenReturn(message)
+        `when`(mockMessageManager.getNextDisplayMessage()).thenReturn(listOf(message))
         runBlocking {
             displayWorker.doWork() shouldBeEqualTo ListenableWorker.Result.success()
         }
@@ -256,7 +256,7 @@ class DisplayMessageWorkerVerifyContextSpec : DisplayMessageWorkerSpec() {
         `when`(message.getMaxImpressions()).thenReturn(1)
         `when`(message.getMessagePayload()).thenReturn(payload)
         `when`(message.getContexts()).thenReturn(listOf("ctx"))
-        `when`(mockMessageManager.getNextDisplayMessage()).thenReturn(message)
+        `when`(mockMessageManager.getNextDisplayMessage()).thenReturn(listOf(message))
         runBlocking {
             displayWorker.doWork() shouldBeEqualTo ListenableWorker.Result.success()
         }

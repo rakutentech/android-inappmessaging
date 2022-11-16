@@ -72,11 +72,6 @@ class InAppMessageViewListenerOnClickSpec : InAppMessageViewListenerSpec() {
     private val mockCheckbox = Mockito.mock(CheckBox::class.java)
 
     @Test
-    fun `should not throw exception when argument is null`() {
-        InAppMessageViewListener(null)
-    }
-
-    @Test
     fun `should call is checked once`() {
         val listener = InAppMessageViewListener(ValidTestMessage("1", true))
         `when`(mockCheckbox.id).thenReturn(R.id.opt_out_checkbox)
@@ -344,22 +339,6 @@ class InAppMessageViewListenerOnKeySpec : InAppMessageViewListenerSpec() {
     }
 
     @Test
-    fun `should return true when message is null with back button click`() {
-        val listener = InAppMessageViewListener(null, mockCoroutine, mockDisplayManager)
-
-        `when`(keyEvent.action).thenReturn(KeyEvent.ACTION_UP)
-        `when`(mockView.id).thenReturn(R.id.message_close_button)
-        `when`(
-            mockCoroutine.executeTask(
-                null,
-                MessageActionsCoroutine.BACK_BUTTON, false
-            )
-        ).thenReturn(true)
-
-        listener.onKey(mockView, KeyEvent.KEYCODE_BACK, keyEvent).shouldBeTrue()
-    }
-
-    @Test
     fun `should return false with back button action down`() {
         val message = ValidTestMessage("1", true)
         val listener = InAppMessageViewListener(message, mockCoroutine, mockDisplayManager)
@@ -428,7 +407,7 @@ class InAppMessageViewListenerOnKeySpec : InAppMessageViewListenerSpec() {
 
         listener.onKey(mockView, KeyEvent.KEYCODE_BACK, keyEvent).shouldBeTrue()
 
-        Mockito.verify(mockDisplayManager).removeMessage(any())
+        Mockito.verify(mockDisplayManager).removeMessage(any(), any(), any(), any())
     }
 }
 

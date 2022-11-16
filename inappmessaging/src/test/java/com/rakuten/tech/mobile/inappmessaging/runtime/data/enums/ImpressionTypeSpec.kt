@@ -29,7 +29,7 @@ class ImpressionTypeSpec(private val id: Int, private val expected: Any?) {
                 arrayOf(4, ImpressionType.EXIT),
                 arrayOf(5, ImpressionType.CLICK_CONTENT),
                 arrayOf(6, ImpressionType.OPT_OUT),
-                arrayOf(7, null)
+                arrayOf(-1, null)
             )
         }
     }
