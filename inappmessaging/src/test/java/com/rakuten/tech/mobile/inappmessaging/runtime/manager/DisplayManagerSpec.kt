@@ -274,7 +274,7 @@ class DisplayManagerSpec : BaseTest() {
         val message = ValidTestMessage(campaignId = "test", type = InAppMessageType.TOOLTIP.typeId, tooltip = tooltip)
         CampaignRepository.instance().clearMessages()
         CampaignRepository.instance().syncWith(listOf(message), 0)
-        MessageReadinessManager.instance().addTooltipToQueue(message.getCampaignId())
+        MessageReadinessManager.instance().addMessageToQueue(message.getCampaignId())
     }
 
     @SuppressWarnings("LongMethod")

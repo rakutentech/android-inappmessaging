@@ -32,17 +32,15 @@ import java.util.concurrent.atomic.AtomicBoolean
  * Returns the next ready to display message.
  */
 internal interface MessageReadinessManager {
+    /**
+     * Adds a message by Id as ready for display.
+     */
+    fun addMessageToQueue(id: String)
 
     /**
-     * Adds a campaign by Id as ready for display.
+     * Removes a message Id to ready for display.
      */
-    fun addCampaignToQueue(id: String)
-
-    /**
-     * Adds tooltip by Id as ready for display.
-     * For improvement, create a separate class specific to tooltip operations.
-     */
-    fun addTooltipToQueue(id: String)
+    fun removeMessageFromQueue(id: String)
 
     /**
      * Clears all queued messages Ids for display.
@@ -79,20 +77,20 @@ internal interface MessageReadinessManager {
     }
 
     @SuppressWarnings("TooManyFunctions", "LargeClass")
-    private class MessageReadinessManagerImpl(private val campaignRepo: CampaignRepository) : MessageReadinessManager {
-        private val queuedMessages = mutableListOf<String>()
+    class MessageReadinessManagerImpl(private val campaignRepo: CampaignRepository) : MessageReadinessManager {
+        internal val queuedMessages = mutableListOf<String>()
         private val queuedTooltips = mutableListOf<String>()
 
-        override fun addCampaignToQueue(id: String) {
-            synchronized(queuedMessages) {
-                queuedMessages.add(id)
-            }
+        override fun addMessageToQueue(id: String) {
+            val message = campaignRepo.messages[id] ?: return
+            val queue = if (message.getType() == InAppMessageType.TOOLTIP.typeId) queuedTooltips else queuedMessages
+            synchronized(queue) { queue.add(id) }
         }
 
-        override fun addTooltipToQueue(id: String) {
-            synchronized(queuedTooltips) {
-                queuedTooltips.add(id)
-            }
+        override fun removeMessageFromQueue(id: String) {
+            val message = campaignRepo.messages[id] ?: return
+            val queue = if (message.getType() == InAppMessageType.TOOLTIP.typeId) queuedTooltips else queuedMessages
+            synchronized(queue) { queue.remove(id) }
         }
 
         override fun clearMessages() {
@@ -110,10 +108,9 @@ internal interface MessageReadinessManager {
             // toList() to prevent ConcurrentModificationException
             val queuedMessagesCopy = if (hasCampaignsInQueue) queuedMessages.toList() else queuedTooltips.toList()
             for (messageId in queuedMessagesCopy) {
-                val campaignId = if (hasCampaignsInQueue) queuedMessages.removeFirst() else queuedTooltips.removeFirst()
-                val message = campaignRepo.messages[campaignId]
+                val message = campaignRepo.messages[messageId]
                 if (message == null) {
-                    InAppLogger(TAG).debug("Queued campaign $campaignId does not exist in the repository anymore")
+                    InAppLogger(TAG).debug("Queued campaign $messageId does not exist in the repository anymore")
                     continue
                 }
 

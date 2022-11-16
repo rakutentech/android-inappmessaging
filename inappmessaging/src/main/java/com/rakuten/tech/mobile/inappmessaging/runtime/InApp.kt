@@ -172,6 +172,7 @@ internal class InApp(
         if (clearQueuedCampaigns) {
             messageReadinessManager.clearMessages()
         } else if (id != null) {
+            messageReadinessManager.removeMessageFromQueue(id as String)
             displayManager.displayMessage()
         }
     }

@@ -21,6 +21,7 @@ import com.rakuten.tech.mobile.inappmessaging.runtime.data.models.messages.Valid
 import com.rakuten.tech.mobile.inappmessaging.runtime.data.repositories.CampaignRepository
 import com.rakuten.tech.mobile.inappmessaging.runtime.data.responses.ping.*
 import com.rakuten.tech.mobile.inappmessaging.runtime.manager.DisplayManager
+import com.rakuten.tech.mobile.inappmessaging.runtime.manager.MessageReadinessManager
 import com.rakuten.tech.mobile.inappmessaging.runtime.utils.BuildVersionChecker
 import org.amshove.kluent.*
 import org.junit.After
@@ -108,6 +109,9 @@ internal class MessageActionsCoroutineSpec(
     fun `should update repo after campaign is displayed`() {
         CampaignRepository.instance().clearMessages()
         CampaignRepository.instance().syncWith(listOf(message), 0)
+        val readinessManager = MessageReadinessManager.instance()
+        readinessManager.clearMessages()
+        readinessManager.addMessageToQueue(message.getCampaignId())
         val currImpressions = message.impressionsLeft!!
         DisplayManager.instance().removeMessage(InAppMessaging.instance().getRegisteredActivity())
         val result = MessageActionsCoroutine().executeTask(message, resourceId, isOpt)
@@ -116,6 +120,9 @@ internal class MessageActionsCoroutineSpec(
         result.shouldBeTrue()
         updatedMessage.impressionsLeft shouldBeEqualTo currImpressions - 1
         updatedMessage.isOptedOut shouldBeEqualTo isOpt
+
+        (readinessManager as MessageReadinessManager.MessageReadinessManagerImpl).queuedMessages.shouldBeEmpty()
+        readinessManager.clearMessages()
     }
 
     companion object {

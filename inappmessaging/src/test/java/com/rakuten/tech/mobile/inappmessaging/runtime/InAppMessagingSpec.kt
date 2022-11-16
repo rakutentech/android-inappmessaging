@@ -17,6 +17,7 @@ import com.rakuten.tech.mobile.inappmessaging.runtime.data.responses.config.Conf
 import com.rakuten.tech.mobile.inappmessaging.runtime.exception.InAppMessagingException
 import com.rakuten.tech.mobile.inappmessaging.runtime.manager.DisplayManager
 import com.rakuten.tech.mobile.inappmessaging.runtime.manager.EventsManager
+import com.rakuten.tech.mobile.inappmessaging.runtime.manager.MessageReadinessManager
 import com.rakuten.tech.mobile.inappmessaging.runtime.manager.SessionManager
 import com.rakuten.tech.mobile.inappmessaging.runtime.utils.EventMatchingUtil
 import org.amshove.kluent.*
@@ -88,9 +89,7 @@ open class InAppMessagingSpec : BaseTest() {
 
         try {
             InAppMessaging.instance().logEvent(AppStartEvent())
-        } catch (e: Exception) {
-            Assert.fail(EXCEPTION_MSG)
-        }
+        } catch (e: Exception) { Assert.fail(EXCEPTION_MSG) }
     }
 
     @SuppressWarnings("SwallowedException")
@@ -101,9 +100,7 @@ open class InAppMessagingSpec : BaseTest() {
         try {
             InAppMessaging.instance().closeMessage()
             InAppMessaging.instance().closeMessage(true)
-        } catch (e: Exception) {
-            Assert.fail(EXCEPTION_MSG)
-        }
+        } catch (e: Exception) { Assert.fail(EXCEPTION_MSG) }
     }
 
     @Test
@@ -199,7 +196,8 @@ open class InAppMessagingSpec : BaseTest() {
         rollout: Int,
         displayManager: DisplayManager = this.displayManager,
         accountRepo: AccountRepository = AccountRepository.instance(),
-        sessionManager: SessionManager = SessionManager
+        sessionManager: SessionManager = SessionManager,
+        readinessManager: MessageReadinessManager = MessageReadinessManager.instance()
     ): InAppMessaging {
         `when`(configResponseData.rollOutPercentage).thenReturn(rollout)
         ConfigResponseRepository.instance().addConfigResponse(configResponseData)
@@ -210,7 +208,8 @@ open class InAppMessagingSpec : BaseTest() {
             displayManager = displayManager,
             eventsManager = eventsManager,
             accountRepo = accountRepo,
-            sessionManager = sessionManager
+            sessionManager = sessionManager,
+            messageReadinessManager = readinessManager
         )
     }
 
@@ -511,7 +510,8 @@ class InAppMessagingRemoveSpec : InAppMessagingSpec() {
     fun `should call display manager when removing campaign but not clear queue`() {
         val message = ValidTestMessage("1")
         setupDisplayedView(message)
-        val instance = initializeMockInstance(100)
+        val mockMgr = Mockito.mock(MessageReadinessManager::class.java)
+        val instance = initializeMockInstance(100, readinessManager = mockMgr)
 
         `when`(displayManager.removeMessage(anyOrNull(), any(), any(), anyOrNull())).thenReturn("1")
 
@@ -520,7 +520,20 @@ class InAppMessagingRemoveSpec : InAppMessagingSpec() {
             // Impressions left should not be reduced
             it.impressionsLeft shouldBeEqualTo it.getMaxImpressions()
         }
+        Mockito.verify(mockMgr).removeMessageFromQueue(message.getCampaignId())
         Mockito.verify(displayManager).displayMessage()
+    }
+
+    @Test
+    fun `should not call display manager when removing campaign but not clear queue`() {
+        val mockMgr = Mockito.mock(MessageReadinessManager::class.java)
+        val instance = initializeMockInstance(100, readinessManager = mockMgr)
+
+        `when`(displayManager.removeMessage(anyOrNull(), any(), any(), anyOrNull())).thenReturn(null)
+
+        (instance as InApp).removeMessage(false)
+        Mockito.verify(mockMgr, never()).removeMessageFromQueue(any())
+        Mockito.verify(displayManager, never()).displayMessage()
     }
 
     private fun setupDisplayedView(message: Message) {
