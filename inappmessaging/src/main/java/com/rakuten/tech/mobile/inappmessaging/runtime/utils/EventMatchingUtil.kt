@@ -1,5 +1,6 @@
 package com.rakuten.tech.mobile.inappmessaging.runtime.utils
 
+import com.rakuten.tech.mobile.inappmessaging.runtime.data.enums.InAppMessageType
 import com.rakuten.tech.mobile.inappmessaging.runtime.data.models.appevents.Event
 import com.rakuten.tech.mobile.inappmessaging.runtime.data.models.messages.Message
 import com.rakuten.tech.mobile.inappmessaging.runtime.data.repositories.CampaignRepository
@@ -10,6 +11,7 @@ internal abstract class EventMatchingUtil {
     internal val persistentEvents = mutableSetOf<Event>()
     internal val matchedEvents = mutableMapOf<String, MutableList<Event>>()
     internal val triggeredPersistentCampaigns = mutableSetOf<String>()
+    internal val triggeredTooltips = mutableSetOf<String>()
 
     /**
      * Stores logged event.
@@ -77,7 +79,7 @@ internal abstract class EventMatchingUtil {
             return triggers.all { isTriggerMatchingOneOfEvents(it, events) }
         }
 
-        @SuppressWarnings("ComplexMethod", "ReturnCount")
+        @SuppressWarnings("ComplexMethod", "ReturnCount", "LongMethod")
         override fun removeSetOfMatchedEvents(eventsToRemove: Set<Event>, campaign: Message): Boolean {
             val campaignEvents = matchedEvents[campaign.getCampaignId()] ?: mutableListOf()
             val totalMatchedEvents = campaignEvents.count() + persistentEvents.count()
@@ -91,12 +93,19 @@ internal abstract class EventMatchingUtil {
             if (isCampaignPersistentEventsOnly && triggeredPersistentCampaigns.contains(campaign.getCampaignId())) {
                 return false
             }
+            // Display tooltips once per app session only
+            if (triggeredTooltips.contains(campaign.getCampaignId())) {
+                return false
+            }
 
             if (removeEvents(eventsToRemove, campaignEvents)) return false
 
             if (isCampaignPersistentEventsOnly) {
                 triggeredPersistentCampaigns.add(campaign.getCampaignId())
             } else {
+                if (campaign.getType() == InAppMessageType.TOOLTIP.typeId) {
+                    triggeredTooltips.add(campaign.getCampaignId())
+                }
                 matchedEvents[campaign.getCampaignId()] = campaignEvents
             }
             return true

@@ -12,6 +12,7 @@ import com.rakuten.tech.mobile.inappmessaging.runtime.R
 import com.rakuten.tech.mobile.inappmessaging.runtime.data.enums.ButtonActionType
 import com.rakuten.tech.mobile.inappmessaging.runtime.data.enums.EventType
 import com.rakuten.tech.mobile.inappmessaging.runtime.data.enums.ImpressionType
+import com.rakuten.tech.mobile.inappmessaging.runtime.data.enums.InAppMessageType
 import com.rakuten.tech.mobile.inappmessaging.runtime.data.enums.ValueType
 import com.rakuten.tech.mobile.inappmessaging.runtime.data.models.appevents.CustomEvent
 import com.rakuten.tech.mobile.inappmessaging.runtime.data.models.appevents.Event
@@ -32,7 +33,7 @@ import kotlin.collections.ArrayList
 /**
  * Task which should be ran in the background.
  */
-@SuppressWarnings("TooManyFunctions")
+@SuppressWarnings("TooManyFunctions", "LargeClass")
 internal class MessageActionsCoroutine(
     private val campaignRepo: CampaignRepository = CampaignRepository.instance(),
     private val readinessManager: MessageReadinessManager = MessageReadinessManager.instance()
@@ -44,10 +45,14 @@ internal class MessageActionsCoroutine(
         }
         // Getting ImpressionType, which represents which button was pressed:
         val buttonType = getOnClickBehaviorType(viewResourceId)
-        // Add event in the button if exist.
-        addEmbeddedEvent(buttonType, message)
-        // Handling onclick action for deep link, redirect, etc.
-        handleAction(getOnClickBehavior(buttonType, message), message.getCampaignId())
+        if (message.getType() != InAppMessageType.TOOLTIP.typeId) {
+            // Add event in the button if exist.
+            addEmbeddedEvent(buttonType, message)
+            // Handling onclick action for deep link, redirect, push primer, etc.
+            handleAction(getOnClickBehavior(buttonType, message), message.getCampaignId())
+        } else if (buttonType == ImpressionType.CLICK_CONTENT) {
+            handleAction(OnClickBehavior(2, message.getTooltipConfig()?.url), "")
+        }
         // Update campaign status in repository
         updateCampaignInRepository(message, optOut)
         // Schedule to report impression.
@@ -63,7 +68,7 @@ internal class MessageActionsCoroutine(
         if (isOptedOut) {
             campaignRepo.optOutCampaign(message)
         }
-        readinessManager.removeMessageToQueue(message.getCampaignId())
+        readinessManager.removeMessageFromQueue(message.getCampaignId())
         campaignRepo.decrementImpressions(message.getCampaignId())
     }
 
@@ -87,11 +92,10 @@ internal class MessageActionsCoroutine(
     @VisibleForTesting
     internal fun getOnClickBehaviorType(viewResourceId: Int): ImpressionType {
         return when (viewResourceId) {
-            R.id.message_close_button -> ImpressionType.EXIT
+            R.id.message_close_button, BACK_BUTTON -> ImpressionType.EXIT
             R.id.message_single_button, R.id.message_button_left -> ImpressionType.ACTION_ONE
             R.id.message_button_right -> ImpressionType.ACTION_TWO
-            R.id.slide_up -> ImpressionType.CLICK_CONTENT
-            BACK_BUTTON -> ImpressionType.EXIT
+            R.id.slide_up, R.id.message_tooltip_image_view, R.id.message_tip -> ImpressionType.CLICK_CONTENT
             else -> ImpressionType.INVALID
         }
     }

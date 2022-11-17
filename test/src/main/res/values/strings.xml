@@ -18,4 +18,5 @@
   <string name="label_reconfigure">Change configuration</string>
   <string name="label_config_url">Config URL</string>
   <string name="label_subs_key">Subscription\nKey</string>
+  <string name="sec_act_custom_event_click">sec_act_click_event</string>
 </resources>

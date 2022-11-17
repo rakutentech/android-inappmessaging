@@ -7,7 +7,6 @@ import com.rakuten.tech.mobile.inappmessaging.runtime.data.responses.ping.Campai
 import com.rakuten.tech.mobile.inappmessaging.runtime.utils.InAppLogger
 import com.rakuten.tech.mobile.sdkutils.PreferencesUtil
 import org.json.JSONObject
-import java.lang.ClassCastException
 import java.lang.Integer.max
 
 internal abstract class CampaignRepository {
@@ -148,21 +147,15 @@ internal abstract class CampaignRepository {
             }
         }
 
-        @SuppressWarnings("TooGenericExceptionCaught")
         private fun retrieveData(): String {
-            return try {
-                InAppMessaging.instance().getHostAppContext()?.let { ctx ->
-                    PreferencesUtil.getString(
-                        context = ctx,
-                        name = InAppMessaging.getPreferencesFile(),
-                        key = IAM_USER_CACHE,
-                        defValue = ""
-                    )
-                }.orEmpty()
-            } catch (ex: ClassCastException) {
-                InAppLogger(TAG).debug(ex.cause, "Incorrect type for $IAM_USER_CACHE data")
-                ""
-            }
+            return InAppMessaging.instance().getHostAppContext()?.let { ctx ->
+                PreferencesUtil.getString(
+                    context = ctx,
+                    name = InAppMessaging.getPreferencesFile(),
+                    key = IAM_USER_CACHE,
+                    defValue = ""
+                )
+            }.orEmpty()
         }
 
         private fun saveDataToCache() {

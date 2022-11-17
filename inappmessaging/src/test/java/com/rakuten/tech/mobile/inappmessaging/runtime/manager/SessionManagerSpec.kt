@@ -148,7 +148,7 @@ class SessionManagerSpec : BaseTest() {
         // Cleared campaigns
         CampaignRepository.instance().messages.shouldHaveSize(0)
         // No ready campaigns
-        MessageReadinessManager.instance().getNextDisplayMessage().shouldBeNull()
+        MessageReadinessManager.instance().getNextDisplayMessage().shouldBeEmpty()
     }
 
     companion object {

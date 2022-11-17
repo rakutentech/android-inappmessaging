@@ -7,6 +7,11 @@
     <item name="android:theme">@style/Theme.MaterialComponents.Light.DarkActionBar</item>
   </style>
 
+  <style name="Shadow" parent="Theme.MaterialComponents.DayNight.NoActionBar" >
+    <item name="android:ambientShadowAlpha">1</item>
+    <item name="android:spotShadowAlpha">1</item>
+  </style>
+
   <style name="InAppMessaging.CloseButton">
     <!--Default button is black.-->
     <item name="android:src">@drawable/close_button_black</item>
@@ -25,6 +30,14 @@
 
   <style name="InAppMessaging.CloseButton.SlideUp">
     <item name="android:layout_gravity">top|end</item>
+  </style>
+
+  <style name="InAppMessaging.TooltipButton">
+    <!--Default background as white.-->
+    <item name="android:layout_height">@dimen/tooltip__close_button_height</item>
+    <item name="android:layout_width">@dimen/tooltip__close_button_width</item>
+    <item name="android:background">@drawable/close_button_background</item>
+    <item name="android:src">@drawable/close_button</item>
   </style>
 
   <style name="InAppMessaging.Button">
@@ -90,6 +103,11 @@
 
   <style name="InAppMessaging.Text.Slide">
     <item name="android:ellipsize">end</item>
+  </style>
+
+  <style name="roundedCorners" parent="">
+    <item name="cornerFamily">rounded</item>
+    <item name="cornerSize">10dp</item>
   </style>
 
 </resources>

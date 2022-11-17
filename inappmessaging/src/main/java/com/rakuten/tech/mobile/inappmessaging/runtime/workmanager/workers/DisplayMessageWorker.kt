@@ -2,7 +2,6 @@ package com.rakuten.tech.mobile.inappmessaging.runtime.workmanager.workers
 
 import android.app.Activity
 import android.content.Context
-import android.content.Intent
 import android.os.Handler
 import android.os.Looper
 import androidx.work.CoroutineWorker
@@ -47,15 +46,17 @@ internal class DisplayMessageWorker(
      */
     private fun prepareNextMessage() {
         // Retrieving the next ready message, and its display permission been checked.
-        val message = messageReadinessManager.getNextDisplayMessage() ?: return
+        val messages = messageReadinessManager.getNextDisplayMessage()
         val hostActivity = InAppMessaging.instance().getRegisteredActivity()
-        val imageUrl = message.getMessagePayload().resource.imageUrl
         if (hostActivity != null) {
-            if (!imageUrl.isNullOrEmpty()) {
-                fetchImageThenDisplayMessage(message, hostActivity, imageUrl)
-            } else {
-                // If no image, just display the message.
-                displayMessage(message, hostActivity)
+            for (message in messages) {
+                val imageUrl = message.getMessagePayload().resource.imageUrl
+                if (!imageUrl.isNullOrEmpty()) {
+                    fetchImageThenDisplayMessage(message, hostActivity, imageUrl)
+                } else {
+                    // If no image, just display the message.
+                    displayMessage(message, hostActivity)
+                }
             }
         }
     }
@@ -113,14 +114,13 @@ internal class DisplayMessageWorker(
     }
 
     companion object {
-        private const val DISPLAY_MESSAGE_JOB_ID = 3210
         private const val TAG = "IAM_JobIntentService"
         private const val DISPLAY_WORKER = "iam_message_display_worker"
 
         /**
          * This method enqueues work in to this service.
          */
-        fun enqueueWork(work: Intent) {
+        fun enqueueWork() {
             InAppMessaging.instance().getHostAppContext()?.let { ctx ->
                 val displayRequest = OneTimeWorkRequest.Builder(DisplayMessageWorker::class.java)
                     .setConstraints(WorkManagerUtil.getNetworkConnectedConstraint())

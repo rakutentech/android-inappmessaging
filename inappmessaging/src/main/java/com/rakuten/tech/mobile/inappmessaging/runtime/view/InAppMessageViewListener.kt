@@ -11,6 +11,7 @@ import androidx.annotation.VisibleForTesting
 import com.rakuten.tech.mobile.inappmessaging.runtime.InAppMessaging
 import com.rakuten.tech.mobile.inappmessaging.runtime.R
 import com.rakuten.tech.mobile.inappmessaging.runtime.coroutine.MessageActionsCoroutine
+import com.rakuten.tech.mobile.inappmessaging.runtime.data.enums.InAppMessageType
 import com.rakuten.tech.mobile.inappmessaging.runtime.data.models.messages.Message
 import com.rakuten.tech.mobile.inappmessaging.runtime.manager.DisplayManager
 import com.rakuten.tech.mobile.inappmessaging.runtime.utils.BuildVersionChecker
@@ -25,7 +26,7 @@ import kotlinx.coroutines.withContext
  * Touch and clicker listener class for InAppMessageView.
  */
 internal class InAppMessageViewListener(
-    val message: Message?,
+    val message: Message,
     private val messageCoroutine: MessageActionsCoroutine = MessageActionsCoroutine(),
     private val displayManager: DisplayManager = DisplayManager.instance(),
     private val buildChecker: BuildVersionChecker = BuildVersionChecker.instance(),
@@ -90,9 +91,16 @@ internal class InAppMessageViewListener(
         }
     }
 
-    private fun handleClick(id: Int, dispatcher: CoroutineDispatcher = Dispatchers.Default) {
-        CoroutineScope(Dispatchers.Main).launch {
-            displayManager.removeMessage(inApp.getRegisteredActivity())
+    internal fun handleClick(
+        id: Int,
+        mainDispatcher: CoroutineDispatcher = Dispatchers.Main,
+        dispatcher: CoroutineDispatcher = Dispatchers.Default
+    ) {
+        CoroutineScope(mainDispatcher).launch {
+            displayManager.removeMessage(
+                inApp.getRegisteredActivity(),
+                id = if (message.getType() == InAppMessageType.TOOLTIP.typeId) message.getCampaignId() else null
+            )
             withContext(dispatcher) {
                 handleMessage(id)
             }
@@ -103,7 +111,7 @@ internal class InAppMessageViewListener(
         val result = messageCoroutine.executeTask(message, id, isOptOutChecked)
         if (result) {
             eventScheduler.startReconciliationWorker(
-                delay = (message?.run { getMessagePayload().messageSettings.displaySettings.delay } ?: 0).toLong()
+                delay = (message.getMessagePayload().messageSettings.displaySettings.delay).toLong()
             )
         }
     }

@@ -15,6 +15,7 @@ import com.rakuten.tech.mobile.inappmessaging.runtime.InAppMessaging
 import com.rakuten.tech.mobile.inappmessaging.runtime.R
 import com.rakuten.tech.mobile.inappmessaging.runtime.TestUserInfoProvider
 import com.rakuten.tech.mobile.inappmessaging.runtime.data.enums.ImpressionType
+import com.rakuten.tech.mobile.inappmessaging.runtime.data.enums.InAppMessageType
 import com.rakuten.tech.mobile.inappmessaging.runtime.data.models.messages.InvalidTestMessage
 import com.rakuten.tech.mobile.inappmessaging.runtime.data.models.messages.Message
 import com.rakuten.tech.mobile.inappmessaging.runtime.data.models.messages.ValidTestMessage
@@ -44,7 +45,8 @@ import org.robolectric.annotation.Config
 internal class MessageActionsCoroutineSpec(
     val testName: String,
     private val resourceId: Int,
-    private val isOpt: Boolean
+    private val isOpt: Boolean,
+    private val isTooltip: Boolean
 ) : BaseTest() {
 
     private lateinit var message: CampaignData
@@ -96,6 +98,16 @@ internal class MessageActionsCoroutineSpec(
     }
 
     @Test
+    fun `should return true when campaign is valid`() {
+        val message = ValidTestMessage(
+            type = if (isTooltip) InAppMessageType.TOOLTIP.typeId else InAppMessageType.MODAL.typeId
+        )
+        DisplayManager.instance().removeMessage(InAppMessaging.instance().getRegisteredActivity())
+        val result = MessageActionsCoroutine().executeTask(message, resourceId, isOpt)
+        result.shouldBeTrue()
+    }
+
+    @Test
     fun `should update repo after campaign is displayed`() {
         CampaignRepository.instance().clearMessages()
         CampaignRepository.instance().syncWith(listOf(message), 0)
@@ -122,18 +134,21 @@ internal class MessageActionsCoroutineSpec(
         )
         fun data(): Collection<Array<Any>> {
             return listOf(
-                arrayOf("Close button - isOpt true", R.id.message_close_button, true),
-                arrayOf("Close button - isOpt false", R.id.message_close_button, false),
-                arrayOf("Single button - isOpt true", R.id.message_single_button, true),
-                arrayOf("Single button - isOpt false", R.id.message_single_button, false),
-                arrayOf("Right button - isOpt true", R.id.message_button_right, true),
-                arrayOf("Right button - isOpt false", R.id.message_button_right, false),
-                arrayOf("Left button - isOpt true", R.id.message_button_left, true),
-                arrayOf("Left button - isOpt false", R.id.message_button_left, false),
-                arrayOf("Content - isOpt true", R.id.slide_up, true),
-                arrayOf("Content - isOpt false", R.id.slide_up, false),
-                arrayOf("Back - isOpt true", MessageActionsCoroutine.BACK_BUTTON, true),
-                arrayOf("Back - isOpt false", MessageActionsCoroutine.BACK_BUTTON, false)
+                arrayOf("Close button - isOpt true", R.id.message_close_button, true, false),
+                arrayOf("Close button - isOpt false", R.id.message_close_button, false, false),
+                arrayOf("Single button - isOpt true", R.id.message_single_button, true, false),
+                arrayOf("Single button - isOpt false", R.id.message_single_button, false, false),
+                arrayOf("Right button - isOpt true", R.id.message_button_right, true, false),
+                arrayOf("Right button - isOpt false", R.id.message_button_right, false, false),
+                arrayOf("Left button - isOpt true", R.id.message_button_left, true, false),
+                arrayOf("Left button - isOpt false", R.id.message_button_left, false, false),
+                arrayOf("Content - isOpt true", R.id.slide_up, true, false),
+                arrayOf("Content - isOpt false", R.id.slide_up, false, false),
+                arrayOf("Back - isOpt true", MessageActionsCoroutine.BACK_BUTTON, true, false),
+                arrayOf("Back - isOpt false", MessageActionsCoroutine.BACK_BUTTON, false, false),
+                arrayOf("Tooltip View - content", R.id.message_tooltip_image_view, false, true),
+                arrayOf("Tooltip Tip- content", R.id.message_tip, false, true),
+                arrayOf("Tooltip Tip- content", -99, false, true)
             )
         }
     }

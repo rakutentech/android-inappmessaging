@@ -2,6 +2,7 @@ package com.rakuten.tech.mobile.inappmessaging.runtime.utils
 
 import com.rakuten.tech.mobile.inappmessaging.runtime.BaseTest
 import com.rakuten.tech.mobile.inappmessaging.runtime.data.enums.EventType
+import com.rakuten.tech.mobile.inappmessaging.runtime.data.enums.InAppMessageType
 import com.rakuten.tech.mobile.inappmessaging.runtime.data.models.appevents.AppStartEvent
 import com.rakuten.tech.mobile.inappmessaging.runtime.data.models.appevents.LoginSuccessfulEvent
 import com.rakuten.tech.mobile.inappmessaging.runtime.data.models.appevents.PurchaseSuccessfulEvent
@@ -86,6 +87,18 @@ class EventMatchingUtilSetSpec : EventMatchingUtilSpec() {
         eventMatchingUtil.matchAndStore(mockAppStartEv)
 
         eventMatchingUtil.removeSetOfMatchedEvents(setOf(mockPurchaseEv), mockCampaign)
+            .shouldBeFalse()
+    }
+
+    @Test
+    fun `should return false if tooltip is already displayed`() {
+        `when`(mockCampaignMap["1"]?.getType()).thenReturn(InAppMessageType.TOOLTIP.typeId)
+        `when`(mockCampaignRepo.messages).thenReturn(mockCampaignMap)
+        eventMatchingUtil.matchAndStore(mockLoginEv)
+        eventMatchingUtil.matchAndStore(mockAppStartEv)
+        eventMatchingUtil.removeSetOfMatchedEvents(setOf(mockAppStartEv, mockLoginEv), mockCampaign)
+
+        eventMatchingUtil.removeSetOfMatchedEvents(setOf(mockLoginEv), mockCampaign)
             .shouldBeFalse()
     }
 

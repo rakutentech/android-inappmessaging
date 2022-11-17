@@ -45,21 +45,31 @@ open class MessageReadinessManagerSpec : BaseTest() {
     override fun setup() {
         super.setup()
         AccountRepository.instance().userInfoProvider = TestUserInfoProvider()
-        setupRepo()
-
+        HostAppInfoRepository.instance().addHostInfo(
+            HostAppInfo(
+                InAppMessagingTestConstants.APP_ID,
+                InAppMessagingTestConstants.DEVICE_ID,
+                InAppMessagingTestConstants.APP_VERSION,
+                InAppMessagingTestConstants.SUB_KEY,
+                InAppMessagingTestConstants.LOCALE
+            )
+        )
+        ConfigResponseRepository.instance().addConfigResponse(configResponseData)
+        `when`(configResponseData.endpoints).thenReturn(configResponseEndpoints)
+        `when`(configResponseEndpoints.displayPermission).thenReturn(DISPLAY_PERMISSION_URL)
         MessageReadinessManager.instance().clearMessages()
     }
 
     @Test
-    fun `should return null if no queued message for display`() {
-        MessageReadinessManager.instance().getNextDisplayMessage().shouldBeNull()
+    fun `should return empty if no queued message for display`() {
+        MessageReadinessManager.instance().getNextDisplayMessage().shouldBeEmpty()
     }
 
     @Test
-    fun `should return null if there are no events`() {
+    fun `should return empty if there are no events`() {
         createMessageList()
 
-        MessageReadinessManager.instance().getNextDisplayMessage().shouldBeNull()
+        MessageReadinessManager.instance().getNextDisplayMessage().shouldBeEmpty()
     }
 
     @Test
@@ -69,7 +79,7 @@ open class MessageReadinessManagerSpec : BaseTest() {
         messageList.add(ValidTestMessage("2", true, maxImpressions = 5))
         setMessagesList(messageList)
 
-        MessageReadinessManager.instance().getNextDisplayMessage() shouldBeEqualTo messageList[1]
+        MessageReadinessManager.instance().getNextDisplayMessage() shouldBeEqualTo listOf(messageList[1])
     }
 
     @Test
@@ -78,16 +88,16 @@ open class MessageReadinessManagerSpec : BaseTest() {
         messageList.add(ValidTestMessage("1", true, infiniteImpressions = true))
         setMessagesList(messageList)
 
-        MessageReadinessManager.instance().getNextDisplayMessage() shouldBeEqualTo messageList[0]
+        MessageReadinessManager.instance().getNextDisplayMessage() shouldBeEqualTo listOf(messageList[0])
     }
 
     @Test
-    fun `should return null when impressions is not infinite`() {
+    fun `should return empty when impressions is not infinite`() {
         val messageList = ArrayList<Message>()
         messageList.add(ValidTestMessage("1", true, maxImpressions = 0, infiniteImpressions = false))
         setMessagesList(messageList)
 
-        MessageReadinessManager.instance().getNextDisplayMessage() shouldBeEqualTo null
+        MessageReadinessManager.instance().getNextDisplayMessage().shouldBeEmpty()
     }
 
     @Test
@@ -98,14 +108,13 @@ open class MessageReadinessManagerSpec : BaseTest() {
         request.campaignId shouldBeEqualTo message.getCampaignId()
         request.appVersion shouldBeEqualTo InAppMessagingTestConstants.APP_VERSION
         request.sdkVersion shouldBeEqualTo BuildConfig.VERSION_NAME
-        request.lastPingInMillis shouldBeEqualTo LAST_PING_MILLIS
         request.locale shouldBeEqualTo InAppMessagingTestConstants.LOCALE.toString()
             .replace("_", "-")
             .lowercase(Locale.getDefault())
     }
 
     @Test
-    fun `should next ready message be null when no events and opted out`() {
+    fun `should next ready message be empty when no events and opted out`() {
         val messageList = ArrayList<Message>()
         val message = ValidTestMessage("1", false).apply {
             isOptedOut = true
@@ -115,12 +124,12 @@ open class MessageReadinessManagerSpec : BaseTest() {
         messageList.add(ValidTestMessage("3", false))
         setMessagesList(messageList)
 
-        MessageReadinessManager.instance().getNextDisplayMessage().shouldBeNull()
+        MessageReadinessManager.instance().getNextDisplayMessage().shouldBeEmpty()
         MessageReadinessManager.shouldRetry.get().shouldBeFalse()
     }
 
     @Test
-    fun `should next ready message be null with ping required`() {
+    fun `should next ready message be empty with ping required`() {
         initializeInApp()
         createMessageList()
         ConfigResponseRepository.instance().addConfigResponse(
@@ -133,11 +142,11 @@ open class MessageReadinessManagerSpec : BaseTest() {
                 "2", InAppMessagingTestConstants.LOCALE
             )
         )
-        MessageReadinessManager.instance().getNextDisplayMessage().shouldBeNull()
+        MessageReadinessManager.instance().getNextDisplayMessage().shouldBeEmpty()
     }
 
     @Test
-    fun `should next ready message be null with empty display impression`() {
+    fun `should next ready message be empty with empty display impression`() {
         initializeInApp()
 
         createMessageList()
@@ -151,22 +160,16 @@ open class MessageReadinessManagerSpec : BaseTest() {
                 "2", InAppMessagingTestConstants.LOCALE
             )
         )
-        MessageReadinessManager.instance().getNextDisplayMessage().shouldBeNull()
+        MessageReadinessManager.instance().getNextDisplayMessage().shouldBeEmpty()
     }
 
-    private fun setupRepo() {
-        HostAppInfoRepository.instance().addHostInfo(
-            HostAppInfo(
-                InAppMessagingTestConstants.APP_ID,
-                InAppMessagingTestConstants.DEVICE_ID,
-                InAppMessagingTestConstants.APP_VERSION,
-                InAppMessagingTestConstants.SUB_KEY,
-                InAppMessagingTestConstants.LOCALE
-            )
-        )
-        ConfigResponseRepository.instance().addConfigResponse(configResponseData)
-        `when`(configResponseData.endpoints).thenReturn(configResponseEndpoints)
-        `when`(configResponseEndpoints.displayPermission).thenReturn(DISPLAY_PERMISSION_URL)
+    @Test
+    fun `should return empty for valid message when max impression`() {
+        val messageList = ArrayList<Message>()
+        messageList.add(ValidTestMessage("10", false, maxImpressions = 0))
+        setMessagesList(messageList)
+
+        MessageReadinessManager.instance().getNextDisplayMessage().shouldBeEmpty()
     }
 
     private fun createMessageList() {
@@ -182,16 +185,9 @@ open class MessageReadinessManagerSpec : BaseTest() {
         CampaignRepository.instance().syncWith(messages, LAST_PING_MILLIS)
 
         MessageReadinessManager.instance().clearMessages()
-        for (message in messages) { MessageReadinessManager.instance().addMessageToQueue(message.getCampaignId()) }
-    }
-
-    @Test
-    fun `should return null for valid message when max impression`() {
-        val messageList = ArrayList<Message>()
-        messageList.add(ValidTestMessage("10", false, maxImpressions = 0))
-        setMessagesList(messageList)
-
-        MessageReadinessManager.instance().getNextDisplayMessage().shouldBeNull()
+        for (message in messages) {
+            MessageReadinessManager.instance().addMessageToQueue(message.getCampaignId())
+        }
     }
 
     private fun initializeInApp() {
@@ -284,7 +280,7 @@ class MessageReadinessManagerRequestSpec : BaseTest() {
     fun `should return valid on retry after first 500 response code`() {
         server.enqueue(MockResponse().setResponseCode(500))
         server.enqueue(MockResponse().setResponseCode(200).setBody(DISPLAY_RESPONSE))
-        verifyValidResponse(MessageReadinessManager.instance().getNextDisplayMessage())
+        verifyValidResponse(MessageReadinessManager.instance().getNextDisplayMessage()[0])
     }
 
     @Test
@@ -298,7 +294,7 @@ class MessageReadinessManagerRequestSpec : BaseTest() {
     fun `should return valid message`() {
         val mockResponse = MockResponse().setResponseCode(200).setBody(DISPLAY_RESPONSE)
         server.enqueue(mockResponse)
-        verifyValidResponse(MessageReadinessManager.instance().getNextDisplayMessage())
+        verifyValidResponse(MessageReadinessManager.instance().getNextDisplayMessage()[0])
         val mgr = MessageReadinessManager.instance()
         (mgr as MessageReadinessManager.MessageReadinessManagerImpl).queuedMessages.shouldHaveSize(1)
     }
@@ -310,7 +306,7 @@ class MessageReadinessManagerRequestSpec : BaseTest() {
         val mgr = MessageReadinessManager.instance()
         mgr.clearMessages()
         (mgr as MessageReadinessManager.MessageReadinessManagerImpl).queuedMessages.add("invalid")
-        MessageReadinessManager.instance().getNextDisplayMessage().shouldBeNull()
+        MessageReadinessManager.instance().getNextDisplayMessage().shouldBeEmpty()
         mgr.clearMessages()
     }
 
@@ -318,11 +314,11 @@ class MessageReadinessManagerRequestSpec : BaseTest() {
     fun `should return remove message`() {
         val mockResponse = MockResponse().setResponseCode(200).setBody(DISPLAY_RESPONSE)
         server.enqueue(mockResponse)
-        val message = MessageReadinessManager.instance().getNextDisplayMessage()
+        val message = MessageReadinessManager.instance().getNextDisplayMessage()[0]
         verifyValidResponse(message)
         val readinessMgr = MessageReadinessManager.instance()
         (readinessMgr as MessageReadinessManager.MessageReadinessManagerImpl).queuedMessages.shouldHaveSize(1)
-        MessageReadinessManager.instance().removeMessageToQueue(message!!.getCampaignId())
+        MessageReadinessManager.instance().removeMessageFromQueue(message!!.getCampaignId())
         readinessMgr.queuedMessages.shouldBeEmpty()
     }
 
@@ -334,11 +330,10 @@ class MessageReadinessManagerRequestSpec : BaseTest() {
     }
 
     @Test
-    fun `should return null on valid response but need ping`() {
+    fun `should return empty on valid response but need ping`() {
         val mockResponse = MockResponse().setResponseCode(200).setBody(DISPLAY_PING_RESPONSE)
         server.enqueue(mockResponse)
-        val message = MessageReadinessManager.instance().getNextDisplayMessage()
-        message.shouldBeNull()
+        MessageReadinessManager.instance().getNextDisplayMessage().shouldBeEmpty()
     }
 
     private fun setMessagesList(messages: ArrayList<Message>) {
@@ -351,7 +346,7 @@ class MessageReadinessManagerRequestSpec : BaseTest() {
     }
 
     private fun verifyFailedResponse(isRetry: Boolean) {
-        MessageReadinessManager.instance().getNextDisplayMessage().shouldBeNull()
+        MessageReadinessManager.instance().getNextDisplayMessage().shouldBeEmpty()
         MessageReadinessManager.shouldRetry.get() shouldBeEqualTo isRetry
     }
 
