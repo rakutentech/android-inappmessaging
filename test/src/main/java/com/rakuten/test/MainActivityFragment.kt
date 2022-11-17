@@ -44,6 +44,7 @@ class MainActivityFragment : Fragment(), View.OnClickListener {
         view.findViewById<Button>(R.id.purchase_successful_twice).setOnClickListener(this)
         view.findViewById<Button>(R.id.login_purchase_successful).setOnClickListener(this)
         view.findViewById<Button>(R.id.close_message).setOnClickListener(this)
+        view.findViewById<Button>(R.id.close_tooltip).setOnClickListener(this)
         view.findViewById<Button>(R.id.reconfigure).setOnClickListener(this)
     }
 
@@ -70,6 +71,10 @@ class MainActivityFragment : Fragment(), View.OnClickListener {
             }
             R.id.close_message -> {
                 InAppMessaging.instance().closeMessage()
+            }
+            R.id.close_tooltip -> {
+                // Closes tooltip displayed in Purchase Successful button, if there is.
+                InAppMessaging.instance().closeTooltip("purchase_successful")
             }
             R.id.reconfigure -> showConfiguration()
             else -> Any()

@@ -89,6 +89,14 @@ abstract class InAppMessaging internal constructor() {
      */
     abstract fun closeMessage(clearQueuedCampaigns: Boolean = false)
 
+    /**
+     * Closes a tooltip by `UIElement` identifier.
+     * This should be called when app needs to force-close the displayed tooltip without user action.
+     * Calling this method will not increment the campaign impression.
+     * @param uiElementIdentifier The ID of UI element where the tooltip is attached.
+     */
+    abstract fun closeTooltip(uiElementIdentifier: String)
+
     companion object {
 
         /**
@@ -195,6 +203,8 @@ abstract class InAppMessaging internal constructor() {
         override fun isLocalCachingEnabled() = isCacheHandling
 
         override fun closeMessage(clearQueuedCampaigns: Boolean) = Unit
+
+        override fun closeTooltip(uiElementIdentifier: String) = Unit
 
         override fun flushEventList() = Unit
     }

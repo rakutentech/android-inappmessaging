@@ -9,6 +9,7 @@ import androidx.annotation.RestrictTo
 import androidx.annotation.VisibleForTesting
 import com.rakuten.tech.mobile.inappmessaging.runtime.data.models.appevents.Event
 import com.rakuten.tech.mobile.inappmessaging.runtime.data.repositories.AccountRepository
+import com.rakuten.tech.mobile.inappmessaging.runtime.data.repositories.CampaignRepository
 import com.rakuten.tech.mobile.inappmessaging.runtime.data.repositories.ConfigResponseRepository
 import com.rakuten.tech.mobile.inappmessaging.runtime.exception.InAppMessagingException
 import com.rakuten.tech.mobile.inappmessaging.runtime.manager.DisplayManager
@@ -22,7 +23,7 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import java.lang.ref.WeakReference
 
-@SuppressWarnings("LongParameterList", "TooManyFunctions")
+@SuppressWarnings("LongParameterList", "TooManyFunctions", "LargeClass")
 internal class InApp(
     private val context: Context,
     isDebugLogging: Boolean,
@@ -137,6 +138,22 @@ internal class InApp(
         }
     }
 
+    @SuppressWarnings("TooGenericExceptionCaught")
+    override fun closeTooltip(uiElementIdentifier: String) {
+        try {
+            if (ConfigResponseRepository.instance().isConfigEnabled()) {
+                CoroutineScope(Dispatchers.Main).launch {
+                    // called inside main dispatcher to make sure that it is always called in UI thread
+                    removeMessage(uiElementIdentifier)
+                }
+            }
+        } catch (ex: Exception) {
+            errorCallback?.let {
+                it(InAppMessagingException("In-App Messaging close tooltip failed", ex))
+            }
+        }
+    }
+
     @VisibleForTesting
     internal fun userDidChange(): Boolean {
         if (accountRepo.updateUserInfo()) {
@@ -174,6 +191,26 @@ internal class InApp(
         } else if (id != null) {
             messageReadinessManager.removeMessageFromQueue(id as String)
             displayManager.displayMessage()
+        }
+    }
+
+    /**
+     * Removes tooltip message by `uiElementIdentifier` .
+     */
+    @VisibleForTesting
+    internal fun removeMessage(uiElementIdentifier: String) {
+        val campaignId = CampaignRepository.instance()
+            .messages
+            .values
+            .firstOrNull { message ->
+                message.getTooltipConfig()?.id == uiElementIdentifier
+            }
+            ?.getCampaignId()
+
+        if (campaignId != null) {
+            displayManager.removeMessage(getRegisteredActivity(), delay = 0, id = campaignId)
+            messageReadinessManager.removeMessageFromQueue(campaignId)
+            displayManager.displayMessage() // next message
         }
     }
 

@@ -462,6 +462,7 @@ Documents targeting Product Managers:
 * SDKCF-5601: Fixed close button's content label accessibility warnings.
 * SDKCF-5900: Refactored code to remove most of the suppressions for code smells.
 * SDKCF-5948: Added tooltip campaigns feature.
+* SDKCF-6035: Added `closeTooltip()` API to manually close displayed tooltip by `UIElement` identifier.
 
 ### 7.2.0 (2022-09-28)
 * SDKCF-5038: Refactored event logging logic and campaign repository to align with iOS.
