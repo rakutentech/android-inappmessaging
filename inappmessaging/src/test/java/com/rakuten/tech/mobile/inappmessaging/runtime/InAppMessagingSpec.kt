@@ -438,6 +438,38 @@ class InAppMessagingExceptionSpec : InAppMessagingSpec() {
     fun `should not crash when save temp data failed due to forced exception`() {
         instance.flushEventList()
     }
+
+    @OptIn(ExperimentalCoroutinesApi::class)
+    @Test
+    fun `should not crash when closing message due to forced exception`() = runTest {
+        InAppMessaging.errorCallback = mockCallback
+
+        instance.closeMessage(false)
+
+        Mockito.verify(mockCallback).invoke(captor.capture())
+        captor.firstValue shouldBeInstanceOf InAppMessagingException::class.java
+    }
+
+    @OptIn(ExperimentalCoroutinesApi::class)
+    @Test
+    fun `should not crash when closing tooltip due to forced exception`() = runTest {
+        InAppMessaging.errorCallback = mockCallback
+        CampaignRepository.instance().syncWith(
+            listOf(
+                ValidTestMessage(
+                    campaignId = "1",
+                    type = InAppMessageType.TOOLTIP.typeId,
+                    tooltip = Tooltip("ui-element", "top-center", "testurl")
+                )
+            ),
+            0
+        )
+
+        instance.closeTooltip("ui-element")
+
+        Mockito.verify(mockCallback).invoke(captor.capture())
+        captor.firstValue shouldBeInstanceOf InAppMessagingException::class.java
+    }
 }
 
 class InAppMessagingUnInitSpec : InAppMessagingSpec() {
