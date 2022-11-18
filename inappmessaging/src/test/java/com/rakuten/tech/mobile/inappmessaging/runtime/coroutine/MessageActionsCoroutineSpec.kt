@@ -210,7 +210,7 @@ class MessageActionsCoroutineFuncSpec : BaseTest() {
     @Test
     fun `should start activity for redirect`() {
         val activity = setupActivity()
-        action.handleAction(OnClickBehavior(1, "https://test"), "")
+        action.handleAction(OnClickBehavior(1, "https://test"))
 
         Mockito.verify(activity).startActivity(any())
     }
@@ -219,18 +219,18 @@ class MessageActionsCoroutineFuncSpec : BaseTest() {
     fun `should start activity for deeplink`() {
         val activity = setupActivity()
         val onClick = OnClickBehavior(2, "https://test")
-        action.handleAction(onClick, "")
+        action.handleAction(onClick)
         Mockito.verify(activity).startActivity(any())
 
         InAppMessaging.instance().unregisterMessageDisplayActivity()
-        action.handleAction(onClick, "")
+        action.handleAction(onClick)
         Mockito.verify(activity).startActivity(any())
     }
 
     @Test
     fun `should not start activity for exit`() {
         val activity = setupActivity()
-        action.handleAction(OnClickBehavior(3, "https://test"), "")
+        action.handleAction(OnClickBehavior(3, "https://test"))
 
         Mockito.verify(activity, never()).startActivity(any())
     }
@@ -239,11 +239,11 @@ class MessageActionsCoroutineFuncSpec : BaseTest() {
     fun `should not start activity for null url and activity`() {
         val activity = setupActivity()
         val onClick = OnClickBehavior(2, null)
-        action.handleAction(onClick, "")
+        action.handleAction(onClick)
         Mockito.verify(activity, never()).startActivity(any())
 
         InAppMessaging.instance().unregisterMessageDisplayActivity()
-        action.handleAction(onClick, "")
+        action.handleAction(onClick)
         Mockito.verify(activity, never()).startActivity(any())
     }
 
@@ -251,11 +251,11 @@ class MessageActionsCoroutineFuncSpec : BaseTest() {
     fun `should not start activity for empty url and null activity`() {
         val activity = setupActivity()
         val onClick = OnClickBehavior(2, "")
-        action.handleAction(onClick, "")
+        action.handleAction(onClick)
         Mockito.verify(activity, never()).startActivity(any())
 
         InAppMessaging.instance().unregisterMessageDisplayActivity()
-        action.handleAction(onClick, "")
+        action.handleAction(onClick)
         Mockito.verify(activity, never()).startActivity(any())
     }
 
@@ -263,7 +263,7 @@ class MessageActionsCoroutineFuncSpec : BaseTest() {
     fun `should not crash on activity not found`() {
         val activity = setupActivity()
         `when`(activity.startActivity(any())).thenThrow(ActivityNotFoundException())
-        action.handleAction(OnClickBehavior(2, "https://test"), "")
+        action.handleAction(OnClickBehavior(2, "https://test"))
     }
 
     @Test

@@ -51,7 +51,7 @@ internal class MessageActionsCoroutine(
             // Handling onclick action for deep link, redirect, push primer, etc.
             handleAction(getOnClickBehavior(buttonType, message), message.getCampaignId())
         } else if (buttonType == ImpressionType.CLICK_CONTENT) {
-            handleAction(OnClickBehavior(2, message.getTooltipConfig()?.url), "")
+            handleAction(OnClickBehavior(2, message.getTooltipConfig()?.url))
         }
         // Update campaign status in repository
         updateCampaignInRepository(message, optOut)
@@ -139,7 +139,7 @@ internal class MessageActionsCoroutine(
      */
     @VisibleForTesting
     @SuppressWarnings("CanBeNonNullable")
-    internal fun handleAction(onClickBehavior: OnClickBehavior?, campaignId: String) {
+    internal fun handleAction(onClickBehavior: OnClickBehavior?, campaignId: String = "") {
         if (onClickBehavior == null) {
             return
         }
