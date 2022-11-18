@@ -379,6 +379,24 @@ override fun onRequestPermissionsResult(requestCode: Int, permissions: Array<Str
 * If push primer campaign is displayed in lower OS versions, tapping the push primer button in the campaign will just close the campaign.
 * Don't forget to [declare the push notification permission](https://developer.android.com/guide/topics/ui/notifiers/notification-permission#declare) in your app's manifest file.
 
+### <a name="push-primer-tracker"></a> #5 Push Primer Tracker
+
+Starting v7.3.0, a new API can be used for tracking if user granted or denied push permission request from a Push Primer campaign.
+
+The `trackPushPrimer()` API should be called upon receiving permission results on the `onRequestPermissionsResult` callback.
+
+```kotlin
+override fun onRequestPermissionsResult(requestCode: Int, permissions: Array<String>, grantResults: IntArray) {
+  when(requestCode) {
+    InAppMessaging.PUSH_PRIMER_REQ_CODE -> { // or the request code used if push permission request is handled by the app via push primer callback
+      InAppMessaging.instance().trackPushPrimer(permissions, grantResults)
+    }
+  }
+}
+```
+
+**<font color="red">Note:</font>** Please make sure that `trackPushPrimer()` API is only called for devices with Android 13 or higher OS since push notification permission request is not available for devices running in lower OS versions.
+
 ## <a name="troubleshooting"></a> Troubleshooting
 ### Proguard ParseException
 ```kotlin
@@ -462,6 +480,8 @@ Documents targeting Product Managers:
 * SDKCF-5601: Fixed close button's content label accessibility warnings.
 * SDKCF-5900: Refactored code to remove most of the suppressions for code smells.
 * SDKCF-5948: Added tooltip campaigns feature.
+* SDKCF-6009: Fixed issue on campaign not displayed after going to background.
+* SDKCF-6025: Added Push Primer opt-in tracking for Android 13 and up devices. Please see [usage](#push-primer-tracker) section for details.
 
 ### 7.2.0 (2022-09-28)
 * SDKCF-5038: Refactored event logging logic and campaign repository to align with iOS.

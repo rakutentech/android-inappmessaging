@@ -89,6 +89,15 @@ abstract class InAppMessaging internal constructor() {
      */
     abstract fun closeMessage(clearQueuedCampaigns: Boolean = false)
 
+    /**
+     * Tracks if user grants or denies the push notification via push primer message.
+     * This API only works for Android 13 and up devices.
+     *
+     * @param: [permissions] requested list.
+     * @param: [grantResults] permission granted/denied results.
+     */
+    abstract fun trackPushPrimer(permissions: Array<String>, grantResults: IntArray)
+
     companion object {
 
         /**
@@ -195,6 +204,8 @@ abstract class InAppMessaging internal constructor() {
         override fun isLocalCachingEnabled() = isCacheHandling
 
         override fun closeMessage(clearQueuedCampaigns: Boolean) = Unit
+
+        override fun trackPushPrimer(permissions: Array<String>, grantResults: IntArray) = Unit
 
         override fun flushEventList() = Unit
     }
