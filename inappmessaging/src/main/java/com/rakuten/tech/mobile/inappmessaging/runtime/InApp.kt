@@ -1,5 +1,6 @@
 package com.rakuten.tech.mobile.inappmessaging.runtime
 
+import android.Manifest
 import android.app.Activity
 import android.content.Context
 import android.content.pm.PackageManager
@@ -15,7 +16,9 @@ import com.rakuten.tech.mobile.inappmessaging.runtime.exception.InAppMessagingEx
 import com.rakuten.tech.mobile.inappmessaging.runtime.manager.DisplayManager
 import com.rakuten.tech.mobile.inappmessaging.runtime.manager.EventsManager
 import com.rakuten.tech.mobile.inappmessaging.runtime.manager.MessageReadinessManager
+import com.rakuten.tech.mobile.inappmessaging.runtime.manager.PushPrimerTrackerManager
 import com.rakuten.tech.mobile.inappmessaging.runtime.manager.SessionManager
+import com.rakuten.tech.mobile.inappmessaging.runtime.utils.BuildVersionChecker
 import com.rakuten.tech.mobile.inappmessaging.runtime.utils.EventMatchingUtil
 import com.rakuten.tech.mobile.inappmessaging.runtime.utils.InAppLogger
 import kotlinx.coroutines.CoroutineScope
@@ -33,7 +36,8 @@ internal class InApp(
     private val eventMatchingUtil: EventMatchingUtil = EventMatchingUtil.instance(),
     private val messageReadinessManager: MessageReadinessManager = MessageReadinessManager.instance(),
     private val accountRepo: AccountRepository = AccountRepository.instance(),
-    private val sessionManager: SessionManager = SessionManager
+    private val sessionManager: SessionManager = SessionManager,
+    private val primerManager: PushPrimerTrackerManager = PushPrimerTrackerManager
 ) : InAppMessaging() {
 
     // Used for displaying or removing messages from screen.
@@ -151,6 +155,22 @@ internal class InApp(
             errorCallback?.let {
                 it(InAppMessagingException("In-App Messaging close tooltip failed", ex))
             }
+        }
+    }
+
+    override fun trackPushPrimer(permissions: Array<String>, grantResults: IntArray) {
+        if (!BuildVersionChecker.instance().isAndroidTAndAbove()) {
+            return
+        }
+
+        var idx = 0
+        while (idx < permissions.size && idx < grantResults.size) {
+            if (permissions[idx] == Manifest.permission.POST_NOTIFICATIONS) {
+                val result = if (grantResults[idx] == PackageManager.PERMISSION_GRANTED) 1 else 0
+                primerManager.sendPrimerEvent(result)
+                break
+            }
+            idx++
         }
     }
 
