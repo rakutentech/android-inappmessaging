@@ -10,6 +10,8 @@ import android.view.ViewGroup
 import androidx.test.core.app.ApplicationProvider
 import androidx.work.testing.WorkManagerTestInitHelper
 import com.nhaarman.mockitokotlin2.*
+import com.rakuten.tech.mobile.inappmessaging.runtime.data.enums.InAppMessageType
+import com.rakuten.tech.mobile.inappmessaging.runtime.data.models.Tooltip
 import com.rakuten.tech.mobile.inappmessaging.runtime.data.models.appevents.AppStartEvent
 import com.rakuten.tech.mobile.inappmessaging.runtime.data.models.appevents.LoginSuccessfulEvent
 import com.rakuten.tech.mobile.inappmessaging.runtime.data.models.appevents.PurchaseSuccessfulEvent
@@ -20,6 +22,9 @@ import com.rakuten.tech.mobile.inappmessaging.runtime.data.responses.config.Conf
 import com.rakuten.tech.mobile.inappmessaging.runtime.exception.InAppMessagingException
 import com.rakuten.tech.mobile.inappmessaging.runtime.manager.*
 import com.rakuten.tech.mobile.inappmessaging.runtime.utils.EventMatchingUtil
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.test.*
 import org.amshove.kluent.*
 import org.junit.*
 import org.junit.runner.RunWith
@@ -31,7 +36,9 @@ import org.robolectric.annotation.Config
 /**
  * Test class for InAppMessaging.
  */
+@ExperimentalCoroutinesApi
 @RunWith(RobolectricTestRunner::class)
+@SuppressWarnings("LargeClass")
 @Ignore("base class")
 open class InAppMessagingSpec : BaseTest() {
     internal val activity = Mockito.mock(Activity::class.java)
@@ -46,17 +53,23 @@ open class InAppMessagingSpec : BaseTest() {
     internal val mockCallback = Mockito.mock(function.javaClass)
     internal val captor = argumentCaptor<InAppMessagingException>()
 
+    private val testDispatcher = UnconfinedTestDispatcher() // for use on tests that call a coroutinescope
+
     @Before
     override fun setup() {
         super.setup()
         EventMatchingUtil.instance().clearNonPersistentEvents()
         `when`(mockContext.applicationContext).thenReturn(null)
+
+        Dispatchers.setMain(testDispatcher)
     }
 
     @After
     override fun tearDown() {
         super.tearDown()
         ConfigResponseRepository.resetInstance()
+
+        Dispatchers.resetMain()
     }
 
     internal fun initializeInstance(shouldEnableCaching: Boolean = false) {
@@ -134,6 +147,14 @@ class InAppMessagingBasicSpec : InAppMessagingSpec() {
             InAppMessaging.instance().closeMessage()
             InAppMessaging.instance().closeMessage(true)
         } catch (e: Exception) { Assert.fail(EXCEPTION_MSG) }
+    }
+
+    @OptIn(ExperimentalCoroutinesApi::class)
+    @Test
+    fun `should not crash close tooltip for initialized instance`() = runTest {
+        initializeInstance()
+
+        InAppMessaging.instance().closeTooltip("ui-element")
     }
 
     @Test
@@ -417,6 +438,38 @@ class InAppMessagingExceptionSpec : InAppMessagingSpec() {
     fun `should not crash when save temp data failed due to forced exception`() {
         instance.flushEventList()
     }
+
+    @OptIn(ExperimentalCoroutinesApi::class)
+    @Test
+    fun `should not crash when closing message due to forced exception`() = runTest {
+        InAppMessaging.errorCallback = mockCallback
+
+        instance.closeMessage(false)
+
+        Mockito.verify(mockCallback).invoke(captor.capture())
+        captor.firstValue shouldBeInstanceOf InAppMessagingException::class.java
+    }
+
+    @OptIn(ExperimentalCoroutinesApi::class)
+    @Test
+    fun `should not crash when closing tooltip due to forced exception`() = runTest {
+        InAppMessaging.errorCallback = mockCallback
+        CampaignRepository.instance().syncWith(
+            listOf(
+                ValidTestMessage(
+                    campaignId = "1",
+                    type = InAppMessageType.TOOLTIP.typeId,
+                    tooltip = Tooltip("ui-element", "top-center", "testurl")
+                )
+            ),
+            0
+        )
+
+        instance.closeTooltip("ui-element")
+
+        Mockito.verify(mockCallback).invoke(captor.capture())
+        captor.firstValue shouldBeInstanceOf InAppMessagingException::class.java
+    }
 }
 
 class InAppMessagingUnInitSpec : InAppMessagingSpec() {
@@ -442,6 +495,7 @@ class InAppMessagingUnInitSpec : InAppMessagingSpec() {
         InAppMessaging.instance().registerPreference(TestUserInfoProvider())
         InAppMessaging.instance().logEvent(AppStartEvent())
         InAppMessaging.instance().closeMessage()
+        InAppMessaging.instance().closeTooltip("ui-element")
         InAppMessaging.instance().isLocalCachingEnabled().shouldBeFalse()
         InAppMessaging.instance().trackPushPrimer(arrayOf(""), intArrayOf(1))
         InAppMessaging.instance().flushEventList()
@@ -511,6 +565,44 @@ class InAppMessagingRemoveSpec : InAppMessagingSpec() {
     }
 
     @Test
+    fun `should remove tooltip when UIElement is valid`() {
+        val message = ValidTestMessage(
+            campaignId = "1",
+            type = InAppMessageType.TOOLTIP.typeId,
+            tooltip = Tooltip("ui-element", "top-center", "testurl")
+        )
+        setupDisplayedView(message, true)
+        val mockMgr = Mockito.mock(MessageReadinessManager::class.java)
+        val instance = initializeMockInstance(100, readinessManager = mockMgr)
+
+        instance.registerMessageDisplayActivity(activity)
+        (instance as InApp).removeMessage("ui-element")
+        Mockito.verify(displayManager).removeMessage(anyOrNull(), any(), any(), anyOrNull())
+        Mockito.verify(mockMgr).removeMessageFromQueue(message.getCampaignId())
+        // atLeastOnce due to registerMessageDisplayActivity
+        Mockito.verify(displayManager, atLeastOnce()).displayMessage()
+    }
+
+    @Test
+    fun `should not process tooltip removal when UIElement is invalid`() {
+        val message = ValidTestMessage(
+            campaignId = "1",
+            type = InAppMessageType.TOOLTIP.typeId,
+            tooltip = Tooltip("invalid-element", "top-center", "testurl")
+        )
+        setupDisplayedView(message, true)
+        val mockMgr = Mockito.mock(MessageReadinessManager::class.java)
+        val instance = initializeMockInstance(100, readinessManager = mockMgr)
+
+        instance.registerMessageDisplayActivity(activity)
+        (instance as InApp).removeMessage("ui-element")
+        Mockito.verify(displayManager, never()).removeMessage(anyOrNull(), any(), any(), anyOrNull())
+        Mockito.verify(mockMgr, never()).removeMessageFromQueue(message.getCampaignId())
+        // atLeastOnce due to registerMessageDisplayActivity
+        Mockito.verify(displayManager, atLeastOnce()).displayMessage()
+    }
+
+    @Test
     fun `should call display manager when removing campaign but not clear queue`() {
         val message = ValidTestMessage("1")
         setupDisplayedView(message)
@@ -540,10 +632,14 @@ class InAppMessagingRemoveSpec : InAppMessagingSpec() {
         Mockito.verify(displayManager, never()).displayMessage()
     }
 
-    private fun setupDisplayedView(message: Message) {
+    private fun setupDisplayedView(message: Message, isTooltip: Boolean = false) {
         val message2 = ValidTestMessage()
         CampaignRepository.instance().syncWith(listOf(message, message2), 0)
-        `when`(activity.findViewById<ViewGroup>(R.id.in_app_message_base_view)).thenReturn(viewGroup)
+        if (isTooltip) {
+            `when`(activity.findViewById<ViewGroup>(R.id.in_app_message_tooltip_view)).thenReturn(viewGroup)
+        } else {
+            `when`(activity.findViewById<ViewGroup>(R.id.in_app_message_base_view)).thenReturn(viewGroup)
+        }
         `when`(viewGroup.parent).thenReturn(parentViewGroup)
         `when`(viewGroup.tag).thenReturn("1")
     }

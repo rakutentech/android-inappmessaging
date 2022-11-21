@@ -16,6 +16,12 @@
       android:text="@string/close_message"/>
 
   <Button
+      android:id="@+id/close_tooltip"
+      android:layout_width="wrap_content"
+      android:layout_height="wrap_content"
+      android:text="@string/close_tooltip"/>
+
+  <Button
     android:id="@+id/launch_second_activity"
     android:layout_width="wrap_content"
     android:layout_height="wrap_content"
