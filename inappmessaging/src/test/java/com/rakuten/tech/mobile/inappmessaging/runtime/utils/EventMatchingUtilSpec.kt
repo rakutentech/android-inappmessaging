@@ -249,4 +249,14 @@ class EventMatchingUtilClearSpec : EventMatchingUtilSpec() {
         eventMatchingUtil.clearNonPersistentEvents()
         eventMatchingUtil.matchedEvents(mockCampaign).shouldNotBeEmpty()
     }
+
+    @Test
+    fun `should not clear triggered persistent campaigns list`() {
+        eventMatchingUtil.triggeredPersistentCampaigns.clear()
+        eventMatchingUtil.triggeredPersistentCampaigns.add("app-start-campaign")
+
+        eventMatchingUtil.clearNonPersistentEvents()
+
+        eventMatchingUtil.triggeredPersistentCampaigns.shouldHaveSize(1)
+    }
 }

@@ -483,6 +483,7 @@ Documents targeting Product Managers:
 * SDKCF-6035: Added `closeTooltip()` API to manually close displayed tooltip by `viewId` (`UIElement` identifier).
 * SDKCF-6009: Fixed issue on campaign not displayed after going to background.
 * SDKCF-6025: Added Push Primer opt-in tracking for Android 13 and up devices. Please see [usage](#push-primer-tracker) section for details.
+* SDKCF-6010: Fixed re-display of AppStart-only campaigns when switching users, and to align with iOS.
 
 ### 7.2.0 (2022-09-28)
 * SDKCF-5038: Refactored event logging logic and campaign repository to align with iOS.

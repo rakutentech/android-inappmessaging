@@ -237,6 +237,23 @@ class InAppMessagingBasicSpec : InAppMessagingSpec() {
         verify(sessMock).onSessionUpdate()
     }
 
+    @Test
+    fun `should not clear persistent campaigns list when changing user`() {
+        EventMatchingUtil.instance().matchedEvents.clear()
+        EventMatchingUtil.instance().matchedEvents["app-start-campaign"] = mutableListOf(AppStartEvent())
+        EventMatchingUtil.instance().matchedEvents["dummy-campaign"] =
+            mutableListOf(AppStartEvent(), LoginSuccessfulEvent())
+
+        EventMatchingUtil.instance().triggeredPersistentCampaigns.clear()
+        EventMatchingUtil.instance().triggeredPersistentCampaigns.add("app-start-campaign")
+
+        // Simulate change user
+        SessionManager.onSessionUpdate()
+
+        EventMatchingUtil.instance().matchedEvents.shouldBeEmpty() // cleared
+        EventMatchingUtil.instance().triggeredPersistentCampaigns.shouldHaveSize(1) // not cleared
+    }
+
     companion object {
         private const val EXCEPTION_MSG = "should not throw exception"
     }
