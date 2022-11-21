@@ -7,6 +7,7 @@ import android.os.Looper
 import android.view.View
 import android.view.ViewGroup
 import android.widget.FrameLayout
+import androidx.annotation.VisibleForTesting
 import com.rakuten.tech.mobile.inappmessaging.runtime.InAppMessaging
 import com.rakuten.tech.mobile.inappmessaging.runtime.R
 import com.rakuten.tech.mobile.inappmessaging.runtime.coroutine.MessageActionsCoroutine
@@ -36,12 +37,23 @@ internal interface DisplayManager {
         private const val TAG = "IAM_DisplayManager"
         private const val MS_MULTIPLIER = 1000L
 
-        private var instance: DisplayManager = DisplayManagerImpl()
+        @VisibleForTesting
+        internal var instance: DisplayManager = DisplayManagerImpl(
+            Handler(Looper.getMainLooper()),
+            MessageActionsCoroutine()
+        )
 
         fun instance() = instance
     }
 
-    private class DisplayManagerImpl : DisplayManager {
+    @SuppressWarnings(
+        "TooManyFunctions",
+        "LargeClass"
+    )
+    class DisplayManagerImpl(
+        private val handler: Handler,
+        private val messageActionsCoroutine: MessageActionsCoroutine
+    ) : DisplayManager {
 
         override fun displayMessage() {
             DisplayMessageWorker.enqueueWork()
@@ -109,20 +121,37 @@ internal interface DisplayManager {
 
         private fun scheduleRemoval(delay: Int, view: ViewGroup, id: String? = null, activity: Activity) {
             if (delay > 0) {
-                Handler(Looper.getMainLooper()).postDelayed(
+                // auto disappear processing for tooltips
+                handler.postDelayed(
                     {
-                        removeCampaign(view, id, activity)
-                        // to handle repo update and impression request for auto disappear,
-                        // simulate a close action
-                        MessageActionsCoroutine().executeTask(
-                            CampaignRepository.instance().messages[id], R.id.message_close_button, false
-                        )
+                        // confirm if view is still visible, for users may have already closed the campaign
+                        // when the delay completes
+                        if (isViewPresent(view, id)) {
+                            removeCampaign(view, id, activity)
+                            // to handle repo update and impression request, simulate a close action
+                            messageActionsCoroutine.executeTask(
+                                CampaignRepository.instance().messages[id], R.id.message_close_button, false
+                            )
+                        }
                     }, delay * MS_MULTIPLIER
                 )
             } else {
                 // to avoid crashing when redirect from tooltip view
                 removeCampaign(view, id, activity)
             }
+        }
+
+        private fun isViewPresent(viewGroup: ViewGroup, id: String?): Boolean {
+            var result = false
+            val parent = viewGroup.parent as? ViewGroup ?: return result
+            for (i in 0 until parent.childCount) {
+                val child = parent.getChildAt(i)
+                if (child?.id == viewGroup.id && child.tag == id) {
+                    result = true
+                    break
+                }
+            }
+            return result
         }
 
         private fun removeCampaign(inAppMessageBaseView: ViewGroup, id: String?, activity: Activity) {
