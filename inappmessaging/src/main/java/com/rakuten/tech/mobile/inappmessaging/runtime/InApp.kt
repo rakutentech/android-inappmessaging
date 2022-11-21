@@ -10,6 +10,7 @@ import androidx.annotation.RestrictTo
 import androidx.annotation.VisibleForTesting
 import com.rakuten.tech.mobile.inappmessaging.runtime.data.models.appevents.Event
 import com.rakuten.tech.mobile.inappmessaging.runtime.data.repositories.AccountRepository
+import com.rakuten.tech.mobile.inappmessaging.runtime.data.repositories.CampaignRepository
 import com.rakuten.tech.mobile.inappmessaging.runtime.data.repositories.ConfigResponseRepository
 import com.rakuten.tech.mobile.inappmessaging.runtime.exception.InAppMessagingException
 import com.rakuten.tech.mobile.inappmessaging.runtime.manager.DisplayManager
@@ -25,7 +26,7 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import java.lang.ref.WeakReference
 
-@SuppressWarnings("LongParameterList", "TooManyFunctions")
+@SuppressWarnings("LongParameterList", "TooManyFunctions", "LargeClass")
 internal class InApp(
     private val context: Context,
     isDebugLogging: Boolean,
@@ -125,20 +126,12 @@ internal class InApp(
         }
     }
 
-    @SuppressWarnings("TooGenericExceptionCaught")
     override fun closeMessage(clearQueuedCampaigns: Boolean) {
-        try {
-            if (ConfigResponseRepository.instance().isConfigEnabled()) {
-                CoroutineScope(Dispatchers.Main).launch {
-                    // called inside main dispatcher to make sure that it is always called in UI thread
-                    removeMessage(clearQueuedCampaigns)
-                }
-            }
-        } catch (ex: Exception) {
-            errorCallback?.let {
-                it(InAppMessagingException("In-App Messaging close message failed", ex))
-            }
-        }
+        closeCampaign(clearQueuedCampaigns = clearQueuedCampaigns)
+    }
+
+    override fun closeTooltip(viewId: String) {
+        closeCampaign(viewId = viewId)
     }
 
     override fun trackPushPrimer(permissions: Array<String>, grantResults: IntArray) {
@@ -185,6 +178,30 @@ internal class InApp(
         }
     }
 
+    @SuppressWarnings(
+        "TooGenericExceptionCaught",
+        "CanBeNonNullable"
+    )
+    private fun closeCampaign(clearQueuedCampaigns: Boolean? = null, viewId: String? = null) {
+        if (ConfigResponseRepository.instance().isConfigEnabled()) {
+            CoroutineScope(Dispatchers.Main).launch {
+                try {
+                    if (clearQueuedCampaigns != null) {
+                        // close normal campaign - `clearQueuedCampaigns` not null
+                        removeMessage(clearQueuedCampaigns)
+                    } else if (viewId != null) {
+                        // close tooltip campaign - `viewId` not null
+                        removeMessage(viewId)
+                    }
+                } catch (ex: Exception) {
+                    errorCallback?.let {
+                        it(InAppMessagingException("In-App Messaging close message failed", ex))
+                    }
+                }
+            }
+        }
+    }
+
     @VisibleForTesting
     internal fun removeMessage(clearQueuedCampaigns: Boolean) {
         val id = displayManager.removeMessage(getRegisteredActivity())
@@ -194,6 +211,26 @@ internal class InApp(
         } else if (id != null) {
             messageReadinessManager.removeMessageFromQueue(id as String)
             displayManager.displayMessage()
+        }
+    }
+
+    /**
+     * Removes tooltip message by `viewId` .
+     */
+    @VisibleForTesting
+    internal fun removeMessage(viewId: String) {
+        val campaignId = CampaignRepository.instance()
+            .messages
+            .values
+            .firstOrNull { message ->
+                message.getTooltipConfig()?.id == viewId
+            }
+            ?.getCampaignId()
+
+        if (campaignId != null) {
+            displayManager.removeMessage(getRegisteredActivity(), delay = 0, id = campaignId)
+            messageReadinessManager.removeMessageFromQueue(campaignId)
+            displayManager.displayMessage() // next message
         }
     }
 

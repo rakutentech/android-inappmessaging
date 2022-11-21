@@ -15,6 +15,7 @@ import com.rakuten.tech.mobile.inappmessaging.runtime.workmanager.schedulers.Con
  * Main entry point for the IAM SDK.
  * Should be accessed via [InAppMessaging.instance].
  */
+@SuppressWarnings("TooManyFunctions")
 abstract class InAppMessaging internal constructor() {
     /**
      * This callback is called just before showing a message of campaign that has registered contexts.
@@ -88,6 +89,14 @@ abstract class InAppMessaging internal constructor() {
      * remove all campaigns that were queued to be displayed.
      */
     abstract fun closeMessage(clearQueuedCampaigns: Boolean = false)
+
+    /**
+     * Closes a tooltip by `viewId` (`UIElement` identifier).
+     * This should be called when app needs to force-close the displayed tooltip without user action.
+     * Calling this method will not increment the campaign impression.
+     * @param viewId The ID of UI element where the tooltip is attached.
+     */
+    abstract fun closeTooltip(viewId: String)
 
     /**
      * Tracks if user grants or denies the push notification via push primer message.
@@ -183,6 +192,7 @@ abstract class InAppMessaging internal constructor() {
         internal fun getPreferencesFile() = "internal_shared_prefs_" + AccountRepository.instance().userInfoHash
     }
 
+    @SuppressWarnings("TooManyFunctions")
     internal class NotConfiguredInAppMessaging(private var isCacheHandling: Boolean = false) : InAppMessaging() {
         override var onVerifyContext: (contexts: List<String>, campaignTitle: String) -> Boolean = { _, _ -> true }
 
@@ -204,6 +214,8 @@ abstract class InAppMessaging internal constructor() {
         override fun isLocalCachingEnabled() = isCacheHandling
 
         override fun closeMessage(clearQueuedCampaigns: Boolean) = Unit
+
+        override fun closeTooltip(viewId: String) = Unit
 
         override fun trackPushPrimer(permissions: Array<String>, grantResults: IntArray) = Unit
 
