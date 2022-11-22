@@ -3,6 +3,7 @@ package com.rakuten.tech.mobile.inappmessaging.runtime.manager
 import android.app.Activity
 import android.content.res.Resources
 import android.graphics.Rect
+import android.os.Handler
 import android.view.View
 import android.view.ViewGroup
 import android.view.ViewParent
@@ -13,6 +14,7 @@ import com.nhaarman.mockitokotlin2.*
 import com.rakuten.tech.mobile.inappmessaging.runtime.BaseTest
 import com.rakuten.tech.mobile.inappmessaging.runtime.InAppMessaging
 import com.rakuten.tech.mobile.inappmessaging.runtime.R
+import com.rakuten.tech.mobile.inappmessaging.runtime.coroutine.MessageActionsCoroutine
 import com.rakuten.tech.mobile.inappmessaging.runtime.data.enums.InAppMessageType
 import com.rakuten.tech.mobile.inappmessaging.runtime.data.models.Tooltip
 import com.rakuten.tech.mobile.inappmessaging.runtime.data.models.messages.ValidTestMessage
@@ -21,6 +23,7 @@ import org.amshove.kluent.shouldBeNull
 import org.junit.Before
 import org.junit.Test
 import org.junit.runner.RunWith
+import org.mockito.ArgumentMatchers.anyLong
 import org.mockito.Mockito
 import org.mockito.Mockito.`when`
 import org.mockito.verification.VerificationMode
@@ -36,11 +39,14 @@ class DisplayManagerSpec : BaseTest() {
     private val activity = Mockito.mock(Activity::class.java)
     private val viewGroup = Mockito.mock(ViewGroup::class.java)
     private val parentViewGroup = Mockito.mock(FrameLayout::class.java)
+    private val handler = Mockito.mock(Handler::class.java)
+    private val messageCoroutine = Mockito.mock(MessageActionsCoroutine::class.java)
 
     @Before
     override fun setup() {
         InAppMessaging.initialize(ApplicationProvider.getApplicationContext())
         InAppMessaging.instance().registerMessageDisplayActivity(activity)
+        DisplayManager.instance = DisplayManager.DisplayManagerImpl(handler, messageCoroutine)
     }
 
     @Test
@@ -83,6 +89,14 @@ class DisplayManagerSpec : BaseTest() {
         `when`(parentViewGroup.childCount).thenReturn(0)
         `when`(viewGroup.tag).thenReturn("invalid")
         verifyViewGroup()
+    }
+
+    @Test
+    fun `should not process remove tooltip when already removed`() {
+        setupTooltipView()
+        `when`(parentViewGroup.childCount).thenReturn(0)
+        DisplayManager.instance().removeMessage(activity, id = ID, delay = 1)
+        Mockito.verify(messageCoroutine, never()).executeTask(anyOrNull(), any(), any())
     }
 
     @Test
@@ -312,6 +326,10 @@ class DisplayManagerSpec : BaseTest() {
         `when`(parentViewGroup.getChildAt(1)).thenReturn(viewGroup)
         `when`(viewGroup.id).thenReturn(R.id.in_app_message_tooltip_view)
         `when`(viewGroup.tag).thenReturn(ID)
+        `when`(handler.postDelayed(any(), anyLong())).thenAnswer {
+            (it.arguments[0] as Runnable).run()
+            true
+        }
     }
 
     private fun setupTooltipInScroll(): ViewGroup {
