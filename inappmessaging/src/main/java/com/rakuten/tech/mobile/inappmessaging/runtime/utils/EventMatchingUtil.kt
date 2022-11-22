@@ -128,7 +128,6 @@ internal abstract class EventMatchingUtil {
 
         override fun clearNonPersistentEvents() {
             matchedEvents.clear()
-            triggeredPersistentCampaigns.clear()
         }
 
         private fun isEventMatchingOneOfTriggers(event: Event, triggers: List<Trigger>) =
