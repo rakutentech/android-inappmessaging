@@ -21,7 +21,8 @@ class MainActivityFragment : Fragment(), View.OnClickListener {
     override fun onCreate(savedInstanceState: Bundle?) {
         context?.let {
             updateUser(PreferencesUtil.getString(it, SHARED_FILE, USER_ID, "user1") ?: "user1",
-            PreferencesUtil.getString(it, SHARED_FILE, ACCESS_TOKEN, "accessToken1") ?: "accessToken1")
+            PreferencesUtil.getString(it, SHARED_FILE, ACCESS_TOKEN, "accessToken1") ?: "accessToken1",
+            PreferencesUtil.getString(it, SHARED_FILE, ID_TRACKING, "idTracking1") ?: "idTracking1")
         }
         super.onCreate(savedInstanceState)
     }
@@ -145,6 +146,7 @@ class MainActivityFragment : Fragment(), View.OnClickListener {
             val application = it.application as MainApplication
             PreferencesUtil.putString(it, SHARED_FILE, USER_ID, application.provider.userId)
             PreferencesUtil.putString(it, SHARED_FILE, ACCESS_TOKEN, application.provider.accessToken)
+            PreferencesUtil.putString(it, SHARED_FILE, ID_TRACKING, application.provider.idTracking)
         }
         super.onDestroy()
     }
@@ -160,5 +162,6 @@ class MainActivityFragment : Fragment(), View.OnClickListener {
         private const val USER_ID: String = "user-id"
         private const val SHARED_FILE: String = "user-shared-file"
         private const val ACCESS_TOKEN: String = "access-token"
+        private const val ID_TRACKING: String = "id-tracking"
     }
 }
