@@ -2,6 +2,7 @@ package com.rakuten.tech.mobile.inappmessaging.runtime.data.repositories
 
 import com.google.gson.Gson
 import com.rakuten.tech.mobile.inappmessaging.runtime.InAppMessaging
+import com.rakuten.tech.mobile.inappmessaging.runtime.data.enums.InAppMessageType
 import com.rakuten.tech.mobile.inappmessaging.runtime.data.models.messages.Message
 import com.rakuten.tech.mobile.inappmessaging.runtime.data.responses.ping.CampaignData
 import com.rakuten.tech.mobile.inappmessaging.runtime.utils.InAppLogger
@@ -47,6 +48,9 @@ internal abstract class CampaignRepository {
         fun instance(): CampaignRepository = instance
     }
 
+    @SuppressWarnings(
+        "TooManyFunctions"
+    )
     private class CampaignRepositoryImpl : CampaignRepository() {
         init {
             loadCachedData()
@@ -58,15 +62,26 @@ internal abstract class CampaignRepository {
             val oldList = LinkedHashMap(messages) // copy
 
             messages.clear()
-            for (newCampaign in messageList) {
-                if (newCampaign.getCampaignId().isEmpty()) {
-                    continue
-                }
-
+            for (newCampaign in messageList.filterMessages()) {
                 val updatedCampaign = updateCampaign(newCampaign, oldList)
                 messages[updatedCampaign.getCampaignId()] = updatedCampaign
             }
             saveDataToCache()
+        }
+
+        /**
+         * Removes campaign/s from list where:
+         * - Campaign Id is empty
+         * - Campaign type is tooltip and Tooltip feature is disable by host app
+         */
+        private fun List<Message>.filterMessages(): List<Message> {
+            return this.filterNot {
+                it.getCampaignId().isEmpty() ||
+                    (
+                        it.getType() == InAppMessageType.TOOLTIP.typeId &&
+                            !HostAppInfoRepository.instance().isTooltipEnabled()
+                        )
+            }
         }
 
         private fun updateCampaign(newCampaign: Message, oldList: LinkedHashMap<String, Message>): Message {

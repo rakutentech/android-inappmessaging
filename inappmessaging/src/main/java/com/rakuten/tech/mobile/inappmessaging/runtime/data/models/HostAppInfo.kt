@@ -11,5 +11,6 @@ internal data class HostAppInfo(
     internal val version: String? = null,
     internal val subscriptionKey: String? = null,
     internal val locale: Locale? = null,
-    internal val configUrl: String? = null
+    internal val configUrl: String? = null,
+    internal val isTooltipEnabled: Boolean? = null
 )

@@ -480,6 +480,7 @@ Documents targeting Product Managers:
 * SDKCF-5601: Fixed close button's content label accessibility warnings.
 * SDKCF-5900: Refactored code to remove most of the suppressions for code smells.
 * SDKCF-5948: Added tooltip campaigns feature.
+* SDKCF-6076: Updated `configure()` API to optionally enable or disable tooltip campaigns feature. Disabled by default.
 * SDKCF-6035: Added `closeTooltip()` API to manually close displayed tooltip by `viewId` (`UIElement` identifier).
 * SDKCF-6009: Fixed issue on campaign not displayed after going to background.
 * SDKCF-6025: Added Push Primer opt-in tracking for Android 13 and up devices. Please see [usage](#push-primer-tracker) section for details.

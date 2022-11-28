@@ -7,6 +7,8 @@ import com.rakuten.tech.mobile.inappmessaging.runtime.exception.InAppMessagingEx
 import com.rakuten.tech.mobile.inappmessaging.runtime.utils.InAppMessagingConstants
 import org.amshove.kluent.shouldBeEmpty
 import org.amshove.kluent.shouldBeEqualTo
+import org.amshove.kluent.shouldBeFalse
+import org.amshove.kluent.shouldBeTrue
 import org.junit.After
 import org.junit.Assert
 import org.junit.Before
@@ -32,13 +34,6 @@ class HostAppInfoRepositorySpec : BaseTest() {
 
     @Test
     fun `should use correct data`() {
-        val testAppInfo = HostAppInfo(
-            InAppMessagingTestConstants.APP_ID,
-            InAppMessagingTestConstants.DEVICE_ID,
-            InAppMessagingTestConstants.APP_VERSION,
-            InAppMessagingTestConstants.SUB_KEY,
-            InAppMessagingTestConstants.LOCALE
-        )
         HostAppInfoRepository.instance().addHostInfo(testAppInfo)
         HostAppInfoRepository.instance().getVersion() shouldBeEqualTo InAppMessagingTestConstants.APP_VERSION
         HostAppInfoRepository.instance().getPackageName() shouldBeEqualTo InAppMessagingTestConstants.APP_ID
@@ -129,5 +124,23 @@ class HostAppInfoRepositorySpec : BaseTest() {
         instance.getSubscriptionKey().shouldBeEmpty()
         instance.getDeviceId().shouldBeEmpty()
         instance.getConfigUrl().shouldBeEmpty()
+    }
+
+    @Test
+    fun `should disable tooltip feature by default when not set`() {
+        HostAppInfoRepository.instance().addHostInfo(testAppInfo.copy(isTooltipEnabled = null))
+        HostAppInfoRepository.instance().isTooltipEnabled().shouldBeFalse()
+    }
+
+    @Test
+    fun `should disable tooltip feature`() {
+        HostAppInfoRepository.instance().addHostInfo(testAppInfo.copy(isTooltipEnabled = false))
+        HostAppInfoRepository.instance().isTooltipEnabled().shouldBeFalse()
+    }
+
+    @Test
+    fun `should enable tooltip feature`() {
+        HostAppInfoRepository.instance().addHostInfo(testAppInfo.copy(isTooltipEnabled = true))
+        HostAppInfoRepository.instance().isTooltipEnabled().shouldBeTrue()
     }
 }

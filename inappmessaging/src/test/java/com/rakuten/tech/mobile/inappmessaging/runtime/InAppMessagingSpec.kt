@@ -365,6 +365,39 @@ class InAppMessagingConfigureSpec : InAppMessagingSpec() {
         InAppMessaging.configure(context, configUrl = newConfigUrl)
         HostAppInfoRepository.instance().getConfigUrl() shouldBeEqualTo newConfigUrl.trim()
     }
+
+    @Test
+    fun `should disable tooltip feature by default when not set`() {
+        InAppMessaging.configure(context)
+        HostAppInfoRepository.instance().isTooltipEnabled().shouldBeFalse()
+    }
+
+    @Test
+    fun `should disable tooltip feature by default when set to null`() {
+        InAppMessaging.configure(context, enableTooltip = null)
+        HostAppInfoRepository.instance().isTooltipEnabled().shouldBeFalse()
+    }
+
+    @Test
+    fun `should disable tooltip feature`() {
+        InAppMessaging.configure(context, enableTooltip = false)
+        HostAppInfoRepository.instance().isTooltipEnabled().shouldBeFalse()
+    }
+
+    @Test
+    fun `should enable tooltip feature`() {
+        InAppMessaging.configure(context, enableTooltip = true)
+        HostAppInfoRepository.instance().isTooltipEnabled().shouldBeTrue()
+    }
+
+    @Test
+    fun `should set updated tooltip setting when re-configured`() {
+        InAppMessaging.configure(context, enableTooltip = false)
+        HostAppInfoRepository.instance().isTooltipEnabled().shouldBeFalse()
+
+        InAppMessaging.configure(context, enableTooltip = true)
+        HostAppInfoRepository.instance().isTooltipEnabled().shouldBeTrue()
+    }
 }
 
 class InAppMessagingExceptionSpec : InAppMessagingSpec() {

@@ -54,6 +54,11 @@ internal interface HostAppInfoRepository {
     fun getConfigUrl(): String
 
     /**
+     * This method returns whether the Tooltip feature is enabled.
+     */
+    fun isTooltipEnabled(): Boolean
+
+    /**
      * Clears host app info for testing.
      */
     @VisibleForTesting
@@ -107,6 +112,8 @@ internal interface HostAppInfoRepository {
         override fun getDeviceId(): String = hostAppInfo?.deviceId.orEmpty()
 
         override fun getConfigUrl(): String = hostAppInfo?.configUrl?.trim().orEmpty()
+
+        override fun isTooltipEnabled(): Boolean = hostAppInfo?.isTooltipEnabled == true
 
         override fun clearInfo() {
             hostAppInfo = null
