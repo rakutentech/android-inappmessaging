@@ -90,7 +90,7 @@ class MainActivityFragment : Fragment(), View.OnClickListener {
         val accessToken = contentView.findViewById<EditText>(R.id.edit_accesstoken)
         accessToken.setText(application.provider.accessToken)
         val idTracking = contentView.findViewById<EditText>(R.id.edit_idTracking)
-        accessToken.setText(application.provider.idTracking)
+        idTracking.setText(application.provider.idTracking)
 
         val dialog =  AlertDialog.Builder(activity)
                 .setView(contentView)
@@ -100,7 +100,7 @@ class MainActivityFragment : Fragment(), View.OnClickListener {
                         InAppMessaging.instance().closeMessage()
                     }
 
-                    updateUser(userId.text.toString(), accessToken.text.toString())
+                    updateUser(userId.text.toString(), accessToken.text.toString(), idTracking.text.toString())
 
                     dialog.dismiss()
                 }
@@ -149,10 +149,11 @@ class MainActivityFragment : Fragment(), View.OnClickListener {
         super.onDestroy()
     }
 
-    private fun updateUser(userId: String, accessToken: String ) {
+    private fun updateUser(userId: String, accessToken: String, idTracking: String) {
         val application = activity?.application as MainApplication
         application.provider.userId = userId
         application.provider.accessToken = accessToken
+        application.provider.idTracking = idTracking
     }
 
     companion object {
