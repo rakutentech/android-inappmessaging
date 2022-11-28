@@ -32,14 +32,14 @@
   <TextView
     android:layout_width="wrap_content"
     android:layout_height="wrap_content"
-    android:text="@string/label_accesstoken"
+    android:text="@string/label_tokenOrTrackingID"
     android:textSize="18sp"
-    app:layout_constraintBottom_toBottomOf="@id/edit_accesstoken"
+    app:layout_constraintBottom_toBottomOf="@id/edit_tokenOrTrackingId"
     app:layout_constraintRight_toLeftOf="@id/vertical_guide"
-    app:layout_constraintTop_toTopOf="@id/edit_accesstoken" />
+    app:layout_constraintTop_toTopOf="@id/edit_tokenOrTrackingId" />
 
   <EditText
-    android:id="@+id/edit_accesstoken"
+    android:id="@+id/edit_tokenOrTrackingId"
     android:layout_width="0dp"
     android:layout_height="wrap_content"
     android:layout_marginStart="15dp"
@@ -48,23 +48,23 @@
     app:layout_constraintRight_toRightOf="parent"
     app:layout_constraintTop_toBottomOf="@id/edit_userid" />
 
-  <TextView
-    android:layout_width="wrap_content"
-    android:layout_height="wrap_content"
-    android:text="@string/label_idtracking"
-    android:textSize="18sp"
-    app:layout_constraintBottom_toBottomOf="@id/edit_idTracking"
-    app:layout_constraintRight_toLeftOf="@id/vertical_guide"
-    app:layout_constraintTop_toTopOf="@id/edit_idTracking" />
-
-  <EditText
-    android:id="@+id/edit_idTracking"
-    android:layout_width="0dp"
-    android:layout_height="wrap_content"
-    android:layout_marginStart="15dp"
-    android:layout_marginEnd="15dp"
-    app:layout_constraintLeft_toLeftOf="@id/vertical_guide"
-    app:layout_constraintRight_toRightOf="parent"
-    app:layout_constraintTop_toBottomOf="@id/edit_accesstoken" />
+  <RadioGroup
+      android:id="@+id/dialog_radio_group"
+      android:layout_width="match_parent"
+      android:layout_height="wrap_content"
+      app:layout_constraintTop_toBottomOf="@id/edit_tokenOrTrackingId"
+      android:orientation="horizontal"
+      android:gravity="center">
+    <RadioButton
+        android:id="@+id/radio_trackingId"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Tracking ID" />
+    <RadioButton
+        android:id="@+id/radio_accessToken"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Access Token" />
+  </RadioGroup>
 
 </androidx.constraintlayout.widget.ConstraintLayout>
