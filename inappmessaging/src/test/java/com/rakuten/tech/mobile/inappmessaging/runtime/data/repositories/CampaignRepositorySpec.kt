@@ -130,13 +130,6 @@ open class CampaignRepositorySpec : BaseTest() {
 }
 
 class CampaignRepositorySyncSpec : CampaignRepositorySpec() {
-
-    @Before
-    override fun setup() {
-        super.setup()
-        HostAppInfoRepository.instance().clearInfo()
-    }
-
     @Test
     fun `should add message list with valid list`() {
         CampaignRepository.instance().syncWith(messageList, 0)
