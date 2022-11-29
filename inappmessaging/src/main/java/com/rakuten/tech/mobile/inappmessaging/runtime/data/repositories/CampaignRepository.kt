@@ -17,7 +17,7 @@ internal abstract class CampaignRepository {
     /**
      * Syncs [messageList] with server.
      */
-    abstract fun syncWith(messageList: List<Message>, timestampMillis: Long)
+    abstract fun syncWith(messageList: List<Message>, timestampMillis: Long, ignoreTooltips: Boolean = false)
 
     /**
      * Updates the [Message.isOptedOut] as true for the provided campaign.
@@ -56,31 +56,22 @@ internal abstract class CampaignRepository {
             loadCachedData()
         }
 
-        override fun syncWith(messageList: List<Message>, timestampMillis: Long) {
+        override fun syncWith(messageList: List<Message>, timestampMillis: Long, ignoreTooltips: Boolean) {
             lastSyncMillis = timestampMillis
             loadCachedData() // ensure we're using latest cache data for syncing below
             val oldList = LinkedHashMap(messages) // copy
 
             messages.clear()
-            for (newCampaign in messageList.filterMessages()) {
+            for (newCampaign in messageList.filterMessages(ignoreTooltips)) {
                 val updatedCampaign = updateCampaign(newCampaign, oldList)
                 messages[updatedCampaign.getCampaignId()] = updatedCampaign
             }
             saveDataToCache()
         }
 
-        /**
-         * Removes campaign/s from list where:
-         * - Campaign Id is empty
-         * - Campaign type is tooltip and Tooltip feature is disable by host app
-         */
-        private fun List<Message>.filterMessages(): List<Message> {
+        private fun List<Message>.filterMessages(ignoreTooltips: Boolean): List<Message> {
             return this.filterNot {
-                it.getCampaignId().isEmpty() ||
-                    (
-                        it.getType() == InAppMessageType.TOOLTIP.typeId &&
-                            !HostAppInfoRepository.instance().isTooltipEnabled()
-                        )
+                it.getCampaignId().isEmpty() || (it.getType() == InAppMessageType.TOOLTIP.typeId && ignoreTooltips)
             }
         }
 

@@ -127,7 +127,7 @@ class MainActivityFragment : Fragment(), View.OnClickListener {
         val subsKey = contentView.findViewById<EditText>(R.id.edit_subs_key)
         subsKey.setText(settings.subscriptionKey)
         val enableTooltip = contentView.findViewById<SwitchCompat>(R.id.tooltip_feat_switch)
-        enableTooltip.isChecked = settings.isTooltipFeatEnabled
+        enableTooltip.isChecked = settings.isTooltipFeatureEnabled
 
         val dialog =  AlertDialog.Builder(activity)
             .setView(contentView)
@@ -136,10 +136,10 @@ class MainActivityFragment : Fragment(), View.OnClickListener {
                 context?.let {
                     settings.subscriptionKey = subsKey.text.toString()
                     settings.configUrl = configUrl.text.toString()
-                    if (enableTooltip.isEnabled != settings.isTooltipFeatEnabled) {
-                        settings.isTooltipFeatEnabled = enableTooltip.isEnabled
+                    if (enableTooltip.isEnabled != settings.isTooltipFeatureEnabled) {
+                        settings.isTooltipFeatureEnabled = enableTooltip.isEnabled
                         InAppMessaging.configure(it, settings.subscriptionKey, settings.configUrl,
-                            enableTooltip = settings.isTooltipFeatEnabled)
+                            enableTooltipFeature = settings.isTooltipFeatureEnabled)
                     }
                 }
                 dialog.dismiss()

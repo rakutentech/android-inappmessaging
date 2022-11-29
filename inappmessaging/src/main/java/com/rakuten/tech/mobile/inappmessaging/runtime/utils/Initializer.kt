@@ -90,13 +90,13 @@ internal object Initializer {
         context: Context,
         subscriptionKey: String?,
         configUrl: String?,
-        enableTooltip: Boolean? = false,
+        enableTooltipFeature: Boolean? = false,
         sharedUtil: PreferencesUtil = PreferencesUtil
     ) {
         val hostAppInfo = HostAppInfo(
             packageName = getHostAppPackageName(context), deviceId = getDeviceId(context, sharedUtil),
             version = getHostAppVersion(context), subscriptionKey = subscriptionKey, locale = getLocale(context),
-            configUrl = configUrl, isTooltipEnabled = enableTooltip
+            configUrl = configUrl, isTooltipFeatureEnabled = enableTooltipFeature
         )
 
         // Store hostAppInfo in repository.

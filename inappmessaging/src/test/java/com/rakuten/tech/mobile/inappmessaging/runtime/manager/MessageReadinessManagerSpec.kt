@@ -45,6 +45,15 @@ open class MessageReadinessManagerSpec : BaseTest() {
     override fun setup() {
         super.setup()
         AccountRepository.instance().userInfoProvider = TestUserInfoProvider()
+        HostAppInfoRepository.instance().addHostInfo(
+            HostAppInfo(
+                InAppMessagingTestConstants.APP_ID,
+                InAppMessagingTestConstants.DEVICE_ID,
+                InAppMessagingTestConstants.APP_VERSION,
+                InAppMessagingTestConstants.SUB_KEY,
+                InAppMessagingTestConstants.LOCALE
+            )
+        )
         ConfigResponseRepository.instance().addConfigResponse(configResponseData)
         `when`(configResponseData.endpoints).thenReturn(configResponseEndpoints)
         `when`(configResponseEndpoints.displayPermission).thenReturn(DISPLAY_PERMISSION_URL)

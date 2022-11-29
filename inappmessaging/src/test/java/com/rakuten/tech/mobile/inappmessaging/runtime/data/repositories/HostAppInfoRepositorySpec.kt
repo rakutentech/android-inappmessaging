@@ -20,6 +20,12 @@ import java.util.Locale
  */
 class HostAppInfoRepositorySpec : BaseTest() {
 
+    private val testAppInfo = HostAppInfo(
+        InAppMessagingTestConstants.APP_ID, InAppMessagingTestConstants.DEVICE_ID,
+        InAppMessagingTestConstants.APP_VERSION, InAppMessagingTestConstants.SUB_KEY,
+        InAppMessagingTestConstants.LOCALE, isTooltipFeatureEnabled = true
+    )
+
     @Before
     override fun setup() {
         super.setup()
@@ -128,19 +134,19 @@ class HostAppInfoRepositorySpec : BaseTest() {
 
     @Test
     fun `should disable tooltip feature by default when not set`() {
-        HostAppInfoRepository.instance().addHostInfo(testAppInfo.copy(isTooltipEnabled = null))
-        HostAppInfoRepository.instance().isTooltipEnabled().shouldBeFalse()
+        HostAppInfoRepository.instance().addHostInfo(testAppInfo.copy(isTooltipFeatureEnabled = null))
+        HostAppInfoRepository.instance().isTooltipFeatureEnabled().shouldBeFalse()
     }
 
     @Test
     fun `should disable tooltip feature`() {
-        HostAppInfoRepository.instance().addHostInfo(testAppInfo.copy(isTooltipEnabled = false))
-        HostAppInfoRepository.instance().isTooltipEnabled().shouldBeFalse()
+        HostAppInfoRepository.instance().addHostInfo(testAppInfo.copy(isTooltipFeatureEnabled = false))
+        HostAppInfoRepository.instance().isTooltipFeatureEnabled().shouldBeFalse()
     }
 
     @Test
     fun `should enable tooltip feature`() {
-        HostAppInfoRepository.instance().addHostInfo(testAppInfo.copy(isTooltipEnabled = true))
-        HostAppInfoRepository.instance().isTooltipEnabled().shouldBeTrue()
+        HostAppInfoRepository.instance().addHostInfo(testAppInfo.copy(isTooltipFeatureEnabled = true))
+        HostAppInfoRepository.instance().isTooltipFeatureEnabled().shouldBeTrue()
     }
 }

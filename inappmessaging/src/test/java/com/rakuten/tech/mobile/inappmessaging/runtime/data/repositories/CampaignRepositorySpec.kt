@@ -220,16 +220,14 @@ class CampaignRepositorySyncSpec : CampaignRepositorySpec() {
     }
 
     @Test
-    fun `should include tooltip campaigns when enabled`() {
-        HostAppInfoRepository.instance().addHostInfo(testAppInfo.copy(isTooltipEnabled = true))
-        CampaignRepository.instance().syncWith(listOf(message1, message2), 0)
+    fun `should include tooltip campaigns`() {
+        CampaignRepository.instance().syncWith(listOf(message1, message2), 0, false)
         CampaignRepository.instance().messages.size.shouldBeEqualTo(2)
     }
 
     @Test
-    fun `should ignore tooltip campaigns when disabled`() {
-        HostAppInfoRepository.instance().addHostInfo(testAppInfo.copy(isTooltipEnabled = false))
-        CampaignRepository.instance().syncWith(listOf(message1, message2), 0)
+    fun `should ignore tooltip campaigns`() {
+        CampaignRepository.instance().syncWith(listOf(message1, message2), 0, true)
         CampaignRepository.instance().messages.size.shouldBeEqualTo(1)
     }
 }

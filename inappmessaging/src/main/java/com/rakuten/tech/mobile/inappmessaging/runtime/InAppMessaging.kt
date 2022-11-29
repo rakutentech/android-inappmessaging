@@ -136,7 +136,7 @@ abstract class InAppMessaging internal constructor() {
          * @param context Context object.
          * @param subscriptionKey An optional subscription key. Default is the value set in your app's AndroidManifest.
          * @param configUrl An optional config URL. Default is the value set in your app's AndroidManifest.
-         * @param enableTooltip An optional flag to enable or disable Tooltip feature. Disabled by default.
+         * @param enableTooltipFeature An optional flag to en/dis-able tooltip campaigns feature. Disabled by default.
          *
          * @return `true` if configuration is successful, and `false` otherwise.
          */
@@ -146,12 +146,13 @@ abstract class InAppMessaging internal constructor() {
             context: Context,
             subscriptionKey: String? = null,
             configUrl: String? = null,
-            enableTooltip: Boolean? = false
+            enableTooltipFeature: Boolean? = false
         ): Boolean {
             return try {
                 initialize(
                     context = context, isCacheHandling = BuildConfig.IS_CACHE_HANDLING,
-                    subscriptionKey = subscriptionKey, configUrl = configUrl, enableTooltip = enableTooltip
+                    subscriptionKey = subscriptionKey, configUrl = configUrl,
+                    enableTooltipFeature = enableTooltipFeature
                 )
                 true
             } catch (ex: Exception) {
@@ -171,7 +172,7 @@ abstract class InAppMessaging internal constructor() {
             isCacheHandling: Boolean = false,
             subscriptionKey: String? = null,
             configUrl: String? = null,
-            enableTooltip: Boolean? = false,
+            enableTooltipFeature: Boolean? = false,
             configScheduler: ConfigScheduler = ConfigScheduler.instance()
         ) {
             val manifestConfig = InApp.AppManifestConfig(context)
@@ -188,7 +189,7 @@ abstract class InAppMessaging internal constructor() {
                 context = context,
                 subscriptionKey = if (!subsKeyTrim.isNullOrEmpty()) subsKeyTrim else manifestConfig.subscriptionKey(),
                 configUrl = if (!configUrlTrim.isNullOrEmpty()) configUrlTrim else manifestConfig.configUrl(),
-                enableTooltip = enableTooltip
+                enableTooltipFeature = enableTooltipFeature
             )
 
             configScheduler.startConfig()
