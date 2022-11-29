@@ -75,13 +75,28 @@ class MainActivityFragment : Fragment(), View.OnClickListener {
             R.id.close_message -> {
                 InAppMessaging.instance().closeMessage()
             }
-            R.id.close_tooltip -> {
-                // Closes tooltip displayed in Purchase Successful button, if there is.
-                InAppMessaging.instance().closeTooltip("purchase_successful")
-            }
+            R.id.close_tooltip -> openCloseTooltipDialog()
             R.id.reconfigure -> showConfiguration()
             else -> Any()
         }
+    }
+
+    private fun openCloseTooltipDialog() {
+        val contentView = LayoutInflater.from(activity).inflate(R.layout.dialog_close_tooltip, null)
+        val viewId = contentView.findViewById<EditText>(R.id.edit_view_id)
+
+        val dialog = AlertDialog.Builder(activity)
+            .setView(contentView)
+            .setTitle("Set the ID to close tooltip")
+            .setPositiveButton(android.R.string.ok) { dialog, _ ->
+                InAppMessaging.instance().closeTooltip(viewId.text.toString())
+                dialog.dismiss()
+            }
+            .setNegativeButton(android.R.string.cancel) {dialog, _ ->
+                dialog.dismiss()
+            }
+            .create()
+        dialog.show()
     }
 
     private fun showUserInfo() {
