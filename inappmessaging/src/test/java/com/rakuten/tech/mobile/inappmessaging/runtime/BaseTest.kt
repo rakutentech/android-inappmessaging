@@ -11,7 +11,6 @@ import org.robolectric.annotation.Config
  */
 @Config(sdk = [Build.VERSION_CODES.M])
 open class BaseTest {
-
     @Before
     open fun setup() {
         InAppMessaging.errorCallback = null
