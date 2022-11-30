@@ -397,6 +397,16 @@ override fun onRequestPermissionsResult(requestCode: Int, permissions: Array<Str
 
 **<font color="red">Note:</font>** Please make sure that `trackPushPrimer()` API is only called for devices with Android 13 or higher OS since push notification permission request is not available for devices running in lower OS versions.
 
+### <a name="tooltip-campaigns"></a> #6 Tooltip Campaigns
+
+Tooltip feature is currently in beta testing; its features and behaviour might change in the future.
+Please refer to the internal guide for more information.
+
+To enable tooltips you must set `enableTooltipFeature` flag to true when calling `configure()`.
+```kotlin
+InAppMessaging.instance().configure(enableTooltipFeature = true)
+```
+
 ## <a name="troubleshooting"></a> Troubleshooting
 ### Proguard ParseException
 ```kotlin
@@ -480,7 +490,7 @@ Documents targeting Product Managers:
 * SDKCF-5601: Fixed close button's content label accessibility warnings.
 * SDKCF-5900: Refactored code to remove most of the suppressions for code smells.
 * SDKCF-5948: Added tooltip campaigns feature.
-* SDKCF-6076: Updated `configure()` API to optionally enable or disable tooltip campaigns feature. Disabled by default.
+* SDKCF-6076: Updated `configure()` API to enable/disable tooltip campaigns feature (disabled by default). Please see [usage](#tooltip-campaigns) section for details.
 * SDKCF-6035: Added `closeTooltip()` API to manually close displayed tooltip by `viewId` (`UIElement` identifier).
 * SDKCF-6009: Fixed issue on campaign not displayed after going to background.
 * SDKCF-6025: Added Push Primer opt-in tracking for Android 13 and up devices. Please see [usage](#push-primer-tracker) section for details.

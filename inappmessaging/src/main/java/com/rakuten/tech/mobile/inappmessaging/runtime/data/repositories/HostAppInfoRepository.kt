@@ -54,7 +54,7 @@ internal interface HostAppInfoRepository {
     fun getConfigUrl(): String
 
     /**
-     * This method returns whether the Tooltip feature is enabled.
+     * This method returns whether the tooltip campaigns feature is enabled.
      */
     fun isTooltipFeatureEnabled(): Boolean
 
