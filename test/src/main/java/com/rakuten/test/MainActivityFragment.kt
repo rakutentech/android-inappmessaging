@@ -151,8 +151,8 @@ class MainActivityFragment : Fragment(), View.OnClickListener {
                 context?.let {
                     settings.subscriptionKey = subsKey.text.toString()
                     settings.configUrl = configUrl.text.toString()
-                    if (enableTooltip.isEnabled != settings.isTooltipFeatureEnabled) {
-                        settings.isTooltipFeatureEnabled = enableTooltip.isEnabled
+                    if (enableTooltip.isChecked != settings.isTooltipFeatureEnabled) {
+                        settings.isTooltipFeatureEnabled = enableTooltip.isChecked
                         InAppMessaging.configure(it, settings.subscriptionKey, settings.configUrl,
                             enableTooltipFeature = settings.isTooltipFeatureEnabled)
                     }
