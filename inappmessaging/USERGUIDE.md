@@ -159,11 +159,11 @@ InAppMessaging.errorCallback = {
 
 // Configure API: configure(context: Context): Boolean
 // In a Java app, this API is callable via `InAppMessaging.Companion.configure(context: Context)`.
-val iamFlag = InAppMessaging.configure(this)
-// Note that the subscription ID and config URL set from AndroidManifest.xml can also be overriden at runtime
-// using the extended configure API: configure (context: Context, subscriptionKey: String, configUrl: String).
-val iamFlag = InAppMessaging.configure(this, "change-to-your-subsrcription-key", "change-to-config-url")
-
+val iamFlag = InAppMessaging.configure(context = this, // Required
+                                       subscriptionKey = "change-to-your-subsrcription-key", // Optional, overrides the subscription ID from AndroidManifest.xml
+                                       configUrl = "change-to-config-url", // Optional, overrides the config URL from AndroidManifest.xml
+                                       enableTooltipFeature = true // Optional, enables/disables tooltip campaigns feature (disabled by default)
+)
 // use flag to enable/disable IAM feature in your app.
 if (iamFlag) {
     InAppMessaging.instance().registerPreference(provider)
@@ -404,7 +404,8 @@ Please refer to the internal guide for more information.
 
 To enable tooltips you must set `enableTooltipFeature` flag to true when calling `configure()`.
 ```kotlin
-InAppMessaging.instance().configure(enableTooltipFeature = true)
+InAppMessaging.instance().configure(context = this,
+                                    enableTooltipFeature = true)
 ```
 
 ## <a name="troubleshooting"></a> Troubleshooting
