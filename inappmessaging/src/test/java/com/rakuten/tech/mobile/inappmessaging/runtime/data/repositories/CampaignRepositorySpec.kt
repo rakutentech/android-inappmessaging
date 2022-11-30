@@ -4,10 +4,8 @@ import android.content.Context
 import android.provider.Settings
 import androidx.test.core.app.ApplicationProvider
 import androidx.work.testing.WorkManagerTestInitHelper
-import com.rakuten.tech.mobile.inappmessaging.runtime.BaseTest
-import com.rakuten.tech.mobile.inappmessaging.runtime.InAppMessaging
-import com.rakuten.tech.mobile.inappmessaging.runtime.TestUserInfoProvider
-import com.rakuten.tech.mobile.inappmessaging.runtime.UserInfoProvider
+import com.rakuten.tech.mobile.inappmessaging.runtime.*
+import com.rakuten.tech.mobile.inappmessaging.runtime.data.enums.InAppMessageType
 import com.rakuten.tech.mobile.inappmessaging.runtime.data.models.messages.InvalidTestMessage
 import com.rakuten.tech.mobile.inappmessaging.runtime.data.models.messages.Message
 import com.rakuten.tech.mobile.inappmessaging.runtime.data.models.messages.ValidTestMessage
@@ -26,6 +24,7 @@ import kotlin.collections.ArrayList
 open class CampaignRepositorySpec : BaseTest() {
     internal val message0 = ValidTestMessage(maxImpressions = 3)
     internal val message1 = ValidTestMessage("1234")
+    internal val message2 = ValidTestMessage("5678", type = InAppMessageType.TOOLTIP.typeId)
     internal val messageList = ArrayList<Message>()
 
     @Before
@@ -218,5 +217,17 @@ class CampaignRepositorySyncSpec : CampaignRepositorySpec() {
         val updatedCampaign = ValidTestMessage(campaignId = message0.getCampaignId(), maxImpressions = 6)
         CampaignRepository.instance().syncWith(listOf(updatedCampaign), 0)
         CampaignRepository.instance().messages.values.first().impressionsLeft shouldBeEqualTo 4
+    }
+
+    @Test
+    fun `should include tooltip campaigns`() {
+        CampaignRepository.instance().syncWith(listOf(message1, message2), 0, false)
+        CampaignRepository.instance().messages.size.shouldBeEqualTo(2)
+    }
+
+    @Test
+    fun `should ignore tooltip campaigns`() {
+        CampaignRepository.instance().syncWith(listOf(message1, message2), 0, true)
+        CampaignRepository.instance().messages.size.shouldBeEqualTo(1)
     }
 }

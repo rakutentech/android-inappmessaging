@@ -9,6 +9,7 @@ import android.view.ViewGroup
 import android.widget.Button
 import android.widget.EditText
 import android.widget.RadioGroup
+import androidx.appcompat.widget.SwitchCompat
 import androidx.fragment.app.Fragment
 import com.rakuten.tech.mobile.inappmessaging.runtime.InAppMessaging
 import com.rakuten.tech.mobile.inappmessaging.runtime.data.models.appevents.AppStartEvent
@@ -140,6 +141,8 @@ class MainActivityFragment : Fragment(), View.OnClickListener {
         configUrl.setText(settings.configUrl)
         val subsKey = contentView.findViewById<EditText>(R.id.edit_subs_key)
         subsKey.setText(settings.subscriptionKey)
+        val enableTooltip = contentView.findViewById<SwitchCompat>(R.id.tooltip_feat_switch)
+        enableTooltip.isChecked = settings.isTooltipFeatureEnabled
 
         val dialog =  AlertDialog.Builder(activity)
             .setView(contentView)
@@ -148,7 +151,9 @@ class MainActivityFragment : Fragment(), View.OnClickListener {
                 context?.let {
                     settings.subscriptionKey = subsKey.text.toString()
                     settings.configUrl = configUrl.text.toString()
-                    InAppMessaging.configure(it, settings.subscriptionKey, settings.configUrl)
+                    settings.isTooltipFeatureEnabled = enableTooltip.isChecked
+                    InAppMessaging.configure(it, settings.subscriptionKey, settings.configUrl,
+                        enableTooltipFeature = settings.isTooltipFeatureEnabled)
                 }
                 dialog.dismiss()
             }

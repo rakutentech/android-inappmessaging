@@ -131,7 +131,10 @@ internal class MessageMixerWorker(
         val parsedMessages = parsePingRespTestMessage(messageMixerResponse)
 
         // Add all parsed messages into CampaignRepository.
-        CampaignRepository.instance().syncWith(parsedMessages, messageMixerResponse.currentPingMillis)
+        CampaignRepository.instance().syncWith(
+            parsedMessages, messageMixerResponse.currentPingMillis,
+            ignoreTooltips = !HostAppInfoRepository.instance().isTooltipFeatureEnabled()
+        )
 
         // Match&Store any temp events using lately synced campaigns.
         InAppMessaging.instance().flushEventList()

@@ -44,7 +44,7 @@ class DisplayManagerSpec : BaseTest() {
 
     @Before
     override fun setup() {
-        InAppMessaging.initialize(ApplicationProvider.getApplicationContext())
+        InAppMessaging.initialize(ApplicationProvider.getApplicationContext(), enableTooltipFeature = true)
         InAppMessaging.instance().registerMessageDisplayActivity(activity)
         DisplayManager.instance = DisplayManager.DisplayManagerImpl(handler, messageCoroutine)
     }

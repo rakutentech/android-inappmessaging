@@ -7,6 +7,7 @@ class IAMSettings(context: Context) {
 
     var subscriptionKey: String
     var configUrl: String
+    var isTooltipFeatureEnabled: Boolean = false
 
     init {
         val metadata =

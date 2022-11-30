@@ -2,6 +2,7 @@ package com.rakuten.tech.mobile.inappmessaging.runtime.data.repositories
 
 import com.google.gson.Gson
 import com.rakuten.tech.mobile.inappmessaging.runtime.InAppMessaging
+import com.rakuten.tech.mobile.inappmessaging.runtime.data.enums.InAppMessageType
 import com.rakuten.tech.mobile.inappmessaging.runtime.data.models.messages.Message
 import com.rakuten.tech.mobile.inappmessaging.runtime.data.responses.ping.CampaignData
 import com.rakuten.tech.mobile.inappmessaging.runtime.utils.InAppLogger
@@ -16,7 +17,7 @@ internal abstract class CampaignRepository {
     /**
      * Syncs [messageList] with server.
      */
-    abstract fun syncWith(messageList: List<Message>, timestampMillis: Long)
+    abstract fun syncWith(messageList: List<Message>, timestampMillis: Long, ignoreTooltips: Boolean = false)
 
     /**
      * Updates the [Message.isOptedOut] as true for the provided campaign.
@@ -47,26 +48,31 @@ internal abstract class CampaignRepository {
         fun instance(): CampaignRepository = instance
     }
 
+    @SuppressWarnings(
+        "TooManyFunctions"
+    )
     private class CampaignRepositoryImpl : CampaignRepository() {
         init {
             loadCachedData()
         }
 
-        override fun syncWith(messageList: List<Message>, timestampMillis: Long) {
+        override fun syncWith(messageList: List<Message>, timestampMillis: Long, ignoreTooltips: Boolean) {
             lastSyncMillis = timestampMillis
             loadCachedData() // ensure we're using latest cache data for syncing below
             val oldList = LinkedHashMap(messages) // copy
 
             messages.clear()
-            for (newCampaign in messageList) {
-                if (newCampaign.getCampaignId().isEmpty()) {
-                    continue
-                }
-
+            for (newCampaign in messageList.filterMessages(ignoreTooltips)) {
                 val updatedCampaign = updateCampaign(newCampaign, oldList)
                 messages[updatedCampaign.getCampaignId()] = updatedCampaign
             }
             saveDataToCache()
+        }
+
+        private fun List<Message>.filterMessages(ignoreTooltips: Boolean): List<Message> {
+            return this.filterNot {
+                it.getCampaignId().isEmpty() || (it.getType() == InAppMessageType.TOOLTIP.typeId && ignoreTooltips)
+            }
         }
 
         private fun updateCampaign(newCampaign: Message, oldList: LinkedHashMap<String, Message>): Message {

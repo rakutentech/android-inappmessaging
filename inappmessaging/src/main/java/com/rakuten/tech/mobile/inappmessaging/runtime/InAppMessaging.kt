@@ -136,16 +136,23 @@ abstract class InAppMessaging internal constructor() {
          * @param context Context object.
          * @param subscriptionKey An optional subscription key. Default is the value set in your app's AndroidManifest.
          * @param configUrl An optional config URL. Default is the value set in your app's AndroidManifest.
+         * @param enableTooltipFeature An optional flag to en/dis-able tooltip campaigns feature. Disabled by default.
          *
          * @return `true` if configuration is successful, and `false` otherwise.
          */
         @SuppressWarnings("TooGenericExceptionCaught")
         @JvmOverloads
-        fun configure(context: Context, subscriptionKey: String? = null, configUrl: String? = null): Boolean {
+        fun configure(
+            context: Context,
+            subscriptionKey: String? = null,
+            configUrl: String? = null,
+            enableTooltipFeature: Boolean? = false
+        ): Boolean {
             return try {
                 initialize(
                     context = context, isCacheHandling = BuildConfig.IS_CACHE_HANDLING,
-                    subscriptionKey = subscriptionKey, configUrl = configUrl
+                    subscriptionKey = subscriptionKey, configUrl = configUrl,
+                    enableTooltipFeature = enableTooltipFeature
                 )
                 true
             } catch (ex: Exception) {
@@ -158,12 +165,14 @@ abstract class InAppMessaging internal constructor() {
             }
         }
 
+        @SuppressWarnings("LongParameterList")
         @Throws(InAppMessagingException::class)
         internal fun initialize(
             context: Context,
             isCacheHandling: Boolean = false,
             subscriptionKey: String? = null,
             configUrl: String? = null,
+            enableTooltipFeature: Boolean? = false,
             configScheduler: ConfigScheduler = ConfigScheduler.instance()
         ) {
             val manifestConfig = InApp.AppManifestConfig(context)
@@ -179,7 +188,8 @@ abstract class InAppMessaging internal constructor() {
             Initializer.initializeSdk(
                 context = context,
                 subscriptionKey = if (!subsKeyTrim.isNullOrEmpty()) subsKeyTrim else manifestConfig.subscriptionKey(),
-                configUrl = if (!configUrlTrim.isNullOrEmpty()) configUrlTrim else manifestConfig.configUrl()
+                configUrl = if (!configUrlTrim.isNullOrEmpty()) configUrlTrim else manifestConfig.configUrl(),
+                enableTooltipFeature = enableTooltipFeature
             )
 
             configScheduler.startConfig()
