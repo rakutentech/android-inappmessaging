@@ -87,6 +87,7 @@ workflows:
     - _common-end
     - _post_discourse
     - _publish-doc
+    - _create-github-release
     steps:
     - script@1:
         title: Run Check
@@ -223,6 +224,23 @@ workflows:
             $HOME/.gradle/caches/*.lock
             ./.gradle/*.lock
             ./.gradle/*.bin
+  _create-github-release:
+    steps:
+    - script@1:
+        inputs:
+        - content: |-
+            #!/usr/bin/env bash
+            set -ex
+            
+            _CHANGELOG="${GIT_REPOSITORY_URL%.git}/blob/$BITRISE_GIT_TAG/inappmessaging/USERGUIDE.md#-changelog"
+            envman add --key CHANGELOG --value "$_CHANGELOG"
+    - github-release@0.11.0:
+        inputs:
+        - body: "$CHANGELOG"
+        - draft: 'no'
+        - username: "$PUBLISHER_GITHUB_USERNAME"
+        - api_token: "$PUBLISHER_GITHUB_API_TOKEN"
+        - name: "$BITRISE_GIT_TAG"
 meta:
   bitrise.io:
     stack: linux-docker-android-20.04
