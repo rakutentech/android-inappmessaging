@@ -85,9 +85,9 @@ workflows:
     - _common-start
     after_run:
     - _common-end
+    - _create-github-release
     - _post_discourse
     - _publish-doc
-    - _create-github-release
     steps:
     - script@1:
         title: Run Check
