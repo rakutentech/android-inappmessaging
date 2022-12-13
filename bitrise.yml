@@ -85,9 +85,9 @@ workflows:
     - _common-start
     after_run:
     - _common-end
-    - _create-github-release
     - _post_discourse
     - _publish-doc
+    - _create-github-release
     steps:
     - script@1:
         title: Run Check
@@ -231,6 +231,9 @@ workflows:
         - content: |-
             #!/usr/bin/env bash
             set -ex
+
+            # Ensure we are at the right location where the userguide is (not in other branch such as `gh-pages`)
+            git checkout $BITRISE_GIT_COMMIT
 
             RELEASE_VER_RAW=$BITRISE_GIT_TAG
             RELEASE_VER_RAW="${RELEASE_VER_RAW/v}"
