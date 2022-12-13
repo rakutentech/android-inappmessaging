@@ -7,6 +7,7 @@
      ]]></notes>
     <packageUrl regex="true">^pkg:maven/com\.google\.guava/guava@.*$</packageUrl>
     <cpe>cpe:/a:google:guava</cpe>
+    <vulnerabilityName>CVE-2020-8908</vulnerabilityName>
   </suppress>
 
   <!-- Dokka -->
