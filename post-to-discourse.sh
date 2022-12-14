@@ -1,4 +1,4 @@
-#!/usr/bin/env bash
+#!/bin/bash
 
 set -e
 
@@ -26,15 +26,16 @@ then
     exit 1;
 fi
 
-if [ -z $DISCOURSE_SDK_NAME ];
+if [ -z "$DISCOURSE_SDK_NAME" ];
 then
     echo "DISCOURSE_SDK_NAME is not set.";
     exit 1;
 fi
 
-if [[ -n $1 ]];
+if [ -n $1 ];
 then
     release_version_number=$1
+    release_version_number="${release_version_number:1}"
 
     cd $DISCOURSE_DIR
 
@@ -53,8 +54,8 @@ then
     --data-raw "{
       \"category\": $DISCOURSE_CATEGORY_ID,
       \"title\": \"$DISCOURSE_SDK_NAME v${release_version_number} released 🚀\",
-      \"tags\": [\"android\", \"mobile\", \"mobilesdk\", \"release\"],
-      \"raw\": \"Hi,\n We are pleased to announce that we have released Android IAM SDK ${release_version_number}!\n$RELEASE_NOTES\"
+      \"tags\": [\"android\", \"mobile\", \"mobilesdk\", \"release\", \"mag-sdk\"],
+      \"raw\": \"Hi,\n We are pleased to announce that we have released $DISCOURSE_SDK_NAME SDK v${release_version_number}!\n$RELEASE_NOTES\"
     }"
 else
     echo "version input (format: vX.Y.Z) is missing.";
