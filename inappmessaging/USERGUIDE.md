@@ -483,7 +483,7 @@ Documents targeting Product Managers:
 
 ## <a name="changelog"></a> Changelog
 
-### 7.3.0 (In-Progress)
+### 7.3.0 (2022-12-13)
 * SDKCF-5835: Updated dependencies to remove vulnerabilities.
 * SDKCF-5893: Added campaign UX Improvements related to texts' wrapping for readability:
   - For Android 13 devices using Japanese language, wrapping by Bunsetsu is applied

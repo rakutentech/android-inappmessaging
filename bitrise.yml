@@ -189,7 +189,8 @@ workflows:
   _post_discourse:
     steps:
     - script@1:
-        title: Run Dependency Check
+        run_if: false
+        title: Post To Discourse
         inputs:
         - content: |-
             #!/usr/bin/env
