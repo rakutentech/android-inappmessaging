@@ -97,6 +97,7 @@ internal object ViewUtil {
         // visible bounds
         view.getDrawingRect(bounds)
         // calculates the relative coordinates to the parent
+        // the parentViewGroup can be any parent in the view hierarchy, so it also works with ScrollView
         (view.parent as? ViewGroup)?.offsetDescendantRectToMyCoords(view, bounds)
         return bounds
     }
