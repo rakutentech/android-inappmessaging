@@ -63,9 +63,7 @@ internal object ViewUtil {
     @SuppressWarnings("LongParameterList")
     fun getPosition(view: View, type: PositionType, width: Int, height: Int, marginH: Int, marginV: Int):
         Pair<Int, Int> {
-        val rect = Rect()
-        rect.top = getRectTop(view)
-        rect.left = getRelativeLeft(view)
+        val rect = getViewBoundsRelativeToRoot(view)
         Logger(TAG).debug("Target position: ${rect.left}-${rect.top}-${rect.right}-${rect.bottom}")
         return when (type) {
             PositionType.TOP_RIGHT -> Pair(getRightPos(rect, view), getTopPos(rect, height, marginV))
@@ -76,15 +74,6 @@ internal object ViewUtil {
             PositionType.BOTTOM_LEFT -> Pair(getLeftPos(rect, width, marginH), getBottomPos(rect, view, marginV))
             PositionType.RIGHT -> Pair(rect.left + view.width - TRI_SIZE / 2, getSidePos(rect, height, marginV))
             PositionType.LEFT -> Pair(getLeftPos(rect, width, marginH), getSidePos(rect, height, marginV))
-        }
-    }
-
-    private fun getRectTop(view: View): Int {
-        val scroll = getScrollView(view)
-        return if (scroll != null) {
-            getScrollTopPos(view, scroll)
-        } else {
-            getRelativeTop(view)
         }
     }
 
@@ -100,27 +89,16 @@ internal object ViewUtil {
 
     private fun getTopPos(rect: Rect, height: Int, marginV: Int) = rect.top - height - marginV - TRI_SIZE / 2
 
-    private fun getRelativeLeft(view: View): Int {
-        return if (view.parent == view.rootView) {
-            view.left
-        } else {
-            view.left + getRelativeLeft((view.parent as View))
-        }
-    }
-
-    private fun getRelativeTop(view: View): Int {
-        return if (view.parent.parent == view.rootView) {
-            0
-        } else {
-            view.top + getRelativeTop((view.parent as View))
-        }
-    }
-
-    private fun getScrollTopPos(view: View, scroll: ViewGroup): Int {
+    /**
+     * Gets the view's position relative to the root layout
+     */
+    private fun getViewBoundsRelativeToRoot(view: View): Rect {
         val bounds = Rect()
+        // visible bounds
         view.getDrawingRect(bounds)
-        (scroll.parent as ViewGroup).offsetDescendantRectToMyCoords(view, bounds)
-        return bounds.top
+        // calculates the relative coordinates to the parent
+        (view.parent as? ViewGroup)?.offsetDescendantRectToMyCoords(view, bounds)
+        return bounds
     }
 
     fun getEdgePosition(width: Int, height: Int, topPos: Pair<Int, Int>): Pair<Int?, Int?> {
