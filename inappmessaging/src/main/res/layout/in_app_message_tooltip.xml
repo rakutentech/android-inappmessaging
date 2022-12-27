@@ -7,7 +7,7 @@
     android:clipToPadding="false"
     android:focusable="true"
     android:theme="@style/InAppMessaging"
-    android:background="#00FF00"
+    tools:background="#00FF00"
     xmlns:tools="http://schemas.android.com/tools" >
 
     <ImageButton
@@ -38,6 +38,7 @@
             android:translationZ="10dp"
             android:visibility="gone"
             tools:src="@drawable/abc_vector_test"
+            tools:background="#FF0000"
             tools:visibility="visible" />
 
         <ImageView

@@ -15,12 +15,12 @@ import com.rakuten.tech.mobile.inappmessaging.runtime.data.repositories.Campaign
 import com.rakuten.tech.mobile.inappmessaging.runtime.data.requests.DisplayPermissionRequest
 import com.rakuten.tech.mobile.inappmessaging.runtime.data.responses.displaypermission.DisplayPermissionResponse
 import com.rakuten.tech.mobile.inappmessaging.runtime.exception.InAppMessagingException
+import com.rakuten.tech.mobile.inappmessaging.runtime.utils.isVisible
 import com.rakuten.tech.mobile.inappmessaging.runtime.utils.InAppLogger
 import com.rakuten.tech.mobile.inappmessaging.runtime.utils.ResourceUtils
 import com.rakuten.tech.mobile.inappmessaging.runtime.utils.RetryDelayUtil
 import com.rakuten.tech.mobile.inappmessaging.runtime.utils.RuntimeUtil
 import com.rakuten.tech.mobile.inappmessaging.runtime.utils.WorkerUtils
-import com.rakuten.tech.mobile.inappmessaging.runtime.utils.ViewUtil
 import com.rakuten.tech.mobile.inappmessaging.runtime.workmanager.schedulers.MessageMixerPingScheduler
 import retrofit2.Call
 import retrofit2.Response
@@ -202,12 +202,14 @@ internal interface MessageReadinessManager {
             }
         }
 
-        @SuppressWarnings("ReplaceSafeCallChainWithRun")
         private fun isTooltipTargetViewVisible(message: Message): Boolean {
             val activity = InAppMessaging.instance().getRegisteredActivity()
-            if (activity != null) {
-                val view = message.getTooltipConfig()?.id?.let { ResourceUtils.findViewByName<View>(activity, it) }
-                view?.let { return ViewUtil.isViewVisible(it) }
+            val id = message.getTooltipConfig()?.id
+
+            if (activity != null && id != null) {
+                ResourceUtils.findViewByName<View>(activity, id)?.let {
+                    return it.isVisible()
+                }
             }
             return false
         }

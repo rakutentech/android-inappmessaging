@@ -176,26 +176,6 @@ class InAppMessagingTooltipViewSpec {
         view?.type shouldBeEqualTo PositionType.TOP_CENTER
     }
 
-    @Test
-    fun `should set top and left params only`() {
-        val params = ViewGroup.MarginLayoutParams(10, 10)
-        view?.setPosition(params, Pair(100, 100), 200, 200)
-        params.topMargin shouldBeEqualTo 100
-        params.leftMargin shouldBeEqualTo 100
-        params.bottomMargin shouldBeEqualTo 0
-        params.rightMargin shouldBeEqualTo 0
-    }
-
-    @Test
-    fun `should set all margin params`() {
-        val params = ViewGroup.MarginLayoutParams(10, 10)
-        view?.setPosition(params, Pair(10, 10), 500, 500)
-        params.topMargin shouldBeEqualTo 10
-        params.leftMargin shouldBeEqualTo 10
-        params.bottomMargin shouldBeEqualTo -100
-        params.rightMargin shouldBeEqualTo -250
-    }
-
     private fun verifyImageFetch(
         isValid: Boolean,
         isException: Boolean = false,
