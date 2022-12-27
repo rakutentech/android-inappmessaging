@@ -310,7 +310,7 @@ class ViewUtilSpec : BaseTest() {
             rect.set(100, 100, 100, 100)
         }
 
-        return ViewUtil.getPosition(mockView, type, WIDTH, HEIGHT, MARGIN_H, MARGIN_V)
+        return ViewUtil.getPosition(mockView, type, WIDTH, HEIGHT, MARGIN_H, MARGIN_V, holderLocation)
     }
 
     companion object {

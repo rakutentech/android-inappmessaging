@@ -16,13 +16,13 @@ class SecondActivity : AppCompatActivity(), View.OnClickListener {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_second)
 
-        findViewById<ScrollView>(R.id.scrollView)?.setOnTouchListener(object : CustomOnTouchListener() {
-            override fun onTouch(v: View, event: MotionEvent): Boolean {
-                super.onTouch(v, event)
-                Log.e("IAM", "scroll")
-                return false
-            }
-        })
+//        findViewById<ScrollView>(R.id.scrollView)?.setOnTouchListener(object : CustomOnTouchListener() {
+//            override fun onTouch(v: View, event: MotionEvent): Boolean {
+//                super.onTouch(v, event)
+//                Log.e("IAM", "scroll")
+//                return false
+//            }
+//        })
 
         findViewById<Button>(R.id.sec_act_custom_event_click).setOnClickListener(this)
     }

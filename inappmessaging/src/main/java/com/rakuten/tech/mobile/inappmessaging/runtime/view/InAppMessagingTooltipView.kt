@@ -1,20 +1,19 @@
 package com.rakuten.tech.mobile.inappmessaging.runtime.view
 
+import android.app.ActionBar
 import android.content.Context
 import android.content.res.ColorStateList
-import android.graphics.Bitmap
-import android.graphics.Canvas
-import android.graphics.Color
-import android.graphics.Paint
-import android.graphics.Path
-import android.graphics.Point
+import android.graphics.*
 import android.graphics.drawable.ScaleDrawable
 import android.os.Handler
 import android.os.Looper
 import android.util.AttributeSet
+import android.util.TypedValue
 import android.view.View
 import android.view.ViewGroup
 import android.view.ViewTreeObserver
+import android.view.Window
+import android.view.animation.DecelerateInterpolator
 import android.widget.ImageButton
 import android.widget.ImageView
 import android.widget.RelativeLayout
@@ -27,6 +26,7 @@ import com.rakuten.tech.mobile.inappmessaging.runtime.InAppMessaging
 import com.rakuten.tech.mobile.inappmessaging.runtime.R
 import com.rakuten.tech.mobile.inappmessaging.runtime.data.enums.PositionType
 import com.rakuten.tech.mobile.inappmessaging.runtime.data.models.messages.Message
+import com.rakuten.tech.mobile.inappmessaging.runtime.manager.DisplayManager
 import com.rakuten.tech.mobile.inappmessaging.runtime.utils.InAppLogger
 import com.rakuten.tech.mobile.inappmessaging.runtime.utils.ResourceUtils
 import com.rakuten.tech.mobile.inappmessaging.runtime.utils.ViewUtil
@@ -37,7 +37,7 @@ import com.squareup.picasso.Picasso
 internal class InAppMessagingTooltipView(
     context: Context,
     attrs: AttributeSet?
-) : RelativeLayout(context, attrs), InAppMessageView {
+) : RelativeLayout(context, attrs), InAppMessageView, View.OnScrollChangeListener {
 
     init {
         id = R.id.in_app_message_tooltip_view
@@ -98,6 +98,7 @@ internal class InAppMessagingTooltipView(
                                 setBackground(it.width, it.height)
                                 setTip()
                                 showView()
+                                setScrollListener()
                                 // to avoid flicker
                                 mainHandler.postDelayed({
                                     it.visibility = VISIBLE
@@ -266,7 +267,7 @@ internal class InAppMessagingTooltipView(
         val paint = Paint(Paint.ANTI_ALIAS_FLAG)
 
         paint.strokeWidth = 2f
-        paint.color = Color.parseColor(bgColor)
+        paint.color = Color.parseColor("#0000FF")
         paint.style = Paint.Style.FILL_AND_STROKE
         paint.isAntiAlias = true
         val bg = Bitmap.createBitmap(adjustedWidth, adjustedHeight, Bitmap.Config.ARGB_8888)
@@ -289,24 +290,49 @@ internal class InAppMessagingTooltipView(
         (tip.layoutParams as LayoutParams).addRule(ALIGN_END, R.id.message_tooltip_image_view)
     }
 
+    private fun actionBarHeight(): Int {
+        val tv = TypedValue()
+        context.theme.resolveAttribute(android.R.attr.actionBarSize, tv, true)
+        return resources.getDimensionPixelSize(tv.resourceId)
+    }
+
+    private fun setScrollListener() {
+
+        val activity = InAppMessaging.instance().getRegisteredActivity() ?: return
+        viewId?.let { id ->
+            ResourceUtils.findViewByName<View>(activity, id)?.let { view ->
+                val scrollView = ViewUtil.getScrollView(view)
+                val init = this.y
+                scrollView?.setOnScrollChangeListener(this)
+//                scrollView?.viewTreeObserver?.addOnScrollChangedListener {
+//                    InAppLogger(TAG).debug("[MAU] ${scrollView.scrollY}")
+//
+//                    this.y = scrollView.scrollY.toFloat() + init
+//                }
+
+
+            }
+        }
+    }
+
     @SuppressWarnings("NestedScopeFunctions")
     private fun showView() {
         val params = this.layoutParams as MarginLayoutParams
         (parent as ViewGroup).clipChildren = false
         (parent as ViewGroup).clipToPadding = false
-        val imageView = findViewById<ImageView>(R.id.message_tooltip_image_view)
+
         viewId?.let { id ->
             val activity = InAppMessaging.instance().getRegisteredActivity() ?: return
-            ResourceUtils.findViewByName<View>(activity, id)?.let { view ->
-                val buttonSize = findViewById<ImageButton>(R.id.message_close_button).layoutParams.height
-                ViewUtil.getPosition(
-                    view = view, type = type, width = imageView.layoutParams.width,
-                    height = imageView.layoutParams.height, marginH = buttonSize, marginV = buttonSize
-                )
-                    .let { pos ->
-                        params.topMargin = pos.second
-                        params.leftMargin = pos.first
-                    }
+            ResourceUtils.findViewByName<View>(activity, id)?.let { anchorView ->
+                val tPosition = ViewUtil.getPosition(
+                    activity = activity,
+                    anchorView = anchorView,
+                    type = type,
+                    tImageView = findViewById<ImageView>(R.id.message_tooltip_image_view),
+                    tTipView = findViewById<ImageView>(R.id.message_tip),
+                    tCloseBtnView = findViewById<ImageButton>(R.id.message_close_button))
+                params.topMargin = tPosition.second
+                params.leftMargin = tPosition.first
             }
         }
     }
@@ -330,5 +356,17 @@ internal class InAppMessagingTooltipView(
         private const val RADIUS = 15f
         private const val MAX_SIZE = 600
         private const val DELAY = 100L // in ms
+    }
+
+    override fun onScrollChange(v: View?, scrollX: Int, scrollY: Int, oldScrollX: Int, oldScrollY: Int) {
+        InAppLogger(TAG).debug("[MAU] ${scrollY}")
+
+        if (scrollY < oldScrollY) {
+            InAppLogger(TAG).debug("[MAU] scroll up")
+            this.y += (oldScrollY - scrollY)
+        } else {
+            InAppLogger(TAG).debug("[MAU] scroll down")
+            this.y -= (scrollY - oldScrollY)
+        }
     }
 }

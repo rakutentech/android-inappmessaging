@@ -1,10 +1,12 @@
 package com.rakuten.tech.mobile.inappmessaging.runtime.utils
 
+import android.app.Activity
 import android.content.Context
 import android.content.res.Resources
 import android.graphics.Rect
 import android.view.View
 import android.view.ViewGroup
+import android.view.Window
 import android.view.animation.Animation
 import android.view.animation.AnimationUtils
 import android.widget.FrameLayout
@@ -18,6 +20,7 @@ import com.rakuten.tech.mobile.inappmessaging.runtime.data.enums.SlideFromDirect
 import com.rakuten.tech.mobile.inappmessaging.runtime.view.InAppMessagingTooltipView.Companion.PADDING
 import com.rakuten.tech.mobile.inappmessaging.runtime.view.InAppMessagingTooltipView.Companion.TRI_SIZE
 import com.rakuten.tech.mobile.sdkutils.logger.Logger
+
 
 /**
  * Utility methods for views.
@@ -61,45 +64,61 @@ internal object ViewUtil {
     }
 
     @SuppressWarnings("LongParameterList")
-    fun getPosition(view: View, type: PositionType, width: Int, height: Int, marginH: Int, marginV: Int):
-        Pair<Int, Int> {
-        val rect = getViewBoundsRelativeToRoot(view)
-        Logger(TAG).debug("Target position: ${rect.left}-${rect.top}-${rect.right}-${rect.bottom}")
-        return when (type) {
-            PositionType.TOP_RIGHT -> Pair(getRightPos(rect, view), getTopPos(rect, height, marginV))
-            PositionType.TOP_CENTER -> Pair(getCenterPos(rect, view, width), getTopPos(rect, height, marginV))
-            PositionType.TOP_LEFT -> Pair(getLeftPos(rect, width, marginH), getTopPos(rect, height, marginV))
-            PositionType.BOTTOM_RIGHT -> Pair(getRightPos(rect, view), getBottomPos(rect, view, marginV))
-            PositionType.BOTTOM_CENTER -> Pair(getCenterPos(rect, view, width), rect.top + view.height)
-            PositionType.BOTTOM_LEFT -> Pair(getLeftPos(rect, width, marginH), getBottomPos(rect, view, marginV))
-            PositionType.RIGHT -> Pair(rect.left + view.width - TRI_SIZE / 2, getSidePos(rect, height, marginV))
-            PositionType.LEFT -> Pair(getLeftPos(rect, width, marginH), getSidePos(rect, height, marginV))
+    fun getPosition(
+        activity: Activity,
+        anchorView: View,
+        type: PositionType,
+        tImageView: View,
+        tTipView: View,
+        tCloseBtnView: View,
+    ): Pair<Int, Int> {
+
+        val anchorLocation = IntArray(2)
+        anchorView.getLocationInWindow(anchorLocation) // location (x, y) based on the activity window
+
+        val actionBarHeight = activity.window.findViewById<View?>(Window.ID_ANDROID_CONTENT).top
+        var left = anchorLocation[0]
+        var top = anchorLocation[1] - actionBarHeight
+
+        Logger(TAG).debug("Anchor position: ($left, $top)")
+        when (type) {
+            PositionType.TOP_LEFT -> {
+                left -= (tImageView.layoutParams.width + tCloseBtnView.layoutParams.width + tTipView.layoutParams.width/2)   // target view left and tooltip width
+                top -= (anchorView.height + tImageView.layoutParams.height + tTipView.layoutParams.height/2)
+            }
+            PositionType.TOP_CENTER -> {
+                left += (anchorView.width - tImageView.layoutParams.width)/2
+                top -= (anchorView.height + tImageView.layoutParams.height + tTipView.layoutParams.height)
+            }
+            PositionType.TOP_RIGHT -> {
+                left += (anchorView.width + tTipView.layoutParams.width/2)
+                top -= (anchorView.height + tImageView.layoutParams.height + tTipView.layoutParams.height/2)
+            }
+            PositionType.RIGHT -> {
+                left += anchorView.width
+                top -= (anchorView.height + tImageView.layoutParams.height)/2
+            }
+            PositionType.BOTTOM_RIGHT -> {
+                left += (anchorView.width + tTipView.layoutParams.width/2)
+                top += (anchorView.height - tCloseBtnView.layoutParams.width - tTipView.layoutParams.height)
+            }
+            PositionType.BOTTOM_CENTER -> {
+                left += (anchorView.width - tImageView.layoutParams.width)/2
+                top += (anchorView.height - tCloseBtnView.layoutParams.width - tTipView.layoutParams.height)
+            }
+            PositionType.BOTTOM_LEFT -> {
+                left -= (tImageView.layoutParams.width + tCloseBtnView.layoutParams.width + tTipView.layoutParams.width/2)
+                top += (anchorView.height - tCloseBtnView.layoutParams.width - tTipView.layoutParams.height)
+            }
+            PositionType.LEFT -> {
+                // tooltipImageView.layoutParams includes padding (border)
+                // in vertical view, only consider the center of imageView
+                left -= (tImageView.layoutParams.width + tCloseBtnView.layoutParams.width + tTipView.layoutParams.width)
+                top -= (anchorView.height + tImageView.layoutParams.height)/2
+            }
         }
-    }
-
-    private fun getSidePos(rect: Rect, height: Int, marginV: Int) = rect.top - (height - marginV + TRI_SIZE) / 2
-
-    private fun getCenterPos(rect: Rect, view: View, width: Int) = rect.left + view.width / 2 - width / 2
-
-    private fun getRightPos(rect: Rect, view: View) = rect.left + view.width + PADDING / 4
-
-    private fun getLeftPos(rect: Rect, width: Int, marginH: Int) = rect.left - width - marginH - TRI_SIZE / 2
-
-    private fun getBottomPos(rect: Rect, view: View, marginV: Int) = rect.top + view.height - marginV + TRI_SIZE / 2
-
-    private fun getTopPos(rect: Rect, height: Int, marginV: Int) = rect.top - height - marginV - TRI_SIZE / 2
-
-    /**
-     * Gets the view's position relative to the root layout
-     */
-    private fun getViewBoundsRelativeToRoot(view: View): Rect {
-        val bounds = Rect()
-        // visible bounds
-        view.getDrawingRect(bounds)
-        // calculates the relative coordinates to the parent
-        // the parentViewGroup can be any parent in the view hierarchy, so it also works with ScrollView
-        (view.parent as? ViewGroup)?.offsetDescendantRectToMyCoords(view, bounds)
-        return bounds
+        Logger(TAG).debug("Tooltip position: ($left, $top)")
+        return Pair(left, top)
     }
 
     fun getEdgePosition(width: Int, height: Int, topPos: Pair<Int, Int>): Pair<Int?, Int?> {
