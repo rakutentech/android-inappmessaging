@@ -51,7 +51,9 @@ internal class InAppMessagingTooltipView(
     private var listener: InAppMessageViewListener? = null
     internal var isTest = false
     internal var mainHandler = Handler(Looper.getMainLooper())
-    private val anchorViewLayoutListener = ViewTreeObserver.OnGlobalLayoutListener { setPosition() }
+    private val anchorViewLayoutListener = ViewTreeObserver.OnGlobalLayoutListener {
+        setPosition()
+    }
 
     @VisibleForTesting
     internal var picasso: Picasso? = null
@@ -72,30 +74,46 @@ internal class InAppMessagingTooltipView(
         bindImage()
     }
 
-    /**
-     * Removes listeners attached to the anchor view.
-     */
-    fun removeAnchorViewListeners() {
-        try {
-            findAnchorView()?.viewTreeObserver?.removeOnGlobalLayoutListener(anchorViewLayoutListener)
-        } catch (e: IllegalStateException) {
-            InAppLogger(TAG).debug(e, "Anchor viewTreeObserver is not alive anymore")
+    /** Called when tooltip is attached to window. */
+    override fun onAttachedToWindow() {
+        super.onAttachedToWindow()
+
+        // Attach layout listener for the anchor view
+        findAnchorView()?.viewTreeObserver?.let { observer ->
+            if (observer.isAlive) observer.addOnGlobalLayoutListener(anchorViewLayoutListener)
         }
     }
 
-    /**
-     * This method binds image to view.
-     */
+    /** Called when tooltip is removed from window. */
+    override fun onDetachedFromWindow() {
+        super.onDetachedFromWindow()
+
+        // Remove layout listener for the anchor view
+        findAnchorView()?.viewTreeObserver?.let { observer ->
+            if (observer.isAlive) observer.removeOnGlobalLayoutListener(anchorViewLayoutListener)
+        }
+    }
+
+    /** The anchor view of this tooltip. */
+    private fun findAnchorView(): View? {
+        val activity = InAppMessaging.instance().getRegisteredActivity()
+        if (activity != null) {
+            viewId?.let { return ResourceUtils.findViewByName(activity, it) }
+        }
+        return null
+    }
+
+    /** This method binds image to view.*/
     @Suppress("ClickableViewAccessibility", "TooGenericExceptionCaught", "LongMethod")
     private fun bindImage() { // Display image.
         if (!this.imageUrl.isNullOrEmpty()) {
             // load the image then display the view
             this.show(false)
-            findViewById<ImageView>(R.id.message_tooltip_image_view).let { imageView ->
+            findViewById<ImageView>(R.id.message_tooltip_image_view).let {
                 try {
                     val callback = object : Callback {
                         override fun onSuccess() {
-                            imageView.show(false)
+                            it.show(false)
                             this@InAppMessagingTooltipView.show(false)
                         }
 
@@ -104,28 +122,26 @@ internal class InAppMessagingTooltipView(
                         }
                     }
 
-                    imageView.viewTreeObserver.addOnGlobalLayoutListener(
-                        object : ViewTreeObserver.OnGlobalLayoutListener {
-                            override fun onGlobalLayout() {
-                                if (imageView.width > 0 || isTest) {
-                                    imageView.viewTreeObserver.removeOnGlobalLayoutListener(this)
-                                    drawBorder(imageView.width, imageView.height)
-                                    drawTip()
-                                    addAnchorViewListeners()
-                                    // to avoid flicker
-                                    mainHandler.postDelayed({
-                                        imageView.show()
-                                        this@InAppMessagingTooltipView.show()
-                                    }, DELAY)
-                                }
+                    it.viewTreeObserver.addOnGlobalLayoutListener(object : ViewTreeObserver.OnGlobalLayoutListener {
+                        override fun onGlobalLayout() {
+                            if (it.width > 0 || isTest) {
+                                it.viewTreeObserver.removeOnGlobalLayoutListener(this)
+                                drawBorder(it.width, it.height)
+                                drawTip()
+                                // to avoid flicker
+                                mainHandler.postDelayed({
+                                    it.show()
+                                    this@InAppMessagingTooltipView.show()
+                                }, DELAY)
                             }
-                        })
+                        }
+                    })
                     (picasso ?: Picasso.get()).load(this.imageUrl)
                         .priority(Picasso.Priority.HIGH)
                         .resize(MAX_SIZE, MAX_SIZE)
                         .onlyScaleDown()
                         .centerInside()
-                        .into(imageView, callback)
+                        .into(it, callback)
                 } catch (ex: Exception) {
                     InAppLogger(TAG).debug(ex, "Downloading image failed $imageUrl")
                 }
@@ -307,25 +323,7 @@ internal class InAppMessagingTooltipView(
         (tip.layoutParams as LayoutParams).addRule(ALIGN_END, R.id.message_tooltip_image_view)
     }
 
-    private fun findAnchorView(): View? {
-        val activity = InAppMessaging.instance().getRegisteredActivity()
-        if (activity != null) {
-            viewId?.let { return ResourceUtils.findViewByName(activity, it) }
-        }
-        return null
-    }
-
-    private fun addAnchorViewListeners() {
-        try {
-            findAnchorView()?.viewTreeObserver?.addOnGlobalLayoutListener(anchorViewLayoutListener)
-        } catch (e: IllegalStateException) {
-            InAppLogger(TAG).debug(e, "Anchor viewTreeObserver is not alive anymore")
-        }
-    }
-
-    /**
-     * Sets the top-left position of this tooltip view.
-     */
+    /** Sets the top-left position of this tooltip */
     private fun setPosition() {
         val activity = InAppMessaging.instance().getRegisteredActivity() ?: return
         findAnchorView()?.let { anchorView ->

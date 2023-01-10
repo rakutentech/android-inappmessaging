@@ -1,5 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
-<com.rakuten.tech.mobile.inappmessaging.runtime.view.InAppMessagingTooltipView xmlns:android="http://schemas.android.com/apk/res/android"
+<com.rakuten.tech.mobile.inappmessaging.runtime.view.InAppMessagingTooltipView
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="wrap_content"
     android:layout_height="wrap_content"
     android:clickable="true"
@@ -7,18 +9,17 @@
     android:clipToPadding="false"
     android:focusable="true"
     android:theme="@style/InAppMessaging"
-    tools:background="#00FF00"
-    xmlns:tools="http://schemas.android.com/tools" >
+    tools:background="#00FF00" >
 
     <ImageButton
         android:id="@+id/message_close_button"
         style="@style/InAppMessaging.TooltipButton"
-        android:layout_toEndOf="@id/image_layout"
         android:contentDescription="@string/close_button"
-        android:elevation="10dp"
         android:scaleType="center"
-        android:stateListAnimator="@null"
+        android:elevation="10dp"
         android:translationZ="10dp"
+        android:stateListAnimator="@null"
+        android:layout_toEndOf="@id/image_layout"
         tools:src="@drawable/close_button_white" />
 
     <RelativeLayout
@@ -26,16 +27,15 @@
         android:layout_width="wrap_content"
         android:layout_below="@id/message_close_button"
         android:layout_height="wrap_content">
-
         <com.google.android.material.imageview.ShapeableImageView
             android:id="@+id/message_tooltip_image_view"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:contentDescription="@null"
-            android:elevation="10dp"
             android:scaleType="center"
-            android:stateListAnimator="@null"
+            android:elevation="10dp"
             android:translationZ="10dp"
+            android:stateListAnimator="@null"
+            android:contentDescription="@null"
             android:visibility="gone"
             tools:src="@drawable/abc_vector_test"
             tools:background="#FF0000"

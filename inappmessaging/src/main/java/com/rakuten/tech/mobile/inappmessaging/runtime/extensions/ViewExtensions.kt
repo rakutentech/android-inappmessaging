@@ -5,12 +5,12 @@ import android.graphics.Rect
 import android.view.View
 import android.view.ViewGroup
 
-internal fun View.isVisible(): Boolean {
+internal fun View.isVisible(outPosition: Rect? = null): Boolean {
     if (!isShown) {
         return false
     }
 
-    val actualPosition = Rect()
+    val actualPosition = outPosition ?: Rect()
     val screen = Rect(
         0, 0,
         Resources.getSystem().displayMetrics.widthPixels, Resources.getSystem().displayMetrics.heightPixels

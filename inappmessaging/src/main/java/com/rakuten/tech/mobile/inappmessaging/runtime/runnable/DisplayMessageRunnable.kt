@@ -56,7 +56,7 @@ internal class DisplayMessageRunnable(
 
     private fun handleSlide() {
         val slideUpView = hostActivity.layoutInflater.inflate(R.layout.in_app_message_slide_up, null)
-                as InAppMessageSlideUpView
+            as InAppMessageSlideUpView
         slideUpView.populateViewData(message)
         hostActivity.addContentView(slideUpView, hostActivity.window.attributes)
         ImpressionManager.sendImpressionEvent(
@@ -68,7 +68,7 @@ internal class DisplayMessageRunnable(
 
     private fun handleFull() {
         val fullScreenView = hostActivity.layoutInflater.inflate(R.layout.in_app_message_full_screen, null)
-                as InAppMessageFullScreenView
+            as InAppMessageFullScreenView
         fullScreenView.populateViewData(message)
         hostActivity.addContentView(fullScreenView, hostActivity.window.attributes)
         ImpressionManager.sendImpressionEvent(
@@ -80,7 +80,7 @@ internal class DisplayMessageRunnable(
 
     private fun handleModal() {
         val modalView = hostActivity.layoutInflater.inflate(R.layout.in_app_message_modal, null)
-                as InAppMessageModalView
+            as InAppMessageModalView
         modalView.populateViewData(message)
         hostActivity.addContentView(modalView, hostActivity.window.attributes)
         ImpressionManager.sendImpressionEvent(
@@ -92,7 +92,7 @@ internal class DisplayMessageRunnable(
 
     private fun handleTooltip() {
         val toolTipView = hostActivity.layoutInflater.inflate(R.layout.in_app_message_tooltip, null)
-                as InAppMessagingTooltipView
+            as InAppMessagingTooltipView
         toolTipView.populateViewData(message)
         message.getTooltipConfig()?.let { displayTooltip(it, toolTipView) }
     }
@@ -113,7 +113,6 @@ internal class DisplayMessageRunnable(
             } else {
                 displayInScrollView(scrollView, toolTipView)
             }
-
             if (tooltip.autoDisappear != null && tooltip.autoDisappear > 0) {
                 displayManager.removeMessage(hostActivity, delay = tooltip.autoDisappear, id = message.getCampaignId())
             }

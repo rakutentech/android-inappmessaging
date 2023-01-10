@@ -7,11 +7,13 @@ import android.os.Handler
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.view.ViewTreeObserver
 import android.widget.FrameLayout
 import android.widget.ImageView
 import androidx.test.core.app.ApplicationProvider
 import com.google.android.material.imageview.ShapeableImageView
 import com.nhaarman.mockitokotlin2.any
+import com.nhaarman.mockitokotlin2.atLeastOnce
 import com.nhaarman.mockitokotlin2.eq
 import com.rakuten.tech.mobile.inappmessaging.runtime.InAppMessaging
 import com.rakuten.tech.mobile.inappmessaging.runtime.R
@@ -20,11 +22,12 @@ import com.rakuten.tech.mobile.inappmessaging.runtime.data.models.Tooltip
 import com.rakuten.tech.mobile.inappmessaging.runtime.data.models.messages.Message
 import com.rakuten.tech.mobile.inappmessaging.runtime.data.responses.ping.*
 import com.rakuten.tech.mobile.inappmessaging.runtime.utils.ImageUtilSpec
+import com.rakuten.tech.mobile.inappmessaging.runtime.utils.ResourceUtils
 import org.amshove.kluent.shouldBeEqualTo
 import org.junit.Before
 import org.junit.Test
 import org.junit.runner.RunWith
-import org.mockito.Mockito
+import org.mockito.Mockito.*
 import org.robolectric.RobolectricTestRunner
 import org.robolectric.annotation.Config
 
@@ -33,37 +36,37 @@ import org.robolectric.annotation.Config
 @RunWith(RobolectricTestRunner::class)
 class InAppMessagingTooltipViewSpec {
 
-    private val hostAppActivity = Mockito.mock(Activity::class.java)
-    private val mockMessage = Mockito.mock(Message::class.java)
-    private val mockPayload = Mockito.mock(MessagePayload::class.java)
-    private val mockResource = Mockito.mock(Resource::class.java)
-    private val mockResources = Mockito.mock(Resources::class.java)
-    private val mockTooltip = Mockito.mock(Tooltip::class.java)
+    private val hostAppActivity = mock(Activity::class.java)
+    private val mockMessage = mock(Message::class.java)
+    private val mockPayload = mock(MessagePayload::class.java)
+    private val mockResource = mock(Resource::class.java)
+    private val mockResources = mock(Resources::class.java)
+    private val mockTooltip = mock(Tooltip::class.java)
     private var view: InAppMessagingTooltipView? = null
-    private val mockView = Mockito.mock(View::class.java)
+    private val mockView = mock(View::class.java)
 
     @Before
     @SuppressWarnings("LongMethod")
     fun setup() {
-        Mockito.`when`(hostAppActivity.layoutInflater).thenReturn(
+        `when`(hostAppActivity.layoutInflater).thenReturn(
             LayoutInflater.from(ApplicationProvider.getApplicationContext())
         )
-        Mockito.`when`(mockMessage.getMessagePayload()).thenReturn(mockPayload)
-        Mockito.`when`(mockMessage.getTooltipConfig()).thenReturn(mockTooltip)
-        Mockito.`when`(mockPayload.backgroundColor).thenReturn("#000000")
-        Mockito.`when`(mockPayload.resource).thenReturn(mockResource)
-        Mockito.`when`(hostAppActivity.resources).thenReturn(mockResources)
-        Mockito.`when`(hostAppActivity.packageName).thenReturn("test")
-        Mockito.`when`(mockResources.getIdentifier(eq("target"), eq("id"), any())).thenReturn(1)
-        Mockito.`when`(hostAppActivity.findViewById<View>(1)).thenReturn(mockView)
-        val mockP = Mockito.mock(ViewGroup::class.java)
-        val mockGp = Mockito.mock(ViewGroup::class.java)
-        val mockRoot = Mockito.mock(ViewGroup::class.java)
-        Mockito.`when`(mockView.parent).thenReturn(mockP)
-        Mockito.`when`(mockP.parent).thenReturn(mockGp)
-        Mockito.`when`(mockGp.parent).thenReturn(mockRoot)
-        Mockito.`when`(mockView.rootView).thenReturn(mockRoot)
-        Mockito.`when`(mockView.findViewById<View>(1)).thenReturn(mockView)
+        `when`(mockMessage.getMessagePayload()).thenReturn(mockPayload)
+        `when`(mockMessage.getTooltipConfig()).thenReturn(mockTooltip)
+        `when`(mockPayload.backgroundColor).thenReturn("#000000")
+        `when`(mockPayload.resource).thenReturn(mockResource)
+        `when`(hostAppActivity.resources).thenReturn(mockResources)
+        `when`(hostAppActivity.packageName).thenReturn("test")
+        `when`(mockResources.getIdentifier(eq("target"), eq("id"), any())).thenReturn(1)
+        `when`(hostAppActivity.findViewById<View>(1)).thenReturn(mockView)
+        val mockP = mock(ViewGroup::class.java)
+        val mockGp = mock(ViewGroup::class.java)
+        val mockRoot = mock(ViewGroup::class.java)
+        `when`(mockView.parent).thenReturn(mockP)
+        `when`(mockP.parent).thenReturn(mockGp)
+        `when`(mockGp.parent).thenReturn(mockRoot)
+        `when`(mockView.rootView).thenReturn(mockRoot)
+        `when`(mockView.findViewById<View>(1)).thenReturn(mockView)
         view = hostAppActivity
             .layoutInflater
             .inflate(R.layout.in_app_message_tooltip, null) as InAppMessagingTooltipView
@@ -73,15 +76,21 @@ class InAppMessagingTooltipViewSpec {
 
     @Test
     fun `should set default type for invalid position value`() {
-        Mockito.`when`(mockTooltip.position).thenReturn("invalid-pos")
+        `when`(mockTooltip.position).thenReturn("invalid-pos")
         view?.populateViewData(mockMessage)
         view?.type shouldBeEqualTo PositionType.BOTTOM_CENTER
     }
 
     @Test
+    fun `test`() {
+        val test = spy(view)
+        test.onAttachedToWindow()
+    }
+
+    @Test
     fun `should not display tooltip due to empty url`() {
-        Mockito.`when`(mockTooltip.position).thenReturn("top-center")
-        Mockito.`when`(mockResource.imageUrl).thenReturn("")
+        `when`(mockTooltip.position).thenReturn("top-center")
+        `when`(mockResource.imageUrl).thenReturn("")
         view?.populateViewData(mockMessage)
         view?.findViewById<ShapeableImageView>(R.id.message_tooltip_image_view)?.visibility shouldBeEqualTo View.GONE
     }
@@ -133,9 +142,9 @@ class InAppMessagingTooltipViewSpec {
 
     @Test
     fun `should show image with mock handler`() {
-        val mockHandler = Mockito.mock(Handler::class.java)
+        val mockHandler = mock(Handler::class.java)
         view?.mainHandler = mockHandler
-        Mockito.`when`(mockHandler.postDelayed(any(), any())).thenAnswer {
+        `when`(mockHandler.postDelayed(any(), any())).thenAnswer {
             it.getArgument<Runnable>(0).run()
             true
         }
@@ -151,30 +160,94 @@ class InAppMessagingTooltipViewSpec {
 
     @Test
     fun `should show image for right with null view`() {
-        Mockito.`when`(hostAppActivity.findViewById<View>(1)).thenReturn(null)
+        `when`(hostAppActivity.findViewById<View>(1)).thenReturn(null)
         showImage(PositionType.RIGHT)
     }
 
     @Test
     fun `should not show image for null error`() {
-        Mockito.`when`(mockTooltip.position).thenReturn("top-center")
+        `when`(mockTooltip.position).thenReturn("top-center")
         verifyImageFetch(false, isNull = true)
         view?.type shouldBeEqualTo PositionType.TOP_CENTER
     }
 
     @Test
     fun `should not show image for error exception`() {
-        Mockito.`when`(mockTooltip.position).thenReturn("top-center")
+        `when`(mockTooltip.position).thenReturn("top-center")
         verifyImageFetch(false)
         view?.type shouldBeEqualTo PositionType.TOP_CENTER
     }
 
     @Test
     fun `should not show image for picasso exception`() {
-        Mockito.`when`(mockTooltip.position).thenReturn("top-center")
+        `when`(mockTooltip.position).thenReturn("top-center")
         verifyImageFetch(false, isException = true)
         view?.type shouldBeEqualTo PositionType.TOP_CENTER
     }
+
+    @Test
+    fun `should set tooltip position when anchor view is layouted`() {
+        val test = ResourceUtils.findViewByName<View>(hostAppActivity, "target")
+        val observer = mock(ViewTreeObserver::class.java)
+        `when`(test?.viewTreeObserver).thenReturn(observer)
+
+        showImage(PositionType.BOTTOM_CENTER)
+        test?.viewTreeObserver?.dispatchOnGlobalLayout()
+
+        // TODO
+    }
+
+    @Test
+    fun `should add anchor view listener`() {
+        val test = ResourceUtils.findViewByName<View>(hostAppActivity, "target")
+        val observer = mock(ViewTreeObserver::class.java)
+        `when`(test?.viewTreeObserver).thenReturn(observer)
+
+        showImage(PositionType.BOTTOM_CENTER)
+
+        verify(observer).addOnGlobalLayoutListener(any())
+    }
+
+    @Test
+    fun `should add anchor view listener not crash`() {
+        val test = ResourceUtils.findViewByName<View>(hostAppActivity, "target")
+        val observer = mock(ViewTreeObserver::class.java)
+        `when`(test?.viewTreeObserver).thenReturn(observer)
+        `when`(observer.addOnGlobalLayoutListener(any())).thenThrow(IllegalStateException())
+
+        showImage(PositionType.BOTTOM_CENTER)
+    }
+
+//    @Test
+//    fun `should remove anchor view listeners`() {
+//        `when`(mockTooltip.id).thenReturn("target")
+//        InAppMessaging.initialize(ApplicationProvider.getApplicationContext())
+//        InAppMessaging.instance().registerMessageDisplayActivity(hostAppActivity)
+//        `when`(mockTooltip.position).thenReturn("bottom-center")
+//        val test = ResourceUtils.findViewByName<View>(hostAppActivity, "target")
+//        val observer = mock(ViewTreeObserver::class.java)
+//        `when`(test?.viewTreeObserver).thenReturn(observer)
+//        view?.populateViewData(mockMessage)
+//
+//        view?.removeAnchorViewListeners()
+//        verify(observer).removeOnGlobalLayoutListener(any())
+//    }
+
+//    @Test
+//    fun `should remove anchor view listeners not crash`() {
+//        `when`(mockTooltip.id).thenReturn("target")
+//        InAppMessaging.initialize(ApplicationProvider.getApplicationContext())
+//        InAppMessaging.instance().registerMessageDisplayActivity(hostAppActivity)
+//        `when`(mockTooltip.position).thenReturn("bottom-center")
+//        val test = ResourceUtils.findViewByName<View>(hostAppActivity, "target")
+//        val observer = mock(ViewTreeObserver::class.java)
+//        `when`(test?.viewTreeObserver).thenReturn(observer)
+//
+//        view?.populateViewData(mockMessage)
+//
+//        `when`(observer.removeOnGlobalLayoutListener(any())).thenThrow(IllegalStateException())
+//        view?.removeAnchorViewListeners()
+//    }
 
     private fun verifyImageFetch(
         isValid: Boolean,
@@ -183,8 +256,8 @@ class InAppMessagingTooltipViewSpec {
     ) {
         ImageUtilSpec.IS_VALID = isValid
         ImageUtilSpec.IS_NULL = isNull
-        Mockito.`when`(mockResource.imageUrl).thenReturn("any url")
-        Mockito.`when`(mockPayload.headerColor).thenReturn("#")
+        `when`(mockResource.imageUrl).thenReturn("any url")
+        `when`(mockPayload.headerColor).thenReturn("#")
         view?.picasso = ImageUtilSpec.setupMockPicasso(isException)
         view?.populateViewData(mockMessage)
         val imageView = view?.findViewById<ShapeableImageView>(R.id.message_tooltip_image_view)
@@ -198,11 +271,11 @@ class InAppMessagingTooltipViewSpec {
 
     private fun showImage(type: PositionType, withId: Boolean = true, activity: Activity? = hostAppActivity) {
         if (withId) {
-            Mockito.`when`(mockTooltip.id).thenReturn("target")
+            `when`(mockTooltip.id).thenReturn("target")
             InAppMessaging.initialize(ApplicationProvider.getApplicationContext())
             activity?.let { InAppMessaging.instance().registerMessageDisplayActivity(it) }
         }
-        Mockito.`when`(mockTooltip.position).thenReturn(type.typeId)
+        `when`(mockTooltip.position).thenReturn(type.typeId)
         verifyImageFetch(true)
         view?.type shouldBeEqualTo type
         val image = view?.findViewById<ImageView>(R.id.message_tooltip_image_view)
@@ -211,7 +284,7 @@ class InAppMessagingTooltipViewSpec {
         image?.viewTreeObserver?.dispatchOnGlobalLayout()
 
         if (withId && activity != null) {
-            Mockito.verify(hostAppActivity).findViewById<View>(any())
+            verify(hostAppActivity, atLeastOnce()).findViewById<View>(any())
         }
     }
 }

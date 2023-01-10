@@ -82,7 +82,6 @@ internal interface DisplayManager {
 
         private fun removeWithId(activity: Activity, id: String?, delay: Int) {
             activity.findViewById<ViewGroup>(R.id.in_app_message_tooltip_view)?.let { tooltip ->
-                (tooltip as? InAppMessagingTooltipView)?.removeAnchorViewListeners()
                 if (tooltip.tag == id) {
                     scheduleRemoval(delay = delay, view = tooltip, id = id, activity = activity)
                 } else {
