@@ -2,7 +2,10 @@ package com.rakuten.tech.mobile.inappmessaging.runtime.utils
 
 import android.graphics.Rect
 import android.view.View
+import android.widget.Button
+import androidx.test.core.app.ApplicationProvider
 import com.nhaarman.mockitokotlin2.any
+import com.rakuten.tech.mobile.inappmessaging.runtime.extensions.hide
 import com.rakuten.tech.mobile.inappmessaging.runtime.extensions.isVisible
 import com.rakuten.tech.mobile.inappmessaging.runtime.extensions.show
 import org.amshove.kluent.shouldBeEqualTo
@@ -43,11 +46,25 @@ class ViewExtensionsSpec {
 
     @Test
     fun `show() should set visibility to VISIBLE`() {
-        mockView.show().shouldBeEqualTo(View.VISIBLE)
+        val v = Button(ApplicationProvider.getApplicationContext()).apply { text = "Hello" }
+
+        v.show()
+        v.visibility.shouldBeEqualTo(View.VISIBLE)
     }
 
     @Test
-    fun `show() should set visibility to INVISIBLE`() {
-        mockView.show(false).shouldBeEqualTo(View.INVISIBLE)
+    fun `hide() should set visibility to INVISIBLE`() {
+        val v = Button(ApplicationProvider.getApplicationContext()).apply { text = "Hello" }
+
+        v.hide()
+        v.visibility.shouldBeEqualTo(View.INVISIBLE)
+    }
+
+    @Test
+    fun `hide() should set visibility to GONE`() {
+        val v = Button(ApplicationProvider.getApplicationContext()).apply { text = "Hello" }
+
+        v.hide(true)
+        v.visibility.shouldBeEqualTo(View.GONE)
     }
 }

@@ -27,6 +27,7 @@ import com.rakuten.tech.mobile.inappmessaging.runtime.InAppMessaging
 import com.rakuten.tech.mobile.inappmessaging.runtime.R
 import com.rakuten.tech.mobile.inappmessaging.runtime.data.enums.PositionType
 import com.rakuten.tech.mobile.inappmessaging.runtime.data.models.messages.Message
+import com.rakuten.tech.mobile.inappmessaging.runtime.extensions.hide
 import com.rakuten.tech.mobile.inappmessaging.runtime.utils.InAppLogger
 import com.rakuten.tech.mobile.inappmessaging.runtime.utils.ResourceUtils
 import com.rakuten.tech.mobile.inappmessaging.runtime.utils.ViewUtil
@@ -78,16 +79,26 @@ internal class InAppMessagingTooltipView(
     override fun onAttachedToWindow() {
         super.onAttachedToWindow()
 
-        // Attach layout listener for the anchor view
-        findAnchorView()?.viewTreeObserver?.let { observer ->
-            if (observer.isAlive) observer.addOnGlobalLayoutListener(anchorViewLayoutListener)
-        }
+        addAnchorViewListeners()
     }
 
     /** Called when tooltip is removed from window. */
     override fun onDetachedFromWindow() {
         super.onDetachedFromWindow()
 
+        removeAnchorViewListeners()
+    }
+
+    @VisibleForTesting
+    internal fun addAnchorViewListeners() {
+        // Attach layout listener for the anchor view
+        findAnchorView()?.viewTreeObserver?.let { observer ->
+            if (observer.isAlive) observer.addOnGlobalLayoutListener(anchorViewLayoutListener)
+        }
+    }
+
+    @VisibleForTesting
+    internal fun removeAnchorViewListeners() {
         // Remove layout listener for the anchor view
         findAnchorView()?.viewTreeObserver?.let { observer ->
             if (observer.isAlive) observer.removeOnGlobalLayoutListener(anchorViewLayoutListener)
@@ -106,45 +117,46 @@ internal class InAppMessagingTooltipView(
     /** This method binds image to view.*/
     @Suppress("ClickableViewAccessibility", "TooGenericExceptionCaught", "LongMethod")
     private fun bindImage() { // Display image.
-        if (!this.imageUrl.isNullOrEmpty()) {
-            // load the image then display the view
-            this.show(false)
-            findViewById<ImageView>(R.id.message_tooltip_image_view).let {
-                try {
-                    val callback = object : Callback {
-                        override fun onSuccess() {
-                            it.show(false)
-                            this@InAppMessagingTooltipView.show(false)
-                        }
+        this.hide(asGone = true)
+        if (this.imageUrl.isNullOrEmpty())
+            return
 
-                        override fun onError(e: Exception?) {
-                            InAppLogger(TAG).debug(e?.cause, "Downloading image failed $imageUrl")
-                        }
+        // load the image then display the view
+        findViewById<ImageView>(R.id.message_tooltip_image_view).let {
+            try {
+                val callback = object : Callback {
+                    override fun onSuccess() {
+                        it.hide()
+                        this@InAppMessagingTooltipView.hide()
                     }
 
-                    it.viewTreeObserver.addOnGlobalLayoutListener(object : ViewTreeObserver.OnGlobalLayoutListener {
-                        override fun onGlobalLayout() {
-                            if (it.width > 0 || isTest) {
-                                it.viewTreeObserver.removeOnGlobalLayoutListener(this)
-                                drawBorder(it.width, it.height)
-                                drawTip()
-                                // to avoid flicker
-                                mainHandler.postDelayed({
-                                    it.show()
-                                    this@InAppMessagingTooltipView.show()
-                                }, DELAY)
-                            }
-                        }
-                    })
-                    (picasso ?: Picasso.get()).load(this.imageUrl)
-                        .priority(Picasso.Priority.HIGH)
-                        .resize(MAX_SIZE, MAX_SIZE)
-                        .onlyScaleDown()
-                        .centerInside()
-                        .into(it, callback)
-                } catch (ex: Exception) {
-                    InAppLogger(TAG).debug(ex, "Downloading image failed $imageUrl")
+                    override fun onError(e: Exception?) {
+                        InAppLogger(TAG).debug(e?.cause, "Downloading image failed $imageUrl")
+                    }
                 }
+
+                it.viewTreeObserver.addOnGlobalLayoutListener(object : ViewTreeObserver.OnGlobalLayoutListener {
+                    override fun onGlobalLayout() {
+                        if (it.width > 0 || isTest) {
+                            it.viewTreeObserver.removeOnGlobalLayoutListener(this)
+                            drawBorder(it.width, it.height)
+                            drawTip()
+                            // to avoid flicker
+                            mainHandler.postDelayed({
+                                it.show()
+                                this@InAppMessagingTooltipView.show()
+                            }, DELAY)
+                        }
+                    }
+                })
+                (picasso ?: Picasso.get()).load(this.imageUrl)
+                    .priority(Picasso.Priority.HIGH)
+                    .resize(MAX_SIZE, MAX_SIZE)
+                    .onlyScaleDown()
+                    .centerInside()
+                    .into(it, callback)
+            } catch (ex: Exception) {
+                InAppLogger(TAG).debug(ex, "Downloading image failed $imageUrl")
             }
         }
     }
@@ -323,7 +335,7 @@ internal class InAppMessagingTooltipView(
         (tip.layoutParams as LayoutParams).addRule(ALIGN_END, R.id.message_tooltip_image_view)
     }
 
-    /** Sets the top-left position of this tooltip */
+    /** Sets the top-left position of this tooltip. */
     private fun setPosition() {
         val activity = InAppMessaging.instance().getRegisteredActivity() ?: return
         findAnchorView()?.let { anchorView ->

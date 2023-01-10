@@ -101,8 +101,8 @@ internal class DisplayMessageRunnable(
         tooltip: Tooltip,
         toolTipView: InAppMessagingTooltipView
     ) {
-        ResourceUtils.findViewByName<View>(hostActivity, tooltip.id)?.let { anchorView ->
-            val scrollView = ViewUtil.getScrollView(anchorView)
+        ResourceUtils.findViewByName<View>(hostActivity, tooltip.id)?.let { target ->
+            val scrollView = ViewUtil.getScrollView(target)
             if (scrollView == null) {
                 hostActivity.addContentView(
                     toolTipView,

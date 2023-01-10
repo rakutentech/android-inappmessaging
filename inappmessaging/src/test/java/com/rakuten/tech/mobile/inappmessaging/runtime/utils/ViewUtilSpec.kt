@@ -2,15 +2,12 @@ package com.rakuten.tech.mobile.inappmessaging.runtime.utils
 
 import android.content.Context
 import android.content.res.Resources
-import android.graphics.Point
-import android.graphics.Rect
 import android.os.Build
 import android.view.View
 import android.view.ViewGroup
 import android.view.ViewParent
 import android.widget.*
 import androidx.core.widget.NestedScrollView
-import androidx.swiperefreshlayout.widget.SwipeRefreshLayout
 import androidx.test.core.app.ApplicationProvider
 import com.nhaarman.mockitokotlin2.any
 import com.nhaarman.mockitokotlin2.doAnswer
@@ -25,7 +22,6 @@ import org.mockito.Mockito.`when`
 import org.mockito.Mockito.mock
 import org.robolectric.RobolectricTestRunner
 import org.robolectric.annotation.Config
-
 
 /**
  * Test class for ViewUtil.
@@ -157,7 +153,7 @@ class ViewUtilGetTooltipPosition {
     fun `should return correct position when type is top-center`() {
         val pos = callGetTooltipPosition(PositionType.TOP_CENTER)
         pos.y shouldBeLessThan LOC_X_Y
-        pos.x shouldBeEqualTo  LOC_X_Y
+        pos.x shouldBeEqualTo LOC_X_Y
     }
 
     @Test

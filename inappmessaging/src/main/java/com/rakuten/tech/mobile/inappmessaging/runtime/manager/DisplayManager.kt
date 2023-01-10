@@ -14,7 +14,6 @@ import com.rakuten.tech.mobile.inappmessaging.runtime.coroutine.MessageActionsCo
 import com.rakuten.tech.mobile.inappmessaging.runtime.data.repositories.CampaignRepository
 import com.rakuten.tech.mobile.inappmessaging.runtime.utils.InAppLogger
 import com.rakuten.tech.mobile.inappmessaging.runtime.utils.ResourceUtils
-import com.rakuten.tech.mobile.inappmessaging.runtime.view.InAppMessagingTooltipView
 import com.rakuten.tech.mobile.inappmessaging.runtime.workmanager.workers.DisplayMessageWorker
 
 /**
@@ -81,11 +80,11 @@ internal interface DisplayManager {
         }
 
         private fun removeWithId(activity: Activity, id: String?, delay: Int) {
-            activity.findViewById<ViewGroup>(R.id.in_app_message_tooltip_view)?.let { tooltip ->
-                if (tooltip.tag == id) {
-                    scheduleRemoval(delay = delay, view = tooltip, id = id, activity = activity)
+            activity.findViewById<ViewGroup>(R.id.in_app_message_tooltip_view)?.let {
+                if (it.tag == id) {
+                    scheduleRemoval(delay = delay, view = it, id = id, activity = activity)
                 } else {
-                    scheduleTargetChild(it = tooltip, id = id, delay = delay, activity = activity)
+                    scheduleTargetChild(it = it, id = id, delay = delay, activity = activity)
                 }
             }
         }

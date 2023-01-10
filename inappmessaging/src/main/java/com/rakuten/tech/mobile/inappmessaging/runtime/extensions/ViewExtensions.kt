@@ -32,8 +32,10 @@ internal fun View.getRectLocationOnContainer(container: ViewGroup): Rect {
     return Rect(relativeLeft, relativeTop, relativeLeft + width, relativeTop + height)
 }
 
-internal fun View.show(visible: Boolean = true): Int {
-    val visibility = if (visible) View.VISIBLE else View.INVISIBLE
-    this.visibility = visibility
-    return visibility
+internal fun View.show() {
+    visibility = View.VISIBLE
+}
+
+internal fun View.hide(asGone: Boolean = false) {
+    visibility = if (asGone) View.GONE else View.INVISIBLE
 }
