@@ -3,17 +3,20 @@ package com.rakuten.tech.mobile.inappmessaging.runtime.view
 import android.app.Activity
 import android.content.Context
 import android.content.res.Resources
-import android.view.LayoutInflater
 import android.view.View
+import android.view.ViewGroup
 import android.view.ViewTreeObserver
+import android.widget.Button
+import android.widget.ScrollView
+import androidx.core.widget.NestedScrollView
 import androidx.test.core.app.ApplicationProvider
 import com.nhaarman.mockitokotlin2.any
 import com.rakuten.tech.mobile.inappmessaging.runtime.InAppMessaging
-import com.rakuten.tech.mobile.inappmessaging.runtime.test_helpers.MockPicasso
-import com.rakuten.tech.mobile.inappmessaging.runtime.test_helpers.MockPicassoReturnType
+import com.rakuten.tech.mobile.inappmessaging.runtime.testhelpers.MockPicasso
+import com.rakuten.tech.mobile.inappmessaging.runtime.testhelpers.MockPicassoReturnType
 import com.rakuten.tech.mobile.inappmessaging.runtime.R
 import com.rakuten.tech.mobile.inappmessaging.runtime.data.enums.PositionType
-import com.rakuten.tech.mobile.inappmessaging.runtime.test_helpers.TooltipHelper
+import com.rakuten.tech.mobile.inappmessaging.runtime.testhelpers.TooltipHelper
 import org.amshove.kluent.shouldBeEqualTo
 import org.amshove.kluent.shouldNotBeEqualTo
 import org.junit.Before
@@ -25,16 +28,7 @@ import org.robolectric.RobolectricTestRunner
 
 @RunWith(RobolectricTestRunner::class)
 class InAppMessagingTooltipViewSpec {
-    private val hostAppActivity = mock(Activity::class.java)
-    private lateinit var tooltipView: InAppMessagingTooltipView
-
-    @Before
-    fun setup() {
-        `when`(hostAppActivity.layoutInflater)
-            .thenReturn(LayoutInflater.from(ApplicationProvider.getApplicationContext()))
-        tooltipView = hostAppActivity.layoutInflater
-            .inflate(R.layout.in_app_message_tooltip, null) as InAppMessagingTooltipView
-    }
+    private val tooltipView = TooltipHelper.inflateTooltipView(mock(Activity::class.java))
 
     @Test
     fun `should not be displayed when image URL is null`() {
@@ -72,6 +66,7 @@ class InAppMessagingTooltipAnchorListenerSpec {
     private val hostAppActivity = mock(Activity::class.java)
     private val mockObserver = mock(ViewTreeObserver::class.java)
     private val mockAnchorView = mock(View::class.java)
+    private val mockResources = mock(Resources::class.java)
     private lateinit var tooltipView: InAppMessagingTooltipView
 
     @Before
@@ -80,12 +75,9 @@ class InAppMessagingTooltipAnchorListenerSpec {
         InAppMessaging.initialize(context)
         InAppMessaging.instance().registerMessageDisplayActivity(hostAppActivity)
 
-        `when`(hostAppActivity.layoutInflater).thenReturn(LayoutInflater.from(context))
-        val mockResources = mock(Resources::class.java)
         `when`(hostAppActivity.resources).thenReturn(mockResources)
         `when`(hostAppActivity.packageName).thenReturn("test")
-        `when`(mockResources.getIdentifier(any(), any(), any())).thenReturn(1)
-        `when`(hostAppActivity.findViewById<View>(any())).thenReturn(mockAnchorView)
+        controlFindViewById(1, mockAnchorView)
         `when`(mockAnchorView.viewTreeObserver).thenReturn(mockObserver)
         `when`(mockObserver.isAlive).thenReturn(true)
 
@@ -122,30 +114,62 @@ class InAppMessagingTooltipAnchorListenerSpec {
         tooltipView.removeAnchorViewListeners()
     }
 
-    @Test // TODO: dispatchOnGlobalLayout not called
-    fun `should set position when anchor view's OnGlobalLayoutListener is triggered`() {
-        `when`(mockAnchorView.x).thenReturn(100f)
-        `when`(mockAnchorView.y).thenReturn(100f)
-        tooltipView.addAnchorViewListeners()
-        mockAnchorView.viewTreeObserver.dispatchOnGlobalLayout()
+    @Test
+    fun `should set position when there is a change in anchor view's layout in window`() {
+        val mockAnchor = Button(ApplicationProvider.getApplicationContext())
+        mockAnchor.apply {
+            text = "I am an anchor view"
+            x = 100f
+            y = 100f
+        }
 
-        tooltipView.x shouldNotBeEqualTo 0
-        tooltipView.y shouldNotBeEqualTo 0
+        controlFindViewById(2, mockAnchor)
+
+        tooltipView.addAnchorViewListeners()
+
+        controlFindViewById(R.id.content, mock(ViewGroup::class.java))
+
+        mockAnchor.viewTreeObserver.dispatchOnGlobalLayout()
+
+        tooltipView.x.shouldNotBeEqualTo(0)
+        tooltipView.y.shouldNotBeEqualTo(0)
+    }
+
+    @Test
+    fun `should set position when there is a change in anchor view's layout in ScrollView`() {
+        setPositionInScrollingParent(ScrollView(ApplicationProvider.getApplicationContext()))
+    }
+
+    @Test
+    fun `should set position when there is a change in anchor view's layout in NestedScrollView`() {
+        setPositionInScrollingParent(NestedScrollView(ApplicationProvider.getApplicationContext()))
+    }
+
+    private fun setPositionInScrollingParent(scroll: ViewGroup) {
+        val anchor = Button(ApplicationProvider.getApplicationContext())
+        anchor.apply {
+            text = "I am an anchor view"
+            x = 100f
+            y = 100f
+        }
+
+        controlFindViewById(2, anchor)
+
+        scroll.addView(anchor)
+        tooltipView.addAnchorViewListeners()
+
+        anchor.viewTreeObserver.dispatchOnGlobalLayout()
+    }
+
+    private fun controlFindViewById(id: Int, returnView: View) {
+        `when`(mockResources.getIdentifier(any(), any(), any())).thenReturn(id)
+        `when`(hostAppActivity.findViewById<View>(id)).thenReturn(returnView)
     }
 }
 
 @RunWith(ParameterizedRobolectricTestRunner::class)
 class InAppMessagingTooltipViewCallbackSuccessSpec(private val position: String) {
-    private val hostAppActivity = mock(Activity::class.java)
-    private lateinit var tooltipView: InAppMessagingTooltipView
-
-    @Before
-    fun setup() {
-        `when`(hostAppActivity.layoutInflater)
-            .thenReturn(LayoutInflater.from(ApplicationProvider.getApplicationContext()))
-        tooltipView = hostAppActivity.layoutInflater
-            .inflate(R.layout.in_app_message_tooltip, null) as InAppMessagingTooltipView
-    }
+    private val tooltipView = TooltipHelper.inflateTooltipView(mock(Activity::class.java))
 
     @Test
     fun `should be displayed when image is loaded`() {
@@ -176,16 +200,7 @@ class InAppMessagingTooltipViewCallbackSuccessSpec(private val position: String)
 
 @RunWith(ParameterizedRobolectricTestRunner::class)
 class InAppMessagingTooltipViewPopulateDataSpec(private val position: String, private val expected: Int) {
-    private val hostAppActivity = mock(Activity::class.java)
-    private lateinit var tooltipView: InAppMessagingTooltipView
-
-    @Before
-    fun setup() {
-        `when`(hostAppActivity.layoutInflater)
-            .thenReturn(LayoutInflater.from(ApplicationProvider.getApplicationContext()))
-        tooltipView = hostAppActivity.layoutInflater
-            .inflate(R.layout.in_app_message_tooltip, null) as InAppMessagingTooltipView
-    }
+    private val tooltipView = TooltipHelper.inflateTooltipView(mock(Activity::class.java))
 
     @Test
     fun `populateViewData should set correct tooltip position`() {

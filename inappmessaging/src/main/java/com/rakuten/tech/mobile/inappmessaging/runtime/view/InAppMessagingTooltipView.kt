@@ -35,7 +35,7 @@ import com.rakuten.tech.mobile.inappmessaging.runtime.extensions.show
 import com.squareup.picasso.Callback
 import com.squareup.picasso.Picasso
 
-@SuppressWarnings("LargeClass", "LongMethod")
+@SuppressWarnings("LargeClass", "LongMethod", "TooManyFunctions")
 internal class InAppMessagingTooltipView(
     context: Context,
     attrs: AttributeSet?
@@ -90,16 +90,16 @@ internal class InAppMessagingTooltipView(
     }
 
     @VisibleForTesting
+    /** Attach layout listener for the anchor view. */
     internal fun addAnchorViewListeners() {
-        // Attach layout listener for the anchor view
         findAnchorView()?.viewTreeObserver?.let { observer ->
             if (observer.isAlive) observer.addOnGlobalLayoutListener(anchorViewLayoutListener)
         }
     }
 
     @VisibleForTesting
+    /** Remove layout listener for the anchor view. */
     internal fun removeAnchorViewListeners() {
-        // Remove layout listener for the anchor view
         findAnchorView()?.viewTreeObserver?.let { observer ->
             if (observer.isAlive) observer.removeOnGlobalLayoutListener(anchorViewLayoutListener)
         }
@@ -114,12 +114,13 @@ internal class InAppMessagingTooltipView(
         return null
     }
 
-    /** This method binds image to view.*/
+    /** This method binds image to view. */
     @Suppress("ClickableViewAccessibility", "TooGenericExceptionCaught", "LongMethod")
     private fun bindImage() { // Display image.
         this.hide(asGone = true)
-        if (this.imageUrl.isNullOrEmpty())
+        if (this.imageUrl.isNullOrEmpty()) {
             return
+        }
 
         // load the image then display the view
         findViewById<ImageView>(R.id.message_tooltip_image_view).let {
@@ -339,7 +340,7 @@ internal class InAppMessagingTooltipView(
     private fun setPosition() {
         val activity = InAppMessaging.instance().getRegisteredActivity() ?: return
         findAnchorView()?.let { anchorView ->
-            val container = ViewUtil.getScrollView(anchorView) ?: activity.findViewById(android.R.id.content)
+            val container = ViewUtil.getScrollView(anchorView) ?: activity.findViewById(R.id.content)
             val tPosition = ViewUtil.getTooltipPosition(
                 container = container,
                 view = this,

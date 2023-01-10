@@ -1,4 +1,4 @@
-package com.rakuten.tech.mobile.inappmessaging.runtime.test_helpers
+package com.rakuten.tech.mobile.inappmessaging.runtime.testhelpers
 
 import com.nhaarman.mockitokotlin2.any
 import com.nhaarman.mockitokotlin2.doAnswer
@@ -10,6 +10,7 @@ import org.mockito.Mockito.`when`
 import org.mockito.Mockito.mock
 
 internal object MockPicasso {
+    @SuppressWarnings("LongMethod")
     fun init(returnType: MockPicassoReturnType): Picasso {
         val picasso = mock(Picasso::class.java)
         val requestCreator = mock(RequestCreator::class.java)
@@ -23,22 +24,20 @@ internal object MockPicasso {
             MockPicassoReturnType.GENERIC_EXCEPTION ->
                 `when`(requestCreator.into(any(), any())).thenThrow(NullPointerException("test error"))
             MockPicassoReturnType.CALLBACK_ERROR ->
-                doAnswer { setCallback(it.getArgument(1), returnType) }
-                    .`when`(requestCreator).into(any(), any())
+                doAnswer { setCallback(it.getArgument(1), returnType) }.`when`(requestCreator).into(any(), any())
             else -> {
-                doAnswer { setCallback(it.getArgument(0)) }
-                    .`when`(requestCreator).fetch(any())
-                doAnswer { setCallback(it.getArgument(1), returnType) }
-                    .`when`(requestCreator).into(any(), any())
+                doAnswer { setCallback(it.getArgument(0)) }.`when`(requestCreator).fetch(any())
+                doAnswer { setCallback(it.getArgument(1), returnType) }.`when`(requestCreator).into(any(), any())
             }
         }
         return picasso
     }
 
     private fun setCallback(callback: Callback, returnType: MockPicassoReturnType? = null) {
-        when(returnType) {
-            MockPicassoReturnType.CALLBACK_ERROR -> callback.onError(null)
-            else -> callback.onSuccess()
+        if (returnType == MockPicassoReturnType.CALLBACK_ERROR) {
+            callback.onError(null)
+        } else {
+            callback.onSuccess()
         }
     }
 }

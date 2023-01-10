@@ -1,24 +1,32 @@
-package com.rakuten.tech.mobile.inappmessaging.runtime.test_helpers
+package com.rakuten.tech.mobile.inappmessaging.runtime.testhelpers
 
 import android.app.Activity
-import android.content.Context
 import android.os.Handler
+import android.view.LayoutInflater
 import android.widget.ImageView
 import androidx.test.core.app.ApplicationProvider
 import com.nhaarman.mockitokotlin2.any
-import com.rakuten.tech.mobile.inappmessaging.runtime.InAppMessaging
 import com.rakuten.tech.mobile.inappmessaging.runtime.R
 import com.rakuten.tech.mobile.inappmessaging.runtime.data.enums.InAppMessageType
 import com.rakuten.tech.mobile.inappmessaging.runtime.data.models.Tooltip
 import com.rakuten.tech.mobile.inappmessaging.runtime.data.models.messages.ValidTestMessage
 import com.rakuten.tech.mobile.inappmessaging.runtime.view.InAppMessagingTooltipView
-import org.mockito.Mockito
+import org.mockito.Mockito.`when`
+import org.mockito.Mockito.mock
 
 internal object TooltipHelper {
+
+    fun inflateTooltipView(activity: Activity): InAppMessagingTooltipView {
+        `when`(activity.layoutInflater)
+            .thenReturn(LayoutInflater.from(ApplicationProvider.getApplicationContext()))
+        return activity.layoutInflater
+            .inflate(R.layout.in_app_message_tooltip, null) as InAppMessagingTooltipView
+    }
+
     fun createMessage(
         position: String = "bottom-center",
-        imageUrl: String? = "valid url"): ValidTestMessage {
-
+        imageUrl: String? = "valid url"
+    ): ValidTestMessage {
         return ValidTestMessage(
             type = InAppMessageType.TOOLTIP.typeId,
             tooltip = Tooltip("ui-element", position, "testurl"),
@@ -30,9 +38,9 @@ internal object TooltipHelper {
         // Setup Picasso
         tv.picasso = MockPicasso.init(MockPicassoReturnType.CALLBACK_SUCCESS)
         tv.isTest = true
-        val mockHandler = Mockito.mock(Handler::class.java)
+        val mockHandler = mock(Handler::class.java)
         tv.mainHandler = mockHandler
-        Mockito.`when`(mockHandler.postDelayed(any(), any())).thenAnswer {
+        `when`(mockHandler.postDelayed(any(), any())).thenAnswer {
             it.getArgument<Runnable>(0).run()
             true
         }

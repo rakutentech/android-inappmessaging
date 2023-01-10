@@ -12,7 +12,6 @@ import android.view.ViewGroup
 import android.view.Window
 import android.widget.FrameLayout
 import android.widget.ScrollView
-import androidx.coordinatorlayout.widget.CoordinatorLayout
 import androidx.test.core.app.ApplicationProvider
 import androidx.work.testing.WorkManagerTestInitHelper
 import com.nhaarman.mockitokotlin2.*
@@ -27,7 +26,6 @@ import com.rakuten.tech.mobile.inappmessaging.runtime.manager.DisplayManager
 import com.rakuten.tech.mobile.inappmessaging.runtime.view.InAppMessageModalView
 import com.rakuten.tech.mobile.inappmessaging.runtime.view.InAppMessageSlideUpView
 import org.junit.Before
-import org.junit.Ignore
 import org.junit.Test
 import org.junit.runner.RunWith
 import org.mockito.Mockito.`when`
@@ -227,56 +225,6 @@ class DisplayMessageRunnableSpec : BaseTest() {
         runner.run()
 
         verify(scroll)?.addView(any())
-        // TODO: Verify tooltip is displayed
-    }
-
-    @Ignore
-    @Test
-    fun `should display for tooltip with valid details in scroll`() {
-        setupActivity()
-        setupTooltip()
-        val scroll = setupTooltipDetails(true)
-        `when`(scroll?.childCount).thenReturn(1)
-        `when`(scroll?.getChildAt(0)).thenReturn(mock(ViewGroup::class.java))
-        val mockFrame = mock(FrameLayout::class.java)
-        verifyShouldDisplayTooltip(mockFrame)
-        verify(scroll)?.addView(any())
-        verify(mockFrame, times(2))?.addView(any())
-    }
-
-    @Ignore
-    @Test
-    fun `should display for tooltip with valid details in scroll with CoordinatorLayout`() {
-        setupActivity()
-        setupTooltip()
-        val scroll = setupTooltipDetails(true)
-        `when`(scroll?.childCount).thenReturn(1)
-        `when`(scroll?.getChildAt(0)).thenReturn(mock(CoordinatorLayout::class.java))
-        val mockFrame = mock(FrameLayout::class.java)
-        `when`(scroll?.parent).thenReturn(mockFrame)
-        verifyShouldDisplayTooltip(mockFrame)
-    }
-
-    @Ignore
-    @Test(expected = NullPointerException::class)
-    fun `should throw exception due to mock activity for tooltip with valid details in scroll`() {
-        setupActivity()
-        setupTooltip()
-        setupTooltipDetails(true)
-        verifyShouldDisplayTooltip()
-    }
-
-    @Ignore
-    @Test
-    fun `should display for tooltip with valid details in scroll with other tooltips`() {
-        setupActivity()
-        setupTooltip()
-        val scroll = setupTooltipDetails(true)
-        val mockFrame = mock(FrameLayout::class.java)
-        `when`(hostAppActivity.findViewById<FrameLayout>(R.id.in_app_message_tooltip_layout)).thenReturn(mockFrame)
-        verifyShouldDisplayTooltip()
-        verify(scroll, never())?.addView(any())
-        verify(mockFrame)?.addView(any())
     }
 
     @SuppressWarnings("LongMethod")

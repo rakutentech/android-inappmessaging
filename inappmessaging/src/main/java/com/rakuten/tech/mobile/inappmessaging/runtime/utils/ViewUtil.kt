@@ -112,7 +112,7 @@ internal object ViewUtil {
         var currView = view.parent
         while (currView != null) {
             if (currView is ScrollView || currView is NestedScrollView) {
-                return currView as ViewGroup
+                return currView as? ViewGroup
             }
 
             currView = currView.parent
