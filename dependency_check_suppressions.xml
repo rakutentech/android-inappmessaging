@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <suppressions xmlns="https://jeremylong.github.io/DependencyCheck/dependency-suppression.1.3.xsd">
   <!-- Robolectric -->
-  <suppress until="2023-01-31Z">
+  <suppress until="2023-06-30Z">
     <notes><![CDATA[
      file name: guava-27.0.1-jre.jar
      ]]></notes>
@@ -11,7 +11,7 @@
   </suppress>
 
   <!-- Dokka -->
-  <suppress until="2023-01-31Z">
+  <suppress until="2023-06-30Z">
     <notes><![CDATA[
    file name: jsoup-1.14.3.jar
    ]]></notes>
@@ -19,7 +19,7 @@
     <cpe>cpe:/a:jsoup:jsoup</cpe>
     <vulnerabilityName>CVE-2022-36033</vulnerabilityName>
   </suppress>
-  <suppress until="2023-01-31Z">
+  <suppress until="2023-06-30Z">
     <notes><![CDATA[
    file name: kotlin-analysis-intellij-1.7.10.jar (shaded: com.google.code.gson:gson:2.8.8)
    ]]></notes>
@@ -27,7 +27,7 @@
     <cpe>cpe:/a:google:gson</cpe>
     <vulnerabilityName>CVE-2022-25647</vulnerabilityName>
   </suppress>
-  <suppress until="2023-01-31Z">
+  <suppress until="2023-06-30Z">
     <notes><![CDATA[
    file name: kotlin-analysis-intellij-1.7.10.jar (shaded: com.google.protobuf:protobuf-java:2.6.1)
    ]]></notes>
@@ -38,14 +38,14 @@
     <vulnerabilityName>CVE-2022-3509</vulnerabilityName>
     <vulnerabilityName>CVE-2022-3510</vulnerabilityName>
   </suppress>
-  <suppress until="2023-01-31Z">
+  <suppress until="2023-06-30Z">
     <notes><![CDATA[
    file name: kotlin-analysis-intellij-1.7.10.jar (shaded: commons-lang:commons-lang:2.4)
    ]]></notes>
     <packageUrl regex="true">^pkg:maven/commons\-lang/commons\-lang@.*$</packageUrl>
     <cve>CVE-2021-37533</cve>
   </suppress>
-  <suppress until="2023-01-31Z">
+  <suppress until="2023-06-30Z">
     <notes><![CDATA[
    file name: jackson-databind-2.12.7.jar
    ]]></notes>
@@ -53,7 +53,7 @@
     <cpe>cpe:/a:fasterxml:jackson-databind</cpe>
     <vulnerabilityName>CVE-2022-42003</vulnerabilityName>
   </suppress>
-  <suppress until="2023-01-31Z">
+  <suppress until="2023-06-30Z">
     <notes><![CDATA[
    file name: jackson-databind-2.12.7.jar
    ]]></notes>
@@ -61,7 +61,7 @@
     <cpe>cpe:/a:fasterxml:jackson-modules-java8</cpe>
     <vulnerabilityName>CVE-2022-42004</vulnerabilityName>
   </suppress>
-  <suppress until="2023-01-31Z">
+  <suppress until="2023-06-30Z">
     <notes><![CDATA[
    file name: woodstox-core-6.2.4.jar
    ]]></notes>
@@ -70,7 +70,7 @@
   </suppress>
 
   <!-- Detekt -->
-  <suppress until="2023-01-31Z">
+  <suppress until="2023-06-30Z">
     <notes><![CDATA[
    file name: snakeyaml-1.30.jar
    ]]></notes>
@@ -85,14 +85,14 @@
     <vulnerabilityName>CVE-2022-41854</vulnerabilityName>
     <vulnerabilityName>CVE-2022-1471</vulnerabilityName>
   </suppress>
-  <suppress until="2023-01-31Z">
+  <suppress until="2023-06-30Z">
     <notes><![CDATA[
    file name: detekt-psi-utils-1.21.0.jar
    ]]></notes>
     <packageUrl regex="true">^pkg:maven/io\.gitlab\.arturbosch\.detekt/detekt\-psi\-utils@.*$</packageUrl>
     <cve>CVE-2021-4277</cve>
   </suppress>
-  <suppress until="2023-01-31Z">
+  <suppress until="2023-06-30Z">
     <notes><![CDATA[
    file name: detekt-utils-1.21.0.jar
    ]]></notes>
@@ -101,7 +101,7 @@
   </suppress>
 
   <!-- SDK Utils -->
-  <suppress until="2023-01-31Z">
+  <suppress until="2023-06-30Z">
     <notes><![CDATA[
    file name: play-services-basement-17.0.0.aar
    ]]></notes>
@@ -109,7 +109,7 @@
     <vulnerabilityName>CVE-2022-1799</vulnerabilityName>
     <vulnerabilityName>CVE-2022-2390</vulnerabilityName>
   </suppress>
-  <suppress until="2023-01-31Z">
+  <suppress until="2023-06-30Z">
     <notes><![CDATA[
    file name: sdk-utils-2.1.1.aar
    ]]></notes>
@@ -118,7 +118,7 @@
   </suppress>
 
   <!-- Retrofit -->
-  <suppress until="2023-01-31Z">
+  <suppress until="2023-06-30Z">
     <notes><![CDATA[
    file name: okhttp-3.14.9.jar
    ]]></notes>
@@ -129,7 +129,7 @@
   </suppress>
 
   <!-- WorkManager -->
-  <suppress until="2023-01-31Z">
+  <suppress until="2023-06-30Z">
     <notes><![CDATA[
    file name: work-runtime-2.7.1.aar: inspector.jar (shaded: com.google.protobuf:protobuf-javalite:3.10.0)
    ]]></notes>
@@ -141,7 +141,7 @@
   </suppress>
 
   <!-- Compose -->
-  <suppress until="2023-01-31Z">
+  <suppress until="2023-06-30Z">
     <notes><![CDATA[
    file name: kotlin-annotation-processing-gradle-1.6.21.jar
    ]]></notes>
@@ -151,14 +151,14 @@
     <vulnerabilityName>CVE-2018-1000840</vulnerabilityName>
   </suppress>
 
-  <suppress until="2023-01-31Z">
+  <suppress until="2023-06-30Z">
     <notes><![CDATA[
    file name: commons-beanutils-1.9.4.jar
    ]]></notes>
     <packageUrl regex="true">^pkg:maven/commons\-beanutils/commons\-beanutils@.*$</packageUrl>
     <cve>CVE-2021-37533</cve>
   </suppress>
-  <suppress until="2023-01-31Z">
+  <suppress until="2023-06-30Z">
     <notes><![CDATA[
    file name: commons-collections-3.2.2.jar
    ]]></notes>
