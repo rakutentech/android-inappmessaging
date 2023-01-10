@@ -30,7 +30,7 @@ import com.rakuten.tech.mobile.inappmessaging.runtime.data.models.messages.Messa
 import com.rakuten.tech.mobile.inappmessaging.runtime.utils.InAppLogger
 import com.rakuten.tech.mobile.inappmessaging.runtime.utils.ResourceUtils
 import com.rakuten.tech.mobile.inappmessaging.runtime.utils.ViewUtil
-import com.rakuten.tech.mobile.inappmessaging.runtime.utils.show
+import com.rakuten.tech.mobile.inappmessaging.runtime.extensions.show
 import com.squareup.picasso.Callback
 import com.squareup.picasso.Picasso
 

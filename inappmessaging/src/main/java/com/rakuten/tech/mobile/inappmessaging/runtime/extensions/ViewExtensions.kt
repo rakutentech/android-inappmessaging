@@ -1,4 +1,4 @@
-package com.rakuten.tech.mobile.inappmessaging.runtime.utils
+package com.rakuten.tech.mobile.inappmessaging.runtime.extensions
 
 import android.content.res.Resources
 import android.graphics.Rect
@@ -32,6 +32,8 @@ internal fun View.getRectLocationOnContainer(container: ViewGroup): Rect {
     return Rect(relativeLeft, relativeTop, relativeLeft + width, relativeTop + height)
 }
 
-internal fun View.show(visible: Boolean = true) {
-    this.visibility = if (visible) View.VISIBLE else View.INVISIBLE
+internal fun View.show(visible: Boolean = true): Int {
+    val visibility = if (visible) View.VISIBLE else View.INVISIBLE
+    this.visibility = visibility
+    return visibility
 }

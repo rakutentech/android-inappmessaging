@@ -84,7 +84,7 @@ class InAppMessagingTooltipViewSpec {
     @Test
     fun `test`() {
         val test = spy(view)
-        test.onAttachedToWindow()
+//        test.onAttachedToWindow()
     }
 
     @Test

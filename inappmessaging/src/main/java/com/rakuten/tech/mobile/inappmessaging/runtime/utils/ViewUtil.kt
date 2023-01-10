@@ -13,6 +13,7 @@ import androidx.core.widget.NestedScrollView
 import com.rakuten.tech.mobile.inappmessaging.runtime.R
 import com.rakuten.tech.mobile.inappmessaging.runtime.data.enums.PositionType
 import com.rakuten.tech.mobile.inappmessaging.runtime.data.enums.SlideFromDirectionType
+import com.rakuten.tech.mobile.inappmessaging.runtime.extensions.getRectLocationOnContainer
 import com.rakuten.tech.mobile.inappmessaging.runtime.view.InAppMessagingTooltipView.Companion.TRI_SIZE
 
 /**
