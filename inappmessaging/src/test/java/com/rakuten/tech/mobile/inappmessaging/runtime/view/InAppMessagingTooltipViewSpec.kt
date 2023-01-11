@@ -127,7 +127,7 @@ class InAppMessagingTooltipAnchorListenerSpec {
 
         tooltipView.addAnchorViewListeners()
 
-        controlFindViewById(R.id.content, mock(ViewGroup::class.java))
+        controlFindViewById(android.R.id.content, mock(ViewGroup::class.java))
 
         mockAnchor.viewTreeObserver.dispatchOnGlobalLayout()
 

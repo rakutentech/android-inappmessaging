@@ -340,7 +340,7 @@ internal class InAppMessagingTooltipView(
     private fun setPosition() {
         val activity = InAppMessaging.instance().getRegisteredActivity() ?: return
         findAnchorView()?.let { anchorView ->
-            val container = ViewUtil.getScrollView(anchorView) ?: activity.findViewById(R.id.content)
+            val container = ViewUtil.getScrollView(anchorView) ?: activity.findViewById(android.R.id.content)
             val tPosition = ViewUtil.getTooltipPosition(
                 container = container,
                 view = this,
