@@ -107,7 +107,8 @@ internal class DisplayMessageRunnable(
                 displayInScrollView(scroll, toolTipView)
             } else {
                 val params = ViewGroup.LayoutParams(
-                    ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT)
+                    ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT
+                )
                 hostActivity.addContentView(toolTipView, params)
             }
             if (tooltip.autoDisappear != null && tooltip.autoDisappear > 0) {
