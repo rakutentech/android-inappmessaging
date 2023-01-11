@@ -102,16 +102,13 @@ internal class DisplayMessageRunnable(
         toolTipView: InAppMessagingTooltipView
     ) {
         ResourceUtils.findViewByName<View>(hostActivity, tooltip.id)?.let { target ->
-            val scrollView = ViewUtil.getScrollView(target)
-            if (scrollView == null) {
-                hostActivity.addContentView(
-                    toolTipView,
-                    ViewGroup.LayoutParams(
-                        ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT
-                    )
-                )
+            val scroll = ViewUtil.getScrollView(target)
+            if (scroll != null) {
+                displayInScrollView(scroll, toolTipView)
             } else {
-                displayInScrollView(scrollView, toolTipView)
+                val params = ViewGroup.LayoutParams(
+                    ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT)
+                hostActivity.addContentView(toolTipView, params)
             }
             if (tooltip.autoDisappear != null && tooltip.autoDisappear > 0) {
                 displayManager.removeMessage(hostActivity, delay = tooltip.autoDisappear, id = message.getCampaignId())
