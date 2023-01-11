@@ -484,7 +484,7 @@ Documents targeting Product Managers:
 ## <a name="changelog"></a> Changelog
 
 ### 7.4.0 (In-Progress)
-* SDKCF-6126: Fixed incorrect tooltip position on ScrollViews and during device screen rotation.
+* SDKCF-6126: Fixed incorrect tooltip position on scroll views and during device screen rotation.
 
 ### 7.3.0 (2022-12-13)
 * SDKCF-5835: Updated dependencies to remove vulnerabilities.

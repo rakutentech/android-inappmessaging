@@ -14,7 +14,6 @@ import com.nhaarman.mockitokotlin2.any
 import com.rakuten.tech.mobile.inappmessaging.runtime.InAppMessaging
 import com.rakuten.tech.mobile.inappmessaging.runtime.testhelpers.MockPicasso
 import com.rakuten.tech.mobile.inappmessaging.runtime.testhelpers.MockPicassoReturnType
-import com.rakuten.tech.mobile.inappmessaging.runtime.R
 import com.rakuten.tech.mobile.inappmessaging.runtime.data.enums.PositionType
 import com.rakuten.tech.mobile.inappmessaging.runtime.testhelpers.TooltipHelper
 import org.amshove.kluent.shouldBeEqualTo
@@ -81,8 +80,7 @@ class InAppMessagingTooltipAnchorListenerSpec {
         `when`(mockAnchorView.viewTreeObserver).thenReturn(mockObserver)
         `when`(mockObserver.isAlive).thenReturn(true)
 
-        tooltipView = hostAppActivity.layoutInflater
-            .inflate(R.layout.in_app_message_tooltip, null) as InAppMessagingTooltipView
+        tooltipView = TooltipHelper.inflateTooltipView(hostAppActivity)
         tooltipView.populateViewData(TooltipHelper.createMessage())
     }
 
