@@ -92,6 +92,22 @@ class InAppMessagingTooltipAnchorListenerSpec {
     }
 
     @Test
+    fun `should not listen to anchor view layout updates when activity is null`() {
+        InAppMessaging.instance().unregisterMessageDisplayActivity()
+        tooltipView.addAnchorViewListeners()
+
+        verify(mockObserver, never()).addOnGlobalLayoutListener(any())
+    }
+
+    @Test
+    fun `should not listen to anchor view layout updates when anchor view is not found`() {
+        controlFindViewById(1, null)
+        tooltipView.addAnchorViewListeners()
+
+        verify(mockObserver, never()).addOnGlobalLayoutListener(any())
+    }
+
+    @Test
     fun `addAnchorViewListeners() should not crash when observer is not alive anymore`() {
         `when`(mockObserver.isAlive).thenReturn(false)
 
@@ -159,7 +175,7 @@ class InAppMessagingTooltipAnchorListenerSpec {
         anchor.viewTreeObserver.dispatchOnGlobalLayout()
     }
 
-    private fun controlFindViewById(id: Int, returnView: View) {
+    private fun controlFindViewById(id: Int, returnView: View?) {
         `when`(mockResources.getIdentifier(any(), any(), any())).thenReturn(id)
         `when`(hostAppActivity.findViewById<View>(id)).thenReturn(returnView)
     }
