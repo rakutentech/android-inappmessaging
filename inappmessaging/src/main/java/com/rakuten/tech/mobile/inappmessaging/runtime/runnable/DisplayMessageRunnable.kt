@@ -117,21 +117,14 @@ internal class DisplayMessageRunnable(
         }
     }
 
-    /**
-     * Handling for when the anchor view is within a scroll view.
-     * The tooltip's parent view is set to anchor view's parent, keeping the z-order correct.
-     */
+    /** Adds the tooltip to the anchor view's parent scroll view. */
     private fun displayInScrollView(scroll: ViewGroup, toolTipView: InAppMessagingTooltipView) {
-        val scrollChild = scroll.getChildAt(0) as? ViewGroup ?: return
-        scroll.removeAllViews()
-
-        scrollChild.addView(
+        (scroll.getChildAt(0) as? ViewGroup)?.addView(
             toolTipView,
             ViewGroup.LayoutParams(
                 ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT
             )
         )
-        scroll.addView(scrollChild)
     }
 
     private fun shouldNotDisplay(messageType: InAppMessageType?): Boolean {

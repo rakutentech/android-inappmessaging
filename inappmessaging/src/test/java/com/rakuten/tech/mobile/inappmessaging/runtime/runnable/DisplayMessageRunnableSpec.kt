@@ -220,11 +220,12 @@ class DisplayMessageRunnableSpec : BaseTest() {
         setupActivity()
         setupTooltip()
         val scroll = setupTooltipDetails(true)
-        `when`(scroll?.getChildAt(0)).thenReturn(mock(ViewGroup::class.java))
+        val scrollChild = mock(ViewGroup::class.java)
+        `when`(scroll?.getChildAt(0)).thenReturn(scrollChild)
         val runner = DisplayMessageRunnable(message, hostAppActivity, mockDisplay)
         runner.run()
 
-        verify(scroll)?.addView(any())
+        verify(scrollChild)?.addView(any(), any<ViewGroup.LayoutParams>())
     }
 
     @SuppressWarnings("LongMethod")
