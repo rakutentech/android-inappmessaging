@@ -12,7 +12,8 @@ internal class ValidTestMessage(
     private val isCampaignDismissable: Boolean = true,
     private val maxImpressions: Int = 1,
     private val infiniteImpressions: Boolean = false,
-    private val triggers: List<Trigger>? = null
+    private val triggers: List<Trigger>? = null,
+    private val imageUrl: String? = null
 ) : Message {
     private var max = maxImpressions
 
@@ -41,7 +42,7 @@ internal class ValidTestMessage(
             DisplaySettings(1, 1, Long.MAX_VALUE, 1, false, 1, false),
             ControlSettings(listOf())
         ),
-        null, Resource(cropType = 2), DEFAULT_COLOR, null, "#ffffff", "title",
+        null, Resource(cropType = 2, imageUrl = imageUrl), DEFAULT_COLOR, null, "#ffffff", "title",
         DEFAULT_COLOR
     )
 
