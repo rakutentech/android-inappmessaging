@@ -85,20 +85,6 @@
     <vulnerabilityName>CVE-2022-41854</vulnerabilityName>
     <vulnerabilityName>CVE-2022-1471</vulnerabilityName>
   </suppress>
-  <suppress until="2023-06-30Z">
-    <notes><![CDATA[
-   file name: detekt-psi-utils-1.21.0.jar
-   ]]></notes>
-    <packageUrl regex="true">^pkg:maven/io\.gitlab\.arturbosch\.detekt/detekt\-psi\-utils@.*$</packageUrl>
-    <cve>CVE-2021-4277</cve>
-  </suppress>
-  <suppress until="2023-06-30Z">
-    <notes><![CDATA[
-   file name: detekt-utils-1.21.0.jar
-   ]]></notes>
-    <packageUrl regex="true">^pkg:maven/io\.gitlab\.arturbosch\.detekt/detekt\-utils@.*$</packageUrl>
-    <cve>CVE-2021-4277</cve>
-  </suppress>
 
   <!-- SDK Utils -->
   <suppress until="2023-06-30Z">
@@ -108,13 +94,6 @@
     <packageUrl regex="true">^pkg:maven/com\.google\.android\.gms/play\-services\-basement@.*$</packageUrl>
     <vulnerabilityName>CVE-2022-1799</vulnerabilityName>
     <vulnerabilityName>CVE-2022-2390</vulnerabilityName>
-  </suppress>
-  <suppress until="2023-06-30Z">
-    <notes><![CDATA[
-   file name: sdk-utils-2.1.1.aar
-   ]]></notes>
-    <packageUrl regex="true">^pkg:maven/io\.github\.rakutentech\.sdkutils/sdk\-utils@.*$</packageUrl>
-    <cve>CVE-2021-4277</cve>
   </suppress>
 
   <!-- Retrofit -->
