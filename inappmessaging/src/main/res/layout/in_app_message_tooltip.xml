@@ -1,12 +1,15 @@
 <?xml version="1.0" encoding="utf-8"?>
-<com.rakuten.tech.mobile.inappmessaging.runtime.view.InAppMessagingTooltipView xmlns:android="http://schemas.android.com/apk/res/android"
+<com.rakuten.tech.mobile.inappmessaging.runtime.view.InAppMessagingTooltipView
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="wrap_content"
     android:layout_height="wrap_content"
     android:clickable="true"
     android:clipChildren="false"
     android:clipToPadding="false"
     android:focusable="true"
-    android:theme="@style/InAppMessaging">
+    android:theme="@style/InAppMessaging"
+    tools:background="#00FF00" >
 
     <ImageButton
         android:id="@+id/message_close_button"
@@ -16,7 +19,8 @@
         android:elevation="10dp"
         android:translationZ="10dp"
         android:stateListAnimator="@null"
-        android:layout_toEndOf="@id/image_layout"/>
+        android:layout_toEndOf="@id/image_layout"
+        tools:src="@drawable/close_button_white" />
 
     <RelativeLayout
         android:id="@+id/image_layout"
@@ -32,7 +36,10 @@
             android:translationZ="10dp"
             android:stateListAnimator="@null"
             android:contentDescription="@null"
-            android:visibility="gone"/>
+            android:visibility="gone"
+            tools:src="@drawable/abc_vector_test"
+            tools:background="#FF0000"
+            tools:visibility="visible" />
 
         <ImageView
             android:id="@+id/message_tip"
@@ -41,7 +48,8 @@
             android:elevation="10dp"
             android:translationZ="10dp"
             android:stateListAnimator="@null"
-            android:contentDescription="@null"/>
+            android:contentDescription="@null"
+            tools:visibility="visible" />
     </RelativeLayout>
 
 </com.rakuten.tech.mobile.inappmessaging.runtime.view.InAppMessagingTooltipView>

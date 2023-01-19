@@ -27,13 +27,15 @@ import com.rakuten.tech.mobile.inappmessaging.runtime.InAppMessaging
 import com.rakuten.tech.mobile.inappmessaging.runtime.R
 import com.rakuten.tech.mobile.inappmessaging.runtime.data.enums.PositionType
 import com.rakuten.tech.mobile.inappmessaging.runtime.data.models.messages.Message
+import com.rakuten.tech.mobile.inappmessaging.runtime.extensions.hide
 import com.rakuten.tech.mobile.inappmessaging.runtime.utils.InAppLogger
 import com.rakuten.tech.mobile.inappmessaging.runtime.utils.ResourceUtils
 import com.rakuten.tech.mobile.inappmessaging.runtime.utils.ViewUtil
+import com.rakuten.tech.mobile.inappmessaging.runtime.extensions.show
 import com.squareup.picasso.Callback
 import com.squareup.picasso.Picasso
 
-@SuppressWarnings("LargeClass", "LongMethod")
+@SuppressWarnings("LargeClass", "LongMethod", "TooManyFunctions")
 internal class InAppMessagingTooltipView(
     context: Context,
     attrs: AttributeSet?
@@ -50,6 +52,9 @@ internal class InAppMessagingTooltipView(
     private var listener: InAppMessageViewListener? = null
     internal var isTest = false
     internal var mainHandler = Handler(Looper.getMainLooper())
+    private val anchorViewLayoutListener = ViewTreeObserver.OnGlobalLayoutListener {
+        setPosition()
+    }
 
     @VisibleForTesting
     internal var picasso: Picasso? = null
@@ -70,56 +75,94 @@ internal class InAppMessagingTooltipView(
         bindImage()
     }
 
-    /**
-     * This method binds image to view.
-     */
+    /** Called when tooltip is attached to window. */
+    override fun onAttachedToWindow() {
+        super.onAttachedToWindow()
+
+        addAnchorViewListeners()
+    }
+
+    /** Called when tooltip is removed from window. */
+    override fun onDetachedFromWindow() {
+        super.onDetachedFromWindow()
+
+        removeAnchorViewListeners()
+    }
+
+    @VisibleForTesting
+    /** Attach layout listener for the anchor view. */
+    internal fun addAnchorViewListeners() {
+        findAnchorView()?.viewTreeObserver?.let { observer ->
+            if (observer.isAlive) observer.addOnGlobalLayoutListener(anchorViewLayoutListener)
+        }
+    }
+
+    @VisibleForTesting
+    /** Remove layout listener for the anchor view. */
+    internal fun removeAnchorViewListeners() {
+        findAnchorView()?.viewTreeObserver?.let { observer ->
+            if (observer.isAlive) observer.removeOnGlobalLayoutListener(anchorViewLayoutListener)
+        }
+    }
+
+    /** The anchor view of this tooltip. */
+    private fun findAnchorView(): View? {
+        val activity = InAppMessaging.instance().getRegisteredActivity()
+        if (activity != null) {
+            viewId?.let { return ResourceUtils.findViewByName(activity, it) }
+        }
+        return null
+    }
+
+    /** This method binds image to view. */
     @Suppress("ClickableViewAccessibility", "TooGenericExceptionCaught", "LongMethod")
     private fun bindImage() { // Display image.
-        if (!this.imageUrl.isNullOrEmpty()) {
-            // load the image then display the view
-            this.visibility = INVISIBLE
-            findViewById<ImageView>(R.id.message_tooltip_image_view).let {
-                try {
-                    val callback = object : Callback {
-                        override fun onSuccess() {
-                            it.visibility = INVISIBLE
-                            this@InAppMessagingTooltipView.visibility = INVISIBLE
-                        }
+        this.hide(asGone = true)
+        if (this.imageUrl.isNullOrEmpty()) {
+            return
+        }
 
-                        override fun onError(e: Exception?) {
-                            InAppLogger(TAG).debug(e?.cause, "Downloading image failed $imageUrl")
-                        }
+        // load the image then display the view
+        findViewById<ImageView>(R.id.message_tooltip_image_view).let {
+            try {
+                val callback = object : Callback {
+                    override fun onSuccess() {
+                        it.hide()
+                        this@InAppMessagingTooltipView.hide()
                     }
 
-                    it.viewTreeObserver.addOnGlobalLayoutListener(object : ViewTreeObserver.OnGlobalLayoutListener {
-                        override fun onGlobalLayout() {
-                            if (it.width > 0 || isTest) {
-                                it.viewTreeObserver.removeOnGlobalLayoutListener(this)
-                                setBackground(it.width, it.height)
-                                setTip()
-                                showView()
-                                // to avoid flicker
-                                mainHandler.postDelayed({
-                                    it.visibility = VISIBLE
-                                    this@InAppMessagingTooltipView.visibility = VISIBLE
-                                }, DELAY)
-                            }
-                        }
-                    })
-                    (picasso ?: Picasso.get()).load(this.imageUrl)
-                        .priority(Picasso.Priority.HIGH)
-                        .resize(MAX_SIZE, MAX_SIZE)
-                        .onlyScaleDown()
-                        .centerInside()
-                        .into(it, callback)
-                } catch (ex: Exception) {
-                    InAppLogger(TAG).debug(ex, "Downloading image failed $imageUrl")
+                    override fun onError(e: Exception?) {
+                        InAppLogger(TAG).debug(e?.cause, "Downloading image failed $imageUrl")
+                    }
                 }
+
+                it.viewTreeObserver.addOnGlobalLayoutListener(object : ViewTreeObserver.OnGlobalLayoutListener {
+                    override fun onGlobalLayout() {
+                        if (it.width > 0 || isTest) {
+                            it.viewTreeObserver.removeOnGlobalLayoutListener(this)
+                            drawBorder(it.width, it.height)
+                            drawTip()
+                            // to avoid flicker
+                            mainHandler.postDelayed({
+                                it.show()
+                                this@InAppMessagingTooltipView.show()
+                            }, DELAY)
+                        }
+                    }
+                })
+                (picasso ?: Picasso.get()).load(this.imageUrl)
+                    .priority(Picasso.Priority.HIGH)
+                    .resize(MAX_SIZE, MAX_SIZE)
+                    .onlyScaleDown()
+                    .centerInside()
+                    .into(it, callback)
+            } catch (ex: Exception) {
+                InAppLogger(TAG).debug(ex, "Downloading image failed $imageUrl")
             }
         }
     }
 
-    private fun setBackground(width: Int, height: Int) {
+    private fun drawBorder(width: Int, height: Int) {
         val imageView = findViewById<ShapeableImageView>(R.id.message_tooltip_image_view)
         imageView.layoutParams.width = width + PADDING
         imageView.layoutParams.height = height + PADDING
@@ -136,7 +179,7 @@ internal class InAppMessagingTooltipView(
     }
 
     @SuppressWarnings("MagicNumber", "ComplexMethod")
-    private fun setTip() {
+    private fun drawTip() {
         val tip = findViewById<ImageView>(R.id.message_tip)
         tip.layoutParams.height = TRI_SIZE
         tip.layoutParams.width = TRI_SIZE
@@ -274,6 +317,10 @@ internal class InAppMessagingTooltipView(
         canvas.drawPath(path, paint)
 
         tip.setImageBitmap(bg)
+
+        // so that the arrow head of tooltip positioned at anchor's edge not be clipped
+        (parent as? ViewGroup)?.clipChildren = false
+        (parent as? ViewGroup)?.clipToPadding = false
     }
 
     private fun alignLeft(close: ImageButton, tip: ImageView) {
@@ -289,37 +336,20 @@ internal class InAppMessagingTooltipView(
         (tip.layoutParams as LayoutParams).addRule(ALIGN_END, R.id.message_tooltip_image_view)
     }
 
-    @SuppressWarnings("NestedScopeFunctions")
-    private fun showView() {
-        val params = this.layoutParams as MarginLayoutParams
-        (parent as ViewGroup).clipChildren = false
-        (parent as ViewGroup).clipToPadding = false
-        val imageView = findViewById<ImageView>(R.id.message_tooltip_image_view)
-        viewId?.let { id ->
-            val activity = InAppMessaging.instance().getRegisteredActivity() ?: return
-            ResourceUtils.findViewByName<View>(activity, id)?.let { view ->
-                val buttonSize = findViewById<ImageButton>(R.id.message_close_button).layoutParams.height
-                ViewUtil.getPosition(
-                    view = view, type = type, width = imageView.layoutParams.width,
-                    height = imageView.layoutParams.height, marginH = buttonSize, marginV = buttonSize
-                )
-                    .let { pos ->
-                        params.topMargin = pos.second
-                        params.leftMargin = pos.first
-                    }
-            }
-        }
-    }
-
-    internal fun setPosition(params: MarginLayoutParams, pos: Pair<Int, Int>, width: Int, height: Int) {
-        params.topMargin = pos.second
-        params.leftMargin = pos.first
-        val edgePos = ViewUtil.getEdgePosition(width, height, pos)
-        edgePos.first?.let { right ->
-            params.rightMargin = right
-        }
-        edgePos.second?.let { bottom ->
-            params.bottomMargin = bottom
+    /** Sets the top-left position of this tooltip. */
+    private fun setPosition() {
+        val activity = InAppMessaging.instance().getRegisteredActivity() ?: return
+        findAnchorView()?.let { anchorView ->
+            val container = ViewUtil.getScrollView(anchorView) ?: activity.findViewById(android.R.id.content)
+            val tPosition = ViewUtil.getTooltipPosition(
+                container = container,
+                view = this,
+                anchorView = anchorView,
+                positionType = type,
+                margin = findViewById<ImageButton>(R.id.message_close_button).height
+            )
+            this.x = tPosition.x.toFloat()
+            this.y = tPosition.y.toFloat()
         }
     }
 
