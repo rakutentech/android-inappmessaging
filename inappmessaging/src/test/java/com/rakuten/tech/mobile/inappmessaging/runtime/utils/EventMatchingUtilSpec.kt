@@ -260,3 +260,23 @@ class EventMatchingUtilClearSpec : EventMatchingUtilSpec() {
         eventMatchingUtil.triggeredPersistentCampaigns.shouldHaveSize(1)
     }
 }
+
+class EventMatchingUtilEventBufferSpec : EventMatchingUtilSpec() {
+    @Test
+    fun `should add to event buffer`() {
+        eventMatchingUtil.addToEventBuffer(AppStartEvent())
+        eventMatchingUtil.addToEventBuffer(PurchaseSuccessfulEvent())
+
+        eventMatchingUtil.tempEvents.size.shouldBeEqualTo(2)
+    }
+
+    @Test
+    fun `should flush event buffer`() {
+        eventMatchingUtil.addToEventBuffer(AppStartEvent())
+        eventMatchingUtil.addToEventBuffer(PurchaseSuccessfulEvent())
+
+        eventMatchingUtil.flushEventBuffer()
+
+        eventMatchingUtil.tempEvents.shouldBeEmpty()
+    }
+}

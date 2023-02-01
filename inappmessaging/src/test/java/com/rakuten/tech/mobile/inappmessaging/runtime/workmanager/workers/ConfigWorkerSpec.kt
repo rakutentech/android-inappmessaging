@@ -10,14 +10,11 @@ import androidx.work.WorkerParameters
 import androidx.work.testing.WorkManagerTestInitHelper
 import com.nhaarman.mockitokotlin2.anyOrNull
 import com.nhaarman.mockitokotlin2.eq
-import com.nhaarman.mockitokotlin2.never
 import com.rakuten.tech.mobile.inappmessaging.runtime.BaseTest
 import com.rakuten.tech.mobile.inappmessaging.runtime.InApp
 import com.rakuten.tech.mobile.inappmessaging.runtime.InAppMessaging
 import com.rakuten.tech.mobile.inappmessaging.runtime.InAppMessagingTestConstants
 import com.rakuten.tech.mobile.inappmessaging.runtime.data.models.HostAppInfo
-import com.rakuten.tech.mobile.inappmessaging.runtime.data.models.appevents.AppStartEvent
-import com.rakuten.tech.mobile.inappmessaging.runtime.data.models.appevents.PurchaseSuccessfulEvent
 import com.rakuten.tech.mobile.inappmessaging.runtime.data.repositories.ConfigResponseRepository
 import com.rakuten.tech.mobile.inappmessaging.runtime.data.repositories.HostAppInfoRepository
 import com.rakuten.tech.mobile.inappmessaging.runtime.data.responses.config.ConfigResponse
@@ -175,40 +172,6 @@ class ConfigWorkerSuccessSpec : ConfigWorkerSpec() {
         `when`(mockResponse.body()).thenReturn(Mockito.mock(ConfigResponse::class.java))
         worker.onResponse(mockResponse) shouldBeEqualTo ListenableWorker.Result.Success()
         ConfigScheduler.currDelay shouldBeEqualTo RetryDelayUtil.INITIAL_BACKOFF_DELAY
-    }
-
-    @Test
-    fun `should log events when config is enabled`() {
-        setupMock(100)
-        initializeInstance()
-        InAppMessaging.instance().logEvent(AppStartEvent())
-        InAppMessaging.instance().logEvent(PurchaseSuccessfulEvent())
-        (InAppMessaging.instance() as InApp).tempEventList.shouldHaveSize(2)
-
-        val worker = ConfigWorker(
-            ctx, workParam, HostAppInfoRepository.instance(),
-            ConfigResponseRepository.instance(), mockMsgSched, mockConfigSched
-        )
-        worker.onResponse(mockResponse!!) shouldBeEqualTo ListenableWorker.Result.Success()
-        Mockito.verify(mockMsgSched).pingMessageMixerService(0)
-    }
-
-    @Test
-    fun `should clear temp events when config is disabled`() {
-        setupMock(0)
-
-        initializeInstance()
-        InAppMessaging.instance().logEvent(AppStartEvent())
-        InAppMessaging.instance().logEvent(PurchaseSuccessfulEvent())
-        (InAppMessaging.instance() as InApp).tempEventList.shouldHaveSize(2)
-
-        val worker = ConfigWorker(
-            ctx, workParam, HostAppInfoRepository.instance(),
-            ConfigResponseRepository.instance(), mockMsgSched, mockConfigSched
-        )
-        worker.onResponse(mockResponse!!) shouldBeEqualTo ListenableWorker.Result.Success()
-        InAppMessaging.instance() shouldBeInstanceOf InAppMessaging.NotConfiguredInAppMessaging::class.java
-        Mockito.verify(mockMsgSched, never()).pingMessageMixerService(0)
     }
 
     @Test
