@@ -8,7 +8,7 @@ import com.rakuten.tech.mobile.inappmessaging.runtime.data.responses.ping.Trigge
 import com.rakuten.tech.mobile.inappmessaging.runtime.data.responses.ping.matchingEventName
 
 internal abstract class EventMatchingUtil {
-    internal val tempEvents = arrayListOf<Event>()
+    internal val eventBuffer = arrayListOf<Event>()
     internal val persistentEvents = mutableSetOf<Event>()
     internal val matchedEvents = mutableMapOf<String, MutableList<Event>>()
     internal val triggeredPersistentCampaigns = mutableSetOf<String>()
@@ -136,16 +136,16 @@ internal abstract class EventMatchingUtil {
         }
 
         override fun addToEventBuffer(event: Event) {
-            synchronized(tempEvents) {
-                tempEvents.add(event)
-                InAppLogger(TAG).debug("Buffer: " + tempEvents.map { it.getEventName() })
+            synchronized(eventBuffer) {
+                eventBuffer.add(event)
+                InAppLogger(TAG).debug("Buffer: " + eventBuffer.map { it.getEventName() })
             }
         }
 
         override fun flushEventBuffer() {
-            synchronized(tempEvents) {
-                tempEvents.forEach { ev -> matchAndStore(ev) }
-                tempEvents.clear()
+            synchronized(eventBuffer) {
+                eventBuffer.forEach { ev -> matchAndStore(ev) }
+                eventBuffer.clear()
                 InAppLogger(TAG).debug("Buffer: []")
             }
         }

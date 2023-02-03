@@ -79,7 +79,7 @@ internal class InApp(
         try {
             activityWeakReference = WeakReference(activity)
             // Making worker thread to display message.
-            if (ConfigResponseRepository.instance().isConfigEnabled()) {
+            if (configRepo.isConfigEnabled()) {
                 displayManager.displayMessage()
             }
         } catch (ex: Exception) {
@@ -93,7 +93,7 @@ internal class InApp(
     override fun unregisterMessageDisplayActivity() {
         InAppLogger(TAG).debug("unregisterMessageDisplayActivity()")
         try {
-            if (ConfigResponseRepository.instance().isConfigEnabled()) {
+            if (configRepo.isConfigEnabled()) {
                 displayManager.removeMessage(getRegisteredActivity(), removeAll = true)
             }
             activityWeakReference?.clear()
@@ -112,24 +112,24 @@ internal class InApp(
         try {
             val isConfigEnabled = configRepo.isConfigEnabled()
             val isSameUser = !accountRepo.updateUserInfo()
-            val hasRefreshedCampaigns = campaignRepo.lastSyncMillis != null && eventMatchingUtil.tempEvents.isEmpty()
+            val areCampaignsSynced = campaignRepo.lastSyncMillis != null && eventMatchingUtil.eventBuffer.isEmpty()
 
             InAppLogger(TAG).debug("${event.getEventName()}, isConfigEnabled: $isConfigEnabled, " +
-                    "isSameUser: $isSameUser, hasRefreshedCampaigns: $hasRefreshedCampaigns")
+                    "isSameUser: $isSameUser, areCampaignsSynced: $areCampaignsSynced")
 
-            if (!isConfigEnabled || !isSameUser || !hasRefreshedCampaigns) {
-                // To be processed later
+            if (!isConfigEnabled || !isSameUser || !areCampaignsSynced) {
+                // To be processed later (flushed after sync)
                 eventMatchingUtil.addToEventBuffer(event)
             }
 
             if (!isSameUser) {
-                // Ping, flush event buffer, then match events
+                // Sync campaigns, flush event buffer, then match events
                 sessionManager.onSessionUpdate()
                 return
             }
 
-            if (hasRefreshedCampaigns) {
-                // Match events right away
+            if (areCampaignsSynced) {
+                // Match event right away
                 eventsManager.onEventReceived(event)
             }
         } catch (ex: Exception) {
@@ -180,7 +180,7 @@ internal class InApp(
         "CanBeNonNullable"
     )
     private fun closeCampaign(clearQueuedCampaigns: Boolean? = null, viewId: String? = null) {
-        if (ConfigResponseRepository.instance().isConfigEnabled()) {
+        if (configRepo.isConfigEnabled()) {
             CoroutineScope(Dispatchers.Main).launch {
                 try {
                     if (clearQueuedCampaigns != null) {

@@ -379,7 +379,7 @@ class InAppMessagingLogEventSpec : InAppMessagingSpec() {
     }
 
     @Test
-    fun `logEvent should not process event yet when refreshing campaigns`() {
+    fun `logEvent should not process event yet when campaigns are not synced`() {
         `when`(mockConfigRepo.isConfigEnabled()).thenReturn(true)
         `when`(mockAcctRepo.updateUserInfo()).thenReturn(false)
         `when`(mockCampaignRepo.lastSyncMillis).thenReturn(null)
@@ -395,7 +395,7 @@ class InAppMessagingLogEventSpec : InAppMessagingSpec() {
         `when`(mockConfigRepo.isConfigEnabled()).thenReturn(true)
         `when`(mockAcctRepo.updateUserInfo()).thenReturn(false)
         `when`(mockCampaignRepo.lastSyncMillis).thenReturn(0)
-        `when`(mockEventUtil.tempEvents).thenReturn(arrayListOf())
+        `when`(mockEventUtil.eventBuffer).thenReturn(arrayListOf())
 
         val event = PurchaseSuccessfulEvent()
         instance.logEvent(event)

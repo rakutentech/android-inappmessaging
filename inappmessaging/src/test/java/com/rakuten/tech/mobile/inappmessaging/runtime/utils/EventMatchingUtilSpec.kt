@@ -267,7 +267,7 @@ class EventMatchingUtilEventBufferSpec : EventMatchingUtilSpec() {
         eventMatchingUtil.addToEventBuffer(AppStartEvent())
         eventMatchingUtil.addToEventBuffer(PurchaseSuccessfulEvent())
 
-        eventMatchingUtil.tempEvents.size.shouldBeEqualTo(2)
+        eventMatchingUtil.eventBuffer.size.shouldBeEqualTo(2)
     }
 
     @Test
@@ -277,6 +277,6 @@ class EventMatchingUtilEventBufferSpec : EventMatchingUtilSpec() {
 
         eventMatchingUtil.flushEventBuffer()
 
-        eventMatchingUtil.tempEvents.shouldBeEmpty()
+        eventMatchingUtil.eventBuffer.shouldBeEmpty()
     }
 }
