@@ -76,12 +76,6 @@ abstract class InAppMessaging internal constructor() {
     internal abstract fun isLocalCachingEnabled(): Boolean
 
     /**
-     * This method moves temp data to persistent cache.
-     */
-    @RestrictTo(RestrictTo.Scope.LIBRARY)
-    internal abstract fun flushEventList()
-
-    /**
      * Close the currently displayed message.
      * This should be called when app needs to force-close the displayed message without user action.
      * Calling this method will not increment the campaign impression.
@@ -228,7 +222,5 @@ abstract class InAppMessaging internal constructor() {
         override fun closeTooltip(viewId: String) = Unit
 
         override fun trackPushPrimer(permissions: Array<String>, grantResults: IntArray) = Unit
-
-        override fun flushEventList() = Unit
     }
 }

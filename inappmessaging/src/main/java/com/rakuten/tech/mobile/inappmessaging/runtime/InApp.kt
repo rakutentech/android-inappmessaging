@@ -36,15 +36,14 @@ internal class InApp(
     private val eventMatchingUtil: EventMatchingUtil = EventMatchingUtil.instance(),
     private val messageReadinessManager: MessageReadinessManager = MessageReadinessManager.instance(),
     private val accountRepo: AccountRepository = AccountRepository.instance(),
+    private val campaignRepo: CampaignRepository = CampaignRepository.instance(),
+    private val configRepo: ConfigResponseRepository = ConfigResponseRepository.instance(),
     private val sessionManager: SessionManager = SessionManager,
     private val primerManager: PushPrimerTrackerManager = PushPrimerTrackerManager
 ) : InAppMessaging() {
 
     // Used for displaying or removing messages from screen.
     private var activityWeakReference: WeakReference<Activity>? = null
-
-    @VisibleForTesting
-    internal val tempEventList = ArrayList<Event>()
 
     init {
         // Start logging for debug builds.
@@ -63,6 +62,7 @@ internal class InApp(
 
     @SuppressWarnings("TooGenericExceptionCaught")
     override fun registerPreference(userInfoProvider: UserInfoProvider) {
+        InAppLogger(TAG).debug("registerPreference()")
         try {
             accountRepo.userInfoProvider = userInfoProvider
             accountRepo.updateUserInfo()
@@ -75,10 +75,11 @@ internal class InApp(
 
     @SuppressWarnings("TooGenericExceptionCaught")
     override fun registerMessageDisplayActivity(activity: Activity) {
+        InAppLogger(TAG).debug("registerMessageDisplayActivity()")
         try {
             activityWeakReference = WeakReference(activity)
             // Making worker thread to display message.
-            if (ConfigResponseRepository.instance().isConfigEnabled()) {
+            if (configRepo.isConfigEnabled()) {
                 displayManager.displayMessage()
             }
         } catch (ex: Exception) {
@@ -90,13 +91,12 @@ internal class InApp(
 
     @SuppressWarnings("FunctionMaxLength", "TooGenericExceptionCaught")
     override fun unregisterMessageDisplayActivity() {
+        InAppLogger(TAG).debug("unregisterMessageDisplayActivity()")
         try {
-            if (ConfigResponseRepository.instance().isConfigEnabled()) {
+            if (configRepo.isConfigEnabled()) {
                 displayManager.removeMessage(getRegisteredActivity(), removeAll = true)
             }
             activityWeakReference?.clear()
-
-            InAppLogger(TAG).debug("unregisterMessageDisplayActivity()")
         } catch (ex: Exception) {
             errorCallback?.let {
                 it(InAppMessagingException("In-App Messaging unregister activity failed", ex))
@@ -104,20 +104,35 @@ internal class InApp(
         }
     }
 
-    @SuppressWarnings("TooGenericExceptionCaught")
+    @SuppressWarnings(
+        "TooGenericExceptionCaught",
+        "LongMethod"
+    )
     override fun logEvent(event: Event) {
         try {
-            val isEnabled = ConfigResponseRepository.instance().isConfigEnabled()
-            val hasUserChanged = userDidChange()
+            val isConfigEnabled = configRepo.isConfigEnabled()
+            val isSameUser = !accountRepo.updateUserInfo()
+            val areCampaignsSynced = campaignRepo.lastSyncMillis != null && eventMatchingUtil.eventBuffer.isEmpty()
 
-            if (isEnabled && !hasUserChanged) {
+            InAppLogger(TAG).debug(
+                "${event.getEventName()}, isConfigEnabled: $isConfigEnabled, " +
+                    "isSameUser: $isSameUser, areCampaignsSynced: $areCampaignsSynced"
+            )
+
+            if (!isConfigEnabled || !isSameUser || !areCampaignsSynced) {
+                // To be processed later (flushed after sync)
+                eventMatchingUtil.addToEventBuffer(event)
+            }
+
+            if (!isSameUser) {
+                // Sync campaigns, flush event buffer, then match events
+                sessionManager.onSessionUpdate()
+                return
+            }
+
+            if (areCampaignsSynced) {
+                // Match event right away
                 eventsManager.onEventReceived(event)
-            } else if (!isEnabled || hasUserChanged) {
-                // Save temp events while config is not enabled yet, or
-                // when there is a change in user (ping in progress)
-                synchronized(tempEventList) {
-                    tempEventList.add(event)
-                }
             }
         } catch (ex: Exception) {
             errorCallback?.let {
@@ -127,14 +142,17 @@ internal class InApp(
     }
 
     override fun closeMessage(clearQueuedCampaigns: Boolean) {
+        InAppLogger(TAG).debug("closeMessage()")
         closeCampaign(clearQueuedCampaigns = clearQueuedCampaigns)
     }
 
     override fun closeTooltip(viewId: String) {
+        InAppLogger(TAG).debug("closeTooltip(): $viewId")
         closeCampaign(viewId = viewId)
     }
 
     override fun trackPushPrimer(permissions: Array<String>, grantResults: IntArray) {
+        InAppLogger(TAG).debug("trackPushPrimer()")
         if (!BuildVersionChecker.instance().isAndroidTAndAbove()) {
             return
         }
@@ -150,16 +168,6 @@ internal class InApp(
         }
     }
 
-    @VisibleForTesting
-    internal fun userDidChange(): Boolean {
-        if (accountRepo.updateUserInfo()) {
-            // Update user-related data such as cache and ping data
-            sessionManager.onSessionUpdate()
-            return true
-        }
-        return false
-    }
-
     // ------------------------------------Library Internal APIs-------------------------------------
     @RestrictTo(RestrictTo.Scope.LIBRARY)
     override fun getRegisteredActivity() = activityWeakReference?.get()
@@ -169,21 +177,12 @@ internal class InApp(
 
     override fun isLocalCachingEnabled() = isCacheHandling
 
-    override fun flushEventList() {
-        synchronized(tempEventList) {
-            tempEventList.forEach { ev ->
-                eventMatchingUtil.matchAndStore(ev)
-            }
-            tempEventList.clear()
-        }
-    }
-
     @SuppressWarnings(
         "TooGenericExceptionCaught",
         "CanBeNonNullable"
     )
     private fun closeCampaign(clearQueuedCampaigns: Boolean? = null, viewId: String? = null) {
-        if (ConfigResponseRepository.instance().isConfigEnabled()) {
+        if (configRepo.isConfigEnabled()) {
             CoroutineScope(Dispatchers.Main).launch {
                 try {
                     if (clearQueuedCampaigns != null) {
@@ -219,7 +218,7 @@ internal class InApp(
      */
     @VisibleForTesting
     internal fun removeMessage(viewId: String) {
-        val campaignId = CampaignRepository.instance()
+        val campaignId = campaignRepo
             .messages
             .values
             .firstOrNull { message ->
