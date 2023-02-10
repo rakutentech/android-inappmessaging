@@ -1,7 +1,6 @@
 package com.rakuten.tech.mobile.inappmessaging.runtime.manager
 
 import android.content.Context
-import android.os.Build
 import android.provider.Settings
 import androidx.test.core.app.ApplicationProvider
 import androidx.work.WorkManager
@@ -23,7 +22,6 @@ import org.junit.runner.RunWith
 import org.mockito.ArgumentMatchers
 import org.mockito.Mockito
 import org.robolectric.RobolectricTestRunner
-import org.robolectric.annotation.Config
 import java.util.*
 import java.util.concurrent.ExecutionException
 
@@ -31,7 +29,6 @@ import java.util.concurrent.ExecutionException
  * Test class for ImpressionManager.
  */
 @RunWith(RobolectricTestRunner::class)
-@Config(sdk = [Build.VERSION_CODES.O_MR1])
 class ImpressionManagerSpec : BaseTest() {
 
     private val eventTracker = Mockito.mock(EventTrackerHelper::class.java)

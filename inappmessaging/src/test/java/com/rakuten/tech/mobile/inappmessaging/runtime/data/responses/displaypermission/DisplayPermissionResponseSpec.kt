@@ -1,15 +1,12 @@
 package com.rakuten.tech.mobile.inappmessaging.runtime.data.responses.displaypermission
 
-import android.os.Build
 import com.google.gson.Gson
 import org.amshove.kluent.shouldBeEqualTo
 import org.junit.Test
 import org.junit.runner.RunWith
 import org.robolectric.ParameterizedRobolectricTestRunner
-import org.robolectric.annotation.Config
 
 @RunWith(ParameterizedRobolectricTestRunner::class)
-@Config(sdk = [Build.VERSION_CODES.O_MR1])
 class DisplayPermissionResponseSpec(
     private val testname: String,
     private val actual: Boolean,

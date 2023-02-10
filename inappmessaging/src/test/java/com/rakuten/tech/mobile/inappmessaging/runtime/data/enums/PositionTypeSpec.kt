@@ -1,14 +1,11 @@
 package com.rakuten.tech.mobile.inappmessaging.runtime.data.enums
 
-import android.os.Build
 import org.amshove.kluent.shouldBeEqualTo
 import org.junit.Test
 import org.junit.runner.RunWith
 import org.robolectric.ParameterizedRobolectricTestRunner
-import org.robolectric.annotation.Config
 
 @RunWith(ParameterizedRobolectricTestRunner::class)
-@Config(sdk = [Build.VERSION_CODES.O_MR1])
 class PositionTypeSpec(private val id: String, private val expected: Any?) {
 
     @Test

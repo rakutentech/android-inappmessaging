@@ -1,6 +1,5 @@
 package com.rakuten.tech.mobile.inappmessaging.runtime.view
 
-import android.os.Build
 import android.view.MotionEvent
 import android.view.View
 import android.widget.ScrollView
@@ -13,9 +12,7 @@ import org.amshove.kluent.shouldBeFalse
 import org.junit.Test
 import org.mockito.Mockito
 import org.mockito.verification.VerificationMode
-import org.robolectric.annotation.Config
 
-@Config(sdk = [Build.VERSION_CODES.M])
 class CustomOnTouchListenerSpec {
 
     private val mockMotionEvent = Mockito.mock(MotionEvent::class.java)

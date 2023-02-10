@@ -3,7 +3,6 @@ package com.rakuten.tech.mobile.inappmessaging.runtime.runnable
 import android.app.Activity
 import android.content.Context
 import android.content.res.Resources
-import android.os.Build
 import android.provider.Settings
 import android.util.DisplayMetrics
 import android.view.LayoutInflater
@@ -31,13 +30,11 @@ import org.junit.runner.RunWith
 import org.mockito.Mockito.`when`
 import org.mockito.Mockito.mock
 import org.robolectric.RobolectricTestRunner
-import org.robolectric.annotation.Config
 
 /**
  * Test class for DisplayMessageRunnable.
  */
 @RunWith(RobolectricTestRunner::class)
-@Config(sdk = [Build.VERSION_CODES.O_MR1])
 @SuppressWarnings("LargeClass")
 class DisplayMessageRunnableSpec : BaseTest() {
     private val message = mock(CampaignData::class.java)

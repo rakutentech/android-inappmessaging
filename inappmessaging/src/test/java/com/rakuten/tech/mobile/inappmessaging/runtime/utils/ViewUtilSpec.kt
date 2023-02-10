@@ -2,7 +2,6 @@ package com.rakuten.tech.mobile.inappmessaging.runtime.utils
 
 import android.content.Context
 import android.content.res.Resources
-import android.os.Build
 import android.view.View
 import android.view.ViewGroup
 import android.view.ViewParent
@@ -21,13 +20,11 @@ import org.junit.runner.RunWith
 import org.mockito.Mockito.`when`
 import org.mockito.Mockito.mock
 import org.robolectric.RobolectricTestRunner
-import org.robolectric.annotation.Config
 
 /**
  * Test class for ViewUtil.
  */
 @RunWith(RobolectricTestRunner::class)
-@Config(sdk = [Build.VERSION_CODES.O_MR1])
 @SuppressWarnings("LargeClass")
 class ViewUtilSpec : BaseTest() {
 
@@ -119,7 +116,6 @@ class ViewUtilSpec : BaseTest() {
 }
 
 @RunWith(RobolectricTestRunner::class)
-@Config(sdk = [Build.VERSION_CODES.O_MR1])
 class ViewUtilGetTooltipPosition {
     private val mockContainer = mock(ViewGroup::class.java)
     private val mockAnchor = mock(View::class.java)

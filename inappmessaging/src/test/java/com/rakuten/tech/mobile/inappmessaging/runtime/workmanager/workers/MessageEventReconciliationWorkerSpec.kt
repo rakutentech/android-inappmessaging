@@ -1,7 +1,6 @@
 package com.rakuten.tech.mobile.inappmessaging.runtime.workmanager.workers
 
 import android.content.Context
-import android.os.Build
 import androidx.test.core.app.ApplicationProvider
 import androidx.work.Data
 import androidx.work.ListenableWorker
@@ -20,13 +19,11 @@ import org.junit.runner.RunWith
 import org.mockito.Mockito
 import org.mockito.Mockito.`when`
 import org.robolectric.RobolectricTestRunner
-import org.robolectric.annotation.Config
 
 /**
  * Test for MessageEventReconciliationWorker class.
  */
 @RunWith(RobolectricTestRunner::class)
-@Config(sdk = [Build.VERSION_CODES.O_MR1])
 class MessageEventReconciliationWorkerSpec : BaseTest() {
 
     private val workerParameters = Mockito.mock(WorkerParameters::class.java)

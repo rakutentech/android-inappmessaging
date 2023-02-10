@@ -1,6 +1,5 @@
 package com.rakuten.tech.mobile.inappmessaging.runtime.data.responses.ping
 
-import android.os.Build
 import com.rakuten.tech.mobile.inappmessaging.runtime.data.enums.InAppMessageType
 import org.amshove.kluent.shouldBeEqualTo
 import org.amshove.kluent.shouldBeNull
@@ -9,9 +8,7 @@ import org.junit.Before
 import org.junit.Test
 import org.mockito.Mockito
 import org.mockito.Mockito.`when`
-import org.robolectric.annotation.Config
 
-@Config(sdk = [Build.VERSION_CODES.M])
 class CampaignDataSpec {
 
     private val mockPayload = Mockito.mock(MessagePayload::class.java)

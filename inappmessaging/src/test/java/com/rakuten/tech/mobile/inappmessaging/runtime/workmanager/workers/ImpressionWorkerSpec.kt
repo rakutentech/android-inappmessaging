@@ -1,7 +1,6 @@
 package com.rakuten.tech.mobile.inappmessaging.runtime.workmanager.workers
 
 import android.content.Context
-import android.os.Build
 import android.provider.Settings
 import android.util.Log
 import androidx.test.core.app.ApplicationProvider
@@ -32,7 +31,6 @@ import org.mockito.Mockito
 import org.mockito.Mockito.`when`
 import org.mockito.MockitoAnnotations
 import org.robolectric.RobolectricTestRunner
-import org.robolectric.annotation.Config
 import retrofit2.Call
 import retrofit2.Response
 import java.net.HttpURLConnection
@@ -42,7 +40,6 @@ import java.util.*
  * Test class for ImpressionWorker.
  */
 @RunWith(RobolectricTestRunner::class)
-@Config(sdk = [Build.VERSION_CODES.O_MR1])
 @Ignore("base class")
 open class ImpressionWorkerSpec : BaseTest() {
 

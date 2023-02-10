@@ -1,15 +1,12 @@
 package com.rakuten.tech.mobile.inappmessaging.runtime
 
-import android.os.Build
 import org.junit.After
 import org.junit.Before
 import org.mockito.Mockito
-import org.robolectric.annotation.Config
 
 /**
  * Base test class of all test classes.
  */
-@Config(sdk = [Build.VERSION_CODES.M])
 open class BaseTest {
     @Before
     open fun setup() {

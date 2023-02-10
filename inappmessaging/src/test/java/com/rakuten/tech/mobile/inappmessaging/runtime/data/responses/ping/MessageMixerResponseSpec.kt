@@ -1,17 +1,14 @@
 package com.rakuten.tech.mobile.inappmessaging.runtime.data.responses.ping
 
-import android.os.Build
 import com.google.gson.Gson
 import org.amshove.kluent.shouldBeEqualTo
 import org.amshove.kluent.shouldHaveSize
 import org.junit.Test
 import org.junit.runner.RunWith
 import org.robolectric.ParameterizedRobolectricTestRunner
-import org.robolectric.annotation.Config
 import java.io.File
 
 @RunWith(ParameterizedRobolectricTestRunner::class)
-@Config(sdk = [Build.VERSION_CODES.O_MR1])
 class MessageMixerResponseSpec(private val testname: String, private val actual: Any?, private val expected: Any?) {
     @Test
     fun `should be correct value after parsing`() {
