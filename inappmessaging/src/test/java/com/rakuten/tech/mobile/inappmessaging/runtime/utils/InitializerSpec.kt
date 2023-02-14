@@ -16,6 +16,7 @@ import com.rakuten.tech.mobile.inappmessaging.runtime.exception.InAppMessagingEx
 import com.rakuten.tech.mobile.sdkutils.PreferencesUtil
 import org.amshove.kluent.*
 import org.junit.Before
+import org.junit.Ignore
 import org.junit.Test
 import org.junit.runner.RunWith
 import org.mockito.Mockito
@@ -45,6 +46,7 @@ class InitializerSpec : BaseTest() {
 
     @Test
     @Config(sdk = [Build.VERSION_CODES.TIRAMISU])
+    @Ignore("Robolectric returns null metadata for API 33")
     fun `should add host app info with basic attributes in API 33`() {
         verifyHostAppInfo()
     }
