@@ -219,7 +219,7 @@ class BaseViewColorSpec : BaseViewSpec() {
     @Test
     @Config(
         sdk = [
-            Build.VERSION_CODES.Q,
+            Build.VERSION_CODES.S,
             Build.VERSION_CODES.TIRAMISU
         ]
     )
@@ -233,7 +233,7 @@ class BaseViewColorSpec : BaseViewSpec() {
     @Test
     @Config(
         sdk = [
-            Build.VERSION_CODES.Q,
+            Build.VERSION_CODES.S,
             Build.VERSION_CODES.TIRAMISU
         ]
     )
@@ -248,7 +248,7 @@ class BaseViewColorSpec : BaseViewSpec() {
     @Test
     @Config(
         sdk = [
-            Build.VERSION_CODES.Q,
+            Build.VERSION_CODES.S,
             Build.VERSION_CODES.TIRAMISU
         ]
     )
@@ -359,7 +359,7 @@ class BaseViewTextSpec : BaseViewSpec() {
     @Test
     @Config(
         sdk = [
-            Build.VERSION_CODES.Q,
+            Build.VERSION_CODES.S,
             Build.VERSION_CODES.TIRAMISU
         ]
     )
