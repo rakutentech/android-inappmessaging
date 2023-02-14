@@ -39,12 +39,12 @@ class InitializerSpec : BaseTest() {
     }
 
     @Test
-    @Config(sdk = [Build.VERSION_CODES.M])
     fun `should add host app info with basic attributes`() {
         verifyHostAppInfo()
     }
 
     @Test
+    @Config(sdk = [Build.VERSION_CODES.TIRAMISU])
     fun `should add host app info with basic attributes in API 33`() {
         verifyHostAppInfo()
     }
