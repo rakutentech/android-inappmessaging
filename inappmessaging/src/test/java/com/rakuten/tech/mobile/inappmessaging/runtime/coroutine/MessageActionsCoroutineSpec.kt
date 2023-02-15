@@ -41,7 +41,6 @@ import org.robolectric.annotation.Config
  * Test class for MessageActionsCoroutine
  */
 @RunWith(ParameterizedRobolectricTestRunner::class)
-@Config(sdk = [Build.VERSION_CODES.O_MR1])
 internal class MessageActionsCoroutineSpec(
     val testName: String,
     private val resourceId: Int,

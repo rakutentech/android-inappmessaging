@@ -37,9 +37,7 @@ import org.amshove.kluent.*
 import org.junit.Ignore
 import org.mockito.Mockito
 import org.mockito.Mockito.`when`
-import org.robolectric.util.ReflectionHelpers
 
-@Config(sdk = [Build.VERSION_CODES.O_MR1])
 @RunWith(RobolectricTestRunner::class)
 @Ignore("base class")
 open class BaseViewSpec : BaseTest() {
@@ -52,14 +50,14 @@ open class BaseViewSpec : BaseTest() {
     internal val mockResource = Mockito.mock(Resource::class.java)
     internal val mockBtn = Mockito.mock(MessageButton::class.java)
     internal var view: InAppMessageBaseView? = null
+    internal var expectedHyphenation = Layout.HYPHENATION_FREQUENCY_NONE
 
     @Before
     override fun setup() {
         super.setup()
-        `when`(
-            hostAppActivity
-                .layoutInflater
-        ).thenReturn(LayoutInflater.from(ApplicationProvider.getApplicationContext()))
+        `when`(hostAppActivity.layoutInflater).thenReturn(
+            LayoutInflater.from(ApplicationProvider.getApplicationContext())
+        )
         `when`(mockMessage.getMessagePayload()).thenReturn(mockPayload)
         `when`(mockMessage.isCampaignDismissable()).thenReturn(true)
         `when`(mockPayload.header).thenReturn("test")
@@ -68,9 +66,12 @@ open class BaseViewSpec : BaseTest() {
         `when`(mockSettings.controlSettings).thenReturn(mockCtrlSettings)
         `when`(mockSettings.displaySettings).thenReturn(mockDisplaySettings)
         `when`(mockPayload.resource).thenReturn(mockResource)
-        view = hostAppActivity
-            .layoutInflater
-            .inflate(R.layout.in_app_message_full_screen, null) as InAppMessageBaseView
+        view = hostAppActivity.layoutInflater.inflate(R.layout.in_app_message_full_screen, null)
+            as InAppMessageBaseView
+
+        expectedHyphenation = if (Build.VERSION.SDK_INT == Build.VERSION_CODES.TIRAMISU) {
+            Layout.HYPHENATION_FREQUENCY_FULL_FAST
+        } else Layout.HYPHENATION_FREQUENCY_FULL
     }
 
     companion object {
@@ -216,6 +217,12 @@ class BaseViewBorderSpec : BaseViewSpec() {
 
 class BaseViewColorSpec : BaseViewSpec() {
     @Test
+    @Config(
+        sdk = [
+            Build.VERSION_CODES.S,
+            Build.VERSION_CODES.TIRAMISU
+        ]
+    )
     fun `should set default when invalid header color`() {
         `when`(mockPayload.headerColor).thenReturn("invalid")
         view?.populateViewData(mockMessage)
@@ -224,6 +231,12 @@ class BaseViewColorSpec : BaseViewSpec() {
     }
 
     @Test
+    @Config(
+        sdk = [
+            Build.VERSION_CODES.S,
+            Build.VERSION_CODES.TIRAMISU
+        ]
+    )
     fun `should set default when invalid body color`() {
         `when`(mockPayload.headerColor).thenReturn(WHITE_HEX)
         `when`(mockPayload.messageBodyColor).thenReturn("incorrect")
@@ -233,6 +246,12 @@ class BaseViewColorSpec : BaseViewSpec() {
     }
 
     @Test
+    @Config(
+        sdk = [
+            Build.VERSION_CODES.S,
+            Build.VERSION_CODES.TIRAMISU
+        ]
+    )
     fun `should set default when invalid bg color`() {
         `when`(mockPayload.headerColor).thenReturn(WHITE_HEX)
         `when`(mockPayload.messageBodyColor).thenReturn(WHITE_HEX)
@@ -278,11 +297,11 @@ class BaseViewColorSpec : BaseViewSpec() {
     private fun verifyDefault() {
         val header = view?.findViewById<TextView>(R.id.header_text)
         header?.textColors shouldBeEqualTo ColorStateList.valueOf(Color.BLACK)
-        header?.hyphenationFrequency shouldNotBeEqualTo Layout.HYPHENATION_FREQUENCY_NONE
+        header?.hyphenationFrequency shouldBe expectedHyphenation
 
         val body = view?.findViewById<TextView>(R.id.message_body)
         body?.textColors shouldBeEqualTo ColorStateList.valueOf(Color.BLACK)
-        body?.hyphenationFrequency shouldNotBeEqualTo Layout.HYPHENATION_FREQUENCY_NONE
+        body?.hyphenationFrequency shouldBe expectedHyphenation
     }
 }
 
@@ -338,13 +357,17 @@ class BaseViewTextSpec : BaseViewSpec() {
     }
 
     @Test
+    @Config(
+        sdk = [
+            Build.VERSION_CODES.S,
+            Build.VERSION_CODES.TIRAMISU
+        ]
+    )
     fun `should set button hyphenation`() {
-        // Use "@Config" instead of setting SDK_INT once we upgrade robolectric with Tiramisu support
-        ReflectionHelpers.setStaticField(Build.VERSION::class.java, "SDK_INT", Build.VERSION_CODES.TIRAMISU)
         setMock()
 
         val btn = view?.findViewById<MaterialButton>(R.id.message_single_button)
-        btn?.hyphenationFrequency shouldNotBeEqualTo Layout.HYPHENATION_FREQUENCY_NONE
+        btn?.hyphenationFrequency shouldBe expectedHyphenation
     }
 
     @SuppressWarnings("LongMethod")

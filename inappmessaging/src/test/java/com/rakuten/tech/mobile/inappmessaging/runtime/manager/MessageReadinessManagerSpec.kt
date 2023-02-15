@@ -1,7 +1,6 @@
 package com.rakuten.tech.mobile.inappmessaging.runtime.manager
 
 import android.content.Context
-import android.os.Build
 import android.provider.Settings
 import androidx.test.core.app.ApplicationProvider
 import androidx.work.testing.WorkManagerTestInitHelper
@@ -27,7 +26,6 @@ import org.junit.runner.RunWith
 import org.mockito.Mockito
 import org.mockito.Mockito.`when`
 import org.robolectric.RobolectricTestRunner
-import org.robolectric.annotation.Config
 import retrofit2.Call
 import java.util.*
 import kotlin.collections.ArrayList
@@ -36,7 +34,6 @@ import kotlin.collections.ArrayList
  * Test class for MessageReadinessManager.
  */
 @RunWith(RobolectricTestRunner::class)
-@Config(sdk = [Build.VERSION_CODES.O_MR1])
 open class MessageReadinessManagerSpec : BaseTest() {
     private var configResponseData = Mockito.mock(ConfigResponseData::class.java)
     private var configResponseEndpoints = Mockito.mock(ConfigResponseEndpoints::class.java)

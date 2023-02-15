@@ -1,14 +1,11 @@
 package com.rakuten.tech.mobile.inappmessaging.runtime.utils
 
-import android.os.Build
 import org.amshove.kluent.shouldBeEqualTo
 import org.amshove.kluent.shouldBePositive
 import org.junit.Test
 import org.junit.runner.RunWith
 import org.robolectric.RobolectricTestRunner
-import org.robolectric.annotation.Config
 
-@Config(sdk = [Build.VERSION_CODES.O_MR1])
 @RunWith(RobolectricTestRunner::class)
 class CacheUtilSpec {
 

@@ -1,6 +1,5 @@
 package com.rakuten.tech.mobile.inappmessaging.runtime.utils
 
-import android.os.Build
 import com.rakuten.tech.mobile.inappmessaging.runtime.BaseTest
 import com.rakuten.tech.mobile.inappmessaging.runtime.data.enums.EventType
 import com.rakuten.tech.mobile.inappmessaging.runtime.data.enums.InAppMessageType
@@ -18,13 +17,11 @@ import org.junit.Ignore
 import org.junit.Test
 import org.junit.runner.RunWith
 import org.robolectric.RobolectricTestRunner
-import org.robolectric.annotation.Config
 
 /**
  * Test class for MessageEventReconciliationUtil.
  */
 @RunWith(RobolectricTestRunner::class)
-@Config(sdk = [Build.VERSION_CODES.O_MR1])
 @Ignore("base class")
 open class MessageEventReconciliationUtilSpec : BaseTest() {
     internal val outdatedTestCampaign = CampaignData(

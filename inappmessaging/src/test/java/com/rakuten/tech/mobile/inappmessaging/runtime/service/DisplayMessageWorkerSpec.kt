@@ -3,7 +3,6 @@ package com.rakuten.tech.mobile.inappmessaging.runtime.service
 import android.app.Activity
 import android.content.Context
 import android.content.res.Resources
-import android.os.Build
 import android.os.Handler
 import android.util.DisplayMetrics
 import android.view.View
@@ -37,13 +36,11 @@ import org.mockito.Mockito
 import org.mockito.Mockito.`when`
 import org.mockito.verification.VerificationMode
 import org.robolectric.RobolectricTestRunner
-import org.robolectric.annotation.Config
 
 /**
  * Test class for DisplayMessageJobIntentService.
  */
 @RunWith(RobolectricTestRunner::class)
-@Config(sdk = [Build.VERSION_CODES.O_MR1])
 open class DisplayMessageWorkerSpec : BaseTest() {
 
     private val activity = Mockito.mock(Activity::class.java)

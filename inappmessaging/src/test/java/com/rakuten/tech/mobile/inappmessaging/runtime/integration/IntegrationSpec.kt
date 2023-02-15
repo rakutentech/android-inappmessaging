@@ -1,7 +1,6 @@
 package com.rakuten.tech.mobile.inappmessaging.runtime.integration
 
 import android.content.Context
-import android.os.Build
 import android.provider.Settings
 import androidx.test.core.app.ApplicationProvider
 import androidx.work.ListenableWorker
@@ -23,10 +22,8 @@ import org.junit.Test
 import org.junit.runner.RunWith
 import org.mockito.Mockito
 import org.robolectric.RobolectricTestRunner
-import org.robolectric.annotation.Config
 
 @RunWith(RobolectricTestRunner::class)
-@Config(sdk = [Build.VERSION_CODES.O_MR1])
 class IntegrationSpec {
     private val context = ApplicationProvider.getApplicationContext<Context>()
     private val workerParameters = Mockito.mock(WorkerParameters::class.java)

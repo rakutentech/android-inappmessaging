@@ -1,7 +1,6 @@
 package com.rakuten.tech.mobile.inappmessaging.runtime.view
 
 import android.app.Activity
-import android.os.Build
 import android.view.KeyEvent
 import android.view.MotionEvent
 import android.view.View
@@ -34,7 +33,6 @@ import org.junit.Before
 import org.junit.Test
 import org.mockito.Mockito
 import org.mockito.Mockito.`when`
-import org.robolectric.annotation.Config
 
 /**
  * Test class for InAppMessageViewListener.
@@ -67,7 +65,6 @@ open class InAppMessageViewListenerSpec : BaseTest() {
 
 @ObsoleteCoroutinesApi
 @ExperimentalCoroutinesApi
-@Config(sdk = [Build.VERSION_CODES.Q])
 class InAppMessageViewListenerOnClickSpec : InAppMessageViewListenerSpec() {
     private val mockCheckbox = Mockito.mock(CheckBox::class.java)
 
@@ -105,7 +102,6 @@ class InAppMessageViewListenerOnClickSpec : InAppMessageViewListenerSpec() {
 
 @ObsoleteCoroutinesApi
 @ExperimentalCoroutinesApi
-@Config(sdk = [Build.VERSION_CODES.Q])
 class InAppMessageViewListenerOnTouchSpec : InAppMessageViewListenerSpec() {
     private val mockMotionEvent = Mockito.mock(MotionEvent::class.java)
     private val mockCheck = Mockito.mock(BuildVersionChecker::class.java)
@@ -299,7 +295,6 @@ class InAppMessageViewListenerOnTouchSpec : InAppMessageViewListenerSpec() {
 
 @ObsoleteCoroutinesApi
 @ExperimentalCoroutinesApi
-@Config(sdk = [Build.VERSION_CODES.Q])
 class InAppMessageViewListenerOnKeySpec : InAppMessageViewListenerSpec() {
 
     private val keyEvent = Mockito.mock(KeyEvent::class.java)

@@ -1,18 +1,15 @@
 package com.rakuten.tech.mobile.inappmessaging.runtime
 
-import android.os.Build
 import org.amshove.kluent.*
 import org.junit.Test
 import org.junit.runner.RunWith
 import org.robolectric.ParameterizedRobolectricTestRunner
-import org.robolectric.annotation.Config
 
 /**
  * Tests for EventTrackerHelper class.
  */
 
 @RunWith(ParameterizedRobolectricTestRunner::class)
-@Config(sdk = [Build.VERSION_CODES.O_MR1])
 class SendEventSpec(
     private val eventName: String,
     private val data: Map<String, *>?,
@@ -41,7 +38,6 @@ class SendEventSpec(
 }
 
 @RunWith(ParameterizedRobolectricTestRunner::class)
-@Config(sdk = [Build.VERSION_CODES.O_MR1])
 class HasClassSpec(
     private val className: String,
     private val expected: Boolean

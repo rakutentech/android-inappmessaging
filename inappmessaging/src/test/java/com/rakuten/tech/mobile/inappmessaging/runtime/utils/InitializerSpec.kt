@@ -46,7 +46,7 @@ class InitializerSpec : BaseTest() {
 
     @Test
     @Config(sdk = [Build.VERSION_CODES.TIRAMISU])
-    @Ignore("API 33 is not yet supported in Robolectric v4.8.1")
+    @Ignore("Robolectric returns null metadata for API 33")
     fun `should add host app info with basic attributes in API 33`() {
         verifyHostAppInfo()
     }

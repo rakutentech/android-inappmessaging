@@ -1,6 +1,5 @@
 package com.rakuten.tech.mobile.inappmessaging.runtime.data.models.appevents
 
-import android.os.Build
 import com.rakuten.tech.mobile.inappmessaging.runtime.BaseTest
 import com.rakuten.tech.mobile.inappmessaging.runtime.data.enums.EventType
 import com.rakuten.tech.mobile.inappmessaging.runtime.utils.InAppMessagingConstants
@@ -8,14 +7,12 @@ import org.amshove.kluent.*
 import org.junit.Test
 import org.junit.runner.RunWith
 import org.robolectric.ParameterizedRobolectricTestRunner
-import org.robolectric.annotation.Config
 import java.util.Locale
 
 /**
  * Test class for AppStartEvent.
  */
 @RunWith(ParameterizedRobolectricTestRunner::class)
-@Config(sdk = [Build.VERSION_CODES.O_MR1])
 class EventSpec(
     val eventName: String,
     val event: BaseEvent,

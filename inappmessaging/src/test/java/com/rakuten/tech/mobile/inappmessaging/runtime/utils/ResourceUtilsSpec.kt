@@ -2,16 +2,13 @@ package com.rakuten.tech.mobile.inappmessaging.runtime.utils
 
 import android.app.Activity
 import android.content.res.Resources
-import android.os.Build
 import android.view.View
 import com.nhaarman.mockitokotlin2.any
 import com.nhaarman.mockitokotlin2.eq
 import org.amshove.kluent.shouldBeNull
 import org.junit.Test
 import org.mockito.Mockito
-import org.robolectric.annotation.Config
 
-@Config(sdk = [Build.VERSION_CODES.M])
 class ResourceUtilsSpec {
 
     @Test

@@ -2,7 +2,6 @@ package com.rakuten.tech.mobile.inappmessaging.runtime.workmanager.workers
 
 import android.content.Context
 import android.content.pm.PackageManager
-import android.os.Build
 import android.provider.Settings
 import androidx.test.core.app.ApplicationProvider
 import androidx.work.ListenableWorker
@@ -31,7 +30,6 @@ import org.junit.runner.RunWith
 import org.mockito.*
 import org.mockito.Mockito.`when`
 import org.robolectric.RobolectricTestRunner
-import org.robolectric.annotation.Config
 import retrofit2.Response
 import java.net.HttpURLConnection
 
@@ -39,7 +37,6 @@ import java.net.HttpURLConnection
  * Test class for ConfigWorker.
  */
 @RunWith(RobolectricTestRunner::class)
-@Config(sdk = [Build.VERSION_CODES.O_MR1])
 @Ignore("base class")
 open class ConfigWorkerSpec : BaseTest() {
 
