@@ -33,7 +33,7 @@ internal interface ConfigScheduler {
                     val manager = workManager ?: WorkManager.getInstance(ctx)
                     manager.beginUniqueWork(
                         CONFIG_WORKER_NAME, ExistingWorkPolicy.REPLACE,
-                        getConfigWorkRequest(delay)
+                        getConfigWorkRequest(delay),
                     )
                         .enqueue()
                 }

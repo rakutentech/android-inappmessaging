@@ -45,7 +45,7 @@ class TriggerAttributesValidatorSpec : BaseTest() {
     fun `should return false when event type mismatches`() {
         TriggerAttributesValidator.isTriggerSatisfied(
             Trigger(1, EventType.APP_START.typeId, "test", mutableListOf()),
-            CustomEvent("custom")
+            CustomEvent("custom"),
         ).shouldBeFalse()
     }
 
@@ -54,8 +54,8 @@ class TriggerAttributesValidatorSpec : BaseTest() {
         val trigger = Trigger(
             0, EventType.CUSTOM.typeId, "custom",
             mutableListOf(
-                TriggerAttribute("name1", "value", 1, 1)
-            )
+                TriggerAttribute("name1", "value", 1, 1),
+            ),
         )
         val customEvent = CustomEvent("custom")
         customEvent.addAttribute("name2", "value")
@@ -67,8 +67,8 @@ class TriggerAttributesValidatorSpec : BaseTest() {
         val trigger = Trigger(
             0, EventType.CUSTOM.typeId, "custom",
             mutableListOf(
-                TriggerAttribute("name", "value", 1, 1)
-            )
+                TriggerAttribute("name", "value", 1, 1),
+            ),
         )
         val customEvent = CustomEvent("custom")
         customEvent.addAttribute("name", 1.0)
@@ -85,8 +85,8 @@ class TriggerAttributesValidatorSpec : BaseTest() {
                 trigger = Trigger(
                     0, EventType.CUSTOM.typeId, "custom",
                     mutableListOf(
-                        TriggerAttribute("name", "value", 1, 1)
-                    )
+                        TriggerAttribute("name", "value", 1, 1),
+                    ),
                 )
                 customEvent.addAttribute("name", "value")
             }
@@ -94,8 +94,8 @@ class TriggerAttributesValidatorSpec : BaseTest() {
                 trigger = Trigger(
                     0, EventType.CUSTOM.typeId, "custom",
                     mutableListOf(
-                        TriggerAttribute("name", "1", 2, 1)
-                    )
+                        TriggerAttribute("name", "1", 2, 1),
+                    ),
                 )
                 customEvent.addAttribute("name", 1)
             }
@@ -103,8 +103,8 @@ class TriggerAttributesValidatorSpec : BaseTest() {
                 trigger = Trigger(
                     0, EventType.CUSTOM.typeId, "custom",
                     mutableListOf(
-                        TriggerAttribute("name", "1.0", 3, 1)
-                    )
+                        TriggerAttribute("name", "1.0", 3, 1),
+                    ),
                 )
                 customEvent.addAttribute("name", 1.0)
             }
@@ -112,8 +112,8 @@ class TriggerAttributesValidatorSpec : BaseTest() {
                 trigger = Trigger(
                     0, EventType.CUSTOM.typeId, "custom",
                     mutableListOf(
-                        TriggerAttribute("name", "true", 4, 1)
-                    )
+                        TriggerAttribute("name", "true", 4, 1),
+                    ),
                 )
                 customEvent.addAttribute("name", true)
             }
@@ -122,8 +122,8 @@ class TriggerAttributesValidatorSpec : BaseTest() {
                 trigger = Trigger(
                     0, EventType.CUSTOM.typeId, "custom",
                     mutableListOf(
-                        TriggerAttribute("name", currDate.time.toString(), 5, 1)
-                    )
+                        TriggerAttribute("name", currDate.time.toString(), 5, 1),
+                    ),
                 )
                 customEvent.addAttribute("name", currDate)
             }

@@ -23,14 +23,11 @@ internal object TooltipHelper {
             .inflate(R.layout.in_app_message_tooltip, null) as InAppMessagingTooltipView
     }
 
-    fun createMessage(
-        position: String = "bottom-center",
-        imageUrl: String? = "valid url"
-    ): ValidTestMessage {
+    fun createMessage(position: String = "bottom-center", imageUrl: String? = "valid url"): ValidTestMessage {
         return ValidTestMessage(
             type = InAppMessageType.TOOLTIP.typeId,
             tooltip = Tooltip("ui-element", position, "testurl"),
-            imageUrl = imageUrl
+            imageUrl = imageUrl,
         )
     }
 

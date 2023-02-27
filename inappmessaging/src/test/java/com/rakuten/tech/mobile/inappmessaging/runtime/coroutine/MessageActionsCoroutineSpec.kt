@@ -45,7 +45,7 @@ internal class MessageActionsCoroutineSpec(
     val testName: String,
     private val resourceId: Int,
     private val isOpt: Boolean,
-    private val isTooltip: Boolean
+    private val isTooltip: Boolean,
 ) : BaseTest() {
 
     private lateinit var message: CampaignData
@@ -61,14 +61,14 @@ internal class MessageActionsCoroutineSpec(
         `when`(activity.packageManager).thenReturn(
             ApplicationProvider
                 .getApplicationContext<Context>()
-                .packageManager
+                .packageManager,
         )
 
         WorkManagerTestInitHelper.initializeTestWorkManager(ApplicationProvider.getApplicationContext())
         Settings.Secure.putString(
             ApplicationProvider.getApplicationContext<Context>().contentResolver,
             Settings.Secure.ANDROID_ID,
-            "test_device_id"
+            "test_device_id",
         )
         InAppMessaging.initialize(ApplicationProvider.getApplicationContext(), true)
         InAppMessaging.instance().registerMessageDisplayActivity(activity)
@@ -99,7 +99,7 @@ internal class MessageActionsCoroutineSpec(
     @Test
     fun `should return true when campaign is valid`() {
         val message = ValidTestMessage(
-            type = if (isTooltip) InAppMessageType.TOOLTIP.typeId else InAppMessageType.MODAL.typeId
+            type = if (isTooltip) InAppMessageType.TOOLTIP.typeId else InAppMessageType.MODAL.typeId,
         )
         DisplayManager.instance().removeMessage(InAppMessaging.instance().getRegisteredActivity())
         val result = MessageActionsCoroutine().executeTask(message, resourceId, isOpt)
@@ -129,7 +129,7 @@ internal class MessageActionsCoroutineSpec(
     companion object {
         @JvmStatic
         @ParameterizedRobolectricTestRunner.Parameters(
-            name = "{0} testing"
+            name = "{0} testing",
         )
         fun data(): Collection<Array<Any>> {
             return listOf(
@@ -147,7 +147,7 @@ internal class MessageActionsCoroutineSpec(
                 arrayOf("Back - isOpt false", MessageActionsCoroutine.BACK_BUTTON, false, false),
                 arrayOf("Tooltip View - content", R.id.message_tooltip_image_view, false, true),
                 arrayOf("Tooltip Tip- content", R.id.message_tip, false, true),
-                arrayOf("Tooltip Tip- content", -99, false, true)
+                arrayOf("Tooltip Tip- content", -99, false, true),
             )
         }
     }

@@ -16,7 +16,7 @@ class PositionTypeSpec(private val id: String, private val expected: Any?) {
     companion object {
         @JvmStatic
         @ParameterizedRobolectricTestRunner.Parameters(
-            name = "{0} type test"
+            name = "{0} type test",
         )
         fun data(): List<Array<out Any?>> {
             return listOf(
@@ -28,7 +28,7 @@ class PositionTypeSpec(private val id: String, private val expected: Any?) {
                 arrayOf("bottom-left", PositionType.BOTTOM_LEFT),
                 arrayOf("right", PositionType.RIGHT),
                 arrayOf("left", PositionType.LEFT),
-                arrayOf("invalid", null)
+                arrayOf("invalid", null),
             )
         }
     }

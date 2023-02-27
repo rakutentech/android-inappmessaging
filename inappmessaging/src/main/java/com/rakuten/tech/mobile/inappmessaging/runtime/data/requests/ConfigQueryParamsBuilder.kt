@@ -19,6 +19,6 @@ internal data class ConfigQueryParamsBuilder(
         "appId" to appId,
         "sdkVersion" to sdkVersion,
         "appVersion" to appVersion,
-        "locale" to locale.orEmpty()
+        "locale" to locale.orEmpty(),
     )
 }

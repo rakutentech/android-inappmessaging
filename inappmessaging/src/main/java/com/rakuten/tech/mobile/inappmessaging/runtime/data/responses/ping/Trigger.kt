@@ -18,7 +18,7 @@ internal data class Trigger(
     val eventName: String,
 
     @SerializedName("attributes")
-    val triggerAttributes: MutableList<TriggerAttribute>
+    val triggerAttributes: MutableList<TriggerAttribute>,
 )
 
 internal val Trigger.matchingEventName: String?

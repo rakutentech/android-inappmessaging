@@ -23,7 +23,7 @@ class HostAppInfoRepositorySpec : BaseTest() {
     private val testAppInfo = HostAppInfo(
         InAppMessagingTestConstants.APP_ID, InAppMessagingTestConstants.DEVICE_ID,
         InAppMessagingTestConstants.APP_VERSION, InAppMessagingTestConstants.SUB_KEY,
-        InAppMessagingTestConstants.LOCALE, isTooltipFeatureEnabled = true
+        InAppMessagingTestConstants.LOCALE, isTooltipFeatureEnabled = true,
     )
 
     @Before
@@ -75,7 +75,7 @@ class HostAppInfoRepositorySpec : BaseTest() {
     @Test
     fun `should throw exception for invalid package name`() {
         val hostAppInfo = HostAppInfo(
-            version = InAppMessagingTestConstants.APP_VERSION
+            version = InAppMessagingTestConstants.APP_VERSION,
         )
         try {
             HostAppInfoRepository.instance().addHostInfo(hostAppInfo)
@@ -89,7 +89,7 @@ class HostAppInfoRepositorySpec : BaseTest() {
     fun `should throw exception for invalid subscription key`() {
         val hostAppInfo = HostAppInfo(
             version = InAppMessagingTestConstants.APP_VERSION,
-            packageName = InAppMessagingTestConstants.APP_ID
+            packageName = InAppMessagingTestConstants.APP_ID,
         )
         try {
             HostAppInfoRepository.instance().addHostInfo(hostAppInfo)
@@ -104,7 +104,7 @@ class HostAppInfoRepositorySpec : BaseTest() {
         val hostAppInfo = HostAppInfo(
             version = InAppMessagingTestConstants.APP_VERSION,
             packageName = InAppMessagingTestConstants.APP_ID,
-            subscriptionKey = InAppMessagingTestConstants.SUB_KEY
+            subscriptionKey = InAppMessagingTestConstants.SUB_KEY,
         )
         HostAppInfoRepository.instance().addHostInfo(hostAppInfo)
     }
@@ -115,7 +115,7 @@ class HostAppInfoRepositorySpec : BaseTest() {
             version = InAppMessagingTestConstants.APP_VERSION,
             packageName = InAppMessagingTestConstants.APP_ID,
             subscriptionKey = InAppMessagingTestConstants.SUB_KEY,
-            locale = InAppMessagingTestConstants.LOCALE
+            locale = InAppMessagingTestConstants.LOCALE,
         )
         HostAppInfoRepository.instance().addHostInfo(hostAppInfo)
     }

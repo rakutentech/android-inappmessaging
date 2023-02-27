@@ -295,7 +295,7 @@ class DisplayManagerSpec : BaseTest() {
     private fun verifyRemoveTarget(
         mode: VerificationMode = never(),
         visible: Boolean = true,
-        layout: ViewGroup? = parentViewGroup
+        layout: ViewGroup? = parentViewGroup,
     ) {
         `when`(activity.findViewById<ViewGroup>(R.id.in_app_message_tooltip_layout)).thenReturn(layout)
         `when`(activity.packageName).thenReturn("test")

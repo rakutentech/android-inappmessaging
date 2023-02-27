@@ -30,7 +30,7 @@ internal data class CampaignData(
     @SerializedName("isCampaignDismissable")
     private val isCampaignDismissable: Boolean = true,
     @SerializedName("infiniteImpressions")
-    private val infiniteImpressions: Boolean = false
+    private val areImpressionsInfinite: Boolean = false,
 ) : Message {
 
     @SerializedName("impressionsLeft")
@@ -65,7 +65,7 @@ internal data class CampaignData(
         return matches.map { it.groupValues[1] }.toList()
     }
 
-    override fun infiniteImpressions() = infiniteImpressions
+    override fun infiniteImpressions() = areImpressionsInfinite
 
     override fun hasNoEndDate() = hasNoEndDate
 

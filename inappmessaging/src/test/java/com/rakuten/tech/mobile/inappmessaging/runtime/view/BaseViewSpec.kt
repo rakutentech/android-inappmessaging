@@ -53,11 +53,11 @@ open class BaseViewSpec : BaseTest() {
     internal var expectedHyphenation = Layout.HYPHENATION_FREQUENCY_NONE
 
     @Before
+    @SuppressWarnings("LongMethod")
     override fun setup() {
         super.setup()
-        `when`(hostAppActivity.layoutInflater).thenReturn(
-            LayoutInflater.from(ApplicationProvider.getApplicationContext())
-        )
+        `when`(hostAppActivity.layoutInflater)
+            .thenReturn(LayoutInflater.from(ApplicationProvider.getApplicationContext()))
         `when`(mockMessage.getMessagePayload()).thenReturn(mockPayload)
         `when`(mockMessage.isCampaignDismissable()).thenReturn(true)
         `when`(mockPayload.header).thenReturn("test")
@@ -71,7 +71,9 @@ open class BaseViewSpec : BaseTest() {
 
         expectedHyphenation = if (Build.VERSION.SDK_INT == Build.VERSION_CODES.TIRAMISU) {
             Layout.HYPHENATION_FREQUENCY_FULL_FAST
-        } else Layout.HYPHENATION_FREQUENCY_FULL
+        } else {
+            Layout.HYPHENATION_FREQUENCY_FULL
+        }
     }
 
     companion object {
@@ -95,7 +97,7 @@ class BaseViewCheckBoxSpec : BaseViewSpec() {
         `when`(mockPayload.headerColor).thenReturn(color)
         `when`(mockPayload.messageBodyColor).thenReturn(color)
         `when`(mockPayload.backgroundColor).thenReturn(color)
-        `when`(mockDisplaySettings.optOut).thenReturn(true)
+        `when`(mockDisplaySettings.isOptedOut).thenReturn(true)
 
         view?.populateViewData(mockMessage)
         view?.findViewById<CheckBox>(R.id.opt_out_checkbox)?.textColors?.defaultColor shouldBeEqualTo expectedColor
@@ -104,7 +106,7 @@ class BaseViewCheckBoxSpec : BaseViewSpec() {
     @Test
     fun `should set checkbox to visible`() {
         `when`(mockPayload.headerColor).thenReturn("#")
-        `when`(mockDisplaySettings.optOut).thenReturn(true)
+        `when`(mockDisplaySettings.isOptedOut).thenReturn(true)
         view?.populateViewData(mockMessage)
 
         view?.findViewById<CheckBox>(R.id.opt_out_checkbox)?.visibility shouldBeEqualTo View.VISIBLE
@@ -195,7 +197,7 @@ class BaseViewBorderSpec : BaseViewSpec() {
         val mockButton = Mockito.mock(MaterialButton::class.java)
         view?.setButtonBorder(mockButton, Color.parseColor(WHITE_HEX), Color.BLACK)
         val expectedColor = view?.resources?.getColorStateList(
-            R.color.modal_border_color_light_grey, view!!.context.theme
+            R.color.modal_border_color_light_grey, view!!.context.theme,
         )
         Mockito.verify(mockButton, times(1)).setStrokeColor(expectedColor)
         Mockito.verify(mockButton, times(1)).setStrokeWidth(any())
@@ -220,8 +222,8 @@ class BaseViewColorSpec : BaseViewSpec() {
     @Config(
         sdk = [
             Build.VERSION_CODES.S,
-            Build.VERSION_CODES.TIRAMISU
-        ]
+            Build.VERSION_CODES.TIRAMISU,
+        ],
     )
     fun `should set default when invalid header color`() {
         `when`(mockPayload.headerColor).thenReturn("invalid")
@@ -234,8 +236,8 @@ class BaseViewColorSpec : BaseViewSpec() {
     @Config(
         sdk = [
             Build.VERSION_CODES.S,
-            Build.VERSION_CODES.TIRAMISU
-        ]
+            Build.VERSION_CODES.TIRAMISU,
+        ],
     )
     fun `should set default when invalid body color`() {
         `when`(mockPayload.headerColor).thenReturn(WHITE_HEX)
@@ -249,8 +251,8 @@ class BaseViewColorSpec : BaseViewSpec() {
     @Config(
         sdk = [
             Build.VERSION_CODES.S,
-            Build.VERSION_CODES.TIRAMISU
-        ]
+            Build.VERSION_CODES.TIRAMISU,
+        ],
     )
     fun `should set default when invalid bg color`() {
         `when`(mockPayload.headerColor).thenReturn(WHITE_HEX)
@@ -360,8 +362,8 @@ class BaseViewTextSpec : BaseViewSpec() {
     @Config(
         sdk = [
             Build.VERSION_CODES.S,
-            Build.VERSION_CODES.TIRAMISU
-        ]
+            Build.VERSION_CODES.TIRAMISU,
+        ],
     )
     fun `should set button hyphenation`() {
         setMock()

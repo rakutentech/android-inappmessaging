@@ -9,7 +9,7 @@ import java.util.Date
 
 internal abstract class MessageEventReconciliationUtil(
     internal val campaignRepo: CampaignRepository,
-    internal val eventMatchingUtil: EventMatchingUtil
+    internal val eventMatchingUtil: EventMatchingUtil,
 ) {
 
     /**
@@ -21,7 +21,7 @@ internal abstract class MessageEventReconciliationUtil(
     companion object {
         private var instance: MessageEventReconciliationUtil = MessageEventReconciliationUtilImpl(
             CampaignRepository.instance(),
-            EventMatchingUtil.instance()
+            EventMatchingUtil.instance(),
         )
 
         private const val TAG = "IAM_MsgEventReconcileUtil"
@@ -35,7 +35,7 @@ internal abstract class MessageEventReconciliationUtil(
      */
     private class MessageEventReconciliationUtilImpl(
         campaignRepo: CampaignRepository,
-        eventMatchingUtil: EventMatchingUtil
+        eventMatchingUtil: EventMatchingUtil,
     ) : MessageEventReconciliationUtil(campaignRepo, eventMatchingUtil) {
 
         @SuppressWarnings("ComplexMethod", "ComplexCondition")

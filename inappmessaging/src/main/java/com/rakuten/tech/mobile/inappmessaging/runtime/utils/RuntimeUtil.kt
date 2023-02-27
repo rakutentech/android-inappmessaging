@@ -41,7 +41,7 @@ internal object RuntimeUtil {
             baseUrl = InAppMessagingConstants.TEMPLATE_BASE_URL,
             okHttpClient = OK_HTTP_CLIENT,
             gsonConverterFactory = GSON_CONVERTER_FACTORY,
-            executor = EXECUTOR
+            executor = EXECUTOR,
         )
     }
 

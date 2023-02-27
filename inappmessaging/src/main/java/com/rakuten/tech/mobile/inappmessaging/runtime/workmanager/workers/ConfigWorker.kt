@@ -34,7 +34,7 @@ internal class ConfigWorker(
     private val configRepo: ConfigResponseRepository,
     private val messagePingScheduler: MessageMixerPingScheduler,
     private val configScheduler: ConfigScheduler = ConfigScheduler.instance(),
-    private val retryUtil: RetryDelayUtil = RetryDelayUtil
+    private val retryUtil: RetryDelayUtil = RetryDelayUtil,
 ) :
     Worker(context, workerParams) {
 
@@ -44,7 +44,7 @@ internal class ConfigWorker(
     constructor(context: Context, workerParams: WorkerParameters) :
         this(
             context, workerParams, HostAppInfoRepository.instance(), ConfigResponseRepository.instance(),
-            MessageMixerPingScheduler.instance()
+            MessageMixerPingScheduler.instance(),
         )
 
     /**
@@ -80,7 +80,7 @@ internal class ConfigWorker(
             appId = hostAppId,
             locale = locale,
             appVersion = hostAppVersion,
-            sdkVersion = sdkVersion
+            sdkVersion = sdkVersion,
         ).queryParams
         return RuntimeUtil.getRetrofit()
             .create(ConfigRetrofitService::class.java)
@@ -98,15 +98,17 @@ internal class ConfigWorker(
     fun onResponse(response: Response<ConfigResponse?>): Result {
         if (response.isSuccessful && response.body() != null) {
             handleResponse(response)
-        } else return when {
-            response.code() == RetryDelayUtil.RETRY_ERROR_CODE -> handleRetry(response)
-            response.code() >= HttpURLConnection.HTTP_INTERNAL_ERROR -> handleInternalError(response)
-            else -> {
-                serverErrorCounter.set(0) // reset server error counter
-                // clear temp data (ignore all temp data stored during config request)
-                InAppMessaging.setNotConfiguredInstance()
-                WorkerUtils.logRequestError(TAG, response.code(), response.errorBody()?.string())
-                Result.failure()
+        } else {
+            return when {
+                response.code() == RetryDelayUtil.RETRY_ERROR_CODE -> handleRetry(response)
+                response.code() >= HttpURLConnection.HTTP_INTERNAL_ERROR -> handleInternalError(response)
+                else -> {
+                    serverErrorCounter.set(0) // reset server error counter
+                    // clear temp data (ignore all temp data stored during config request)
+                    InAppMessaging.setNotConfiguredInstance()
+                    WorkerUtils.logRequestError(TAG, response.code(), response.errorBody()?.string())
+                    Result.failure()
+                }
             }
         }
         return Result.success()
@@ -132,7 +134,7 @@ internal class ConfigWorker(
         ConfigScheduler.currDelay = RetryDelayUtil.INITIAL_BACKOFF_DELAY
         InAppLogger(TAG).debug(
             "Config Response: %d (%b)",
-            response.body()?.data?.rollOutPercentage, configRepo.isConfigEnabled()
+            response.body()?.data?.rollOutPercentage, configRepo.isConfigEnabled(),
         )
         if (configRepo.isConfigEnabled()) {
             MessageMixerPingScheduler.currDelay = RetryDelayUtil.INITIAL_BACKOFF_DELAY

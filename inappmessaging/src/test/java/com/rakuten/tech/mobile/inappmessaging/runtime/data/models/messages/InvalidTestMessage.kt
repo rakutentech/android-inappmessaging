@@ -18,10 +18,10 @@ internal class InvalidTestMessage : Message {
         "invalid", "invalid",
         MessageSettings(
             DisplaySettings(1, 1, 1, 1, false, 1, false),
-            ControlSettings(listOf())
+            ControlSettings(listOf()),
         ),
         null, Resource(cropType = 2), "#000000", null, "#ffffff", "title",
-        "#000000"
+        "#000000",
     )
 
     override fun isTest(): Boolean = false

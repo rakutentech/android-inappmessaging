@@ -40,8 +40,8 @@ class EventMessageReconciliationSchedulerSpec : BaseTest() {
         `when`(
             mockWorkManager.beginUniqueWork(
                 any(), any(),
-                ArgumentMatchers.any(OneTimeWorkRequest::class.java)
-            )
+                ArgumentMatchers.any(OneTimeWorkRequest::class.java),
+            ),
         ).thenThrow(IllegalStateException("test"))
     }
 
@@ -52,7 +52,7 @@ class EventMessageReconciliationSchedulerSpec : BaseTest() {
         Settings.Secure.putString(
             ApplicationProvider.getApplicationContext<Context>().contentResolver,
             Settings.Secure.ANDROID_ID,
-            "test_device_id"
+            "test_device_id",
         )
         InAppMessaging.initialize(ApplicationProvider.getApplicationContext(), true)
         EventMessageReconciliationScheduler.instance().startReconciliationWorker()

@@ -49,7 +49,7 @@ internal abstract class CampaignRepository {
     }
 
     @SuppressWarnings(
-        "TooManyFunctions"
+        "TooManyFunctions",
     )
     private class CampaignRepositoryImpl : CampaignRepository() {
         init {
@@ -81,7 +81,7 @@ internal abstract class CampaignRepository {
             if (oldCampaign != null) {
                 updatedCampaign = Message.updatedMessage(
                     updatedCampaign,
-                    asOptedOut = oldCampaign.isOptedOut == true
+                    asOptedOut = oldCampaign.isOptedOut == true,
                 )
 
                 var newImpressionsLeft = oldCampaign.impressionsLeft ?: oldCampaign.getMaxImpressions()
@@ -105,7 +105,7 @@ internal abstract class CampaignRepository {
             if (localCampaign == null) {
                 InAppLogger(TAG).debug(
                     "Campaign (${campaign.getCampaignId()}) could not be updated -" +
-                        "not found in the repository"
+                        "not found in the repository",
                 )
                 return null
             }
@@ -123,7 +123,7 @@ internal abstract class CampaignRepository {
             val campaign = messages[id] ?: return null
             return updateImpressions(
                 campaign,
-                max(0, (campaign.impressionsLeft ?: campaign.getMaxImpressions()) - 1)
+                max(0, (campaign.impressionsLeft ?: campaign.getMaxImpressions()) - 1),
             )
         }
 
@@ -132,7 +132,7 @@ internal abstract class CampaignRepository {
             val campaign = messages[id] ?: return null
             return updateImpressions(
                 campaign,
-                (campaign.impressionsLeft ?: campaign.getMaxImpressions()) + 1
+                (campaign.impressionsLeft ?: campaign.getMaxImpressions()) + 1,
             )
         }
 
@@ -144,7 +144,7 @@ internal abstract class CampaignRepository {
                     val jsonObject = JSONObject(retrieveData())
                     for (key in jsonObject.keys()) {
                         messages[key] = Gson().fromJson(
-                            jsonObject.getJSONObject(key).toString(), CampaignData::class.java
+                            jsonObject.getJSONObject(key).toString(), CampaignData::class.java,
                         )
                     }
                 } catch (ex: Exception) {
@@ -159,7 +159,7 @@ internal abstract class CampaignRepository {
                     context = ctx,
                     name = InAppMessaging.getPreferencesFile(),
                     key = IAM_USER_CACHE,
-                    defValue = ""
+                    defValue = "",
                 )
             }.orEmpty()
         }
@@ -171,7 +171,7 @@ internal abstract class CampaignRepository {
                         context = it,
                         name = InAppMessaging.getPreferencesFile(),
                         key = IAM_USER_CACHE,
-                        value = Gson().toJson(messages)
+                        value = Gson().toJson(messages),
                     )
                 } ?: InAppLogger(TAG).debug("failed saving response data")
             }

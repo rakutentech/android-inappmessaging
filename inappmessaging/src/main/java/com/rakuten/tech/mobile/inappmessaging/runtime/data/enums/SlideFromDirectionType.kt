@@ -9,7 +9,8 @@ internal enum class SlideFromDirectionType(val typeId: Int) {
     BOTTOM(1),
     TOP(2), // Currently not support.
     LEFT(3),
-    RIGHT(4);
+    RIGHT(4),
+    ;
 
     companion object {
         /**

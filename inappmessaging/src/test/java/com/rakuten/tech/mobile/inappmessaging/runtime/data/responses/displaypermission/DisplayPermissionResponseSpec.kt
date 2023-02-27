@@ -10,7 +10,7 @@ import org.robolectric.ParameterizedRobolectricTestRunner
 class DisplayPermissionResponseSpec(
     private val testname: String,
     private val actual: Boolean,
-    private val expected: Boolean
+    private val expected: Boolean,
 ) {
     @Test
     fun `should be correct value after parsing`() {
@@ -38,14 +38,14 @@ class DisplayPermissionResponseSpec(
 
         @JvmStatic
         @ParameterizedRobolectricTestRunner.Parameters(
-            name = "{0} type test"
+            name = "{0} type test",
         )
         fun data(): List<Array<out Any?>> {
             return listOf(
                 arrayOf("display-true", response.display, true),
                 arrayOf("display-false", otherResponse.display, false),
-                arrayOf("performPing-true", otherResponse.performPing, true),
-                arrayOf("performPing-false", response.performPing, false)
+                arrayOf("performPing-true", otherResponse.shouldPing, true),
+                arrayOf("performPing-false", response.shouldPing, false),
             )
         }
     }

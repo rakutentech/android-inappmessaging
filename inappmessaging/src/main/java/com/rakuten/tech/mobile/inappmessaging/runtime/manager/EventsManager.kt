@@ -17,7 +17,7 @@ internal object EventsManager {
     fun onEventReceived(
         event: Event,
         eventMatchingUtil: EventMatchingUtil = EventMatchingUtil.instance(),
-        eventScheduler: EventMessageReconciliationScheduler = EventMessageReconciliationScheduler.instance()
+        eventScheduler: EventMessageReconciliationScheduler = EventMessageReconciliationScheduler.instance(),
     ) {
         if (ConfigResponseRepository.instance().isConfigEnabled()) {
             eventMatchingUtil.matchAndStore(event)

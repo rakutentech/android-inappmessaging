@@ -15,7 +15,7 @@ class ImpressionTypeSpec(private val id: Int, private val expected: Any?) {
     companion object {
         @JvmStatic
         @ParameterizedRobolectricTestRunner.Parameters(
-            name = "{0} type test"
+            name = "{0} type test",
         )
         fun data(): List<Array<out Any?>> {
             return listOf(
@@ -26,7 +26,7 @@ class ImpressionTypeSpec(private val id: Int, private val expected: Any?) {
                 arrayOf(4, ImpressionType.EXIT),
                 arrayOf(5, ImpressionType.CLICK_CONTENT),
                 arrayOf(6, ImpressionType.OPT_OUT),
-                arrayOf(-1, null)
+                arrayOf(-1, null),
             )
         }
     }

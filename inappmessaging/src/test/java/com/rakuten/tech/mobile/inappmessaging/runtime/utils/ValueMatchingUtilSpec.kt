@@ -39,7 +39,7 @@ open class ValueMatchingUtilSpec : BaseTest() {
         ValueMatchingUtil.isOperatorConditionSatisfied("", OperatorType.DOES_NOT_EQUAL, STR).shouldBeTrue()
         ValueMatchingUtil.isOperatorConditionSatisfied(STR, OperatorType.MATCHES_REGEX, STR_REGEX).shouldBeTrue()
         ValueMatchingUtil.isOperatorConditionSatisfied(
-            STR, OperatorType.DOES_NOT_MATCH_REGEX, STR_REGEX
+            STR, OperatorType.DOES_NOT_MATCH_REGEX, STR_REGEX,
         ).shouldBeFalse()
     }
 
@@ -61,21 +61,21 @@ open class ValueMatchingUtilSpec : BaseTest() {
     @Test
     fun `should be false when compare double with not match regex`() {
         ValueMatchingUtil.isOperatorConditionSatisfied(
-            1.0, OperatorType.DOES_NOT_MATCH_REGEX, 1.0
+            1.0, OperatorType.DOES_NOT_MATCH_REGEX, 1.0,
         ).shouldBeFalse()
     }
 
     @Test
     fun `should be false when compare long with regex`() {
         ValueMatchingUtil.isOperatorConditionSatisfied(
-            1L, OperatorType.MATCHES_REGEX, 1L, false
+            1L, OperatorType.MATCHES_REGEX, 1L, false,
         ).shouldBeFalse()
     }
 
     @Test
     fun `should be false when compare long with not match regex`() {
         ValueMatchingUtil.isOperatorConditionSatisfied(
-            1L, OperatorType.DOES_NOT_MATCH_REGEX, 1L, false
+            1L, OperatorType.DOES_NOT_MATCH_REGEX, 1L, false,
         ).shouldBeFalse()
     }
 
@@ -107,7 +107,7 @@ open class ValueMatchingUtilSpec : BaseTest() {
     @Test
     fun `should be false when compare boolean with not match regex`() {
         ValueMatchingUtil.isOperatorConditionSatisfied(
-            true, OperatorType.DOES_NOT_MATCH_REGEX, true
+            true, OperatorType.DOES_NOT_MATCH_REGEX, true,
         ).shouldBeFalse()
     }
 
@@ -143,105 +143,105 @@ class ValueMatchingUtilNullSpec : ValueMatchingUtilSpec() {
     @Test
     fun `should be false when integer event value argument is null`() {
         ValueMatchingUtil.isOperatorConditionSatisfied(
-            null, OperatorType.EQUALS, 1
+            null, OperatorType.EQUALS, 1,
         ).shouldBeFalse()
     }
 
     @Test
     fun `should be false when integer operator type argument is null`() {
         ValueMatchingUtil.isOperatorConditionSatisfied(
-            1, null, 1
+            1, null, 1,
         ).shouldBeFalse()
     }
 
     @Test
     fun `should be false when integer trigger value argument is null`() {
         ValueMatchingUtil.isOperatorConditionSatisfied(
-            1, OperatorType.EQUALS, null
+            1, OperatorType.EQUALS, null,
         ).shouldBeFalse()
     }
 
     @Test
     fun `should be false when long event value argument is null`() {
         ValueMatchingUtil.isOperatorConditionSatisfied(
-            null, OperatorType.EQUALS, 1L, true
+            null, OperatorType.EQUALS, 1L, true,
         ).shouldBeFalse()
     }
 
     @Test
     fun `should be false when long operator type argument is null`() {
         ValueMatchingUtil.isOperatorConditionSatisfied(
-            1L, null, 1L, true
+            1L, null, 1L, true,
         ).shouldBeFalse()
     }
 
     @Test
     fun `should be false when long trigger value argument is null`() {
         ValueMatchingUtil.isOperatorConditionSatisfied(
-            1L, OperatorType.EQUALS, null, true
+            1L, OperatorType.EQUALS, null, true,
         ).shouldBeFalse()
     }
 
     @Test
     fun `should be false when double event value argument is null`() {
         ValueMatchingUtil.isOperatorConditionSatisfied(
-            null, OperatorType.EQUALS, 1.1
+            null, OperatorType.EQUALS, 1.1,
         ).shouldBeFalse()
     }
 
     @Test
     fun `should be false when double operator type argument is null`() {
         ValueMatchingUtil.isOperatorConditionSatisfied(
-            1.1, null, 1.1
+            1.1, null, 1.1,
         ).shouldBeFalse()
     }
 
     @Test
     fun `should be false when double trigger value argument is null`() {
         ValueMatchingUtil.isOperatorConditionSatisfied(
-            1.1, OperatorType.EQUALS, null
+            1.1, OperatorType.EQUALS, null,
         ).shouldBeFalse()
     }
 
     @Test
     fun `should be false when boolean event value argument is null`() {
         ValueMatchingUtil.isOperatorConditionSatisfied(
-            null, OperatorType.EQUALS, true
+            null, OperatorType.EQUALS, true,
         ).shouldBeFalse()
     }
 
     @Test
     fun `should be false when boolean operator type argument is null`() {
         ValueMatchingUtil.isOperatorConditionSatisfied(
-            true, null, true
+            true, null, true,
         ).shouldBeFalse()
     }
 
     @Test
     fun `should be false when boolean trigger value argument is null`() {
         ValueMatchingUtil.isOperatorConditionSatisfied(
-            true, OperatorType.EQUALS, null
+            true, OperatorType.EQUALS, null,
         ).shouldBeFalse()
     }
 
     @Test
     fun `should be false when string event value argument is null`() {
         ValueMatchingUtil.isOperatorConditionSatisfied(
-            null, OperatorType.EQUALS, ""
+            null, OperatorType.EQUALS, "",
         ).shouldBeFalse()
     }
 
     @Test
     fun `should be false when string operator type argument is null`() {
         ValueMatchingUtil.isOperatorConditionSatisfied(
-            "", null, ""
+            "", null, "",
         ).shouldBeFalse()
     }
 
     @Test
     fun `should be false when string trigger value argument is null`() {
         ValueMatchingUtil.isOperatorConditionSatisfied(
-            "", OperatorType.EQUALS, null
+            "", OperatorType.EQUALS, null,
         ).shouldBeFalse()
     }
 }
@@ -251,29 +251,29 @@ class ValueMatchingUtilLongSpec : ValueMatchingUtilSpec() {
     fun `should compare non time long yield true`() {
         ValueMatchingUtil.isOperatorConditionSatisfied(LONG_VAL, OperatorType.EQUALS, LONG_VAL, false).shouldBeTrue()
         ValueMatchingUtil.isOperatorConditionSatisfied(
-            LONG_VAL, OperatorType.DOES_NOT_EQUAL, LONG_OT_VALUE, false
+            LONG_VAL, OperatorType.DOES_NOT_EQUAL, LONG_OT_VALUE, false,
         ).shouldBeTrue()
         ValueMatchingUtil.isOperatorConditionSatisfied(
-            LONG_OT_VALUE, OperatorType.GREATER_THAN, LONG_VAL, false
+            LONG_OT_VALUE, OperatorType.GREATER_THAN, LONG_VAL, false,
         ).shouldBeTrue()
         ValueMatchingUtil.isOperatorConditionSatisfied(
-            LONG_VAL, OperatorType.LESS_THAN, LONG_OT_VALUE, false
+            LONG_VAL, OperatorType.LESS_THAN, LONG_OT_VALUE, false,
         ).shouldBeTrue()
     }
 
     @Test
     fun `should compare non time long yield false`() {
         ValueMatchingUtil.isOperatorConditionSatisfied(
-            LONG_VAL, OperatorType.EQUALS, LONG_OT_VALUE, false
+            LONG_VAL, OperatorType.EQUALS, LONG_OT_VALUE, false,
         ).shouldBeFalse()
         ValueMatchingUtil.isOperatorConditionSatisfied(
-            LONG_VAL, OperatorType.DOES_NOT_EQUAL, LONG_VAL, false
+            LONG_VAL, OperatorType.DOES_NOT_EQUAL, LONG_VAL, false,
         ).shouldBeFalse()
         ValueMatchingUtil.isOperatorConditionSatisfied(
-            LONG_VAL, OperatorType.GREATER_THAN, LONG_VAL, false
+            LONG_VAL, OperatorType.GREATER_THAN, LONG_VAL, false,
         ).shouldBeFalse()
         ValueMatchingUtil.isOperatorConditionSatisfied(
-            LONG_VAL, OperatorType.LESS_THAN, LONG_VAL, false
+            LONG_VAL, OperatorType.LESS_THAN, LONG_VAL, false,
         ).shouldBeFalse()
     }
 
@@ -281,32 +281,32 @@ class ValueMatchingUtilLongSpec : ValueMatchingUtilSpec() {
     fun `should compare time long yield true`() {
         ValueMatchingUtil.isOperatorConditionSatisfied(TIME_MS, OperatorType.EQUALS, TIME_DIFF, true).shouldBeTrue()
         ValueMatchingUtil.isOperatorConditionSatisfied(
-            TIME_MS, OperatorType.DOES_NOT_EQUAL, TIME_MS - 2 * TIME_TOL, true
+            TIME_MS, OperatorType.DOES_NOT_EQUAL, TIME_MS - 2 * TIME_TOL, true,
         ).shouldBeTrue()
         ValueMatchingUtil.isOperatorConditionSatisfied(
-            TIME_MS * 2, OperatorType.GREATER_THAN, TIME_DIFF, true
+            TIME_MS * 2, OperatorType.GREATER_THAN, TIME_DIFF, true,
         ).shouldBeTrue()
         ValueMatchingUtil.isOperatorConditionSatisfied(
-            TIME_MS / 2, OperatorType.LESS_THAN, TIME_DIFF, true
+            TIME_MS / 2, OperatorType.LESS_THAN, TIME_DIFF, true,
         ).shouldBeTrue()
     }
 
     @Test
     fun `should compare time long yield false`() {
         ValueMatchingUtil.isOperatorConditionSatisfied(
-            TIME_MS, OperatorType.EQUALS, TIME_MS - 2 * TIME_TOL, true
+            TIME_MS, OperatorType.EQUALS, TIME_MS - 2 * TIME_TOL, true,
         ).shouldBeFalse()
         ValueMatchingUtil.isOperatorConditionSatisfied(
-            TIME_MS, OperatorType.DOES_NOT_EQUAL, TIME_DIFF, true
+            TIME_MS, OperatorType.DOES_NOT_EQUAL, TIME_DIFF, true,
         ).shouldBeFalse()
         ValueMatchingUtil.isOperatorConditionSatisfied(
-            TIME_MS, OperatorType.GREATER_THAN, TIME_DIFF, true
+            TIME_MS, OperatorType.GREATER_THAN, TIME_DIFF, true,
         ).shouldBeFalse()
         ValueMatchingUtil.isOperatorConditionSatisfied(
-            TIME_MS, OperatorType.LESS_THAN, TIME_DIFF, true
+            TIME_MS, OperatorType.LESS_THAN, TIME_DIFF, true,
         ).shouldBeFalse()
         ValueMatchingUtil.isOperatorConditionSatisfied(
-            TIME_MS, OperatorType.GREATER_THAN, TIME_MS, true
+            TIME_MS, OperatorType.GREATER_THAN, TIME_MS, true,
         ).shouldBeFalse()
         ValueMatchingUtil.isOperatorConditionSatisfied(TIME_MS, OperatorType.LESS_THAN, TIME_MS, true).shouldBeFalse()
         ValueMatchingUtil.isOperatorConditionSatisfied(TIME_MS, OperatorType.IS_BLANK, TIME_DIFF, true).shouldBeFalse()

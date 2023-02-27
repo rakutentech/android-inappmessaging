@@ -15,7 +15,7 @@ class EventTypeSpec(private val id: Int, private val expected: Any?) {
     companion object {
         @JvmStatic
         @ParameterizedRobolectricTestRunner.Parameters(
-            name = "{0} type test"
+            name = "{0} type test",
         )
         fun data(): List<Array<out Any?>> {
             return listOf(
@@ -24,7 +24,7 @@ class EventTypeSpec(private val id: Int, private val expected: Any?) {
                 arrayOf(2, EventType.LOGIN_SUCCESSFUL),
                 arrayOf(3, EventType.PURCHASE_SUCCESSFUL),
                 arrayOf(4, EventType.CUSTOM),
-                arrayOf(-1, null)
+                arrayOf(-1, null),
             )
         }
     }

@@ -39,7 +39,7 @@ internal class InApp(
     private val campaignRepo: CampaignRepository = CampaignRepository.instance(),
     private val configRepo: ConfigResponseRepository = ConfigResponseRepository.instance(),
     private val sessionManager: SessionManager = SessionManager,
-    private val primerManager: PushPrimerTrackerManager = PushPrimerTrackerManager
+    private val primerManager: PushPrimerTrackerManager = PushPrimerTrackerManager,
 ) : InAppMessaging() {
 
     // Used for displaying or removing messages from screen.
@@ -106,7 +106,7 @@ internal class InApp(
 
     @SuppressWarnings(
         "TooGenericExceptionCaught",
-        "LongMethod"
+        "LongMethod",
     )
     override fun logEvent(event: Event) {
         try {
@@ -116,7 +116,7 @@ internal class InApp(
 
             InAppLogger(TAG).debug(
                 "${event.getEventName()}, isConfigEnabled: $isConfigEnabled, " +
-                    "isSameUser: $isSameUser, areCampaignsSynced: $areCampaignsSynced"
+                    "isSameUser: $isSameUser, areCampaignsSynced: $areCampaignsSynced",
             )
 
             if (!isConfigEnabled || !isSameUser || !areCampaignsSynced) {
@@ -179,7 +179,7 @@ internal class InApp(
 
     @SuppressWarnings(
         "TooGenericExceptionCaught",
-        "CanBeNonNullable"
+        "CanBeNonNullable",
     )
     private fun closeCampaign(clearQueuedCampaigns: Boolean? = null, viewId: String? = null) {
         if (configRepo.isConfigEnabled()) {
@@ -239,7 +239,7 @@ internal class InApp(
         private val metadata = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
             context.packageManager.getApplicationInfo(
                 context.packageName,
-                PackageManager.ApplicationInfoFlags.of(PackageManager.GET_META_DATA.toLong())
+                PackageManager.ApplicationInfoFlags.of(PackageManager.GET_META_DATA.toLong()),
             ).metaData
         } else {
             context.packageManager

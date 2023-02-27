@@ -20,6 +20,6 @@ internal interface ConfigRetrofitService {
     fun getConfigService(
         @Url url: String,
         @Header("Subscription-Id") subscriptionId: String,
-        @QueryMap parameters: Map<String, @JvmSuppressWildcards Any?>
+        @QueryMap parameters: Map<String, @JvmSuppressWildcards Any?>,
     ): Call<ConfigResponse>
 }

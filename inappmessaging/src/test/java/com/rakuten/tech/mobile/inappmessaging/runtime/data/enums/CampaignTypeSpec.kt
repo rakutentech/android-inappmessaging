@@ -15,14 +15,14 @@ class CampaignTypeSpec(private val id: Int, private val expected: Any?) {
     companion object {
         @JvmStatic
         @ParameterizedRobolectricTestRunner.Parameters(
-            name = "{0} type test"
+            name = "{0} type test",
         )
         fun data(): List<Array<out Any?>> {
             return listOf(
                 arrayOf(0, CampaignType.INVALID),
                 arrayOf(1, CampaignType.REGULAR),
                 arrayOf(2, CampaignType.PUSH_PRIMER),
-                arrayOf(3, null)
+                arrayOf(3, null),
             )
         }
     }

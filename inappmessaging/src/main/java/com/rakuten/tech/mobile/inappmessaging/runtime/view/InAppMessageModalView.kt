@@ -11,7 +11,7 @@ import com.rakuten.tech.mobile.inappmessaging.runtime.data.models.messages.Messa
  */
 internal class InAppMessageModalView(
     context: Context,
-    attrs: AttributeSet?
+    attrs: AttributeSet?,
 ) :
     InAppMessageBaseView(context, attrs) {
 

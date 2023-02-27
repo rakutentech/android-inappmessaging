@@ -13,7 +13,7 @@ internal fun View.isVisible(outPosition: Rect? = null): Boolean {
     val actualPosition = outPosition ?: Rect()
     val screen = Rect(
         0, 0,
-        Resources.getSystem().displayMetrics.widthPixels, Resources.getSystem().displayMetrics.heightPixels
+        Resources.getSystem().displayMetrics.widthPixels, Resources.getSystem().displayMetrics.heightPixels,
     )
 
     return getGlobalVisibleRect(actualPosition) && Rect.intersects(actualPosition, screen)

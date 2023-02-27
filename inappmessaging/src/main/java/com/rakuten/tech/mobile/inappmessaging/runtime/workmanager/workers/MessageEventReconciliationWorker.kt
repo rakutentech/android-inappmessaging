@@ -21,7 +21,7 @@ internal class MessageEventReconciliationWorker(
     workerParams: WorkerParameters,
     private val eventMatchingUtil: EventMatchingUtil,
     private val messageEventReconciliationUtil: MessageEventReconciliationUtil,
-    private val messageReadinessManager: MessageReadinessManager
+    private val messageReadinessManager: MessageReadinessManager,
 ) :
     Worker(context, workerParams) {
 
@@ -31,7 +31,7 @@ internal class MessageEventReconciliationWorker(
     constructor(context: Context, workerParams: WorkerParameters) :
         this(
             context, workerParams, EventMatchingUtil.instance(), MessageEventReconciliationUtil.instance(),
-            MessageReadinessManager.instance()
+            MessageReadinessManager.instance(),
         )
 
     /**

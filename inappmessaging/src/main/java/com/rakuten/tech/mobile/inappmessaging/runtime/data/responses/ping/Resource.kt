@@ -15,5 +15,5 @@ internal data class Resource(
     val imageUrl: String? = null,
 
     @SerializedName("cropType")
-    val cropType: Int
+    val cropType: Int,
 )

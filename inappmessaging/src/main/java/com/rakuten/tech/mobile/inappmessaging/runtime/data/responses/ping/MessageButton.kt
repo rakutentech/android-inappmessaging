@@ -19,5 +19,5 @@ internal data class MessageButton(
     val buttonText: String,
 
     @SerializedName("campaignTrigger")
-    val embeddedEvent: Trigger? = null
+    val embeddedEvent: Trigger? = null,
 )

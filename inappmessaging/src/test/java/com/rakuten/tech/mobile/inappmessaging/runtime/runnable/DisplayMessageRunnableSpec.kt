@@ -253,7 +253,7 @@ class DisplayMessageRunnableSpec : BaseTest() {
         childCount: Int = 1,
         isNullChild: Boolean = false,
         tag: String? = null,
-        isNullParent: Boolean = false
+        isNullParent: Boolean = false,
     ) {
         `when`(hostAppActivity.findViewById<View>(R.id.in_app_message_base_view))
             .thenReturn(mock(InAppMessageSlideUpView::class.java))
@@ -289,13 +289,13 @@ class DisplayMessageRunnableSpec : BaseTest() {
         Settings.Secure.putString(
             ApplicationProvider.getApplicationContext<Context>().contentResolver,
             Settings.Secure.ANDROID_ID,
-            "test_device_id"
+            "test_device_id",
         )
         InAppMessaging.initialize(ApplicationProvider.getApplicationContext())
         `when`(message.getMessagePayload()).thenReturn(payload)
         `when`(
             hostAppActivity
-                .layoutInflater
+                .layoutInflater,
         ).thenReturn(LayoutInflater.from(ApplicationProvider.getApplicationContext()))
     }
 

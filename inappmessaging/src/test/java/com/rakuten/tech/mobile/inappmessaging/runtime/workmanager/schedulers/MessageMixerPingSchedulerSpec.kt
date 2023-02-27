@@ -35,8 +35,8 @@ class MessageMixerPingSchedulerSpec : BaseTest() {
         `when`(
             mockWorkManager.enqueueUniqueWork(
                 any(), any(),
-                ArgumentMatchers.any(OneTimeWorkRequest::class.java)
-            )
+                ArgumentMatchers.any(OneTimeWorkRequest::class.java),
+            ),
         ).thenThrow(IllegalStateException("test"))
     }
 

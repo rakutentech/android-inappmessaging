@@ -15,7 +15,7 @@ class InAppMessageTypeSpec(private val id: Int, private val expected: Any?) {
     companion object {
         @JvmStatic
         @ParameterizedRobolectricTestRunner.Parameters(
-            name = "{0} type test"
+            name = "{0} type test",
         )
         fun data(): List<Array<out Any?>> {
             return listOf(
@@ -25,7 +25,7 @@ class InAppMessageTypeSpec(private val id: Int, private val expected: Any?) {
                 arrayOf(3, InAppMessageType.SLIDE),
                 arrayOf(4, InAppMessageType.HTML),
                 arrayOf(5, InAppMessageType.TOOLTIP),
-                arrayOf(-1, null)
+                arrayOf(-1, null),
             )
         }
     }

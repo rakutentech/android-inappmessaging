@@ -8,7 +8,8 @@ internal enum class PositionType(val typeId: String) {
     BOTTOM_CENTER("bottom-center"),
     BOTTOM_LEFT("bottom-left"),
     RIGHT("right"),
-    LEFT("left");
+    LEFT("left"),
+    ;
 
     companion object {
         /**

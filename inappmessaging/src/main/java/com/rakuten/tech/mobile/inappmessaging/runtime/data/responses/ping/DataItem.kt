@@ -7,5 +7,5 @@ import com.google.gson.annotations.SerializedName
  */
 internal data class DataItem(
     @SerializedName("campaignData")
-    val campaignData: CampaignData
+    val campaignData: CampaignData,
 )

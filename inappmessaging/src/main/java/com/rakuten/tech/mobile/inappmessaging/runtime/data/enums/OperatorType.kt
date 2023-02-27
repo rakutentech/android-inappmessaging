@@ -13,7 +13,8 @@ internal enum class OperatorType(val typeId: Int) {
     IS_BLANK(5),
     IS_NOT_BLANK(6),
     MATCHES_REGEX(7),
-    DOES_NOT_MATCH_REGEX(8);
+    DOES_NOT_MATCH_REGEX(8),
+    ;
 
     companion object {
         /**

@@ -9,7 +9,7 @@ import com.rakuten.tech.mobile.inappmessaging.runtime.data.enums.ImpressionType
 internal data class Impression(
     private val impType: ImpressionType,
     @SerializedName("timestamp")
-    val timestamp: Long
+    val timestamp: Long,
 ) {
 
     @SerializedName("type")

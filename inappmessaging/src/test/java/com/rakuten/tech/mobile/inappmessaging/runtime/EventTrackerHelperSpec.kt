@@ -13,7 +13,7 @@ import org.robolectric.ParameterizedRobolectricTestRunner
 class SendEventSpec(
     private val eventName: String,
     private val data: Map<String, *>?,
-    private val expected: Boolean
+    private val expected: Boolean,
 ) {
     private val sendEvent = EventTrackerHelper::sendEvent
 
@@ -31,7 +31,7 @@ class SendEventSpec(
                 arrayOf("event2", emptyMap<String, Any>(), true),
                 arrayOf("event3", mapOf(Pair(Any(), Any())), true),
                 arrayOf("event4", null, true),
-                arrayOf("", emptyMap<String, Any>(), false)
+                arrayOf("", emptyMap<String, Any>(), false),
             )
         }
     }
@@ -40,7 +40,7 @@ class SendEventSpec(
 @RunWith(ParameterizedRobolectricTestRunner::class)
 class HasClassSpec(
     private val className: String,
-    private val expected: Boolean
+    private val expected: Boolean,
 ) {
     private val hasClass = EventTrackerHelper::hasClass
 
@@ -56,7 +56,7 @@ class HasClassSpec(
             return listOf(
                 arrayOf("com.rakuten.tech.mobile.analytics.Event", true),
                 arrayOf("", false),
-                arrayOf("com.rakuten.tech.mobile.NonExistingClass", false)
+                arrayOf("com.rakuten.tech.mobile.NonExistingClass", false),
             )
         }
     }

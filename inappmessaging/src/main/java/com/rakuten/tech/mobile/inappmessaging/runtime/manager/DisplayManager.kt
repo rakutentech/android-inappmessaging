@@ -40,7 +40,7 @@ internal interface DisplayManager {
         @VisibleForTesting
         internal var instance: DisplayManager = DisplayManagerImpl(
             Handler(Looper.getMainLooper()),
-            MessageActionsCoroutine()
+            MessageActionsCoroutine(),
         )
 
         fun instance() = instance
@@ -48,11 +48,11 @@ internal interface DisplayManager {
 
     @SuppressWarnings(
         "TooManyFunctions",
-        "LargeClass"
+        "LargeClass",
     )
     class DisplayManagerImpl(
         private val handler: Handler,
-        private val messageActionsCoroutine: MessageActionsCoroutine
+        private val messageActionsCoroutine: MessageActionsCoroutine,
     ) : DisplayManager {
 
         override fun displayMessage() {
@@ -80,11 +80,11 @@ internal interface DisplayManager {
         }
 
         private fun removeWithId(activity: Activity, id: String?, delay: Int) {
-            activity.findViewById<ViewGroup>(R.id.in_app_message_tooltip_view)?.let {
-                if (it.tag == id) {
-                    scheduleRemoval(delay = delay, view = it, id = id, activity = activity)
+            activity.findViewById<ViewGroup>(R.id.in_app_message_tooltip_view)?.let { view ->
+                if (view.tag == id) {
+                    scheduleRemoval(delay = delay, view = view, id = id, activity = activity)
                 } else {
-                    scheduleTargetChild(it = it, id = id, delay = delay, activity = activity)
+                    scheduleTargetChild(it = view, id = id, delay = delay, activity = activity)
                 }
             }
         }
@@ -113,7 +113,7 @@ internal interface DisplayManager {
                 for (view in viewList) {
                     scheduleRemoval(
                         delay = delay, view = view as ViewGroup, id = view.tag as String?,
-                        activity = activity
+                        activity = activity,
                     )
                 }
             }
@@ -130,10 +130,10 @@ internal interface DisplayManager {
                             removeCampaign(view, id, activity)
                             // to handle repo update and impression request, simulate a close action
                             messageActionsCoroutine.executeTask(
-                                CampaignRepository.instance().messages[id], R.id.message_close_button, false
+                                CampaignRepository.instance().messages[id], R.id.message_close_button, false,
                             )
                         }
-                    }, delay * MS_MULTIPLIER
+                    }, delay * MS_MULTIPLIER,
                 )
             } else {
                 // to avoid crashing when redirect from tooltip view

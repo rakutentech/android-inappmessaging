@@ -77,10 +77,10 @@ class ImpressionManagerSpec : BaseTest() {
             emptyList(),
             "1234",
             false,
-            eventTracker::sendEvent
+            eventTracker::sendEvent,
         )
         Mockito.verify(eventTracker, never()).sendEvent(
-            ArgumentMatchers.anyString(), ArgumentMatchers.anyMap<String, Any>()
+            ArgumentMatchers.anyString(), ArgumentMatchers.anyMap<String, Any>(),
         )
     }
 
@@ -100,12 +100,12 @@ class ImpressionManagerSpec : BaseTest() {
     @Test
     fun `should invoke broadcaster for impression type`() {
         ImpressionManager.sendImpressionEvent(
-            "1234", listOf(Impression(ImpressionType.IMPRESSION, Date().time)), eventTracker::sendEvent
+            "1234", listOf(Impression(ImpressionType.IMPRESSION, Date().time)), eventTracker::sendEvent,
         )
 
         val captor = argumentCaptor<Map<String, Any>>()
         Mockito.verify(eventTracker).sendEvent(
-            eq(InAppMessagingConstants.RAT_EVENT_KEY_IMPRESSION), captor.capture()
+            eq(InAppMessagingConstants.RAT_EVENT_KEY_IMPRESSION), captor.capture(),
         )
 
         val map = captor.firstValue
@@ -127,7 +127,7 @@ class ImpressionManagerSpec : BaseTest() {
         Settings.Secure.putString(
             ApplicationProvider.getApplicationContext<Context>().contentResolver,
             Settings.Secure.ANDROID_ID,
-            "test_device_id"
+            "test_device_id",
         )
         InAppMessaging.initialize(ApplicationProvider.getApplicationContext(), true)
         InAppMessaging.instance().registerPreference(TestUserInfoProvider())

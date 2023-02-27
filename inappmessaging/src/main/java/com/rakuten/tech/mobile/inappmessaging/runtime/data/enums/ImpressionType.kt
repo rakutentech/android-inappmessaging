@@ -23,7 +23,8 @@ internal enum class ImpressionType(val typeId: Int) {
     CLICK_CONTENT(5),
 
     // Checkbox of opt-out.
-    OPT_OUT(6);
+    OPT_OUT(6),
+    ;
 
     companion object {
         /**

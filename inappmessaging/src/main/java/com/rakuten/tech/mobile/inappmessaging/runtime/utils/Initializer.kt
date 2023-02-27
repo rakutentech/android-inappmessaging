@@ -51,12 +51,11 @@ internal object Initializer {
      */
     @SuppressWarnings("Deprecation", "kotlin:S1874")
     @TargetApi(Build.VERSION_CODES.N)
-    private fun getLocale(context: Context): Locale? =
-        if (BuildVersionChecker.instance().isNougatAndAbove()) {
-            context.resources.configuration.locales[0]
-        } else {
-            context.resources.configuration.locale
-        }
+    private fun getLocale(context: Context): Locale? = if (BuildVersionChecker.instance().isNougatAndAbove()) {
+        context.resources.configuration.locales[0]
+    } else {
+        context.resources.configuration.locale
+    }
 
     /**
      * This method retrieves host app's app version.
@@ -91,12 +90,12 @@ internal object Initializer {
         subscriptionKey: String?,
         configUrl: String?,
         enableTooltipFeature: Boolean? = false,
-        sharedUtil: PreferencesUtil = PreferencesUtil
+        sharedUtil: PreferencesUtil = PreferencesUtil,
     ) {
         val hostAppInfo = HostAppInfo(
             packageName = getHostAppPackageName(context), deviceId = getDeviceId(context, sharedUtil),
             version = getHostAppVersion(context), subscriptionKey = subscriptionKey, locale = getLocale(context),
-            configUrl = configUrl, isTooltipFeatureEnabled = enableTooltipFeature
+            configUrl = configUrl, isTooltipFeatureEnabled = enableTooltipFeature,
         )
 
         // Store hostAppInfo in repository.

@@ -15,7 +15,7 @@ class ValueTypeSpec(private val id: Int, private val expected: Any?) {
     companion object {
         @JvmStatic
         @ParameterizedRobolectricTestRunner.Parameters(
-            name = "{0} type test"
+            name = "{0} type test",
         )
         fun data(): List<Array<out Any?>> {
             return listOf(
@@ -25,7 +25,7 @@ class ValueTypeSpec(private val id: Int, private val expected: Any?) {
                 arrayOf(3, ValueType.DOUBLE),
                 arrayOf(4, ValueType.BOOLEAN),
                 arrayOf(5, ValueType.TIME_IN_MILLI),
-                arrayOf(6, null)
+                arrayOf(6, null),
             )
         }
     }

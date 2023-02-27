@@ -8,5 +8,5 @@ import com.google.gson.annotations.SerializedName
  */
 internal data class RatAttribute(
     @SerializedName("name") private val name: String,
-    @SerializedName("value") private val value: Any
+    @SerializedName("value") private val value: Any,
 )

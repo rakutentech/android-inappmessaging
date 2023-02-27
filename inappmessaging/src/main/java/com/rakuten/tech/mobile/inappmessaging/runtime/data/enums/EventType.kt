@@ -17,7 +17,8 @@ enum class EventType(@NotNull val typeId: Int) {
     APP_START(1),
     LOGIN_SUCCESSFUL(2),
     PURCHASE_SUCCESSFUL(3),
-    CUSTOM(4);
+    CUSTOM(4),
+    ;
 
     companion object {
         /**

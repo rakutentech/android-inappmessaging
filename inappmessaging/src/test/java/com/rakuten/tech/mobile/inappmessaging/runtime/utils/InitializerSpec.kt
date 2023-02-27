@@ -63,7 +63,7 @@ class InitializerSpec : BaseTest() {
         Settings.Secure.putString(
             ApplicationProvider.getApplicationContext<Context>().contentResolver,
             Settings.Secure.ANDROID_ID,
-            "test_device_id"
+            "test_device_id",
         )
         `when`(context.contentResolver).thenReturn(ApplicationProvider.getApplicationContext<Context>().contentResolver)
         `when`(context.packageManager).thenReturn(ApplicationProvider.getApplicationContext<Context>().packageManager)

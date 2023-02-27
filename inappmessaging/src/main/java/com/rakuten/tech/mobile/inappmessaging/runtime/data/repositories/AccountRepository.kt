@@ -65,7 +65,9 @@ internal abstract class AccountRepository {
             this.userInfoProvider?.provideAccessToken().isNullOrEmpty()
         ) {
             ""
-        } else TOKEN_PREFIX + this.userInfoProvider?.provideAccessToken()
+        } else {
+            TOKEN_PREFIX + this.userInfoProvider?.provideAccessToken()
+        }
         // According to backend specs, token has to start with "OAuth2{space}", followed by real token.
 
         override fun getUserId() = this.userInfoProvider?.provideUserId().orEmpty()

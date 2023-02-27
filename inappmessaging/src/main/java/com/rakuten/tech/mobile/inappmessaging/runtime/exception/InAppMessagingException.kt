@@ -5,5 +5,5 @@ package com.rakuten.tech.mobile.inappmessaging.runtime.exception
  */
 class InAppMessagingException(
     name: String,
-    cause: Throwable? = null
+    cause: Throwable? = null,
 ) : RuntimeException(name, cause)

@@ -29,7 +29,7 @@ internal interface MessageMixerRetrofitService {
         @Header(ACCESS_TOKEN_HEADER) accessToken: String,
         @Header(DEVICE_ID_HEADER) deviceId: String,
         @Url url: String,
-        @Body requestBody: PingRequest
+        @Body requestBody: PingRequest,
     ): Call<MessageMixerResponse>
 
     /**
@@ -40,7 +40,7 @@ internal interface MessageMixerRetrofitService {
         @Header(SUBSCRIPTION_ID_HEADER) subscriptionId: String,
         @Header(ACCESS_TOKEN_HEADER) accessToken: String,
         @Url url: String,
-        @Body request: DisplayPermissionRequest
+        @Body request: DisplayPermissionRequest,
     ): Call<DisplayPermissionResponse>
 
     /**
@@ -52,7 +52,7 @@ internal interface MessageMixerRetrofitService {
         @Header(DEVICE_ID_HEADER) deviceId: String,
         @Header(ACCESS_TOKEN_HEADER) accessToken: String,
         @Url impressionUrl: String,
-        @Body impressionRequest: ImpressionRequest
+        @Body impressionRequest: ImpressionRequest,
     ): Call<ResponseBody>
 
     // ----------------------------------- Downloading Image --------------------------------------

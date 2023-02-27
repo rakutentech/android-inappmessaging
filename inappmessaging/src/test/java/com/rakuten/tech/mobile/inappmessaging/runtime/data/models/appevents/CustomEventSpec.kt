@@ -47,7 +47,7 @@ class CustomEventSpec : BaseTest() {
 class CustomEventParameterizedSpec(
     val testName: String,
     private val attrType: ValueType,
-    private val attrValue: String
+    private val attrValue: String,
 ) {
 
     @Test
@@ -65,55 +65,55 @@ class CustomEventParameterizedSpec(
     private fun confirmMilli() {
         confirmValues(
             CustomEvent(EVENT_NAME).addAttribute(DATE_ATTRIBUTE, Date(attrValue.toLong())),
-            DATE_ATTRIBUTE, DATE_ATTRIBUTE, attrValue, ValueType.TIME_IN_MILLI.typeId
+            DATE_ATTRIBUTE, DATE_ATTRIBUTE, attrValue, ValueType.TIME_IN_MILLI.typeId,
         )
         confirmValues(
             CustomEvent(EVENT_NAME).addAttribute(DATE_ATTRIBUTE_UPPER, Date(attrValue.toLong())),
-            DATE_ATTRIBUTE, DATE_ATTRIBUTE, attrValue, ValueType.TIME_IN_MILLI.typeId
+            DATE_ATTRIBUTE, DATE_ATTRIBUTE, attrValue, ValueType.TIME_IN_MILLI.typeId,
         )
     }
 
     private fun confirmBoolean() {
         confirmValues(
             CustomEvent(EVENT_NAME).addAttribute(BOOLEAN_ATTRIBUTE, attrValue.toBoolean()),
-            BOOLEAN_ATTRIBUTE, BOOLEAN_ATTRIBUTE, attrValue, ValueType.BOOLEAN.typeId
+            BOOLEAN_ATTRIBUTE, BOOLEAN_ATTRIBUTE, attrValue, ValueType.BOOLEAN.typeId,
         )
         confirmValues(
             CustomEvent(EVENT_NAME).addAttribute(BOOLEAN_ATTRIBUTE_UPPER, attrValue.toBoolean()),
-            BOOLEAN_ATTRIBUTE, BOOLEAN_ATTRIBUTE, attrValue, ValueType.BOOLEAN.typeId
+            BOOLEAN_ATTRIBUTE, BOOLEAN_ATTRIBUTE, attrValue, ValueType.BOOLEAN.typeId,
         )
     }
 
     private fun confirmDouble() {
         confirmValues(
             CustomEvent(EVENT_NAME).addAttribute(DOUBLE_ATTRIBUTE, attrValue.toDouble()),
-            DOUBLE_ATTRIBUTE, DOUBLE_ATTRIBUTE, attrValue, ValueType.DOUBLE.typeId
+            DOUBLE_ATTRIBUTE, DOUBLE_ATTRIBUTE, attrValue, ValueType.DOUBLE.typeId,
         )
         confirmValues(
             CustomEvent(EVENT_NAME).addAttribute(DOUBLE_ATTRIBUTE_UPPER, attrValue.toDouble()),
-            DOUBLE_ATTRIBUTE, DOUBLE_ATTRIBUTE, attrValue, ValueType.DOUBLE.typeId
+            DOUBLE_ATTRIBUTE, DOUBLE_ATTRIBUTE, attrValue, ValueType.DOUBLE.typeId,
         )
     }
 
     private fun confirmInt() {
         confirmValues(
             CustomEvent(EVENT_NAME).addAttribute(INTEGER_ATTRIBUTE, attrValue.toInt()),
-            INTEGER_ATTRIBUTE, INTEGER_ATTRIBUTE, attrValue, ValueType.INTEGER.typeId
+            INTEGER_ATTRIBUTE, INTEGER_ATTRIBUTE, attrValue, ValueType.INTEGER.typeId,
         )
         confirmValues(
             CustomEvent(EVENT_NAME).addAttribute(INTEGER_ATTRIBUTE_UPPER, attrValue.toInt()),
-            INTEGER_ATTRIBUTE, INTEGER_ATTRIBUTE, attrValue, ValueType.INTEGER.typeId
+            INTEGER_ATTRIBUTE, INTEGER_ATTRIBUTE, attrValue, ValueType.INTEGER.typeId,
         )
     }
 
     private fun confirmString() {
         confirmValues(
             CustomEvent(EVENT_NAME).addAttribute(STRING_ATTRIBUTE, attrValue),
-            STRING_ATTRIBUTE, STRING_ATTRIBUTE, attrValue, ValueType.STRING.typeId
+            STRING_ATTRIBUTE, STRING_ATTRIBUTE, attrValue, ValueType.STRING.typeId,
         )
         confirmValues(
             CustomEvent(EVENT_NAME).addAttribute(STRING_ATTRIBUTE_UPPER, attrValue),
-            STRING_ATTRIBUTE, STRING_ATTRIBUTE, attrValue, ValueType.STRING.typeId
+            STRING_ATTRIBUTE, STRING_ATTRIBUTE, attrValue, ValueType.STRING.typeId,
         )
     }
 
@@ -139,7 +139,7 @@ class CustomEventParameterizedSpec(
 
         @JvmStatic
         @ParameterizedRobolectricTestRunner.Parameters(
-            name = "{0} type test"
+            name = "{0} type test",
         )
         fun data(): Collection<Array<Any>> {
             return listOf(
@@ -148,7 +148,7 @@ class CustomEventParameterizedSpec(
                 arrayOf("Double", ValueType.DOUBLE, "10.5"),
                 arrayOf("Boolean", ValueType.BOOLEAN, "true"),
                 arrayOf("Boolean", ValueType.BOOLEAN, "false"),
-                arrayOf("Long", ValueType.TIME_IN_MILLI, "9999")
+                arrayOf("Long", ValueType.TIME_IN_MILLI, "9999"),
             )
         }
     }
