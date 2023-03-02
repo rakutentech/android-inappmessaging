@@ -13,7 +13,7 @@ internal class ValidTestMessage(
     private val maxImpressions: Int = 1,
     private val infiniteImpressions: Boolean = false,
     private val triggers: List<Trigger>? = null,
-    private val imageUrl: String? = null
+    private val imageUrl: String? = null,
 ) : Message {
     private var max = maxImpressions
 
@@ -40,10 +40,10 @@ internal class ValidTestMessage(
         DEFAULT_COLOR, "#ffffff",
         MessageSettings(
             DisplaySettings(1, 1, Long.MAX_VALUE, 1, false, 1, false),
-            ControlSettings(listOf())
+            ControlSettings(listOf()),
         ),
         null, Resource(cropType = 2, imageUrl = imageUrl), DEFAULT_COLOR, null, "#ffffff", "title",
-        DEFAULT_COLOR
+        DEFAULT_COLOR,
     )
 
     override fun isTest(): Boolean = isTest
@@ -71,7 +71,9 @@ internal class ValidTestMessage(
             getCampaignId() != otherObject.getCampaignId() ||
             isTest() != otherObject.isTest() ||
             getMaxImpressions() != otherObject.getMaxImpressions()
-        ) return false
+        ) {
+            return false
+        }
         return true
     }
 

@@ -9,7 +9,7 @@ import com.rakuten.tech.mobile.inappmessaging.runtime.data.models.messages.Messa
  */
 internal class InAppMessageFullScreenView(
     context: Context,
-    attrs: AttributeSet?
+    attrs: AttributeSet?,
 ) :
     InAppMessageBaseView(context, attrs) {
 

@@ -10,7 +10,8 @@ internal enum class InAppMessageType(val typeId: Int) {
     FULL(2),
     SLIDE(3),
     HTML(4),
-    TOOLTIP(5);
+    TOOLTIP(5),
+    ;
 
     companion object {
         /**

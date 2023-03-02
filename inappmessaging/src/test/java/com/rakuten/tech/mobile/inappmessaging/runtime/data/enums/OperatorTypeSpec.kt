@@ -15,7 +15,7 @@ class OperatorTypeSpec(private val id: Int, private val expected: Any?) {
     companion object {
         @JvmStatic
         @ParameterizedRobolectricTestRunner.Parameters(
-            name = "{0} type test"
+            name = "{0} type test",
         )
         fun data(): List<Array<out Any?>> {
             return listOf(
@@ -28,7 +28,7 @@ class OperatorTypeSpec(private val id: Int, private val expected: Any?) {
                 arrayOf(6, OperatorType.IS_NOT_BLANK),
                 arrayOf(7, OperatorType.MATCHES_REGEX),
                 arrayOf(8, OperatorType.DOES_NOT_MATCH_REGEX),
-                arrayOf(-1, null)
+                arrayOf(-1, null),
             )
         }
     }

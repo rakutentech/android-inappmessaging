@@ -65,8 +65,11 @@ open class ImpressionWorkerSpec : BaseTest() {
         initializeInApp()
     }
 
-    internal fun createWorkRequest(impressionRequest: ImpressionRequest, key: String, isValid: Boolean = true):
-        OneTimeWorkRequest = OneTimeWorkRequest.Builder(ImpressionWorker::class.java)
+    internal fun createWorkRequest(
+        impressionRequest: ImpressionRequest,
+        key: String,
+        isValid: Boolean = true,
+    ): OneTimeWorkRequest = OneTimeWorkRequest.Builder(ImpressionWorker::class.java)
         .setInputData(if (isValid) getInputData(impressionRequest, key) else getInvalidInputData(key))
         .addTag("iam_impression_work")
         .build()
@@ -91,8 +94,8 @@ open class ImpressionWorkerSpec : BaseTest() {
             HostAppInfo(
                 InAppMessagingTestConstants.APP_ID,
                 InAppMessagingTestConstants.DEVICE_ID, InAppMessagingTestConstants.APP_VERSION,
-                InAppMessagingTestConstants.SUB_KEY, InAppMessagingTestConstants.LOCALE
-            )
+                InAppMessagingTestConstants.SUB_KEY, InAppMessagingTestConstants.LOCALE,
+            ),
         )
     }
 
@@ -107,7 +110,7 @@ open class ImpressionWorkerSpec : BaseTest() {
         WorkManagerTestInitHelper.initializeTestWorkManager(context, config)
         Settings.Secure.putString(
             ApplicationProvider.getApplicationContext<Context>().contentResolver,
-            Settings.Secure.ANDROID_ID, "test_device_id"
+            Settings.Secure.ANDROID_ID, "test_device_id",
         )
         InAppMessaging.initialize(context, true)
         ImpressionWorker.serverErrorCounter.set(0)
@@ -157,7 +160,7 @@ class ImpressionWorkerEndpointSpec : ImpressionWorkerSpec() {
             appVersion = HostAppInfoRepository.instance().getVersion(),
             sdkVersion = BuildConfig.VERSION_NAME,
             userIdentifiers = RuntimeUtil.getUserIdentifiers(),
-            impressions = listOf(Impression(ImpressionType.ACTION_ONE, Date().time))
+            impressions = listOf(Impression(ImpressionType.ACTION_ONE, Date().time)),
         )
         val workManager = WorkManager.getInstance(ApplicationProvider.getApplicationContext())
         val request = createWorkRequest(impressionRequest, ImpressionWorker.IMPRESSION_REQUEST_KEY)
@@ -177,7 +180,7 @@ class ImpressionWorkerEndpointSpec : ImpressionWorkerSpec() {
             appVersion = HostAppInfoRepository.instance().getVersion(),
             sdkVersion = BuildConfig.VERSION_NAME,
             userIdentifiers = RuntimeUtil.getUserIdentifiers(),
-            impressions = listOf(Impression(ImpressionType.ACTION_ONE, Date().time))
+            impressions = listOf(Impression(ImpressionType.ACTION_ONE, Date().time)),
         )
         val workManager = WorkManager.getInstance(ApplicationProvider.getApplicationContext())
         val request = createWorkRequest(impressionRequest, ImpressionWorker.IMPRESSION_REQUEST_KEY)
@@ -281,7 +284,7 @@ class ImpressionWorkerBaseSpec : ImpressionWorkerSpec() {
             appVersion = HostAppInfoRepository.instance().getVersion(),
             sdkVersion = BuildConfig.VERSION_NAME,
             userIdentifiers = RuntimeUtil.getUserIdentifiers(),
-            impressions = listOf(Impression(ImpressionType.ACTION_ONE, Date().time))
+            impressions = listOf(Impression(ImpressionType.ACTION_ONE, Date().time)),
         )
         val workManager = WorkManager.getInstance(context)
 
@@ -301,7 +304,7 @@ class ImpressionWorkerBaseSpec : ImpressionWorkerSpec() {
             appVersion = HostAppInfoRepository.instance().getVersion(),
             sdkVersion = BuildConfig.VERSION_NAME,
             userIdentifiers = RuntimeUtil.getUserIdentifiers(),
-            impressions = listOf(Impression(ImpressionType.ACTION_ONE, Date().time))
+            impressions = listOf(Impression(ImpressionType.ACTION_ONE, Date().time)),
         )
         val workManager = WorkManager.getInstance(context)
 
@@ -323,7 +326,7 @@ class ImpressionWorkerBaseSpec : ImpressionWorkerSpec() {
             appVersion = HostAppInfoRepository.instance().getVersion(),
             sdkVersion = BuildConfig.VERSION_NAME,
             userIdentifiers = RuntimeUtil.getUserIdentifiers(),
-            impressions = listOf(Impression(ImpressionType.ACTION_ONE, Date().time))
+            impressions = listOf(Impression(ImpressionType.ACTION_ONE, Date().time)),
         )
         val workManager = WorkManager.getInstance(context)
 
@@ -341,14 +344,14 @@ class ImpressionWorkerBaseSpec : ImpressionWorkerSpec() {
         HostAppInfoRepository.instance().addHostInfo(
             HostAppInfo(
                 "rakuten.com.tech.mobile.test", InAppMessagingTestConstants.DEVICE_ID,
-                InAppMessagingTestConstants.APP_VERSION, "sample-key", InAppMessagingTestConstants.LOCALE
-            )
+                InAppMessagingTestConstants.APP_VERSION, "sample-key", InAppMessagingTestConstants.LOCALE,
+            ),
         )
         val workManager = WorkManager.getInstance(context)
 
         val request = createWorkRequest(
             Gson().fromJson(REQUEST.trimIndent(), ImpressionRequest::class.java),
-            ImpressionWorker.IMPRESSION_REQUEST_KEY
+            ImpressionWorker.IMPRESSION_REQUEST_KEY,
         )
 
         retrieveValidConfig()

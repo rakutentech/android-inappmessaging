@@ -36,7 +36,7 @@ import kotlin.collections.ArrayList
 @SuppressWarnings("TooManyFunctions", "LargeClass")
 internal class MessageActionsCoroutine(
     private val campaignRepo: CampaignRepository = CampaignRepository.instance(),
-    private val readinessManager: MessageReadinessManager = MessageReadinessManager.instance()
+    private val readinessManager: MessageReadinessManager = MessageReadinessManager.instance(),
 ) {
 
     fun executeTask(message: Message?, viewResourceId: Int, optOut: Boolean): Boolean {
@@ -128,7 +128,7 @@ internal class MessageActionsCoroutine(
         ImpressionManager.scheduleReportImpression(
             ImpressionManager.createImpressionList(impressionTypes),
             message.getCampaignId(),
-            message.isTest()
+            message.isTest(),
         )
     }
 
@@ -168,10 +168,10 @@ internal class MessageActionsCoroutine(
     }
 
     internal fun handlePushPrimer(campaignId: String, checker: BuildVersionChecker = BuildVersionChecker.instance()) {
-        InAppMessaging.instance().onPushPrimer.let {
-            if (it != null) {
+        InAppMessaging.instance().onPushPrimer.let { callback ->
+            if (callback != null) {
                 PushPrimerTrackerManager.campaignId = campaignId
-                it.invoke()
+                callback.invoke()
             } else if (checker.isAndroidTAndAbove()) {
                 PushPrimerTrackerManager.campaignId = campaignId
                 requestPushPrimer()
@@ -183,7 +183,7 @@ internal class MessageActionsCoroutine(
     private fun requestPushPrimer() {
         InAppMessaging.instance().getRegisteredActivity()?.let { act ->
             ActivityCompat.requestPermissions(
-                act, arrayOf(Manifest.permission.POST_NOTIFICATIONS), InAppMessaging.PUSH_PRIMER_REQ_CODE
+                act, arrayOf(Manifest.permission.POST_NOTIFICATIONS), InAppMessaging.PUSH_PRIMER_REQ_CODE,
             )
         }
     }

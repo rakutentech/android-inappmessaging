@@ -67,7 +67,7 @@ internal abstract class EventMatchingUtil {
                 matchedEvents[campaign.getCampaignId()] = events
                 InAppLogger(TAG).debug(
                     "Campaign (${campaign.getCampaignId()}) matched events:" +
-                        matchedEvents(campaign).map { it.getEventName() }
+                        matchedEvents(campaign).map { it.getEventName() },
                 )
             }
         }

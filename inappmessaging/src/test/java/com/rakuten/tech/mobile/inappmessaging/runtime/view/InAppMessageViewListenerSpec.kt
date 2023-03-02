@@ -90,14 +90,13 @@ class InAppMessageViewListenerOnClickSpec : InAppMessageViewListenerSpec() {
         listener.onClick(mockView)
     }
 
-    private fun createMockListener(message: Message) =
-        InAppMessageViewListener(
-            message = message,
-            messageCoroutine = mockCoroutine,
-            displayManager = mockDisplayManager,
-            eventScheduler = mockEventScheduler,
-            inApp = mockInApp
-        )
+    private fun createMockListener(message: Message) = InAppMessageViewListener(
+        message = message,
+        messageCoroutine = mockCoroutine,
+        displayManager = mockDisplayManager,
+        eventScheduler = mockEventScheduler,
+        inApp = mockInApp,
+    )
 }
 
 @ObsoleteCoroutinesApi
@@ -309,8 +308,8 @@ class InAppMessageViewListenerOnKeySpec : InAppMessageViewListenerSpec() {
         `when`(
             mockCoroutine.executeTask(
                 message,
-                MessageActionsCoroutine.BACK_BUTTON, false
-            )
+                MessageActionsCoroutine.BACK_BUTTON, false,
+            ),
         ).thenReturn(true)
 
         listener.onKey(mockView, KeyEvent.KEYCODE_BACK, keyEvent).shouldBeTrue()
@@ -326,8 +325,8 @@ class InAppMessageViewListenerOnKeySpec : InAppMessageViewListenerSpec() {
         `when`(
             mockCoroutine.executeTask(
                 message,
-                MessageActionsCoroutine.BACK_BUTTON, false
-            )
+                MessageActionsCoroutine.BACK_BUTTON, false,
+            ),
         ).thenReturn(true)
 
         listener.onKey(mockView, KeyEvent.KEYCODE_BACK, keyEvent).shouldBeFalse()
@@ -343,8 +342,8 @@ class InAppMessageViewListenerOnKeySpec : InAppMessageViewListenerSpec() {
         `when`(
             mockCoroutine.executeTask(
                 message,
-                MessageActionsCoroutine.BACK_BUTTON, false
-            )
+                MessageActionsCoroutine.BACK_BUTTON, false,
+            ),
         ).thenReturn(true)
 
         listener.onKey(mockView, KeyEvent.KEYCODE_BACK, keyEvent).shouldBeFalse()
@@ -392,7 +391,7 @@ class InAppMessageViewListenerOnKeySpec : InAppMessageViewListenerSpec() {
             messageCoroutine = mockCoroutine,
             displayManager = mockDisplayManager,
             eventScheduler = mockEventScheduler,
-            inApp = mockInApp
+            inApp = mockInApp,
         )
 
         `when`(keyEvent.action).thenReturn(KeyEvent.ACTION_UP)
@@ -436,12 +435,11 @@ class InAppMessageViewListenerHandleSpec : InAppMessageViewListenerSpec() {
         Mockito.verify(mockEventScheduler).startReconciliationWorker(anyOrNull(), eq(3000L))
     }
 
-    private fun createMockListener(message: Message) =
-        InAppMessageViewListener(
-            message = message,
-            messageCoroutine = mockCoroutine,
-            displayManager = mockDisplayManager,
-            eventScheduler = mockEventScheduler,
-            inApp = mockInApp
-        )
+    private fun createMockListener(message: Message) = InAppMessageViewListener(
+        message = message,
+        messageCoroutine = mockCoroutine,
+        displayManager = mockDisplayManager,
+        eventScheduler = mockEventScheduler,
+        inApp = mockInApp,
+    )
 }

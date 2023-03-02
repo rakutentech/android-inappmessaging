@@ -59,7 +59,7 @@ open class MessageMixerWorkerSpec : BaseTest() {
         Settings.Secure.putString(
             ApplicationProvider.getApplicationContext<Context>().contentResolver,
             Settings.Secure.ANDROID_ID,
-            "test_device_id"
+            "test_device_id",
         )
         InAppMessaging.initialize(ApplicationProvider.getApplicationContext(), true)
         MessageMixerPingScheduler.currDelay = RetryDelayUtil.INITIAL_BACKOFF_DELAY
@@ -142,7 +142,7 @@ open class MessageMixerWorkerSpec : BaseTest() {
         val mockMessageScheduler = Mockito.mock(MessageMixerPingScheduler::class.java)
         val worker = ConfigWorker(
             ctx, workParam, HostAppInfoRepository.instance(),
-            ConfigResponseRepository.instance(), mockMessageScheduler
+            ConfigResponseRepository.instance(), mockMessageScheduler,
         )
         worker.doWork()
     }
@@ -151,8 +151,8 @@ open class MessageMixerWorkerSpec : BaseTest() {
         HostAppInfoRepository.instance().addHostInfo(
             HostAppInfo(
                 "rakuten.com.tech.mobile.test", InAppMessagingTestConstants.DEVICE_ID,
-                InAppMessagingTestConstants.APP_VERSION, "test-key", InAppMessagingTestConstants.LOCALE
-            )
+                InAppMessagingTestConstants.APP_VERSION, "test-key", InAppMessagingTestConstants.LOCALE,
+            ),
         )
     }
 }
@@ -226,7 +226,7 @@ class MessageMixerWorkerFailSpec : MessageMixerWorkerSpec() {
 
         worker.onResponse(mockResp) shouldBeEqualTo ListenableWorker.Result.Success()
         Mockito.verify(mockSched).pingMessageMixerService(
-            AdditionalMatchers.gt(RetryDelayUtil.INITIAL_BACKOFF_DELAY * 2), anyOrNull()
+            AdditionalMatchers.gt(RetryDelayUtil.INITIAL_BACKOFF_DELAY * 2), anyOrNull(),
         )
         MessageMixerPingScheduler.currDelay shouldBeGreaterThan (RetryDelayUtil.INITIAL_BACKOFF_DELAY * 4)
     }

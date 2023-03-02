@@ -18,7 +18,7 @@ class EventSpec(
     val event: BaseEvent,
     private val expectedType: EventType,
     private val expectedName: String,
-    private val expectedPersistType: Boolean
+    private val expectedPersistType: Boolean,
 ) : BaseTest() {
 
     @Test
@@ -72,7 +72,7 @@ class EventSpec(
             return listOf(
                 arrayOf(
                     "AppStart", AppStartEvent(), EventType.APP_START,
-                    EventType.APP_START.name.lowercase(Locale.getDefault()), true
+                    EventType.APP_START.name.lowercase(Locale.getDefault()), true,
                 ),
                 arrayOf("Custom", CustomEvent("custom"), EventType.CUSTOM, "custom", false),
                 arrayOf("Custom UpperCase", CustomEvent("CuStOm"), EventType.CUSTOM, "custom", false),
@@ -80,15 +80,15 @@ class EventSpec(
                     "LoginSuccessful",
                     LoginSuccessfulEvent(), EventType.LOGIN_SUCCESSFUL,
                     EventType.LOGIN_SUCCESSFUL.name.lowercase(Locale.getDefault()),
-                    false
+                    false,
                 ),
                 arrayOf(
                     "PurchaseSuccessful",
                     PurchaseSuccessfulEvent(),
                     EventType.PURCHASE_SUCCESSFUL,
                     EventType.PURCHASE_SUCCESSFUL.name.lowercase(Locale.getDefault()),
-                    false
-                )
+                    false,
+                ),
             )
         }
     }

@@ -13,5 +13,5 @@ internal data class MessageMixerResponse(
     val nextPingMillis: Long,
     // Current UTC time when message mixer returned response.
     @SerializedName("currentPingMillis")
-    val currentPingMillis: Long
+    val currentPingMillis: Long,
 )

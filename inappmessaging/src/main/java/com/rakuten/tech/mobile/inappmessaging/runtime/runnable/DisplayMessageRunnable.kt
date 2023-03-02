@@ -30,7 +30,7 @@ import java.util.Date
 internal class DisplayMessageRunnable(
     private val message: Message,
     private val hostActivity: Activity,
-    private val displayManager: DisplayManager = DisplayManager.instance()
+    private val displayManager: DisplayManager = DisplayManager.instance(),
 ) : Runnable {
     internal var testLayout: FrameLayout? = null
 
@@ -62,7 +62,7 @@ internal class DisplayMessageRunnable(
         ImpressionManager.sendImpressionEvent(
             message.getCampaignId(),
             listOf(Impression(ImpressionType.IMPRESSION, Date().time)),
-            impressionTypeOnly = true
+            impressionTypeOnly = true,
         )
     }
 
@@ -74,7 +74,7 @@ internal class DisplayMessageRunnable(
         ImpressionManager.sendImpressionEvent(
             message.getCampaignId(),
             listOf(Impression(ImpressionType.IMPRESSION, Date().time)),
-            impressionTypeOnly = true
+            impressionTypeOnly = true,
         )
     }
 
@@ -86,7 +86,7 @@ internal class DisplayMessageRunnable(
         ImpressionManager.sendImpressionEvent(
             message.getCampaignId(),
             listOf(Impression(ImpressionType.IMPRESSION, Date().time)),
-            impressionTypeOnly = true
+            impressionTypeOnly = true,
         )
     }
 
@@ -97,17 +97,14 @@ internal class DisplayMessageRunnable(
         message.getTooltipConfig()?.let { displayTooltip(it, toolTipView) }
     }
 
-    private fun displayTooltip(
-        tooltip: Tooltip,
-        toolTipView: InAppMessagingTooltipView
-    ) {
+    private fun displayTooltip(tooltip: Tooltip, toolTipView: InAppMessagingTooltipView) {
         ResourceUtils.findViewByName<View>(hostActivity, tooltip.id)?.let { target ->
             val scroll = ViewUtil.getScrollView(target)
             if (scroll != null) {
                 displayInScrollView(scroll, toolTipView)
             } else {
                 val params = ViewGroup.LayoutParams(
-                    ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT
+                    ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT,
                 )
                 hostActivity.addContentView(toolTipView, params)
             }
@@ -122,8 +119,8 @@ internal class DisplayMessageRunnable(
         (scroll.getChildAt(0) as? ViewGroup)?.addView(
             toolTipView,
             ViewGroup.LayoutParams(
-                ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT
-            )
+                ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT,
+            ),
         )
     }
 
@@ -142,9 +139,9 @@ internal class DisplayMessageRunnable(
     }
 
     private fun checkTooltipDisplay(): Boolean {
-        hostActivity.findViewById<View?>(R.id.in_app_message_tooltip_view)?.parent?.let {
-            for (i in 0 until (it as ViewGroup).childCount) {
-                val child = it.getChildAt(i)
+        hostActivity.findViewById<View?>(R.id.in_app_message_tooltip_view)?.parent?.let { viewParent ->
+            for (i in 0 until (viewParent as ViewGroup).childCount) {
+                val child = viewParent.getChildAt(i)
                 if (child?.id == R.id.in_app_message_tooltip_view && child.tag == message.getCampaignId()) {
                     // tool campaign is already displayed, no need to display again
                     return true

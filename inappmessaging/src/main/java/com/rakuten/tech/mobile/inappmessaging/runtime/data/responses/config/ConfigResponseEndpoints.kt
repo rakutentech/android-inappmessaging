@@ -9,5 +9,5 @@ import com.google.gson.annotations.SerializedName
 internal data class ConfigResponseEndpoints(
     @SerializedName("ping") val ping: String? = null,
     @SerializedName("impression") val impression: String? = null,
-    @SerializedName("displayPermission") val displayPermission: String? = null
+    @SerializedName("displayPermission") val displayPermission: String? = null,
 )

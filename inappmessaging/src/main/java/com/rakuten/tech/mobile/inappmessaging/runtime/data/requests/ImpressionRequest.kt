@@ -19,5 +19,5 @@ internal data class ImpressionRequest(
     @SerializedName("userIdentifiers")
     private val userIdentifiers: List<UserIdentifier>,
     @SerializedName("impressions")
-    val impressions: List<Impression>
+    val impressions: List<Impression>,
 )

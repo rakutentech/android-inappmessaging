@@ -45,5 +45,5 @@ internal object MockPicasso {
 internal enum class MockPicassoReturnType {
     GENERIC_EXCEPTION,
     CALLBACK_SUCCESS,
-    CALLBACK_ERROR
+    CALLBACK_ERROR,
 }

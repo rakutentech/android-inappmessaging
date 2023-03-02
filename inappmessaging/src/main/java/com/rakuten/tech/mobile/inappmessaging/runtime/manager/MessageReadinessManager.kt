@@ -63,14 +63,13 @@ internal interface MessageReadinessManager {
      * This method returns a DisplayPermissionResponse object.
      */
     @VisibleForTesting
-    fun getDisplayCall(displayPermissionUrl: String, request: DisplayPermissionRequest):
-        Call<DisplayPermissionResponse>
+    fun getDisplayCall(displayPermissionUrl: String, request: DisplayPermissionRequest): Call<DisplayPermissionResponse>
 
     companion object {
         private const val TAG = "IAM_MsgReadinessManager"
         private const val DISP_TAG = "IAM_DisplayPermission"
         private var instance: MessageReadinessManager = MessageReadinessManagerImpl(
-            CampaignRepository.instance()
+            CampaignRepository.instance(),
         )
         internal val shouldRetry = AtomicBoolean(true)
         fun instance() = instance
@@ -127,8 +126,9 @@ internal interface MessageReadinessManager {
                 if (shouldPing(message, result)) break
 
                 // Multiple tooltips can be displayed, checked other from queue.
-                if (queuedTooltips.isNotEmpty()) continue
-                else if (result.isNotEmpty()) return result
+                if (queuedTooltips.isNotEmpty()) {
+                    continue
+                } else if (result.isNotEmpty()) return result
             }
             return result
         }
@@ -142,7 +142,7 @@ internal interface MessageReadinessManager {
             val displayPermissionResponse = getMessagePermission(message)
             // If server wants SDK to ping for updated messages, do a new ping request and break this loop.
             when {
-                (displayPermissionResponse != null) && displayPermissionResponse.performPing -> {
+                (displayPermissionResponse != null) && displayPermissionResponse.shouldPing -> {
                     // reset current delay to initial
                     MessageMixerPingScheduler.currDelay = RetryDelayUtil.INITIAL_BACKOFF_DELAY
                     MessageMixerPingScheduler.instance().pingMessageMixerService(0)
@@ -164,24 +164,22 @@ internal interface MessageReadinessManager {
                 sdkVersion = BuildConfig.VERSION_NAME,
                 locale = HostAppInfoRepository.instance().getDeviceLocale(),
                 lastPingInMillis = CampaignRepository.instance().lastSyncMillis ?: 0,
-                userIdentifier = RuntimeUtil.getUserIdentifiers()
+                userIdentifier = RuntimeUtil.getUserIdentifiers(),
             )
         }
 
         @VisibleForTesting
         override fun getDisplayCall(
             displayPermissionUrl: String,
-            request: DisplayPermissionRequest
-        ):
-            Call<DisplayPermissionResponse> =
-            RuntimeUtil.getRetrofit()
-                .create(MessageMixerRetrofitService::class.java)
-                .getDisplayPermissionService(
-                    subscriptionId = HostAppInfoRepository.instance().getSubscriptionKey(),
-                    accessToken = AccountRepository.instance().getAccessToken(),
-                    url = displayPermissionUrl,
-                    request = request
-                )
+            request: DisplayPermissionRequest,
+        ): Call<DisplayPermissionResponse> = RuntimeUtil.getRetrofit()
+            .create(MessageMixerRetrofitService::class.java)
+            .getDisplayPermissionService(
+                subscriptionId = HostAppInfoRepository.instance().getSubscriptionKey(),
+                accessToken = AccountRepository.instance().getAccessToken(),
+                url = displayPermissionUrl,
+                request = request,
+            )
 
         /**
          * This method checks if the message has infinite impressions, or has been displayed less
@@ -218,9 +216,8 @@ internal interface MessageReadinessManager {
          * This method returns if message is permissible to be displayed according to the message.
          * display permission response parameter.
          */
-        private fun isMessagePermissibleToDisplay(
-            response: DisplayPermissionResponse?
-        ): Boolean = response != null && response.display
+        private fun isMessagePermissibleToDisplay(response: DisplayPermissionResponse?): Boolean =
+            response != null && response.display
 
         /**
          * This method returns display message permission (from server).
@@ -255,12 +252,12 @@ internal interface MessageReadinessManager {
 
         private fun handleResponse(
             response: Response<DisplayPermissionResponse>,
-            callClone: Call<DisplayPermissionResponse>
+            callClone: Call<DisplayPermissionResponse>,
         ): DisplayPermissionResponse? {
             return when {
                 response.isSuccessful -> {
                     InAppLogger(DISP_TAG).debug(
-                        "display: %b performPing: %b", response.body()?.display, response.body()?.performPing
+                        "display: %b performPing: %b", response.body()?.display, response.body()?.shouldPing,
                     )
                     response.body()
                 }
@@ -276,7 +273,7 @@ internal interface MessageReadinessManager {
 
         private fun checkAndRetry(
             call: Call<DisplayPermissionResponse>,
-            errorHandling: () -> Unit
+            errorHandling: () -> Unit,
         ): DisplayPermissionResponse? {
             return if (shouldRetry.getAndSet(false)) {
                 executeDisplayRequest(call)

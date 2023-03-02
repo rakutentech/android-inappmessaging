@@ -38,8 +38,8 @@ open class EventMatchingUtilSpec : BaseTest() {
         `when`(mockCampaign.getTriggers()).thenReturn(
             listOf(
                 Trigger(0, EventType.APP_START.typeId, "appStartTest", mutableListOf()),
-                Trigger(0, EventType.LOGIN_SUCCESSFUL.typeId, "loginSuccessfulTest", mutableListOf())
-            )
+                Trigger(0, EventType.LOGIN_SUCCESSFUL.typeId, "loginSuccessfulTest", mutableListOf()),
+            ),
         )
 
         `when`(mockPersistentOnlyCampaign.getCampaignId()).thenReturn("test")
@@ -47,9 +47,9 @@ open class EventMatchingUtilSpec : BaseTest() {
         `when`(mockPersistentOnlyCampaign.getTriggers()).thenReturn(
             listOf(
                 Trigger(
-                    0, EventType.APP_START.typeId, "appStartTest", mutableListOf()
-                )
-            )
+                    0, EventType.APP_START.typeId, "appStartTest", mutableListOf(),
+                ),
+            ),
         )
     }
 }

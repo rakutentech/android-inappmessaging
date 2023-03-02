@@ -31,7 +31,7 @@ internal class InAppMessageViewListener(
     private val displayManager: DisplayManager = DisplayManager.instance(),
     private val buildChecker: BuildVersionChecker = BuildVersionChecker.instance(),
     private val eventScheduler: EventMessageReconciliationScheduler = EventMessageReconciliationScheduler.instance(),
-    private val inApp: InAppMessaging = InAppMessaging.instance()
+    private val inApp: InAppMessaging = InAppMessaging.instance(),
 ) :
     View.OnTouchListener, View.OnClickListener, View.OnKeyListener {
 
@@ -94,12 +94,12 @@ internal class InAppMessageViewListener(
     internal fun handleClick(
         id: Int,
         mainDispatcher: CoroutineDispatcher = Dispatchers.Main,
-        dispatcher: CoroutineDispatcher = Dispatchers.Default
+        dispatcher: CoroutineDispatcher = Dispatchers.Default,
     ) {
         CoroutineScope(mainDispatcher).launch {
             displayManager.removeMessage(
                 inApp.getRegisteredActivity(),
-                id = if (message.getType() == InAppMessageType.TOOLTIP.typeId) message.getCampaignId() else null
+                id = if (message.getType() == InAppMessageType.TOOLTIP.typeId) message.getCampaignId() else null,
             )
             withContext(dispatcher) {
                 handleMessage(id)
@@ -111,7 +111,7 @@ internal class InAppMessageViewListener(
         val result = messageCoroutine.executeTask(message, id, isOptOutChecked)
         if (result) {
             eventScheduler.startReconciliationWorker(
-                delay = (message.getMessagePayload().messageSettings.displaySettings.delay).toLong()
+                delay = (message.getMessagePayload().messageSettings.displaySettings.delay).toLong(),
             )
         }
     }
@@ -123,7 +123,7 @@ internal class InAppMessageViewListener(
             view.getLocationOnScreen(viewPosition)
             this.magnifier?.show(
                 event.rawX - viewPosition[0],
-                event.rawY - viewPosition[1]
+                event.rawY - viewPosition[1],
             )
         }
     }

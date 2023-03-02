@@ -12,5 +12,5 @@ internal data class DisplayPermissionResponse(
     val display: Boolean,
 
     @SerializedName("performPing")
-    val performPing: Boolean
+    val shouldPing: Boolean,
 )

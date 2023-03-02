@@ -195,7 +195,7 @@ class InAppMessagingTooltipViewCallbackSuccessSpec(private val position: String)
     companion object {
         @JvmStatic
         @ParameterizedRobolectricTestRunner.Parameters(
-            name = "{0}"
+            name = "{0}",
         )
         fun data(): List<Array<out Any?>> {
             return listOf(
@@ -206,7 +206,7 @@ class InAppMessagingTooltipViewCallbackSuccessSpec(private val position: String)
                 arrayOf("bottom-right"),
                 arrayOf("bottom-center"),
                 arrayOf("bottom-left"),
-                arrayOf("left")
+                arrayOf("left"),
             )
         }
     }
@@ -226,7 +226,7 @@ class InAppMessagingTooltipViewPopulateDataSpec(private val position: String, pr
     companion object {
         @JvmStatic
         @ParameterizedRobolectricTestRunner.Parameters(
-            name = "{0}"
+            name = "{0}",
         )
         fun data(): List<Array<out Any?>> {
             return listOf(

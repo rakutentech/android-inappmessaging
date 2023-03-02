@@ -18,7 +18,8 @@ enum class ValueType(@NotNull val typeId: Int) {
     INTEGER(2),
     DOUBLE(3),
     BOOLEAN(4),
-    TIME_IN_MILLI(5);
+    TIME_IN_MILLI(5),
+    ;
 
     companion object {
         /**

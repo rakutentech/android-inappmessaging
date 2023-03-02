@@ -113,7 +113,7 @@ open class CampaignRepositorySpec : BaseTest() {
             ApplicationProvider.getApplicationContext(),
             InAppMessaging.getPreferencesFile(),
             CampaignRepository.IAM_USER_CACHE,
-            1
+            1,
         )
         CampaignRepository.instance().messages.shouldBeEmpty()
     }
@@ -122,7 +122,7 @@ open class CampaignRepositorySpec : BaseTest() {
         WorkManagerTestInitHelper.initializeTestWorkManager(ApplicationProvider.getApplicationContext())
         Settings.Secure.putString(
             ApplicationProvider.getApplicationContext<Context>().contentResolver,
-            Settings.Secure.ANDROID_ID, "test_device_id"
+            Settings.Secure.ANDROID_ID, "test_device_id",
         )
         InAppMessaging.initialize(ApplicationProvider.getApplicationContext(), isCache)
         InAppMessaging.instance().registerPreference(infoProvider)

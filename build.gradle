@@ -1,7 +1,7 @@
 buildscript {
     ext.dokka_version = '1.7.10'
     ext.compose_version = '1.1.1'
-    ext.detekt_version = '1.21.0'
+    ext.detekt_version = '1.22.0'
 
     // Build Config.
     apply from: 'config/index.gradle'

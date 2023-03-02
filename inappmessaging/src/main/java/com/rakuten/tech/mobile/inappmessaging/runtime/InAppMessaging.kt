@@ -140,13 +140,13 @@ abstract class InAppMessaging internal constructor() {
             context: Context,
             subscriptionKey: String? = null,
             configUrl: String? = null,
-            enableTooltipFeature: Boolean? = false
+            enableTooltipFeature: Boolean? = false,
         ): Boolean {
             return try {
                 initialize(
                     context = context, isCacheHandling = BuildConfig.IS_CACHE_HANDLING,
                     subscriptionKey = subscriptionKey, configUrl = configUrl,
-                    enableTooltipFeature = enableTooltipFeature
+                    enableTooltipFeature = enableTooltipFeature,
                 )
                 true
             } catch (ex: Exception) {
@@ -167,7 +167,7 @@ abstract class InAppMessaging internal constructor() {
             subscriptionKey: String? = null,
             configUrl: String? = null,
             enableTooltipFeature: Boolean? = false,
-            configScheduler: ConfigScheduler = ConfigScheduler.instance()
+            configScheduler: ConfigScheduler = ConfigScheduler.instance(),
         ) {
             val manifestConfig = InApp.AppManifestConfig(context)
 
@@ -183,7 +183,7 @@ abstract class InAppMessaging internal constructor() {
                 context = context,
                 subscriptionKey = if (!subsKeyTrim.isNullOrEmpty()) subsKeyTrim else manifestConfig.subscriptionKey(),
                 configUrl = if (!configUrlTrim.isNullOrEmpty()) configUrlTrim else manifestConfig.configUrl(),
-                enableTooltipFeature = enableTooltipFeature
+                enableTooltipFeature = enableTooltipFeature,
             )
 
             configScheduler.startConfig()

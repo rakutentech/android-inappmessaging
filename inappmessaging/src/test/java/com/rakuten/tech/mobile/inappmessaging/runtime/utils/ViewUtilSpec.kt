@@ -32,7 +32,7 @@ class ViewUtilSpec : BaseTest() {
     fun `should have correct duration for bottom animation`() {
         val animation = ViewUtil.getSlidingAnimation(
             ApplicationProvider.getApplicationContext(),
-            SlideFromDirectionType.BOTTOM
+            SlideFromDirectionType.BOTTOM,
         )
         animation?.duration shouldBeEqualTo 400L
     }
@@ -41,7 +41,7 @@ class ViewUtilSpec : BaseTest() {
     fun `should have correct duration for right animation`() {
         val animation = ViewUtil.getSlidingAnimation(
             ApplicationProvider.getApplicationContext(),
-            SlideFromDirectionType.RIGHT
+            SlideFromDirectionType.RIGHT,
         )
         animation?.duration shouldBeEqualTo 400L
     }
@@ -50,7 +50,7 @@ class ViewUtilSpec : BaseTest() {
     fun `should have correct duration for left animation`() {
         val animation = ViewUtil.getSlidingAnimation(
             ApplicationProvider.getApplicationContext(),
-            SlideFromDirectionType.LEFT
+            SlideFromDirectionType.LEFT,
         )
         animation?.duration shouldBeEqualTo 400L
     }
@@ -59,7 +59,7 @@ class ViewUtilSpec : BaseTest() {
     fun `should have correct duration for others animation`() {
         val animation = ViewUtil.getSlidingAnimation(
             ApplicationProvider.getApplicationContext(),
-            SlideFromDirectionType.INVALID
+            SlideFromDirectionType.INVALID,
         )
         animation?.duration shouldBeEqualTo 400L
     }
@@ -199,7 +199,7 @@ class ViewUtilGetTooltipPosition {
         mockTooltip,
         mockAnchor,
         type,
-        0
+        0,
     )
 
     companion object {

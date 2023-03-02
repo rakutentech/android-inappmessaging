@@ -9,5 +9,5 @@ internal data class UserIdentifier(
     @SerializedName("id")
     private val id: String,
     @SerializedName("type")
-    private val type: Int
+    private val type: Int,
 )

@@ -17,7 +17,7 @@ import java.util.Locale
 data class Attribute(
     @NotNull private val nm: String,
     @NotNull val value: String,
-    @NotNull private val type: ValueType
+    @NotNull private val type: ValueType,
 ) {
     /** Attribute name. */
     val name = nm.lowercase(Locale.getDefault())

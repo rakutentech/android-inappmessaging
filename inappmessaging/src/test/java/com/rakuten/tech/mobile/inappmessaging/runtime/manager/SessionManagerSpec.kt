@@ -47,7 +47,7 @@ class SessionManagerSpec : BaseTest() {
         Settings.Secure.putString(
             ApplicationProvider.getApplicationContext<Context>().contentResolver,
             Settings.Secure.ANDROID_ID,
-            "test_device_id"
+            "test_device_id",
         )
         InAppMessaging.initialize(ApplicationProvider.getApplicationContext())
         `when`(configResponseData.rollOutPercentage).thenReturn(100)
@@ -66,7 +66,7 @@ class SessionManagerSpec : BaseTest() {
         Settings.Secure.putString(
             ApplicationProvider.getApplicationContext<Context>().contentResolver,
             Settings.Secure.ANDROID_ID,
-            "test_device_id"
+            "test_device_id",
         )
         InAppMessaging.initialize(ApplicationProvider.getApplicationContext())
         `when`(configResponseData.rollOutPercentage).thenReturn(0)
@@ -84,7 +84,7 @@ class SessionManagerSpec : BaseTest() {
         Settings.Secure.putString(
             ApplicationProvider.getApplicationContext<Context>().contentResolver,
             Settings.Secure.ANDROID_ID,
-            "test_device_id"
+            "test_device_id",
         )
         InAppMessaging.initialize(ApplicationProvider.getApplicationContext())
         `when`(configResponseData.rollOutPercentage).thenReturn(0)
@@ -102,7 +102,7 @@ class SessionManagerSpec : BaseTest() {
         Settings.Secure.putString(
             ApplicationProvider.getApplicationContext<Context>().contentResolver,
             Settings.Secure.ANDROID_ID,
-            "test_device_id"
+            "test_device_id",
         )
         InAppMessaging.initialize(ApplicationProvider.getApplicationContext())
         `when`(configResponseData.rollOutPercentage).thenReturn(0)
@@ -119,7 +119,7 @@ class SessionManagerSpec : BaseTest() {
         WorkManagerTestInitHelper.initializeTestWorkManager(ApplicationProvider.getApplicationContext())
         Settings.Secure.putString(
             ApplicationProvider.getApplicationContext<Context>().contentResolver,
-            Settings.Secure.ANDROID_ID, "test_device_id"
+            Settings.Secure.ANDROID_ID, "test_device_id",
         )
         InAppMessaging.initialize(ApplicationProvider.getApplicationContext())
 

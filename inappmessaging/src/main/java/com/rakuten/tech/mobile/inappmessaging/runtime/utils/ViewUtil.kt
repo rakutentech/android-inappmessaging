@@ -28,10 +28,7 @@ internal object ViewUtil {
      * animation.
      */
     @SuppressWarnings("SwallowedException", "ElseCaseInsteadOfExhaustiveWhen")
-    fun getSlidingAnimation(
-        context: Context,
-        direction: SlideFromDirectionType
-    ): Animation? {
+    fun getSlidingAnimation(context: Context, direction: SlideFromDirectionType): Animation? {
         return try {
             when (direction) {
                 SlideFromDirectionType.RIGHT -> AnimationUtils.loadAnimation(context, R.anim.slide_from_right)
@@ -63,7 +60,7 @@ internal object ViewUtil {
         view: View,
         anchorView: View,
         positionType: PositionType,
-        margin: Int
+        margin: Int,
     ): Point {
         val location = Point()
 

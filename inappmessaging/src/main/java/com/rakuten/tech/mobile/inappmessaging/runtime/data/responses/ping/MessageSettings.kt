@@ -10,5 +10,5 @@ internal data class MessageSettings(
     val displaySettings: DisplaySettings,
 
     @com.google.gson.annotations.SerializedName("controlSettings")
-    val controlSettings: ControlSettings
+    val controlSettings: ControlSettings,
 )

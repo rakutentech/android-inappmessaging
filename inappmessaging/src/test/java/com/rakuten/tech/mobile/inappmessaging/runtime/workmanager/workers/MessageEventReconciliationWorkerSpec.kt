@@ -52,7 +52,7 @@ class MessageEventReconciliationWorkerSpec : BaseTest() {
             workerParameters,
             EventMatchingUtil.instance(),
             MessageEventReconciliationUtil.instance(),
-            MessageReadinessManager.instance()
+            MessageReadinessManager.instance(),
         )
         CampaignRepository.instance().syncWith(listOf(message, notTestMessage), 0)
         worker?.doWork() shouldBeEqualTo ListenableWorker.Result.success()

@@ -63,14 +63,14 @@ open class ConfigWorkerSpec : BaseTest() {
         val testAppInfo = HostAppInfo(
             "rakuten.com.tech.mobile.test",
             InAppMessagingTestConstants.DEVICE_ID, InAppMessagingTestConstants.APP_VERSION,
-            "test-key", InAppMessagingTestConstants.LOCALE
+            "test-key", InAppMessagingTestConstants.LOCALE,
         )
         HostAppInfoRepository.instance().addHostInfo(testAppInfo)
         val context: Context = ApplicationProvider.getApplicationContext()
         WorkManagerTestInitHelper.initializeTestWorkManager(context)
         Settings.Secure.putString(
             ApplicationProvider.getApplicationContext<Context>().contentResolver,
-            Settings.Secure.ANDROID_ID, "test_device_id"
+            Settings.Secure.ANDROID_ID, "test_device_id",
         )
 
         InAppMessaging.initialize(ApplicationProvider.getApplicationContext(), true)
@@ -112,7 +112,9 @@ class ConfigWorkerSuccessSpec : ConfigWorkerSpec() {
         val worker = ConfigWorker(this.ctx, workParam, mockHostRepo, mockConfigRepo, mockMsgSched)
         val expected = if (bundle.getString(CONFIG_KEY, "").isNullOrEmpty()) {
             ListenableWorker.Result.retry()
-        } else ListenableWorker.Result.success()
+        } else {
+            ListenableWorker.Result.success()
+        }
         worker.doWork() shouldBeEqualTo expected
     }
 
@@ -123,7 +125,9 @@ class ConfigWorkerSuccessSpec : ConfigWorkerSpec() {
         val worker = ConfigWorker(ctx, workParam)
         val expected = if (HostAppInfoRepository.instance().getConfigUrl().isNullOrEmpty()) {
             ListenableWorker.Result.retry()
-        } else ListenableWorker.Result.success()
+        } else {
+            ListenableWorker.Result.success()
+        }
         worker.doWork() shouldBeEqualTo expected
     }
 
@@ -133,7 +137,7 @@ class ConfigWorkerSuccessSpec : ConfigWorkerSpec() {
         `when`(mockResponse?.code()).thenReturn(RetryDelayUtil.RETRY_ERROR_CODE)
         ConfigWorker(
             ctx, workParam, HostAppInfoRepository.instance(), ConfigResponseRepository.instance(),
-            MessageMixerPingScheduler.instance(), mockConfigSched, mockRetry
+            MessageMixerPingScheduler.instance(), mockConfigSched, mockRetry,
         )
             .onResponse(mockResponse!!) shouldBeEqualTo ListenableWorker.Result.Success()
 
@@ -147,7 +151,7 @@ class ConfigWorkerSuccessSpec : ConfigWorkerSpec() {
         `when`(mockResponse?.code()).thenReturn(RetryDelayUtil.RETRY_ERROR_CODE)
         val worker = ConfigWorker(
             ctx, workParam, HostAppInfoRepository.instance(),
-            ConfigResponseRepository.instance(), MessageMixerPingScheduler.instance(), mockConfigSched
+            ConfigResponseRepository.instance(), MessageMixerPingScheduler.instance(), mockConfigSched,
         )
         verifyBackoff(worker)
     }
@@ -159,7 +163,7 @@ class ConfigWorkerSuccessSpec : ConfigWorkerSpec() {
         setupErrorBody()
         val worker = ConfigWorker(
             ctx, workParam, mockHostRepo,
-            mockConfigRepo, mockMsgSched, mockConfigSched
+            mockConfigRepo, mockMsgSched, mockConfigSched,
         )
         worker.onResponse(mockResponse!!) shouldBeEqualTo ListenableWorker.Result.Success()
         Mockito.verify(mockConfigSched).startConfig(eq(RetryDelayUtil.INITIAL_BACKOFF_DELAY), anyOrNull())
@@ -180,7 +184,7 @@ class ConfigWorkerSuccessSpec : ConfigWorkerSpec() {
         setupErrorBody()
         val worker = ConfigWorker(
             ctx, workParam, HostAppInfoRepository.instance(),
-            ConfigResponseRepository.instance(), MessageMixerPingScheduler.instance(), mockConfigSched
+            ConfigResponseRepository.instance(), MessageMixerPingScheduler.instance(), mockConfigSched,
         )
 
         verifyBackoff(worker)
@@ -196,7 +200,7 @@ class ConfigWorkerSuccessSpec : ConfigWorkerSpec() {
 
         worker.onResponse(mockResponse) shouldBeEqualTo ListenableWorker.Result.Success()
         Mockito.verify(mockConfigSched).startConfig(
-            AdditionalMatchers.gt(RetryDelayUtil.INITIAL_BACKOFF_DELAY * 2), anyOrNull()
+            AdditionalMatchers.gt(RetryDelayUtil.INITIAL_BACKOFF_DELAY * 2), anyOrNull(),
         )
         ConfigScheduler.currDelay shouldBeGreaterThan (RetryDelayUtil.INITIAL_BACKOFF_DELAY * 4)
     }
@@ -212,7 +216,7 @@ class ConfigWorkerFailSpec : ConfigWorkerSpec() {
         `when`(mockResponse?.body()).thenReturn(null)
         val worker = ConfigWorker(
             ctx, workParam, HostAppInfoRepository.instance(),
-            ConfigResponseRepository.instance(), MessageMixerPingScheduler.instance(), mockConfigSched
+            ConfigResponseRepository.instance(), MessageMixerPingScheduler.instance(), mockConfigSched,
         )
         repeat(3) {
             worker.onResponse(mockResponse!!) shouldBeEqualTo ListenableWorker.Result.success()
@@ -244,7 +248,7 @@ class ConfigWorkerFailSpec : ConfigWorkerSpec() {
         `when`(mockHostRepo.getPackageName()).thenReturn("")
         val worker = ConfigWorker(
             ctx, workParam, mockHostRepo, ConfigResponseRepository.instance(),
-            MessageMixerPingScheduler.instance()
+            MessageMixerPingScheduler.instance(),
         )
         worker.doWork() shouldBeEqualTo ListenableWorker.Result.failure()
     }
@@ -255,7 +259,7 @@ class ConfigWorkerFailSpec : ConfigWorkerSpec() {
         `when`(mockHostRepo.getVersion()).thenReturn("")
         val worker = ConfigWorker(
             ctx, workParam, mockHostRepo, ConfigResponseRepository.instance(),
-            MessageMixerPingScheduler.instance()
+            MessageMixerPingScheduler.instance(),
         )
         worker.doWork() shouldBeEqualTo ListenableWorker.Result.failure()
     }
@@ -267,7 +271,7 @@ class ConfigWorkerFailSpec : ConfigWorkerSpec() {
         `when`(mockHostRepo.getSubscriptionKey()).thenReturn("")
         val worker = ConfigWorker(
             ctx, workParam, mockHostRepo, ConfigResponseRepository.instance(),
-            MessageMixerPingScheduler.instance()
+            MessageMixerPingScheduler.instance(),
         )
         worker.doWork() shouldBeEqualTo ListenableWorker.Result.failure()
     }

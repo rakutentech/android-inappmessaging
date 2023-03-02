@@ -36,7 +36,7 @@ internal object ImpressionManager {
         impressionList: List<Impression>,
         campaignId: String,
         isTestMessage: Boolean,
-        sendEvent: (String, data: Map<String, *>?) -> Boolean = EventTrackerHelper::sendEvent
+        sendEvent: (String, data: Map<String, *>?) -> Boolean = EventTrackerHelper::sendEvent,
     ) {
         if (impressionList.isEmpty()) return
 
@@ -55,7 +55,7 @@ internal object ImpressionManager {
             appVersion = HostAppInfoRepository.instance().getVersion(),
             sdkVersion = BuildConfig.VERSION_NAME,
             userIdentifiers = RuntimeUtil.getUserIdentifiers(),
-            impressions = impListRequest
+            impressions = impListRequest,
         )
 
         // Schedule work to report impressions back to IAM backend.
@@ -66,7 +66,7 @@ internal object ImpressionManager {
         campaignId: String,
         impressionList: List<Impression>,
         sendEvent: (String, data: Map<String, *>?) -> Boolean = EventTrackerHelper::sendEvent,
-        impressionTypeOnly: Boolean = false
+        impressionTypeOnly: Boolean = false,
     ) {
         if (impressionList.isEmpty()) return
 

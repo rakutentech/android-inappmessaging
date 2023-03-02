@@ -3,7 +3,8 @@ package com.rakuten.tech.mobile.inappmessaging.runtime.data.enums
 internal enum class CampaignType(val typeId: Int) {
     INVALID(0),
     REGULAR(1),
-    PUSH_PRIMER(2);
+    PUSH_PRIMER(2),
+    ;
 
     companion object {
 

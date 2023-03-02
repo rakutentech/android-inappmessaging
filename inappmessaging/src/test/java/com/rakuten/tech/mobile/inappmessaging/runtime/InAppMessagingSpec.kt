@@ -89,7 +89,7 @@ open class InAppMessagingSpec : BaseTest() {
         configRepo: ConfigResponseRepository = ConfigResponseRepository.instance(),
         sessionManager: SessionManager = SessionManager,
         readinessManager: MessageReadinessManager = MessageReadinessManager.instance(),
-        primerManager: PushPrimerTrackerManager = PushPrimerTrackerManager
+        primerManager: PushPrimerTrackerManager = PushPrimerTrackerManager,
     ): InAppMessaging {
         `when`(configResponseData.rollOutPercentage).thenReturn(rollout)
         ConfigResponseRepository.instance().addConfigResponse(configResponseData)
@@ -105,7 +105,7 @@ open class InAppMessagingSpec : BaseTest() {
             configRepo = configRepo,
             sessionManager = sessionManager,
             messageReadinessManager = readinessManager,
-            primerManager = primerManager
+            primerManager = primerManager,
         )
     }
 }
@@ -513,10 +513,10 @@ class InAppMessagingExceptionSpec : InAppMessagingSpec() {
                 ValidTestMessage(
                     campaignId = "1",
                     type = InAppMessageType.TOOLTIP.typeId,
-                    tooltip = Tooltip("ui-element", "top-center", "testurl")
-                )
+                    tooltip = Tooltip("ui-element", "top-center", "testurl"),
+                ),
             ),
-            0
+            0,
         )
 
         instance.closeTooltip("ui-element")
@@ -622,7 +622,7 @@ class InAppMessagingRemoveSpec : InAppMessagingSpec() {
         val message = ValidTestMessage(
             campaignId = "1",
             type = InAppMessageType.TOOLTIP.typeId,
-            tooltip = Tooltip("ui-element", "top-center", "testurl")
+            tooltip = Tooltip("ui-element", "top-center", "testurl"),
         )
         setupDisplayedView(message, true)
         val mockMgr = Mockito.mock(MessageReadinessManager::class.java)
@@ -641,7 +641,7 @@ class InAppMessagingRemoveSpec : InAppMessagingSpec() {
         val message = ValidTestMessage(
             campaignId = "1",
             type = InAppMessageType.TOOLTIP.typeId,
-            tooltip = Tooltip("invalid-element", "top-center", "testurl")
+            tooltip = Tooltip("invalid-element", "top-center", "testurl"),
         )
         setupDisplayedView(message, true)
         val mockMgr = Mockito.mock(MessageReadinessManager::class.java)
@@ -715,7 +715,7 @@ class InAppMessagingPrimerTrackerSpec : InAppMessagingSpec() {
         val inApp = initializeMockInstance(primerManager = mockMgr)
 
         inApp.trackPushPrimer(
-            arrayOf(Manifest.permission.POST_NOTIFICATIONS), intArrayOf(PackageManager.PERMISSION_GRANTED)
+            arrayOf(Manifest.permission.POST_NOTIFICATIONS), intArrayOf(PackageManager.PERMISSION_GRANTED),
         )
 
         verify(mockMgr).sendPrimerEvent(eq(1), any())
@@ -726,7 +726,7 @@ class InAppMessagingPrimerTrackerSpec : InAppMessagingSpec() {
         val inApp = initializeMockInstance(primerManager = mockMgr)
 
         inApp.trackPushPrimer(
-            arrayOf(Manifest.permission.POST_NOTIFICATIONS), intArrayOf(PackageManager.PERMISSION_DENIED)
+            arrayOf(Manifest.permission.POST_NOTIFICATIONS), intArrayOf(PackageManager.PERMISSION_DENIED),
         )
 
         verify(mockMgr).sendPrimerEvent(eq(0), any())
@@ -737,7 +737,7 @@ class InAppMessagingPrimerTrackerSpec : InAppMessagingSpec() {
         val inApp = initializeMockInstance(primerManager = mockMgr)
 
         inApp.trackPushPrimer(
-            arrayOf(Manifest.permission.ACCESS_FINE_LOCATION), intArrayOf(PackageManager.PERMISSION_DENIED)
+            arrayOf(Manifest.permission.ACCESS_FINE_LOCATION), intArrayOf(PackageManager.PERMISSION_DENIED),
         )
 
         verify(mockMgr, never()).sendPrimerEvent(any(), any())
@@ -749,7 +749,7 @@ class InAppMessagingPrimerTrackerSpec : InAppMessagingSpec() {
 
         inApp.trackPushPrimer(
             arrayOf(Manifest.permission.ACCESS_FINE_LOCATION),
-            intArrayOf(PackageManager.PERMISSION_DENIED, PackageManager.PERMISSION_GRANTED)
+            intArrayOf(PackageManager.PERMISSION_DENIED, PackageManager.PERMISSION_GRANTED),
         )
 
         verify(mockMgr, never()).sendPrimerEvent(any(), any())
@@ -761,7 +761,7 @@ class InAppMessagingPrimerTrackerSpec : InAppMessagingSpec() {
 
         inApp.trackPushPrimer(
             arrayOf(Manifest.permission.ACCESS_FINE_LOCATION, Manifest.permission.ACCESS_COARSE_LOCATION),
-            intArrayOf(PackageManager.PERMISSION_DENIED)
+            intArrayOf(PackageManager.PERMISSION_DENIED),
         )
 
         verify(mockMgr, never()).sendPrimerEvent(any(), any())
@@ -774,7 +774,7 @@ class InAppMessagingPrimerTrackerSpec : InAppMessagingSpec() {
 
         inApp.trackPushPrimer(
             arrayOf(Manifest.permission.ACCESS_FINE_LOCATION),
-            intArrayOf(PackageManager.PERMISSION_DENIED, PackageManager.PERMISSION_GRANTED)
+            intArrayOf(PackageManager.PERMISSION_DENIED, PackageManager.PERMISSION_GRANTED),
         )
 
         verify(mockMgr, never()).sendPrimerEvent(any(), any())

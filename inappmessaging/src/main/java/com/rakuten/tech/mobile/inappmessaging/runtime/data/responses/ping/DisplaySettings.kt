@@ -19,11 +19,11 @@ internal data class DisplaySettings(
     val textAlign: Int,
 
     @SerializedName("optOut")
-    val optOut: Boolean,
+    val isOptedOut: Boolean,
 
     @SerializedName("delay")
     val delay: Int,
 
     @SerializedName("html")
-    val html: Boolean // currently not used (always false)
+    val isHtml: Boolean, // currently not used (always false)
 )

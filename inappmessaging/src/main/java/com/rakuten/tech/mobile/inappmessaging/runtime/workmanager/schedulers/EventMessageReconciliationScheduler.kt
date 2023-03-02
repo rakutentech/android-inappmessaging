@@ -41,7 +41,7 @@ internal interface EventMessageReconciliationScheduler {
                 context?.let { ctx ->
                     val manager = workManager ?: WorkManager.getInstance(ctx)
                     manager.beginUniqueWork(
-                        MESSAGES_EVENTS_WORKER_NAME, ExistingWorkPolicy.REPLACE, reconciliationWorkRequest
+                        MESSAGES_EVENTS_WORKER_NAME, ExistingWorkPolicy.REPLACE, reconciliationWorkRequest,
                     ).enqueue()
                 }
             } catch (ie: IllegalStateException) {

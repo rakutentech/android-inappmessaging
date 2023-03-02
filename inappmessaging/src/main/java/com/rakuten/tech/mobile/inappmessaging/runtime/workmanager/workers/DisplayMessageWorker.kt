@@ -25,7 +25,7 @@ import java.lang.Exception
  */
 internal class DisplayMessageWorker(
     context: Context,
-    params: WorkerParameters
+    params: WorkerParameters,
 ) : CoroutineWorker(context, params) {
     var messageReadinessManager = MessageReadinessManager.instance()
     var handler = Handler(Looper.getMainLooper())
@@ -65,11 +65,7 @@ internal class DisplayMessageWorker(
      * This method fetches image from network, then cache it in memory.
      * Once image is fully downloaded, the message will be displayed.
      */
-    private fun fetchImageThenDisplayMessage(
-        message: Message,
-        hostActivity: Activity,
-        imageUrl: String
-    ) {
+    private fun fetchImageThenDisplayMessage(message: Message, hostActivity: Activity, imageUrl: String) {
         ImageUtil.fetchImage(
             imageUrl = imageUrl,
             callback = object : Callback {
@@ -81,7 +77,7 @@ internal class DisplayMessageWorker(
                     InAppLogger(TAG).debug("Downloading image failed")
                 }
             },
-            context = hostActivity, picasso = picasso
+            context = hostActivity, picasso = picasso,
         )
     }
 

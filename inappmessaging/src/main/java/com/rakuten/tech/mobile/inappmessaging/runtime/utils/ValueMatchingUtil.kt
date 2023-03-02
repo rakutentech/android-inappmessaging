@@ -19,13 +19,16 @@ internal object ValueMatchingUtil {
     fun isOperatorConditionSatisfied(eventValue: Int?, operatorType: OperatorType?, triggerValue: Int?): Boolean {
         return if (eventValue == null || operatorType == null || triggerValue == null) {
             false
-        } else when (operatorType) {
-            OperatorType.EQUALS -> eventValue == triggerValue
-            OperatorType.DOES_NOT_EQUAL -> eventValue != triggerValue
-            OperatorType.GREATER_THAN -> eventValue > triggerValue
-            OperatorType.LESS_THAN -> eventValue < triggerValue
-            OperatorType.IS_BLANK, OperatorType.IS_NOT_BLANK,
-            OperatorType.MATCHES_REGEX, OperatorType.DOES_NOT_MATCH_REGEX, OperatorType.INVALID -> false
+        } else {
+            when (operatorType) {
+                OperatorType.EQUALS -> eventValue == triggerValue
+                OperatorType.DOES_NOT_EQUAL -> eventValue != triggerValue
+                OperatorType.GREATER_THAN -> eventValue > triggerValue
+                OperatorType.LESS_THAN -> eventValue < triggerValue
+                OperatorType.IS_BLANK, OperatorType.IS_NOT_BLANK,
+                OperatorType.MATCHES_REGEX, OperatorType.DOES_NOT_MATCH_REGEX, OperatorType.INVALID,
+                -> false
+            }
         }
     }
 
@@ -46,7 +49,8 @@ internal object ValueMatchingUtil {
             OperatorType.GREATER_THAN -> eventValueDecimal > triggerValueDecimal
             OperatorType.LESS_THAN -> eventValueDecimal < triggerValueDecimal
             OperatorType.IS_BLANK, OperatorType.IS_NOT_BLANK,
-            OperatorType.MATCHES_REGEX, OperatorType.DOES_NOT_MATCH_REGEX, OperatorType.INVALID -> false
+            OperatorType.MATCHES_REGEX, OperatorType.DOES_NOT_MATCH_REGEX, OperatorType.INVALID,
+            -> false
         }
     }
 
@@ -61,7 +65,7 @@ internal object ValueMatchingUtil {
         eventValue: Long?,
         operatorType: OperatorType?,
         triggerValue: Long?,
-        isTime: Boolean
+        isTime: Boolean,
     ): Boolean {
         return if (eventValue == null || operatorType == null || triggerValue == null) {
             false
@@ -79,7 +83,8 @@ internal object ValueMatchingUtil {
             OperatorType.GREATER_THAN -> eventValue > triggerValue
             OperatorType.LESS_THAN -> eventValue < triggerValue
             OperatorType.IS_BLANK, OperatorType.IS_NOT_BLANK,
-            OperatorType.MATCHES_REGEX, OperatorType.DOES_NOT_MATCH_REGEX, OperatorType.INVALID -> false
+            OperatorType.MATCHES_REGEX, OperatorType.DOES_NOT_MATCH_REGEX, OperatorType.INVALID,
+            -> false
         }
     }
 
@@ -90,7 +95,8 @@ internal object ValueMatchingUtil {
             OperatorType.GREATER_THAN -> eventValue - triggerValue > TIME_IN_MILLIS_TOLERANCE
             OperatorType.LESS_THAN -> eventValue - triggerValue < -TIME_IN_MILLIS_TOLERANCE
             OperatorType.IS_BLANK, OperatorType.IS_NOT_BLANK,
-            OperatorType.MATCHES_REGEX, OperatorType.DOES_NOT_MATCH_REGEX, OperatorType.INVALID -> false
+            OperatorType.MATCHES_REGEX, OperatorType.DOES_NOT_MATCH_REGEX, OperatorType.INVALID,
+            -> false
         }
     }
 
@@ -98,16 +104,22 @@ internal object ValueMatchingUtil {
      * This method compares two Boolean values (i.e. [eventValue] and [triggerValue]) using the [operatorType].
      * Supported operators are: EQUALS, DOES_NOT_EQUAL.
      */
-    fun isOperatorConditionSatisfied(eventValue: Boolean?, operatorType: OperatorType?, triggerValue: Boolean?):
-        Boolean {
+    fun isOperatorConditionSatisfied(
+        eventValue: Boolean?,
+        operatorType: OperatorType?,
+        triggerValue: Boolean?,
+    ): Boolean {
         return if (eventValue == null || operatorType == null || triggerValue == null) {
             false
-        } else when (operatorType) {
-            OperatorType.EQUALS -> eventValue == triggerValue
-            OperatorType.DOES_NOT_EQUAL -> eventValue != triggerValue
-            OperatorType.GREATER_THAN, OperatorType.LESS_THAN, OperatorType.IS_BLANK,
-            OperatorType.IS_NOT_BLANK, OperatorType.MATCHES_REGEX,
-            OperatorType.DOES_NOT_MATCH_REGEX, OperatorType.INVALID -> false
+        } else {
+            when (operatorType) {
+                OperatorType.EQUALS -> eventValue == triggerValue
+                OperatorType.DOES_NOT_EQUAL -> eventValue != triggerValue
+                OperatorType.GREATER_THAN, OperatorType.LESS_THAN, OperatorType.IS_BLANK,
+                OperatorType.IS_NOT_BLANK, OperatorType.MATCHES_REGEX,
+                OperatorType.DOES_NOT_MATCH_REGEX, OperatorType.INVALID,
+                -> false
+            }
         }
     }
 
@@ -121,14 +133,16 @@ internal object ValueMatchingUtil {
     fun isOperatorConditionSatisfied(eventValue: String?, operatorType: OperatorType?, triggerValue: String?): Boolean {
         return if (eventValue == null || operatorType == null || triggerValue == null) {
             false
-        } else when (operatorType) {
-            OperatorType.EQUALS -> eventValue.equals(triggerValue, ignoreCase = true)
-            OperatorType.DOES_NOT_EQUAL -> !eventValue.equals(triggerValue, ignoreCase = true)
-            OperatorType.IS_BLANK -> eventValue.isEmpty()
-            OperatorType.IS_NOT_BLANK -> eventValue.isNotEmpty()
-            OperatorType.MATCHES_REGEX -> eventValue.matches(triggerValue.toRegex())
-            OperatorType.DOES_NOT_MATCH_REGEX -> !eventValue.matches(triggerValue.toRegex())
-            OperatorType.GREATER_THAN, OperatorType.LESS_THAN, OperatorType.INVALID -> false
+        } else {
+            when (operatorType) {
+                OperatorType.EQUALS -> eventValue.equals(triggerValue, ignoreCase = true)
+                OperatorType.DOES_NOT_EQUAL -> !eventValue.equals(triggerValue, ignoreCase = true)
+                OperatorType.IS_BLANK -> eventValue.isEmpty()
+                OperatorType.IS_NOT_BLANK -> eventValue.isNotEmpty()
+                OperatorType.MATCHES_REGEX -> eventValue.matches(triggerValue.toRegex())
+                OperatorType.DOES_NOT_MATCH_REGEX -> !eventValue.matches(triggerValue.toRegex())
+                OperatorType.GREATER_THAN, OperatorType.LESS_THAN, OperatorType.INVALID -> false
+            }
         }
     }
 }

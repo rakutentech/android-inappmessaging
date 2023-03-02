@@ -69,7 +69,7 @@ internal open class InAppMessageBaseView(context: Context, attrs: AttributeSet?)
         this.buttons = message.getMessagePayload().messageSettings.controlSettings.buttons
         this.imageUrl = message.getMessagePayload().resource.imageUrl
         this.listener = InAppMessageViewListener(message)
-        this.displayOptOut = message.getMessagePayload().messageSettings.displaySettings.optOut
+        this.displayOptOut = message.getMessagePayload().messageSettings.displaySettings.isOptedOut
         this.isDismissable = message.isCampaignDismissable()
         bindViewData()
         this.tag = message.getCampaignId()
@@ -112,11 +112,11 @@ internal open class InAppMessageBaseView(context: Context, attrs: AttributeSet?)
     private fun bindButtons() {
         // Set onClick listener to close button.
         val closeButton = findViewById<ImageButton>(R.id.message_close_button)
-        closeButton?.let {
+        closeButton?.let { button ->
             if (isDismissable) {
-                it.setOnClickListener(this.listener)
+                button.setOnClickListener(this.listener)
             } else {
-                it.visibility = View.GONE
+                button.visibility = View.GONE
             }
         }
 
@@ -328,8 +328,8 @@ internal open class InAppMessageBaseView(context: Context, attrs: AttributeSet?)
         return round(
             sqrt(
                 (2 + redMean / COLOR_RANGE) * dRed * dRed + GREEN_MULTI * dGreen * dGreen +
-                    (2 + (COLOR_MAX - redMean) / COLOR_RANGE) * dBlue * dBlue
-            )
+                    (2 + (COLOR_MAX - redMean) / COLOR_RANGE) * dBlue * dBlue,
+            ),
         ).toInt()
     }
 
@@ -340,7 +340,7 @@ internal open class InAppMessageBaseView(context: Context, attrs: AttributeSet?)
             try {
                 return ResourceUtils.getFont(
                     ctx,
-                    ResourceUtils.getResourceIdentifier(ctx, ctx.getString(strId), "font")
+                    ResourceUtils.getResourceIdentifier(ctx, ctx.getString(strId), "font"),
                 )
             } catch (rex: Resources.NotFoundException) {
                 InAppLogger(TAG).debug(rex.cause, "Font file is not found. Will revert to default font.")

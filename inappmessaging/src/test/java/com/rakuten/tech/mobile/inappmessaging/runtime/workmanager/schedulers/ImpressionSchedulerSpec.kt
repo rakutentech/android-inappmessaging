@@ -38,8 +38,8 @@ class ImpressionSchedulerSpec : BaseTest() {
         super.setup()
         `when`(
             mockWorkManager.enqueue(
-                ArgumentMatchers.any(WorkRequest::class.java)
-            )
+                ArgumentMatchers.any(WorkRequest::class.java),
+            ),
         ).thenThrow(IllegalStateException("test"))
     }
 
@@ -49,7 +49,7 @@ class ImpressionSchedulerSpec : BaseTest() {
         Settings.Secure.putString(
             ApplicationProvider.getApplicationContext<Context>().contentResolver,
             Settings.Secure.ANDROID_ID,
-            "test_device_id"
+            "test_device_id",
         )
         InAppMessaging.initialize(ApplicationProvider.getApplicationContext(), true)
         setupImpressionScheduler()
@@ -97,7 +97,7 @@ class ImpressionSchedulerSpec : BaseTest() {
             BuildConfig.VERSION_NAME,
             HostAppInfoRepository.instance().getVersion(),
             RuntimeUtil.getUserIdentifiers(),
-            ImpressionManager.createImpressionList(impressionTypes)
+            ImpressionManager.createImpressionList(impressionTypes),
         )
         ImpressionScheduler().startImpressionWorker(impressionRequest, mockManager)
     }

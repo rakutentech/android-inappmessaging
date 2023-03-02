@@ -109,8 +109,8 @@ class AccountRepositoryUsageSpec : AccountRepositorySpec() {
             HostAppInfo(
                 InAppMessagingTestConstants.APP_ID,
                 InAppMessagingTestConstants.DEVICE_ID, InAppMessagingTestConstants.APP_VERSION,
-                InAppMessagingTestConstants.SUB_KEY, InAppMessagingTestConstants.LOCALE
-            )
+                InAppMessagingTestConstants.SUB_KEY, InAppMessagingTestConstants.LOCALE,
+            ),
         )
         val context = Mockito.mock(Context::class.java)
         val workerParameters = Mockito.mock(WorkerParameters::class.java)
@@ -140,7 +140,7 @@ class AccountRepositoryUsageSpec : AccountRepositorySpec() {
         `when`(mockAcctRepo.getUserId()).thenReturn("")
         `when`(
             mockAcctRepo
-                .getIdTrackingIdentifier()
+                .getIdTrackingIdentifier(),
         ).thenReturn(provider.provideIdTrackingIdentifier().toString())
         RuntimeUtil.getUserIdentifiers(mockAcctRepo).shouldHaveSize(1)
         Mockito.verify(mockAcctRepo).getIdTrackingIdentifier()

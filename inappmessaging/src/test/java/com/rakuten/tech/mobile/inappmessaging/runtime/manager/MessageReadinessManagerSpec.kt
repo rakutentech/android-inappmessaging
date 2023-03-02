@@ -48,8 +48,8 @@ open class MessageReadinessManagerSpec : BaseTest() {
                 InAppMessagingTestConstants.DEVICE_ID,
                 InAppMessagingTestConstants.APP_VERSION,
                 InAppMessagingTestConstants.SUB_KEY,
-                InAppMessagingTestConstants.LOCALE
-            )
+                InAppMessagingTestConstants.LOCALE,
+            ),
         )
         ConfigResponseRepository.instance().addConfigResponse(configResponseData)
         `when`(configResponseData.endpoints).thenReturn(configResponseEndpoints)
@@ -130,14 +130,14 @@ open class MessageReadinessManagerSpec : BaseTest() {
         initializeInApp()
         createMessageList()
         ConfigResponseRepository.instance().addConfigResponse(
-            Gson().fromJson(CONFIG_RESPONSE.trimIndent(), ConfigResponse::class.java).data
+            Gson().fromJson(CONFIG_RESPONSE.trimIndent(), ConfigResponse::class.java).data,
         )
         HostAppInfoRepository.instance().addHostInfo(
             HostAppInfo(
                 "rakuten.com.tech.mobile.test",
                 InAppMessagingTestConstants.DEVICE_ID, InAppMessagingTestConstants.APP_VERSION,
-                "2", InAppMessagingTestConstants.LOCALE
-            )
+                "2", InAppMessagingTestConstants.LOCALE,
+            ),
         )
         MessageReadinessManager.instance().getNextDisplayMessage().shouldBeEmpty()
     }
@@ -148,14 +148,14 @@ open class MessageReadinessManagerSpec : BaseTest() {
 
         createMessageList()
         ConfigResponseRepository.instance().addConfigResponse(
-            Gson().fromJson(CONFIG_RESPONSE_EMPTY.trimIndent(), ConfigResponse::class.java).data
+            Gson().fromJson(CONFIG_RESPONSE_EMPTY.trimIndent(), ConfigResponse::class.java).data,
         )
         HostAppInfoRepository.instance().addHostInfo(
             HostAppInfo(
                 "rakuten.com.tech.mobile.test",
                 InAppMessagingTestConstants.DEVICE_ID, InAppMessagingTestConstants.APP_VERSION,
-                "2", InAppMessagingTestConstants.LOCALE
-            )
+                "2", InAppMessagingTestConstants.LOCALE,
+            ),
         )
         MessageReadinessManager.instance().getNextDisplayMessage().shouldBeEmpty()
     }
@@ -191,7 +191,7 @@ open class MessageReadinessManagerSpec : BaseTest() {
         WorkManagerTestInitHelper.initializeTestWorkManager(ApplicationProvider.getApplicationContext())
         Settings.Secure.putString(
             ApplicationProvider.getApplicationContext<Context>().contentResolver,
-            Settings.Secure.ANDROID_ID, "test_device_id"
+            Settings.Secure.ANDROID_ID, "test_device_id",
         )
         InAppMessaging.initialize(ApplicationProvider.getApplicationContext(), true)
     }
@@ -237,8 +237,8 @@ class MessageReadinessManagerRequestSpec : BaseTest() {
                 InAppMessagingTestConstants.DEVICE_ID,
                 InAppMessagingTestConstants.APP_VERSION,
                 InAppMessagingTestConstants.SUB_KEY,
-                InAppMessagingTestConstants.LOCALE
-            )
+                InAppMessagingTestConstants.LOCALE,
+            ),
         )
         ConfigResponseRepository.instance().addConfigResponse(data)
         setMessagesList(arrayListOf(ValidTestMessage(CAMPAIGN_ID, false)))

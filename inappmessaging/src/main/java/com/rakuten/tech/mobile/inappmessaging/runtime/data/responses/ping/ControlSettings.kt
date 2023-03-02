@@ -9,5 +9,5 @@ internal data class ControlSettings(
     @SerializedName("buttons")
     val buttons: List<MessageButton>,
     @SerializedName("content")
-    val content: Content? = null
+    val content: Content? = null,
 )

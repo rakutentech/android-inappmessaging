@@ -34,5 +34,5 @@ internal data class MessagePayload(
     val title: String,
 
     @SerializedName("messageBodyColor")
-    val messageBodyColor: String
+    val messageBodyColor: String,
 )

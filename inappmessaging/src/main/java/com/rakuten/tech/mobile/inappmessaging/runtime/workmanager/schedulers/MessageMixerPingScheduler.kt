@@ -68,7 +68,7 @@ internal interface MessageMixerPingScheduler {
                 context?.let { ctx ->
                     val manager = workManager ?: WorkManager.getInstance(ctx)
                     manager.enqueueUniqueWork(
-                        MESSAGE_MIXER_PING_WORKER, ExistingWorkPolicy.REPLACE, periodicMessageMixerFetch
+                        MESSAGE_MIXER_PING_WORKER, ExistingWorkPolicy.REPLACE, periodicMessageMixerFetch,
                     )
                 }
             } catch (ie: IllegalStateException) {

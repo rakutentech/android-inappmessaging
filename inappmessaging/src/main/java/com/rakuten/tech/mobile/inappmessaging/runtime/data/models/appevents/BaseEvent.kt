@@ -26,7 +26,7 @@ import java.util.Collections
 abstract class BaseEvent(
     @NotNull private val eventType: EventType,
     @NotNull private var eventName: String,
-    @NotNull private val isPersistent: Boolean
+    @NotNull private val isPersistent: Boolean,
 ) : Event {
     private val timestamp: Long
 

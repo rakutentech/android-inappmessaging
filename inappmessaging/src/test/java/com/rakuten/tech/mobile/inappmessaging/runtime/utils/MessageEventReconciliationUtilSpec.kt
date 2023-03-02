@@ -41,12 +41,12 @@ open class MessageEventReconciliationUtilSpec : BaseTest() {
                     slideFrom = SlideFromDirectionType.BOTTOM.typeId,
                     endTimeMillis = 0,
                     textAlign = 0,
-                    optOut = false,
-                    html = false,
+                    isOptedOut = false,
+                    isHtml = false,
                     delay = 0,
                 ),
-                controlSettings = ControlSettings(listOf())
-            )
+                controlSettings = ControlSettings(listOf()),
+            ),
         ),
         type = InAppMessageType.MODAL.typeId,
         triggers = listOf(Trigger(0, EventType.LOGIN_SUCCESSFUL.typeId, "testEvent", mutableListOf())),
@@ -55,7 +55,7 @@ open class MessageEventReconciliationUtilSpec : BaseTest() {
         maxImpressions = 1,
         hasNoEndDate = false,
         isCampaignDismissable = true,
-        infiniteImpressions = false
+        areImpressionsInfinite = false,
     )
 
     @Before
@@ -68,7 +68,7 @@ open class MessageEventReconciliationUtilSpec : BaseTest() {
 internal class ValidatorHandler {
     data class Element(
         val campaign: Message,
-        val events: Set<Event>
+        val events: Set<Event>,
     )
     var validatedElements = mutableListOf<Element>()
     val validatedCampaigns: List<Message>
@@ -91,8 +91,8 @@ class MessageEventReconciliationUtilCampaignsSpec : MessageEventReconciliationUt
 
         handler.validatedElements.shouldBeEqualTo(
             listOf(
-                ValidatorHandler.Element(outdatedTestCampaign, setOf(event))
-            )
+                ValidatorHandler.Element(outdatedTestCampaign, setOf(event)),
+            ),
         )
     }
 
@@ -123,8 +123,8 @@ class MessageEventReconciliationUtilCampaignsSpec : MessageEventReconciliationUt
 
         handler.validatedElements.shouldBeEqualTo(
             listOf(
-                ValidatorHandler.Element(campaign, setOf(event))
-            )
+                ValidatorHandler.Element(campaign, setOf(event)),
+            ),
         )
     }
 
@@ -136,7 +136,7 @@ class MessageEventReconciliationUtilCampaignsSpec : MessageEventReconciliationUt
             maxImpressions = 0,
             triggers = listOf(Trigger(0, EventType.LOGIN_SUCCESSFUL.typeId, "testEvent", mutableListOf())),
         )
-        CampaignRepository.instance().syncWith(listOf(campaign,), 0)
+        CampaignRepository.instance().syncWith(listOf(campaign), 0)
         val event = LoginSuccessfulEvent()
         EventMatchingUtil.instance().matchAndStore(event)
         val handler = ValidatorHandler()
@@ -172,7 +172,7 @@ class MessageEventReconciliationUtilTriggerSpec : MessageEventReconciliationUtil
             maxImpressions = 2,
             triggers = listOf(
                 Trigger(0, EventType.LOGIN_SUCCESSFUL.typeId, "testEvent", mutableListOf()),
-                Trigger(0, EventType.APP_START.typeId, "testEvent2", mutableListOf())
+                Trigger(0, EventType.APP_START.typeId, "testEvent2", mutableListOf()),
             ),
         )
         CampaignRepository.instance().syncWith(listOf(campaign), 0)
@@ -192,7 +192,7 @@ class MessageEventReconciliationUtilTriggerSpec : MessageEventReconciliationUtil
             maxImpressions = 2,
             triggers = listOf(
                 Trigger(0, EventType.LOGIN_SUCCESSFUL.typeId, "testEvent", mutableListOf()),
-                Trigger(0, EventType.APP_START.typeId, "testEvent2", mutableListOf())
+                Trigger(0, EventType.APP_START.typeId, "testEvent2", mutableListOf()),
             ),
         )
         CampaignRepository.instance().syncWith(listOf(campaign), 0)
@@ -210,7 +210,7 @@ class MessageEventReconciliationUtilTriggerSpec : MessageEventReconciliationUtil
             campaignId = "test",
             isTest = false,
             maxImpressions = 2,
-            triggers = listOf()
+            triggers = listOf(),
         )
         CampaignRepository.instance().syncWith(listOf(campaign), 0)
         EventMatchingUtil.instance().matchAndStore(LoginSuccessfulEvent())
@@ -226,7 +226,7 @@ class MessageEventReconciliationUtilTriggerSpec : MessageEventReconciliationUtil
             campaignId = "test",
             isTest = true,
             maxImpressions = 2,
-            triggers = listOf()
+            triggers = listOf(),
         )
         CampaignRepository.instance().syncWith(listOf(campaign), 0)
         EventMatchingUtil.instance().matchAndStore(LoginSuccessfulEvent())
@@ -244,7 +244,7 @@ class MessageEventReconciliationUtilTriggerSpec : MessageEventReconciliationUtil
             maxImpressions = 2,
             triggers = listOf(
                 Trigger(0, EventType.LOGIN_SUCCESSFUL.typeId, "testEvent", mutableListOf()),
-                Trigger(0, EventType.PURCHASE_SUCCESSFUL.typeId, "testEvent2", mutableListOf())
+                Trigger(0, EventType.PURCHASE_SUCCESSFUL.typeId, "testEvent2", mutableListOf()),
             ),
         )
         CampaignRepository.instance().syncWith(listOf(campaign), 0)

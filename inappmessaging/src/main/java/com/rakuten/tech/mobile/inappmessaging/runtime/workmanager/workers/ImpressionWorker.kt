@@ -24,7 +24,7 @@ import java.util.concurrent.atomic.AtomicInteger
  */
 internal class ImpressionWorker(
     context: Context,
-    workerParams: WorkerParameters
+    workerParams: WorkerParameters,
 ) :
     Worker(context, workerParams) {
 
@@ -88,9 +88,8 @@ internal class ImpressionWorker(
     fun createReportImpressionCall(
         impressionEndpoint: String,
         impressionRequest: ImpressionRequest,
-        accountRepo: AccountRepository = AccountRepository.instance()
-    ): Call<ResponseBody> =
-        // Create a Retrofit API call.
+        accountRepo: AccountRepository = AccountRepository.instance(),
+    ): Call<ResponseBody> = // Create a Retrofit API call.
         RuntimeUtil.getRetrofit()
             .create(MessageMixerRetrofitService::class.java)
             .reportImpression(
@@ -98,7 +97,7 @@ internal class ImpressionWorker(
                 deviceId = HostAppInfoRepository.instance().getDeviceId(),
                 accessToken = accountRepo.getAccessToken(),
                 impressionUrl = impressionEndpoint,
-                impressionRequest = impressionRequest
+                impressionRequest = impressionRequest,
             )
 
     companion object {

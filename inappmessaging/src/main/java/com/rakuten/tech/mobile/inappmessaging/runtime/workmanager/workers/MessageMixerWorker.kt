@@ -36,7 +36,7 @@ internal class MessageMixerWorker(
     workerParams: WorkerParameters,
     private val eventMessageScheduler: EventMessageReconciliationScheduler,
     private val messageMixerScheduler: MessageMixerPingScheduler,
-    private val retryUtil: RetryDelayUtil = RetryDelayUtil
+    private val retryUtil: RetryDelayUtil = RetryDelayUtil,
 ) :
     Worker(context, workerParams) {
 
@@ -49,7 +49,7 @@ internal class MessageMixerWorker(
     constructor(context: Context, workerParams: WorkerParameters) :
         this(
             context, workerParams, EventMessageReconciliationScheduler.instance(),
-            MessageMixerPingScheduler.instance()
+            MessageMixerPingScheduler.instance(),
         )
 
     /**
@@ -79,7 +79,7 @@ internal class MessageMixerWorker(
         // Create an pingRequest for the API.
         val pingRequest = PingRequest(
             HostAppInfoRepository.instance().getVersion(), RuntimeUtil.getUserIdentifiers(),
-            getSupportedCampaign()
+            getSupportedCampaign(),
         )
 
         // Create an retrofit API network call.
@@ -88,7 +88,7 @@ internal class MessageMixerWorker(
             accessToken = AccountRepository.instance().getAccessToken(),
             deviceId = HostAppInfoRepository.instance().getDeviceId(),
             url = ConfigResponseRepository.instance().getPingEndpoint(),
-            requestBody = pingRequest
+            requestBody = pingRequest,
         )
     }
 
@@ -103,13 +103,15 @@ internal class MessageMixerWorker(
         if (response.isSuccessful) {
             serverErrorCounter.set(0) // reset server error counter
             response.body()?.let { handleResponse(it) }
-        } else return when {
-            response.code() == RetryDelayUtil.RETRY_ERROR_CODE -> handleRetry(response)
-            response.code() >= HttpURLConnection.HTTP_INTERNAL_ERROR -> handleInternalError(response)
-            else -> {
-                serverErrorCounter.set(0) // reset server error counter
-                WorkerUtils.logRequestError(TAG, response.code(), response.errorBody()?.string())
-                Result.failure()
+        } else {
+            return when {
+                response.code() == RetryDelayUtil.RETRY_ERROR_CODE -> handleRetry(response)
+                response.code() >= HttpURLConnection.HTTP_INTERNAL_ERROR -> handleInternalError(response)
+                else -> {
+                    serverErrorCounter.set(0) // reset server error counter
+                    WorkerUtils.logRequestError(TAG, response.code(), response.errorBody()?.string())
+                    Result.failure()
+                }
             }
         }
         return Result.success()
@@ -133,7 +135,7 @@ internal class MessageMixerWorker(
         // Add all parsed messages into CampaignRepository.
         CampaignRepository.instance().syncWith(
             parsedMessages, messageMixerResponse.currentPingMillis,
-            ignoreTooltips = !HostAppInfoRepository.instance().isTooltipFeatureEnabled()
+            ignoreTooltips = !HostAppInfoRepository.instance().isTooltipFeatureEnabled(),
         )
 
         // Match&Store any temp events using lately synced campaigns.

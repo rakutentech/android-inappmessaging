@@ -15,7 +15,7 @@ class SlideFromDirectionTypeSpec(private val id: Int, private val expected: Any?
     companion object {
         @JvmStatic
         @ParameterizedRobolectricTestRunner.Parameters(
-            name = "{0} type test"
+            name = "{0} type test",
         )
         fun data(): List<Array<out Any?>> {
             return listOf(
@@ -24,7 +24,7 @@ class SlideFromDirectionTypeSpec(private val id: Int, private val expected: Any?
                 arrayOf(2, SlideFromDirectionType.TOP),
                 arrayOf(3, SlideFromDirectionType.LEFT),
                 arrayOf(4, SlideFromDirectionType.RIGHT),
-                arrayOf(5, SlideFromDirectionType.INVALID)
+                arrayOf(5, SlideFromDirectionType.INVALID),
             )
         }
     }

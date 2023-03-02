@@ -65,7 +65,7 @@ class EventsManagerSpec : BaseTest() {
         Settings.Secure.putString(
             ApplicationProvider.getApplicationContext<Context>().contentResolver,
             Settings.Secure.ANDROID_ID,
-            "test_device_id"
+            "test_device_id",
         )
         InAppMessaging.initialize(ApplicationProvider.getApplicationContext())
         InAppMessaging.instance().registerPreference(TestUserInfoProvider())
@@ -81,7 +81,7 @@ class EventsManagerSpec : BaseTest() {
         Settings.Secure.putString(
             ApplicationProvider.getApplicationContext<Context>().contentResolver,
             Settings.Secure.ANDROID_ID,
-            "test_device_id"
+            "test_device_id",
         )
         InAppMessaging.initialize(ApplicationProvider.getApplicationContext(), true)
         InAppMessaging.instance().registerPreference(TestUserInfoProvider())
@@ -92,7 +92,7 @@ class EventsManagerSpec : BaseTest() {
         addTestData()
 
         EventsManager.onEventReceived(
-            event = PurchaseSuccessfulEvent(), eventScheduler = eventRecon
+            event = PurchaseSuccessfulEvent(), eventScheduler = eventRecon,
         )
 
         verifyTestData(1)
@@ -110,7 +110,7 @@ class EventsManagerSpec : BaseTest() {
 
         if (expected > 0) {
             EventMatchingUtil.instance().matchedEvents(
-                CampaignRepository.instance().messages.values.first()
+                CampaignRepository.instance().messages.values.first(),
             ).shouldNotBeNull()
         }
 

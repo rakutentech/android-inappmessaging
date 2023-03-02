@@ -19,7 +19,7 @@ internal data class DisplayPermissionRequest(
     @SerializedName("lastPingInMillis")
     val lastPingInMillis: Long,
     @SerializedName("userIdentifier")
-    val userIdentifier: List<UserIdentifier>
+    val userIdentifier: List<UserIdentifier>,
 ) {
     @SerializedName("platform")
     private val platform: Int = InAppMessagingConstants.ANDROID_PLATFORM_ENUM

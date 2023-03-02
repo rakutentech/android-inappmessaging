@@ -16,5 +16,5 @@ internal data class TriggerAttribute(
     val type: Int,
 
     @SerializedName("operator")
-    val operator: Int
+    val operator: Int,
 )

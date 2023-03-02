@@ -11,7 +11,7 @@ internal data class Tooltip(
     @SerializedName("redirectURL")
     val url: String? = null,
     @SerializedName("auto-disappear")
-    val autoDisappear: Int? = null
+    val autoDisappear: Int? = null,
 ) {
     internal fun isValid() = id.isNotEmpty() && position.isNotEmpty()
 }

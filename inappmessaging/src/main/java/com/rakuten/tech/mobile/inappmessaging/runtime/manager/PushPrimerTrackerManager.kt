@@ -9,7 +9,7 @@ internal object PushPrimerTrackerManager {
 
     internal fun sendPrimerEvent(
         permission: Int,
-        sendEvent: (String, data: Map<String, *>?) -> Boolean = EventTrackerHelper::sendEvent
+        sendEvent: (String, data: Map<String, *>?) -> Boolean = EventTrackerHelper::sendEvent,
     ) {
         val params: MutableMap<String, Any?> = HashMap()
         params[InAppMessagingConstants.RAT_EVENT_CAMP_ID] = campaignId

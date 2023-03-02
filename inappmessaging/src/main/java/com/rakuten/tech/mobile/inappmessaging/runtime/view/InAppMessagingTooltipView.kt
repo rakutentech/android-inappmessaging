@@ -38,7 +38,7 @@ import com.squareup.picasso.Picasso
 @SuppressWarnings("LargeClass", "LongMethod", "TooManyFunctions")
 internal class InAppMessagingTooltipView(
     context: Context,
-    attrs: AttributeSet?
+    attrs: AttributeSet?,
 ) : RelativeLayout(context, attrs), InAppMessageView {
 
     init {
@@ -123,11 +123,11 @@ internal class InAppMessagingTooltipView(
         }
 
         // load the image then display the view
-        findViewById<ImageView>(R.id.message_tooltip_image_view).let {
+        findViewById<ImageView>(R.id.message_tooltip_image_view).let { view ->
             try {
                 val callback = object : Callback {
                     override fun onSuccess() {
-                        it.hide()
+                        view.hide()
                         this@InAppMessagingTooltipView.hide()
                     }
 
@@ -136,26 +136,27 @@ internal class InAppMessagingTooltipView(
                     }
                 }
 
-                it.viewTreeObserver.addOnGlobalLayoutListener(object : ViewTreeObserver.OnGlobalLayoutListener {
+                view.viewTreeObserver.addOnGlobalLayoutListener(object : ViewTreeObserver.OnGlobalLayoutListener {
                     override fun onGlobalLayout() {
-                        if (it.width > 0 || isTest) {
-                            it.viewTreeObserver.removeOnGlobalLayoutListener(this)
-                            drawBorder(it.width, it.height)
+                        if (view.width > 0 || isTest) {
+                            view.viewTreeObserver.removeOnGlobalLayoutListener(this)
+                            drawBorder(view.width, view.height)
                             drawTip()
                             // to avoid flicker
                             mainHandler.postDelayed({
-                                it.show()
+                                view.show()
                                 this@InAppMessagingTooltipView.show()
-                            }, DELAY)
+                            }, DELAY,)
                         }
                     }
-                })
+                },
+                )
                 (picasso ?: Picasso.get()).load(this.imageUrl)
                     .priority(Picasso.Priority.HIGH)
                     .resize(MAX_SIZE, MAX_SIZE)
                     .onlyScaleDown()
                     .centerInside()
-                    .into(it, callback)
+                    .into(view, callback)
             } catch (ex: Exception) {
                 InAppLogger(TAG).debug(ex, "Downloading image failed $imageUrl")
             }
@@ -207,7 +208,7 @@ internal class InAppMessagingTooltipView(
                 arrayOf(
                     Point(PADDING * 2 / 3, 0),
                     Point(0, PADDING),
-                    Point(PADDING, PADDING * 1 / 3)
+                    Point(PADDING, PADDING * 1 / 3),
                 )
             }
             PositionType.TOP_CENTER -> {
@@ -219,7 +220,7 @@ internal class InAppMessagingTooltipView(
                 arrayOf(
                     Point(0, 0),
                     Point(TRI_SIZE / 2, TRI_SIZE),
-                    Point(TRI_SIZE, 0)
+                    Point(TRI_SIZE, 0),
                 )
             }
             PositionType.TOP_LEFT -> {
@@ -232,7 +233,7 @@ internal class InAppMessagingTooltipView(
                 arrayOf(
                     Point(PADDING * 1 / 3, 0),
                     Point(PADDING, PADDING),
-                    Point(0, PADDING * 1 / 3)
+                    Point(0, PADDING * 1 / 3),
                 )
             }
             PositionType.BOTTOM_RIGHT -> {
@@ -246,7 +247,7 @@ internal class InAppMessagingTooltipView(
                 arrayOf(
                     Point(PADDING * 2 / 3, PADDING),
                     Point(0, 0),
-                    Point(PADDING, PADDING * 2 / 3)
+                    Point(PADDING, PADDING * 2 / 3),
                 )
             }
             PositionType.BOTTOM_CENTER -> {
@@ -259,7 +260,7 @@ internal class InAppMessagingTooltipView(
                 arrayOf(
                     Point(0, TRI_SIZE),
                     Point(TRI_SIZE / 2, 0),
-                    Point(TRI_SIZE, TRI_SIZE)
+                    Point(TRI_SIZE, TRI_SIZE),
                 )
             }
             PositionType.BOTTOM_LEFT -> {
@@ -272,7 +273,7 @@ internal class InAppMessagingTooltipView(
                 arrayOf(
                     Point(0, PADDING * 2 / 3),
                     Point(PADDING, 0),
-                    Point(PADDING * 1 / 3, PADDING)
+                    Point(PADDING * 1 / 3, PADDING),
                 )
             }
             PositionType.RIGHT -> {
@@ -281,7 +282,7 @@ internal class InAppMessagingTooltipView(
                 arrayOf(
                     Point(TRI_SIZE, 0),
                     Point(0, TRI_SIZE / 2),
-                    Point(TRI_SIZE, TRI_SIZE)
+                    Point(TRI_SIZE, TRI_SIZE),
                 )
             }
             PositionType.LEFT -> {
@@ -295,7 +296,7 @@ internal class InAppMessagingTooltipView(
                 arrayOf(
                     Point(0, 0),
                     Point(TRI_SIZE, TRI_SIZE / 2),
-                    Point(0, TRI_SIZE)
+                    Point(0, TRI_SIZE),
                 )
             }
         }
@@ -329,7 +330,7 @@ internal class InAppMessagingTooltipView(
         (close.layoutParams as LayoutParams).removeRule(RIGHT_OF)
         (findViewById<RelativeLayout>(R.id.image_layout).layoutParams as LayoutParams).addRule(
             END_OF,
-            R.id.message_close_button
+            R.id.message_close_button,
         )
         tip.layoutParams.height = PADDING
         tip.layoutParams.width = PADDING
@@ -346,7 +347,7 @@ internal class InAppMessagingTooltipView(
                 view = this,
                 anchorView = anchorView,
                 positionType = type,
-                margin = findViewById<ImageButton>(R.id.message_close_button).height
+                margin = findViewById<ImageButton>(R.id.message_close_button).height,
             )
             this.x = tPosition.x.toFloat()
             this.y = tPosition.y.toFloat()

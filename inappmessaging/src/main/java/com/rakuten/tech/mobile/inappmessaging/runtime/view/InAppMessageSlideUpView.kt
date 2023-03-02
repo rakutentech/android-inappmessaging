@@ -13,7 +13,7 @@ import com.rakuten.tech.mobile.inappmessaging.runtime.utils.ViewUtil
  */
 internal class InAppMessageSlideUpView(
     context: Context,
-    attrs: AttributeSet?
+    attrs: AttributeSet?,
 ) :
     InAppMessageBaseView(context, attrs) {
 
@@ -32,8 +32,8 @@ internal class InAppMessageSlideUpView(
         val animation = ViewUtil.getSlidingAnimation(
             context,
             SlideFromDirectionType.getById(
-                message.getMessagePayload().messageSettings.displaySettings.slideFrom
-            )
+                message.getMessagePayload().messageSettings.displaySettings.slideFrom,
+            ),
         )
         animation?.let {
             constraintLayout?.startAnimation(it)
