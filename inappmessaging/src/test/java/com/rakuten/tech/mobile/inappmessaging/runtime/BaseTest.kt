@@ -1,5 +1,10 @@
 package com.rakuten.tech.mobile.inappmessaging.runtime
 
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.test.UnconfinedTestDispatcher
+import kotlinx.coroutines.test.resetMain
+import kotlinx.coroutines.test.setMain
 import org.junit.After
 import org.junit.Before
 import org.mockito.Mockito
@@ -7,11 +12,15 @@ import org.mockito.Mockito
 /**
  * Base test class of all test classes.
  */
+@OptIn(ExperimentalCoroutinesApi::class)
 open class BaseTest {
+    internal val testDispatcher = UnconfinedTestDispatcher() // for use on tests that call a coroutinescope
     @Before
     open fun setup() {
         InAppMessaging.errorCallback = null
         InAppMessaging.setNotConfiguredInstance()
+
+        Dispatchers.setMain(testDispatcher)
     }
 
     /**
@@ -22,5 +31,7 @@ open class BaseTest {
         Mockito.framework().clearInlineMocks()
         InAppMessaging.errorCallback = null
         InAppMessaging.setNotConfiguredInstance()
+
+        Dispatchers.resetMain()
     }
 }
