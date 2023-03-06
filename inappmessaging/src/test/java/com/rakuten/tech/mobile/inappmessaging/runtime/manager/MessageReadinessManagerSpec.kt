@@ -21,6 +21,7 @@ import okhttp3.mockwebserver.MockWebServer
 import org.amshove.kluent.*
 import org.junit.After
 import org.junit.Before
+import org.junit.Ignore
 import org.junit.Test
 import org.junit.runner.RunWith
 import org.mockito.Mockito
@@ -167,6 +168,12 @@ open class MessageReadinessManagerSpec : BaseTest() {
         setMessagesList(messageList)
 
         MessageReadinessManager.instance().getNextDisplayMessage().shouldBeEmpty()
+    }
+
+    @Test
+    @Ignore("Complicated to pass isTooltipTargetViewVisible. Might need to introduce excessive mocks.")
+    fun `should return multiple tooltips`() {
+        /* Do nothing */
     }
 
     private fun createMessageList() {

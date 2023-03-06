@@ -115,6 +115,16 @@ class InAppMessagingTooltipAnchorListenerSpec {
     }
 
     @Test
+    fun `should call addAnchorViewListeners() when attached to window`() {
+        // This test is using reflection and should be generally avoided.
+        tooltipView.javaClass.getDeclaredMethod("onAttachedToWindow").apply {
+            isAccessible = true
+        }.invoke(tooltipView)
+
+        verify(mockObserver).addOnGlobalLayoutListener(any())
+    }
+
+    @Test
     fun `should remove anchor view layout listeners`() {
         tooltipView.removeAnchorViewListeners()
 
@@ -126,6 +136,16 @@ class InAppMessagingTooltipAnchorListenerSpec {
         `when`(mockObserver.isAlive).thenReturn(false)
 
         tooltipView.removeAnchorViewListeners()
+    }
+
+    @Test
+    fun `should call removeAnchorViewListeners() when attached to window`() {
+        // This test is using reflection and should be generally avoided.
+        tooltipView.javaClass.getDeclaredMethod("onDetachedFromWindow").apply {
+            isAccessible = true
+        }.invoke(tooltipView)
+
+        verify(mockObserver).removeOnGlobalLayoutListener(any())
     }
 
     @Test

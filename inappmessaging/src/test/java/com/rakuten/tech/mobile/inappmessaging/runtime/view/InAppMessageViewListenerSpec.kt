@@ -6,9 +6,7 @@ import android.view.MotionEvent
 import android.view.View
 import android.widget.CheckBox
 import android.widget.Magnifier
-import com.nhaarman.mockitokotlin2.any
-import com.nhaarman.mockitokotlin2.anyOrNull
-import com.nhaarman.mockitokotlin2.eq
+import com.nhaarman.mockitokotlin2.*
 import com.rakuten.tech.mobile.inappmessaging.runtime.BaseTest
 import com.rakuten.tech.mobile.inappmessaging.runtime.InAppMessaging
 import com.rakuten.tech.mobile.inappmessaging.runtime.R
@@ -25,8 +23,7 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.ObsoleteCoroutinesApi
 import kotlinx.coroutines.newSingleThreadContext
-import kotlinx.coroutines.test.resetMain
-import kotlinx.coroutines.test.setMain
+import kotlinx.coroutines.test.*
 import org.amshove.kluent.*
 import org.junit.After
 import org.junit.Before
@@ -79,8 +76,17 @@ class InAppMessageViewListenerOnClickSpec : InAppMessageViewListenerSpec() {
     }
 
     @Test
-    fun `should not throw exception with non-checkbox click`() {
-        val message = ValidTestMessage("1", true)
+    fun `should not throw exception with non-checkbox click and message is non-dismissible`() {
+        val mockView = Mockito.mock(CheckBox::class.java)
+        `when`(mockView.id).thenReturn(R.id.message_close_button)
+
+        createMockListener(ValidTestMessage("1", true, isCampaignDismissable = false))
+            .onClick(mockView)
+    }
+
+    @Test
+    fun `should not throw exception with non-checkbox click message is dismissible`() {
+        val message = ValidTestMessage("1", true, isCampaignDismissable = true)
         val listener = createMockListener(message)
         val mockView = Mockito.mock(CheckBox::class.java)
         `when`(mockView.id).thenReturn(R.id.message_close_button)
@@ -88,6 +94,16 @@ class InAppMessageViewListenerOnClickSpec : InAppMessageViewListenerSpec() {
         `when`(mockInApp.getRegisteredActivity()).thenReturn(mockActivity)
 
         listener.onClick(mockView)
+    }
+
+    @Test
+    fun `should handle message`() = runTest {
+        val message = ValidTestMessage("1", true)
+        val listener = createMockListener(message)
+
+        listener.handleClick(0, UnconfinedTestDispatcher())
+        // This is a flaky test due to this line
+        verify(mockCoroutine, atLeastOnce()).executeTask(any(), any(), any())
     }
 
     private fun createMockListener(message: Message) = InAppMessageViewListener(
