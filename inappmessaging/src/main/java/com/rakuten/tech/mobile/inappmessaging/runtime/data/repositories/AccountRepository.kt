@@ -46,7 +46,10 @@ internal abstract class AccountRepository {
      * Checks whether user cache uses old cache structure (structure until v7.1.0) and clears it since it will no
      * longer be used.
      */
-    abstract fun clearUserOldCacheStructure()
+    abstract fun clearUserOldCacheStructure(
+        inAppMessaging: InAppMessaging = InAppMessaging.instance(),
+        prefsUtil: PreferencesUtil = PreferencesUtil,
+    )
 
     companion object {
         private const val TOKEN_PREFIX = "OAuth2 "
@@ -103,13 +106,13 @@ internal abstract class AccountRepository {
             }
         }
 
-        override fun clearUserOldCacheStructure() {
-            if (InAppMessaging.instance().isLocalCachingEnabled()) {
-                InAppMessaging.instance().getHostAppContext()?.let { ctx ->
+        override fun clearUserOldCacheStructure(inAppMessaging: InAppMessaging, prefsUtil: PreferencesUtil) {
+            if (inAppMessaging.isLocalCachingEnabled()) {
+                inAppMessaging.getHostAppContext()?.let { ctx ->
                     val prefs = InAppMessaging.getPreferencesFile()
                     // Clear if using old cache structure
-                    if (!PreferencesUtil.contains(ctx, prefs, CampaignRepository.IAM_USER_CACHE)) {
-                        PreferencesUtil.clear(ctx, prefs)
+                    if (!prefsUtil.contains(ctx, prefs, CampaignRepository.IAM_USER_CACHE)) {
+                        prefsUtil.clear(ctx, prefs)
                     }
                 }
             }

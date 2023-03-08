@@ -10,13 +10,14 @@ import com.rakuten.tech.mobile.inappmessaging.runtime.data.requests.ImpressionRe
 import com.rakuten.tech.mobile.inappmessaging.runtime.utils.InAppLogger
 import com.rakuten.tech.mobile.inappmessaging.runtime.utils.RuntimeUtil
 import com.rakuten.tech.mobile.inappmessaging.runtime.workmanager.workers.ImpressionWorker
+import com.rakuten.tech.mobile.sdkutils.PreferencesUtil
 import org.amshove.kluent.*
 import org.junit.Assert
 import org.junit.Before
 import org.junit.Ignore
 import org.junit.Test
 import org.mockito.Mockito
-import org.mockito.Mockito.`when`
+import org.mockito.Mockito.*
 
 /**
  * Test class for AccountRepository class.
@@ -64,6 +65,34 @@ class AccountRepositoryDefaultSpec : AccountRepositorySpec() {
         AccountRepository.instance().userInfoProvider = TestUserInfoProvider()
         AccountRepository.instance()
             .getIdTrackingIdentifier() shouldBeEqualTo TestUserInfoProvider().provideIdTrackingIdentifier()
+    }
+
+    @Test
+    fun `should clear cache`() {
+        val iam = mock(InAppMessaging::class.java)
+        val ctx = mock(Context::class.java)
+        val prefsUtil = mock(PreferencesUtil::class.java)
+
+        `when`(iam.isLocalCachingEnabled()).thenReturn(true)
+        `when`(iam.getHostAppContext()).thenReturn(ctx)
+        `when`(prefsUtil.contains(any() ?: ctx, anyString(), anyString())).thenReturn(false)
+
+        AccountRepository.instance().clearUserOldCacheStructure(inAppMessaging = iam, prefsUtil = prefsUtil)
+        verify(prefsUtil).clear(any() ?: ctx, anyString())
+    }
+
+    @Test
+    fun `should not clear cache`() {
+        val iam = mock(InAppMessaging::class.java)
+        val ctx = mock(Context::class.java)
+        val prefsUtil = mock(PreferencesUtil::class.java)
+
+        `when`(iam.isLocalCachingEnabled()).thenReturn(true)
+        `when`(iam.getHostAppContext()).thenReturn(ctx)
+        `when`(prefsUtil.contains(any() ?: ctx, anyString(), anyString())).thenReturn(true)
+
+        AccountRepository.instance().clearUserOldCacheStructure(inAppMessaging = iam, prefsUtil = prefsUtil)
+        verify(prefsUtil, never()).clear(any() ?: ctx, anyString())
     }
 }
 
