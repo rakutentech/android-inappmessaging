@@ -102,7 +102,6 @@ class InAppMessageViewListenerOnClickSpec : InAppMessageViewListenerSpec() {
         val listener = createMockListener(message)
 
         listener.handleClick(0, testDispatcher, testDispatcher)
-        // This is a flaky test due to this line
         verify(mockCoroutine, atLeastOnce()).executeTask(any(), any(), any())
     }
 
