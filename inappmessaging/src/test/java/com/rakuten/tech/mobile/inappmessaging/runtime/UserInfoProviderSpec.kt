@@ -7,7 +7,7 @@ import org.robolectric.RobolectricTestRunner
 
 @RunWith(RobolectricTestRunner::class)
 class UserInfoProviderSpec {
-    class TestDefaultProvider: UserInfoProvider
+    class TestDefaultProvider : UserInfoProvider
     val provider: UserInfoProvider = TestDefaultProvider()
 
     @Test
