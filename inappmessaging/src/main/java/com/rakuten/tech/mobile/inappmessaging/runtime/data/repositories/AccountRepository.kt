@@ -60,6 +60,11 @@ internal abstract class AccountRepository {
     }
 
     private class AccountRepositoryImpl : AccountRepository() {
+        private val anonymousUserHash = hash("", null)
+
+        init {
+            userInfoHash = anonymousUserHash
+        }
 
         override fun getAccessToken() = if (this.userInfoProvider == null ||
             this.userInfoProvider?.provideAccessToken().isNullOrEmpty()
@@ -75,13 +80,8 @@ internal abstract class AccountRepository {
         override fun getIdTrackingIdentifier() = this.userInfoProvider?.provideIdTrackingIdentifier().orEmpty()
 
         override fun updateUserInfo(algo: String?): Boolean {
-            val newHash = hash(getUserId() + getIdTrackingIdentifier(), algo)
-            if (userInfoHash.isEmpty()) {
-                userInfoHash = newHash
-                return true
-            }
             val currentHash = userInfoHash
-            userInfoHash = newHash
+            userInfoHash = hash(getUserId() + getIdTrackingIdentifier(), algo)
             return currentHash != userInfoHash
         }
 
@@ -106,11 +106,14 @@ internal abstract class AccountRepository {
         override fun clearUserOldCacheStructure() {
             if (InAppMessaging.instance().isLocalCachingEnabled()) {
                 InAppMessaging.instance().getHostAppContext()?.let { ctx ->
-                    val prefs = InAppMessaging.getPreferencesFile()
-                    // Clear if using old cache structure
-                    if (!PreferencesUtil.contains(ctx, prefs, CampaignRepository.IAM_USER_CACHE)) {
-                        PreferencesUtil.clear(ctx, prefs)
-                    }
+                    val preference = InAppMessaging.getPreferencesFile()
+                    listOf(
+                        "ping_response_list",
+                        "ready_display_list",
+                        "local_event_list",
+                        "local_displayed_list",
+                        "local_opted_out_list",
+                    ).forEach { PreferencesUtil.remove(ctx, preference, it) }
                 }
             }
         }

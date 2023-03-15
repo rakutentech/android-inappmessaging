@@ -65,7 +65,6 @@ internal class InApp(
         InAppLogger(TAG).debug("registerPreference()")
         try {
             accountRepo.userInfoProvider = userInfoProvider
-            accountRepo.updateUserInfo()
         } catch (ex: Exception) {
             errorCallback?.let {
                 it(InAppMessagingException("In-App Messaging register preference failed", ex))
