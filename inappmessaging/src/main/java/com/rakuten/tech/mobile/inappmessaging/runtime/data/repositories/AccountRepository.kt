@@ -1,6 +1,7 @@
 package com.rakuten.tech.mobile.inappmessaging.runtime.data.repositories
 
 import android.annotation.SuppressLint
+import android.content.Context
 import com.rakuten.tech.mobile.inappmessaging.runtime.BuildConfig
 import com.rakuten.tech.mobile.inappmessaging.runtime.InAppMessaging
 import com.rakuten.tech.mobile.inappmessaging.runtime.UserInfoProvider
@@ -46,7 +47,10 @@ internal abstract class AccountRepository {
      * Checks whether user cache uses old cache structure (structure until v7.1.0) and clears it since it will no
      * longer be used.
      */
-    abstract fun clearUserOldCacheStructure()
+    abstract fun clearUserOldCacheStructure(
+        context: Context? = InAppMessaging.instance().getHostAppContext(),
+        preferences: PreferencesUtil = PreferencesUtil,
+    )
 
     companion object {
         private const val TOKEN_PREFIX = "OAuth2 "
@@ -103,18 +107,15 @@ internal abstract class AccountRepository {
             }
         }
 
-        override fun clearUserOldCacheStructure() {
-            if (InAppMessaging.instance().isLocalCachingEnabled()) {
-                InAppMessaging.instance().getHostAppContext()?.let { ctx ->
-                    val preference = InAppMessaging.getPreferencesFile()
-                    listOf(
-                        "ping_response_list",
-                        "ready_display_list",
-                        "local_event_list",
-                        "local_displayed_list",
-                        "local_opted_out_list",
-                    ).forEach { PreferencesUtil.remove(ctx, preference, it) }
-                }
+        override fun clearUserOldCacheStructure(context: Context?, preferences: PreferencesUtil) {
+            context?.let { ctx ->
+                listOf(
+                    "ping_response_list",
+                    "ready_display_list",
+                    "local_event_list",
+                    "local_displayed_list",
+                    "local_opted_out_list",
+                ).forEach { preferences.remove(ctx, InAppMessaging.getPreferencesFile(), it) }
             }
         }
 

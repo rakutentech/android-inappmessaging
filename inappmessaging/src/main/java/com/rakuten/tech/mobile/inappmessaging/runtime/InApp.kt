@@ -60,16 +60,9 @@ internal class InApp(
 
     override var onPushPrimer: (() -> Unit)? = null
 
-    @SuppressWarnings("TooGenericExceptionCaught")
     override fun registerPreference(userInfoProvider: UserInfoProvider) {
         InAppLogger(TAG).debug("registerPreference()")
-        try {
-            accountRepo.userInfoProvider = userInfoProvider
-        } catch (ex: Exception) {
-            errorCallback?.let {
-                it(InAppMessagingException("In-App Messaging register preference failed", ex))
-            }
-        }
+        accountRepo.userInfoProvider = userInfoProvider
     }
 
     @SuppressWarnings("TooGenericExceptionCaught")
