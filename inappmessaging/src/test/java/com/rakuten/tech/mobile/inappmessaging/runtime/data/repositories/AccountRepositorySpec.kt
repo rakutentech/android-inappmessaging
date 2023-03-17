@@ -10,13 +10,14 @@ import com.rakuten.tech.mobile.inappmessaging.runtime.data.requests.ImpressionRe
 import com.rakuten.tech.mobile.inappmessaging.runtime.utils.InAppLogger
 import com.rakuten.tech.mobile.inappmessaging.runtime.utils.RuntimeUtil
 import com.rakuten.tech.mobile.inappmessaging.runtime.workmanager.workers.ImpressionWorker
+import com.rakuten.tech.mobile.sdkutils.PreferencesUtil
 import org.amshove.kluent.*
 import org.junit.Assert
 import org.junit.Before
 import org.junit.Ignore
 import org.junit.Test
 import org.mockito.Mockito
-import org.mockito.Mockito.`when`
+import org.mockito.Mockito.*
 
 /**
  * Test class for AccountRepository class.
@@ -65,13 +66,29 @@ class AccountRepositoryDefaultSpec : AccountRepositorySpec() {
         AccountRepository.instance()
             .getIdTrackingIdentifier() shouldBeEqualTo TestUserInfoProvider().provideIdTrackingIdentifier()
     }
+
+    @Test
+    fun `should not clear stale cache structure`() {
+        val mockPreferences = mock(PreferencesUtil::class.java)
+        AccountRepository.instance().clearUserOldCacheStructure(null, mockPreferences)
+        verifyNoInteractions(mockPreferences)
+    }
+
+    @Test
+    fun `should clear stale cache structure`() {
+        val mockPreferences = mock(PreferencesUtil::class.java)
+        val mockContext = mock(Context::class.java)
+        AccountRepository.instance().clearUserOldCacheStructure(mockContext, mockPreferences)
+        verify(mockPreferences, times(5))
+            .remove(any(Context::class.java) ?: mockContext, anyString(), anyString())
+    }
 }
 
 class AccountRepositoryNullSpec : AccountRepositorySpec() {
 
     @Test
     fun `should get access token with null values`() {
-        val mockProvider = Mockito.mock(TestUserInfoProvider::class.java)
+        val mockProvider = mock(TestUserInfoProvider::class.java)
         `when`(mockProvider.provideAccessToken()).thenReturn(null)
         AccountRepository.instance().userInfoProvider = mockProvider
         AccountRepository.instance().getAccessToken() shouldBeEqualTo ""
@@ -79,7 +96,7 @@ class AccountRepositoryNullSpec : AccountRepositorySpec() {
 
     @Test
     fun `should get user id with null values`() {
-        val mockProvider = Mockito.mock(TestUserInfoProvider::class.java)
+        val mockProvider = mock(TestUserInfoProvider::class.java)
         `when`(mockProvider.provideUserId()).thenReturn(null)
         AccountRepository.instance().userInfoProvider = mockProvider
         AccountRepository.instance().getUserId() shouldBeEqualTo ""
@@ -87,7 +104,7 @@ class AccountRepositoryNullSpec : AccountRepositorySpec() {
 
     @Test
     fun `should get id tracking identifier with null values`() {
-        val mockProvider = Mockito.mock(TestUserInfoProvider::class.java)
+        val mockProvider = mock(TestUserInfoProvider::class.java)
         `when`(mockProvider.provideIdTrackingIdentifier()).thenReturn(null)
         AccountRepository.instance().userInfoProvider = mockProvider
         AccountRepository.instance().getUserId() shouldBeEqualTo ""
@@ -96,12 +113,12 @@ class AccountRepositoryNullSpec : AccountRepositorySpec() {
 
 class AccountRepositoryUsageSpec : AccountRepositorySpec() {
 
-    private val mockLogger = Mockito.mock(InAppLogger::class.java)
+    private val mockLogger = mock(InAppLogger::class.java)
     private val captor = argumentCaptor<String>()
 
     @Test
     fun `should get be called once for get access token`() {
-        val mockAcctRepo = Mockito.mock(AccountRepository::class.java)
+        val mockAcctRepo = mock(AccountRepository::class.java)
 
         `when`(mockAcctRepo.userInfoProvider).thenReturn(TestUserInfoProvider())
         `when`(mockAcctRepo.getAccessToken()).thenReturn(TestUserInfoProvider().provideAccessToken().toString())
@@ -112,9 +129,9 @@ class AccountRepositoryUsageSpec : AccountRepositorySpec() {
                 InAppMessagingTestConstants.SUB_KEY, InAppMessagingTestConstants.LOCALE,
             ),
         )
-        val context = Mockito.mock(Context::class.java)
-        val workerParameters = Mockito.mock(WorkerParameters::class.java)
-        val impressionRequest = Mockito.mock(ImpressionRequest::class.java)
+        val context = mock(Context::class.java)
+        val workerParameters = mock(WorkerParameters::class.java)
+        val impressionRequest = mock(ImpressionRequest::class.java)
         val worker = ImpressionWorker(context, workerParameters)
         worker.createReportImpressionCall("https://host/impression/", impressionRequest, mockAcctRepo)
         Mockito.verify(mockAcctRepo).getAccessToken()
@@ -122,7 +139,7 @@ class AccountRepositoryUsageSpec : AccountRepositorySpec() {
 
     @Test
     fun `should get be called once for get user id`() {
-        val mockAcctRepo = Mockito.mock(AccountRepository::class.java)
+        val mockAcctRepo = mock(AccountRepository::class.java)
 
         `when`(mockAcctRepo.userInfoProvider).thenReturn(TestUserInfoProvider())
         `when`(mockAcctRepo.getUserId()).thenReturn(TestUserInfoProvider().provideUserId().toString())
@@ -133,7 +150,7 @@ class AccountRepositoryUsageSpec : AccountRepositorySpec() {
 
     @Test
     fun `should get be called once for get id tracking identifier`() {
-        val mockAcctRepo = Mockito.mock(AccountRepository::class.java)
+        val mockAcctRepo = mock(AccountRepository::class.java)
         val provider = TestUserInfoProvider()
         provider.idTrackingIdentifier = TestUserInfoProvider.TEST_ID_TRACKING_IDENTIFIER
         `when`(mockAcctRepo.userInfoProvider).thenReturn(provider)

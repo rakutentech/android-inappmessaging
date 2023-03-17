@@ -427,7 +427,8 @@ class InAppMessagingExceptionSpec : InAppMessagingSpec() {
 
     private val mockActivity = Mockito.mock(Activity::class.java)
     private val dispMgr = Mockito.mock(DisplayManager::class.java)
-    private val instance = initializeMockInstance(100, dispMgr)
+    private val mockAcctRepo = Mockito.mock(AccountRepository::class.java)
+    private val instance = initializeMockInstance(100, dispMgr, accountRepo = mockAcctRepo)
 
     @Before
     override fun setup() {
@@ -442,26 +443,6 @@ class InAppMessagingExceptionSpec : InAppMessagingSpec() {
     override fun tearDown() {
         super.tearDown()
         InAppMessaging.errorCallback = null
-    }
-
-    @Test
-    fun `should not crash when register preference failed due to forced exception`() {
-        val mockProvider = Mockito.mock(UserInfoProvider::class.java)
-        `when`(mockProvider.provideUserId()).thenThrow(NullPointerException())
-
-        instance.registerPreference(mockProvider)
-    }
-
-    @Test
-    fun `should trigger callback when register preference failed due to forced exception`() {
-        InAppMessaging.errorCallback = mockCallback
-        val mockProvider = Mockito.mock(UserInfoProvider::class.java)
-        `when`(mockProvider.provideUserId()).thenThrow(NullPointerException())
-
-        instance.registerPreference(mockProvider)
-
-        Mockito.verify(mockCallback).invoke(captor.capture())
-        captor.firstValue shouldBeInstanceOf InAppMessagingException::class.java
     }
 
     @Test

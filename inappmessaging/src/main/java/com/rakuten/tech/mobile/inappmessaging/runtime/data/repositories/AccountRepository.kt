@@ -1,6 +1,7 @@
 package com.rakuten.tech.mobile.inappmessaging.runtime.data.repositories
 
 import android.annotation.SuppressLint
+import android.content.Context
 import com.rakuten.tech.mobile.inappmessaging.runtime.BuildConfig
 import com.rakuten.tech.mobile.inappmessaging.runtime.InAppMessaging
 import com.rakuten.tech.mobile.inappmessaging.runtime.UserInfoProvider
@@ -46,7 +47,10 @@ internal abstract class AccountRepository {
      * Checks whether user cache uses old cache structure (structure until v7.1.0) and clears it since it will no
      * longer be used.
      */
-    abstract fun clearUserOldCacheStructure()
+    abstract fun clearUserOldCacheStructure(
+        context: Context? = InAppMessaging.instance().getHostAppContext(),
+        preferences: PreferencesUtil = PreferencesUtil,
+    )
 
     companion object {
         private const val TOKEN_PREFIX = "OAuth2 "
@@ -60,6 +64,11 @@ internal abstract class AccountRepository {
     }
 
     private class AccountRepositoryImpl : AccountRepository() {
+        private val anonymousUserHash = hash("", null)
+
+        init {
+            userInfoHash = anonymousUserHash
+        }
 
         override fun getAccessToken() = if (this.userInfoProvider == null ||
             this.userInfoProvider?.provideAccessToken().isNullOrEmpty()
@@ -75,13 +84,8 @@ internal abstract class AccountRepository {
         override fun getIdTrackingIdentifier() = this.userInfoProvider?.provideIdTrackingIdentifier().orEmpty()
 
         override fun updateUserInfo(algo: String?): Boolean {
-            val newHash = hash(getUserId() + getIdTrackingIdentifier(), algo)
-            if (userInfoHash.isEmpty()) {
-                userInfoHash = newHash
-                return true
-            }
             val currentHash = userInfoHash
-            userInfoHash = newHash
+            userInfoHash = hash(getUserId() + getIdTrackingIdentifier(), algo)
             return currentHash != userInfoHash
         }
 
@@ -103,15 +107,15 @@ internal abstract class AccountRepository {
             }
         }
 
-        override fun clearUserOldCacheStructure() {
-            if (InAppMessaging.instance().isLocalCachingEnabled()) {
-                InAppMessaging.instance().getHostAppContext()?.let { ctx ->
-                    val prefs = InAppMessaging.getPreferencesFile()
-                    // Clear if using old cache structure
-                    if (!PreferencesUtil.contains(ctx, prefs, CampaignRepository.IAM_USER_CACHE)) {
-                        PreferencesUtil.clear(ctx, prefs)
-                    }
-                }
+        override fun clearUserOldCacheStructure(context: Context?, preferences: PreferencesUtil) {
+            context?.let { ctx ->
+                listOf(
+                    "ping_response_list",
+                    "ready_display_list",
+                    "local_event_list",
+                    "local_displayed_list",
+                    "local_opted_out_list",
+                ).forEach { preferences.remove(ctx, InAppMessaging.getPreferencesFile(), it) }
             }
         }
 
