@@ -9,7 +9,7 @@ import com.nhaarman.mockitokotlin2.atLeastOnce
 import com.rakuten.tech.mobile.inappmessaging.runtime.BaseTest
 import com.rakuten.tech.mobile.inappmessaging.runtime.InAppMessaging
 import com.rakuten.tech.mobile.inappmessaging.runtime.data.repositories.ConfigResponseRepository
-import com.rakuten.tech.mobile.inappmessaging.runtime.data.responses.config.ConfigResponseData
+import com.rakuten.tech.mobile.inappmessaging.runtime.data.responses.ConfigResponseData
 import com.rakuten.tech.mobile.inappmessaging.runtime.exception.InAppMessagingException
 import com.rakuten.tech.mobile.inappmessaging.runtime.utils.RetryDelayUtil
 import org.amshove.kluent.*
