@@ -27,7 +27,7 @@ class DisplayPermissionRequestSpec {
     }
 
     @Test
-    fun `should serialize DisplayPermissionRequest from json field names set`() {
+    fun `should deserialize DisplayPermissionRequest from json field names set`() {
         val json = """{"lastPingInMillis":0,"userIdentifier":[{"id":"test-id","type":0}],"platform":2}"""
         val testDataClass = Gson().fromJson(json, DisplayPermissionRequest::class.java)
         testDataClass.shouldBeEquivalentTo(
