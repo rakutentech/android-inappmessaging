@@ -1,4 +1,4 @@
-package com.rakuten.tech.mobile.inappmessaging.runtime.data.responses.displaypermission
+package com.rakuten.tech.mobile.inappmessaging.runtime.data.responses
 
 import androidx.annotation.RestrictTo
 import com.google.gson.annotations.SerializedName
@@ -8,9 +8,6 @@ import com.google.gson.annotations.SerializedName
  */
 @RestrictTo(RestrictTo.Scope.LIBRARY)
 internal data class DisplayPermissionResponse(
-    @SerializedName("display")
     val display: Boolean,
-
-    @SerializedName("performPing")
-    val shouldPing: Boolean,
+    @SerializedName("performPing") val shouldPing: Boolean,
 )
