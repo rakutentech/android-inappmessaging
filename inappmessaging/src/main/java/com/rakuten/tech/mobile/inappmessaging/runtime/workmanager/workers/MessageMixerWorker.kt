@@ -12,7 +12,7 @@ import com.rakuten.tech.mobile.inappmessaging.runtime.data.repositories.HostAppI
 import com.rakuten.tech.mobile.inappmessaging.runtime.data.repositories.CampaignRepository
 import com.rakuten.tech.mobile.inappmessaging.runtime.data.requests.PingRequest
 import com.rakuten.tech.mobile.inappmessaging.runtime.data.responses.ping.Message
-import com.rakuten.tech.mobile.inappmessaging.runtime.data.responses.ping.PingResponse
+import com.rakuten.tech.mobile.inappmessaging.runtime.data.responses.ping.MessageMixerResponse
 import com.rakuten.tech.mobile.inappmessaging.runtime.utils.BuildVersionChecker
 import com.rakuten.tech.mobile.inappmessaging.runtime.utils.InAppLogger
 import com.rakuten.tech.mobile.inappmessaging.runtime.utils.RetryDelayUtil
@@ -41,7 +41,7 @@ internal class MessageMixerWorker(
     Worker(context, workerParams) {
 
     @VisibleForTesting
-    internal var testResponse: Call<PingResponse>? = null
+    internal var testResponse: Call<MessageMixerResponse>? = null
 
     /**
      * Overload constructor to handle OneTimeWorkRequest.Builder().
@@ -72,7 +72,7 @@ internal class MessageMixerWorker(
         }
     }
 
-    private fun setupCall(): Call<PingResponse> {
+    private fun setupCall(): Call<MessageMixerResponse> {
         // Create a retrofit API.
         val serviceApi = RuntimeUtil.getRetrofit().create(MessageMixerRetrofitService::class.java)
 
@@ -99,7 +99,7 @@ internal class MessageMixerWorker(
      * else -> returns failure
      */
     @VisibleForTesting
-    fun onResponse(response: Response<PingResponse>): Result {
+    fun onResponse(response: Response<MessageMixerResponse>): Result {
         if (response.isSuccessful) {
             serverErrorCounter.set(0) // reset server error counter
             response.body()?.let { handleResponse(it) }
@@ -117,24 +117,24 @@ internal class MessageMixerWorker(
         return Result.success()
     }
 
-    private fun handleInternalError(response: Response<PingResponse>): Result {
+    private fun handleInternalError(response: Response<MessageMixerResponse>): Result {
         WorkerUtils.logRequestError(TAG, response.code(), response.errorBody()?.string())
         return WorkerUtils.checkRetry(serverErrorCounter.getAndIncrement()) { retryPingRequest() }
     }
 
-    private fun handleRetry(response: Response<PingResponse>): Result {
+    private fun handleRetry(response: Response<MessageMixerResponse>): Result {
         serverErrorCounter.set(0) // reset server error counter
         WorkerUtils.logSilentRequestError(TAG, response.code(), response.errorBody()?.string())
         return retryPingRequest()
     }
 
-    private fun handleResponse(pingResponse: PingResponse) {
+    private fun handleResponse(MessageMixerResponse: MessageMixerResponse) {
         // Parse all data in response.
-        val parsedMessages = parsePingRespTestMessage(pingResponse)
+        val parsedMessages = parsePingRespTestMessage(MessageMixerResponse)
 
         // Add all parsed messages into CampaignRepository.
         CampaignRepository.instance().syncWith(
-            parsedMessages, pingResponse.currentPingMillis,
+            parsedMessages, MessageMixerResponse.currentPingMillis,
             ignoreTooltips = !HostAppInfoRepository.instance().isTooltipFeatureEnabled(),
         )
 
@@ -147,8 +147,8 @@ internal class MessageMixerWorker(
         eventMessageScheduler.startReconciliationWorker()
 
         // Schedule next ping.
-        scheduleNextPing(pingResponse.nextPingMillis)
-        InAppLogger(TAG).debug("campaign size: %d", pingResponse.data.size)
+        scheduleNextPing(MessageMixerResponse.nextPingMillis)
+        InAppLogger(TAG).debug("campaign size: %d", MessageMixerResponse.data.size)
     }
 
     private fun retryPingRequest(): Result {
@@ -172,7 +172,7 @@ internal class MessageMixerWorker(
     /**
      * This method parses response data, and returns a list of parsed messages.
      */
-    private fun parsePingRespTestMessage(response: PingResponse): List<Message> {
+    private fun parsePingRespTestMessage(response: MessageMixerResponse): List<Message> {
         val parsedMessages = ArrayList<Message>()
         for (data in response.data) {
             val message: Message = data.campaignData

@@ -14,7 +14,7 @@ internal abstract class MessageEventReconciliationUtil(
      * Validates whether a campaign is ready to be displayed by cross-referencing [CampaignRepository.messages]
      * and the list of [EventMatchingUtil.matchedEvents].
      */
-    abstract fun validate(validatedCampaignHandler: (message: Message, events: Set<Event>) -> Unit)
+    abstract fun validate(validatedCampaignHandler: (campaign: Message, events: Set<Event>) -> Unit)
 
     companion object {
         private var instance: MessageEventReconciliationUtil = MessageEventReconciliationUtilImpl(

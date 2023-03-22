@@ -62,7 +62,7 @@ internal class MessageActionsCoroutine(
     }
 
     /**
-     * After InApp campaign was displayed and removed from screen, update it's impressions left and opt-out status.
+     * After InApp message was displayed and removed from screen, update it's impressions left and opt-out status.
      */
     private fun updateCampaignInRepository(message: Message, isOptedOut: Boolean) {
         if (isOptedOut) {
@@ -101,7 +101,7 @@ internal class MessageActionsCoroutine(
     }
 
     /**
-     * This method returns a OnClickBehavior object which is retrieved from the campaign argument
+     * This method returns a OnClickBehavior object which is retrieved from the message argument
      * according to which content or button was clicked.
      */
     @VisibleForTesting
@@ -121,7 +121,7 @@ internal class MessageActionsCoroutine(
     /**
      * Notify ImpressionManager to report impression.
      *
-     * @param message A Campaign object.
+     * @param message A Message object.
      * @param impressionTypes An ImpressionType of the button click.
      */
     private fun scheduleReportImpression(message: Message, impressionTypes: List<ImpressionType>) {
@@ -133,7 +133,7 @@ internal class MessageActionsCoroutine(
     }
 
     /**
-     * This method handles button's actions accordingly, such as close campaign, redirect to webview, etc. Deep
+     * This method handles button's actions accordingly, such as close message, redirect to webview, etc. Deep
      * link to another activity or app, or push permission. Context of the app is needed in order to use PackageManager
      * to check if there are browser apps installed, or request for push permission.
      */
@@ -201,7 +201,7 @@ internal class MessageActionsCoroutine(
     }
 
     /**
-     * This method retrieves embedded event object from campaign based on impressionType.
+     * This method retrieves embedded event object from message based on impressionType.
      */
     private fun getEmbeddedEvent(impressionType: ImpressionType, message: Message): Trigger? {
         val payload = message.messagePayload

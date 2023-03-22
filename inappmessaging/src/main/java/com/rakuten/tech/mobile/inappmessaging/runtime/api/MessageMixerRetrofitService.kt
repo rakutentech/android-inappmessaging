@@ -4,7 +4,7 @@ import com.rakuten.tech.mobile.inappmessaging.runtime.data.requests.DisplayPermi
 import com.rakuten.tech.mobile.inappmessaging.runtime.data.requests.ImpressionRequest
 import com.rakuten.tech.mobile.inappmessaging.runtime.data.requests.PingRequest
 import com.rakuten.tech.mobile.inappmessaging.runtime.data.responses.DisplayPermissionResponse
-import com.rakuten.tech.mobile.inappmessaging.runtime.data.responses.ping.PingResponse
+import com.rakuten.tech.mobile.inappmessaging.runtime.data.responses.ping.MessageMixerResponse
 import okhttp3.ResponseBody
 import retrofit2.Call
 import retrofit2.http.POST
@@ -30,7 +30,7 @@ internal interface MessageMixerRetrofitService {
         @Header(DEVICE_ID_HEADER) deviceId: String,
         @Url url: String,
         @Body requestBody: PingRequest,
-    ): Call<PingResponse>
+    ): Call<MessageMixerResponse>
 
     /**
      * Retrofit API interface in order for Retrofit to make request to check display permission.

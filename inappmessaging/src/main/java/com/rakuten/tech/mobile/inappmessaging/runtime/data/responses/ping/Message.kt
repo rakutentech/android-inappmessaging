@@ -9,7 +9,7 @@ import com.rakuten.tech.mobile.inappmessaging.runtime.utils.InAppLogger
 import java.util.Date
 
 /**
- * Class for parsing CampaignData, which is a response from MessageMixer.
+ * Class for parsing Message, which is a response from MessageMixer.
  */
 internal data class Message(
     val campaignId: String,
