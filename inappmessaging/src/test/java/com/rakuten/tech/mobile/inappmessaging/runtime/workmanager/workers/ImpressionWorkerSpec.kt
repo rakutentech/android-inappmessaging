@@ -12,10 +12,10 @@ import com.rakuten.tech.mobile.inappmessaging.runtime.*
 import com.rakuten.tech.mobile.inappmessaging.runtime.api.MessageMixerRetrofitService
 import com.rakuten.tech.mobile.inappmessaging.runtime.data.enums.ImpressionType
 import com.rakuten.tech.mobile.inappmessaging.runtime.data.models.HostAppInfo
-import com.rakuten.tech.mobile.inappmessaging.runtime.data.models.Impression
 import com.rakuten.tech.mobile.inappmessaging.runtime.data.repositories.AccountRepository
 import com.rakuten.tech.mobile.inappmessaging.runtime.data.repositories.ConfigResponseRepository
 import com.rakuten.tech.mobile.inappmessaging.runtime.data.repositories.HostAppInfoRepository
+import com.rakuten.tech.mobile.inappmessaging.runtime.data.requests.Impression
 import com.rakuten.tech.mobile.inappmessaging.runtime.data.requests.ImpressionRequest
 import com.rakuten.tech.mobile.inappmessaging.runtime.data.responses.config.ConfigResponse
 import com.rakuten.tech.mobile.inappmessaging.runtime.utils.RuntimeUtil
