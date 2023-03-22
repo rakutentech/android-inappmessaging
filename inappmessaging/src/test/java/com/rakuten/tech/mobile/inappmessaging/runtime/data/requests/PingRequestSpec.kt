@@ -11,8 +11,8 @@ class PingRequestSpec {
     fun `should serialize PingRequest with correct json field names`() {
         val testDataClass = PingRequest(
             appVersion = "appVersion",
-            userIdentifiers = mutableListOf(),
-            supportedTypes = mutableListOf(CampaignType.REGULAR.typeId)
+            userIdentifiers = listOf(),
+            supportedTypes = listOf(CampaignType.REGULAR.typeId)
         )
         val json = """{"appVersion":"appVersion","userIdentifiers":[],"supportedCampaignTypes":[1]}"""
         Gson().toJson(testDataClass).shouldBeEqualTo(json)
