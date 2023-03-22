@@ -7,10 +7,7 @@ import com.rakuten.tech.mobile.inappmessaging.runtime.data.models.UserIdentifier
  * This class represents the request body for ping request.
  */
 internal data class PingRequest(
-    @SerializedName("appVersion")
     private val appVersion: String?,
-    @SerializedName("userIdentifiers")
-    private val userIdentifiers: MutableList<UserIdentifier>?,
-    @SerializedName("supportedCampaignTypes")
-    private val supportedTypes: MutableList<Int>,
+    private val userIdentifiers: List<UserIdentifier>?,
+    @SerializedName("supportedCampaignTypes") private val supportedTypes: List<Int>,
 )
