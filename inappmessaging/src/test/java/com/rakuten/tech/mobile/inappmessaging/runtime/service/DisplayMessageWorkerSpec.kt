@@ -15,10 +15,9 @@ import androidx.work.testing.TestListenableWorkerBuilder
 import com.nhaarman.mockitokotlin2.*
 import com.rakuten.tech.mobile.inappmessaging.runtime.BaseTest
 import com.rakuten.tech.mobile.inappmessaging.runtime.InAppMessaging
-import com.rakuten.tech.mobile.inappmessaging.runtime.data.models.messages.Message
 import com.rakuten.tech.mobile.inappmessaging.runtime.data.repositories.ConfigResponseRepository
 import com.rakuten.tech.mobile.inappmessaging.runtime.data.responses.config.ConfigResponseData
-import com.rakuten.tech.mobile.inappmessaging.runtime.data.responses.ping.MessageMixerResponseSpec
+import com.rakuten.tech.mobile.inappmessaging.runtime.data.responses.ping.PingResponseSpec
 import com.rakuten.tech.mobile.inappmessaging.runtime.data.responses.ping.MessagePayload
 import com.rakuten.tech.mobile.inappmessaging.runtime.data.responses.ping.Resource
 import com.rakuten.tech.mobile.inappmessaging.runtime.manager.MessageReadinessManager
@@ -48,7 +47,7 @@ open class DisplayMessageWorkerSpec : BaseTest() {
     internal val mockMessageManager = Mockito.mock(MessageReadinessManager::class.java)
 
     private val configResponseData = Mockito.mock(ConfigResponseData::class.java)
-    internal val payload = MessageMixerResponseSpec.response.data[0].campaignData.getMessagePayload()
+    internal val payload = PingResponseSpec.response.data[0].message.getMessagePayload()
     private val handler = Mockito.mock(Handler::class.java)
 
     @Before

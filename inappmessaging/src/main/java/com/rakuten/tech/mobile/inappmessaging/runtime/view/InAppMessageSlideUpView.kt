@@ -5,7 +5,7 @@ import android.util.AttributeSet
 import androidx.constraintlayout.widget.ConstraintLayout
 import com.rakuten.tech.mobile.inappmessaging.runtime.R
 import com.rakuten.tech.mobile.inappmessaging.runtime.data.enums.SlideFromDirectionType
-import com.rakuten.tech.mobile.inappmessaging.runtime.data.models.messages.Message
+import com.rakuten.tech.mobile.inappmessaging.runtime.data.responses.ping.Message
 import com.rakuten.tech.mobile.inappmessaging.runtime.utils.ViewUtil
 
 /**
@@ -32,7 +32,7 @@ internal class InAppMessageSlideUpView(
         val animation = ViewUtil.getSlidingAnimation(
             context,
             SlideFromDirectionType.getById(
-                message.getMessagePayload().messageSettings.displaySettings.slideFrom,
+                message.messagePayload.messageSettings.displaySettings.slideFrom,
             ),
         )
         animation?.let {

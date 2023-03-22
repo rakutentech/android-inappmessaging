@@ -1,11 +1,9 @@
 package com.rakuten.tech.mobile.inappmessaging.runtime.utils
 
 import com.rakuten.tech.mobile.inappmessaging.runtime.data.models.appevents.Event
-import com.rakuten.tech.mobile.inappmessaging.runtime.data.models.messages.Message
 import com.rakuten.tech.mobile.inappmessaging.runtime.data.repositories.CampaignRepository
+import com.rakuten.tech.mobile.inappmessaging.runtime.data.responses.ping.Message
 import com.rakuten.tech.mobile.inappmessaging.runtime.data.responses.ping.Trigger
-import com.rakuten.tech.mobile.inappmessaging.runtime.data.responses.ping.matchingEventName
-import java.util.Date
 
 internal abstract class MessageEventReconciliationUtil(
     internal val campaignRepo: CampaignRepository,
@@ -16,7 +14,7 @@ internal abstract class MessageEventReconciliationUtil(
      * Validates whether a campaign is ready to be displayed by cross-referencing [CampaignRepository.messages]
      * and the list of [EventMatchingUtil.matchedEvents].
      */
-    abstract fun validate(validatedCampaignHandler: (campaign: Message, events: Set<Event>) -> Unit)
+    abstract fun validate(validatedCampaignHandler: (message: Message, events: Set<Event>) -> Unit)
 
     companion object {
         private var instance: MessageEventReconciliationUtil = MessageEventReconciliationUtilImpl(
@@ -39,15 +37,15 @@ internal abstract class MessageEventReconciliationUtil(
     ) : MessageEventReconciliationUtil(campaignRepo, eventMatchingUtil) {
 
         @SuppressWarnings("ComplexMethod", "ComplexCondition")
-        override fun validate(validatedCampaignHandler: (campaign: Message, events: Set<Event>) -> Unit) {
+        override fun validate(validatedCampaignHandler: (message: Message, events: Set<Event>) -> Unit) {
             for (campaign in campaignRepo.messages.values) {
                 if (campaign.impressionsLeft == 0 ||
-                    (!campaign.isTest() && (campaign.isOptedOut == true || campaign.isOutdated))
+                    (!campaign.isTest && (campaign.isOptedOut == true || campaign.isOutdated))
                 ) { continue }
 
-                val triggers = campaign.getTriggers()
+                val triggers = campaign.triggers
                 if (triggers.isNullOrEmpty()) {
-                    InAppLogger(TAG).debug("Campaign (${campaign.getCampaignId()}) has no triggers.")
+                    InAppLogger(TAG).debug("Campaign (${campaign.campaignId}) has no triggers.")
                     continue
                 }
 
@@ -81,11 +79,3 @@ internal abstract class MessageEventReconciliationUtil(
         }
     }
 }
-
-private val Message.isOutdated: Boolean
-    get() =
-        if (hasNoEndDate()) {
-            false
-        } else {
-            getMessagePayload().messageSettings.displaySettings.endTimeMillis < Date().time
-        }

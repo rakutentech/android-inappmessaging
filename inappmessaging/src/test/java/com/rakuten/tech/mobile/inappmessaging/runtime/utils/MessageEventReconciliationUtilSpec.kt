@@ -7,7 +7,6 @@ import com.rakuten.tech.mobile.inappmessaging.runtime.data.enums.SlideFromDirect
 import com.rakuten.tech.mobile.inappmessaging.runtime.data.models.appevents.AppStartEvent
 import com.rakuten.tech.mobile.inappmessaging.runtime.data.models.appevents.Event
 import com.rakuten.tech.mobile.inappmessaging.runtime.data.models.appevents.LoginSuccessfulEvent
-import com.rakuten.tech.mobile.inappmessaging.runtime.data.models.messages.Message
 import com.rakuten.tech.mobile.inappmessaging.runtime.data.models.messages.ValidTestMessage
 import com.rakuten.tech.mobile.inappmessaging.runtime.data.repositories.CampaignRepository
 import com.rakuten.tech.mobile.inappmessaging.runtime.data.responses.ping.*
@@ -24,7 +23,7 @@ import org.robolectric.RobolectricTestRunner
 @RunWith(RobolectricTestRunner::class)
 @Ignore("base class")
 open class MessageEventReconciliationUtilSpec : BaseTest() {
-    internal val outdatedTestCampaign = CampaignData(
+    internal val outdatedTestMessage = Message(
         messagePayload = MessagePayload(
             title = "testTitle",
             messageBody = "testBody",
@@ -83,7 +82,7 @@ class MessageEventReconciliationUtilCampaignsSpec : MessageEventReconciliationUt
 
     @Test
     fun `should accept outdated test campaign`() {
-        CampaignRepository.instance().syncWith(listOf(outdatedTestCampaign), 0)
+        CampaignRepository.instance().syncWith(listOf(outdatedTestMessage), 0)
         val event = LoginSuccessfulEvent()
         EventMatchingUtil.instance().matchAndStore(event)
         val handler = ValidatorHandler()
@@ -91,7 +90,7 @@ class MessageEventReconciliationUtilCampaignsSpec : MessageEventReconciliationUt
 
         handler.validatedElements.shouldBeEqualTo(
             listOf(
-                ValidatorHandler.Element(outdatedTestCampaign, setOf(event)),
+                ValidatorHandler.Element(outdatedTestMessage, setOf(event)),
             ),
         )
     }

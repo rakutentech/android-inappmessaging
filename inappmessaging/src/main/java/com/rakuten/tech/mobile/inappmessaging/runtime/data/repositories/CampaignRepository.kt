@@ -3,8 +3,7 @@ package com.rakuten.tech.mobile.inappmessaging.runtime.data.repositories
 import com.google.gson.Gson
 import com.rakuten.tech.mobile.inappmessaging.runtime.InAppMessaging
 import com.rakuten.tech.mobile.inappmessaging.runtime.data.enums.InAppMessageType
-import com.rakuten.tech.mobile.inappmessaging.runtime.data.models.messages.Message
-import com.rakuten.tech.mobile.inappmessaging.runtime.data.responses.ping.CampaignData
+import com.rakuten.tech.mobile.inappmessaging.runtime.data.responses.ping.Message
 import com.rakuten.tech.mobile.inappmessaging.runtime.utils.InAppLogger
 import com.rakuten.tech.mobile.sdkutils.PreferencesUtil
 import org.json.JSONObject
@@ -22,7 +21,7 @@ internal abstract class CampaignRepository {
     /**
      * Updates the [Message.isOptedOut] as true for the provided campaign.
      */
-    abstract fun optOutCampaign(campaign: Message): Message?
+    abstract fun optOutCampaign(message: Message): Message?
 
     /**
      * Decrements the number of [Message.impressionsLeft] for provided campaign Id in the repository.
@@ -64,35 +63,33 @@ internal abstract class CampaignRepository {
             messages.clear()
             for (newCampaign in messageList.filterMessages(ignoreTooltips)) {
                 val updatedCampaign = updateCampaign(newCampaign, oldList)
-                messages[updatedCampaign.getCampaignId()] = updatedCampaign
+                messages[updatedCampaign.campaignId] = updatedCampaign
             }
             saveDataToCache()
         }
 
         private fun List<Message>.filterMessages(ignoreTooltips: Boolean): List<Message> {
             return this.filterNot {
-                it.getCampaignId().isEmpty() || (it.getType() == InAppMessageType.TOOLTIP.typeId && ignoreTooltips)
+                it.campaignId.isEmpty() || (it.type == InAppMessageType.TOOLTIP.typeId && ignoreTooltips)
             }
         }
 
-        private fun updateCampaign(newCampaign: Message, oldList: LinkedHashMap<String, Message>): Message {
-            var updatedCampaign = newCampaign
-            val oldCampaign = oldList[newCampaign.getCampaignId()]
+        private fun updateCampaign(newMessage: Message, oldList: LinkedHashMap<String, Message>): Message {
+            val oldCampaign = oldList[newMessage.campaignId]
             if (oldCampaign != null) {
-                updatedCampaign = Message.updatedMessage(
-                    updatedCampaign,
-                    asOptedOut = oldCampaign.isOptedOut == true,
-                )
+                // TODO: Check
+                newMessage.isOptedOut = (oldCampaign.isOptedOut == true)
 
-                var newImpressionsLeft = oldCampaign.impressionsLeft ?: oldCampaign.getMaxImpressions()
-                val isMaxImpressionsEdited = oldCampaign.getMaxImpressions() != newCampaign.getMaxImpressions()
+                var newImpressionsLeft = oldCampaign.impressionsLeft ?: oldCampaign.maxImpressions
+                val isMaxImpressionsEdited = oldCampaign.maxImpressions != newMessage.maxImpressions
                 if (isMaxImpressionsEdited) {
-                    newImpressionsLeft += newCampaign.getMaxImpressions() - oldCampaign.getMaxImpressions()
+                    newImpressionsLeft += newMessage.maxImpressions - oldCampaign.maxImpressions
                 }
                 newImpressionsLeft = max(0, newImpressionsLeft)
-                updatedCampaign = Message.updatedMessage(updatedCampaign, impressionsLeft = newImpressionsLeft)
+                // TODO: Check
+                newMessage.impressionsLeft = newImpressionsLeft
             }
-            return updatedCampaign
+            return newMessage
         }
 
         override fun clearMessages() {
@@ -100,20 +97,21 @@ internal abstract class CampaignRepository {
             saveDataToCache()
         }
 
-        override fun optOutCampaign(campaign: Message): Message? {
-            val localCampaign = messages[campaign.getCampaignId()]
+        override fun optOutCampaign(message: Message): Message? {
+            val localCampaign = messages[message.campaignId]
             if (localCampaign == null) {
                 InAppLogger(TAG).debug(
-                    "Campaign (${campaign.getCampaignId()}) could not be updated -" +
+                    "Campaign (${message.campaignId}) could not be updated -" +
                         "not found in the repository",
                 )
                 return null
             }
 
-            val updatedCampaign = Message.updatedMessage(localCampaign, asOptedOut = true)
-            messages[campaign.getCampaignId()] = updatedCampaign
+            // TODO: Check
+            val updatedCampaign = localCampaign.copy().apply { isOptedOut = true }
+            messages[message.campaignId] = updatedCampaign
 
-            if (!campaign.isTest()) {
+            if (!message.isTest) {
                 saveDataToCache()
             }
             return updatedCampaign
@@ -123,7 +121,7 @@ internal abstract class CampaignRepository {
             val campaign = messages[id] ?: return null
             return updateImpressions(
                 campaign,
-                max(0, (campaign.impressionsLeft ?: campaign.getMaxImpressions()) - 1),
+                max(0, (campaign.impressionsLeft ?: campaign.maxImpressions) - 1),
             )
         }
 
@@ -132,7 +130,7 @@ internal abstract class CampaignRepository {
             val campaign = messages[id] ?: return null
             return updateImpressions(
                 campaign,
-                (campaign.impressionsLeft ?: campaign.getMaxImpressions()) + 1,
+                (campaign.impressionsLeft ?: campaign.maxImpressions) + 1,
             )
         }
 
@@ -144,7 +142,7 @@ internal abstract class CampaignRepository {
                     val jsonObject = JSONObject(retrieveData())
                     for (key in jsonObject.keys()) {
                         messages[key] = Gson().fromJson(
-                            jsonObject.getJSONObject(key).toString(), CampaignData::class.java,
+                            jsonObject.getJSONObject(key).toString(), Message::class.java,
                         )
                     }
                 } catch (ex: Exception) {
@@ -177,9 +175,10 @@ internal abstract class CampaignRepository {
             }
         }
 
-        private fun updateImpressions(campaign: Message, newValue: Int): Message {
-            val updatedCampaign = Message.updatedMessage(campaign, impressionsLeft = newValue)
-            messages[campaign.getCampaignId()] = updatedCampaign
+        private fun updateImpressions(message: Message, newValue: Int): Message {
+            // TODO: Check
+            val updatedCampaign = message.copy().apply { impressionsLeft = newValue }
+            messages[message.campaignId] = updatedCampaign
 
             saveDataToCache()
             return updatedCampaign

@@ -2,10 +2,9 @@ package com.rakuten.tech.mobile.inappmessaging.runtime.utils
 
 import com.rakuten.tech.mobile.inappmessaging.runtime.data.enums.InAppMessageType
 import com.rakuten.tech.mobile.inappmessaging.runtime.data.models.appevents.Event
-import com.rakuten.tech.mobile.inappmessaging.runtime.data.models.messages.Message
 import com.rakuten.tech.mobile.inappmessaging.runtime.data.repositories.CampaignRepository
+import com.rakuten.tech.mobile.inappmessaging.runtime.data.responses.ping.Message
 import com.rakuten.tech.mobile.inappmessaging.runtime.data.responses.ping.Trigger
-import com.rakuten.tech.mobile.inappmessaging.runtime.data.responses.ping.matchingEventName
 
 internal abstract class EventMatchingUtil {
     internal val eventBuffer = arrayListOf<Event>()
@@ -21,16 +20,16 @@ internal abstract class EventMatchingUtil {
      */
     abstract fun matchAndStore(event: Event)
 
-    abstract fun matchedEvents(campaign: Message): List<Event>
+    abstract fun matchedEvents(message: Message): List<Event>
 
-    abstract fun containsAllMatchedEvents(campaign: Message): Boolean
+    abstract fun containsAllMatchedEvents(message: Message): Boolean
 
     /**
      * Finds and removes one record for each event in set for provided campaign.
      * Operation succeeds only if there is at least one record of each event.
      * Function can be used with persistent events - they won't be removed.
      */
-    abstract fun removeSetOfMatchedEvents(eventsToRemove: Set<Event>, campaign: Message): Boolean
+    abstract fun removeSetOfMatchedEvents(eventsToRemove: Set<Event>, message: Message): Boolean
 
     abstract fun clearNonPersistentEvents()
 
@@ -58,35 +57,35 @@ internal abstract class EventMatchingUtil {
             }
 
             campaignRepo.messages.values.forEach { campaign ->
-                val campaignTriggers = campaign.getTriggers()
+                val campaignTriggers = campaign.triggers
                 if (campaignTriggers.isNullOrEmpty()) { return@forEach }
                 if (!isEventMatchingOneOfTriggers(event, campaignTriggers)) { return@forEach }
 
-                val events = matchedEvents[campaign.getCampaignId()] ?: mutableListOf()
+                val events = matchedEvents[campaign.campaignId] ?: mutableListOf()
                 events.add(event)
-                matchedEvents[campaign.getCampaignId()] = events
+                matchedEvents[campaign.campaignId] = events
                 InAppLogger(TAG).debug(
-                    "Campaign (${campaign.getCampaignId()}) matched events:" +
+                    "Campaign (${campaign.campaignId}) matched events:" +
                         matchedEvents(campaign).map { it.getEventName() },
                 )
             }
         }
 
-        override fun matchedEvents(campaign: Message) =
-            matchedEvents[campaign.getCampaignId()].orEmpty() + persistentEvents
+        override fun matchedEvents(message: Message) =
+            matchedEvents[message.campaignId].orEmpty() + persistentEvents
 
-        override fun containsAllMatchedEvents(campaign: Message): Boolean {
-            val triggers = campaign.getTriggers()
+        override fun containsAllMatchedEvents(message: Message): Boolean {
+            val triggers = message.triggers
             if (triggers.isNullOrEmpty()) {
                 return false
             }
-            val events = matchedEvents[campaign.getCampaignId()].orEmpty() + persistentEvents
+            val events = matchedEvents[message.campaignId].orEmpty() + persistentEvents
             return triggers.all { isTriggerMatchingOneOfEvents(it, events) }
         }
 
         @SuppressWarnings("ComplexMethod", "ReturnCount", "LongMethod")
-        override fun removeSetOfMatchedEvents(eventsToRemove: Set<Event>, campaign: Message): Boolean {
-            val campaignEvents = matchedEvents[campaign.getCampaignId()] ?: mutableListOf()
+        override fun removeSetOfMatchedEvents(eventsToRemove: Set<Event>, message: Message): Boolean {
+            val campaignEvents = matchedEvents[message.campaignId] ?: mutableListOf()
             val totalMatchedEvents = campaignEvents.count() + persistentEvents.count()
 
             if (!(totalMatchedEvents > 0 && totalMatchedEvents >= eventsToRemove.size)) {
@@ -95,23 +94,23 @@ internal abstract class EventMatchingUtil {
             }
 
             val isCampaignPersistentEventsOnly = campaignEvents.isEmpty()
-            if (isCampaignPersistentEventsOnly && triggeredPersistentCampaigns.contains(campaign.getCampaignId())) {
+            if (isCampaignPersistentEventsOnly && triggeredPersistentCampaigns.contains(message.campaignId)) {
                 return false
             }
             // Display tooltips once per app session only
-            if (triggeredTooltips.contains(campaign.getCampaignId())) {
+            if (triggeredTooltips.contains(message.campaignId)) {
                 return false
             }
 
             if (removeEvents(eventsToRemove, campaignEvents)) return false
 
             if (isCampaignPersistentEventsOnly) {
-                triggeredPersistentCampaigns.add(campaign.getCampaignId())
+                triggeredPersistentCampaigns.add(message.campaignId)
             } else {
-                if (campaign.getType() == InAppMessageType.TOOLTIP.typeId) {
-                    triggeredTooltips.add(campaign.getCampaignId())
+                if (message.type == InAppMessageType.TOOLTIP.typeId) {
+                    triggeredTooltips.add(message.campaignId)
                 }
-                matchedEvents[campaign.getCampaignId()] = campaignEvents
+                matchedEvents[message.campaignId] = campaignEvents
             }
             return true
         }

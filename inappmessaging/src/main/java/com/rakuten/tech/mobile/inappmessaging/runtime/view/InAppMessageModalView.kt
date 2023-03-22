@@ -4,7 +4,7 @@ import android.content.Context
 import android.util.AttributeSet
 import android.widget.LinearLayout
 import com.rakuten.tech.mobile.inappmessaging.runtime.R
-import com.rakuten.tech.mobile.inappmessaging.runtime.data.models.messages.Message
+import com.rakuten.tech.mobile.inappmessaging.runtime.data.responses.ping.Message
 
 /**
  * This is a custom view that extends from InAppMessageBaseView.

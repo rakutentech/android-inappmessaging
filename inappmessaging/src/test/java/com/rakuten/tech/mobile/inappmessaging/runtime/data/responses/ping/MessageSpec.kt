@@ -9,14 +9,14 @@ import org.junit.Test
 import org.mockito.Mockito
 import org.mockito.Mockito.`when`
 
-class CampaignDataSpec {
+class MessageSpec {
 
     private val mockPayload = Mockito.mock(MessagePayload::class.java)
-    private val campaign = CampaignData(mockPayload, InAppMessageType.MODAL.typeId, null, "test", false)
+    private val message = Message(mockPayload, InAppMessageType.MODAL.typeId, null, "test", false)
 
     @Before
     fun setup() {
-        `when`(mockPayload.title).thenReturn("${CampaignData.TOOLTIP_TAG} any")
+        `when`(mockPayload.title).thenReturn("${Message.TOOLTIP_TAG} any")
         `when`(mockPayload.messageBody).thenReturn(TOOLTIP_CONFIG.trim())
     }
 
@@ -28,22 +28,22 @@ class CampaignDataSpec {
 
     @Test
     fun `should return null tooltip config for non-prefix tag`() {
-        `when`(mockPayload.title).thenReturn("any ${CampaignData.TOOLTIP_TAG}")
+        `when`(mockPayload.title).thenReturn("any ${Message.TOOLTIP_TAG}")
         verifyInvalidTooltip()
     }
 
     @Test
     fun `should return valid tooltip config with correct format`() {
-        val tooltip = campaign.getTooltipConfig()
-        campaign.setMaxImpression(5)
+        val tooltip = message.getTooltipConfig()
+        message.setMaxImpression(5)
         tooltip.shouldNotBeNull()
         tooltip.id shouldBeEqualTo "target"
         tooltip.position shouldBeEqualTo "top-center"
         tooltip.url shouldBeEqualTo "testurl"
         tooltip.autoDisappear shouldBeEqualTo 5
-        campaign.getType() shouldBeEqualTo InAppMessageType.TOOLTIP.typeId
-        campaign.getMaxImpressions() shouldBeEqualTo 5
-        campaign.getTooltipConfig() shouldBeEqualTo tooltip
+        message.getType() shouldBeEqualTo InAppMessageType.TOOLTIP.typeId
+        message.getMaxImpressions() shouldBeEqualTo 5
+        message.getTooltipConfig() shouldBeEqualTo tooltip
     }
 
     @Test
@@ -71,8 +71,8 @@ class CampaignDataSpec {
     }
 
     private fun verifyInvalidTooltip() {
-        campaign.getTooltipConfig().shouldBeNull()
-        campaign.getType() shouldBeEqualTo InAppMessageType.MODAL.typeId
+        message.getTooltipConfig().shouldBeNull()
+        message.getType() shouldBeEqualTo InAppMessageType.MODAL.typeId
     }
 
     companion object {

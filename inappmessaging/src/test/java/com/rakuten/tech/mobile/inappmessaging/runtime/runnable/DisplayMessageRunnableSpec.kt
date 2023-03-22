@@ -19,8 +19,8 @@ import com.rakuten.tech.mobile.inappmessaging.runtime.InAppMessaging
 import com.rakuten.tech.mobile.inappmessaging.runtime.R
 import com.rakuten.tech.mobile.inappmessaging.runtime.data.enums.InAppMessageType
 import com.rakuten.tech.mobile.inappmessaging.runtime.data.models.Tooltip
-import com.rakuten.tech.mobile.inappmessaging.runtime.data.responses.ping.CampaignData
-import com.rakuten.tech.mobile.inappmessaging.runtime.data.responses.ping.MessageMixerResponseSpec
+import com.rakuten.tech.mobile.inappmessaging.runtime.data.responses.ping.Message
+import com.rakuten.tech.mobile.inappmessaging.runtime.data.responses.ping.PingResponseSpec
 import com.rakuten.tech.mobile.inappmessaging.runtime.manager.DisplayManager
 import com.rakuten.tech.mobile.inappmessaging.runtime.view.InAppMessageModalView
 import com.rakuten.tech.mobile.inappmessaging.runtime.view.InAppMessageSlideUpView
@@ -37,12 +37,12 @@ import org.robolectric.RobolectricTestRunner
 @RunWith(RobolectricTestRunner::class)
 @SuppressWarnings("LargeClass")
 class DisplayMessageRunnableSpec : BaseTest() {
-    private val message = mock(CampaignData::class.java)
+    private val message = mock(Message::class.java)
     private var hostAppActivity = mock(Activity::class.java)
     private var mockDisplay = mock(DisplayManager::class.java)
     private val view = mock(View::class.java)
     private val window = mock(Window::class.java)
-    private val payload = MessageMixerResponseSpec.response.data[0].campaignData.getMessagePayload()
+    private val payload = PingResponseSpec.response.data[0].message.getMessagePayload()
 
     @Before
     override fun setup() {

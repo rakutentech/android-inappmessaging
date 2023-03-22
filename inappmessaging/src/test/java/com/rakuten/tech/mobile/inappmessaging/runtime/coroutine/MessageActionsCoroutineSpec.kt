@@ -17,7 +17,6 @@ import com.rakuten.tech.mobile.inappmessaging.runtime.TestUserInfoProvider
 import com.rakuten.tech.mobile.inappmessaging.runtime.data.enums.ImpressionType
 import com.rakuten.tech.mobile.inappmessaging.runtime.data.enums.InAppMessageType
 import com.rakuten.tech.mobile.inappmessaging.runtime.data.models.messages.InvalidTestMessage
-import com.rakuten.tech.mobile.inappmessaging.runtime.data.models.messages.Message
 import com.rakuten.tech.mobile.inappmessaging.runtime.data.models.messages.ValidTestMessage
 import com.rakuten.tech.mobile.inappmessaging.runtime.data.repositories.CampaignRepository
 import com.rakuten.tech.mobile.inappmessaging.runtime.data.responses.ping.*
@@ -48,7 +47,7 @@ internal class MessageActionsCoroutineSpec(
     private val isTooltip: Boolean,
 ) : BaseTest() {
 
-    private lateinit var message: CampaignData
+    private lateinit var message: Message
     private val activity = Mockito.mock(Activity::class.java)
 
     @Before
@@ -56,7 +55,7 @@ internal class MessageActionsCoroutineSpec(
         super.setup()
 
         // Copy object to not modify internal properties when testing
-        message = MessageMixerResponseSpec.response.data[0].campaignData.copy()
+        message = PingResponseSpec.response.data[0].message.copy()
 
         `when`(activity.packageManager).thenReturn(
             ApplicationProvider

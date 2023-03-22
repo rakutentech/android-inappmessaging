@@ -7,7 +7,6 @@ import androidx.work.testing.WorkManagerTestInitHelper
 import com.rakuten.tech.mobile.inappmessaging.runtime.*
 import com.rakuten.tech.mobile.inappmessaging.runtime.data.enums.InAppMessageType
 import com.rakuten.tech.mobile.inappmessaging.runtime.data.models.messages.InvalidTestMessage
-import com.rakuten.tech.mobile.inappmessaging.runtime.data.models.messages.Message
 import com.rakuten.tech.mobile.inappmessaging.runtime.data.models.messages.ValidTestMessage
 import com.rakuten.tech.mobile.sdkutils.PreferencesUtil
 import org.amshove.kluent.*
@@ -21,7 +20,7 @@ import kotlin.collections.ArrayList
  * Test class for CampaignRepository.
  */
 @RunWith(RobolectricTestRunner::class)
-open class CampaignRepositorySpec : BaseTest() {
+open class MessageRepositorySpec : BaseTest() {
     internal val message0 = ValidTestMessage(maxImpressions = 3)
     internal val message1 = ValidTestMessage("1234")
     internal val message2 = ValidTestMessage("5678", type = InAppMessageType.TOOLTIP.typeId)
@@ -129,7 +128,7 @@ open class CampaignRepositorySpec : BaseTest() {
     }
 }
 
-class CampaignRepositorySyncSpec : CampaignRepositorySpec() {
+class MessageRepositorySyncSpec : MessageRepositorySpec() {
     @Test
     fun `should add message list with valid list`() {
         CampaignRepository.instance().syncWith(messageList, 0)

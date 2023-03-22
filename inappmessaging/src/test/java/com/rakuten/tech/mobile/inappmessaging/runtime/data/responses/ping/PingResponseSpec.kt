@@ -9,7 +9,7 @@ import org.robolectric.ParameterizedRobolectricTestRunner
 import java.io.File
 
 @RunWith(ParameterizedRobolectricTestRunner::class)
-class MessageMixerResponseSpec(private val testname: String, private val actual: Any?, private val expected: Any?) {
+class PingResponseSpec(private val testname: String, private val actual: Any?, private val expected: Any?) {
     @Test
     fun `should be correct value after parsing`() {
         actual shouldBeEqualTo expected
@@ -63,7 +63,7 @@ class MessageMixerResponseSpec(private val testname: String, private val actual:
         campaign.getContexts() shouldHaveSize 0
     }
 
-    private fun generateDummyCampaign(id: String, title: String): CampaignData {
+    private fun generateDummyCampaign(id: String, title: String): Message {
         val messagePayload = MessagePayload(
             "#000000", "#ffffff",
             MessageSettings(
@@ -73,29 +73,29 @@ class MessageMixerResponseSpec(private val testname: String, private val actual:
             null, Resource(cropType = 2), "#000000", null, "#ffffff", title,
             "#000000",
         )
-        return CampaignData(messagePayload, 1, listOf(), id, false, 1)
+        return Message(messagePayload, 1, listOf(), id, false, 1)
     }
 
     companion object {
         internal val response = Gson().fromJson(
             File("src/test/resources/test_response.json").readText(),
-            MessageMixerResponse::class.java,
+            PingResponse::class.java,
         )
-        private val dataItem = DataItem(response.data[0].campaignData)
-        private val campaignData = CampaignData(
-            dataItem.campaignData.getMessagePayload(),
-            dataItem.campaignData.getType(), dataItem.campaignData.getTriggers(),
-            dataItem.campaignData.getCampaignId(), dataItem.campaignData.isTest(),
-            dataItem.campaignData.getMaxImpressions(), dataItem.campaignData.hasNoEndDate(),
-            dataItem.campaignData.isCampaignDismissable(), dataItem.campaignData.infiniteImpressions(),
+        private val dataItem = DataItem(response.data[0].message)
+        private val message = Message(
+            dataItem.message.getMessagePayload(),
+            dataItem.message.getType(), dataItem.message.getTriggers(),
+            dataItem.message.getCampaignId(), dataItem.message.isTest(),
+            dataItem.message.getMaxImpressions(), dataItem.message.hasNoEndDate(),
+            dataItem.message.isCampaignDismissable(), dataItem.message.infiniteImpressions(),
         )
         private val messagePayload = MessagePayload(
-            campaignData.getMessagePayload().headerColor,
-            campaignData.getMessagePayload().backgroundColor, campaignData.getMessagePayload().messageSettings,
-            campaignData.getMessagePayload().messageBody, campaignData.getMessagePayload().resource,
-            campaignData.getMessagePayload().titleColor, campaignData.getMessagePayload().header,
-            campaignData.getMessagePayload().frameColor, campaignData.getMessagePayload().title,
-            campaignData.getMessagePayload().messageBodyColor,
+            message.getMessagePayload().headerColor,
+            message.getMessagePayload().backgroundColor, message.getMessagePayload().messageSettings,
+            message.getMessagePayload().messageBody, message.getMessagePayload().resource,
+            message.getMessagePayload().titleColor, message.getMessagePayload().header,
+            message.getMessagePayload().frameColor, message.getMessagePayload().title,
+            message.getMessagePayload().messageBodyColor,
         )
         private val messageSettings = MessageSettings(
             messagePayload.messageSettings.displaySettings,
@@ -146,9 +146,9 @@ class MessageMixerResponseSpec(private val testname: String, private val actual:
             messagePayload.resource.cropType,
         )
         private val campaignTrigger = Trigger(
-            campaignData.getTriggers()!![0].type,
-            campaignData.getTriggers()!![0].eventType, campaignData.getTriggers()!![0].eventName,
-            campaignData.getTriggers()!![0].triggerAttributes,
+            message.getTriggers()!![0].type,
+            message.getTriggers()!![0].eventType, message.getTriggers()!![0].eventName,
+            message.getTriggers()!![0].triggerAttributes,
         )
         private val campaignTriggerAttr = TriggerAttribute(
             campaignTrigger.triggerAttributes[0].name,
@@ -163,13 +163,13 @@ class MessageMixerResponseSpec(private val testname: String, private val actual:
             return listOf(
                 arrayOf("currentPingMills", response.currentPingMillis, 1583890595467),
                 arrayOf("nextPingMillis", response.nextPingMillis, 3600000L),
-                arrayOf("type", campaignData.getType(), 2),
-                arrayOf("campaignId", campaignData.getCampaignId(), "1234567890"),
-                arrayOf("isTest", campaignData.isTest(), false),
-                arrayOf("hasNoEndDate", campaignData.hasNoEndDate(), true),
-                arrayOf("isCampaignDismissable", campaignData.isCampaignDismissable(), false),
-                arrayOf("infiniteImpressions", campaignData.infiniteImpressions(), false),
-                arrayOf("maxImpressions", campaignData.getMaxImpressions(), 100),
+                arrayOf("type", message.getType(), 2),
+                arrayOf("campaignId", message.getCampaignId(), "1234567890"),
+                arrayOf("isTest", message.isTest(), false),
+                arrayOf("hasNoEndDate", message.hasNoEndDate(), true),
+                arrayOf("isCampaignDismissable", message.isCampaignDismissable(), false),
+                arrayOf("infiniteImpressions", message.infiniteImpressions(), false),
+                arrayOf("maxImpressions", message.getMaxImpressions(), 100),
                 arrayOf("headerColor", messagePayload.headerColor, "#ffffff"),
                 arrayOf("backgroundColor", messagePayload.backgroundColor, "#000000"),
                 arrayOf("messageBody", messagePayload.messageBody, "Response Test"),

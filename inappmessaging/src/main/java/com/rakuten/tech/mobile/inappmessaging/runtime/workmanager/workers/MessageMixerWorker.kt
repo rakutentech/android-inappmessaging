@@ -6,13 +6,13 @@ import androidx.work.Worker
 import androidx.work.WorkerParameters
 import com.rakuten.tech.mobile.inappmessaging.runtime.api.MessageMixerRetrofitService
 import com.rakuten.tech.mobile.inappmessaging.runtime.data.enums.CampaignType
-import com.rakuten.tech.mobile.inappmessaging.runtime.data.models.messages.Message
 import com.rakuten.tech.mobile.inappmessaging.runtime.data.repositories.AccountRepository
 import com.rakuten.tech.mobile.inappmessaging.runtime.data.repositories.ConfigResponseRepository
 import com.rakuten.tech.mobile.inappmessaging.runtime.data.repositories.HostAppInfoRepository
 import com.rakuten.tech.mobile.inappmessaging.runtime.data.repositories.CampaignRepository
 import com.rakuten.tech.mobile.inappmessaging.runtime.data.requests.PingRequest
-import com.rakuten.tech.mobile.inappmessaging.runtime.data.responses.ping.MessageMixerResponse
+import com.rakuten.tech.mobile.inappmessaging.runtime.data.responses.ping.Message
+import com.rakuten.tech.mobile.inappmessaging.runtime.data.responses.ping.PingResponse
 import com.rakuten.tech.mobile.inappmessaging.runtime.utils.BuildVersionChecker
 import com.rakuten.tech.mobile.inappmessaging.runtime.utils.InAppLogger
 import com.rakuten.tech.mobile.inappmessaging.runtime.utils.RetryDelayUtil
@@ -41,7 +41,7 @@ internal class MessageMixerWorker(
     Worker(context, workerParams) {
 
     @VisibleForTesting
-    internal var testResponse: Call<MessageMixerResponse>? = null
+    internal var testResponse: Call<PingResponse>? = null
 
     /**
      * Overload constructor to handle OneTimeWorkRequest.Builder().
@@ -72,7 +72,7 @@ internal class MessageMixerWorker(
         }
     }
 
-    private fun setupCall(): Call<MessageMixerResponse> {
+    private fun setupCall(): Call<PingResponse> {
         // Create a retrofit API.
         val serviceApi = RuntimeUtil.getRetrofit().create(MessageMixerRetrofitService::class.java)
 
@@ -99,7 +99,7 @@ internal class MessageMixerWorker(
      * else -> returns failure
      */
     @VisibleForTesting
-    fun onResponse(response: Response<MessageMixerResponse>): Result {
+    fun onResponse(response: Response<PingResponse>): Result {
         if (response.isSuccessful) {
             serverErrorCounter.set(0) // reset server error counter
             response.body()?.let { handleResponse(it) }
@@ -117,24 +117,24 @@ internal class MessageMixerWorker(
         return Result.success()
     }
 
-    private fun handleInternalError(response: Response<MessageMixerResponse>): Result {
+    private fun handleInternalError(response: Response<PingResponse>): Result {
         WorkerUtils.logRequestError(TAG, response.code(), response.errorBody()?.string())
         return WorkerUtils.checkRetry(serverErrorCounter.getAndIncrement()) { retryPingRequest() }
     }
 
-    private fun handleRetry(response: Response<MessageMixerResponse>): Result {
+    private fun handleRetry(response: Response<PingResponse>): Result {
         serverErrorCounter.set(0) // reset server error counter
         WorkerUtils.logSilentRequestError(TAG, response.code(), response.errorBody()?.string())
         return retryPingRequest()
     }
 
-    private fun handleResponse(messageMixerResponse: MessageMixerResponse) {
+    private fun handleResponse(pingResponse: PingResponse) {
         // Parse all data in response.
-        val parsedMessages = parsePingRespTestMessage(messageMixerResponse)
+        val parsedMessages = parsePingRespTestMessage(pingResponse)
 
         // Add all parsed messages into CampaignRepository.
         CampaignRepository.instance().syncWith(
-            parsedMessages, messageMixerResponse.currentPingMillis,
+            parsedMessages, pingResponse.currentPingMillis,
             ignoreTooltips = !HostAppInfoRepository.instance().isTooltipFeatureEnabled(),
         )
 
@@ -147,8 +147,8 @@ internal class MessageMixerWorker(
         eventMessageScheduler.startReconciliationWorker()
 
         // Schedule next ping.
-        scheduleNextPing(messageMixerResponse.nextPingMillis)
-        InAppLogger(TAG).debug("campaign size: %d", messageMixerResponse.data.size)
+        scheduleNextPing(pingResponse.nextPingMillis)
+        InAppLogger(TAG).debug("campaign size: %d", pingResponse.data.size)
     }
 
     private fun retryPingRequest(): Result {
@@ -172,7 +172,7 @@ internal class MessageMixerWorker(
     /**
      * This method parses response data, and returns a list of parsed messages.
      */
-    private fun parsePingRespTestMessage(response: MessageMixerResponse): List<Message> {
+    private fun parsePingRespTestMessage(response: PingResponse): List<Message> {
         val parsedMessages = ArrayList<Message>()
         for (data in response.data) {
             val message: Message = data.campaignData

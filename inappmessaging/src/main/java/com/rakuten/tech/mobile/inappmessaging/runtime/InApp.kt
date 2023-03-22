@@ -216,7 +216,7 @@ internal class InApp(
             .firstOrNull { message ->
                 message.getTooltipConfig()?.id == viewId
             }
-            ?.getCampaignId()
+            ?.campaignId
 
         if (campaignId != null) {
             displayManager.removeMessage(getRegisteredActivity(), delay = 0, id = campaignId)

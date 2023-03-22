@@ -6,7 +6,7 @@ import org.junit.runner.RunWith
 import org.robolectric.ParameterizedRobolectricTestRunner
 
 @RunWith(ParameterizedRobolectricTestRunner::class)
-class CampaignTypeSpec(private val id: Int, private val expected: Any?) {
+class MessageTypeSpec(private val id: Int, private val expected: Any?) {
     @Test
     fun `should return correct type from id`() {
         CampaignType.getById(id) shouldBeEqualTo expected

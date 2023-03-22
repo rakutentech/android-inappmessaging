@@ -7,13 +7,13 @@ import com.rakuten.tech.mobile.inappmessaging.runtime.BuildConfig
 import com.rakuten.tech.mobile.inappmessaging.runtime.InAppMessaging
 import com.rakuten.tech.mobile.inappmessaging.runtime.api.MessageMixerRetrofitService
 import com.rakuten.tech.mobile.inappmessaging.runtime.data.enums.InAppMessageType
-import com.rakuten.tech.mobile.inappmessaging.runtime.data.models.messages.Message
 import com.rakuten.tech.mobile.inappmessaging.runtime.data.repositories.AccountRepository
 import com.rakuten.tech.mobile.inappmessaging.runtime.data.repositories.ConfigResponseRepository
 import com.rakuten.tech.mobile.inappmessaging.runtime.data.repositories.HostAppInfoRepository
 import com.rakuten.tech.mobile.inappmessaging.runtime.data.repositories.CampaignRepository
 import com.rakuten.tech.mobile.inappmessaging.runtime.data.requests.DisplayPermissionRequest
 import com.rakuten.tech.mobile.inappmessaging.runtime.data.responses.DisplayPermissionResponse
+import com.rakuten.tech.mobile.inappmessaging.runtime.data.responses.ping.Message
 import com.rakuten.tech.mobile.inappmessaging.runtime.exception.InAppMessagingException
 import com.rakuten.tech.mobile.inappmessaging.runtime.extensions.isVisible
 import com.rakuten.tech.mobile.inappmessaging.runtime.utils.InAppLogger
@@ -82,13 +82,13 @@ internal interface MessageReadinessManager {
 
         override fun addMessageToQueue(id: String) {
             val message = campaignRepo.messages[id] ?: return
-            val queue = if (message.getType() == InAppMessageType.TOOLTIP.typeId) queuedTooltips else queuedMessages
+            val queue = if (message.type == InAppMessageType.TOOLTIP.typeId) queuedTooltips else queuedMessages
             synchronized(queue) { queue.add(id) }
         }
 
         override fun removeMessageFromQueue(id: String) {
             val message = campaignRepo.messages[id] ?: return
-            val queue = if (message.getType() == InAppMessageType.TOOLTIP.typeId) queuedTooltips else queuedMessages
+            val queue = if (message.type == InAppMessageType.TOOLTIP.typeId) queuedTooltips else queuedMessages
             synchronized(queue) { queue.remove(id) }
         }
 
@@ -113,11 +113,11 @@ internal interface MessageReadinessManager {
                     continue
                 }
 
-                InAppLogger(TAG).debug("checking permission for message: %s", message.getCampaignId())
+                InAppLogger(TAG).debug("checking permission for message: %s", message.campaignId)
 
                 // First, check if this message should be displayed.
                 if (!shouldDisplayMessage(message)) {
-                    InAppLogger(TAG).debug("skipping message: %s", message.getCampaignId())
+                    InAppLogger(TAG).debug("skipping message: %s", message.campaignId)
                     // Skip to next message.
                     continue
                 }
@@ -133,8 +133,8 @@ internal interface MessageReadinessManager {
             return result
         }
 
-        private fun shouldPing(message: Message, result: MutableList<Message>) = if (message.isTest()) {
-            InAppLogger(TAG).debug("skipping test message: %s", message.getCampaignId())
+        private fun shouldPing(message: Message, result: MutableList<Message>) = if (message.isTest) {
+            InAppLogger(TAG).debug("skipping test message: %s", message.campaignId)
             result.add(message)
             false
         } else {
@@ -159,7 +159,7 @@ internal interface MessageReadinessManager {
         @VisibleForTesting
         override fun getDisplayPermissionRequest(message: Message): DisplayPermissionRequest {
             return DisplayPermissionRequest(
-                campaignId = message.getCampaignId(),
+                campaignId = message.campaignId,
                 appVersion = HostAppInfoRepository.instance().getVersion(),
                 sdkVersion = BuildConfig.VERSION_NAME,
                 locale = HostAppInfoRepository.instance().getDeviceLocale(),
@@ -187,11 +187,11 @@ internal interface MessageReadinessManager {
          * Additional checks are performed depending on message type.
          */
         private fun shouldDisplayMessage(message: Message): Boolean {
-            val impressions = message.impressionsLeft ?: message.getMaxImpressions()
+            val impressions = message.impressionsLeft ?: message.maxImpressions
             val isOptOut = message.isOptedOut == true
-            val hasPassedBasicCheck = (message.infiniteImpressions() || impressions > 0) && !isOptOut
+            val hasPassedBasicCheck = (message.areImpressionsInfinite || impressions > 0) && !isOptOut
 
-            return if (message.getType() == InAppMessageType.TOOLTIP.typeId) {
+            return if (message.type == InAppMessageType.TOOLTIP.typeId) {
                 val shouldDisplayTooltip = hasPassedBasicCheck &&
                     isTooltipTargetViewVisible(message) // if view where to attach tooltip is indeed visible
                 shouldDisplayTooltip
