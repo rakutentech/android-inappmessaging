@@ -77,7 +77,6 @@ internal abstract class CampaignRepository {
         private fun updateCampaign(newMessage: Message, oldList: LinkedHashMap<String, Message>): Message {
             val oldCampaign = oldList[newMessage.campaignId]
             if (oldCampaign != null) {
-                // TODO: Check
                 newMessage.isOptedOut = (oldCampaign.isOptedOut == true)
 
                 var newImpressionsLeft = oldCampaign.impressionsLeft ?: oldCampaign.maxImpressions
@@ -86,7 +85,6 @@ internal abstract class CampaignRepository {
                     newImpressionsLeft += newMessage.maxImpressions - oldCampaign.maxImpressions
                 }
                 newImpressionsLeft = max(0, newImpressionsLeft)
-                // TODO: Check
                 newMessage.impressionsLeft = newImpressionsLeft
             }
             return newMessage
@@ -106,11 +104,7 @@ internal abstract class CampaignRepository {
                 )
                 return null
             }
-
-            // TODO: Check
-            val updatedCampaign = localCampaign.copy().apply { isOptedOut = true }
-            messages[campaign.campaignId] = updatedCampaign
-
+            val updatedCampaign = localCampaign.apply { isOptedOut = true }
             if (!campaign.isTest) {
                 saveDataToCache()
             }
@@ -176,8 +170,7 @@ internal abstract class CampaignRepository {
         }
 
         private fun updateImpressions(message: Message, newValue: Int): Message {
-            // TODO: Check
-            val updatedCampaign = message.copy().apply { impressionsLeft = newValue }
+            val updatedCampaign = message.apply { impressionsLeft = newValue }
             messages[message.campaignId] = updatedCampaign
 
             saveDataToCache()
