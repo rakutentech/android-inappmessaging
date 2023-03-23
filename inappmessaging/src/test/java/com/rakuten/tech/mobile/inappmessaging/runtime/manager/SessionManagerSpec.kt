@@ -12,8 +12,8 @@ import com.rakuten.tech.mobile.inappmessaging.runtime.TestUserInfoProvider
 import com.rakuten.tech.mobile.inappmessaging.runtime.data.models.messages.Message
 import com.rakuten.tech.mobile.inappmessaging.runtime.data.models.messages.ValidTestMessage
 import com.rakuten.tech.mobile.inappmessaging.runtime.data.repositories.*
-import com.rakuten.tech.mobile.inappmessaging.runtime.data.responses.config.ConfigResponseData
-import com.rakuten.tech.mobile.inappmessaging.runtime.data.responses.config.ConfigResponseEndpoints
+import com.rakuten.tech.mobile.inappmessaging.runtime.data.responses.ConfigResponseData
+import com.rakuten.tech.mobile.inappmessaging.runtime.data.responses.ConfigResponseEndpoints
 import com.rakuten.tech.mobile.inappmessaging.runtime.manager.SessionManager.onSessionUpdate
 import org.amshove.kluent.*
 import org.junit.Before

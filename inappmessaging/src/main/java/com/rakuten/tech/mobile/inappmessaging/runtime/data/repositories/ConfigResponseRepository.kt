@@ -1,7 +1,7 @@
 package com.rakuten.tech.mobile.inappmessaging.runtime.data.repositories
 
 import androidx.annotation.VisibleForTesting
-import com.rakuten.tech.mobile.inappmessaging.runtime.data.responses.config.ConfigResponseData
+import com.rakuten.tech.mobile.inappmessaging.runtime.data.responses.ConfigResponseData
 import kotlin.random.Random
 
 /**

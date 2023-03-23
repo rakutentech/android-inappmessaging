@@ -17,7 +17,7 @@ import com.rakuten.tech.mobile.inappmessaging.runtime.data.repositories.ConfigRe
 import com.rakuten.tech.mobile.inappmessaging.runtime.data.repositories.HostAppInfoRepository
 import com.rakuten.tech.mobile.inappmessaging.runtime.data.requests.Impression
 import com.rakuten.tech.mobile.inappmessaging.runtime.data.requests.ImpressionRequest
-import com.rakuten.tech.mobile.inappmessaging.runtime.data.responses.config.ConfigResponse
+import com.rakuten.tech.mobile.inappmessaging.runtime.data.responses.ConfigResponse
 import com.rakuten.tech.mobile.inappmessaging.runtime.utils.RuntimeUtil
 import com.rakuten.tech.mobile.inappmessaging.runtime.workmanager.schedulers.MessageMixerPingScheduler
 import okhttp3.ResponseBody
