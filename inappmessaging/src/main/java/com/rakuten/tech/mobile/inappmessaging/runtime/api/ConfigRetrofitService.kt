@@ -1,6 +1,6 @@
 package com.rakuten.tech.mobile.inappmessaging.runtime.api
 
-import com.rakuten.tech.mobile.inappmessaging.runtime.data.responses.config.ConfigResponse
+import com.rakuten.tech.mobile.inappmessaging.runtime.data.responses.ConfigResponse
 import retrofit2.Call
 import retrofit2.http.GET
 import retrofit2.http.Header
