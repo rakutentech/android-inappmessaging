@@ -17,7 +17,7 @@ class TooltipSpec {
             Tooltip(
                 id = "view-id",
                 position = "top-left",
-            )
+            ),
         )
         testDataClass.isValid().shouldBeTrue()
     }
