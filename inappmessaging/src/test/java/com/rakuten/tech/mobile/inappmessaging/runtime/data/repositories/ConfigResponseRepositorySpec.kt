@@ -2,8 +2,8 @@ package com.rakuten.tech.mobile.inappmessaging.runtime.data.repositories
 
 import com.google.gson.Gson
 import com.rakuten.tech.mobile.inappmessaging.runtime.BaseTest
-import com.rakuten.tech.mobile.inappmessaging.runtime.data.responses.config.ConfigResponse
-import com.rakuten.tech.mobile.inappmessaging.runtime.data.responses.config.ConfigResponseData
+import com.rakuten.tech.mobile.inappmessaging.runtime.data.responses.ConfigResponse
+import com.rakuten.tech.mobile.inappmessaging.runtime.data.responses.ConfigResponseData
 import org.amshove.kluent.*
 import org.junit.Before
 import org.junit.Test

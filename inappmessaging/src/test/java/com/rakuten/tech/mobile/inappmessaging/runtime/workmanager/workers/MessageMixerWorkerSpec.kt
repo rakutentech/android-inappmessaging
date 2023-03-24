@@ -18,8 +18,8 @@ import com.rakuten.tech.mobile.inappmessaging.runtime.data.models.HostAppInfo
 import com.rakuten.tech.mobile.inappmessaging.runtime.data.repositories.AccountRepository
 import com.rakuten.tech.mobile.inappmessaging.runtime.data.repositories.ConfigResponseRepository
 import com.rakuten.tech.mobile.inappmessaging.runtime.data.repositories.HostAppInfoRepository
-import com.rakuten.tech.mobile.inappmessaging.runtime.data.responses.ping.PingResponse
-import com.rakuten.tech.mobile.inappmessaging.runtime.data.responses.ping.PingResponseSpec
+import com.rakuten.tech.mobile.inappmessaging.runtime.data.responses.ping.MessageMixerResponse
+import com.rakuten.tech.mobile.inappmessaging.runtime.testhelpers.TestDataHelper
 import com.rakuten.tech.mobile.inappmessaging.runtime.utils.BuildVersionChecker
 import com.rakuten.tech.mobile.inappmessaging.runtime.utils.RetryDelayUtil
 import com.rakuten.tech.mobile.inappmessaging.runtime.workmanager.schedulers.EventMessageReconciliationScheduler
@@ -45,7 +45,7 @@ import java.net.HttpURLConnection
 @RunWith(RobolectricTestRunner::class)
 open class MessageMixerWorkerSpec : BaseTest() {
     @Mock
-    internal val mockResp: Response<PingResponse>? = null
+    internal val mockResp: Response<MessageMixerResponse>? = null
     internal val ctx = Mockito.mock(Context::class.java)
     internal val workParam = Mockito.mock(WorkerParameters::class.java)
     internal val mockRetry = Mockito.mock(RetryDelayUtil::class.java)
@@ -89,7 +89,7 @@ open class MessageMixerWorkerSpec : BaseTest() {
     @Test
     fun `should return success with valid response`() {
         `when`(mockResp?.isSuccessful).thenReturn(true)
-        `when`(mockResp?.body()).thenReturn(PingResponseSpec.response)
+        `when`(mockResp?.body()).thenReturn(TestDataHelper.messageMixerResponse)
         MessageMixerWorker(ctx!!, workParam!!).onResponse(mockResp!!) shouldBeEqualTo ListenableWorker.Result.success()
     }
 
@@ -205,7 +205,7 @@ class MessageMixerWorkerFailSpec : MessageMixerWorkerSpec() {
     @Test
     fun `should reset initial delay`() {
         setupResponse(RetryDelayUtil.RETRY_ERROR_CODE)
-        `when`(mockResp?.body()).thenReturn(Mockito.mock(PingResponse::class.java))
+        `when`(mockResp?.body()).thenReturn(Mockito.mock(MessageMixerResponse::class.java))
 
         val worker = MessageMixerWorker(ctx!!, workParam!!, EventMessageReconciliationScheduler.instance(), mockSched)
         worker.onResponse(mockResp!!) shouldBeEqualTo ListenableWorker.Result.Success()

@@ -16,8 +16,8 @@ import com.rakuten.tech.mobile.inappmessaging.runtime.InAppMessagingTestConstant
 import com.rakuten.tech.mobile.inappmessaging.runtime.data.models.HostAppInfo
 import com.rakuten.tech.mobile.inappmessaging.runtime.data.repositories.ConfigResponseRepository
 import com.rakuten.tech.mobile.inappmessaging.runtime.data.repositories.HostAppInfoRepository
-import com.rakuten.tech.mobile.inappmessaging.runtime.data.responses.config.ConfigResponse
-import com.rakuten.tech.mobile.inappmessaging.runtime.data.responses.config.ConfigResponseData
+import com.rakuten.tech.mobile.inappmessaging.runtime.data.responses.ConfigResponse
+import com.rakuten.tech.mobile.inappmessaging.runtime.data.responses.ConfigResponseData
 import com.rakuten.tech.mobile.inappmessaging.runtime.utils.RetryDelayUtil
 import com.rakuten.tech.mobile.inappmessaging.runtime.workmanager.schedulers.ConfigScheduler
 import com.rakuten.tech.mobile.inappmessaging.runtime.workmanager.schedulers.MessageMixerPingScheduler
