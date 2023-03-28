@@ -7,62 +7,73 @@ import org.amshove.kluent.*
 import org.junit.Test
 import java.util.Date
 
+@SuppressWarnings(
+    "LargeClass",
+)
 @OptIn(ExperimentalStdlibApi::class)
 class MessageSpec {
 
     @Test
     fun `should return empty array if there are no contexts when calling contexts`() {
         val campaign = TestDataHelper.createDummyMessage(
-            messagePayload = TestDataHelper.createDummyPayload(title = "title"))
+            messagePayload = TestDataHelper.createDummyPayload(title = "title"),
+        )
         campaign.contexts shouldHaveSize 0
     }
 
     @Test
     fun `should properly read context if there's nothing beside it when calling contexts`() {
         val campaign = TestDataHelper.createDummyMessage(
-            messagePayload = TestDataHelper.createDummyPayload(title = "[ctx]"))
+            messagePayload = TestDataHelper.createDummyPayload(title = "[ctx]"),
+        )
         campaign.contexts shouldBeEqualTo listOf("ctx")
     }
 
     @Test
     fun `should properly read one context when calling contexts`() {
         val campaign = TestDataHelper.createDummyMessage(
-            messagePayload = TestDataHelper.createDummyPayload(title = "[ctx] title"))
+            messagePayload = TestDataHelper.createDummyPayload(title = "[ctx] title"),
+        )
         campaign.contexts shouldBeEqualTo listOf("ctx")
     }
 
     @Test
     fun `should properly read multiple contexts when calling contexts`() {
         val campaign = TestDataHelper.createDummyMessage(
-            messagePayload = TestDataHelper.createDummyPayload(title = "[ctx1] [ctx2][ctx3] title"))
+            messagePayload = TestDataHelper.createDummyPayload(title = "[ctx1] [ctx2][ctx3] title"),
+        )
         campaign.contexts shouldBeEqualTo listOf("ctx1", "ctx2", "ctx3")
     }
 
     @Test
     fun `should properly read multiple contexts separated with characters when calling contexts`() {
         val campaign = TestDataHelper.createDummyMessage(
-            messagePayload = TestDataHelper.createDummyPayload(title = "[ctx A]~~[ctx B]ab ab[ctx C]"))
+            messagePayload = TestDataHelper.createDummyPayload(title = "[ctx A]~~[ctx B]ab ab[ctx C]"),
+        )
         campaign.contexts shouldBeEqualTo listOf("ctx A", "ctx B", "ctx C")
     }
 
     @Test
     fun `should ignore invalid contexts when calling contexts`() {
         val campaign = TestDataHelper.createDummyMessage(
-            messagePayload = TestDataHelper.createDummyPayload(title = "[ctx] [ctxbad title"))
+            messagePayload = TestDataHelper.createDummyPayload(title = "[ctx] [ctxbad title"),
+        )
         campaign.contexts shouldBeEqualTo listOf("ctx")
     }
 
     @Test
     fun `should properly read context even if there are invalid ones when calling contexts`() {
         val campaign = TestDataHelper.createDummyMessage(
-            messagePayload = TestDataHelper.createDummyPayload(title = "ctxbad] title [ctx]"))
+            messagePayload = TestDataHelper.createDummyPayload(title = "ctxbad] title [ctx]"),
+        )
         campaign.contexts shouldBeEqualTo listOf("ctx")
     }
 
     @Test
     fun `should not return any context when title is empty`() {
         val campaign = TestDataHelper.createDummyMessage(
-            messagePayload = TestDataHelper.createDummyPayload(title = ""))
+            messagePayload = TestDataHelper.createDummyPayload(title = ""),
+        )
         campaign.contexts shouldHaveSize 0
     }
 
@@ -78,10 +89,11 @@ class MessageSpec {
             messagePayload = TestDataHelper.createDummyPayload(
                 messageSettings = TestDataHelper.message0Payload.messageSettings.copy(
                     displaySettings = TestDataHelper.message0Payload.messageSettings.displaySettings.copy(
-                        endTimeMillis = Date().time
-                    )
-                )
-            ))
+                        endTimeMillis = Date().time,
+                    ),
+                ),
+            ),
+        )
         campaign.isOutdated.shouldBeFalse()
     }
 
@@ -92,10 +104,11 @@ class MessageSpec {
             messagePayload = TestDataHelper.createDummyPayload(
                 messageSettings = TestDataHelper.message0Payload.messageSettings.copy(
                     displaySettings = TestDataHelper.message0Payload.messageSettings.displaySettings.copy(
-                        endTimeMillis = 0
-                    )
-                )
-            ))
+                        endTimeMillis = 0,
+                    ),
+                ),
+            ),
+        )
         campaign.isOutdated.shouldBeTrue()
     }
 
@@ -126,7 +139,8 @@ class MessageSpec {
     @Test
     fun `should return null if normal campaign when calling getTooltipConfig()`() {
         val campaign = TestDataHelper.createDummyMessage(
-            messagePayload = TestDataHelper.createDummyPayload(title = "normal"))
+            messagePayload = TestDataHelper.createDummyPayload(title = "normal"),
+        )
         campaign.getTooltipConfig().shouldBeNull()
         campaign.type.shouldNotBeEqualTo(InAppMessageType.TOOLTIP.typeId)
     }
@@ -136,8 +150,9 @@ class MessageSpec {
         val campaign = TestDataHelper.createDummyMessage(
             messagePayload = TestDataHelper.createDummyPayload(
                 title = "${Message.TOOLTIP_TAG} Test",
-                messageBody = """{"position":"top-left","auto-disappear":5,"redirectURL":"myUrl"}"""
-            ))
+                messageBody = """{"position":"top-left","auto-disappear":5,"redirectURL":"myUrl"}""",
+            ),
+        )
         campaign.getTooltipConfig().shouldBeNull()
         campaign.type.shouldNotBeEqualTo(InAppMessageType.TOOLTIP.typeId)
     }
@@ -147,8 +162,9 @@ class MessageSpec {
         val campaign = TestDataHelper.createDummyMessage(
             messagePayload = TestDataHelper.createDummyPayload(
                 title = "${Message.TOOLTIP_TAG} Test",
-                messageBody = """{"UIElement":"myId","auto-disappear":5,"redirectURL":"myUrl"}"""
-            ))
+                messageBody = """{"UIElement":"myId","auto-disappear":5,"redirectURL":"myUrl"}""",
+            ),
+        )
         campaign.getTooltipConfig().shouldBeNull()
         campaign.type.shouldNotBeEqualTo(InAppMessageType.TOOLTIP.typeId)
     }
@@ -158,8 +174,9 @@ class MessageSpec {
         val campaign = TestDataHelper.createDummyMessage(
             messagePayload = TestDataHelper.createDummyPayload(
                 title = "${Message.TOOLTIP_TAG} Test",
-                messageBody = """{"random":"invalid"}"""
-            ))
+                messageBody = """{"random":"invalid"}""",
+            ),
+        )
         campaign.getTooltipConfig().shouldBeNull()
         campaign.type.shouldNotBeEqualTo(InAppMessageType.TOOLTIP.typeId)
     }
@@ -169,10 +186,11 @@ class MessageSpec {
         val campaign = TestDataHelper.createDummyMessage(
             messagePayload = TestDataHelper.createDummyPayload(
                 title = "${Message.TOOLTIP_TAG} Test",
-                messageBody = """{"UIElement":"myId","position":"top-left","auto-disappear":5,"redirectURL":"myUrl"}"""
-            ))
+                messageBody = """{"UIElement":"myId","position":"top-left","auto-disappear":5,"redirectURL":"myUrl"}""",
+            ),
+        )
         campaign.getTooltipConfig()?.shouldBeEquivalentTo(
-            Tooltip(id = "myId", position = "top-left", autoDisappear = 5, url = "myUrl")
+            Tooltip(id = "myId", position = "top-left", autoDisappear = 5, url = "myUrl"),
         )
         campaign.type.shouldBeEqualTo(InAppMessageType.TOOLTIP.typeId)
     }

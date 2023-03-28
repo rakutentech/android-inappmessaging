@@ -8,13 +8,15 @@ internal object TestDataHelper {
 
     val messageMixerResponseJson: String = ""
         get() {
-            if (field.isEmpty())
+            if (field.isEmpty()) {
                 return File("src/test/resources/test_response.json").readText()
+            }
             return field
         }
 
-    val messageMixerResponse: MessageMixerResponse = Gson().fromJson(messageMixerResponseJson, MessageMixerResponse::class.java)
-    private val message0 = messageMixerResponse.data[0].campaignData
+    val messageMixerResponse: MessageMixerResponse = Gson()
+        .fromJson(messageMixerResponseJson, MessageMixerResponse::class.java)
+    val message0 = messageMixerResponse.data[0].campaignData.copy()
     val message0Payload = message0.messagePayload.copy()
 
     fun createDummyMessage(

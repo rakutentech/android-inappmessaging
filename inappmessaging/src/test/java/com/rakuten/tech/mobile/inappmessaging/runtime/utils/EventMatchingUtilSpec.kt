@@ -13,6 +13,9 @@ import org.junit.Test
 import org.mockito.Mockito
 import org.mockito.Mockito.`when`
 
+@SuppressWarnings(
+    "LargeClass",
+)
 class EventMatchingUtilSpec {
 
     private val mockCampaignRepo = Mockito.mock(CampaignRepository::class.java)
@@ -118,8 +121,12 @@ class EventMatchingUtilSpec {
     @Test
     fun `should return true if only persistent events are required`() {
         val campaign = TestDataHelper.createDummyMessage(
-            triggers = listOf(Trigger(type = 1, eventType = 1,
-                eventName = "Launch the App Event", triggerAttributes = mutableListOf()))
+            triggers = listOf(
+                Trigger(
+                    type = 1, eventType = 1,
+                    eventName = "Launch the App Event", triggerAttributes = mutableListOf(),
+                ),
+            ),
         )
         `when`(mockCampaignRepo.messages).thenReturn(linkedMapOf(campaign.campaignId to campaign))
         eventMatchingUtil.matchAndStore(appStartEv)
@@ -131,8 +138,12 @@ class EventMatchingUtilSpec {
     @Test
     fun `should return true only once if only persistent events are required`() {
         val campaign = TestDataHelper.createDummyMessage(
-            triggers = listOf(Trigger(type = 1, eventType = 1,
-                eventName = "Launch the App Event", triggerAttributes = mutableListOf()))
+            triggers = listOf(
+                Trigger(
+                    type = 1, eventType = 1,
+                    eventName = "Launch the App Event", triggerAttributes = mutableListOf(),
+                ),
+            ),
         )
         `when`(mockCampaignRepo.messages).thenReturn(linkedMapOf(campaign.campaignId to campaign))
         eventMatchingUtil.matchAndStore(appStartEv)
@@ -194,7 +205,7 @@ class EventMatchingUtilSpec {
     @Test
     fun `should return false if triggers are null or empty`() {
         val campaign = TestDataHelper.createDummyMessage(
-            triggers = listOf()
+            triggers = listOf(),
         )
         eventMatchingUtil.containsAllMatchedEvents(campaign).shouldBeFalse()
     }

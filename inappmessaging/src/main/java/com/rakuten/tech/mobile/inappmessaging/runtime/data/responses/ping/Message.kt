@@ -11,6 +11,7 @@ import java.util.Date
 /**
  * Class for parsing Message, which is a response from MessageMixer.
  */
+@SuppressWarnings("DataClassContainsFunctions")
 internal data class Message(
     val campaignId: String,
     val maxImpressions: Int,
@@ -39,8 +40,11 @@ internal data class Message(
 
     val isOutdated: Boolean
         get() {
-            return if (hasNoEndDate) false
-            else messagePayload.messageSettings.displaySettings.endTimeMillis < Date().time
+            return if (hasNoEndDate) {
+                false
+            } else {
+                messagePayload.messageSettings.displaySettings.endTimeMillis < Date().time
+            }
         }
 
     fun getTooltipConfig(): Tooltip? {

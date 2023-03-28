@@ -22,16 +22,20 @@ internal object TooltipHelper {
         return activity.layoutInflater
             .inflate(R.layout.in_app_message_tooltip, null) as InAppMessagingTooltipView
     }
-
-    fun createMessage(position: String = "bottom-center",
-                      imageUrl: String? = "valid url",
-                      target: String? = "ui-element",
+    fun createMessage(
+        position: String = "bottom-center",
+        imageUrl: String? = "valid url",
+        target: String? = "ui-element",
     ): Message {
         return TestDataHelper.createDummyMessage(
+            campaignId = "test",
             type = InAppMessageType.TOOLTIP.typeId,
             messagePayload = TestDataHelper.createDummyPayload(
-                title =  "${Message.TOOLTIP_TAG} test",
-                messageBody = """{"UIElement":"$target","position":"$position","auto-disappear":5,"redirectURL":"myUrl"}""",
+                title = "${Message.TOOLTIP_TAG} test",
+                messageBody = """
+                    >{"UIElement":"$target","position":"$position",
+                    >"auto-disappear":5,"redirectURL":"myUrl"}
+                """.trimMargin(">").replace("\n", ""),
                 resource = Resource(cropType = 2, imageUrl = imageUrl),
             ),
         )

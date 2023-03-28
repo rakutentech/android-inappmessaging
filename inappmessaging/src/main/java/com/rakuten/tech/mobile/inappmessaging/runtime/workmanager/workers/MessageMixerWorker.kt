@@ -128,13 +128,13 @@ internal class MessageMixerWorker(
         return retryPingRequest()
     }
 
-    private fun handleResponse(MessageMixerResponse: MessageMixerResponse) {
+    private fun handleResponse(messageMixerResponse: MessageMixerResponse) {
         // Parse all data in response.
-        val parsedMessages = parsePingRespTestMessage(MessageMixerResponse)
+        val parsedMessages = parsePingRespTestMessage(messageMixerResponse)
 
         // Add all parsed messages into CampaignRepository.
         CampaignRepository.instance().syncWith(
-            parsedMessages, MessageMixerResponse.currentPingMillis,
+            parsedMessages, messageMixerResponse.currentPingMillis,
             ignoreTooltips = !HostAppInfoRepository.instance().isTooltipFeatureEnabled(),
         )
 
@@ -147,8 +147,8 @@ internal class MessageMixerWorker(
         eventMessageScheduler.startReconciliationWorker()
 
         // Schedule next ping.
-        scheduleNextPing(MessageMixerResponse.nextPingMillis)
-        InAppLogger(TAG).debug("campaign size: %d", MessageMixerResponse.data.size)
+        scheduleNextPing(messageMixerResponse.nextPingMillis)
+        InAppLogger(TAG).debug("campaign size: %d", messageMixerResponse.data.size)
     }
 
     private fun retryPingRequest(): Result {

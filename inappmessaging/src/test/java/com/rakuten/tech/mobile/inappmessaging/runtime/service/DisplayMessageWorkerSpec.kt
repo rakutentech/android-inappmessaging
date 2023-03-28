@@ -35,6 +35,9 @@ import org.mockito.Mockito.`when`
 import org.mockito.verification.VerificationMode
 import org.robolectric.RobolectricTestRunner
 
+@SuppressWarnings(
+    "LargeClass",
+)
 @RunWith(RobolectricTestRunner::class)
 class DisplayMessageWorkerSpec : BaseTest() {
 
@@ -85,8 +88,8 @@ class DisplayMessageWorkerSpec : BaseTest() {
     fun `should return successful with valid message with empty string url`() {
         val message = TestDataHelper.createDummyMessage(
             messagePayload = TestDataHelper.createDummyPayload(
-                resource = Resource(imageUrl = "", cropType = 0)
-            )
+                resource = Resource(imageUrl = "", cropType = 0),
+            ),
         )
         `when`(mockMessageManager.getNextDisplayMessage()).thenReturn(listOf(message))
         runBlocking { displayWorker.doWork() shouldBeEqualTo ListenableWorker.Result.success() }
@@ -97,8 +100,8 @@ class DisplayMessageWorkerSpec : BaseTest() {
     fun `should return successful with valid message and null url`() {
         val message = TestDataHelper.createDummyMessage(
             messagePayload = TestDataHelper.createDummyPayload(
-                resource = Resource(imageUrl = null, cropType = 0)
-            )
+                resource = Resource(imageUrl = null, cropType = 0),
+            ),
         )
         `when`(mockMessageManager.getNextDisplayMessage()).thenReturn(listOf(message))
         runBlocking { displayWorker.doWork() shouldBeEqualTo ListenableWorker.Result.success() }
@@ -140,15 +143,15 @@ class DisplayMessageWorkerSpec : BaseTest() {
         worker.messageReadinessManager = mockMessageManager
         val message = TestDataHelper.createDummyMessage(
             messagePayload = TestDataHelper.createDummyPayload(
-                resource = Resource(imageUrl = "https://imageurl.jpg", cropType = 0)
-            )
+                resource = Resource(imageUrl = "https://imageurl.jpg", cropType = 0),
+            ),
         )
         `when`(mockMessageManager.getNextDisplayMessage()).thenReturn(listOf(message)).thenReturn(null)
         `when`(mockMessageManager.getNextDisplayMessage()).thenReturn(listOf(message))
         val mockResource = Mockito.mock(Resources::class.java)
         `when`(activity.resources).thenReturn(mockResource)
         `when`(mockResource.displayMetrics).thenReturn(Mockito.mock(DisplayMetrics::class.java))
-        ImageUtilSpec.IS_VALID = isValid // TODO: Remove this ugly code
+        ImageUtilSpec.IS_VALID = isValid
         worker.picasso = ImageUtilSpec.setupMockPicasso()
         worker.handler = handler
         runBlocking { worker.doWork() shouldBeEqualTo ListenableWorker.Result.success() }
@@ -160,8 +163,8 @@ class DisplayMessageWorkerSpec : BaseTest() {
     fun `should display the message if null image url`() {
         val message = TestDataHelper.createDummyMessage(
             messagePayload = TestDataHelper.createDummyPayload(
-                resource = Resource(imageUrl = null, cropType = 0)
-            )
+                resource = Resource(imageUrl = null, cropType = 0),
+            ),
         )
         `when`(mockMessageManager.getNextDisplayMessage()).thenReturn(listOf(message))
         runBlocking { displayWorker.doWork() shouldBeEqualTo ListenableWorker.Result.success() }
@@ -173,8 +176,8 @@ class DisplayMessageWorkerSpec : BaseTest() {
     fun `should call onVerifyContext for non-test campaign with contexts`() {
         val message = TestDataHelper.createDummyMessage(
             messagePayload = TestDataHelper.createDummyPayload(
-                title = "[ctx] DEV-Test (Android In-App-Test)"
-            )
+                title = "[ctx] DEV-Test (Android In-App-Test)",
+            ),
         )
         `when`(onVerifyContexts.invoke(any(), any())).thenReturn(true)
         `when`(mockMessageManager.getNextDisplayMessage()).thenReturn(listOf(message)).thenReturn(listOf())
@@ -204,8 +207,8 @@ class DisplayMessageWorkerSpec : BaseTest() {
         val message = TestDataHelper.createDummyMessage(
             isTest = true,
             messagePayload = TestDataHelper.createDummyPayload(
-                title = "[ctx] DEV-Test (Android In-App-Test)"
-            )
+                title = "[ctx] DEV-Test (Android In-App-Test)",
+            ),
         )
         `when`(onVerifyContexts.invoke(any(), any())).thenReturn(true)
         `when`(mockMessageManager.getNextDisplayMessage()).thenReturn(listOf(message)).thenReturn(listOf())
@@ -221,7 +224,10 @@ class DisplayMessageWorkerSpec : BaseTest() {
         `when`(mockMessageManager.getNextDisplayMessage()).thenReturn(listOf(TestDataHelper.createDummyMessage()))
         runBlocking { displayWorker.doWork() shouldBeEqualTo ListenableWorker.Result.success() }
 
-        if (shouldCall) verify(handler).post(any())
-        else verify(handler, never()).post(any())
+        if (shouldCall) {
+            verify(handler).post(any())
+        } else {
+            verify(handler, never()).post(any())
+        }
     }
 }

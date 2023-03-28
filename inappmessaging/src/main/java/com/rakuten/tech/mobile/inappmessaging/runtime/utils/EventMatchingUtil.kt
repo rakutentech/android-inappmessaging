@@ -71,8 +71,7 @@ internal abstract class EventMatchingUtil {
             }
         }
 
-        override fun matchedEvents(message: Message) =
-            matchedEvents[message.campaignId].orEmpty() + persistentEvents
+        override fun matchedEvents(message: Message) = matchedEvents[message.campaignId].orEmpty() + persistentEvents
 
         override fun containsAllMatchedEvents(message: Message): Boolean {
             val triggers = message.triggers

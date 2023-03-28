@@ -1,11 +1,14 @@
 package com.rakuten.tech.mobile.inappmessaging.runtime.data.responses.ping
 
 import com.google.gson.Gson
-import com.rakuten.tech.mobile.inappmessaging.runtime.data.responses.ping.*
 import com.rakuten.tech.mobile.inappmessaging.runtime.testhelpers.TestDataHelper
 import org.amshove.kluent.shouldBeEquivalentTo
 import org.junit.Test
 
+@SuppressWarnings(
+    "LargeClass",
+    "LongMethod",
+)
 @OptIn(ExperimentalStdlibApi::class)
 class MessageMixerResponseSpec {
 
@@ -20,148 +23,150 @@ class MessageMixerResponseSpec {
                 data = listOf(
                     DataItem(
                         campaignData = Message(
-                            campaignId="1234567890",
-                            maxImpressions=100,
-                            areImpressionsInfinite=false,
-                            hasNoEndDate=true,
-                            isCampaignDismissable=false,
-                            type=2,
-                            isTest=false,
-                            triggers=listOf(
+                            campaignId = "1234567890",
+                            maxImpressions = 100,
+                            areImpressionsInfinite = false,
+                            hasNoEndDate = true,
+                            isCampaignDismissable = false,
+                            type = 2,
+                            isTest = false,
+                            triggers = listOf(
                                 Trigger(
-                                    type=1,
-                                    eventType=1,
-                                    eventName="Launch the App Event",
-                                    triggerAttributes= mutableListOf(
+                                    type = 1,
+                                    eventType = 1,
+                                    eventName = "Launch the App Event",
+                                    triggerAttributes = mutableListOf(
                                         TriggerAttribute(
-                                            name="attribute",
-                                            value="attrValue",
-                                            type=1,
-                                            operator=1
+                                            name = "attribute",
+                                            value = "attrValue",
+                                            type = 1,
+                                            operator = 1,
                                         ),
                                     ),
                                 ),
-                                Trigger(type=1,
-                                    eventType=2,
-                                    eventName="Login Event",
-                                    triggerAttributes= mutableListOf()
+                                Trigger(
+                                    type = 1,
+                                    eventType = 2,
+                                    eventName = "Login Event",
+                                    triggerAttributes = mutableListOf(),
                                 ),
                             ),
-                            messagePayload=MessagePayload(
-                                headerColor="#ffffff",
-                                backgroundColor="#000000",
-                                messageSettings=MessageSettings(
-                                    displaySettings=DisplaySettings(
-                                        orientation=1,
-                                        slideFrom=1,
-                                        endTimeMillis=1584109800000,
-                                        textAlign=2,
-                                        isOptedOut=false,
-                                        delay=0,
-                                        isHtml=false),
-                                    controlSettings=ControlSettings(
-                                        buttons=listOf(
+                            messagePayload = MessagePayload(
+                                headerColor = "#ffffff",
+                                backgroundColor = "#000000",
+                                messageSettings = MessageSettings(
+                                    displaySettings = DisplaySettings(
+                                        orientation = 1,
+                                        slideFrom = 1,
+                                        endTimeMillis = 1584109800000,
+                                        textAlign = 2,
+                                        isOptedOut = false,
+                                        delay = 0,
+                                        isHtml = false,
+                                    ),
+                                    controlSettings = ControlSettings(
+                                        buttons = listOf(
                                             MessageButton(
-                                                buttonBackgroundColor="#000000",
-                                                buttonTextColor="#ffffff",
-                                                buttonBehavior=OnClickBehavior(
-                                                    action=1,
-                                                    uri="https://en.wikipedia.org/wiki/Test"
+                                                buttonBackgroundColor = "#000000",
+                                                buttonTextColor = "#ffffff",
+                                                buttonBehavior = OnClickBehavior(
+                                                    action = 1,
+                                                    uri = "https://en.wikipedia.org/wiki/Test",
                                                 ),
-                                                buttonText="Test",
-                                                embeddedEvent=Trigger(
-                                                    type=1,
-                                                    eventType=4,
-                                                    eventName="custom",
-                                                    triggerAttributes= mutableListOf(
+                                                buttonText = "Test",
+                                                embeddedEvent = Trigger(
+                                                    type = 1,
+                                                    eventType = 4,
+                                                    eventName = "custom",
+                                                    triggerAttributes = mutableListOf(
                                                         TriggerAttribute(
-                                                            name="attribute1",
-                                                            value="attrValue1",
-                                                            type=1,
-                                                            operator=1
+                                                            name = "attribute1",
+                                                            value = "attrValue1",
+                                                            type = 1,
+                                                            operator = 1,
                                                         ),
                                                         TriggerAttribute(
-                                                            name="attribute2",
-                                                            value="1",
-                                                            type=2,
-                                                            operator=1
+                                                            name = "attribute2",
+                                                            value = "1",
+                                                            type = 2,
+                                                            operator = 1,
                                                         ),
                                                         TriggerAttribute(
-                                                            name="attribute3",
-                                                            value="1.0",
-                                                            type=3,
-                                                            operator=1
+                                                            name = "attribute3",
+                                                            value = "1.0",
+                                                            type = 3,
+                                                            operator = 1,
                                                         ),
                                                         TriggerAttribute(
-                                                            name="attribute4",
-                                                            value="true",
-                                                            type=4,
-                                                            operator=1
+                                                            name = "attribute4",
+                                                            value = "true",
+                                                            type = 4,
+                                                            operator = 1,
                                                         ),
                                                         TriggerAttribute(
-                                                            name="attribute5",
-                                                            value="1234567",
-                                                            type=5,
-                                                            operator=1
-                                                        )
-                                                    )
+                                                            name = "attribute5",
+                                                            value = "1234567",
+                                                            type = 5,
+                                                            operator = 1,
+                                                        ),
+                                                    ),
                                                 ),
                                             ),
                                             MessageButton(
-                                                buttonBackgroundColor="#000fff",
-                                                buttonTextColor="#fff000",
-                                                buttonBehavior=OnClickBehavior(
-                                                    action=2,
-                                                    uri="https://test.url"
+                                                buttonBackgroundColor = "#000fff",
+                                                buttonTextColor = "#fff000",
+                                                buttonBehavior = OnClickBehavior(
+                                                    action = 2,
+                                                    uri = "https://test.url",
                                                 ),
-                                                buttonText="Redirect",
-                                                embeddedEvent=Trigger(
-                                                    type=2,
-                                                    eventType=3,
-                                                    eventName="test",
-                                                    triggerAttributes= mutableListOf(
+                                                buttonText = "Redirect",
+                                                embeddedEvent = Trigger(
+                                                    type = 2,
+                                                    eventType = 3,
+                                                    eventName = "test",
+                                                    triggerAttributes = mutableListOf(
                                                         TriggerAttribute(
-                                                            name="attribute",
-                                                            value="attribute Value",
-                                                            type=1,
-                                                            operator=1
+                                                            name = "attribute",
+                                                            value = "attribute Value",
+                                                            type = 1,
+                                                            operator = 1,
                                                         ),
                                                     ),
                                                 ),
                                             ),
                                         ),
-                                        content=Content(
-                                            onClick=OnClickBehavior(
-                                                action=1,
-                                                uri="https://sample.url"
+                                        content = Content(
+                                            onClick = OnClickBehavior(
+                                                action = 1,
+                                                uri = "https://sample.url",
                                             ),
-                                            embeddedEvent=Trigger(
-                                                type=1,
-                                                eventType=1,
-                                                eventName="event",
-                                                triggerAttributes= mutableListOf(
+                                            embeddedEvent = Trigger(
+                                                type = 1,
+                                                eventType = 1,
+                                                eventName = "event",
+                                                triggerAttributes = mutableListOf(
                                                     TriggerAttribute(
-                                                        name="attribute name",
-                                                        value="value",
-                                                        type=1,
-                                                        operator=1
+                                                        name = "attribute name",
+                                                        value = "value",
+                                                        type = 1,
+                                                        operator = 1,
                                                     ),
                                                 ),
                                             ),
                                         ),
                                     ),
                                 ),
-                                messageBody="Response Test",
-                                resource=Resource(
-                                    assetsUrl=null,
-                                    imageUrl=null,
-                                    cropType=2
+                                messageBody = "Response Test",
+                                resource = Resource(
+                                    assetsUrl = null,
+                                    imageUrl = null,
+                                    cropType = 2,
                                 ),
-                                titleColor="#000000",
-                                header="DEV-Test",
-                                frameColor="#ffffff",
-                                title="DEV-Test (Android In-App-Test)",
-                                messageBodyColor="#ffffff"
+                                titleColor = "#000000",
+                                header = "DEV-Test",
+                                frameColor = "#ffffff",
+                                title = "DEV-Test (Android In-App-Test)",
+                                messageBodyColor = "#ffffff",
                             ),
                         ),
                     ),
