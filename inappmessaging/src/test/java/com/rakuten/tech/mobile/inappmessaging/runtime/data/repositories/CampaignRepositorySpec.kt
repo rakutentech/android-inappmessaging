@@ -1,12 +1,19 @@
 package com.rakuten.tech.mobile.inappmessaging.runtime.data.repositories
 
+import android.content.Context
+import androidx.test.core.app.ApplicationProvider
+import com.google.gson.Gson
 import com.rakuten.tech.mobile.inappmessaging.runtime.*
 import com.rakuten.tech.mobile.inappmessaging.runtime.data.enums.InAppMessageType
 import com.rakuten.tech.mobile.inappmessaging.runtime.testhelpers.TestDataHelper
+import com.rakuten.tech.mobile.sdkutils.PreferencesUtil
 import org.amshove.kluent.*
 import org.junit.Before
 import org.junit.Test
+import org.junit.runner.RunWith
+import org.robolectric.RobolectricTestRunner
 
+@RunWith(RobolectricTestRunner::class)
 class CampaignRepositorySpec {
     @Before
     fun setup() {
@@ -14,6 +21,18 @@ class CampaignRepositorySpec {
     }
 
     /** syncWith **/
+
+    @Test
+    fun `should load cached data`() {
+        val ctx = ApplicationProvider.getApplicationContext<Context>()
+        InAppMessaging.initialize(ctx, true)
+        val message = TestDataHelper.createDummyMessage() // maxImpressions=100
+        PreferencesUtil.putString(ctx, InAppMessaging.getPreferencesFile(), CampaignRepository.IAM_USER_CACHE,
+            Gson().toJson(message))
+        CampaignRepository.instance().syncWith(listOf(TestDataHelper.createDummyMessage(maxImpressions = 999)), 0)
+
+        CampaignRepository.instance().messages.values.first().maxImpressions.shouldBeEqualTo(999)
+    }
 
     @Test
     fun `should set message list when calling syncWith()`() {
@@ -40,6 +59,7 @@ class CampaignRepositorySpec {
         val campaign = TestDataHelper.createDummyMessage(campaignId = "0")
         val campaign1 = TestDataHelper.createDummyMessage(campaignId = "1")
         CampaignRepository.instance().syncWith(listOf(campaign, campaign1), 0, false)
+
         CampaignRepository.instance().messages.shouldHaveSize(2)
     }
 
@@ -48,6 +68,7 @@ class CampaignRepositorySpec {
         val campaign = TestDataHelper.createDummyMessage(campaignId = "0")
         val campaign1 = TestDataHelper.createDummyMessage(campaignId = "1", type = InAppMessageType.TOOLTIP.typeId)
         CampaignRepository.instance().syncWith(listOf(campaign, campaign1), 0, true)
+
         CampaignRepository.instance().messages.shouldHaveSize(1)
     }
 

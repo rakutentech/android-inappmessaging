@@ -74,20 +74,20 @@ internal abstract class CampaignRepository {
             }
         }
 
-        private fun updateCampaign(newMessage: Message, oldList: LinkedHashMap<String, Message>): Message {
-            val oldCampaign = oldList[newMessage.campaignId]
+        private fun updateCampaign(newCampaign: Message, oldList: LinkedHashMap<String, Message>): Message {
+            val oldCampaign = oldList[newCampaign.campaignId]
             if (oldCampaign != null) {
-                newMessage.isOptedOut = (oldCampaign.isOptedOut == true)
+                newCampaign.isOptedOut = (oldCampaign.isOptedOut == true)
 
                 var newImpressionsLeft = oldCampaign.impressionsLeft ?: oldCampaign.maxImpressions
-                val isMaxImpressionsEdited = oldCampaign.maxImpressions != newMessage.maxImpressions
+                val isMaxImpressionsEdited = oldCampaign.maxImpressions != newCampaign.maxImpressions
                 if (isMaxImpressionsEdited) {
-                    newImpressionsLeft += newMessage.maxImpressions - oldCampaign.maxImpressions
+                    newImpressionsLeft += newCampaign.maxImpressions - oldCampaign.maxImpressions
                 }
                 newImpressionsLeft = max(0, newImpressionsLeft)
-                newMessage.impressionsLeft = newImpressionsLeft
+                newCampaign.impressionsLeft = newImpressionsLeft
             }
-            return newMessage
+            return newCampaign
         }
 
         override fun clearMessages() {
