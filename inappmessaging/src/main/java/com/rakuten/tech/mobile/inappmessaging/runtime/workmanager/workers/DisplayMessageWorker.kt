@@ -88,7 +88,8 @@ internal class DisplayMessageWorker(
         if (!verifyContexts(message)) {
             // Message display aborted by the host app
             InAppLogger(TAG).debug("message display cancelled by the host app")
-
+            // Remove message in queue and proceed to next message
+            messageReadinessManager.removeMessageFromQueue(message.campaignId)
             prepareNextMessage()
             return
         }

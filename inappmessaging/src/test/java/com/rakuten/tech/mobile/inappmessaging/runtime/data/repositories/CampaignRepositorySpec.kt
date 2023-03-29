@@ -27,8 +27,10 @@ class CampaignRepositorySpec {
         val ctx = ApplicationProvider.getApplicationContext<Context>()
         InAppMessaging.initialize(ctx, true)
         val message = TestDataHelper.createDummyMessage() // maxImpressions=100
-        PreferencesUtil.putString(ctx, InAppMessaging.getPreferencesFile(), CampaignRepository.IAM_USER_CACHE,
-            Gson().toJson(message))
+        PreferencesUtil.putString(
+            ctx, InAppMessaging.getPreferencesFile(), CampaignRepository.IAM_USER_CACHE,
+            Gson().toJson(message),
+        )
         CampaignRepository.instance().syncWith(listOf(TestDataHelper.createDummyMessage(maxImpressions = 999)), 0)
 
         CampaignRepository.instance().messages.values.first().maxImpressions.shouldBeEqualTo(999)

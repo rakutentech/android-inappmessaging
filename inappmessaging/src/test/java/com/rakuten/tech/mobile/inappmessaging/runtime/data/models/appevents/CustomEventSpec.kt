@@ -6,7 +6,6 @@ import com.rakuten.tech.mobile.inappmessaging.runtime.utils.InAppMessagingConsta
 import org.amshove.kluent.shouldBeEqualTo
 import org.amshove.kluent.shouldBeFalse
 import org.amshove.kluent.shouldHaveKey
-import org.amshove.kluent.shouldNotBeNull
 import org.junit.Test
 import org.junit.runner.RunWith
 import org.robolectric.ParameterizedRobolectricTestRunner

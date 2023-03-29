@@ -212,12 +212,26 @@ class DisplayMessageWorkerSpec : BaseTest() {
         )
         `when`(onVerifyContexts.invoke(any(), any())).thenReturn(true)
         `when`(mockMessageManager.getNextDisplayMessage()).thenReturn(listOf(message)).thenReturn(listOf())
+
+        verify(onVerifyContexts, never()).invoke(any(), any())
+    }
+
+    @Test
+    fun `should skip message when context was rejected`() {
+        val message = TestDataHelper.createDummyMessage(
+            messagePayload = TestDataHelper.createDummyPayload(
+                title = "[ctx] DEV-Test (Android In-App-Test)",
+            ),
+        )
+        `when`(onVerifyContexts.invoke(any(), any())).thenReturn(false)
         InAppMessaging.instance().onVerifyContext = onVerifyContexts
+        `when`(mockMessageManager.getNextDisplayMessage()).thenReturn(listOf(message)).thenReturn(listOf())
         runBlocking {
             displayWorker.doWork() shouldBeEqualTo ListenableWorker.Result.success()
         }
 
-        verify(onVerifyContexts, never()).invoke(any(), any())
+        Mockito.verify(mockMessageManager, Mockito.times(2)).getNextDisplayMessage()
+        Mockito.verify(mockMessageManager).removeMessageFromQueue(message.campaignId)
     }
 
     private fun verifyHandlerCalled(shouldCall: Boolean = false) {

@@ -488,6 +488,7 @@ Documents targeting Product Managers:
 * SDKCF-6126: Fixed incorrect tooltip position on scroll views and during device screen rotation.
 * SDKCF-6267: Fixed issue where campaign is sometimes not displayed on app launch.
 * SDKCF-6391: Fixed campaign being displayed multiple times when upgrading to version `7.2.0` or later.
+* SDKCF-6440: Fixed campaigns are not displayed when prior campaign in queue is cancelled through `onVerifyContext`.
 * SDKCF-6394: Refactored data classes to remove unnecessary annotation and grouped related data classes.
 
 ### 7.3.0 (2022-12-13)
