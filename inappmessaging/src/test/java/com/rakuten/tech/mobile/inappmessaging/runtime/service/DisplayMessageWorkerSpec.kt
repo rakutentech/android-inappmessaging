@@ -282,6 +282,13 @@ class DisplayMessageWorkerVerifyContextSpec : DisplayMessageWorkerSpec() {
         Mockito.verify(mockMessageManager, Mockito.times(2)).getNextDisplayMessage()
     }
 
+    @Test
+    fun `should remove message from queue when context was rejected`() {
+        setupNextCampaign()
+
+        Mockito.verify(mockMessageManager).removeMessageFromQueue("1")
+    }
+
     private fun setupNextCampaign(): Message {
         val message = Mockito.mock(Message::class.java)
 

@@ -21,6 +21,7 @@ import com.rakuten.tech.mobile.sdkutils.PreferencesUtil
 class MainActivityFragment : Fragment(), View.OnClickListener {
 
     private var tokenOrIdTrackingType = 0 // Use Tracking ID over access token by default
+    private var ignoredContexts = ""
 
     override fun onCreate(savedInstanceState: Bundle?) {
         context?.let {
@@ -50,6 +51,7 @@ class MainActivityFragment : Fragment(), View.OnClickListener {
         view.findViewById<Button>(R.id.close_message).setOnClickListener(this)
         view.findViewById<Button>(R.id.close_tooltip).setOnClickListener(this)
         view.findViewById<Button>(R.id.reconfigure).setOnClickListener(this)
+        view.findViewById<Button>(R.id.set_contexts).setOnClickListener(this)
     }
 
     override fun onClick(v: View) {
@@ -78,8 +80,33 @@ class MainActivityFragment : Fragment(), View.OnClickListener {
             }
             R.id.close_tooltip -> openCloseTooltipDialog()
             R.id.reconfigure -> showConfiguration()
+            R.id.set_contexts -> setContexts()
             else -> Any()
         }
+    }
+
+    private fun setContexts() {
+        val contentView = LayoutInflater.from(activity).inflate(R.layout.dialog_contexts, null)
+        val viewId = contentView.findViewById<EditText>(R.id.edit_contexts)
+        viewId.setText(ignoredContexts)
+
+        val dialog = AlertDialog.Builder(activity)
+            .setView(contentView)
+            .setTitle("Set Contexts")
+            .setPositiveButton(android.R.string.ok) { dialog, _ ->
+                ignoredContexts = viewId.text.toString().trim()
+                if (ignoredContexts.isNotEmpty()) {
+                    InAppMessaging.instance().onVerifyContext = { contexts, _ ->
+                        contexts.intersect(ignoredContexts.split(",").toSet()).isEmpty()
+                    }
+                }
+                dialog.dismiss()
+            }
+            .setNegativeButton(android.R.string.cancel) {dialog, _ ->
+                dialog.dismiss()
+            }
+            .create()
+        dialog.show()
     }
 
     private fun openCloseTooltipDialog() {
