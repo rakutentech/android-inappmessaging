@@ -169,9 +169,9 @@ internal abstract class CampaignRepository {
             }
         }
 
-        private fun updateImpressions(message: Message, newValue: Int): Message {
-            val updatedCampaign = message.apply { impressionsLeft = newValue }
-            messages[message.campaignId] = updatedCampaign
+        private fun updateImpressions(campaign: Message, newValue: Int): Message {
+            val updatedCampaign = campaign.apply { impressionsLeft = newValue }
+            messages[campaign.campaignId] = updatedCampaign
 
             saveDataToCache()
             return updatedCampaign

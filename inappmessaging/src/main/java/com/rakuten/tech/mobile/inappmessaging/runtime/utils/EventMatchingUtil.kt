@@ -29,7 +29,7 @@ internal abstract class EventMatchingUtil {
      * Operation succeeds only if there is at least one record of each event.
      * Function can be used with persistent events - they won't be removed.
      */
-    abstract fun removeSetOfMatchedEvents(eventsToRemove: Set<Event>, message: Message): Boolean
+    abstract fun removeSetOfMatchedEvents(eventsToRemove: Set<Event>, campaign: Message): Boolean
 
     abstract fun clearNonPersistentEvents()
 
@@ -71,14 +71,14 @@ internal abstract class EventMatchingUtil {
             }
         }
 
-        override fun matchedEvents(message: Message) = matchedEvents[message.campaignId].orEmpty() + persistentEvents
+        override fun matchedEvents(campaign: Message) = matchedEvents[campaign.campaignId].orEmpty() + persistentEvents
 
-        override fun containsAllMatchedEvents(message: Message): Boolean {
-            val triggers = message.triggers
+        override fun containsAllMatchedEvents(campaign: Message): Boolean {
+            val triggers = campaign.triggers
             if (triggers.isNullOrEmpty()) {
                 return false
             }
-            val events = matchedEvents[message.campaignId].orEmpty() + persistentEvents
+            val events = matchedEvents[campaign.campaignId].orEmpty() + persistentEvents
             return triggers.all { isTriggerMatchingOneOfEvents(it, events) }
         }
 

@@ -37,7 +37,7 @@ internal abstract class MessageEventReconciliationUtil(
     ) : MessageEventReconciliationUtil(campaignRepo, eventMatchingUtil) {
 
         @SuppressWarnings("ComplexMethod", "ComplexCondition")
-        override fun validate(validatedCampaignHandler: (message: Message, events: Set<Event>) -> Unit) {
+        override fun validate(validatedCampaignHandler: (campaign: Message, events: Set<Event>) -> Unit) {
             for (campaign in campaignRepo.messages.values) {
                 if (campaign.impressionsLeft == 0 ||
                     (!campaign.isTest && (campaign.isOptedOut == true || campaign.isOutdated))
