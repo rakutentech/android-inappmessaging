@@ -11,7 +11,10 @@ import java.util.Date
 /**
  * Class for parsing Message, which is a response from MessageMixer.
  */
-@SuppressWarnings("DataClassContainsFunctions")
+@SuppressWarnings(
+    "DataClassContainsFunctions",
+    "kotlin:S1125",
+)
 internal data class Message(
     val campaignId: String,
     val maxImpressions: Int,
