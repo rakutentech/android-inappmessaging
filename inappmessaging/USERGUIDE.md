@@ -485,6 +485,7 @@ Documents targeting Product Managers:
 
 ### 7.4.0 (In-Progress)
 * SDKCF-6321: Updated detekt version to `1.22.0`.
+* SDKCF-6395: Removed unused Retrofit utility function `getImage()`.
 * SDKCF-6126: Fixed incorrect tooltip position on scroll views and during device screen rotation.
 * SDKCF-6267: Fixed issue where campaign is sometimes not displayed on app launch.
 * SDKCF-6391: Fixed campaign being displayed multiple times when upgrading to version `7.2.0` or later.
