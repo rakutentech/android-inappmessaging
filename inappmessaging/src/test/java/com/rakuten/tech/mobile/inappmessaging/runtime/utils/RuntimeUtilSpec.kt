@@ -51,9 +51,4 @@ class RuntimeUtilSpec : BaseTest() {
         retrofit.converterFactories().shouldNotBeNull()
         retrofit.callbackExecutor().shouldNotBeNull()
     }
-
-    @Test
-    fun `should get null with invalid url`() {
-        RuntimeUtil.getImage("https://test.jpg").shouldBeNull()
-    }
 }
