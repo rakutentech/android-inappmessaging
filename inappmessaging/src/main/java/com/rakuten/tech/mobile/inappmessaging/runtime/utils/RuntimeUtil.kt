@@ -1,16 +1,10 @@
 package com.rakuten.tech.mobile.inappmessaging.runtime.utils
 
-import android.graphics.Bitmap
-import android.graphics.BitmapFactory
-import android.webkit.URLUtil
-import com.rakuten.tech.mobile.inappmessaging.runtime.api.MessageMixerRetrofitService
 import com.rakuten.tech.mobile.inappmessaging.runtime.data.enums.UserIdentifierType
 import com.rakuten.tech.mobile.inappmessaging.runtime.data.models.UserIdentifier
 import com.rakuten.tech.mobile.inappmessaging.runtime.data.repositories.AccountRepository
 import com.rakuten.tech.mobile.sdkutils.network.build
 import okhttp3.OkHttpClient
-import okhttp3.ResponseBody
-import retrofit2.Call
 import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory
 import java.util.Calendar
@@ -30,7 +24,6 @@ internal object RuntimeUtil {
         .build()
     private val EXECUTOR = Executors.newSingleThreadExecutor()
     private val GSON_CONVERTER_FACTORY = GsonConverterFactory.create()
-    private const val TAG = "IAM_RuntimeUtil"
 
     /**
      * This method returns a reference of Retrofit. Retrofit is handling API calls.
@@ -43,37 +36,6 @@ internal object RuntimeUtil {
             gsonConverterFactory = GSON_CONVERTER_FACTORY,
             executor = EXECUTOR,
         )
-    }
-
-    /**
-     * This method is a thread blocking GET request to retrieve image from server.
-     * Returns null if call was failed.
-     * Throws IOException if an error occur when making Get request, or converting image data
-     * into bytes.
-     */
-    fun getImage(imageUrl: String): Bitmap? {
-        if (URLUtil.isNetworkUrl(imageUrl)) {
-            return fetchImage(imageUrl)
-        }
-        return null
-    }
-
-    @SuppressWarnings("TooGenericExceptionCaught")
-    private fun fetchImage(imageUrl: String): Bitmap? {
-        val getImageCall: Call<ResponseBody> =
-            getRetrofit().create(MessageMixerRetrofitService::class.java).getImage(imageUrl)
-        try {
-            val imageResponse = getImageCall.execute()
-            if (imageResponse.isSuccessful) {
-                imageResponse.body()?.let { body ->
-                    val bytes = body.bytes() // should no longer be null
-                    return BitmapFactory.decodeByteArray(bytes, 0, bytes.size)
-                }
-            }
-        } catch (ex: Exception) {
-            InAppLogger(TAG).debug(ex.message)
-        }
-        return null
     }
 
     /**
