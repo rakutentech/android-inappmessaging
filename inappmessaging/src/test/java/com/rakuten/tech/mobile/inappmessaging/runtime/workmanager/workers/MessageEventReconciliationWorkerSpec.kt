@@ -7,9 +7,9 @@ import androidx.work.ListenableWorker
 import androidx.work.WorkerParameters
 import androidx.work.testing.WorkManagerTestInitHelper
 import com.rakuten.tech.mobile.inappmessaging.runtime.BaseTest
-import com.rakuten.tech.mobile.inappmessaging.runtime.data.models.messages.ValidTestMessage
 import com.rakuten.tech.mobile.inappmessaging.runtime.data.repositories.CampaignRepository
 import com.rakuten.tech.mobile.inappmessaging.runtime.manager.MessageReadinessManager
+import com.rakuten.tech.mobile.inappmessaging.runtime.testhelpers.TestDataHelper
 import com.rakuten.tech.mobile.inappmessaging.runtime.utils.EventMatchingUtil
 import com.rakuten.tech.mobile.inappmessaging.runtime.utils.MessageEventReconciliationUtil
 import org.amshove.kluent.shouldBeEqualTo
@@ -45,8 +45,8 @@ class MessageEventReconciliationWorkerSpec : BaseTest() {
 
     @Test
     fun `should return success with valid messages`() {
-        val message = ValidTestMessage()
-        val notTestMessage = ValidTestMessage(isTest = false)
+        val message = TestDataHelper.createDummyMessage(campaignId = "1", isTest = true)
+        val notTestMessage = TestDataHelper.createDummyMessage(campaignId = "2")
         worker = MessageEventReconciliationWorker(
             ApplicationProvider.getApplicationContext(),
             workerParameters,

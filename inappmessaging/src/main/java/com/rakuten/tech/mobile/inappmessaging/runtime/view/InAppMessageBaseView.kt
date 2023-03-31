@@ -19,7 +19,7 @@ import androidx.annotation.VisibleForTesting
 import androidx.core.widget.NestedScrollView
 import com.google.android.material.button.MaterialButton
 import com.rakuten.tech.mobile.inappmessaging.runtime.R
-import com.rakuten.tech.mobile.inappmessaging.runtime.data.models.messages.Message
+import com.rakuten.tech.mobile.inappmessaging.runtime.data.responses.ping.Message
 import com.rakuten.tech.mobile.inappmessaging.runtime.data.responses.ping.MessageButton
 import com.rakuten.tech.mobile.inappmessaging.runtime.utils.BuildVersionChecker
 import com.rakuten.tech.mobile.inappmessaging.runtime.utils.InAppLogger
@@ -64,22 +64,22 @@ internal open class InAppMessageBaseView(context: Context, attrs: AttributeSet?)
      */
     override fun populateViewData(message: Message) {
         setColor(message)
-        this.header = message.getMessagePayload().header
-        this.messageBody = message.getMessagePayload().messageBody
-        this.buttons = message.getMessagePayload().messageSettings.controlSettings.buttons
-        this.imageUrl = message.getMessagePayload().resource.imageUrl
+        this.header = message.messagePayload.header
+        this.messageBody = message.messagePayload.messageBody
+        this.buttons = message.messagePayload.messageSettings.controlSettings.buttons
+        this.imageUrl = message.messagePayload.resource.imageUrl
         this.listener = InAppMessageViewListener(message)
-        this.displayOptOut = message.getMessagePayload().messageSettings.displaySettings.isOptedOut
-        this.isDismissable = message.isCampaignDismissable()
+        this.displayOptOut = message.messagePayload.messageSettings.displaySettings.isOptedOut
+        this.isDismissable = message.isCampaignDismissable
         bindViewData()
-        this.tag = message.getCampaignId()
+        this.tag = message.campaignId
     }
 
     private fun setColor(message: Message) {
         try {
-            this.headerColor = Color.parseColor(message.getMessagePayload().headerColor)
-            this.messageBodyColor = Color.parseColor(message.getMessagePayload().messageBodyColor)
-            this.bgColor = Color.parseColor(message.getMessagePayload().backgroundColor)
+            this.headerColor = Color.parseColor(message.messagePayload.headerColor)
+            this.messageBodyColor = Color.parseColor(message.messagePayload.messageBodyColor)
+            this.bgColor = Color.parseColor(message.messagePayload.backgroundColor)
         } catch (e: IllegalArgumentException) {
             // values are from backend
             InAppLogger(TAG).error(e.message)

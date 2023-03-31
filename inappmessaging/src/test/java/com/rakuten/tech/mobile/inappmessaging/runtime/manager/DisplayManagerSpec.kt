@@ -15,10 +15,10 @@ import com.rakuten.tech.mobile.inappmessaging.runtime.BaseTest
 import com.rakuten.tech.mobile.inappmessaging.runtime.InAppMessaging
 import com.rakuten.tech.mobile.inappmessaging.runtime.R
 import com.rakuten.tech.mobile.inappmessaging.runtime.coroutine.MessageActionsCoroutine
-import com.rakuten.tech.mobile.inappmessaging.runtime.data.enums.InAppMessageType
 import com.rakuten.tech.mobile.inappmessaging.runtime.data.models.Tooltip
-import com.rakuten.tech.mobile.inappmessaging.runtime.data.models.messages.ValidTestMessage
 import com.rakuten.tech.mobile.inappmessaging.runtime.data.repositories.CampaignRepository
+import com.rakuten.tech.mobile.inappmessaging.runtime.data.responses.ping.Message
+import com.rakuten.tech.mobile.inappmessaging.runtime.testhelpers.TooltipHelper
 import org.amshove.kluent.shouldBeNull
 import org.junit.Before
 import org.junit.Test
@@ -285,10 +285,18 @@ class DisplayManagerSpec : BaseTest() {
     }
 
     private fun setupTargetToRemove(tooltip: Tooltip? = Tooltip("target", "top-center", "testurl", 5)) {
-        val message = ValidTestMessage(campaignId = "test", type = InAppMessageType.TOOLTIP.typeId, tooltip = tooltip)
+        val message: Message = if (tooltip == null) {
+            TooltipHelper.createMessage()
+        } else {
+            TooltipHelper.createMessage(
+                position = tooltip.position,
+                imageUrl = tooltip.url,
+                target = tooltip.id,
+            )
+        }
         CampaignRepository.instance().clearMessages()
         CampaignRepository.instance().syncWith(listOf(message), 0)
-        MessageReadinessManager.instance().addMessageToQueue(message.getCampaignId())
+        MessageReadinessManager.instance().addMessageToQueue(message.campaignId)
     }
 
     @SuppressWarnings("LongMethod")

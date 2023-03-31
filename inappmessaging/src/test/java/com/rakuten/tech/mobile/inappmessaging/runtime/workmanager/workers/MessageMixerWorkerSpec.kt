@@ -19,7 +19,7 @@ import com.rakuten.tech.mobile.inappmessaging.runtime.data.repositories.AccountR
 import com.rakuten.tech.mobile.inappmessaging.runtime.data.repositories.ConfigResponseRepository
 import com.rakuten.tech.mobile.inappmessaging.runtime.data.repositories.HostAppInfoRepository
 import com.rakuten.tech.mobile.inappmessaging.runtime.data.responses.ping.MessageMixerResponse
-import com.rakuten.tech.mobile.inappmessaging.runtime.data.responses.ping.MessageMixerResponseSpec
+import com.rakuten.tech.mobile.inappmessaging.runtime.testhelpers.TestDataHelper
 import com.rakuten.tech.mobile.inappmessaging.runtime.utils.BuildVersionChecker
 import com.rakuten.tech.mobile.inappmessaging.runtime.utils.RetryDelayUtil
 import com.rakuten.tech.mobile.inappmessaging.runtime.workmanager.schedulers.EventMessageReconciliationScheduler
@@ -89,7 +89,7 @@ open class MessageMixerWorkerSpec : BaseTest() {
     @Test
     fun `should return success with valid response`() {
         `when`(mockResp?.isSuccessful).thenReturn(true)
-        `when`(mockResp?.body()).thenReturn(MessageMixerResponseSpec.response)
+        `when`(mockResp?.body()).thenReturn(TestDataHelper.messageMixerResponse)
         MessageMixerWorker(ctx!!, workParam!!).onResponse(mockResp!!) shouldBeEqualTo ListenableWorker.Result.success()
     }
 

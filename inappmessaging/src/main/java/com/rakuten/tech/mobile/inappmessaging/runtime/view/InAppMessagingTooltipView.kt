@@ -26,7 +26,7 @@ import com.google.android.material.shape.ShapeAppearanceModel
 import com.rakuten.tech.mobile.inappmessaging.runtime.InAppMessaging
 import com.rakuten.tech.mobile.inappmessaging.runtime.R
 import com.rakuten.tech.mobile.inappmessaging.runtime.data.enums.PositionType
-import com.rakuten.tech.mobile.inappmessaging.runtime.data.models.messages.Message
+import com.rakuten.tech.mobile.inappmessaging.runtime.data.responses.ping.Message
 import com.rakuten.tech.mobile.inappmessaging.runtime.extensions.hide
 import com.rakuten.tech.mobile.inappmessaging.runtime.utils.InAppLogger
 import com.rakuten.tech.mobile.inappmessaging.runtime.utils.ResourceUtils
@@ -61,9 +61,9 @@ internal class InAppMessagingTooltipView(
 
     override fun populateViewData(message: Message) {
         // set tag
-        tag = message.getCampaignId()
-        this.imageUrl = message.getMessagePayload().resource.imageUrl
-        this.bgColor = message.getMessagePayload().backgroundColor
+        tag = message.campaignId
+        this.imageUrl = message.messagePayload.resource.imageUrl
+        this.bgColor = message.messagePayload.backgroundColor
         message.getTooltipConfig()?.let { tooltip ->
             val position = PositionType.getById(tooltip.position)
             if (position != null) {

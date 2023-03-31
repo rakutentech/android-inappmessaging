@@ -1,253 +1,233 @@
 package com.rakuten.tech.mobile.inappmessaging.runtime.utils
 
-import com.rakuten.tech.mobile.inappmessaging.runtime.BaseTest
-import com.rakuten.tech.mobile.inappmessaging.runtime.data.enums.EventType
 import com.rakuten.tech.mobile.inappmessaging.runtime.data.enums.InAppMessageType
 import com.rakuten.tech.mobile.inappmessaging.runtime.data.models.appevents.AppStartEvent
 import com.rakuten.tech.mobile.inappmessaging.runtime.data.models.appevents.LoginSuccessfulEvent
 import com.rakuten.tech.mobile.inappmessaging.runtime.data.models.appevents.PurchaseSuccessfulEvent
-import com.rakuten.tech.mobile.inappmessaging.runtime.data.models.messages.Message
-import com.rakuten.tech.mobile.inappmessaging.runtime.data.models.messages.ValidTestMessage
 import com.rakuten.tech.mobile.inappmessaging.runtime.data.repositories.CampaignRepository
 import com.rakuten.tech.mobile.inappmessaging.runtime.data.responses.ping.Trigger
+import com.rakuten.tech.mobile.inappmessaging.runtime.testhelpers.TestDataHelper
 import org.amshove.kluent.*
+import org.junit.Before
 import org.junit.Test
 import org.mockito.Mockito
 import org.mockito.Mockito.`when`
 
-open class EventMatchingUtilSpec : BaseTest() {
+@SuppressWarnings(
+    "LargeClass",
+)
+class EventMatchingUtilSpec {
 
-    // Mocks
-    internal val mockCampaignRepo = Mockito.mock(CampaignRepository::class.java)
-    internal val mockCampaign = Mockito.mock(Message::class.java)
-    internal val mockPersistentOnlyCampaign = Mockito.mock(Message::class.java)
-    internal val mockAppStartEv = AppStartEvent()
-    internal val mockLoginEv = LoginSuccessfulEvent()
-    internal val mockPurchaseEv = PurchaseSuccessfulEvent()
-    internal val mockCampaignMap = linkedMapOf("1" to mockCampaign)
+    private val mockCampaignRepo = Mockito.mock(CampaignRepository::class.java)
+    private val appStartEv = AppStartEvent()
+    private val loginEv = LoginSuccessfulEvent()
+    private val purchaseEv = PurchaseSuccessfulEvent()
+    private val campaign = TestDataHelper.createDummyMessage()
+    private val eventMatchingUtil = EventMatchingUtil.EventMatchingUtilImpl(mockCampaignRepo)
 
-    // In Test
-    internal val eventMatchingUtil = EventMatchingUtil.EventMatchingUtilImpl(mockCampaignRepo)
-
-    init {
-        setupTestCampaigns()
+    @Before
+    fun setup() {
+        `when`(mockCampaignRepo.messages).thenReturn(linkedMapOf(campaign.campaignId to campaign))
     }
 
-    private fun setupTestCampaigns() {
-        `when`(mockCampaign.getCampaignId()).thenReturn("test")
-        `when`(mockCampaign.getTriggers()).thenReturn(
-            listOf(
-                Trigger(0, EventType.APP_START.typeId, "appStartTest", mutableListOf()),
-                Trigger(0, EventType.LOGIN_SUCCESSFUL.typeId, "loginSuccessfulTest", mutableListOf()),
-            ),
-        )
+    /** removeSetOfMatchedEvents **/
 
-        `when`(mockPersistentOnlyCampaign.getCampaignId()).thenReturn("test")
-        `when`(mockPersistentOnlyCampaign.getMaxImpressions()).thenReturn(2)
-        `when`(mockPersistentOnlyCampaign.getTriggers()).thenReturn(
-            listOf(
-                Trigger(
-                    0, EventType.APP_START.typeId, "appStartTest", mutableListOf(),
-                ),
-            ),
-        )
-    }
-}
-
-class EventMatchingUtilSetSpec : EventMatchingUtilSpec() {
     @Test
     fun `should return false if events for a given campaign weren't found`() {
-        eventMatchingUtil.removeSetOfMatchedEvents(setOf(mockAppStartEv), mockCampaign).shouldBeFalse()
+        eventMatchingUtil.removeSetOfMatchedEvents(setOf(appStartEv), campaign)
+            .shouldBeFalse()
     }
 
     @Test
     fun `should return false if all events weren't found`() {
-        `when`(mockCampaignRepo.messages).thenReturn(mockCampaignMap)
-        eventMatchingUtil.matchAndStore(mockLoginEv)
+        eventMatchingUtil.matchAndStore(loginEv)
 
-        eventMatchingUtil.removeSetOfMatchedEvents(setOf(mockAppStartEv, mockLoginEv), mockCampaign)
+        eventMatchingUtil.removeSetOfMatchedEvents(setOf(appStartEv, loginEv), campaign)
             .shouldBeFalse()
     }
 
     @Test
     fun `should return false if one of requested events doesn't match given campaign`() {
-        `when`(mockCampaignRepo.messages).thenReturn(mockCampaignMap) // login & appstart only
-        eventMatchingUtil.matchAndStore(mockLoginEv)
-        eventMatchingUtil.matchAndStore(mockAppStartEv)
-        eventMatchingUtil.matchAndStore(mockPurchaseEv)
+        eventMatchingUtil.matchAndStore(loginEv)
+        eventMatchingUtil.matchAndStore(appStartEv)
+        eventMatchingUtil.matchAndStore(purchaseEv)
 
-        eventMatchingUtil.removeSetOfMatchedEvents(setOf(mockAppStartEv, mockLoginEv, mockPurchaseEv), mockCampaign)
+        eventMatchingUtil.removeSetOfMatchedEvents(setOf(appStartEv, loginEv, purchaseEv), campaign)
             .shouldBeFalse()
     }
 
     @Test
     fun `should return false if requested set of event isn't found`() {
-        `when`(mockCampaignRepo.messages).thenReturn(mockCampaignMap)
-        eventMatchingUtil.matchAndStore(mockLoginEv)
-        eventMatchingUtil.matchAndStore(mockAppStartEv)
+        eventMatchingUtil.matchAndStore(loginEv)
+        eventMatchingUtil.matchAndStore(appStartEv)
 
-        eventMatchingUtil.removeSetOfMatchedEvents(setOf(mockPurchaseEv), mockCampaign)
+        eventMatchingUtil.removeSetOfMatchedEvents(setOf(purchaseEv), campaign)
             .shouldBeFalse()
     }
 
     @Test
     fun `should return false if tooltip is already displayed`() {
-        `when`(mockCampaignMap["1"]?.getType()).thenReturn(InAppMessageType.TOOLTIP.typeId)
-        `when`(mockCampaignRepo.messages).thenReturn(mockCampaignMap)
-        eventMatchingUtil.matchAndStore(mockLoginEv)
-        eventMatchingUtil.matchAndStore(mockAppStartEv)
-        eventMatchingUtil.removeSetOfMatchedEvents(setOf(mockAppStartEv, mockLoginEv), mockCampaign)
+        val campaign = TestDataHelper.createDummyMessage(type = InAppMessageType.TOOLTIP.typeId)
+        `when`(mockCampaignRepo.messages).thenReturn(linkedMapOf(campaign.campaignId to campaign))
+        eventMatchingUtil.matchAndStore(loginEv)
+        eventMatchingUtil.matchAndStore(appStartEv)
+        eventMatchingUtil.removeSetOfMatchedEvents(setOf(appStartEv, loginEv), campaign)
 
-        eventMatchingUtil.removeSetOfMatchedEvents(setOf(mockLoginEv), mockCampaign)
+        eventMatchingUtil.removeSetOfMatchedEvents(setOf(loginEv), campaign)
             .shouldBeFalse()
     }
 
     @Test
     fun `should not persist normal events`() {
-        `when`(mockCampaignRepo.messages).thenReturn(mockCampaignMap)
-        eventMatchingUtil.matchAndStore(mockLoginEv)
-        eventMatchingUtil.matchAndStore(mockAppStartEv)
-        eventMatchingUtil.removeSetOfMatchedEvents(setOf(mockAppStartEv, mockLoginEv), mockCampaign)
+        eventMatchingUtil.matchAndStore(loginEv)
+        eventMatchingUtil.matchAndStore(appStartEv)
+        eventMatchingUtil.removeSetOfMatchedEvents(setOf(appStartEv, loginEv), campaign)
 
-        eventMatchingUtil.removeSetOfMatchedEvents(setOf(mockAppStartEv, mockLoginEv), mockCampaign)
+        eventMatchingUtil.removeSetOfMatchedEvents(setOf(appStartEv, loginEv), campaign)
             .shouldBeFalse()
     }
 
     @Test
     fun `should return true if all events are found`() {
-        `when`(mockCampaignRepo.messages).thenReturn(mockCampaignMap)
-        eventMatchingUtil.matchAndStore(mockLoginEv)
-        eventMatchingUtil.matchAndStore(mockAppStartEv)
+        eventMatchingUtil.matchAndStore(appStartEv)
+        eventMatchingUtil.matchAndStore(loginEv)
 
-        eventMatchingUtil.removeSetOfMatchedEvents(setOf(mockAppStartEv, mockLoginEv), mockCampaign)
+        eventMatchingUtil.removeSetOfMatchedEvents(setOf(appStartEv, loginEv), campaign)
             .shouldBeTrue()
     }
 
     @Test
     fun `should only remove one copy of non-persistent event`() {
-        `when`(mockCampaignRepo.messages).thenReturn(mockCampaignMap)
-        eventMatchingUtil.matchAndStore(mockLoginEv)
-        eventMatchingUtil.matchAndStore(mockLoginEv)
-        eventMatchingUtil.matchAndStore(mockAppStartEv)
-        eventMatchingUtil.removeSetOfMatchedEvents(setOf(mockAppStartEv, mockLoginEv), mockCampaign)
+        eventMatchingUtil.matchAndStore(loginEv)
+        eventMatchingUtil.matchAndStore(loginEv)
+        eventMatchingUtil.matchAndStore(appStartEv)
+        eventMatchingUtil.removeSetOfMatchedEvents(setOf(appStartEv, loginEv), campaign)
 
-        eventMatchingUtil.removeSetOfMatchedEvents(setOf(mockAppStartEv, mockLoginEv), mockCampaign)
+        eventMatchingUtil.removeSetOfMatchedEvents(setOf(appStartEv, loginEv), campaign)
             .shouldBeTrue()
     }
 
     @Test
     fun `should return true without the need for persistent event to be logged`() {
-        `when`(mockCampaignRepo.messages).thenReturn(mockCampaignMap)
-        eventMatchingUtil.matchAndStore(mockLoginEv)
-        eventMatchingUtil.matchAndStore(mockAppStartEv)
-        eventMatchingUtil.removeSetOfMatchedEvents(setOf(mockAppStartEv, mockLoginEv), mockCampaign)
-        eventMatchingUtil.matchAndStore(mockLoginEv)
+        eventMatchingUtil.matchAndStore(loginEv)
+        eventMatchingUtil.matchAndStore(appStartEv)
+        eventMatchingUtil.removeSetOfMatchedEvents(setOf(appStartEv, loginEv), campaign)
+        eventMatchingUtil.matchAndStore(loginEv)
 
-        eventMatchingUtil.removeSetOfMatchedEvents(setOf(mockAppStartEv, mockLoginEv), mockCampaign)
+        eventMatchingUtil.removeSetOfMatchedEvents(setOf(appStartEv, loginEv), campaign)
             .shouldBeTrue()
     }
 
     @Test
     fun `should return true if only persistent events are required`() {
-        `when`(mockCampaignRepo.messages).thenReturn(linkedMapOf("1" to mockPersistentOnlyCampaign))
-        eventMatchingUtil.matchAndStore(mockAppStartEv)
+        val campaign = TestDataHelper.createDummyMessage(
+            triggers = listOf(
+                Trigger(
+                    type = 1, eventType = 1,
+                    eventName = "Launch the App Event", triggerAttributes = mutableListOf(),
+                ),
+            ),
+        )
+        `when`(mockCampaignRepo.messages).thenReturn(linkedMapOf(campaign.campaignId to campaign))
+        eventMatchingUtil.matchAndStore(appStartEv)
 
-        eventMatchingUtil.removeSetOfMatchedEvents(setOf(mockAppStartEv), mockPersistentOnlyCampaign)
+        eventMatchingUtil.removeSetOfMatchedEvents(setOf(appStartEv), campaign)
             .shouldBeTrue()
     }
 
     @Test
     fun `should return true only once if only persistent events are required`() {
-        `when`(mockCampaignRepo.messages).thenReturn(linkedMapOf("1" to mockPersistentOnlyCampaign))
-        eventMatchingUtil.matchAndStore(mockAppStartEv)
-        eventMatchingUtil.removeSetOfMatchedEvents(setOf(mockAppStartEv), mockPersistentOnlyCampaign)
+        val campaign = TestDataHelper.createDummyMessage(
+            triggers = listOf(
+                Trigger(
+                    type = 1, eventType = 1,
+                    eventName = "Launch the App Event", triggerAttributes = mutableListOf(),
+                ),
+            ),
+        )
+        `when`(mockCampaignRepo.messages).thenReturn(linkedMapOf(campaign.campaignId to campaign))
+        eventMatchingUtil.matchAndStore(appStartEv)
+        eventMatchingUtil.removeSetOfMatchedEvents(setOf(appStartEv), campaign)
+            .shouldBeTrue()
 
-        eventMatchingUtil.removeSetOfMatchedEvents(setOf(AppStartEvent()), mockPersistentOnlyCampaign)
+        eventMatchingUtil.removeSetOfMatchedEvents(setOf(appStartEv), campaign)
             .shouldBeFalse()
     }
-}
 
-class EventMatchingUtilEventsSpec : EventMatchingUtilSpec() {
+    /** matchedEvents **/
+
     @Test
     fun `should properly match persistent events`() {
-        `when`(mockCampaignRepo.messages).thenReturn(mockCampaignMap)
-        eventMatchingUtil.matchAndStore(mockAppStartEv)
+        eventMatchingUtil.matchAndStore(appStartEv)
 
-        eventMatchingUtil.matchedEvents(mockCampaign).shouldContain(mockAppStartEv)
+        eventMatchingUtil.matchedEvents(campaign).shouldContain(appStartEv)
     }
 
     @Test
     fun `should properly match non-persistent events`() {
-        `when`(mockCampaignRepo.messages).thenReturn(mockCampaignMap)
-        eventMatchingUtil.matchAndStore(mockLoginEv)
+        eventMatchingUtil.matchAndStore(loginEv)
 
-        eventMatchingUtil.matchedEvents(mockCampaign).shouldContain(mockLoginEv)
+        eventMatchingUtil.matchedEvents(campaign).shouldContain(loginEv)
     }
-}
 
-class EventMatchingUtilContainsSpec : EventMatchingUtilSpec() {
+    /** containsAllMatchedEvents **/
+
     @Test
     fun `should return true if all required events were stored`() {
-        `when`(mockCampaignRepo.messages).thenReturn(mockCampaignMap)
-        eventMatchingUtil.matchAndStore(mockAppStartEv)
-        eventMatchingUtil.matchAndStore(mockLoginEv)
+        eventMatchingUtil.matchAndStore(appStartEv)
+        eventMatchingUtil.matchAndStore(loginEv)
 
-        eventMatchingUtil.containsAllMatchedEvents(mockCampaign).shouldBeTrue()
+        eventMatchingUtil.containsAllMatchedEvents(campaign).shouldBeTrue()
     }
 
     @Test
     fun `should return true if more events than required were stored`() {
-        `when`(mockCampaignRepo.messages).thenReturn(mockCampaignMap)
-        eventMatchingUtil.matchAndStore(mockAppStartEv)
-        eventMatchingUtil.matchAndStore(mockLoginEv)
-        eventMatchingUtil.matchAndStore(mockLoginEv)
-        eventMatchingUtil.matchAndStore(mockPurchaseEv)
+        eventMatchingUtil.matchAndStore(appStartEv)
+        eventMatchingUtil.matchAndStore(loginEv)
+        eventMatchingUtil.matchAndStore(loginEv)
+        eventMatchingUtil.matchAndStore(purchaseEv)
 
-        eventMatchingUtil.containsAllMatchedEvents(mockCampaign).shouldBeTrue()
+        eventMatchingUtil.containsAllMatchedEvents(campaign).shouldBeTrue()
     }
 
     @Test
     fun `should return false if not all required events were stored`() {
-        `when`(mockCampaignRepo.messages).thenReturn(mockCampaignMap)
-        eventMatchingUtil.matchAndStore(mockAppStartEv)
+        eventMatchingUtil.matchAndStore(appStartEv)
 
-        eventMatchingUtil.containsAllMatchedEvents(mockCampaign).shouldBeFalse()
+        eventMatchingUtil.containsAllMatchedEvents(campaign).shouldBeFalse()
     }
 
     @Test
     fun `should return false if none of required events were stored`() {
-        eventMatchingUtil.containsAllMatchedEvents(mockCampaign).shouldBeFalse()
+        eventMatchingUtil.containsAllMatchedEvents(campaign).shouldBeFalse()
     }
 
     @Test
     fun `should return false if triggers are null or empty`() {
-        val campaign = ValidTestMessage(
-            campaignId = "test",
+        val campaign = TestDataHelper.createDummyMessage(
             triggers = listOf(),
         )
         eventMatchingUtil.containsAllMatchedEvents(campaign).shouldBeFalse()
     }
-}
 
-class EventMatchingUtilClearSpec : EventMatchingUtilSpec() {
+    /** clearNonPersistentEvents **/
+
     @Test
     fun `should clear all matched non-persistent events`() {
-        `when`(mockCampaignRepo.messages).thenReturn(mockCampaignMap)
-        eventMatchingUtil.matchAndStore(mockLoginEv)
-        eventMatchingUtil.matchedEvents(mockCampaign).shouldNotBeEmpty()
+        eventMatchingUtil.matchAndStore(loginEv)
+        eventMatchingUtil.matchedEvents(campaign).shouldNotBeEmpty()
 
         eventMatchingUtil.clearNonPersistentEvents()
-        eventMatchingUtil.matchedEvents(mockCampaign).shouldBeEmpty()
+        eventMatchingUtil.matchedEvents(campaign).shouldBeEmpty()
     }
 
     @Test
     fun `should not clear all persistent events`() {
-        `when`(mockCampaignRepo.messages).thenReturn(mockCampaignMap)
-        eventMatchingUtil.matchAndStore(mockAppStartEv)
-        eventMatchingUtil.matchedEvents(mockCampaign).shouldNotBeEmpty()
+        eventMatchingUtil.matchAndStore(appStartEv)
+        eventMatchingUtil.matchedEvents(campaign).shouldNotBeEmpty()
 
         eventMatchingUtil.clearNonPersistentEvents()
-        eventMatchingUtil.matchedEvents(mockCampaign).shouldNotBeEmpty()
+        eventMatchingUtil.matchedEvents(campaign).shouldNotBeEmpty()
     }
 
     @Test
@@ -259,21 +239,21 @@ class EventMatchingUtilClearSpec : EventMatchingUtilSpec() {
 
         eventMatchingUtil.triggeredPersistentCampaigns.shouldHaveSize(1)
     }
-}
 
-class EventMatchingUtilEventBufferSpec : EventMatchingUtilSpec() {
+    /** addToEventBuffer **/
+
     @Test
     fun `should add to event buffer`() {
-        eventMatchingUtil.addToEventBuffer(AppStartEvent())
-        eventMatchingUtil.addToEventBuffer(PurchaseSuccessfulEvent())
+        eventMatchingUtil.addToEventBuffer(appStartEv)
+        eventMatchingUtil.addToEventBuffer(purchaseEv)
 
         eventMatchingUtil.eventBuffer.size.shouldBeEqualTo(2)
     }
 
     @Test
     fun `should flush event buffer`() {
-        eventMatchingUtil.addToEventBuffer(AppStartEvent())
-        eventMatchingUtil.addToEventBuffer(PurchaseSuccessfulEvent())
+        eventMatchingUtil.addToEventBuffer(appStartEv)
+        eventMatchingUtil.addToEventBuffer(purchaseEv)
 
         eventMatchingUtil.flushEventBuffer()
 

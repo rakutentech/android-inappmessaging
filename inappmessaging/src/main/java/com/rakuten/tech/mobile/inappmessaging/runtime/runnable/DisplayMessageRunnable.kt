@@ -9,7 +9,7 @@ import com.rakuten.tech.mobile.inappmessaging.runtime.R
 import com.rakuten.tech.mobile.inappmessaging.runtime.data.enums.ImpressionType
 import com.rakuten.tech.mobile.inappmessaging.runtime.data.enums.InAppMessageType
 import com.rakuten.tech.mobile.inappmessaging.runtime.data.models.Tooltip
-import com.rakuten.tech.mobile.inappmessaging.runtime.data.models.messages.Message
+import com.rakuten.tech.mobile.inappmessaging.runtime.data.responses.ping.Message
 import com.rakuten.tech.mobile.inappmessaging.runtime.data.requests.Impression
 import com.rakuten.tech.mobile.inappmessaging.runtime.manager.DisplayManager
 import com.rakuten.tech.mobile.inappmessaging.runtime.manager.ImpressionManager
@@ -40,7 +40,7 @@ internal class DisplayMessageRunnable(
      */
     @UiThread
     override fun run() {
-        val messageType = InAppMessageType.getById(message.getType())
+        val messageType = InAppMessageType.getById(message.type)
         if (shouldNotDisplay(messageType)) return
 
         if (messageType != null) {
@@ -60,7 +60,7 @@ internal class DisplayMessageRunnable(
         slideUpView.populateViewData(message)
         hostActivity.addContentView(slideUpView, hostActivity.window.attributes)
         ImpressionManager.sendImpressionEvent(
-            message.getCampaignId(),
+            message.campaignId,
             listOf(Impression(ImpressionType.IMPRESSION, Date().time)),
             impressionTypeOnly = true,
         )
@@ -72,7 +72,7 @@ internal class DisplayMessageRunnable(
         fullScreenView.populateViewData(message)
         hostActivity.addContentView(fullScreenView, hostActivity.window.attributes)
         ImpressionManager.sendImpressionEvent(
-            message.getCampaignId(),
+            message.campaignId,
             listOf(Impression(ImpressionType.IMPRESSION, Date().time)),
             impressionTypeOnly = true,
         )
@@ -84,7 +84,7 @@ internal class DisplayMessageRunnable(
         modalView.populateViewData(message)
         hostActivity.addContentView(modalView, hostActivity.window.attributes)
         ImpressionManager.sendImpressionEvent(
-            message.getCampaignId(),
+            message.campaignId,
             listOf(Impression(ImpressionType.IMPRESSION, Date().time)),
             impressionTypeOnly = true,
         )
@@ -109,7 +109,7 @@ internal class DisplayMessageRunnable(
                 hostActivity.addContentView(toolTipView, params)
             }
             if (tooltip.autoDisappear != null && tooltip.autoDisappear > 0) {
-                displayManager.removeMessage(hostActivity, delay = tooltip.autoDisappear, id = message.getCampaignId())
+                displayManager.removeMessage(hostActivity, delay = tooltip.autoDisappear, id = message.campaignId)
             }
         }
     }
@@ -142,7 +142,7 @@ internal class DisplayMessageRunnable(
         hostActivity.findViewById<View?>(R.id.in_app_message_tooltip_view)?.parent?.let { viewParent ->
             for (i in 0 until (viewParent as ViewGroup).childCount) {
                 val child = viewParent.getChildAt(i)
-                if (child?.id == R.id.in_app_message_tooltip_view && child.tag == message.getCampaignId()) {
+                if (child?.id == R.id.in_app_message_tooltip_view && child.tag == message.campaignId) {
                     // tool campaign is already displayed, no need to display again
                     return true
                 }

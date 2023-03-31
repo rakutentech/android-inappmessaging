@@ -1,17 +1,17 @@
 package com.rakuten.tech.mobile.inappmessaging.runtime.data.responses.ping
 
-import com.google.gson.annotations.SerializedName
-
 /**
- * Class for parsing response from MessageMixer.
+ * Class for parsing response from MessageMixer (PingResponse).
+ * @property data list of [DataItem] containing campaign data.
+ * @property nextPingMillis Next ping to MessageMixer in millisecond.
+ * @property currentPingMillis UTC time when MessageMixer returned response.
  */
 internal data class MessageMixerResponse(
-    @SerializedName("data")
     val data: List<DataItem>,
-    // SDK's next ping to message mixer should be in nextPingMillis. Time is in millisecond.
-    @SerializedName("nextPingMillis")
     val nextPingMillis: Long,
-    // Current UTC time when message mixer returned response.
-    @SerializedName("currentPingMillis")
     val currentPingMillis: Long,
+)
+
+internal data class DataItem(
+    val campaignData: Message,
 )

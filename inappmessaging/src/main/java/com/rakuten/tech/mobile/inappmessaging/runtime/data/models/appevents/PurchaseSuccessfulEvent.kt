@@ -22,20 +22,16 @@ import kotlin.collections.set
 class PurchaseSuccessfulEvent : BaseEvent(EventType.PURCHASE_SUCCESSFUL, EventType.PURCHASE_SUCCESSFUL.name, false) {
 
     /** Purchase amount in micros, $1 = 100_000. Such as $10.58 = 1058_000. */
-    var purchaseAmountMicros = -1
-        private set
+    private var purchaseAmountMicros = -1
 
     /** Number of items in this purchase. */
-    var numberOfItems = -1
-        private set
+    private var numberOfItems = -1
 
     /** Currency code. */
-    var currencyCode = "UNKNOWN"
-        private set
+    private var currencyCode = "UNKNOWN"
 
     /** List of purchased item IDs. */
-    var itemIdList: List<String> = emptyList()
-        private set
+    private var itemIdList: List<String> = emptyList()
 
     /**
      * This method sets the purchase amount in micros, $1 = 100_000. Such as $10.58 = 1058_000.

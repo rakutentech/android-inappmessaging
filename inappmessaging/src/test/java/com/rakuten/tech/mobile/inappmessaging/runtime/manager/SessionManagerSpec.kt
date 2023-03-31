@@ -9,12 +9,12 @@ import androidx.work.testing.WorkManagerTestInitHelper
 import com.rakuten.tech.mobile.inappmessaging.runtime.BaseTest
 import com.rakuten.tech.mobile.inappmessaging.runtime.InAppMessaging
 import com.rakuten.tech.mobile.inappmessaging.runtime.TestUserInfoProvider
-import com.rakuten.tech.mobile.inappmessaging.runtime.data.models.messages.Message
-import com.rakuten.tech.mobile.inappmessaging.runtime.data.models.messages.ValidTestMessage
 import com.rakuten.tech.mobile.inappmessaging.runtime.data.repositories.*
 import com.rakuten.tech.mobile.inappmessaging.runtime.data.responses.ConfigResponseData
 import com.rakuten.tech.mobile.inappmessaging.runtime.data.responses.ConfigResponseEndpoints
+import com.rakuten.tech.mobile.inappmessaging.runtime.data.responses.ping.Message
 import com.rakuten.tech.mobile.inappmessaging.runtime.manager.SessionManager.onSessionUpdate
+import com.rakuten.tech.mobile.inappmessaging.runtime.testhelpers.TestDataHelper
 import org.amshove.kluent.*
 import org.junit.Before
 import org.junit.Test
@@ -33,7 +33,7 @@ class SessionManagerSpec : BaseTest() {
 
     private var configResponseData = Mockito.mock(ConfigResponseData::class.java)
     private var endpoints = Mockito.mock(ConfigResponseEndpoints::class.java)
-    private val message = ValidTestMessage()
+    private val message = TestDataHelper.createDummyMessage()
 
     @Before
     override fun setup() {
@@ -126,7 +126,7 @@ class SessionManagerSpec : BaseTest() {
         val infoProvider = TestUserInfoProvider() // test_user_id
         InAppMessaging.instance().registerPreference(infoProvider)
 
-        CampaignRepository.instance().syncWith(listOf(ValidTestMessage()), 0)
+        CampaignRepository.instance().syncWith(listOf(TestDataHelper.createDummyMessage()), 0)
         CampaignRepository.instance().messages.shouldHaveSize(1)
 
         // Simulate change user

@@ -15,15 +15,13 @@ import com.rakuten.tech.mobile.inappmessaging.runtime.InAppMessaging
 import com.rakuten.tech.mobile.inappmessaging.runtime.R
 import com.rakuten.tech.mobile.inappmessaging.runtime.TestUserInfoProvider
 import com.rakuten.tech.mobile.inappmessaging.runtime.data.enums.ImpressionType
-import com.rakuten.tech.mobile.inappmessaging.runtime.data.enums.InAppMessageType
-import com.rakuten.tech.mobile.inappmessaging.runtime.data.models.messages.InvalidTestMessage
-import com.rakuten.tech.mobile.inappmessaging.runtime.data.models.messages.Message
-import com.rakuten.tech.mobile.inappmessaging.runtime.data.models.messages.ValidTestMessage
 import com.rakuten.tech.mobile.inappmessaging.runtime.data.repositories.CampaignRepository
 import com.rakuten.tech.mobile.inappmessaging.runtime.data.responses.ping.*
 import com.rakuten.tech.mobile.inappmessaging.runtime.manager.DisplayManager
 import com.rakuten.tech.mobile.inappmessaging.runtime.manager.MessageReadinessManager
 import com.rakuten.tech.mobile.inappmessaging.runtime.manager.PushPrimerTrackerManager
+import com.rakuten.tech.mobile.inappmessaging.runtime.testhelpers.TestDataHelper
+import com.rakuten.tech.mobile.inappmessaging.runtime.testhelpers.TooltipHelper
 import com.rakuten.tech.mobile.inappmessaging.runtime.utils.BuildVersionChecker
 import org.amshove.kluent.*
 import org.junit.After
@@ -47,16 +45,11 @@ internal class MessageActionsCoroutineSpec(
     private val isOpt: Boolean,
     private val isTooltip: Boolean,
 ) : BaseTest() {
-
-    private lateinit var message: CampaignData
     private val activity = Mockito.mock(Activity::class.java)
 
     @Before
     override fun setup() {
         super.setup()
-
-        // Copy object to not modify internal properties when testing
-        message = MessageMixerResponseSpec.response.data[0].campaignData.copy()
 
         `when`(activity.packageManager).thenReturn(
             ApplicationProvider
@@ -83,24 +76,17 @@ internal class MessageActionsCoroutineSpec(
     }
 
     @Test
-    fun `should return false when campaign id is null`() {
-        DisplayManager.instance().removeMessage(InAppMessaging.instance().getRegisteredActivity())
-        val result = MessageActionsCoroutine().executeTask(InvalidTestMessage(), resourceId, isOpt)
-        result.shouldBeFalse()
-    }
-
-    @Test
     fun `should return false when campaign id is empty`() {
         DisplayManager.instance().removeMessage(InAppMessaging.instance().getRegisteredActivity())
-        val result = MessageActionsCoroutine().executeTask(ValidTestMessage(""), resourceId, isOpt)
+        val result = MessageActionsCoroutine().executeTask(
+            TestDataHelper.createDummyMessage(campaignId = ""), resourceId, isOpt,
+        )
         result.shouldBeFalse()
     }
 
     @Test
     fun `should return true when campaign is valid`() {
-        val message = ValidTestMessage(
-            type = if (isTooltip) InAppMessageType.TOOLTIP.typeId else InAppMessageType.MODAL.typeId,
-        )
+        val message = if (isTooltip) TooltipHelper.createMessage() else TestDataHelper.createDummyMessage()
         DisplayManager.instance().removeMessage(InAppMessaging.instance().getRegisteredActivity())
         val result = MessageActionsCoroutine().executeTask(message, resourceId, isOpt)
         result.shouldBeTrue()
@@ -108,11 +94,12 @@ internal class MessageActionsCoroutineSpec(
 
     @Test
     fun `should update repo after campaign is displayed`() {
+        val message = TestDataHelper.createDummyMessage()
         CampaignRepository.instance().clearMessages()
         CampaignRepository.instance().syncWith(listOf(message), 0)
         val readinessManager = MessageReadinessManager.instance()
         readinessManager.clearMessages()
-        readinessManager.addMessageToQueue(message.getCampaignId())
+        readinessManager.addMessageToQueue(message.campaignId)
         val currImpressions = message.impressionsLeft!!
         DisplayManager.instance().removeMessage(InAppMessaging.instance().getRegisteredActivity())
         val result = MessageActionsCoroutine().executeTask(message, resourceId, isOpt)
@@ -146,8 +133,8 @@ internal class MessageActionsCoroutineSpec(
                 arrayOf("Back - isOpt true", MessageActionsCoroutine.BACK_BUTTON, true, false),
                 arrayOf("Back - isOpt false", MessageActionsCoroutine.BACK_BUTTON, false, false),
                 arrayOf("Tooltip View - content", R.id.message_tooltip_image_view, false, true),
-                arrayOf("Tooltip Tip- content", R.id.message_tip, false, true),
-                arrayOf("Tooltip Tip- content", -99, false, true),
+                arrayOf("Tooltip Tip - content", R.id.message_tip, false, true),
+                arrayOf("Tooltip Tip - content", -99, false, true),
             )
         }
     }
@@ -163,7 +150,7 @@ class MessageActionsCoroutineFuncSpec : BaseTest() {
     override fun setup() {
         super.setup()
         val mockPayload = Mockito.mock(MessagePayload::class.java)
-        `when`(message.getMessagePayload()).thenReturn(mockPayload)
+        `when`(message.messagePayload).thenReturn(mockPayload)
         val mockSettings = Mockito.mock(MessageSettings::class.java)
         `when`(mockPayload.messageSettings).thenReturn(mockSettings)
         `when`(mockSettings.controlSettings).thenReturn(mockCtrl)

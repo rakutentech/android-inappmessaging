@@ -8,14 +8,14 @@ import com.google.gson.Gson
 import com.rakuten.tech.mobile.inappmessaging.runtime.*
 import com.rakuten.tech.mobile.inappmessaging.runtime.api.MessageMixerRetrofitService
 import com.rakuten.tech.mobile.inappmessaging.runtime.data.models.HostAppInfo
-import com.rakuten.tech.mobile.inappmessaging.runtime.data.models.messages.Message
-import com.rakuten.tech.mobile.inappmessaging.runtime.data.models.messages.ValidTestMessage
 import com.rakuten.tech.mobile.inappmessaging.runtime.data.repositories.*
 import com.rakuten.tech.mobile.inappmessaging.runtime.data.requests.DisplayPermissionRequest
 import com.rakuten.tech.mobile.inappmessaging.runtime.data.responses.ConfigResponse
 import com.rakuten.tech.mobile.inappmessaging.runtime.data.responses.ConfigResponseData
 import com.rakuten.tech.mobile.inappmessaging.runtime.data.responses.ConfigResponseEndpoints
 import com.rakuten.tech.mobile.inappmessaging.runtime.data.responses.DisplayPermissionResponse
+import com.rakuten.tech.mobile.inappmessaging.runtime.data.responses.ping.Message
+import com.rakuten.tech.mobile.inappmessaging.runtime.testhelpers.TestDataHelper
 import okhttp3.mockwebserver.MockResponse
 import okhttp3.mockwebserver.MockWebServer
 import org.amshove.kluent.*
@@ -72,8 +72,8 @@ open class MessageReadinessManagerSpec : BaseTest() {
     @Test
     fun `should return test message`() {
         val messageList = ArrayList<Message>()
-        messageList.add(ValidTestMessage("1", false))
-        messageList.add(ValidTestMessage("2", true, maxImpressions = 5))
+        messageList.add(TestDataHelper.createDummyMessage(campaignId = "1"))
+        messageList.add(TestDataHelper.createDummyMessage(campaignId = "2", isTest = true, maxImpressions = 5))
         setMessagesList(messageList)
 
         MessageReadinessManager.instance().getNextDisplayMessage() shouldBeEqualTo listOf(messageList[1])
@@ -82,7 +82,10 @@ open class MessageReadinessManagerSpec : BaseTest() {
     @Test
     fun `should return test message when impressions is infinite`() {
         val messageList = ArrayList<Message>()
-        messageList.add(ValidTestMessage("1", true, infiniteImpressions = true))
+        messageList.add(
+            TestDataHelper
+                .createDummyMessage(campaignId = "1", isTest = true, areImpressionsInfinite = true),
+        )
         setMessagesList(messageList)
 
         MessageReadinessManager.instance().getNextDisplayMessage() shouldBeEqualTo listOf(messageList[0])
@@ -91,7 +94,14 @@ open class MessageReadinessManagerSpec : BaseTest() {
     @Test
     fun `should return empty when impressions is not infinite`() {
         val messageList = ArrayList<Message>()
-        messageList.add(ValidTestMessage("1", true, maxImpressions = 0, infiniteImpressions = false))
+        messageList.add(
+            TestDataHelper.createDummyMessage(
+                campaignId = "1",
+                isTest = true,
+                maxImpressions = 0,
+                areImpressionsInfinite = false,
+            ),
+        )
         setMessagesList(messageList)
 
         MessageReadinessManager.instance().getNextDisplayMessage().shouldBeEmpty()
@@ -99,10 +109,10 @@ open class MessageReadinessManagerSpec : BaseTest() {
 
     @Test
     fun `should get display permission request with all attributes`() {
-        val message = ValidTestMessage()
+        val message = TestDataHelper.createDummyMessage()
         val request = MessageReadinessManager.instance().getDisplayPermissionRequest(message)
 
-        request.campaignId shouldBeEqualTo message.getCampaignId()
+        request.campaignId shouldBeEqualTo message.campaignId
         request.appVersion shouldBeEqualTo InAppMessagingTestConstants.APP_VERSION
         request.sdkVersion shouldBeEqualTo BuildConfig.VERSION_NAME
         request.locale shouldBeEqualTo InAppMessagingTestConstants.LOCALE.toString()
@@ -113,12 +123,12 @@ open class MessageReadinessManagerSpec : BaseTest() {
     @Test
     fun `should next ready message be empty when no events and opted out`() {
         val messageList = ArrayList<Message>()
-        val message = ValidTestMessage("1", false).apply {
+        val message = TestDataHelper.createDummyMessage(campaignId = "1").apply {
             isOptedOut = true
         }
         messageList.add(message)
-        messageList.add(ValidTestMessage("2", false))
-        messageList.add(ValidTestMessage("3", false))
+        messageList.add(TestDataHelper.createDummyMessage(campaignId = "2"))
+        messageList.add(TestDataHelper.createDummyMessage(campaignId = "3"))
         setMessagesList(messageList)
 
         MessageReadinessManager.instance().getNextDisplayMessage().shouldBeEmpty()
@@ -163,7 +173,7 @@ open class MessageReadinessManagerSpec : BaseTest() {
     @Test
     fun `should return empty for valid message when max impression`() {
         val messageList = ArrayList<Message>()
-        messageList.add(ValidTestMessage("10", false, maxImpressions = 0))
+        messageList.add(TestDataHelper.createDummyMessage(campaignId = "10", maxImpressions = 0))
         setMessagesList(messageList)
 
         MessageReadinessManager.instance().getNextDisplayMessage().shouldBeEmpty()
@@ -171,9 +181,9 @@ open class MessageReadinessManagerSpec : BaseTest() {
 
     private fun createMessageList() {
         val messageList = ArrayList<Message>()
-        messageList.add(ValidTestMessage("1", false))
-        messageList.add(ValidTestMessage("2", false))
-        messageList.add(ValidTestMessage("3", false))
+        messageList.add(TestDataHelper.createDummyMessage(campaignId = "1"))
+        messageList.add(TestDataHelper.createDummyMessage(campaignId = "2"))
+        messageList.add(TestDataHelper.createDummyMessage(campaignId = "3"))
         setMessagesList(messageList)
     }
 
@@ -183,7 +193,7 @@ open class MessageReadinessManagerSpec : BaseTest() {
 
         MessageReadinessManager.instance().clearMessages()
         for (message in messages) {
-            MessageReadinessManager.instance().addMessageToQueue(message.getCampaignId())
+            MessageReadinessManager.instance().addMessageToQueue(message.campaignId)
         }
     }
 
@@ -241,7 +251,7 @@ class MessageReadinessManagerRequestSpec : BaseTest() {
             ),
         )
         ConfigResponseRepository.instance().addConfigResponse(data)
-        setMessagesList(arrayListOf(ValidTestMessage(CAMPAIGN_ID, false)))
+        setMessagesList(arrayListOf(TestDataHelper.createDummyMessage(campaignId = CAMPAIGN_ID)))
 
         server.start()
         `when`(data.endpoints).thenReturn(endpoint)
@@ -315,7 +325,7 @@ class MessageReadinessManagerRequestSpec : BaseTest() {
         verifyValidResponse(message)
         val readinessMgr = MessageReadinessManager.instance()
         (readinessMgr as MessageReadinessManager.MessageReadinessManagerImpl).queuedMessages.shouldHaveSize(1)
-        MessageReadinessManager.instance().removeMessageFromQueue(message!!.getCampaignId())
+        MessageReadinessManager.instance().removeMessageFromQueue(message.campaignId)
         readinessMgr.queuedMessages.shouldBeEmpty()
     }
 
@@ -338,7 +348,7 @@ class MessageReadinessManagerRequestSpec : BaseTest() {
 
         MessageReadinessManager.instance().clearMessages()
         for (message in messages) {
-            MessageReadinessManager.instance().addMessageToQueue(message.getCampaignId())
+            MessageReadinessManager.instance().addMessageToQueue(message.campaignId)
         }
     }
 
@@ -349,7 +359,7 @@ class MessageReadinessManagerRequestSpec : BaseTest() {
 
     private fun verifyValidResponse(message: Message?) {
         message.shouldNotBeNull()
-        message.getCampaignId() shouldBeEqualTo CAMPAIGN_ID
+        message.campaignId shouldBeEqualTo CAMPAIGN_ID
     }
 
     companion object {

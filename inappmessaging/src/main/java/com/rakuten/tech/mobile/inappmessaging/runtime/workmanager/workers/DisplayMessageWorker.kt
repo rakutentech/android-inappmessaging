@@ -9,8 +9,8 @@ import androidx.work.OneTimeWorkRequest
 import androidx.work.WorkerParameters
 import androidx.work.WorkManager
 import com.rakuten.tech.mobile.inappmessaging.runtime.InAppMessaging
+import com.rakuten.tech.mobile.inappmessaging.runtime.data.responses.ping.Message
 import com.rakuten.tech.mobile.inappmessaging.runtime.utils.ImageUtil
-import com.rakuten.tech.mobile.inappmessaging.runtime.data.models.messages.Message
 import com.rakuten.tech.mobile.inappmessaging.runtime.manager.MessageReadinessManager
 import com.rakuten.tech.mobile.inappmessaging.runtime.runnable.DisplayMessageRunnable
 import com.rakuten.tech.mobile.inappmessaging.runtime.utils.InAppLogger
@@ -50,7 +50,7 @@ internal class DisplayMessageWorker(
         val hostActivity = InAppMessaging.instance().getRegisteredActivity()
         if (hostActivity != null) {
             for (message in messages) {
-                val imageUrl = message.getMessagePayload().resource.imageUrl
+                val imageUrl = message.messagePayload.resource.imageUrl
                 if (!imageUrl.isNullOrEmpty()) {
                     fetchImageThenDisplayMessage(message, hostActivity, imageUrl)
                 } else {
@@ -89,7 +89,7 @@ internal class DisplayMessageWorker(
             // Message display aborted by the host app
             InAppLogger(TAG).debug("message display cancelled by the host app")
             // Remove message in queue and proceed to next message
-            messageReadinessManager.removeMessageFromQueue(message.getCampaignId())
+            messageReadinessManager.removeMessageFromQueue(message.campaignId)
             prepareNextMessage()
             return
         }
@@ -101,13 +101,13 @@ internal class DisplayMessageWorker(
      * This method verifies campaign's contexts before displaying the message.
      */
     private fun verifyContexts(message: Message): Boolean {
-        val campaignContexts = message.getContexts()
-        if (message.isTest() || campaignContexts.isEmpty()) {
+        val campaignContexts = message.contexts
+        if (message.isTest || campaignContexts.isEmpty()) {
             return true
         }
 
         return InAppMessaging.instance()
-            .onVerifyContext(campaignContexts, message.getMessagePayload().title)
+            .onVerifyContext(campaignContexts, message.messagePayload.title)
     }
 
     companion object {

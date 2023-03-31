@@ -7,10 +7,9 @@ import com.rakuten.tech.mobile.inappmessaging.runtime.data.enums.SlideFromDirect
 import com.rakuten.tech.mobile.inappmessaging.runtime.data.models.appevents.AppStartEvent
 import com.rakuten.tech.mobile.inappmessaging.runtime.data.models.appevents.Event
 import com.rakuten.tech.mobile.inappmessaging.runtime.data.models.appevents.LoginSuccessfulEvent
-import com.rakuten.tech.mobile.inappmessaging.runtime.data.models.messages.Message
-import com.rakuten.tech.mobile.inappmessaging.runtime.data.models.messages.ValidTestMessage
 import com.rakuten.tech.mobile.inappmessaging.runtime.data.repositories.CampaignRepository
 import com.rakuten.tech.mobile.inappmessaging.runtime.data.responses.ping.*
+import com.rakuten.tech.mobile.inappmessaging.runtime.testhelpers.TestDataHelper
 import org.amshove.kluent.*
 import org.junit.Before
 import org.junit.Ignore
@@ -24,7 +23,7 @@ import org.robolectric.RobolectricTestRunner
 @RunWith(RobolectricTestRunner::class)
 @Ignore("base class")
 open class MessageEventReconciliationUtilSpec : BaseTest() {
-    internal val outdatedTestCampaign = CampaignData(
+    internal val outdatedTestMessage = Message(
         messagePayload = MessagePayload(
             title = "testTitle",
             messageBody = "testBody",
@@ -83,7 +82,7 @@ class MessageEventReconciliationUtilCampaignsSpec : MessageEventReconciliationUt
 
     @Test
     fun `should accept outdated test campaign`() {
-        CampaignRepository.instance().syncWith(listOf(outdatedTestCampaign), 0)
+        CampaignRepository.instance().syncWith(listOf(outdatedTestMessage), 0)
         val event = LoginSuccessfulEvent()
         EventMatchingUtil.instance().matchAndStore(event)
         val handler = ValidatorHandler()
@@ -91,16 +90,16 @@ class MessageEventReconciliationUtilCampaignsSpec : MessageEventReconciliationUt
 
         handler.validatedElements.shouldBeEqualTo(
             listOf(
-                ValidatorHandler.Element(outdatedTestCampaign, setOf(event)),
+                ValidatorHandler.Element(outdatedTestMessage, setOf(event)),
             ),
         )
     }
 
     @Test
     fun `should not accept test campaign with impression left less than 1`() {
-        val message = ValidTestMessage("1", maxImpressions = 1, isTest = true)
+        val message = TestDataHelper.createDummyMessage(campaignId = "1", isTest = true, maxImpressions = 1)
         CampaignRepository.instance().syncWith(listOf(message), 0)
-        CampaignRepository.instance().decrementImpressions(message.getCampaignId())
+        CampaignRepository.instance().decrementImpressions(message.campaignId)
         val handler = ValidatorHandler()
         MessageEventReconciliationUtil.instance().validate(handler.closure)
 
@@ -109,7 +108,7 @@ class MessageEventReconciliationUtilCampaignsSpec : MessageEventReconciliationUt
 
     @Test
     fun `should accept every non-test campaign matching criteria`() {
-        val campaign = ValidTestMessage(
+        val campaign = TestDataHelper.createDummyMessage(
             campaignId = "test",
             isTest = false,
             maxImpressions = 2,
@@ -130,7 +129,7 @@ class MessageEventReconciliationUtilCampaignsSpec : MessageEventReconciliationUt
 
     @Test
     fun `should not accept campaigns with no impressions left`() {
-        val campaign = ValidTestMessage(
+        val campaign = TestDataHelper.createDummyMessage(
             campaignId = "test",
             isTest = false,
             maxImpressions = 0,
@@ -147,7 +146,7 @@ class MessageEventReconciliationUtilCampaignsSpec : MessageEventReconciliationUt
 
     @Test
     fun `should not accept opted out campaigns`() {
-        val campaign = ValidTestMessage(
+        val campaign = TestDataHelper.createDummyMessage(
             campaignId = "test",
             isTest = false,
             maxImpressions = 2,
@@ -166,7 +165,7 @@ class MessageEventReconciliationUtilCampaignsSpec : MessageEventReconciliationUt
 class MessageEventReconciliationUtilTriggerSpec : MessageEventReconciliationUtilSpec() {
     @Test
     fun `should accept normal campaign when triggers are satisfied`() {
-        val campaign = ValidTestMessage(
+        val campaign = TestDataHelper.createDummyMessage(
             campaignId = "test",
             isTest = false,
             maxImpressions = 2,
@@ -186,7 +185,7 @@ class MessageEventReconciliationUtilTriggerSpec : MessageEventReconciliationUtil
 
     @Test
     fun `should accept test campaign when triggers are satisfied`() {
-        val campaign = ValidTestMessage(
+        val campaign = TestDataHelper.createDummyMessage(
             campaignId = "test",
             isTest = true,
             maxImpressions = 2,
@@ -206,7 +205,7 @@ class MessageEventReconciliationUtilTriggerSpec : MessageEventReconciliationUtil
 
     @Test
     fun `should not accept normal campaign with no triggers`() {
-        val campaign = ValidTestMessage(
+        val campaign = TestDataHelper.createDummyMessage(
             campaignId = "test",
             isTest = false,
             maxImpressions = 2,
@@ -222,7 +221,7 @@ class MessageEventReconciliationUtilTriggerSpec : MessageEventReconciliationUtil
 
     @Test
     fun `should not accept test campaign with no triggers`() {
-        val campaign = ValidTestMessage(
+        val campaign = TestDataHelper.createDummyMessage(
             campaignId = "test",
             isTest = true,
             maxImpressions = 2,
@@ -238,7 +237,7 @@ class MessageEventReconciliationUtilTriggerSpec : MessageEventReconciliationUtil
 
     @Test
     fun `should not accept campaign when not all triggers are satisfied`() {
-        val campaign = ValidTestMessage(
+        val campaign = TestDataHelper.createDummyMessage(
             campaignId = "test",
             isTest = false,
             maxImpressions = 2,

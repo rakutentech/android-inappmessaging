@@ -1,6 +1,6 @@
 package com.rakuten.tech.mobile.inappmessaging.runtime.view
 
-import com.rakuten.tech.mobile.inappmessaging.runtime.data.models.messages.Message
+import com.rakuten.tech.mobile.inappmessaging.runtime.data.responses.ping.Message
 
 /**
  * Interface for the InApp custom views to implement.

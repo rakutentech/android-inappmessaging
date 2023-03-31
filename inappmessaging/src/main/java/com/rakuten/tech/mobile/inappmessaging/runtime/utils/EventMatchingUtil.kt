@@ -2,10 +2,9 @@ package com.rakuten.tech.mobile.inappmessaging.runtime.utils
 
 import com.rakuten.tech.mobile.inappmessaging.runtime.data.enums.InAppMessageType
 import com.rakuten.tech.mobile.inappmessaging.runtime.data.models.appevents.Event
-import com.rakuten.tech.mobile.inappmessaging.runtime.data.models.messages.Message
 import com.rakuten.tech.mobile.inappmessaging.runtime.data.repositories.CampaignRepository
+import com.rakuten.tech.mobile.inappmessaging.runtime.data.responses.ping.Message
 import com.rakuten.tech.mobile.inappmessaging.runtime.data.responses.ping.Trigger
-import com.rakuten.tech.mobile.inappmessaging.runtime.data.responses.ping.matchingEventName
 
 internal abstract class EventMatchingUtil {
     internal val eventBuffer = arrayListOf<Event>()
@@ -58,35 +57,34 @@ internal abstract class EventMatchingUtil {
             }
 
             campaignRepo.messages.values.forEach { campaign ->
-                val campaignTriggers = campaign.getTriggers()
+                val campaignTriggers = campaign.triggers
                 if (campaignTriggers.isNullOrEmpty()) { return@forEach }
                 if (!isEventMatchingOneOfTriggers(event, campaignTriggers)) { return@forEach }
 
-                val events = matchedEvents[campaign.getCampaignId()] ?: mutableListOf()
+                val events = matchedEvents[campaign.campaignId] ?: mutableListOf()
                 events.add(event)
-                matchedEvents[campaign.getCampaignId()] = events
+                matchedEvents[campaign.campaignId] = events
                 InAppLogger(TAG).debug(
-                    "Campaign (${campaign.getCampaignId()}) matched events:" +
+                    "Campaign (${campaign.campaignId}) matched events:" +
                         matchedEvents(campaign).map { it.getEventName() },
                 )
             }
         }
 
-        override fun matchedEvents(campaign: Message) =
-            matchedEvents[campaign.getCampaignId()].orEmpty() + persistentEvents
+        override fun matchedEvents(campaign: Message) = matchedEvents[campaign.campaignId].orEmpty() + persistentEvents
 
         override fun containsAllMatchedEvents(campaign: Message): Boolean {
-            val triggers = campaign.getTriggers()
+            val triggers = campaign.triggers
             if (triggers.isNullOrEmpty()) {
                 return false
             }
-            val events = matchedEvents[campaign.getCampaignId()].orEmpty() + persistentEvents
+            val events = matchedEvents[campaign.campaignId].orEmpty() + persistentEvents
             return triggers.all { isTriggerMatchingOneOfEvents(it, events) }
         }
 
         @SuppressWarnings("ComplexMethod", "ReturnCount", "LongMethod")
         override fun removeSetOfMatchedEvents(eventsToRemove: Set<Event>, campaign: Message): Boolean {
-            val campaignEvents = matchedEvents[campaign.getCampaignId()] ?: mutableListOf()
+            val campaignEvents = matchedEvents[campaign.campaignId] ?: mutableListOf()
             val totalMatchedEvents = campaignEvents.count() + persistentEvents.count()
 
             if (!(totalMatchedEvents > 0 && totalMatchedEvents >= eventsToRemove.size)) {
@@ -95,23 +93,23 @@ internal abstract class EventMatchingUtil {
             }
 
             val isCampaignPersistentEventsOnly = campaignEvents.isEmpty()
-            if (isCampaignPersistentEventsOnly && triggeredPersistentCampaigns.contains(campaign.getCampaignId())) {
+            if (isCampaignPersistentEventsOnly && triggeredPersistentCampaigns.contains(campaign.campaignId)) {
                 return false
             }
             // Display tooltips once per app session only
-            if (triggeredTooltips.contains(campaign.getCampaignId())) {
+            if (triggeredTooltips.contains(campaign.campaignId)) {
                 return false
             }
 
             if (removeEvents(eventsToRemove, campaignEvents)) return false
 
             if (isCampaignPersistentEventsOnly) {
-                triggeredPersistentCampaigns.add(campaign.getCampaignId())
+                triggeredPersistentCampaigns.add(campaign.campaignId)
             } else {
-                if (campaign.getType() == InAppMessageType.TOOLTIP.typeId) {
-                    triggeredTooltips.add(campaign.getCampaignId())
+                if (campaign.type == InAppMessageType.TOOLTIP.typeId) {
+                    triggeredTooltips.add(campaign.campaignId)
                 }
-                matchedEvents[campaign.getCampaignId()] = campaignEvents
+                matchedEvents[campaign.campaignId] = campaignEvents
             }
             return true
         }

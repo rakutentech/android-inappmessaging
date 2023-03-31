@@ -19,9 +19,9 @@ import com.rakuten.tech.mobile.inappmessaging.runtime.InAppMessaging
 import com.rakuten.tech.mobile.inappmessaging.runtime.R
 import com.rakuten.tech.mobile.inappmessaging.runtime.data.enums.InAppMessageType
 import com.rakuten.tech.mobile.inappmessaging.runtime.data.models.Tooltip
-import com.rakuten.tech.mobile.inappmessaging.runtime.data.responses.ping.CampaignData
-import com.rakuten.tech.mobile.inappmessaging.runtime.data.responses.ping.MessageMixerResponseSpec
+import com.rakuten.tech.mobile.inappmessaging.runtime.data.responses.ping.Message
 import com.rakuten.tech.mobile.inappmessaging.runtime.manager.DisplayManager
+import com.rakuten.tech.mobile.inappmessaging.runtime.testhelpers.TestDataHelper
 import com.rakuten.tech.mobile.inappmessaging.runtime.view.InAppMessageModalView
 import com.rakuten.tech.mobile.inappmessaging.runtime.view.InAppMessageSlideUpView
 import org.junit.Before
@@ -37,83 +37,83 @@ import org.robolectric.RobolectricTestRunner
 @RunWith(RobolectricTestRunner::class)
 @SuppressWarnings("LargeClass")
 class DisplayMessageRunnableSpec : BaseTest() {
-    private val message = mock(CampaignData::class.java)
+    private val message = mock(Message::class.java)
     private var hostAppActivity = mock(Activity::class.java)
     private var mockDisplay = mock(DisplayManager::class.java)
     private val view = mock(View::class.java)
     private val window = mock(Window::class.java)
-    private val payload = MessageMixerResponseSpec.response.data[0].campaignData.getMessagePayload()
+    private val payload = TestDataHelper.message0Payload
 
     @Before
     override fun setup() {
         super.setup()
         `when`(view!!.id).thenReturn(12343254)
         `when`(hostAppActivity.window).thenReturn(window)
-        `when`(message.getCampaignId()).thenReturn("1234")
+        `when`(message.campaignId).thenReturn("1234")
     }
 
     @Test
     fun `should not throw exception fo invalid message type`() {
-        `when`(message.getType()).thenReturn(0)
+        `when`(message.type).thenReturn(0)
         DisplayMessageRunnable(message, hostAppActivity).run()
     }
 
     @Test
     fun `should not throw exception fo invalid does not exist`() {
-        `when`(message.getType()).thenReturn(100)
+        `when`(message.type).thenReturn(100)
         DisplayMessageRunnable(message, hostAppActivity).run()
     }
 
     @Test(expected = NullPointerException::class)
     fun `should throw null pointer exception when modal`() {
-        `when`(message.getType()).thenReturn(InAppMessageType.MODAL.typeId)
+        `when`(message.type).thenReturn(InAppMessageType.MODAL.typeId)
         DisplayMessageRunnable(message, hostAppActivity).run()
     }
 
     @Test(expected = NullPointerException::class)
     fun `should throw null pointer exception when fullscreen`() {
-        `when`(message.getType()).thenReturn(InAppMessageType.FULL.typeId)
+        `when`(message.type).thenReturn(InAppMessageType.FULL.typeId)
         DisplayMessageRunnable(message, hostAppActivity).run()
     }
 
     @Test(expected = NullPointerException::class)
     fun `should throw null pointer exception when tooltip`() {
-        `when`(message.getType()).thenReturn(InAppMessageType.TOOLTIP.typeId)
+        `when`(message.type).thenReturn(InAppMessageType.TOOLTIP.typeId)
         DisplayMessageRunnable(message, hostAppActivity).run()
     }
 
     @Test
     fun `should throw exception with mock activity for full`() {
         setupActivity()
-        `when`(message.getType()).thenReturn(InAppMessageType.FULL.typeId)
+        `when`(message.type).thenReturn(InAppMessageType.FULL.typeId)
         verifyShouldDisplayTooltip()
     }
 
     @Test
     fun `should not throw exception with mock activity for modal`() {
         setupActivity()
-        `when`(message.getType()).thenReturn(InAppMessageType.MODAL.typeId)
+        `when`(message.type).thenReturn(InAppMessageType.MODAL.typeId)
         verifyShouldDisplayTooltip()
     }
 
     @Test
     fun `should not throw exception with mock activity for slide`() {
         setupActivity()
-        `when`(message.getType()).thenReturn(InAppMessageType.SLIDE.typeId)
+        `when`(message.type).thenReturn(InAppMessageType.SLIDE.typeId)
         verifyShouldDisplayTooltip()
     }
 
     @Test
     fun `should not throw exception with mock activity for tooltip`() {
         setupActivity()
-        `when`(message.getType()).thenReturn(InAppMessageType.TOOLTIP.typeId)
+        `when`(message.type).thenReturn(InAppMessageType.TOOLTIP.typeId)
         verifyShouldDisplayTooltip()
     }
 
     @Test
     fun `should not display campaign due to already displayed normal campaign`() {
         setupActivity()
-        `when`(message.getType()).thenReturn(InAppMessageType.MODAL.typeId)
+        `when`(message.type).thenReturn(InAppMessageType.MODAL.typeId)
         `when`(hostAppActivity.findViewById<View>(R.id.in_app_message_base_view))
             .thenReturn(mock(View::class.java))
         DisplayMessageRunnable(message, hostAppActivity).run()
@@ -257,7 +257,7 @@ class DisplayMessageRunnableSpec : BaseTest() {
     ) {
         `when`(hostAppActivity.findViewById<View>(R.id.in_app_message_base_view))
             .thenReturn(mock(InAppMessageSlideUpView::class.java))
-        `when`(message.getType()).thenReturn(InAppMessageType.TOOLTIP.typeId)
+        `when`(message.type).thenReturn(InAppMessageType.TOOLTIP.typeId)
         val tooltip = mock(View::class.java)
         val parent = mock(ViewGroup::class.java)
         `when`(hostAppActivity.findViewById<View>(R.id.in_app_message_tooltip_view))
@@ -275,11 +275,11 @@ class DisplayMessageRunnableSpec : BaseTest() {
         }
         `when`(tooltip.id).thenReturn(R.id.in_app_message_tooltip_view)
         `when`(tooltip.tag).thenReturn(tag ?: "test")
-        `when`(message.getCampaignId()).thenReturn("test")
+        `when`(message.campaignId).thenReturn("test")
     }
 
     private fun verifyNotShowTooltip() {
-        `when`(message.getType()).thenReturn(InAppMessageType.TOOLTIP.typeId)
+        `when`(message.type).thenReturn(InAppMessageType.TOOLTIP.typeId)
         DisplayMessageRunnable(message, hostAppActivity).run()
         verify(hostAppActivity, never()).layoutInflater
     }
@@ -292,7 +292,7 @@ class DisplayMessageRunnableSpec : BaseTest() {
             "test_device_id",
         )
         InAppMessaging.initialize(ApplicationProvider.getApplicationContext())
-        `when`(message.getMessagePayload()).thenReturn(payload)
+        `when`(message.messagePayload).thenReturn(payload)
         `when`(
             hostAppActivity
                 .layoutInflater,

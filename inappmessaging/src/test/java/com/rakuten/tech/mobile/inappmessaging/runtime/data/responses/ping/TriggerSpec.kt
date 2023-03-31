@@ -1,13 +1,12 @@
 package com.rakuten.tech.mobile.inappmessaging.runtime.data.responses.ping
 
-import com.rakuten.tech.mobile.inappmessaging.runtime.BaseTest
 import com.rakuten.tech.mobile.inappmessaging.runtime.data.enums.EventType
 import org.amshove.kluent.shouldBeEqualTo
 import org.amshove.kluent.shouldBeNull
 import org.junit.Test
 import java.util.*
 
-class TriggerSpec : BaseTest() {
+class TriggerSpec {
     @Test
     fun `should return null trigger matching event name for invalid event`() {
         val trigger = Trigger(0, EventType.INVALID.typeId, "test", mutableListOf())

@@ -2,7 +2,7 @@ package com.rakuten.tech.mobile.inappmessaging.runtime.view
 
 import android.content.Context
 import android.util.AttributeSet
-import com.rakuten.tech.mobile.inappmessaging.runtime.data.models.messages.Message
+import com.rakuten.tech.mobile.inappmessaging.runtime.data.responses.ping.Message
 
 /**
  * This is the custom view which represents Full Screen message.

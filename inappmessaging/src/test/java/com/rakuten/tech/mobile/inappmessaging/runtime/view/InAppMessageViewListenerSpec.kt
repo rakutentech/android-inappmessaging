@@ -13,12 +13,12 @@ import com.rakuten.tech.mobile.inappmessaging.runtime.BaseTest
 import com.rakuten.tech.mobile.inappmessaging.runtime.InAppMessaging
 import com.rakuten.tech.mobile.inappmessaging.runtime.R
 import com.rakuten.tech.mobile.inappmessaging.runtime.coroutine.MessageActionsCoroutine
-import com.rakuten.tech.mobile.inappmessaging.runtime.data.models.messages.Message
-import com.rakuten.tech.mobile.inappmessaging.runtime.data.models.messages.ValidTestMessage
 import com.rakuten.tech.mobile.inappmessaging.runtime.data.responses.ping.DisplaySettings
+import com.rakuten.tech.mobile.inappmessaging.runtime.data.responses.ping.Message
 import com.rakuten.tech.mobile.inappmessaging.runtime.data.responses.ping.MessagePayload
 import com.rakuten.tech.mobile.inappmessaging.runtime.data.responses.ping.MessageSettings
 import com.rakuten.tech.mobile.inappmessaging.runtime.manager.DisplayManager
+import com.rakuten.tech.mobile.inappmessaging.runtime.testhelpers.TestDataHelper
 import com.rakuten.tech.mobile.inappmessaging.runtime.utils.BuildVersionChecker
 import com.rakuten.tech.mobile.inappmessaging.runtime.workmanager.schedulers.EventMessageReconciliationScheduler
 import kotlinx.coroutines.Dispatchers
@@ -70,7 +70,7 @@ class InAppMessageViewListenerOnClickSpec : InAppMessageViewListenerSpec() {
 
     @Test
     fun `should call is checked once`() {
-        val listener = InAppMessageViewListener(ValidTestMessage("1", true))
+        val listener = InAppMessageViewListener(TestDataHelper.createDummyMessage(campaignId = "1", isTest = true))
         `when`(mockCheckbox.id).thenReturn(R.id.opt_out_checkbox)
         `when`(mockCheckbox.isChecked).thenReturn(true)
         listener.onClick(mockCheckbox)
@@ -80,7 +80,7 @@ class InAppMessageViewListenerOnClickSpec : InAppMessageViewListenerSpec() {
 
     @Test
     fun `should not throw exception with non-checkbox click`() {
-        val message = ValidTestMessage("1", true)
+        val message = TestDataHelper.createDummyMessage(campaignId = "1", isTest = true)
         val listener = createMockListener(message)
         val mockView = Mockito.mock(CheckBox::class.java)
         `when`(mockView.id).thenReturn(R.id.message_close_button)
@@ -99,6 +99,9 @@ class InAppMessageViewListenerOnClickSpec : InAppMessageViewListenerSpec() {
     )
 }
 
+@SuppressWarnings(
+    "LargeClass",
+)
 @ObsoleteCoroutinesApi
 @ExperimentalCoroutinesApi
 class InAppMessageViewListenerOnTouchSpec : InAppMessageViewListenerSpec() {
@@ -185,7 +188,10 @@ class InAppMessageViewListenerOnTouchSpec : InAppMessageViewListenerSpec() {
 
     @Test
     fun `should return true on touch with action down`() {
-        val listener = InAppMessageViewListener(ValidTestMessage("1", true), buildChecker = mockCheck)
+        val listener = InAppMessageViewListener(
+            TestDataHelper.createDummyMessage(campaignId = "1", isTest = true),
+            buildChecker = mockCheck,
+        )
 
         `when`(mockCheck.isAndroidQAndAbove()).thenReturn(true)
         `when`(mockMotionEvent.actionMasked).thenReturn(MotionEvent.ACTION_DOWN)
@@ -195,7 +201,10 @@ class InAppMessageViewListenerOnTouchSpec : InAppMessageViewListenerSpec() {
 
     @Test
     fun `should return true on touch with action move`() {
-        val listener = InAppMessageViewListener(ValidTestMessage("1", true), buildChecker = mockCheck)
+        val listener = InAppMessageViewListener(
+            TestDataHelper.createDummyMessage(campaignId = "1", isTest = true),
+            buildChecker = mockCheck,
+        )
 
         listener.magnifier = Mockito.mock(Magnifier::class.java)
         `when`(mockCheck.isAndroidQAndAbove()).thenReturn(true)
@@ -205,7 +214,10 @@ class InAppMessageViewListenerOnTouchSpec : InAppMessageViewListenerSpec() {
 
     @Test
     fun `should return true on touch with action cancel`() {
-        val listener = InAppMessageViewListener(ValidTestMessage("1", true), buildChecker = mockCheck)
+        val listener = InAppMessageViewListener(
+            TestDataHelper.createDummyMessage(campaignId = "1", isTest = true),
+            buildChecker = mockCheck,
+        )
 
         listener.magnifier = Mockito.mock(Magnifier::class.java)
         `when`(mockCheck.isAndroidQAndAbove()).thenReturn(true)
@@ -215,7 +227,10 @@ class InAppMessageViewListenerOnTouchSpec : InAppMessageViewListenerSpec() {
 
     @Test
     fun `should return true on touch with action up`() {
-        val listener = InAppMessageViewListener(ValidTestMessage("1", true), buildChecker = mockCheck)
+        val listener = InAppMessageViewListener(
+            TestDataHelper.createDummyMessage(campaignId = "1", isTest = true),
+            buildChecker = mockCheck,
+        )
 
         listener.magnifier = Mockito.mock(Magnifier::class.java)
         `when`(mockCheck.isAndroidQAndAbove()).thenReturn(true)
@@ -225,7 +240,10 @@ class InAppMessageViewListenerOnTouchSpec : InAppMessageViewListenerSpec() {
 
     @Test
     fun `should return true on touch with other action`() {
-        val listener = InAppMessageViewListener(ValidTestMessage("1", true), buildChecker = mockCheck)
+        val listener = InAppMessageViewListener(
+            TestDataHelper.createDummyMessage(campaignId = "1", isTest = true),
+            buildChecker = mockCheck,
+        )
 
         listener.magnifier = Mockito.mock(Magnifier::class.java)
         `when`(mockCheck.isAndroidQAndAbove()).thenReturn(true)
@@ -236,7 +254,10 @@ class InAppMessageViewListenerOnTouchSpec : InAppMessageViewListenerSpec() {
 
     @Test
     fun `should return true on touch with action move and null magnifier`() {
-        val listener = InAppMessageViewListener(ValidTestMessage("1", true), buildChecker = mockCheck)
+        val listener = InAppMessageViewListener(
+            TestDataHelper.createDummyMessage(campaignId = "1", isTest = true),
+            buildChecker = mockCheck,
+        )
 
         `when`(mockCheck.isAndroidQAndAbove()).thenReturn(true)
         `when`(mockMotionEvent.actionMasked).thenReturn(MotionEvent.ACTION_MOVE)
@@ -246,7 +267,10 @@ class InAppMessageViewListenerOnTouchSpec : InAppMessageViewListenerSpec() {
 
     @Test
     fun `should return true on touch with action cancel and null magnifier`() {
-        val listener = InAppMessageViewListener(ValidTestMessage("1", true), buildChecker = mockCheck)
+        val listener = InAppMessageViewListener(
+            TestDataHelper.createDummyMessage(campaignId = "1", isTest = true),
+            buildChecker = mockCheck,
+        )
 
         `when`(mockCheck.isAndroidQAndAbove()).thenReturn(true)
         `when`(mockMotionEvent.actionMasked).thenReturn(MotionEvent.ACTION_CANCEL)
@@ -256,7 +280,10 @@ class InAppMessageViewListenerOnTouchSpec : InAppMessageViewListenerSpec() {
 
     @Test
     fun `should return true on touch with action up and null magnifier`() {
-        val listener = InAppMessageViewListener(ValidTestMessage("1", true), buildChecker = mockCheck)
+        val listener = InAppMessageViewListener(
+            TestDataHelper.createDummyMessage(campaignId = "1", isTest = true),
+            buildChecker = mockCheck,
+        )
 
         `when`(mockCheck.isAndroidQAndAbove()).thenReturn(true)
         `when`(mockMotionEvent.actionMasked).thenReturn(MotionEvent.ACTION_UP)
@@ -266,7 +293,10 @@ class InAppMessageViewListenerOnTouchSpec : InAppMessageViewListenerSpec() {
 
     @Test
     fun `should return true on touch with other action and null magnifier`() {
-        val listener = InAppMessageViewListener(ValidTestMessage("1", true), buildChecker = mockCheck)
+        val listener = InAppMessageViewListener(
+            TestDataHelper.createDummyMessage(campaignId = "1", isTest = true),
+            buildChecker = mockCheck,
+        )
 
         `when`(mockCheck.isAndroidQAndAbove()).thenReturn(true)
         `when`(mockMotionEvent.actionMasked).thenReturn(MotionEvent.ACTION_OUTSIDE)
@@ -277,13 +307,16 @@ class InAppMessageViewListenerOnTouchSpec : InAppMessageViewListenerSpec() {
 
     @Test
     fun `should return false for lower android version`() {
-        val listener = InAppMessageViewListener(ValidTestMessage("1", true))
+        val listener = InAppMessageViewListener(TestDataHelper.createDummyMessage(campaignId = "1", isTest = true))
 
         listener.onTouch(mockView, mockMotionEvent).shouldBeFalse()
     }
 
     private fun setupListener(action: Int): InAppMessageViewListener {
-        val listener = InAppMessageViewListener(ValidTestMessage("1", true), buildChecker = mockCheck)
+        val listener = InAppMessageViewListener(
+            TestDataHelper.createDummyMessage(campaignId = "1", isTest = true),
+            buildChecker = mockCheck,
+        )
 
         `when`(mockCheck.isAndroidQAndAbove()).thenReturn(true)
         `when`(mockMotionEvent.actionMasked).thenReturn(action)
@@ -300,7 +333,7 @@ class InAppMessageViewListenerOnKeySpec : InAppMessageViewListenerSpec() {
 
     @Test
     fun `should return true with back button click`() {
-        val message = ValidTestMessage("1", true)
+        val message = TestDataHelper.createDummyMessage(campaignId = "1", isTest = true, isCampaignDismissable = true)
         val listener = InAppMessageViewListener(message, mockCoroutine, mockDisplayManager)
 
         `when`(keyEvent.action).thenReturn(KeyEvent.ACTION_UP)
@@ -317,7 +350,7 @@ class InAppMessageViewListenerOnKeySpec : InAppMessageViewListenerSpec() {
 
     @Test
     fun `should return false with back button click`() {
-        val message = ValidTestMessage("1", true, isCampaignDismissable = false)
+        val message = TestDataHelper.createDummyMessage(campaignId = "1", isTest = true, isCampaignDismissable = false)
         val listener = InAppMessageViewListener(message, mockCoroutine, mockDisplayManager)
 
         `when`(keyEvent.action).thenReturn(KeyEvent.ACTION_UP)
@@ -334,7 +367,7 @@ class InAppMessageViewListenerOnKeySpec : InAppMessageViewListenerSpec() {
 
     @Test
     fun `should return false with back button action down`() {
-        val message = ValidTestMessage("1", true)
+        val message = TestDataHelper.createDummyMessage(campaignId = "1", isTest = true)
         val listener = InAppMessageViewListener(message, mockCoroutine, mockDisplayManager)
 
         `when`(keyEvent.action).thenReturn(KeyEvent.ACTION_DOWN)
@@ -351,7 +384,7 @@ class InAppMessageViewListenerOnKeySpec : InAppMessageViewListenerSpec() {
 
     @Test
     fun `should return false with null event`() {
-        val message = ValidTestMessage("1", true)
+        val message = TestDataHelper.createDummyMessage(campaignId = "1", isTest = true)
         val listener = InAppMessageViewListener(message, mockCoroutine, mockDisplayManager)
 
         listener.onKey(mockView, KeyEvent.KEYCODE_BACK, null).shouldBeFalse()
@@ -359,7 +392,7 @@ class InAppMessageViewListenerOnKeySpec : InAppMessageViewListenerSpec() {
 
     @Test
     fun `should return false with null event and not back button`() {
-        val message = ValidTestMessage("1", true)
+        val message = TestDataHelper.createDummyMessage(campaignId = "1", isTest = true)
         val listener = InAppMessageViewListener(message, mockCoroutine, mockDisplayManager)
 
         listener.onKey(mockView, KeyEvent.KEYCODE_BREAK, null).shouldBeFalse()
@@ -367,7 +400,7 @@ class InAppMessageViewListenerOnKeySpec : InAppMessageViewListenerSpec() {
 
     @Test
     fun `should return false with not back button`() {
-        val message = ValidTestMessage("1", true)
+        val message = TestDataHelper.createDummyMessage(campaignId = "1", isTest = true)
         val listener = InAppMessageViewListener(message, mockCoroutine, mockDisplayManager)
         `when`(keyEvent.action).thenReturn(KeyEvent.ACTION_UP)
 
@@ -376,7 +409,7 @@ class InAppMessageViewListenerOnKeySpec : InAppMessageViewListenerSpec() {
 
     @Test
     fun `should return false with not back button and action down`() {
-        val message = ValidTestMessage("1", true)
+        val message = TestDataHelper.createDummyMessage(campaignId = "1", isTest = true)
         val listener = InAppMessageViewListener(message, mockCoroutine, mockDisplayManager)
         `when`(keyEvent.action).thenReturn(KeyEvent.ACTION_DOWN)
 
@@ -385,7 +418,7 @@ class InAppMessageViewListenerOnKeySpec : InAppMessageViewListenerSpec() {
 
 //    @Test
     fun `should return true on false coroutine`() {
-        val message = ValidTestMessage("1", true)
+        val message = TestDataHelper.createDummyMessage(campaignId = "1", isTest = true)
         val listener = InAppMessageViewListener(
             message = message,
             messageCoroutine = mockCoroutine,
@@ -417,7 +450,7 @@ class InAppMessageViewListenerHandleSpec : InAppMessageViewListenerSpec() {
     @Test
     fun `should start worker with zero delay due to null value`() {
         `when`(mockCoroutine.executeTask(mockMessage, R.id.message_close_button, false)).thenReturn(true)
-        `when`(mockMessage.getMessagePayload()).thenReturn(mockPayload)
+        `when`(mockMessage.messagePayload).thenReturn(mockPayload)
         `when`(mockPayload.messageSettings).thenReturn(mockSettings)
         `when`(mockSettings.displaySettings).thenReturn(Mockito.mock(DisplaySettings::class.java))
         instance.handleMessage(R.id.message_close_button)
@@ -427,7 +460,7 @@ class InAppMessageViewListenerHandleSpec : InAppMessageViewListenerSpec() {
     @Test
     fun `should start worker with valid delay due to null values`() {
         `when`(mockCoroutine.executeTask(mockMessage, R.id.message_close_button, false)).thenReturn(true)
-        `when`(mockMessage.getMessagePayload()).thenReturn(mockPayload)
+        `when`(mockMessage.messagePayload).thenReturn(mockPayload)
         `when`(mockPayload.messageSettings).thenReturn(mockSettings)
         `when`(mockSettings.displaySettings).thenReturn(mockDispSettings)
         `when`(mockDispSettings.delay).thenReturn(3000)

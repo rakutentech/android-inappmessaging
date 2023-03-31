@@ -7,15 +7,14 @@ import androidx.work.WorkManager
 import androidx.work.testing.WorkManagerTestInitHelper
 import com.rakuten.tech.mobile.inappmessaging.runtime.BaseTest
 import com.rakuten.tech.mobile.inappmessaging.runtime.InAppMessaging
-import com.rakuten.tech.mobile.inappmessaging.runtime.EventTrackerHelper
 import com.rakuten.tech.mobile.inappmessaging.runtime.TestUserInfoProvider
 import com.rakuten.tech.mobile.inappmessaging.runtime.data.enums.EventType
 import com.rakuten.tech.mobile.inappmessaging.runtime.data.models.appevents.Event
 import com.rakuten.tech.mobile.inappmessaging.runtime.data.models.appevents.PurchaseSuccessfulEvent
-import com.rakuten.tech.mobile.inappmessaging.runtime.data.models.messages.Message
-import com.rakuten.tech.mobile.inappmessaging.runtime.data.models.messages.ValidTestMessage
 import com.rakuten.tech.mobile.inappmessaging.runtime.data.repositories.*
 import com.rakuten.tech.mobile.inappmessaging.runtime.data.responses.ConfigResponseData
+import com.rakuten.tech.mobile.inappmessaging.runtime.data.responses.ping.Message
+import com.rakuten.tech.mobile.inappmessaging.runtime.testhelpers.TestDataHelper
 import com.rakuten.tech.mobile.inappmessaging.runtime.utils.EventMatchingUtil
 import com.rakuten.tech.mobile.inappmessaging.runtime.workmanager.schedulers.EventMessageReconciliationScheduler
 import org.amshove.kluent.*
@@ -35,9 +34,8 @@ import kotlin.collections.HashMap
 @RunWith(RobolectricTestRunner::class)
 class EventsManagerSpec : BaseTest() {
 
-    private val message = ValidTestMessage()
+    private val message = TestDataHelper.createDummyMessage()
     private val mockEvent = Mockito.mock(Event::class.java)
-    private val mockEventBroadcaster = Mockito.mock(EventTrackerHelper::class.java)
     private val configResponseData = Mockito.mock(ConfigResponseData::class.java)
     private val mockAccount = Mockito.mock(AccountRepository::class.java)
     private val eventRecon = Mockito.mock(EventMessageReconciliationScheduler::class.java)
