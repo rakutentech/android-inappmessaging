@@ -40,6 +40,7 @@ class InitializerSpec : BaseTest() {
     }
 
     @Test
+    @Config(sdk = [Build.VERSION_CODES.M, Build.VERSION_CODES.S])
     fun `should add host app info with basic attributes`() {
         verifyHostAppInfo()
     }
@@ -107,5 +108,6 @@ class InitializerSpec : BaseTest() {
         HostAppInfoRepository.instance()
             .getPackageName() shouldBeEqualTo "com.rakuten.tech.mobile.inappmessaging.runtime.test"
         HostAppInfoRepository.instance().getVersion() shouldBeEqualTo "1.0.2"
+        HostAppInfoRepository.instance().getDeviceLocale().shouldNotBeEmpty()
     }
 }
