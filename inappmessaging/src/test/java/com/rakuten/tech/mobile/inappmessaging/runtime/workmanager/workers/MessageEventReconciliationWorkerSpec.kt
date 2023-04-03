@@ -50,7 +50,7 @@ class MessageEventReconciliationWorkerSpec : BaseTest() {
     fun `should return success with valid messages`() {
         val triggers = listOf(Trigger(0, EventType.APP_START.typeId, "testEvent2", mutableListOf()))
         val message = TestDataHelper.createDummyMessage(campaignId = "1", isTest = true, triggers = triggers)
-        val notTestMessage = TestDataHelper.createDummyMessage(campaignId = "2", triggers = triggers,)
+        val notTestMessage = TestDataHelper.createDummyMessage(campaignId = "2", triggers = triggers)
         worker = MessageEventReconciliationWorker(
             ApplicationProvider.getApplicationContext(),
             workerParameters,
