@@ -7,7 +7,10 @@ import androidx.work.ListenableWorker
 import androidx.work.WorkerParameters
 import androidx.work.testing.WorkManagerTestInitHelper
 import com.rakuten.tech.mobile.inappmessaging.runtime.BaseTest
+import com.rakuten.tech.mobile.inappmessaging.runtime.data.enums.EventType
+import com.rakuten.tech.mobile.inappmessaging.runtime.data.models.appevents.AppStartEvent
 import com.rakuten.tech.mobile.inappmessaging.runtime.data.repositories.CampaignRepository
+import com.rakuten.tech.mobile.inappmessaging.runtime.data.responses.ping.Trigger
 import com.rakuten.tech.mobile.inappmessaging.runtime.manager.MessageReadinessManager
 import com.rakuten.tech.mobile.inappmessaging.runtime.testhelpers.TestDataHelper
 import com.rakuten.tech.mobile.inappmessaging.runtime.utils.EventMatchingUtil
@@ -45,8 +48,9 @@ class MessageEventReconciliationWorkerSpec : BaseTest() {
 
     @Test
     fun `should return success with valid messages`() {
-        val message = TestDataHelper.createDummyMessage(campaignId = "1", isTest = true)
-        val notTestMessage = TestDataHelper.createDummyMessage(campaignId = "2")
+        val triggers = listOf(Trigger(0, EventType.APP_START.typeId, "testEvent2", mutableListOf()))
+        val message = TestDataHelper.createDummyMessage(campaignId = "1", isTest = true, triggers = triggers)
+        val notTestMessage = TestDataHelper.createDummyMessage(campaignId = "2", triggers = triggers)
         worker = MessageEventReconciliationWorker(
             ApplicationProvider.getApplicationContext(),
             workerParameters,
@@ -55,6 +59,7 @@ class MessageEventReconciliationWorkerSpec : BaseTest() {
             MessageReadinessManager.instance(),
         )
         CampaignRepository.instance().syncWith(listOf(message, notTestMessage), 0)
+        EventMatchingUtil.instance().matchAndStore(AppStartEvent())
         worker?.doWork() shouldBeEqualTo ListenableWorker.Result.success()
     }
 }
