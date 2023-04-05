@@ -235,7 +235,15 @@ class DisplayMessageWorkerSpec : BaseTest() {
     }
 
     private fun verifyHandlerCalled(shouldCall: Boolean = false) {
-        `when`(mockMessageManager.getNextDisplayMessage()).thenReturn(listOf(TestDataHelper.createDummyMessage()))
+        `when`(mockMessageManager.getNextDisplayMessage()).thenReturn(
+            listOf(
+                TestDataHelper.createDummyMessage(
+                    messagePayload = TestDataHelper.createDummyPayload(
+                        title = "[ctx] DEV-Test (Android In-App-Test)",
+                    ),
+                ),
+            ),
+        )
         runBlocking { displayWorker.doWork() shouldBeEqualTo ListenableWorker.Result.success() }
 
         if (shouldCall) {
