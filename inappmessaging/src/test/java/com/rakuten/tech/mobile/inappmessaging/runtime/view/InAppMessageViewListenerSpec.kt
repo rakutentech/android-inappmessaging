@@ -82,19 +82,23 @@ class InAppMessageViewListenerOnClickSpec : InAppMessageViewListenerSpec() {
         val mockView = Mockito.mock(CheckBox::class.java)
         `when`(mockView.id).thenReturn(R.id.message_close_button)
 
-        createMockListener(TestDataHelper.createDummyMessage(
-            campaignId = "1",
-            isTest = true,
-            isCampaignDismissable = true)
+        createMockListener(
+            TestDataHelper.createDummyMessage(
+                campaignId = "1",
+                isTest = true,
+                isCampaignDismissable = true,
+            ),
         ).onClick(mockView)
     }
 
     @Test
     fun `should handle message in coroutine`() {
-        val listener = createMockListener(TestDataHelper.createDummyMessage(
-            campaignId = "1",
-            isTest = true
-        ))
+        val listener = createMockListener(
+            TestDataHelper.createDummyMessage(
+                campaignId = "1",
+                isTest = true,
+            ),
+        )
 
         listener.handleClick(0, testDispatcher, testDispatcher)
         verify(mockCoroutine, atLeastOnce()).executeTask(any(), any(), any())

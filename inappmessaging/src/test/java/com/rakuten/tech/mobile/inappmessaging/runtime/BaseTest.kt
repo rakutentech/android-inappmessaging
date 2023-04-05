@@ -13,10 +13,11 @@ import org.mockito.Mockito
  * Base test class of all test classes.
  */
 @OptIn(
-    ExperimentalCoroutinesApi::class
+    ExperimentalCoroutinesApi::class,
 )
 open class BaseTest {
     internal val testDispatcher = UnconfinedTestDispatcher()
+
     @Before
     open fun setup() {
         InAppMessaging.errorCallback = null
