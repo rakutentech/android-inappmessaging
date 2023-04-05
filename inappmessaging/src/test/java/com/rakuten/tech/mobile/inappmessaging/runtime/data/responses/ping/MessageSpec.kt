@@ -174,7 +174,7 @@ class MessageSpec {
         val campaign = TestDataHelper.createDummyMessage(
             messagePayload = TestDataHelper.createDummyPayload(
                 title = "${Message.TOOLTIP_TAG} Test",
-                messageBody = """{"random":"invalid"}""",
+                messageBody = """random":"invalid"}""",
             ),
         )
         campaign.getTooltipConfig().shouldBeNull()
