@@ -19,7 +19,6 @@ import com.rakuten.tech.mobile.inappmessaging.runtime.manager.*
 import com.rakuten.tech.mobile.inappmessaging.runtime.testhelpers.TestDataHelper
 import com.rakuten.tech.mobile.inappmessaging.runtime.testhelpers.TooltipHelper
 import com.rakuten.tech.mobile.inappmessaging.runtime.utils.EventMatchingUtil
-import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.test.*
 import org.amshove.kluent.*
@@ -50,23 +49,17 @@ open class InAppMessagingSpec : BaseTest() {
     internal val mockCallback = Mockito.mock(function.javaClass)
     internal val captor = argumentCaptor<InAppMessagingException>()
 
-    private val testDispatcher = UnconfinedTestDispatcher() // for use on tests that call a coroutinescope
-
     @Before
     override fun setup() {
         super.setup()
         EventMatchingUtil.instance().clearNonPersistentEvents()
         `when`(mockContext.applicationContext).thenReturn(null)
-
-        Dispatchers.setMain(testDispatcher)
     }
 
     @After
     override fun tearDown() {
         super.tearDown()
         ConfigResponseRepository.resetInstance()
-
-        Dispatchers.resetMain()
     }
 
     internal fun initializeInstance(shouldEnableCaching: Boolean = false) {

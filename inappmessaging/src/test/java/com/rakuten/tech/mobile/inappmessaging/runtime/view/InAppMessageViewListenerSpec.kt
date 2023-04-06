@@ -6,9 +6,7 @@ import android.view.MotionEvent
 import android.view.View
 import android.widget.CheckBox
 import android.widget.Magnifier
-import com.nhaarman.mockitokotlin2.any
-import com.nhaarman.mockitokotlin2.anyOrNull
-import com.nhaarman.mockitokotlin2.eq
+import com.nhaarman.mockitokotlin2.*
 import com.rakuten.tech.mobile.inappmessaging.runtime.BaseTest
 import com.rakuten.tech.mobile.inappmessaging.runtime.InAppMessaging
 import com.rakuten.tech.mobile.inappmessaging.runtime.R
@@ -21,12 +19,7 @@ import com.rakuten.tech.mobile.inappmessaging.runtime.manager.DisplayManager
 import com.rakuten.tech.mobile.inappmessaging.runtime.testhelpers.TestDataHelper
 import com.rakuten.tech.mobile.inappmessaging.runtime.utils.BuildVersionChecker
 import com.rakuten.tech.mobile.inappmessaging.runtime.workmanager.schedulers.EventMessageReconciliationScheduler
-import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
-import kotlinx.coroutines.ObsoleteCoroutinesApi
-import kotlinx.coroutines.newSingleThreadContext
-import kotlinx.coroutines.test.resetMain
-import kotlinx.coroutines.test.setMain
 import org.amshove.kluent.*
 import org.junit.After
 import org.junit.Before
@@ -37,8 +30,6 @@ import org.mockito.Mockito.`when`
 /**
  * Test class for InAppMessageViewListener.
  */
-@ExperimentalCoroutinesApi
-@ObsoleteCoroutinesApi
 open class InAppMessageViewListenerSpec : BaseTest() {
     internal val mockView = Mockito.mock(View::class.java)
     internal val mockDisplayManager = Mockito.mock(DisplayManager::class.java)
@@ -47,24 +38,20 @@ open class InAppMessageViewListenerSpec : BaseTest() {
     internal val mockActivity = Mockito.mock(Activity::class.java)
     internal val mockInApp = Mockito.mock(InAppMessaging::class.java)
 
-    private val mainThreadSurrogate = newSingleThreadContext("UI thread")
-
     @Before
     override fun setup() {
         super.setup()
-        Dispatchers.setMain(mainThreadSurrogate)
     }
 
     @After
     override fun tearDown() {
         super.tearDown()
-        Dispatchers.resetMain()
-        mainThreadSurrogate.close()
     }
 }
 
-@ObsoleteCoroutinesApi
-@ExperimentalCoroutinesApi
+@OptIn(
+    ExperimentalCoroutinesApi::class,
+)
 class InAppMessageViewListenerOnClickSpec : InAppMessageViewListenerSpec() {
     private val mockCheckbox = Mockito.mock(CheckBox::class.java)
 
@@ -90,6 +77,33 @@ class InAppMessageViewListenerOnClickSpec : InAppMessageViewListenerSpec() {
         listener.onClick(mockView)
     }
 
+    @Test
+    fun `should not throw exception with non-checkbox click and non-dismissible message`() {
+        val mockView = Mockito.mock(CheckBox::class.java)
+        `when`(mockView.id).thenReturn(R.id.message_close_button)
+
+        createMockListener(
+            TestDataHelper.createDummyMessage(
+                campaignId = "1",
+                isTest = true,
+                isCampaignDismissable = true,
+            ),
+        ).onClick(mockView)
+    }
+
+    @Test
+    fun `should handle message in coroutine`() {
+        val listener = createMockListener(
+            TestDataHelper.createDummyMessage(
+                campaignId = "1",
+                isTest = true,
+            ),
+        )
+
+        listener.handleClick(0, testDispatcher, testDispatcher)
+        verify(mockCoroutine, atLeastOnce()).executeTask(any(), any(), any())
+    }
+
     private fun createMockListener(message: Message) = InAppMessageViewListener(
         message = message,
         messageCoroutine = mockCoroutine,
@@ -102,8 +116,6 @@ class InAppMessageViewListenerOnClickSpec : InAppMessageViewListenerSpec() {
 @SuppressWarnings(
     "LargeClass",
 )
-@ObsoleteCoroutinesApi
-@ExperimentalCoroutinesApi
 class InAppMessageViewListenerOnTouchSpec : InAppMessageViewListenerSpec() {
     private val mockMotionEvent = Mockito.mock(MotionEvent::class.java)
     private val mockCheck = Mockito.mock(BuildVersionChecker::class.java)
@@ -325,8 +337,6 @@ class InAppMessageViewListenerOnTouchSpec : InAppMessageViewListenerSpec() {
     }
 }
 
-@ObsoleteCoroutinesApi
-@ExperimentalCoroutinesApi
 class InAppMessageViewListenerOnKeySpec : InAppMessageViewListenerSpec() {
 
     private val keyEvent = Mockito.mock(KeyEvent::class.java)
@@ -438,8 +448,6 @@ class InAppMessageViewListenerOnKeySpec : InAppMessageViewListenerSpec() {
     }
 }
 
-@ObsoleteCoroutinesApi
-@ExperimentalCoroutinesApi
 class InAppMessageViewListenerHandleSpec : InAppMessageViewListenerSpec() {
     private val mockMessage = Mockito.mock(Message::class.java)
     private val mockPayload = Mockito.mock(MessagePayload::class.java)
