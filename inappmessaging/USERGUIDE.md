@@ -483,6 +483,10 @@ Documents targeting Product Managers:
 
 ## <a name="changelog"></a> Changelog
 
+### 7.5.0 (In-Progress)
+* Refactored the following classes to increase code coverage:
+  - InAppMessageSlideUpView (SDKCF-6478)
+
 ### 7.4.0 (In-Progress)
 * SDKCF-6321: Updated detekt version to `1.22.0`.
 * SDKCF-6395: Removed unused utility function `getImage()` (downloading image with Retrofit).
