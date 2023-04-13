@@ -108,10 +108,27 @@ class InAppMessagingTooltipAnchorListenerSpec {
     }
 
     @Test
+    fun `addAnchorViewListeners() should not crash when observer is null`() {
+        `when`(mockAnchorView.viewTreeObserver).thenReturn(null)
+
+        tooltipView.addAnchorViewListeners()
+    }
+
+    @Test
     fun `addAnchorViewListeners() should not crash when observer is not alive anymore`() {
         `when`(mockObserver.isAlive).thenReturn(false)
 
         tooltipView.addAnchorViewListeners()
+    }
+
+    @Test
+    fun `should call addAnchorViewListeners() when attached to window`() {
+        // This test is using reflection and should be generally avoided.
+        tooltipView.javaClass.getDeclaredMethod("onAttachedToWindow").apply {
+            isAccessible = true
+        }.invoke(tooltipView)
+
+        verify(mockObserver).addOnGlobalLayoutListener(any())
     }
 
     @Test
@@ -122,10 +139,27 @@ class InAppMessagingTooltipAnchorListenerSpec {
     }
 
     @Test
+    fun `removeAnchorViewListeners() should not crash when observer is null`() {
+        `when`(mockAnchorView.viewTreeObserver).thenReturn(null)
+
+        tooltipView.removeAnchorViewListeners()
+    }
+
+    @Test
     fun `removeAnchorViewListeners() should not crash when observer is not alive anymore`() {
         `when`(mockObserver.isAlive).thenReturn(false)
 
         tooltipView.removeAnchorViewListeners()
+    }
+
+    @Test
+    fun `should call removeAnchorViewListeners() when attached to window`() {
+        // This test is using reflection and should be generally avoided.
+        tooltipView.javaClass.getDeclaredMethod("onDetachedFromWindow").apply {
+            isAccessible = true
+        }.invoke(tooltipView)
+
+        verify(mockObserver).removeOnGlobalLayoutListener(any())
     }
 
     @Test
