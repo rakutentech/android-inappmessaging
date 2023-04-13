@@ -27,18 +27,17 @@ internal class InAppMessageSlideUpView(
         val constraintLayout = findViewById<ConstraintLayout>(R.id.slide_up)
 
         // Setting background color.
-        constraintLayout?.setBackgroundColor(bgColor)
+        constraintLayout.setBackgroundColor(bgColor)
         // Start animation based on direction.
-        val animation = ViewUtil.getSlidingAnimation(
+        ViewUtil.getSlidingAnimation(
             context,
             SlideFromDirectionType.getById(
                 message.messagePayload.messageSettings.displaySettings.slideFrom,
             ),
-        )
-        animation?.let {
-            constraintLayout?.startAnimation(it)
+        )?.let { animation ->
+            constraintLayout.startAnimation(animation)
         }
         // Set listener for special handling of the invisible constraints(button) click.
-        constraintLayout?.setOnClickListener(listener)
+        constraintLayout.setOnClickListener(listener)
     }
 }
