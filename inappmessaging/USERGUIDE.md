@@ -484,7 +484,8 @@ Documents targeting Product Managers:
 ## <a name="changelog"></a> Changelog
 
 ### 7.5.0 (In-Progress)
-* Refactored the following classes to increase code coverage:
+* Improved the following classes to increase code coverage:
+  - InAppMessagingConstants (SDKCF-6497)
   - InAppMessageSlideUpView (SDKCF-6478)
 
 ### 7.4.0 (In-Progress)
