@@ -1,5 +1,6 @@
 package com.rakuten.tech.mobile.inappmessaging.runtime.utils
 
+import androidx.annotation.VisibleForTesting
 import com.rakuten.tech.mobile.inappmessaging.runtime.data.enums.EventType
 import com.rakuten.tech.mobile.inappmessaging.runtime.data.enums.OperatorType
 import com.rakuten.tech.mobile.inappmessaging.runtime.data.enums.ValueType
@@ -56,7 +57,8 @@ internal object TriggerAttributesValidator {
      * event. This is done by comparing TriggerAttribute's value and operator against local event
      * Attribute's value.
      */
-    private fun isAttributeReconciled(triggerAttribute: TriggerAttribute, eventAttribute: Attribute): Boolean {
+    @VisibleForTesting
+    internal fun isAttributeReconciled(triggerAttribute: TriggerAttribute, eventAttribute: Attribute): Boolean {
         if (triggerAttribute.name.lowercase(Locale.getDefault()) != eventAttribute.name) {
             return false
         }
@@ -80,15 +82,20 @@ internal object TriggerAttributesValidator {
      * The method checks if the value from event attribute can satisfy trigger's attribute values according to
      * trigger attribute's operator type.
      */
+    @VisibleForTesting
     @SuppressWarnings("LongMethod", "ComplexMethod", "ReturnCount")
-    private fun isValueReconciled(valueId: Int, eventValue: String?, operatorId: Int, triggerValue: String?): Boolean {
+    internal fun isValueReconciled(valueId: Int, eventValue: String?, operatorId: Int, triggerValue: String?): Boolean {
         // Validate value strings. They shouldn't be null, but empty string is OK.
         if (eventValue == null || triggerValue == null) return false
 
         // Validate attribute's operator type and value type.
-        val operatorType = OperatorType.getById(operatorId) ?: return false
-        val valueType = ValueType.getById(valueId) ?: return false
-        if (operatorType == OperatorType.INVALID || valueType == ValueType.INVALID) return false
+        val operatorType = OperatorType.getById(operatorId)
+        val valueType = ValueType.getById(valueId)
+        if (operatorType == null || operatorType == OperatorType.INVALID ||
+            valueType == null
+        ) {
+            return false
+        }
 
         return when (valueType) {
             ValueType.STRING -> ValueMatchingUtil.isOperatorConditionSatisfied(eventValue, operatorType, triggerValue)
