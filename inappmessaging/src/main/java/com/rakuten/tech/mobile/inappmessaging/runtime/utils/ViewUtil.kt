@@ -121,6 +121,6 @@ internal object ViewUtil {
 
     fun isViewByNameVisible(activity: Activity, name: String, resourceUtil: ResourceUtils? = null): Boolean {
         val view = (resourceUtil ?: ResourceUtils).findViewByName<View>(activity, name)
-        return view?.isVisible() ?: false
+        return view?.isVisible() == true
     }
 }
