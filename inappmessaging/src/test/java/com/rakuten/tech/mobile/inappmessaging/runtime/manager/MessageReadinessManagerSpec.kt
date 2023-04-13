@@ -35,10 +35,10 @@ import java.util.*
 import kotlin.collections.ArrayList
 
 /**
- * Test class for MessageMessageReadinessManager.
+ * Test class for MessageReadinessManager.
  */
 @RunWith(RobolectricTestRunner::class)
-open class MessageMessageReadinessManagerSpec : BaseTest() {
+open class MessageReadinessManagerSpec : BaseTest() {
     private var configResponseData = mock(ConfigResponseData::class.java)
     private var configResponseEndpoints = mock(ConfigResponseEndpoints::class.java)
 
@@ -235,7 +235,7 @@ open class MessageMessageReadinessManagerSpec : BaseTest() {
     }
 }
 
-class MessageMessageReadinessManagerRequestSpec : BaseTest() {
+class MessageReadinessManagerRequestSpec : BaseTest() {
     private val server = MockWebServer()
     private var data = mock(ConfigResponseData::class.java)
     private var endpoint = mock(ConfigResponseEndpoints::class.java)
@@ -356,7 +356,7 @@ class MessageMessageReadinessManagerRequestSpec : BaseTest() {
     }
 }
 
-class MessageMessageReadinessManagerCallSpec : MessageMessageReadinessManagerSpec() {
+class MessageReadinessManagerCallSpec : MessageReadinessManagerSpec() {
     private var mockRequest = mock(DisplayPermissionRequest::class.java)
 
     @Test
@@ -498,7 +498,7 @@ class MessageReadinessTooltipSpec {
     }
 
     @Test
-    fun `should get display call`() {
+    fun `should get display call for tooltip`() {
         `when`(manager.hostAppInfoRepo.getSubscriptionKey()).thenReturn("test-key")
         `when`(manager.accountRepo.getAccessToken()).thenReturn("test-token")
         val request = manager.getDisplayPermissionRequest(testTooltip)
