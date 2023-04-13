@@ -1,5 +1,6 @@
 package com.rakuten.tech.mobile.inappmessaging.runtime.manager
 
+import android.app.Activity
 import android.content.Context
 import android.provider.Settings
 import androidx.test.core.app.ApplicationProvider
@@ -7,6 +8,7 @@ import androidx.work.testing.WorkManagerTestInitHelper
 import com.google.gson.Gson
 import com.rakuten.tech.mobile.inappmessaging.runtime.*
 import com.rakuten.tech.mobile.inappmessaging.runtime.api.MessageMixerRetrofitService
+import com.rakuten.tech.mobile.inappmessaging.runtime.data.enums.InAppMessageType
 import com.rakuten.tech.mobile.inappmessaging.runtime.data.models.HostAppInfo
 import com.rakuten.tech.mobile.inappmessaging.runtime.data.repositories.*
 import com.rakuten.tech.mobile.inappmessaging.runtime.data.requests.DisplayPermissionRequest
@@ -16,6 +18,9 @@ import com.rakuten.tech.mobile.inappmessaging.runtime.data.responses.ConfigRespo
 import com.rakuten.tech.mobile.inappmessaging.runtime.data.responses.DisplayPermissionResponse
 import com.rakuten.tech.mobile.inappmessaging.runtime.data.responses.ping.Message
 import com.rakuten.tech.mobile.inappmessaging.runtime.testhelpers.TestDataHelper
+import com.rakuten.tech.mobile.inappmessaging.runtime.testhelpers.TooltipHelper
+import com.rakuten.tech.mobile.inappmessaging.runtime.utils.ViewUtil
+import com.rakuten.tech.mobile.inappmessaging.runtime.workmanager.schedulers.MessageMixerPingScheduler
 import okhttp3.mockwebserver.MockResponse
 import okhttp3.mockwebserver.MockWebServer
 import org.amshove.kluent.*
@@ -23,20 +28,19 @@ import org.junit.After
 import org.junit.Before
 import org.junit.Test
 import org.junit.runner.RunWith
-import org.mockito.Mockito
-import org.mockito.Mockito.`when`
+import org.mockito.Mockito.*
 import org.robolectric.RobolectricTestRunner
 import retrofit2.Call
 import java.util.*
 import kotlin.collections.ArrayList
 
 /**
- * Test class for MessageReadinessManager.
+ * Test class for MessageMessageReadinessManager.
  */
 @RunWith(RobolectricTestRunner::class)
-open class MessageReadinessManagerSpec : BaseTest() {
-    private var configResponseData = Mockito.mock(ConfigResponseData::class.java)
-    private var configResponseEndpoints = Mockito.mock(ConfigResponseEndpoints::class.java)
+open class MessageMessageReadinessManagerSpec : BaseTest() {
+    private var configResponseData = mock(ConfigResponseData::class.java)
+    private var configResponseEndpoints = mock(ConfigResponseEndpoints::class.java)
 
     @Before
     override fun setup() {
@@ -132,7 +136,6 @@ open class MessageReadinessManagerSpec : BaseTest() {
         setMessagesList(messageList)
 
         MessageReadinessManager.instance().getNextDisplayMessage().shouldBeEmpty()
-        MessageReadinessManager.shouldRetry.get().shouldBeFalse()
     }
 
     @Test
@@ -232,10 +235,10 @@ open class MessageReadinessManagerSpec : BaseTest() {
     }
 }
 
-class MessageReadinessManagerRequestSpec : BaseTest() {
+class MessageMessageReadinessManagerRequestSpec : BaseTest() {
     private val server = MockWebServer()
-    private var data = Mockito.mock(ConfigResponseData::class.java)
-    private var endpoint = Mockito.mock(ConfigResponseEndpoints::class.java)
+    private var data = mock(ConfigResponseData::class.java)
+    private var endpoint = mock(ConfigResponseEndpoints::class.java)
 
     @Before
     override fun setup() {
@@ -302,19 +305,6 @@ class MessageReadinessManagerRequestSpec : BaseTest() {
         val mockResponse = MockResponse().setResponseCode(200).setBody(DISPLAY_RESPONSE)
         server.enqueue(mockResponse)
         verifyValidResponse(MessageReadinessManager.instance().getNextDisplayMessage()[0])
-        val mgr = MessageReadinessManager.instance()
-        (mgr as MessageReadinessManager.MessageReadinessManagerImpl).queuedMessages.shouldHaveSize(1)
-    }
-
-    @Test
-    fun `should return null for invalid id`() {
-        val mockResponse = MockResponse().setResponseCode(200).setBody(DISPLAY_RESPONSE)
-        server.enqueue(mockResponse)
-        val mgr = MessageReadinessManager.instance()
-        mgr.clearMessages()
-        (mgr as MessageReadinessManager.MessageReadinessManagerImpl).queuedMessages.add("invalid")
-        MessageReadinessManager.instance().getNextDisplayMessage().shouldBeEmpty()
-        mgr.clearMessages()
     }
 
     @Test
@@ -323,10 +313,6 @@ class MessageReadinessManagerRequestSpec : BaseTest() {
         server.enqueue(mockResponse)
         val message = MessageReadinessManager.instance().getNextDisplayMessage()[0]
         verifyValidResponse(message)
-        val readinessMgr = MessageReadinessManager.instance()
-        (readinessMgr as MessageReadinessManager.MessageReadinessManagerImpl).queuedMessages.shouldHaveSize(1)
-        MessageReadinessManager.instance().removeMessageFromQueue(message.campaignId)
-        readinessMgr.queuedMessages.shouldBeEmpty()
     }
 
     @Test
@@ -370,8 +356,8 @@ class MessageReadinessManagerRequestSpec : BaseTest() {
     }
 }
 
-class MessageReadinessManagerCallSpec : MessageReadinessManagerSpec() {
-    private var mockRequest = Mockito.mock(DisplayPermissionRequest::class.java)
+class MessageMessageReadinessManagerCallSpec : MessageMessageReadinessManagerSpec() {
+    private var mockRequest = mock(DisplayPermissionRequest::class.java)
 
     @Test
     fun `should response call contain two headers`() {
@@ -394,5 +380,130 @@ class MessageReadinessManagerCallSpec : MessageReadinessManagerSpec() {
             MessageReadinessManager.instance().getDisplayCall(DISPLAY_PERMISSION_URL, mockRequest)
         responseCall.request().header(MessageMixerRetrofitService.SUBSCRIPTION_ID_HEADER) shouldBeEqualTo
             InAppMessagingTestConstants.SUB_KEY
+    }
+}
+
+@RunWith(RobolectricTestRunner::class)
+class MessageReadinessTooltipSpec {
+    private val manager = MessageReadinessManager(
+        inAppMessaging = mock(InAppMessaging::class.java),
+        campaignRepo = mock(CampaignRepository::class.java),
+        configResponseRepo = mock(ConfigResponseRepository::class.java),
+        hostAppInfoRepo = mock(HostAppInfoRepository::class.java),
+        accountRepo = mock(AccountRepository::class.java),
+        pingScheduler = mock(MessageMixerPingScheduler::class.java),
+        viewUtil = mock(ViewUtil::class.java),
+    )
+
+    private val mockActivity = mock(Activity::class.java)
+    private val testTooltip = TooltipHelper.createMessage().copy(isTest = true)
+
+    @Before
+    fun setup() {
+        `when`(manager.campaignRepo.messages).thenReturn(linkedMapOf(testTooltip.campaignId to testTooltip))
+        `when`(manager.inAppMessaging.getRegisteredActivity()).thenReturn(mockActivity)
+        `when`(manager.inAppMessaging.getHostAppContext()).thenReturn(mock(Context::class.java))
+        `when`(manager.configResponseRepo.getDisplayPermissionEndpoint()).thenReturn("http://sample")
+    }
+
+    @After
+    fun tearDown() {
+        manager.clearMessages()
+    }
+
+    @Test
+    fun `should not add message if does not exist in list`() {
+        `when`(manager.campaignRepo.messages).thenReturn(linkedMapOf())
+
+        manager.addMessageToQueue("sample-id")
+        manager.getNextDisplayMessage().shouldBeEmpty()
+    }
+
+    @Test
+    fun `should remove message`() {
+        val campaign = TestDataHelper.createDummyMessage()
+        `when`(manager.campaignRepo.messages).thenReturn(linkedMapOf(campaign.campaignId to campaign))
+
+        manager.removeMessageFromQueue(campaign.campaignId)
+        manager.getNextDisplayMessage().shouldBeEmpty()
+    }
+
+    @Test
+    fun `should remove tooltip message`() {
+        `when`(manager.campaignRepo.messages).thenReturn(linkedMapOf(testTooltip.campaignId to testTooltip))
+
+        manager.removeMessageFromQueue(testTooltip.campaignId)
+        manager.getNextDisplayMessage().shouldBeEmpty()
+    }
+
+    @Test
+    fun `should return empty if message does not exist anymore`() {
+        manager.addMessageToQueue(testTooltip.campaignId)
+
+        `when`(manager.campaignRepo.messages).thenReturn(linkedMapOf())
+        manager.getNextDisplayMessage().shouldBeEmpty()
+    }
+
+    @Test
+    fun `should return tooltip if target is visible when calling getNextDisplayMessage()`() {
+        manager.addMessageToQueue(testTooltip.campaignId)
+        `when`(manager.viewUtil.isViewByNameVisible(mockActivity, testTooltip.getTooltipConfig()!!.id))
+            .thenReturn(true)
+
+        manager.getNextDisplayMessage().shouldContain(testTooltip)
+    }
+
+    @Test
+    fun `should not return tooltip if target is not visible when calling getNextDisplayMessage()`() {
+        `when`(manager.viewUtil.isViewByNameVisible(mockActivity, testTooltip.getTooltipConfig()!!.id))
+            .thenReturn(false)
+        manager.addMessageToQueue(testTooltip.campaignId)
+
+        manager.getNextDisplayMessage().shouldNotContain(testTooltip)
+    }
+
+    @Test
+    fun `should not return tooltip if opted-out when calling getNextDisplayMessage()`() {
+        val testTooltip = testTooltip.apply { isOptedOut = true }
+        `when`(manager.campaignRepo.messages).thenReturn(linkedMapOf(testTooltip.campaignId to testTooltip))
+        manager.addMessageToQueue(testTooltip.campaignId)
+
+        manager.getNextDisplayMessage().shouldNotContain(testTooltip)
+    }
+
+    @Test
+    fun `should not return tooltip if activity becomes null when calling getNextDisplayMessage()`() {
+        `when`(manager.inAppMessaging.getRegisteredActivity()).thenReturn(null)
+        manager.addMessageToQueue(testTooltip.campaignId)
+
+        manager.getNextDisplayMessage().shouldNotContain(testTooltip)
+    }
+
+    @Test
+    fun `should not return tooltip if tooltip config is null when calling getNextDisplayMessage()`() {
+        val testTooltip = TestDataHelper.createDummyMessage(type = InAppMessageType.TOOLTIP.typeId)
+        `when`(manager.campaignRepo.messages).thenReturn(linkedMapOf(testTooltip.campaignId to testTooltip))
+        manager.addMessageToQueue(testTooltip.campaignId)
+
+        manager.getNextDisplayMessage().shouldNotContain(testTooltip)
+    }
+
+    @Test
+    fun `should get display permission request for tooltip`() {
+        `when`(manager.campaignRepo.lastSyncMillis).thenReturn(null)
+        val message = TooltipHelper.createMessage()
+        val request = manager.getDisplayPermissionRequest(message)
+
+        request.lastPingInMillis.shouldBeEqualTo(0)
+    }
+
+    @Test
+    fun `should get display call`() {
+        `when`(manager.hostAppInfoRepo.getSubscriptionKey()).thenReturn("test-key")
+        `when`(manager.accountRepo.getAccessToken()).thenReturn("test-token")
+        val request = manager.getDisplayPermissionRequest(testTooltip)
+
+        val call = manager.getDisplayCall("test-url", request)
+        call.request().headers().size() shouldBeEqualTo 2
     }
 }

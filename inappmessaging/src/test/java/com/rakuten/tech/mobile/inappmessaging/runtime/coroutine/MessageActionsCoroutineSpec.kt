@@ -109,7 +109,6 @@ internal class MessageActionsCoroutineSpec(
         updatedMessage.impressionsLeft shouldBeEqualTo currImpressions - 1
         updatedMessage.isOptedOut shouldBeEqualTo isOpt
 
-        (readinessManager as MessageReadinessManager.MessageReadinessManagerImpl).queuedMessages.shouldBeEmpty()
         readinessManager.clearMessages()
     }
 

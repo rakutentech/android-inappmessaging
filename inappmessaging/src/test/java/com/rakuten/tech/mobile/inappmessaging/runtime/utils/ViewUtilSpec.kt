@@ -1,5 +1,6 @@
 package com.rakuten.tech.mobile.inappmessaging.runtime.utils
 
+import android.app.Activity
 import android.content.Context
 import android.content.res.Resources
 import android.view.View
@@ -112,6 +113,15 @@ class ViewUtilSpec : BaseTest() {
         `when`(mockView.parent).thenReturn(mockView2)
         `when`(mockView2.parent).thenReturn(mockScrollView)
         ViewUtil.getScrollView(mockView).shouldNotBeNull()
+    }
+
+    @Test
+    fun `should return false when calling isViewByNameVisible`() {
+        val mockResourceUtil = mock(ResourceUtils::class.java)
+        val mockActivity = mock(Activity::class.java)
+        `when`(mockResourceUtil.findViewByName<View>(mockActivity, "viewName"))
+            .thenReturn(mock(View::class.java))
+        ViewUtil.isViewByNameVisible(mockActivity, "viewName", mockResourceUtil).shouldBeFalse()
     }
 }
 
