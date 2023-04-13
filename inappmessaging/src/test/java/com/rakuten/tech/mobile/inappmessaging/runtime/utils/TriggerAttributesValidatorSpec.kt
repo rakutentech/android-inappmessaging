@@ -2,7 +2,9 @@ package com.rakuten.tech.mobile.inappmessaging.runtime.utils
 
 import com.rakuten.tech.mobile.inappmessaging.runtime.BaseTest
 import com.rakuten.tech.mobile.inappmessaging.runtime.data.enums.EventType
+import com.rakuten.tech.mobile.inappmessaging.runtime.data.enums.OperatorType
 import com.rakuten.tech.mobile.inappmessaging.runtime.data.enums.ValueType
+import com.rakuten.tech.mobile.inappmessaging.runtime.data.models.Attribute
 import com.rakuten.tech.mobile.inappmessaging.runtime.data.models.appevents.CustomEvent
 import com.rakuten.tech.mobile.inappmessaging.runtime.data.responses.ping.Trigger
 import com.rakuten.tech.mobile.inappmessaging.runtime.data.responses.ping.TriggerAttribute
@@ -13,6 +15,9 @@ import org.junit.runner.RunWith
 import org.robolectric.RobolectricTestRunner
 import java.util.*
 
+@SuppressWarnings(
+    "LargeClass",
+)
 @RunWith(RobolectricTestRunner::class)
 class TriggerAttributesValidatorSpec : BaseTest() {
 
@@ -50,6 +55,16 @@ class TriggerAttributesValidatorSpec : BaseTest() {
     }
 
     @Test
+    fun `should return false when custom event and event name mismatches`() {
+        val trigger = Trigger(
+            0, EventType.CUSTOM.typeId, "custom",
+            mutableListOf(),
+        )
+        val customEvent = CustomEvent("custom2")
+        TriggerAttributesValidator.isTriggerSatisfied(trigger, customEvent).shouldBeFalse()
+    }
+
+    @Test
     fun `should return false when attribute name mismatches`() {
         val trigger = Trigger(
             0, EventType.CUSTOM.typeId, "custom",
@@ -73,6 +88,46 @@ class TriggerAttributesValidatorSpec : BaseTest() {
         val customEvent = CustomEvent("custom")
         customEvent.addAttribute("name", 1.0)
         TriggerAttributesValidator.isTriggerSatisfied(trigger, customEvent).shouldBeFalse()
+    }
+
+    @Test
+    fun `should return false if trigger and attribute name mismatches when calling isAttributeReconciled()`() {
+        TriggerAttributesValidator.isAttributeReconciled(
+            TriggerAttribute("name1", "", 1, 1),
+            Attribute("name2", "", ValueType.STRING),
+        ).shouldBeFalse()
+    }
+
+    @Test
+    fun `should return false when eventValue is null when calling isValueReconciled`() {
+        TriggerAttributesValidator.isValueReconciled(0, null, 1, "").shouldBeFalse()
+    }
+
+    @Test
+    fun `should return false when triggerValue is null when calling isValueReconciled`() {
+        TriggerAttributesValidator.isValueReconciled(0, "", 1, null).shouldBeFalse()
+    }
+
+    @Test
+    fun `should return false when operatorType is null when calling isValueReconciled`() {
+        TriggerAttributesValidator.isValueReconciled(0, "", 99, "").shouldBeFalse()
+    }
+
+    @Test
+    fun `should return false when operatorType is invalid when calling isValueReconciled`() {
+        TriggerAttributesValidator.isValueReconciled(0, "", OperatorType.INVALID.typeId, "")
+            .shouldBeFalse()
+    }
+
+    @Test
+    fun `should return false when valueType is null when calling isValueReconciled`() {
+        TriggerAttributesValidator.isValueReconciled(99, "", 1, "").shouldBeFalse()
+    }
+
+    @Test
+    fun `should return false when valueType is invalid when calling isValueReconciled`() {
+        TriggerAttributesValidator.isValueReconciled(ValueType.INVALID.typeId, "", 1, "")
+            .shouldBeFalse()
     }
 
     @SuppressWarnings("LongMethod")
