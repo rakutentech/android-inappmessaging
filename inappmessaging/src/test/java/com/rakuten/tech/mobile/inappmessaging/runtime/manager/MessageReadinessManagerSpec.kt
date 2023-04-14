@@ -386,7 +386,6 @@ class MessageReadinessManagerCallSpec : MessageReadinessManagerSpec() {
 @RunWith(RobolectricTestRunner::class)
 class MessageReadinessTooltipSpec {
     private val manager = MessageReadinessManager(
-        inAppMessaging = mock(InAppMessaging::class.java),
         campaignRepo = mock(CampaignRepository::class.java),
         configResponseRepo = mock(ConfigResponseRepository::class.java),
         hostAppInfoRepo = mock(HostAppInfoRepository::class.java),
@@ -401,8 +400,8 @@ class MessageReadinessTooltipSpec {
     @Before
     fun setup() {
         `when`(manager.campaignRepo.messages).thenReturn(linkedMapOf(testTooltip.campaignId to testTooltip))
-        `when`(manager.inAppMessaging.getRegisteredActivity()).thenReturn(mockActivity)
-        `when`(manager.inAppMessaging.getHostAppContext()).thenReturn(mock(Context::class.java))
+        `when`(manager.hostAppInfoRepo.getRegisteredActivity()).thenReturn(mockActivity)
+        `when`(manager.hostAppInfoRepo.getContext()).thenReturn(mock(Context::class.java))
         `when`(manager.configResponseRepo.getDisplayPermissionEndpoint()).thenReturn("http://sample")
     }
 
@@ -473,7 +472,7 @@ class MessageReadinessTooltipSpec {
 
     @Test
     fun `should not return tooltip if activity becomes null when calling getNextDisplayMessage()`() {
-        `when`(manager.inAppMessaging.getRegisteredActivity()).thenReturn(null)
+        `when`(manager.hostAppInfoRepo.getRegisteredActivity()).thenReturn(null)
         manager.addMessageToQueue(testTooltip.campaignId)
 
         manager.getNextDisplayMessage().shouldNotContain(testTooltip)

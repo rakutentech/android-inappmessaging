@@ -99,6 +99,7 @@ internal object Initializer {
         )
 
         // Store hostAppInfo in repository.
+        HostAppInfoRepository.instance().setContext(context)
         HostAppInfoRepository.instance().addHostInfo(hostAppInfo)
 
         initializePicassoInstance(context)

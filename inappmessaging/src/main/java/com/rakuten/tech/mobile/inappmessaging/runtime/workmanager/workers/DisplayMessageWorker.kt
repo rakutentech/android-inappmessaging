@@ -9,6 +9,7 @@ import androidx.work.OneTimeWorkRequest
 import androidx.work.WorkerParameters
 import androidx.work.WorkManager
 import com.rakuten.tech.mobile.inappmessaging.runtime.InAppMessaging
+import com.rakuten.tech.mobile.inappmessaging.runtime.data.repositories.HostAppInfoRepository
 import com.rakuten.tech.mobile.inappmessaging.runtime.data.responses.ping.Message
 import com.rakuten.tech.mobile.inappmessaging.runtime.utils.ImageUtil
 import com.rakuten.tech.mobile.inappmessaging.runtime.manager.MessageReadinessManager
@@ -47,7 +48,7 @@ internal class DisplayMessageWorker(
     private fun prepareNextMessage() {
         // Retrieving the next ready message, and its display permission been checked.
         val messages = messageReadinessManager.getNextDisplayMessage()
-        val hostActivity = InAppMessaging.instance().getRegisteredActivity()
+        val hostActivity = HostAppInfoRepository.instance().getRegisteredActivity()
         if (hostActivity != null) {
             for (message in messages) {
                 val imageUrl = message.messagePayload.resource.imageUrl
@@ -118,7 +119,7 @@ internal class DisplayMessageWorker(
          * This method enqueues work in to this service.
          */
         fun enqueueWork() {
-            InAppMessaging.instance().getHostAppContext()?.let { ctx ->
+            HostAppInfoRepository.instance().getContext()?.let { ctx ->
                 val displayRequest = OneTimeWorkRequest.Builder(DisplayMessageWorker::class.java)
                     .setConstraints(WorkManagerUtil.getNetworkConnectedConstraint())
                     .addTag(DISPLAY_WORKER)

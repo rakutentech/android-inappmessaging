@@ -8,10 +8,10 @@ import android.widget.CheckBox
 import android.widget.Magnifier
 import androidx.annotation.UiThread
 import androidx.annotation.VisibleForTesting
-import com.rakuten.tech.mobile.inappmessaging.runtime.InAppMessaging
 import com.rakuten.tech.mobile.inappmessaging.runtime.R
 import com.rakuten.tech.mobile.inappmessaging.runtime.coroutine.MessageActionsCoroutine
 import com.rakuten.tech.mobile.inappmessaging.runtime.data.enums.InAppMessageType
+import com.rakuten.tech.mobile.inappmessaging.runtime.data.repositories.HostAppInfoRepository
 import com.rakuten.tech.mobile.inappmessaging.runtime.data.responses.ping.Message
 import com.rakuten.tech.mobile.inappmessaging.runtime.manager.DisplayManager
 import com.rakuten.tech.mobile.inappmessaging.runtime.utils.BuildVersionChecker
@@ -31,7 +31,7 @@ internal class InAppMessageViewListener(
     private val displayManager: DisplayManager = DisplayManager.instance(),
     private val buildChecker: BuildVersionChecker = BuildVersionChecker.instance(),
     private val eventScheduler: EventMessageReconciliationScheduler = EventMessageReconciliationScheduler.instance(),
-    private val inApp: InAppMessaging = InAppMessaging.instance(),
+    private val hostAppInfoRepo: HostAppInfoRepository = HostAppInfoRepository.instance(),
 ) :
     View.OnTouchListener, View.OnClickListener, View.OnKeyListener {
 
@@ -98,7 +98,7 @@ internal class InAppMessageViewListener(
     ) {
         CoroutineScope(mainDispatcher).launch {
             displayManager.removeMessage(
-                inApp.getRegisteredActivity(),
+                hostAppInfoRepo.getRegisteredActivity(),
                 id = if (message.type == InAppMessageType.TOOLTIP.typeId) message.campaignId else null,
             )
             withContext(dispatcher) {

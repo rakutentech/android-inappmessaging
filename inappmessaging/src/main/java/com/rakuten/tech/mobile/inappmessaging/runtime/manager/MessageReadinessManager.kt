@@ -70,7 +70,6 @@ internal interface ReadinessManager {
     "LongParameterList",
 )
 internal class MessageReadinessManager(
-    val inAppMessaging: InAppMessaging,
     val campaignRepo: CampaignRepository,
     val configResponseRepo: ConfigResponseRepository,
     val hostAppInfoRepo: HostAppInfoRepository,
@@ -202,7 +201,7 @@ internal class MessageReadinessManager(
     }
 
     private fun isTooltipTargetViewVisible(message: Message): Boolean {
-        val activity = inAppMessaging.getRegisteredActivity()
+        val activity = hostAppInfoRepo.getRegisteredActivity()
         val id = message.getTooltipConfig()?.id
 
         if (activity != null && id != null) {
@@ -286,7 +285,6 @@ internal class MessageReadinessManager(
         private const val TAG = "IAM_MsgReadinessManager"
         private const val DISP_TAG = "IAM_DisplayPermission"
         private val instance: MessageReadinessManager = MessageReadinessManager(
-            inAppMessaging = InAppMessaging.instance(),
             campaignRepo = CampaignRepository.instance(),
             configResponseRepo = ConfigResponseRepository.instance(),
             hostAppInfoRepo = HostAppInfoRepository.instance(),

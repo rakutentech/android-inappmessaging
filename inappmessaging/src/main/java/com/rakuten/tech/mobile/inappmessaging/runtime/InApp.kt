@@ -6,12 +6,12 @@ import android.content.Context
 import android.content.pm.PackageManager
 import android.os.Build
 import androidx.annotation.NonNull
-import androidx.annotation.RestrictTo
 import androidx.annotation.VisibleForTesting
 import com.rakuten.tech.mobile.inappmessaging.runtime.data.models.appevents.Event
 import com.rakuten.tech.mobile.inappmessaging.runtime.data.repositories.AccountRepository
 import com.rakuten.tech.mobile.inappmessaging.runtime.data.repositories.CampaignRepository
 import com.rakuten.tech.mobile.inappmessaging.runtime.data.repositories.ConfigResponseRepository
+import com.rakuten.tech.mobile.inappmessaging.runtime.data.repositories.HostAppInfoRepository
 import com.rakuten.tech.mobile.inappmessaging.runtime.exception.InAppMessagingException
 import com.rakuten.tech.mobile.inappmessaging.runtime.manager.DisplayManager
 import com.rakuten.tech.mobile.inappmessaging.runtime.manager.EventsManager
@@ -24,26 +24,22 @@ import com.rakuten.tech.mobile.inappmessaging.runtime.utils.InAppLogger
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
-import java.lang.ref.WeakReference
 
 @SuppressWarnings("LongParameterList", "TooManyFunctions", "LargeClass")
 internal class InApp(
-    private val context: Context,
     isDebugLogging: Boolean,
+    private val isCacheHandling: Boolean = BuildConfig.IS_CACHE_HANDLING,
     private val displayManager: DisplayManager = DisplayManager.instance(),
-    private var isCacheHandling: Boolean = BuildConfig.IS_CACHE_HANDLING,
     private val eventsManager: EventsManager = EventsManager,
-    private val eventMatchingUtil: EventMatchingUtil = EventMatchingUtil.instance(),
     private val messageReadinessManager: MessageReadinessManager = MessageReadinessManager.instance(),
+    private val sessionManager: SessionManager = SessionManager,
+    private val primerManager: PushPrimerTrackerManager = PushPrimerTrackerManager,
     private val accountRepo: AccountRepository = AccountRepository.instance(),
     private val campaignRepo: CampaignRepository = CampaignRepository.instance(),
     private val configRepo: ConfigResponseRepository = ConfigResponseRepository.instance(),
-    private val sessionManager: SessionManager = SessionManager,
-    private val primerManager: PushPrimerTrackerManager = PushPrimerTrackerManager,
+    private val hostAppInfoRepo: HostAppInfoRepository = HostAppInfoRepository.instance(),
+    private val eventMatchingUtil: EventMatchingUtil = EventMatchingUtil.instance(),
 ) : InAppMessaging() {
-
-    // Used for displaying or removing messages from screen.
-    private var activityWeakReference: WeakReference<Activity>? = null
 
     init {
         // Start logging for debug builds.
@@ -69,7 +65,7 @@ internal class InApp(
     override fun registerMessageDisplayActivity(activity: Activity) {
         InAppLogger(TAG).debug("registerMessageDisplayActivity()")
         try {
-            activityWeakReference = WeakReference(activity)
+            hostAppInfoRepo.registerActivity(activity)
             // Making worker thread to display message.
             if (configRepo.isConfigEnabled()) {
                 displayManager.displayMessage()
@@ -86,9 +82,10 @@ internal class InApp(
         InAppLogger(TAG).debug("unregisterMessageDisplayActivity()")
         try {
             if (configRepo.isConfigEnabled()) {
-                displayManager.removeMessage(getRegisteredActivity(), removeAll = true)
+                displayManager.removeMessage(hostAppInfoRepo.getRegisteredActivity(), removeAll = true)
             }
-            activityWeakReference?.clear()
+            hostAppInfoRepo.registerActivity(null)
+            // activityWeakReference?.clear()
         } catch (ex: Exception) {
             errorCallback?.let {
                 it(InAppMessagingException("In-App Messaging unregister activity failed", ex))
@@ -161,12 +158,6 @@ internal class InApp(
     }
 
     // ------------------------------------Library Internal APIs-------------------------------------
-    @RestrictTo(RestrictTo.Scope.LIBRARY)
-    override fun getRegisteredActivity() = activityWeakReference?.get()
-
-    @RestrictTo(RestrictTo.Scope.LIBRARY)
-    override fun getHostAppContext() = context
-
     override fun isLocalCachingEnabled() = isCacheHandling
 
     @SuppressWarnings(
@@ -195,7 +186,7 @@ internal class InApp(
 
     @VisibleForTesting
     internal fun removeMessage(clearQueuedCampaigns: Boolean) {
-        val id = displayManager.removeMessage(getRegisteredActivity())
+        val id = displayManager.removeMessage(hostAppInfoRepo.getRegisteredActivity())
 
         if (clearQueuedCampaigns) {
             messageReadinessManager.clearMessages()
@@ -219,7 +210,7 @@ internal class InApp(
             ?.campaignId
 
         if (campaignId != null) {
-            displayManager.removeMessage(getRegisteredActivity(), delay = 0, id = campaignId)
+            displayManager.removeMessage(hostAppInfoRepo.getRegisteredActivity(), delay = 0, id = campaignId)
             messageReadinessManager.removeMessageFromQueue(campaignId)
             displayManager.displayMessage() // next message
         }

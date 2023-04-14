@@ -146,7 +146,7 @@ internal abstract class CampaignRepository {
         }
 
         private fun retrieveData(): String {
-            return InAppMessaging.instance().getHostAppContext()?.let { ctx ->
+            return HostAppInfoRepository.instance().getContext()?.let { ctx ->
                 PreferencesUtil.getString(
                     context = ctx,
                     name = InAppMessaging.getPreferencesFile(),
@@ -158,7 +158,7 @@ internal abstract class CampaignRepository {
 
         private fun saveDataToCache() {
             if (InAppMessaging.instance().isLocalCachingEnabled()) {
-                InAppMessaging.instance().getHostAppContext()?.let {
+                HostAppInfoRepository.instance().getContext()?.let {
                     PreferencesUtil.putString(
                         context = it,
                         name = InAppMessaging.getPreferencesFile(),

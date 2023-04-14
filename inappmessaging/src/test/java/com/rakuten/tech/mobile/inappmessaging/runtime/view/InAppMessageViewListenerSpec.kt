@@ -8,9 +8,9 @@ import android.widget.CheckBox
 import android.widget.Magnifier
 import com.nhaarman.mockitokotlin2.*
 import com.rakuten.tech.mobile.inappmessaging.runtime.BaseTest
-import com.rakuten.tech.mobile.inappmessaging.runtime.InAppMessaging
 import com.rakuten.tech.mobile.inappmessaging.runtime.R
 import com.rakuten.tech.mobile.inappmessaging.runtime.coroutine.MessageActionsCoroutine
+import com.rakuten.tech.mobile.inappmessaging.runtime.data.repositories.HostAppInfoRepository
 import com.rakuten.tech.mobile.inappmessaging.runtime.data.responses.ping.DisplaySettings
 import com.rakuten.tech.mobile.inappmessaging.runtime.data.responses.ping.Message
 import com.rakuten.tech.mobile.inappmessaging.runtime.data.responses.ping.MessagePayload
@@ -36,7 +36,7 @@ open class InAppMessageViewListenerSpec : BaseTest() {
     internal val mockCoroutine = Mockito.mock(MessageActionsCoroutine::class.java)
     internal val mockEventScheduler = Mockito.mock(EventMessageReconciliationScheduler::class.java)
     internal val mockActivity = Mockito.mock(Activity::class.java)
-    internal val mockInApp = Mockito.mock(InAppMessaging::class.java)
+    internal val mockHostAppInfoRepo = Mockito.mock(HostAppInfoRepository::class.java)
 
     @Before
     override fun setup() {
@@ -72,7 +72,7 @@ class InAppMessageViewListenerOnClickSpec : InAppMessageViewListenerSpec() {
         val mockView = Mockito.mock(CheckBox::class.java)
         `when`(mockView.id).thenReturn(R.id.message_close_button)
         `when`(mockCoroutine.executeTask(message, R.id.message_close_button, false)).thenReturn(true)
-        `when`(mockInApp.getRegisteredActivity()).thenReturn(mockActivity)
+        `when`(mockHostAppInfoRepo.getRegisteredActivity()).thenReturn(mockActivity)
 
         listener.onClick(mockView)
     }
@@ -109,7 +109,7 @@ class InAppMessageViewListenerOnClickSpec : InAppMessageViewListenerSpec() {
         messageCoroutine = mockCoroutine,
         displayManager = mockDisplayManager,
         eventScheduler = mockEventScheduler,
-        inApp = mockInApp,
+        hostAppInfoRepo = mockHostAppInfoRepo,
     )
 }
 
@@ -434,13 +434,13 @@ class InAppMessageViewListenerOnKeySpec : InAppMessageViewListenerSpec() {
             messageCoroutine = mockCoroutine,
             displayManager = mockDisplayManager,
             eventScheduler = mockEventScheduler,
-            inApp = mockInApp,
+            hostAppInfoRepo = mockHostAppInfoRepo,
         )
 
         `when`(keyEvent.action).thenReturn(KeyEvent.ACTION_UP)
         `when`(mockView.id).thenReturn(R.id.message_close_button)
         `when`(mockCoroutine.executeTask(message, MessageActionsCoroutine.BACK_BUTTON, false)).thenReturn(false)
-        `when`(mockInApp.getRegisteredActivity()).thenReturn(mockActivity)
+        `when`(mockHostAppInfoRepo.getRegisteredActivity()).thenReturn(mockActivity)
 
         listener.onKey(mockView, KeyEvent.KEYCODE_BACK, keyEvent).shouldBeTrue()
 
@@ -481,6 +481,6 @@ class InAppMessageViewListenerHandleSpec : InAppMessageViewListenerSpec() {
         messageCoroutine = mockCoroutine,
         displayManager = mockDisplayManager,
         eventScheduler = mockEventScheduler,
-        inApp = mockInApp,
+        hostAppInfoRepo = mockHostAppInfoRepo,
     )
 }

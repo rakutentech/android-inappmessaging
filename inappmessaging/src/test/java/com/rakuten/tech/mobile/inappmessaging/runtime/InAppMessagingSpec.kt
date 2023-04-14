@@ -87,7 +87,6 @@ open class InAppMessagingSpec : BaseTest() {
         ConfigResponseRepository.instance().addConfigResponse(configResponseData)
 
         return InApp(
-            context = ApplicationProvider.getApplicationContext(),
             isDebugLogging = false,
             displayManager = displayManager,
             eventsManager = eventsManager,
@@ -120,9 +119,9 @@ class InAppMessagingBasicSpec : InAppMessagingSpec() {
         initializeInstance()
 
         InAppMessaging.instance().registerMessageDisplayActivity(activity)
-        InAppMessaging.instance().getRegisteredActivity() shouldBeEqualTo activity
+        HostAppInfoRepository.instance().getRegisteredActivity() shouldBeEqualTo activity
         InAppMessaging.instance().unregisterMessageDisplayActivity()
-        InAppMessaging.instance().getRegisteredActivity().shouldBeNull()
+        HostAppInfoRepository.instance().getRegisteredActivity().shouldBeNull()
     }
 
     @SuppressWarnings("SwallowedException")
@@ -525,18 +524,6 @@ class InAppMessagingUnInitSpec : InAppMessagingSpec() {
         InAppMessaging.instance().isLocalCachingEnabled().shouldBeFalse()
         InAppMessaging.instance().trackPushPrimer(arrayOf(""), intArrayOf(1))
         InAppMessaging.instance().onPushPrimer.shouldBeNull()
-    }
-
-    @Test
-    fun `should return null activity using uninitialized instance`() {
-        InAppMessaging.setNotConfiguredInstance()
-        InAppMessaging.instance().getRegisteredActivity().shouldBeNull()
-    }
-
-    @Test
-    fun `should return null context using uninitialized instance`() {
-        InAppMessaging.setNotConfiguredInstance()
-        InAppMessaging.instance().getHostAppContext() shouldBeEqualTo null
     }
 }
 

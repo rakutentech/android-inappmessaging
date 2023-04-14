@@ -1,5 +1,7 @@
 package com.rakuten.tech.mobile.inappmessaging.runtime.data.repositories
 
+import android.app.Activity
+import android.content.Context
 import androidx.annotation.VisibleForTesting
 import com.rakuten.tech.mobile.inappmessaging.runtime.data.models.HostAppInfo
 import com.rakuten.tech.mobile.inappmessaging.runtime.exception.InAppMessagingException
@@ -10,12 +12,17 @@ import com.rakuten.tech.mobile.inappmessaging.runtime.utils.InAppMessagingConsta
 import com.rakuten.tech.mobile.inappmessaging.runtime.utils.InAppMessagingConstants.Companion.PACKAGE_NAME_IS_EMPTY_EXCEPTION
 import com.rakuten.tech.mobile.inappmessaging.runtime.utils.InAppMessagingConstants.Companion.SUBSCRIPTION_KEY_IS_EMPTY_EXCEPTION
 import com.rakuten.tech.mobile.inappmessaging.runtime.utils.InAppMessagingConstants.Companion.VERSION_IS_EMPTY_EXCEPTION
+import java.lang.ref.WeakReference
 import java.util.Locale
 
 /**
  * Host app information repository which stores information such as host app version, package name,
  * subscription key, etc.
  */
+@SuppressWarnings(
+    "ComplexInterface",
+    "TooManyFunctions",
+)
 internal interface HostAppInfoRepository {
     /**
      * This method adds host information.
@@ -64,6 +71,28 @@ internal interface HostAppInfoRepository {
     @VisibleForTesting
     fun clearInfo()
 
+    /**
+     * Sets the current activity or screen for displaying campaigns, which is provided by host apps during
+     * InAppMessaging.registerMessageDisplayActivity.
+     * The activity is kept as a weak reference. When set to null, this reference is cleared.
+     */
+    fun registerActivity(activity: Activity?)
+
+    /**
+     * Returns the current activity or screen to display campaign.
+     */
+    fun getRegisteredActivity(): Activity?
+
+    /**
+     * Sets the application context, which is provided by host apps during InAppMessaging.configure.
+     */
+    fun setContext(context: Context)
+
+    /**
+     * Returns the context.
+     */
+    fun getContext(): Context?
+
     companion object {
         private const val TAG = "IAM_HostAppRepository"
         private var instance: HostAppInfoRepository = HostAppInfoRepositoryImpl()
@@ -74,6 +103,8 @@ internal interface HostAppInfoRepository {
     private class HostAppInfoRepositoryImpl : HostAppInfoRepository {
         @Volatile
         private var hostAppInfo: HostAppInfo? = null
+        private var context: Context? = null
+        private var activity: WeakReference<Activity>? = null
 
         @Throws(InAppMessagingException::class)
         override fun addHostInfo(hostAppInfo: HostAppInfo?) {
@@ -118,5 +149,21 @@ internal interface HostAppInfoRepository {
         override fun clearInfo() {
             hostAppInfo = null
         }
+
+        override fun registerActivity(activity: Activity?) {
+            if (activity == null) {
+                this.activity?.clear()
+                return
+            }
+            this.activity = WeakReference(activity)
+        }
+
+        override fun getRegisteredActivity() = this.activity?.get()
+
+        override fun setContext(context: Context) {
+            this.context = context
+        }
+
+        override fun getContext() = this.context
     }
 }

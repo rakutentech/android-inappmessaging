@@ -23,9 +23,9 @@ import com.google.android.material.imageview.ShapeableImageView
 import com.google.android.material.shape.CornerFamily
 import com.google.android.material.shape.MaterialShapeDrawable
 import com.google.android.material.shape.ShapeAppearanceModel
-import com.rakuten.tech.mobile.inappmessaging.runtime.InAppMessaging
 import com.rakuten.tech.mobile.inappmessaging.runtime.R
 import com.rakuten.tech.mobile.inappmessaging.runtime.data.enums.PositionType
+import com.rakuten.tech.mobile.inappmessaging.runtime.data.repositories.HostAppInfoRepository
 import com.rakuten.tech.mobile.inappmessaging.runtime.data.responses.ping.Message
 import com.rakuten.tech.mobile.inappmessaging.runtime.extensions.hide
 import com.rakuten.tech.mobile.inappmessaging.runtime.utils.InAppLogger
@@ -107,7 +107,7 @@ internal class InAppMessagingTooltipView(
 
     /** The anchor view of this tooltip. */
     private fun findAnchorView(): View? {
-        val activity = InAppMessaging.instance().getRegisteredActivity()
+        val activity = HostAppInfoRepository.instance().getRegisteredActivity()
         if (activity != null) {
             viewId?.let { return ResourceUtils.findViewByName(activity, it) }
         }
@@ -339,7 +339,7 @@ internal class InAppMessagingTooltipView(
 
     /** Sets the top-left position of this tooltip. */
     private fun setPosition() {
-        val activity = InAppMessaging.instance().getRegisteredActivity() ?: return
+        val activity = HostAppInfoRepository.instance().getRegisteredActivity() ?: return
         findAnchorView()?.let { anchorView ->
             val container = ViewUtil.getScrollView(anchorView) ?: activity.findViewById(android.R.id.content)
             val tPosition = ViewUtil.getTooltipPosition(
