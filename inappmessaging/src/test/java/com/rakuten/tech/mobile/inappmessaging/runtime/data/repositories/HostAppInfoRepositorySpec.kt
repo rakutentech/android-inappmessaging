@@ -13,11 +13,16 @@ import org.junit.After
 import org.junit.Assert
 import org.junit.Before
 import org.junit.Test
+import org.mockito.Mockito.mock
+import org.mockito.Mockito.`when`
 import java.util.Locale
 
 /**
  * Test class for HostAppInfoRepository class
  */
+@SuppressWarnings(
+    "LargeClass",
+)
 class HostAppInfoRepositorySpec : BaseTest() {
 
     private val testAppInfo = HostAppInfo(
@@ -72,31 +77,52 @@ class HostAppInfoRepositorySpec : BaseTest() {
         }
     }
 
-    @Test
-    fun `should throw exception for invalid package name`() {
-        val hostAppInfo = HostAppInfo(
-            version = InAppMessagingTestConstants.APP_VERSION,
+    @Test(expected = InAppMessagingException::class)
+    fun `should throw exception for empty package name`() {
+        HostAppInfoRepository.instance().addHostInfo(
+            HostAppInfo(
+                version = "test",
+                packageName = "",
+                subscriptionKey = "test",
+                deviceId = "test",
+            ),
         )
-        try {
-            HostAppInfoRepository.instance().addHostInfo(hostAppInfo)
-            Assert.fail()
-        } catch (e: InAppMessagingException) {
-            e.localizedMessage shouldBeEqualTo InAppMessagingConstants.PACKAGE_NAME_IS_EMPTY_EXCEPTION
-        }
     }
 
-    @Test
-    fun `should throw exception for invalid subscription key`() {
-        val hostAppInfo = HostAppInfo(
-            version = InAppMessagingTestConstants.APP_VERSION,
-            packageName = InAppMessagingTestConstants.APP_ID,
+    @Test(expected = InAppMessagingException::class)
+    fun `should throw exception for null package name`() {
+        HostAppInfoRepository.instance().addHostInfo(
+            HostAppInfo(
+                version = "test",
+                packageName = null,
+                subscriptionKey = "test",
+                deviceId = "test",
+            ),
         )
-        try {
-            HostAppInfoRepository.instance().addHostInfo(hostAppInfo)
-            Assert.fail()
-        } catch (e: InAppMessagingException) {
-            e.localizedMessage shouldBeEqualTo InAppMessagingConstants.SUBSCRIPTION_KEY_IS_EMPTY_EXCEPTION
-        }
+    }
+
+    @Test(expected = InAppMessagingException::class)
+    fun `should throw exception for empty subscription key`() {
+        HostAppInfoRepository.instance().addHostInfo(
+            HostAppInfo(
+                version = "test",
+                packageName = "test",
+                subscriptionKey = "",
+                deviceId = "test",
+            ),
+        )
+    }
+
+    @Test(expected = InAppMessagingException::class)
+    fun `should throw exception for null subscription key`() {
+        HostAppInfoRepository.instance().addHostInfo(
+            HostAppInfo(
+                version = "test",
+                packageName = "test",
+                subscriptionKey = null,
+                deviceId = "test",
+            ),
+        )
     }
 
     @Test
@@ -110,12 +136,25 @@ class HostAppInfoRepositorySpec : BaseTest() {
     }
 
     @Test
-    fun `should not throw exception for invalid device id`() {
+    fun `should not throw exception for empty device id`() {
         val hostAppInfo = HostAppInfo(
             version = InAppMessagingTestConstants.APP_VERSION,
             packageName = InAppMessagingTestConstants.APP_ID,
             subscriptionKey = InAppMessagingTestConstants.SUB_KEY,
             locale = InAppMessagingTestConstants.LOCALE,
+            deviceId = "",
+        )
+        HostAppInfoRepository.instance().addHostInfo(hostAppInfo)
+    }
+
+    @Test
+    fun `should not throw exception for null device id`() {
+        val hostAppInfo = HostAppInfo(
+            version = InAppMessagingTestConstants.APP_VERSION,
+            packageName = InAppMessagingTestConstants.APP_ID,
+            subscriptionKey = InAppMessagingTestConstants.SUB_KEY,
+            locale = InAppMessagingTestConstants.LOCALE,
+            deviceId = null,
         )
         HostAppInfoRepository.instance().addHostInfo(hostAppInfo)
     }
@@ -133,7 +172,28 @@ class HostAppInfoRepositorySpec : BaseTest() {
     }
 
     @Test
+    fun `should set subscription key to empty when set to null`() {
+        val mockHostInfo = mock(HostAppInfo::class.java)
+
+        `when`(mockHostInfo.version).thenReturn("test")
+        `when`(mockHostInfo.packageName).thenReturn("test")
+        `when`(mockHostInfo.subscriptionKey).thenReturn("test")
+        `when`(mockHostInfo.locale).thenReturn(Locale.ENGLISH)
+        `when`(mockHostInfo.deviceId).thenReturn("test")
+
+        HostAppInfoRepository.instance().addHostInfo(mockHostInfo)
+
+        `when`(mockHostInfo.subscriptionKey).thenReturn(null)
+        HostAppInfoRepository.instance().getSubscriptionKey().shouldBeEmpty()
+    }
+
+    @Test
     fun `should disable tooltip feature by default when not set`() {
+        HostAppInfoRepository.instance().isTooltipFeatureEnabled().shouldBeFalse()
+    }
+
+    @Test
+    fun `should disable tooltip feature by default when set to null`() {
         HostAppInfoRepository.instance().addHostInfo(testAppInfo.copy(isTooltipFeatureEnabled = null))
         HostAppInfoRepository.instance().isTooltipFeatureEnabled().shouldBeFalse()
     }
