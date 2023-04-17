@@ -140,6 +140,9 @@ internal class MessageActionsCoroutineSpec(
     }
 }
 
+@SuppressWarnings(
+    "LargeClass",
+)
 @RunWith(RobolectricTestRunner::class)
 class MessageActionsCoroutineFuncSpec : BaseTest() {
     private val action = MessageActionsCoroutine()
@@ -307,8 +310,8 @@ class MessageActionsCoroutineFuncSpec : BaseTest() {
             messagePayload = TestDataHelper.message0Payload.copy(
                 messageSettings = TestDataHelper.message0Payload.messageSettings.copy(
                     controlSettings = TestDataHelper.message0Payload.messageSettings.controlSettings.copy(
-                        content = null
-                    )
+                        content = null,
+                    ),
                 ),
             ),
         )
