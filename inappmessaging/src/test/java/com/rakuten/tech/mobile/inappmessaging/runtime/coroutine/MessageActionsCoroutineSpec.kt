@@ -140,6 +140,9 @@ internal class MessageActionsCoroutineSpec(
     }
 }
 
+@SuppressWarnings(
+    "LargeClass",
+)
 @RunWith(RobolectricTestRunner::class)
 class MessageActionsCoroutineFuncSpec : BaseTest() {
     private val action = MessageActionsCoroutine()
@@ -287,6 +290,60 @@ class MessageActionsCoroutineFuncSpec : BaseTest() {
 
         PushPrimerTrackerManager.campaignId shouldBeEqualTo "test"
         Mockito.verify(mockAct).requestPermissions(any(), any())
+    }
+
+    @Test
+    fun `should handle empty buttons`() {
+        val message = TestDataHelper.createDummyMessage(
+            messagePayload = TestDataHelper.message0Payload.copy(
+                messageSettings = TestDataHelper.message0Payload.messageSettings.copy(
+                    controlSettings = ControlSettings(buttons = listOf()),
+                ),
+            ),
+        )
+        action.executeTask(message, R.id.message_single_button, false).shouldBeTrue()
+    }
+
+    @Test
+    fun `should handle empty content`() {
+        val message = TestDataHelper.createDummyMessage(
+            messagePayload = TestDataHelper.message0Payload.copy(
+                messageSettings = TestDataHelper.message0Payload.messageSettings.copy(
+                    controlSettings = TestDataHelper.message0Payload.messageSettings.controlSettings.copy(
+                        content = null,
+                    ),
+                ),
+            ),
+        )
+        action.executeTask(message, R.id.slide_up, false).shouldBeTrue()
+    }
+
+    @SuppressWarnings("LongMethod")
+    @Test
+    fun `should handle invalid attribute type`() {
+        val message = TestDataHelper.createDummyMessage(
+            messagePayload = TestDataHelper.message0Payload.copy(
+                messageSettings = TestDataHelper.message0Payload.messageSettings.copy(
+                    controlSettings = TestDataHelper.message0Payload.messageSettings.controlSettings.copy(
+                        buttons = listOf(
+                            MessageButton(
+                                "", "", OnClickBehavior(4, ""),
+                                "",
+                                embeddedEvent = Trigger(
+                                    1, 4, "custom",
+                                    triggerAttributes = mutableListOf(
+                                        TriggerAttribute(
+                                            "attribute1", "attrValue1", 0, 0,
+                                        ),
+                                    ),
+                                ),
+                            ),
+                        ),
+                    ),
+                ),
+            ),
+        )
+        action.executeTask(message, R.id.message_single_button, false).shouldBeTrue()
     }
 
     private fun setupActivity(isTiramisu: Boolean = false): Activity {
