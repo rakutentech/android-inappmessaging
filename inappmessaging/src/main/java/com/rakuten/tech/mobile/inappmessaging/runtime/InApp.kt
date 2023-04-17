@@ -85,7 +85,6 @@ internal class InApp(
                 displayManager.removeMessage(hostAppInfoRepo.getRegisteredActivity(), removeAll = true)
             }
             hostAppInfoRepo.registerActivity(null)
-            // activityWeakReference?.clear()
         } catch (ex: Exception) {
             errorCallback?.let {
                 it(InAppMessagingException("In-App Messaging unregister activity failed", ex))
