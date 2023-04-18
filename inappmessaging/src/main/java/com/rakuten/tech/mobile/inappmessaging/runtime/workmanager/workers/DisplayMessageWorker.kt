@@ -10,7 +10,6 @@ import androidx.work.WorkerParameters
 import androidx.work.WorkManager
 import com.rakuten.tech.mobile.inappmessaging.runtime.InAppMessaging
 import com.rakuten.tech.mobile.inappmessaging.runtime.data.responses.ping.Message
-import com.rakuten.tech.mobile.inappmessaging.runtime.manager.DisplayManager
 import com.rakuten.tech.mobile.inappmessaging.runtime.utils.ImageUtil
 import com.rakuten.tech.mobile.inappmessaging.runtime.manager.MessageReadinessManager
 import com.rakuten.tech.mobile.inappmessaging.runtime.runnable.DisplayMessageRunnable
@@ -91,7 +90,7 @@ internal class DisplayMessageWorker(
             // Remove message in queue
             messageReadinessManager.removeMessageFromQueue(message.campaignId)
             // Prepare next message
-            if (newWorker) DisplayManager.instance().displayMessage() else prepareNextMessage()
+            if (newWorker) enqueueWork() else prepareNextMessage()
             return
         }
 
