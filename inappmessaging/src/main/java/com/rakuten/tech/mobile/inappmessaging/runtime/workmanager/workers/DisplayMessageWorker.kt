@@ -10,6 +10,7 @@ import androidx.work.WorkerParameters
 import androidx.work.WorkManager
 import com.rakuten.tech.mobile.inappmessaging.runtime.InAppMessaging
 import com.rakuten.tech.mobile.inappmessaging.runtime.data.responses.ping.Message
+import com.rakuten.tech.mobile.inappmessaging.runtime.manager.DisplayManager
 import com.rakuten.tech.mobile.inappmessaging.runtime.utils.ImageUtil
 import com.rakuten.tech.mobile.inappmessaging.runtime.manager.MessageReadinessManager
 import com.rakuten.tech.mobile.inappmessaging.runtime.runnable.DisplayMessageRunnable
@@ -70,7 +71,9 @@ internal class DisplayMessageWorker(
             imageUrl = imageUrl,
             callback = object : Callback {
                 override fun onSuccess() {
-                    displayMessage(message, hostActivity)
+                    // Picasso callbacks run on main thread
+                    // Prepare for next message off the main thread if this message is cancelled
+                    displayMessage(message, hostActivity, true)
                 }
 
                 override fun onError(e: Exception?) {
@@ -81,19 +84,18 @@ internal class DisplayMessageWorker(
         )
     }
 
-    /**
-     * This method displays message on UI thread.
-     */
-    private fun displayMessage(message: Message, hostActivity: Activity) {
+    private fun displayMessage(message: Message, hostActivity: Activity, newWorker: Boolean = false) {
         if (!verifyContexts(message)) {
             // Message display aborted by the host app
             InAppLogger(TAG).debug("message display cancelled by the host app")
-            // Remove message in queue and proceed to next message
+            // Remove message in queue
             messageReadinessManager.removeMessageFromQueue(message.campaignId)
-            prepareNextMessage()
+            // Prepare next message
+            if (newWorker) DisplayManager.instance().displayMessage() else prepareNextMessage()
             return
         }
 
+        // Display message on main thread
         handler.post(DisplayMessageRunnable(message, hostActivity))
     }
 
