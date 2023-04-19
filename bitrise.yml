@@ -40,6 +40,7 @@ workflows:
     steps:
     - script@1:
         title: Dependency Check
+        run_if: '{{enveq "RUN_DEPENDENCY_CHECK" "true"}}'
         inputs:
         - content: ./gradlew dependencyCheckAggregate
     - script@1:
