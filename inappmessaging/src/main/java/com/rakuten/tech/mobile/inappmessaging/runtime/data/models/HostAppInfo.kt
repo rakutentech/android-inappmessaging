@@ -1,5 +1,6 @@
 package com.rakuten.tech.mobile.inappmessaging.runtime.data.models
 
+import android.content.Context
 import java.util.Locale
 
 /**
@@ -13,4 +14,5 @@ internal data class HostAppInfo(
     internal val locale: Locale? = null,
     internal val configUrl: String? = null,
     internal val isTooltipFeatureEnabled: Boolean? = null,
+    internal val context: Context? = null,
 )

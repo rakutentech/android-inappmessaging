@@ -66,6 +66,11 @@ internal interface HostAppInfoRepository {
     fun isTooltipFeatureEnabled(): Boolean
 
     /**
+     * Returns the context which is provided by host apps during InAppMessaging.configure.
+     */
+    fun getContext(): Context?
+
+    /**
      * Clears host app info for testing.
      */
     @VisibleForTesting
@@ -83,16 +88,6 @@ internal interface HostAppInfoRepository {
      */
     fun getRegisteredActivity(): Activity?
 
-    /**
-     * Sets the application context, which is provided by host apps during InAppMessaging.configure.
-     */
-    fun setContext(context: Context)
-
-    /**
-     * Returns the context.
-     */
-    fun getContext(): Context?
-
     companion object {
         private const val TAG = "IAM_HostAppRepository"
         private var instance: HostAppInfoRepository = HostAppInfoRepositoryImpl()
@@ -103,7 +98,6 @@ internal interface HostAppInfoRepository {
     private class HostAppInfoRepositoryImpl : HostAppInfoRepository {
         @Volatile
         private var hostAppInfo: HostAppInfo? = null
-        private var context: Context? = null
         private var activity: WeakReference<Activity>? = null
 
         @Throws(InAppMessagingException::class)
@@ -146,6 +140,8 @@ internal interface HostAppInfoRepository {
 
         override fun isTooltipFeatureEnabled(): Boolean = hostAppInfo?.isTooltipFeatureEnabled == true
 
+        override fun getContext(): Context? = hostAppInfo?.context
+
         override fun clearInfo() {
             hostAppInfo = null
         }
@@ -159,11 +155,5 @@ internal interface HostAppInfoRepository {
         }
 
         override fun getRegisteredActivity() = this.activity?.get()
-
-        override fun setContext(context: Context) {
-            this.context = context
-        }
-
-        override fun getContext() = this.context
     }
 }

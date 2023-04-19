@@ -95,11 +95,10 @@ internal object Initializer {
         val hostAppInfo = HostAppInfo(
             packageName = getHostAppPackageName(context), deviceId = getDeviceId(context, sharedUtil),
             version = getHostAppVersion(context), subscriptionKey = subscriptionKey, locale = getLocale(context),
-            configUrl = configUrl, isTooltipFeatureEnabled = enableTooltipFeature,
+            configUrl = configUrl, isTooltipFeatureEnabled = enableTooltipFeature, context = context,
         )
 
         // Store hostAppInfo in repository.
-        HostAppInfoRepository.instance().setContext(context)
         HostAppInfoRepository.instance().addHostInfo(hostAppInfo)
 
         initializePicassoInstance(context)

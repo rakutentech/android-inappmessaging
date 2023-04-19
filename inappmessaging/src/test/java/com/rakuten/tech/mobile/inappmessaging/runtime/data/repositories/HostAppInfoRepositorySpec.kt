@@ -1,29 +1,33 @@
 package com.rakuten.tech.mobile.inappmessaging.runtime.data.repositories
 
+import android.app.Activity
+import androidx.test.core.app.ApplicationProvider
 import com.rakuten.tech.mobile.inappmessaging.runtime.BaseTest
 import com.rakuten.tech.mobile.inappmessaging.runtime.InAppMessagingTestConstants
 import com.rakuten.tech.mobile.inappmessaging.runtime.data.models.HostAppInfo
 import com.rakuten.tech.mobile.inappmessaging.runtime.exception.InAppMessagingException
 import com.rakuten.tech.mobile.inappmessaging.runtime.utils.InAppMessagingConstants
-import org.amshove.kluent.shouldBeEmpty
-import org.amshove.kluent.shouldBeEqualTo
-import org.amshove.kluent.shouldBeFalse
-import org.amshove.kluent.shouldBeTrue
+import org.amshove.kluent.*
 import org.junit.After
 import org.junit.Assert
 import org.junit.Before
 import org.junit.Test
+import org.junit.runner.RunWith
+import org.mockito.Mockito.mock
+import org.robolectric.RobolectricTestRunner
 import java.util.Locale
 
 /**
  * Test class for HostAppInfoRepository class
  */
+@RunWith(RobolectricTestRunner::class)
 class HostAppInfoRepositorySpec : BaseTest() {
 
     private val testAppInfo = HostAppInfo(
         InAppMessagingTestConstants.APP_ID, InAppMessagingTestConstants.DEVICE_ID,
         InAppMessagingTestConstants.APP_VERSION, InAppMessagingTestConstants.SUB_KEY,
         InAppMessagingTestConstants.LOCALE, isTooltipFeatureEnabled = true,
+        context = ApplicationProvider.getApplicationContext(),
     )
 
     @Before
@@ -49,6 +53,7 @@ class HostAppInfoRepositorySpec : BaseTest() {
         HostAppInfoRepository.instance()
             .getSubscriptionKey() shouldBeEqualTo InAppMessagingTestConstants.SUB_KEY
         HostAppInfoRepository.instance().getDeviceId() shouldBeEqualTo InAppMessagingTestConstants.DEVICE_ID
+        HostAppInfoRepository.instance().getContext() shouldBeEqualTo ApplicationProvider.getApplicationContext()
     }
 
     @Test
@@ -148,5 +153,19 @@ class HostAppInfoRepositorySpec : BaseTest() {
     fun `should enable tooltip feature`() {
         HostAppInfoRepository.instance().addHostInfo(testAppInfo.copy(isTooltipFeatureEnabled = true))
         HostAppInfoRepository.instance().isTooltipFeatureEnabled().shouldBeTrue()
+    }
+
+    @Test
+    fun `should return valid activity`() {
+        val activity = mock(Activity::class.java)
+
+        HostAppInfoRepository.instance().registerActivity(activity)
+        HostAppInfoRepository.instance().getRegisteredActivity().shouldBeEqualTo(activity)
+    }
+
+    @Test
+    fun `should return null activity`() {
+        HostAppInfoRepository.instance().registerActivity(null)
+        HostAppInfoRepository.instance().getRegisteredActivity().shouldBeNull()
     }
 }
