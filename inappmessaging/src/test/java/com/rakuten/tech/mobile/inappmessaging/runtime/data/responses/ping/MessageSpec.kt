@@ -194,4 +194,82 @@ class MessageSpec {
         )
         campaign.type.shouldBeEqualTo(InAppMessageType.TOOLTIP.typeId)
     }
+
+    @Test
+    fun `should correctly map message type`() {
+        val message = Message(
+            "",
+            0,
+            false,
+            false,
+            true,
+            0,
+            true,
+            null,
+            TestDataHelper.message0Payload,
+        )
+        message.type shouldBe 0
+        message.type = 1
+        message.type shouldBe 1
+    }
+
+    @Test
+    fun `should map messagePayload defaults`() {
+        val messagePayload = MessagePayload(
+            "",
+            "",
+            TestDataHelper.message0Payload.messageSettings,
+            resource = TestDataHelper.message0Payload.resource,
+            titleColor = "",
+            frameColor = "",
+            title = "",
+            messageBodyColor = "",
+        )
+        messagePayload.messageBody shouldBe null
+        messagePayload.header shouldBe null
+    }
+
+    @Test
+    fun `should map messageButton defaults`() {
+        val messageButton = MessageButton(
+            "",
+            "",
+            OnClickBehavior(action = 0),
+            "",
+        )
+        messageButton.embeddedEvent shouldBe null
+    }
+
+    @Test
+    fun `should map content defaults`() {
+        val content = Content(
+            OnClickBehavior(action = 0),
+        )
+        content.embeddedEvent shouldBe null
+    }
+
+    @Test
+    fun `should map resource defauls`() {
+        val res = Resource(cropType = 0)
+        res.imageUrl shouldBe null
+        res.assetsUrl shouldBe null
+        res.cropType shouldBe 0
+    }
+
+    @Test
+    fun `should map displaySettings defaults`() {
+        val settings = DisplaySettings(
+            0,
+            0,
+            0,
+            0,
+            false,
+            0,
+            false,
+        )
+        settings.orientation shouldBe 0
+        settings.textAlign shouldBe 0
+        settings.delay shouldBe 0
+        settings.isHtml shouldBe false
+    }
 }
