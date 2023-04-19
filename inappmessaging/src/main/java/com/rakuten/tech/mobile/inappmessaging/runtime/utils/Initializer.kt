@@ -102,8 +102,6 @@ internal object Initializer {
         HostAppInfoRepository.instance().addHostInfo(hostAppInfo)
 
         initializePicassoInstance(context)
-
-        InAppLogger(TAG).debug(Gson().toJson(hostAppInfo))
     }
 
     /**
