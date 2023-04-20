@@ -182,8 +182,10 @@ internal class InAppMessagingTooltipView(
     @SuppressWarnings("MagicNumber", "ComplexMethod")
     private fun drawTip() {
         val tip = findViewById<ImageView>(R.id.message_tip)
-        tip.layoutParams.height = TRI_SIZE
-        tip.layoutParams.width = TRI_SIZE
+        tip.layoutParams.apply {
+            height = TRI_SIZE
+            width = TRI_SIZE
+        }
 
         var adjustedWidth = TRI_SIZE
         var adjustedHeight = TRI_SIZE
@@ -195,16 +197,25 @@ internal class InAppMessagingTooltipView(
         tip.setOnClickListener(this.listener)
         close.setOnClickListener(this.listener)
         imageView.setOnClickListener(this.listener)
+        val tipLayoutParams = tip.layoutParams as LayoutParams
+        val tipMarginParams = tip.layoutParams as MarginLayoutParams
+        val closeLayoutParams = (close.layoutParams as LayoutParams)
         val ptArray = when (type) {
             PositionType.TOP_RIGHT -> {
                 adjustedHeight = PADDING
                 adjustedWidth = PADDING
-                tip.layoutParams.height = PADDING
-                tip.layoutParams.width = PADDING
-                (tip.layoutParams as LayoutParams).addRule(ALIGN_START, R.id.message_tooltip_image_view)
-                (tip.layoutParams as LayoutParams).addRule(ALIGN_BOTTOM, R.id.message_tooltip_image_view)
-                (tip.layoutParams as MarginLayoutParams).leftMargin = -PADDING / 2
-                (tip.layoutParams as MarginLayoutParams).bottomMargin = -PADDING / 2
+                tip.layoutParams.apply {
+                    height = PADDING
+                    width = PADDING
+                }
+                tipLayoutParams.apply {
+                    addRule(ALIGN_START, R.id.message_tooltip_image_view)
+                    addRule(ALIGN_BOTTOM, R.id.message_tooltip_image_view)
+                }
+                tipMarginParams.apply {
+                    leftMargin = -PADDING / 2
+                    bottomMargin = -PADDING / 2
+                }
                 arrayOf(
                     Point(PADDING * 2 / 3, 0),
                     Point(0, PADDING),
@@ -212,11 +223,12 @@ internal class InAppMessagingTooltipView(
                 )
             }
             PositionType.TOP_CENTER -> {
-                (tip.layoutParams as LayoutParams).addRule(ALIGN_START, R.id.message_tooltip_image_view)
-                (tip.layoutParams as LayoutParams).addRule(ALIGN_END, R.id.message_tooltip_image_view)
-                (tip.layoutParams as LayoutParams).addRule(CENTER_HORIZONTAL)
-                (tip.layoutParams as LayoutParams).addRule(BELOW, R.id.message_tooltip_image_view)
-
+                tipLayoutParams.apply {
+                    addRule(ALIGN_START, R.id.message_tooltip_image_view)
+                    addRule(ALIGN_END, R.id.message_tooltip_image_view)
+                    addRule(CENTER_HORIZONTAL)
+                    addRule(BELOW, R.id.message_tooltip_image_view)
+                }
                 arrayOf(
                     Point(0, 0),
                     Point(TRI_SIZE / 2, TRI_SIZE),
@@ -225,9 +237,11 @@ internal class InAppMessagingTooltipView(
             }
             PositionType.TOP_LEFT -> {
                 alignLeft(close, tip)
-                (tip.layoutParams as LayoutParams).addRule(ALIGN_BOTTOM, R.id.message_tooltip_image_view)
-                (tip.layoutParams as MarginLayoutParams).rightMargin = -PADDING / 2
-                (tip.layoutParams as MarginLayoutParams).bottomMargin = -PADDING / 2
+                tipLayoutParams.apply {
+                    addRule(ALIGN_BOTTOM, R.id.message_tooltip_image_view)
+                    rightMargin = -PADDING / 2
+                    bottomMargin = -PADDING / 2
+                }
                 adjustedHeight = PADDING
                 adjustedWidth = PADDING
                 arrayOf(
@@ -239,11 +253,15 @@ internal class InAppMessagingTooltipView(
             PositionType.BOTTOM_RIGHT -> {
                 adjustedHeight = PADDING
                 adjustedWidth = PADDING
-                tip.layoutParams.height = PADDING
-                tip.layoutParams.width = PADDING
-                (tip.layoutParams as LayoutParams).addRule(ALIGN_TOP, R.id.message_tooltip_image_view)
-                (tip.layoutParams as MarginLayoutParams).leftMargin = -PADDING / 2
-                (tip.layoutParams as MarginLayoutParams).topMargin = -PADDING / 2
+                tip.layoutParams.apply {
+                    height = PADDING
+                    width = PADDING
+                }
+                tipLayoutParams.apply {
+                    addRule(ALIGN_TOP, R.id.message_tooltip_image_view)
+                    leftMargin = -PADDING / 2
+                    topMargin = -PADDING / 2
+                }
                 arrayOf(
                     Point(PADDING * 2 / 3, PADDING),
                     Point(0, 0),
@@ -252,10 +270,12 @@ internal class InAppMessagingTooltipView(
             }
             PositionType.BOTTOM_CENTER -> {
                 (findViewById<RelativeLayout>(R.id.image_layout).layoutParams as LayoutParams).removeRule(BELOW)
-                (close.layoutParams as LayoutParams).addRule(BELOW, R.id.image_layout)
-                (tip.layoutParams as LayoutParams).addRule(ALIGN_START, R.id.message_tooltip_image_view)
-                (tip.layoutParams as LayoutParams).addRule(ALIGN_END, R.id.message_tooltip_image_view)
-                (tip.layoutParams as LayoutParams).addRule(CENTER_HORIZONTAL)
+                closeLayoutParams.addRule(BELOW, R.id.image_layout)
+                tipLayoutParams.apply {
+                    addRule(ALIGN_START, R.id.message_tooltip_image_view)
+                    addRule(ALIGN_END, R.id.message_tooltip_image_view)
+                    addRule(CENTER_HORIZONTAL)
+                }
                 (imageView.layoutParams as LayoutParams).addRule(BELOW, R.id.message_tip)
                 arrayOf(
                     Point(0, TRI_SIZE),
@@ -267,9 +287,11 @@ internal class InAppMessagingTooltipView(
                 alignLeft(close, tip)
                 adjustedHeight = PADDING
                 adjustedWidth = PADDING
-                (tip.layoutParams as LayoutParams).addRule(ALIGN_TOP, R.id.message_tooltip_image_view)
-                (tip.layoutParams as MarginLayoutParams).rightMargin = -PADDING / 2
-                (tip.layoutParams as MarginLayoutParams).topMargin = -PADDING / 2
+                tipLayoutParams.addRule(ALIGN_TOP, R.id.message_tooltip_image_view)
+                tipMarginParams.apply {
+                    rightMargin = -PADDING / 2
+                    topMargin = -PADDING / 2
+                }
                 arrayOf(
                     Point(0, PADDING * 2 / 3),
                     Point(PADDING, 0),
@@ -277,7 +299,7 @@ internal class InAppMessagingTooltipView(
                 )
             }
             PositionType.RIGHT -> {
-                (tip.layoutParams as LayoutParams).addRule(CENTER_VERTICAL)
+                tipLayoutParams.addRule(CENTER_VERTICAL)
                 (imageView.layoutParams as LayoutParams).addRule(RIGHT_OF, R.id.message_tip)
                 arrayOf(
                     Point(TRI_SIZE, 0),
@@ -286,13 +308,17 @@ internal class InAppMessagingTooltipView(
                 )
             }
             PositionType.LEFT -> {
-                (close.layoutParams as LayoutParams).removeRule(END_OF)
-                (close.layoutParams as LayoutParams).removeRule(ABOVE)
-                (close.layoutParams as LayoutParams).removeRule(RIGHT_OF)
+                closeLayoutParams.apply {
+                    removeRule(END_OF)
+                    removeRule(ABOVE)
+                    removeRule(RIGHT_OF)
+                }
                 (findViewById<RelativeLayout>(R.id.image_layout).layoutParams as LayoutParams)
                     .addRule(END_OF, R.id.message_close_button)
-                (tip.layoutParams as LayoutParams).addRule(CENTER_VERTICAL)
-                (tip.layoutParams as LayoutParams).addRule(RIGHT_OF, R.id.message_tooltip_image_view)
+                tipLayoutParams.apply {
+                    addRule(CENTER_VERTICAL)
+                    addRule(RIGHT_OF, R.id.message_tooltip_image_view)
+                }
                 arrayOf(
                     Point(0, 0),
                     Point(TRI_SIZE, TRI_SIZE / 2),
@@ -320,20 +346,25 @@ internal class InAppMessagingTooltipView(
         tip.setImageBitmap(bg)
 
         // so that the arrow head of tooltip positioned at anchor's edge not be clipped
-        (parent as? ViewGroup)?.clipChildren = false
-        (parent as? ViewGroup)?.clipToPadding = false
+        val parentVG = parent as? ViewGroup
+        parentVG?.clipChildren = false
+        parentVG?.clipToPadding = false
     }
 
     private fun alignLeft(close: ImageButton, tip: ImageView) {
-        (close.layoutParams as LayoutParams).removeRule(END_OF)
-        (close.layoutParams as LayoutParams).removeRule(ABOVE)
-        (close.layoutParams as LayoutParams).removeRule(RIGHT_OF)
+        (close.layoutParams as LayoutParams).apply {
+            removeRule(END_OF)
+            removeRule(ABOVE)
+            removeRule(RIGHT_OF)
+        }
         (findViewById<RelativeLayout>(R.id.image_layout).layoutParams as LayoutParams).addRule(
             END_OF,
             R.id.message_close_button,
         )
-        tip.layoutParams.height = PADDING
-        tip.layoutParams.width = PADDING
+        tip.layoutParams.apply {
+            height = PADDING
+            width = PADDING
+        }
         (tip.layoutParams as LayoutParams).addRule(ALIGN_END, R.id.message_tooltip_image_view)
     }
 
