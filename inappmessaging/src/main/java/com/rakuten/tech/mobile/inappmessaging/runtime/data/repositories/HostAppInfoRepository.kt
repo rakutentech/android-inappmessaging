@@ -4,12 +4,12 @@ import androidx.annotation.VisibleForTesting
 import com.rakuten.tech.mobile.inappmessaging.runtime.data.models.HostAppInfo
 import com.rakuten.tech.mobile.inappmessaging.runtime.exception.InAppMessagingException
 import com.rakuten.tech.mobile.inappmessaging.runtime.utils.InAppLogger
-import com.rakuten.tech.mobile.inappmessaging.runtime.utils.InAppMessagingConstants.Companion.ARGUMENT_IS_NULL_EXCEPTION
-import com.rakuten.tech.mobile.inappmessaging.runtime.utils.InAppMessagingConstants.Companion.DEVICE_ID_IS_EMPTY_EXCEPTION
-import com.rakuten.tech.mobile.inappmessaging.runtime.utils.InAppMessagingConstants.Companion.LOCALE_IS_EMPTY_EXCEPTION
-import com.rakuten.tech.mobile.inappmessaging.runtime.utils.InAppMessagingConstants.Companion.PACKAGE_NAME_IS_EMPTY_EXCEPTION
-import com.rakuten.tech.mobile.inappmessaging.runtime.utils.InAppMessagingConstants.Companion.SUBSCRIPTION_KEY_IS_EMPTY_EXCEPTION
-import com.rakuten.tech.mobile.inappmessaging.runtime.utils.InAppMessagingConstants.Companion.VERSION_IS_EMPTY_EXCEPTION
+import com.rakuten.tech.mobile.inappmessaging.runtime.utils.InAppMessagingConstants.ARGUMENT_IS_NULL_EXCEPTION
+import com.rakuten.tech.mobile.inappmessaging.runtime.utils.InAppMessagingConstants.DEVICE_ID_IS_EMPTY_EXCEPTION
+import com.rakuten.tech.mobile.inappmessaging.runtime.utils.InAppMessagingConstants.LOCALE_IS_EMPTY_EXCEPTION
+import com.rakuten.tech.mobile.inappmessaging.runtime.utils.InAppMessagingConstants.PACKAGE_NAME_IS_EMPTY_EXCEPTION
+import com.rakuten.tech.mobile.inappmessaging.runtime.utils.InAppMessagingConstants.SUBSCRIPTION_KEY_IS_EMPTY_EXCEPTION
+import com.rakuten.tech.mobile.inappmessaging.runtime.utils.InAppMessagingConstants.VERSION_IS_EMPTY_EXCEPTION
 import java.util.Locale
 
 /**
