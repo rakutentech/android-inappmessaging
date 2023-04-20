@@ -55,7 +55,10 @@ class MessageEventReconciliationWorkerSpec : BaseTest() {
             ApplicationProvider.getApplicationContext(),
             workerParameters,
             EventMatchingUtil.instance(),
-            MessageEventReconciliationUtil.instance(),
+            MessageEventReconciliationUtil(
+                campaignRepo = CampaignRepository.instance(),
+                eventMatchingUtil = EventMatchingUtil.instance(),
+            ),
             MessageReadinessManager.instance(),
         )
         CampaignRepository.instance().syncWith(listOf(message, notTestMessage), 0)

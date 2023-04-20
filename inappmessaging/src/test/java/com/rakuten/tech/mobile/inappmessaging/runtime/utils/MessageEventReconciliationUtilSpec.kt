@@ -2,59 +2,33 @@ package com.rakuten.tech.mobile.inappmessaging.runtime.utils
 
 import com.rakuten.tech.mobile.inappmessaging.runtime.BaseTest
 import com.rakuten.tech.mobile.inappmessaging.runtime.data.enums.EventType
-import com.rakuten.tech.mobile.inappmessaging.runtime.data.enums.InAppMessageType
 import com.rakuten.tech.mobile.inappmessaging.runtime.data.enums.SlideFromDirectionType
 import com.rakuten.tech.mobile.inappmessaging.runtime.data.models.appevents.AppStartEvent
 import com.rakuten.tech.mobile.inappmessaging.runtime.data.models.appevents.Event
 import com.rakuten.tech.mobile.inappmessaging.runtime.data.models.appevents.LoginSuccessfulEvent
+import com.rakuten.tech.mobile.inappmessaging.runtime.data.models.appevents.PurchaseSuccessfulEvent
 import com.rakuten.tech.mobile.inappmessaging.runtime.data.repositories.CampaignRepository
 import com.rakuten.tech.mobile.inappmessaging.runtime.data.responses.ping.*
 import com.rakuten.tech.mobile.inappmessaging.runtime.testhelpers.TestDataHelper
 import org.amshove.kluent.*
 import org.junit.Before
-import org.junit.Ignore
 import org.junit.Test
 import org.junit.runner.RunWith
+import org.mockito.Mockito.*
 import org.robolectric.RobolectricTestRunner
 
 /**
  * Test class for MessageEventReconciliationUtil.
  */
+@SuppressWarnings(
+    "LargeClass",
+)
 @RunWith(RobolectricTestRunner::class)
-@Ignore("base class")
-open class MessageEventReconciliationUtilSpec : BaseTest() {
-    internal val outdatedTestMessage = Message(
-        messagePayload = MessagePayload(
-            title = "testTitle",
-            messageBody = "testBody",
-            header = "testHeader",
-            titleColor = "#000000",
-            headerColor = "#444444",
-            messageBodyColor = "#FAFAFA",
-            backgroundColor = "#FAFAFA",
-            frameColor = "#FF2222",
-            resource = Resource(cropType = 0),
-            messageSettings = MessageSettings(
-                displaySettings = DisplaySettings(
-                    orientation = 0,
-                    slideFrom = SlideFromDirectionType.BOTTOM.typeId,
-                    endTimeMillis = 0,
-                    textAlign = 0,
-                    isOptedOut = false,
-                    isHtml = false,
-                    delay = 0,
-                ),
-                controlSettings = ControlSettings(listOf()),
-            ),
-        ),
-        type = InAppMessageType.MODAL.typeId,
-        triggers = listOf(Trigger(0, EventType.LOGIN_SUCCESSFUL.typeId, "testEvent", mutableListOf())),
-        campaignId = "test",
-        isTest = true,
-        maxImpressions = 1,
-        hasNoEndDate = false,
-        isCampaignDismissable = true,
-        areImpressionsInfinite = false,
+class MessageEventReconciliationUtilSpec : BaseTest() {
+
+    private val messageEventReconciliationUtil = MessageEventReconciliationUtil(
+        campaignRepo = CampaignRepository.instance(),
+        eventMatchingUtil = EventMatchingUtil.instance(),
     )
 
     @Before
@@ -62,31 +36,30 @@ open class MessageEventReconciliationUtilSpec : BaseTest() {
         CampaignRepository.instance().clearMessages()
         EventMatchingUtil.instance().clearNonPersistentEvents()
     }
-}
 
-internal class ValidatorHandler {
-    data class Element(
-        val campaign: Message,
-        val events: Set<Event>,
+    @SuppressWarnings(
+        "LongMethod",
     )
-    var validatedElements = mutableListOf<Element>()
-    val validatedCampaigns: List<Message>
-        get() = this.validatedElements.map { it.campaign }
-
-    var closure: (Message, Set<Event>) -> Unit = { campaign: Message, events: Set<Event> ->
-        this.validatedElements.add(Element(campaign, events))
-    }
-}
-
-class MessageEventReconciliationUtilCampaignsSpec : MessageEventReconciliationUtilSpec() {
-
     @Test
     fun `should accept outdated test campaign`() {
+        val outdatedTestMessage = TestDataHelper.createDummyMessage(
+            isTest = true,
+            messagePayload = TestDataHelper.message0Payload.copy(
+                messageSettings = MessageSettings(
+                    displaySettings = DisplaySettings(
+                        orientation = 0, slideFrom = SlideFromDirectionType.BOTTOM.typeId,
+                        endTimeMillis = 0, textAlign = 0, isOptedOut = false, isHtml = false, delay = 0,
+                    ),
+                    controlSettings = ControlSettings(listOf()),
+                ),
+            ),
+            triggers = listOf(Trigger(0, EventType.LOGIN_SUCCESSFUL.typeId, "testEvent", mutableListOf())),
+        )
         CampaignRepository.instance().syncWith(listOf(outdatedTestMessage), 0)
         val event = LoginSuccessfulEvent()
         EventMatchingUtil.instance().matchAndStore(event)
         val handler = ValidatorHandler()
-        MessageEventReconciliationUtil.instance().validate(handler.closure)
+        messageEventReconciliationUtil.validate(handler.closure)
 
         handler.validatedElements.shouldBeEqualTo(
             listOf(
@@ -101,7 +74,7 @@ class MessageEventReconciliationUtilCampaignsSpec : MessageEventReconciliationUt
         CampaignRepository.instance().syncWith(listOf(message), 0)
         CampaignRepository.instance().decrementImpressions(message.campaignId)
         val handler = ValidatorHandler()
-        MessageEventReconciliationUtil.instance().validate(handler.closure)
+        messageEventReconciliationUtil.validate(handler.closure)
 
         handler.validatedElements.shouldBeEmpty()
     }
@@ -118,7 +91,7 @@ class MessageEventReconciliationUtilCampaignsSpec : MessageEventReconciliationUt
         val event = LoginSuccessfulEvent()
         EventMatchingUtil.instance().matchAndStore(event)
         val handler = ValidatorHandler()
-        MessageEventReconciliationUtil.instance().validate(handler.closure)
+        messageEventReconciliationUtil.validate(handler.closure)
 
         handler.validatedElements.shouldBeEqualTo(
             listOf(
@@ -139,7 +112,7 @@ class MessageEventReconciliationUtilCampaignsSpec : MessageEventReconciliationUt
         val event = LoginSuccessfulEvent()
         EventMatchingUtil.instance().matchAndStore(event)
         val handler = ValidatorHandler()
-        MessageEventReconciliationUtil.instance().validate(handler.closure)
+        messageEventReconciliationUtil.validate(handler.closure)
 
         handler.validatedElements.shouldBeEmpty()
     }
@@ -156,13 +129,11 @@ class MessageEventReconciliationUtilCampaignsSpec : MessageEventReconciliationUt
         EventMatchingUtil.instance().matchAndStore(LoginSuccessfulEvent())
         CampaignRepository.instance().optOutCampaign(campaign)
         val handler = ValidatorHandler()
-        MessageEventReconciliationUtil.instance().validate(handler.closure)
+        messageEventReconciliationUtil.validate(handler.closure)
 
         handler.validatedCampaigns.shouldNotContain(campaign)
     }
-}
 
-class MessageEventReconciliationUtilTriggerSpec : MessageEventReconciliationUtilSpec() {
     @Test
     fun `should accept normal campaign when triggers are satisfied`() {
         val campaign = TestDataHelper.createDummyMessage(
@@ -178,7 +149,7 @@ class MessageEventReconciliationUtilTriggerSpec : MessageEventReconciliationUtil
         EventMatchingUtil.instance().matchAndStore(LoginSuccessfulEvent())
         EventMatchingUtil.instance().matchAndStore(AppStartEvent())
         val handler = ValidatorHandler()
-        MessageEventReconciliationUtil.instance().validate(handler.closure)
+        messageEventReconciliationUtil.validate(handler.closure)
 
         handler.validatedCampaigns.shouldContain(campaign)
     }
@@ -198,7 +169,7 @@ class MessageEventReconciliationUtilTriggerSpec : MessageEventReconciliationUtil
         EventMatchingUtil.instance().matchAndStore(LoginSuccessfulEvent())
         EventMatchingUtil.instance().matchAndStore(AppStartEvent())
         val handler = ValidatorHandler()
-        MessageEventReconciliationUtil.instance().validate(handler.closure)
+        messageEventReconciliationUtil.validate(handler.closure)
 
         handler.validatedCampaigns.shouldContain(campaign)
     }
@@ -214,7 +185,7 @@ class MessageEventReconciliationUtilTriggerSpec : MessageEventReconciliationUtil
         CampaignRepository.instance().syncWith(listOf(campaign), 0)
         EventMatchingUtil.instance().matchAndStore(LoginSuccessfulEvent())
         val handler = ValidatorHandler()
-        MessageEventReconciliationUtil.instance().validate(handler.closure)
+        messageEventReconciliationUtil.validate(handler.closure)
 
         handler.validatedCampaigns.shouldNotContain(campaign)
     }
@@ -230,7 +201,7 @@ class MessageEventReconciliationUtilTriggerSpec : MessageEventReconciliationUtil
         CampaignRepository.instance().syncWith(listOf(campaign), 0)
         EventMatchingUtil.instance().matchAndStore(LoginSuccessfulEvent())
         val handler = ValidatorHandler()
-        MessageEventReconciliationUtil.instance().validate(handler.closure)
+        messageEventReconciliationUtil.validate(handler.closure)
 
         handler.validatedCampaigns.shouldNotContain(campaign)
     }
@@ -249,8 +220,58 @@ class MessageEventReconciliationUtilTriggerSpec : MessageEventReconciliationUtil
         CampaignRepository.instance().syncWith(listOf(campaign), 0)
         EventMatchingUtil.instance().matchAndStore(LoginSuccessfulEvent())
         val handler = ValidatorHandler()
-        MessageEventReconciliationUtil.instance().validate(handler.closure)
+        messageEventReconciliationUtil.validate(handler.closure)
 
         handler.validatedCampaigns.shouldNotContain(campaign)
+    }
+
+    @Test
+    fun `should return empty when logged events is empty`() {
+        val message = TestDataHelper.createDummyMessage()
+        val mockEventMatchingUtil = mock(EventMatchingUtil::class.java)
+        `when`(mockEventMatchingUtil.containsAllMatchedEvents(message)).thenReturn(true)
+        `when`(mockEventMatchingUtil.matchedEvents(message)).thenReturn(listOf())
+
+        CampaignRepository.instance().syncWith(listOf(message), 0)
+
+        val util = MessageEventReconciliationUtil(
+            campaignRepo = CampaignRepository.instance(),
+            eventMatchingUtil = mockEventMatchingUtil,
+        )
+        val handler = ValidatorHandler()
+        util.validate(handler.closure)
+        handler.validatedCampaigns.shouldBeEmpty()
+    }
+
+    @Test
+    fun `should return empty when no event is found for trigger`() {
+        val message = TestDataHelper.createDummyMessage()
+        val mockEventMatchingUtil = mock(EventMatchingUtil::class.java)
+        `when`(mockEventMatchingUtil.containsAllMatchedEvents(message)).thenReturn(true)
+        `when`(mockEventMatchingUtil.matchedEvents(message)).thenReturn(listOf(PurchaseSuccessfulEvent()))
+
+        CampaignRepository.instance().syncWith(listOf(message), 0)
+
+        val util = MessageEventReconciliationUtil(
+            campaignRepo = CampaignRepository.instance(),
+            eventMatchingUtil = mockEventMatchingUtil,
+        )
+        val handler = ValidatorHandler()
+        util.validate(handler.closure)
+        handler.validatedCampaigns.shouldBeEmpty()
+    }
+}
+
+internal class ValidatorHandler {
+    data class Element(
+        val campaign: Message,
+        val events: Set<Event>,
+    )
+    var validatedElements = mutableListOf<Element>()
+    val validatedCampaigns: List<Message>
+        get() = this.validatedElements.map { it.campaign }
+
+    var closure: (Message, Set<Event>) -> Unit = { campaign: Message, events: Set<Event> ->
+        this.validatedElements.add(Element(campaign, events))
     }
 }
