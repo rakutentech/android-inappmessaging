@@ -183,7 +183,7 @@ internal class MessageMixerWorker(
     }
 
     @VisibleForTesting
-    internal fun getSupportedCampaign(checker: BuildVersionChecker = BuildVersionChecker.instance()): ArrayList<Int> {
+    internal fun getSupportedCampaign(checker: BuildVersionChecker = BuildVersionChecker): ArrayList<Int> {
         val list = arrayListOf(CampaignType.REGULAR.typeId)
         if (checker.isAndroidTAndAbove()) {
             list.add(CampaignType.PUSH_PRIMER.typeId)

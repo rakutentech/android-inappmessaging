@@ -167,7 +167,7 @@ internal class MessageActionsCoroutine(
         }
     }
 
-    internal fun handlePushPrimer(campaignId: String, checker: BuildVersionChecker = BuildVersionChecker.instance()) {
+    internal fun handlePushPrimer(campaignId: String, checker: BuildVersionChecker = BuildVersionChecker) {
         InAppMessaging.instance().onPushPrimer.let { callback ->
             if (callback != null) {
                 PushPrimerTrackerManager.campaignId = campaignId

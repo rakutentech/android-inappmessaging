@@ -5,22 +5,9 @@ import android.os.Build
 /**
  * Class for checking build version.
  */
-internal interface BuildVersionChecker {
-    fun isNougatAndAbove(): Boolean
-    fun isAndroidQAndAbove(): Boolean
-    fun isAndroidOAndAbove(): Boolean
-    fun isAndroidTAndAbove(): Boolean
-
-    companion object {
-        private var instance: BuildVersionChecker = BuildVersionCheckerImpl()
-
-        fun instance() = instance
-    }
-
-    private class BuildVersionCheckerImpl : BuildVersionChecker {
-        override fun isNougatAndAbove() = Build.VERSION.SDK_INT >= Build.VERSION_CODES.N
-        override fun isAndroidQAndAbove() = Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q
-        override fun isAndroidOAndAbove() = Build.VERSION.SDK_INT >= Build.VERSION_CODES.O
-        override fun isAndroidTAndAbove() = Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU
-    }
+internal object BuildVersionChecker {
+    fun isNougatAndAbove() = Build.VERSION.SDK_INT >= Build.VERSION_CODES.N
+    fun isAndroidQAndAbove() = Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q
+    fun isAndroidOAndAbove() = Build.VERSION.SDK_INT >= Build.VERSION_CODES.O
+    fun isAndroidTAndAbove() = Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU
 }

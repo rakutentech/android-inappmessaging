@@ -352,7 +352,7 @@ internal open class InAppMessageBaseView(context: Context, attrs: AttributeSet?)
 
     @SuppressLint("InlinedApi")
     private fun getHyphenationFreq(): Int {
-        return if (BuildVersionChecker.instance().isAndroidTAndAbove()) {
+        return if (BuildVersionChecker.isAndroidTAndAbove()) {
             Layout.HYPHENATION_FREQUENCY_FULL_FAST
         } else {
             Layout.HYPHENATION_FREQUENCY_FULL

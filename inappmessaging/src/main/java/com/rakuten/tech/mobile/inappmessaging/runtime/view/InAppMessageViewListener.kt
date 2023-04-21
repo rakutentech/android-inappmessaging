@@ -29,7 +29,7 @@ internal class InAppMessageViewListener(
     val message: Message,
     private val messageCoroutine: MessageActionsCoroutine = MessageActionsCoroutine(),
     private val displayManager: DisplayManager = DisplayManager.instance(),
-    private val buildChecker: BuildVersionChecker = BuildVersionChecker.instance(),
+    private val buildChecker: BuildVersionChecker = BuildVersionChecker,
     private val eventScheduler: EventMessageReconciliationScheduler = EventMessageReconciliationScheduler.instance(),
     private val inApp: InAppMessaging = InAppMessaging.instance(),
 ) :

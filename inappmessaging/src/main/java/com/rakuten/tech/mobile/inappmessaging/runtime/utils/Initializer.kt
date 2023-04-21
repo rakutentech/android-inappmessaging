@@ -51,7 +51,7 @@ internal object Initializer {
      */
     @SuppressWarnings("Deprecation", "kotlin:S1874")
     @TargetApi(Build.VERSION_CODES.N)
-    private fun getLocale(context: Context): Locale? = if (BuildVersionChecker.instance().isNougatAndAbove()) {
+    private fun getLocale(context: Context): Locale? = if (BuildVersionChecker.isNougatAndAbove()) {
         context.resources.configuration.locales[0]
     } else {
         context.resources.configuration.locale
