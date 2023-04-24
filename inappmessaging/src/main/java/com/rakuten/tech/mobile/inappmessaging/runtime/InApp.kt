@@ -145,7 +145,7 @@ internal class InApp(
 
     override fun trackPushPrimer(permissions: Array<String>, grantResults: IntArray) {
         InAppLogger(TAG).debug("trackPushPrimer()")
-        if (!BuildVersionChecker.instance().isAndroidTAndAbove()) {
+        if (!BuildVersionChecker.isAndroidTAndAbove()) {
             return
         }
 
