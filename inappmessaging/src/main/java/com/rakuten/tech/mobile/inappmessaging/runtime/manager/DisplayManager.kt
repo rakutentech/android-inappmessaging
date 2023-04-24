@@ -8,10 +8,10 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.FrameLayout
 import androidx.annotation.VisibleForTesting
-import com.rakuten.tech.mobile.inappmessaging.runtime.InAppMessaging
 import com.rakuten.tech.mobile.inappmessaging.runtime.R
 import com.rakuten.tech.mobile.inappmessaging.runtime.coroutine.MessageActionsCoroutine
 import com.rakuten.tech.mobile.inappmessaging.runtime.data.repositories.CampaignRepository
+import com.rakuten.tech.mobile.inappmessaging.runtime.data.repositories.HostAppInfoRepository
 import com.rakuten.tech.mobile.inappmessaging.runtime.utils.InAppLogger
 import com.rakuten.tech.mobile.inappmessaging.runtime.utils.ResourceUtils
 import com.rakuten.tech.mobile.inappmessaging.runtime.workmanager.workers.DisplayMessageWorker
@@ -194,7 +194,7 @@ internal interface DisplayManager {
         }
 
         override fun removeHiddenTargets(parent: ViewGroup) {
-            val activity = InAppMessaging.instance().getRegisteredActivity() ?: return
+            val activity = HostAppInfoRepository.instance().getRegisteredActivity() ?: return
             activity.findViewById<FrameLayout>(R.id.in_app_message_tooltip_layout)?.let { frameLayout ->
                 val removeList = mutableListOf<View>()
                 for (i in 0 until frameLayout.childCount) {

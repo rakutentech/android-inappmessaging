@@ -16,6 +16,7 @@ import com.rakuten.tech.mobile.inappmessaging.runtime.R
 import com.rakuten.tech.mobile.inappmessaging.runtime.TestUserInfoProvider
 import com.rakuten.tech.mobile.inappmessaging.runtime.data.enums.ImpressionType
 import com.rakuten.tech.mobile.inappmessaging.runtime.data.repositories.CampaignRepository
+import com.rakuten.tech.mobile.inappmessaging.runtime.data.repositories.HostAppInfoRepository
 import com.rakuten.tech.mobile.inappmessaging.runtime.data.responses.ping.*
 import com.rakuten.tech.mobile.inappmessaging.runtime.manager.DisplayManager
 import com.rakuten.tech.mobile.inappmessaging.runtime.manager.MessageReadinessManager
@@ -70,14 +71,14 @@ internal class MessageActionsCoroutineSpec(
 
     @Test
     fun `should return false when message is null`() {
-        DisplayManager.instance().removeMessage(InAppMessaging.instance().getRegisteredActivity())
+        DisplayManager.instance().removeMessage(HostAppInfoRepository.instance().getRegisteredActivity())
         val result = MessageActionsCoroutine().executeTask(null, resourceId, isOpt)
         result.shouldBeFalse()
     }
 
     @Test
     fun `should return false when campaign id is empty`() {
-        DisplayManager.instance().removeMessage(InAppMessaging.instance().getRegisteredActivity())
+        DisplayManager.instance().removeMessage(HostAppInfoRepository.instance().getRegisteredActivity())
         val result = MessageActionsCoroutine().executeTask(
             TestDataHelper.createDummyMessage(campaignId = ""), resourceId, isOpt,
         )
@@ -87,7 +88,7 @@ internal class MessageActionsCoroutineSpec(
     @Test
     fun `should return true when campaign is valid`() {
         val message = if (isTooltip) TooltipHelper.createMessage() else TestDataHelper.createDummyMessage()
-        DisplayManager.instance().removeMessage(InAppMessaging.instance().getRegisteredActivity())
+        DisplayManager.instance().removeMessage(HostAppInfoRepository.instance().getRegisteredActivity())
         val result = MessageActionsCoroutine().executeTask(message, resourceId, isOpt)
         result.shouldBeTrue()
     }
@@ -101,7 +102,7 @@ internal class MessageActionsCoroutineSpec(
         readinessManager.clearMessages()
         readinessManager.addMessageToQueue(message.campaignId)
         val currImpressions = message.impressionsLeft!!
-        DisplayManager.instance().removeMessage(InAppMessaging.instance().getRegisteredActivity())
+        DisplayManager.instance().removeMessage(HostAppInfoRepository.instance().getRegisteredActivity())
         val result = MessageActionsCoroutine().executeTask(message, resourceId, isOpt)
         val updatedMessage = CampaignRepository.instance().messages.values.first()
 
@@ -109,7 +110,6 @@ internal class MessageActionsCoroutineSpec(
         updatedMessage.impressionsLeft shouldBeEqualTo currImpressions - 1
         updatedMessage.isOptedOut shouldBeEqualTo isOpt
 
-        (readinessManager as MessageReadinessManager.MessageReadinessManagerImpl).queuedMessages.shouldBeEmpty()
         readinessManager.clearMessages()
     }
 

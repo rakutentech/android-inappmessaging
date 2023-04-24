@@ -9,7 +9,6 @@ import android.content.pm.PackageManager.NameNotFoundException
 import android.os.Build
 import android.provider.Settings
 import androidx.core.content.pm.PackageInfoCompat
-import com.google.gson.Gson
 import com.rakuten.tech.mobile.inappmessaging.runtime.data.models.HostAppInfo
 import com.rakuten.tech.mobile.inappmessaging.runtime.data.repositories.HostAppInfoRepository
 import com.rakuten.tech.mobile.inappmessaging.runtime.exception.InAppMessagingException
@@ -95,15 +94,13 @@ internal object Initializer {
         val hostAppInfo = HostAppInfo(
             packageName = getHostAppPackageName(context), deviceId = getDeviceId(context, sharedUtil),
             version = getHostAppVersion(context), subscriptionKey = subscriptionKey, locale = getLocale(context),
-            configUrl = configUrl, isTooltipFeatureEnabled = enableTooltipFeature,
+            configUrl = configUrl, isTooltipFeatureEnabled = enableTooltipFeature, context = context,
         )
 
         // Store hostAppInfo in repository.
         HostAppInfoRepository.instance().addHostInfo(hostAppInfo)
 
         initializePicassoInstance(context)
-
-        InAppLogger(TAG).debug(Gson().toJson(hostAppInfo))
     }
 
     /**

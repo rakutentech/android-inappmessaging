@@ -48,7 +48,7 @@ internal abstract class AccountRepository {
      * longer be used.
      */
     abstract fun clearUserOldCacheStructure(
-        context: Context? = InAppMessaging.instance().getHostAppContext(),
+        context: Context? = HostAppInfoRepository.instance().getContext(),
         preferences: PreferencesUtil = PreferencesUtil,
     )
 

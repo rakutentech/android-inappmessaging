@@ -3,7 +3,6 @@ package com.rakuten.tech.mobile.inappmessaging.runtime
 import android.app.Activity
 import android.content.Context
 import androidx.annotation.NonNull
-import androidx.annotation.Nullable
 import androidx.annotation.RestrictTo
 import com.rakuten.tech.mobile.inappmessaging.runtime.data.models.appevents.Event
 import com.rakuten.tech.mobile.inappmessaging.runtime.data.repositories.AccountRepository
@@ -54,20 +53,6 @@ abstract class InAppMessaging internal constructor() {
      * triggers are satisfied, then display that message if all trigger conditions are satisfied.
      */
     abstract fun logEvent(@NonNull event: Event)
-
-    /**
-     * This method returns registered activity of the host app.
-     */
-    @RestrictTo(RestrictTo.Scope.LIBRARY)
-    @Nullable
-    internal abstract fun getRegisteredActivity(): Activity?
-
-    /**
-     * This method returns application context of the host app.
-     */
-    @Nullable
-    @RestrictTo(RestrictTo.Scope.LIBRARY)
-    internal abstract fun getHostAppContext(): Context?
 
     /**
      * This method returns flag if local caching feature is enabled.
@@ -174,7 +159,10 @@ abstract class InAppMessaging internal constructor() {
             // `manifestConfig.isDebugging()` is used to enable/disable the debug logging of InAppMessaging SDK.
             // Note: All InAppMessaging SDK logs' tags begins with "IAM_".
             if (instance is NotConfiguredInAppMessaging) {
-                instance = InApp(context, manifestConfig.isDebugging(), isCacheHandling = isCacheHandling)
+                instance = InApp(
+                    isDebugLogging = manifestConfig.isDebugging(),
+                    isCacheHandling = isCacheHandling,
+                )
             }
 
             val subsKeyTrim = subscriptionKey?.trim()
@@ -210,10 +198,6 @@ abstract class InAppMessaging internal constructor() {
         override fun unregisterMessageDisplayActivity() = Unit
 
         override fun logEvent(event: Event) = Unit
-
-        override fun getRegisteredActivity(): Activity? = null
-
-        override fun getHostAppContext(): Context? = null
 
         override fun isLocalCachingEnabled() = isCacheHandling
 
