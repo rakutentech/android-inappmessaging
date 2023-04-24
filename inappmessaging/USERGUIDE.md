@@ -488,7 +488,7 @@ Documents targeting Product Managers:
   - InAppMessagingConstants (SDKCF-6497)
   - InAppMessageSlideUpView (SDKCF-6478)
 
-### 7.4.0 (In-Progress)
+### 7.4.0 (2023-04-24)
 * SDKCF-6321: Updated detekt version to `1.22.0`.
 * SDKCF-6395: Removed unused utility function `getImage()` (downloading image with Retrofit).
 * SDKCF-6126: Fixed incorrect tooltip position on scroll views and during device screen rotation.
