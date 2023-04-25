@@ -17,6 +17,7 @@ import com.rakuten.tech.mobile.inappmessaging.runtime.data.enums.ValueType
 import com.rakuten.tech.mobile.inappmessaging.runtime.data.models.appevents.CustomEvent
 import com.rakuten.tech.mobile.inappmessaging.runtime.data.models.appevents.Event
 import com.rakuten.tech.mobile.inappmessaging.runtime.data.repositories.CampaignRepository
+import com.rakuten.tech.mobile.inappmessaging.runtime.data.repositories.HostAppInfoRepository
 import com.rakuten.tech.mobile.inappmessaging.runtime.data.responses.ping.Message
 import com.rakuten.tech.mobile.inappmessaging.runtime.data.responses.ping.OnClickBehavior
 import com.rakuten.tech.mobile.inappmessaging.runtime.data.responses.ping.Trigger
@@ -154,7 +155,7 @@ internal class MessageActionsCoroutine(
 
     private fun handleDeeplinkRedirection(uri: String?) {
         // Always use activity context.
-        val activityContext = InAppMessaging.instance().getRegisteredActivity()
+        val activityContext = HostAppInfoRepository.instance().getRegisteredActivity()
         if (!uri.isNullOrEmpty() && activityContext != null) {
             // Build an implicit intent.
             val intent = Intent(Intent.ACTION_DEFAULT, Uri.parse(uri))
@@ -167,7 +168,7 @@ internal class MessageActionsCoroutine(
         }
     }
 
-    internal fun handlePushPrimer(campaignId: String, checker: BuildVersionChecker = BuildVersionChecker.instance()) {
+    internal fun handlePushPrimer(campaignId: String, checker: BuildVersionChecker = BuildVersionChecker) {
         InAppMessaging.instance().onPushPrimer.let { callback ->
             if (callback != null) {
                 PushPrimerTrackerManager.campaignId = campaignId
@@ -181,7 +182,7 @@ internal class MessageActionsCoroutine(
 
     @SuppressLint("InlinedApi")
     private fun requestPushPrimer() {
-        InAppMessaging.instance().getRegisteredActivity()?.let { act ->
+        HostAppInfoRepository.instance().getRegisteredActivity()?.let { act ->
             ActivityCompat.requestPermissions(
                 act, arrayOf(Manifest.permission.POST_NOTIFICATIONS), InAppMessaging.PUSH_PRIMER_REQ_CODE,
             )

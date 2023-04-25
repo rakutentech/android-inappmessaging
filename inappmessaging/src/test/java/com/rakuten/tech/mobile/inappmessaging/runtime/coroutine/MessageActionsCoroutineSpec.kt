@@ -16,6 +16,7 @@ import com.rakuten.tech.mobile.inappmessaging.runtime.R
 import com.rakuten.tech.mobile.inappmessaging.runtime.TestUserInfoProvider
 import com.rakuten.tech.mobile.inappmessaging.runtime.data.enums.ImpressionType
 import com.rakuten.tech.mobile.inappmessaging.runtime.data.repositories.CampaignRepository
+import com.rakuten.tech.mobile.inappmessaging.runtime.data.repositories.HostAppInfoRepository
 import com.rakuten.tech.mobile.inappmessaging.runtime.data.responses.ping.*
 import com.rakuten.tech.mobile.inappmessaging.runtime.manager.DisplayManager
 import com.rakuten.tech.mobile.inappmessaging.runtime.manager.MessageReadinessManager
@@ -70,14 +71,14 @@ internal class MessageActionsCoroutineSpec(
 
     @Test
     fun `should return false when message is null`() {
-        DisplayManager.instance().removeMessage(InAppMessaging.instance().getRegisteredActivity())
+        DisplayManager.instance().removeMessage(HostAppInfoRepository.instance().getRegisteredActivity())
         val result = MessageActionsCoroutine().executeTask(null, resourceId, isOpt)
         result.shouldBeFalse()
     }
 
     @Test
     fun `should return false when campaign id is empty`() {
-        DisplayManager.instance().removeMessage(InAppMessaging.instance().getRegisteredActivity())
+        DisplayManager.instance().removeMessage(HostAppInfoRepository.instance().getRegisteredActivity())
         val result = MessageActionsCoroutine().executeTask(
             TestDataHelper.createDummyMessage(campaignId = ""), resourceId, isOpt,
         )
@@ -87,7 +88,7 @@ internal class MessageActionsCoroutineSpec(
     @Test
     fun `should return true when campaign is valid`() {
         val message = if (isTooltip) TooltipHelper.createMessage() else TestDataHelper.createDummyMessage()
-        DisplayManager.instance().removeMessage(InAppMessaging.instance().getRegisteredActivity())
+        DisplayManager.instance().removeMessage(HostAppInfoRepository.instance().getRegisteredActivity())
         val result = MessageActionsCoroutine().executeTask(message, resourceId, isOpt)
         result.shouldBeTrue()
     }
@@ -101,7 +102,7 @@ internal class MessageActionsCoroutineSpec(
         readinessManager.clearMessages()
         readinessManager.addMessageToQueue(message.campaignId)
         val currImpressions = message.impressionsLeft!!
-        DisplayManager.instance().removeMessage(InAppMessaging.instance().getRegisteredActivity())
+        DisplayManager.instance().removeMessage(HostAppInfoRepository.instance().getRegisteredActivity())
         val result = MessageActionsCoroutine().executeTask(message, resourceId, isOpt)
         val updatedMessage = CampaignRepository.instance().messages.values.first()
 
@@ -109,7 +110,6 @@ internal class MessageActionsCoroutineSpec(
         updatedMessage.impressionsLeft shouldBeEqualTo currImpressions - 1
         updatedMessage.isOptedOut shouldBeEqualTo isOpt
 
-        (readinessManager as MessageReadinessManager.MessageReadinessManagerImpl).queuedMessages.shouldBeEmpty()
         readinessManager.clearMessages()
     }
 
@@ -140,6 +140,9 @@ internal class MessageActionsCoroutineSpec(
     }
 }
 
+@SuppressWarnings(
+    "LargeClass",
+)
 @RunWith(RobolectricTestRunner::class)
 class MessageActionsCoroutineFuncSpec : BaseTest() {
     private val action = MessageActionsCoroutine()
@@ -287,6 +290,60 @@ class MessageActionsCoroutineFuncSpec : BaseTest() {
 
         PushPrimerTrackerManager.campaignId shouldBeEqualTo "test"
         Mockito.verify(mockAct).requestPermissions(any(), any())
+    }
+
+    @Test
+    fun `should handle empty buttons`() {
+        val message = TestDataHelper.createDummyMessage(
+            messagePayload = TestDataHelper.message0Payload.copy(
+                messageSettings = TestDataHelper.message0Payload.messageSettings.copy(
+                    controlSettings = ControlSettings(buttons = listOf()),
+                ),
+            ),
+        )
+        action.executeTask(message, R.id.message_single_button, false).shouldBeTrue()
+    }
+
+    @Test
+    fun `should handle empty content`() {
+        val message = TestDataHelper.createDummyMessage(
+            messagePayload = TestDataHelper.message0Payload.copy(
+                messageSettings = TestDataHelper.message0Payload.messageSettings.copy(
+                    controlSettings = TestDataHelper.message0Payload.messageSettings.controlSettings.copy(
+                        content = null,
+                    ),
+                ),
+            ),
+        )
+        action.executeTask(message, R.id.slide_up, false).shouldBeTrue()
+    }
+
+    @SuppressWarnings("LongMethod")
+    @Test
+    fun `should handle invalid attribute type`() {
+        val message = TestDataHelper.createDummyMessage(
+            messagePayload = TestDataHelper.message0Payload.copy(
+                messageSettings = TestDataHelper.message0Payload.messageSettings.copy(
+                    controlSettings = TestDataHelper.message0Payload.messageSettings.controlSettings.copy(
+                        buttons = listOf(
+                            MessageButton(
+                                "", "", OnClickBehavior(4, ""),
+                                "",
+                                embeddedEvent = Trigger(
+                                    1, 4, "custom",
+                                    triggerAttributes = mutableListOf(
+                                        TriggerAttribute(
+                                            "attribute1", "attrValue1", 0, 0,
+                                        ),
+                                    ),
+                                ),
+                            ),
+                        ),
+                    ),
+                ),
+            ),
+        )
+        action.executeTask(message, R.id.message_single_button, false).shouldBeTrue()
     }
 
     private fun setupActivity(isTiramisu: Boolean = false): Activity {

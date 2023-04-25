@@ -5,6 +5,7 @@ import androidx.work.OneTimeWorkRequest
 import androidx.work.WorkManager
 import com.google.gson.Gson
 import com.rakuten.tech.mobile.inappmessaging.runtime.InAppMessaging
+import com.rakuten.tech.mobile.inappmessaging.runtime.data.repositories.HostAppInfoRepository
 import com.rakuten.tech.mobile.inappmessaging.runtime.data.requests.ImpressionRequest
 import com.rakuten.tech.mobile.inappmessaging.runtime.exception.InAppMessagingException
 import com.rakuten.tech.mobile.inappmessaging.runtime.utils.WorkManagerUtil
@@ -22,7 +23,7 @@ internal class ImpressionScheduler {
     fun startImpressionWorker(impressionRequest: ImpressionRequest, workManager: WorkManager? = null) {
         // Enqueue unique work request in the background.
         try {
-            val context = InAppMessaging.instance().getHostAppContext()
+            val context = HostAppInfoRepository.instance().getContext()
             context?.let { ctx ->
                 val manager = workManager ?: WorkManager.getInstance(ctx)
                 manager.enqueue(createWorkRequest(impressionRequest))

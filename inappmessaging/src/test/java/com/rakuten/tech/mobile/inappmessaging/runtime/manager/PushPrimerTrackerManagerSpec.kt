@@ -6,10 +6,10 @@ import com.nhaarman.mockitokotlin2.verify
 import com.rakuten.tech.mobile.inappmessaging.runtime.BaseTest
 import com.rakuten.tech.mobile.inappmessaging.runtime.EventTrackerHelper
 import com.rakuten.tech.mobile.inappmessaging.runtime.data.repositories.HostAppInfoRepository
-import com.rakuten.tech.mobile.inappmessaging.runtime.utils.InAppMessagingConstants.Companion.RAT_EVENT_CAMP_ID
-import com.rakuten.tech.mobile.inappmessaging.runtime.utils.InAppMessagingConstants.Companion.RAT_EVENT_KEY_PERMISSION
-import com.rakuten.tech.mobile.inappmessaging.runtime.utils.InAppMessagingConstants.Companion.RAT_EVENT_KEY_PRIMER
-import com.rakuten.tech.mobile.inappmessaging.runtime.utils.InAppMessagingConstants.Companion.RAT_EVENT_SUBS_ID
+import com.rakuten.tech.mobile.inappmessaging.runtime.utils.InAppMessagingConstants.RAT_EVENT_CAMP_ID
+import com.rakuten.tech.mobile.inappmessaging.runtime.utils.InAppMessagingConstants.RAT_EVENT_KEY_PERMISSION
+import com.rakuten.tech.mobile.inappmessaging.runtime.utils.InAppMessagingConstants.RAT_EVENT_KEY_PRIMER
+import com.rakuten.tech.mobile.inappmessaging.runtime.utils.InAppMessagingConstants.RAT_EVENT_SUBS_ID
 import org.amshove.kluent.shouldBeEmpty
 import org.amshove.kluent.shouldBeEqualTo
 import org.junit.Before

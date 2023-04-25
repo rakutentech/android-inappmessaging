@@ -1,21 +1,28 @@
 package com.rakuten.tech.mobile.inappmessaging.runtime.data.repositories
 
+import android.app.Activity
+import android.content.Context
 import androidx.annotation.VisibleForTesting
 import com.rakuten.tech.mobile.inappmessaging.runtime.data.models.HostAppInfo
 import com.rakuten.tech.mobile.inappmessaging.runtime.exception.InAppMessagingException
 import com.rakuten.tech.mobile.inappmessaging.runtime.utils.InAppLogger
-import com.rakuten.tech.mobile.inappmessaging.runtime.utils.InAppMessagingConstants.Companion.ARGUMENT_IS_NULL_EXCEPTION
-import com.rakuten.tech.mobile.inappmessaging.runtime.utils.InAppMessagingConstants.Companion.DEVICE_ID_IS_EMPTY_EXCEPTION
-import com.rakuten.tech.mobile.inappmessaging.runtime.utils.InAppMessagingConstants.Companion.LOCALE_IS_EMPTY_EXCEPTION
-import com.rakuten.tech.mobile.inappmessaging.runtime.utils.InAppMessagingConstants.Companion.PACKAGE_NAME_IS_EMPTY_EXCEPTION
-import com.rakuten.tech.mobile.inappmessaging.runtime.utils.InAppMessagingConstants.Companion.SUBSCRIPTION_KEY_IS_EMPTY_EXCEPTION
-import com.rakuten.tech.mobile.inappmessaging.runtime.utils.InAppMessagingConstants.Companion.VERSION_IS_EMPTY_EXCEPTION
+import com.rakuten.tech.mobile.inappmessaging.runtime.utils.InAppMessagingConstants.ARGUMENT_IS_NULL_EXCEPTION
+import com.rakuten.tech.mobile.inappmessaging.runtime.utils.InAppMessagingConstants.DEVICE_ID_IS_EMPTY_EXCEPTION
+import com.rakuten.tech.mobile.inappmessaging.runtime.utils.InAppMessagingConstants.LOCALE_IS_EMPTY_EXCEPTION
+import com.rakuten.tech.mobile.inappmessaging.runtime.utils.InAppMessagingConstants.PACKAGE_NAME_IS_EMPTY_EXCEPTION
+import com.rakuten.tech.mobile.inappmessaging.runtime.utils.InAppMessagingConstants.SUBSCRIPTION_KEY_IS_EMPTY_EXCEPTION
+import com.rakuten.tech.mobile.inappmessaging.runtime.utils.InAppMessagingConstants.VERSION_IS_EMPTY_EXCEPTION
+import java.lang.ref.WeakReference
 import java.util.Locale
 
 /**
  * Host app information repository which stores information such as host app version, package name,
  * subscription key, etc.
  */
+@SuppressWarnings(
+    "ComplexInterface",
+    "TooManyFunctions",
+)
 internal interface HostAppInfoRepository {
     /**
      * This method adds host information.
@@ -59,10 +66,27 @@ internal interface HostAppInfoRepository {
     fun isTooltipFeatureEnabled(): Boolean
 
     /**
+     * Returns the context which is provided by host apps during InAppMessaging.configure.
+     */
+    fun getContext(): Context?
+
+    /**
      * Clears host app info for testing.
      */
     @VisibleForTesting
     fun clearInfo()
+
+    /**
+     * Sets the current activity or screen for displaying campaigns, which is provided by host apps during
+     * InAppMessaging.registerMessageDisplayActivity.
+     * The activity is kept as a weak reference. When set to null, this reference is cleared.
+     */
+    fun registerActivity(activity: Activity?)
+
+    /**
+     * Returns the current activity or screen to display campaign.
+     */
+    fun getRegisteredActivity(): Activity?
 
     companion object {
         private const val TAG = "IAM_HostAppRepository"
@@ -74,6 +98,7 @@ internal interface HostAppInfoRepository {
     private class HostAppInfoRepositoryImpl : HostAppInfoRepository {
         @Volatile
         private var hostAppInfo: HostAppInfo? = null
+        private var activity: WeakReference<Activity>? = null
 
         @Throws(InAppMessagingException::class)
         override fun addHostInfo(hostAppInfo: HostAppInfo?) {
@@ -115,8 +140,20 @@ internal interface HostAppInfoRepository {
 
         override fun isTooltipFeatureEnabled(): Boolean = hostAppInfo?.isTooltipFeatureEnabled == true
 
+        override fun getContext(): Context? = hostAppInfo?.context
+
         override fun clearInfo() {
             hostAppInfo = null
         }
+
+        override fun registerActivity(activity: Activity?) {
+            if (activity == null) {
+                this.activity?.clear()
+                return
+            }
+            this.activity = WeakReference(activity)
+        }
+
+        override fun getRegisteredActivity() = this.activity?.get()
     }
 }

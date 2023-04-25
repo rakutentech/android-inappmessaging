@@ -14,33 +14,59 @@ open class ValueMatchingUtilSpec : BaseTest() {
     @Test
     fun `should compare integer yield correct result`() {
         ValueMatchingUtil.isOperatorConditionSatisfied(1, OperatorType.EQUALS, 1).shouldBeTrue()
+        ValueMatchingUtil.isOperatorConditionSatisfied(1, OperatorType.EQUALS, 0).shouldBeFalse()
+
         ValueMatchingUtil.isOperatorConditionSatisfied(1, OperatorType.DOES_NOT_EQUAL, 1).shouldBeFalse()
+        ValueMatchingUtil.isOperatorConditionSatisfied(1, OperatorType.DOES_NOT_EQUAL, 0).shouldBeTrue()
+
         ValueMatchingUtil.isOperatorConditionSatisfied(1, OperatorType.GREATER_THAN, 1).shouldBeFalse()
+        ValueMatchingUtil.isOperatorConditionSatisfied(1, OperatorType.GREATER_THAN, 0).shouldBeTrue()
+
         ValueMatchingUtil.isOperatorConditionSatisfied(1, OperatorType.LESS_THAN, 1).shouldBeFalse()
+        ValueMatchingUtil.isOperatorConditionSatisfied(0, OperatorType.LESS_THAN, 1).shouldBeTrue()
     }
 
     @Test
     fun `should compare double yield correct result`() {
         ValueMatchingUtil.isOperatorConditionSatisfied(DBVAL, OperatorType.EQUALS, DBVAL).shouldBeTrue()
+        ValueMatchingUtil.isOperatorConditionSatisfied(DBVAL, OperatorType.EQUALS, 1.00002).shouldBeFalse()
+
         ValueMatchingUtil.isOperatorConditionSatisfied(DBVAL, OperatorType.DOES_NOT_EQUAL, DBVAL).shouldBeFalse()
+        ValueMatchingUtil.isOperatorConditionSatisfied(DBVAL, OperatorType.DOES_NOT_EQUAL, 1.00002).shouldBeTrue()
+
         ValueMatchingUtil.isOperatorConditionSatisfied(DBVAL, OperatorType.GREATER_THAN, DBVAL).shouldBeFalse()
+        ValueMatchingUtil.isOperatorConditionSatisfied(1.00002, OperatorType.GREATER_THAN, DBVAL).shouldBeTrue()
+
         ValueMatchingUtil.isOperatorConditionSatisfied(DBVAL, OperatorType.LESS_THAN, DBVAL).shouldBeFalse()
+        ValueMatchingUtil.isOperatorConditionSatisfied(DBVAL, OperatorType.LESS_THAN, 1.00002).shouldBeTrue()
     }
 
     @Test
     fun `should compare boolean yield correct result`() {
         ValueMatchingUtil.isOperatorConditionSatisfied(true, OperatorType.EQUALS, true).shouldBeTrue()
+        ValueMatchingUtil.isOperatorConditionSatisfied(true, OperatorType.EQUALS, false).shouldBeFalse()
+
         ValueMatchingUtil.isOperatorConditionSatisfied(true, OperatorType.DOES_NOT_EQUAL, true).shouldBeFalse()
+        ValueMatchingUtil.isOperatorConditionSatisfied(true, OperatorType.DOES_NOT_EQUAL, false).shouldBeTrue()
     }
 
     @Test
     fun `should compare string yield correct result`() {
         ValueMatchingUtil.isOperatorConditionSatisfied("", OperatorType.EQUALS, STR).shouldBeFalse()
+        ValueMatchingUtil.isOperatorConditionSatisfied(STR, OperatorType.EQUALS, STR).shouldBeTrue()
+
         ValueMatchingUtil.isOperatorConditionSatisfied("", OperatorType.DOES_NOT_EQUAL, STR).shouldBeTrue()
+        ValueMatchingUtil.isOperatorConditionSatisfied(STR, OperatorType.DOES_NOT_EQUAL, STR).shouldBeFalse()
+
         ValueMatchingUtil.isOperatorConditionSatisfied(STR, OperatorType.MATCHES_REGEX, STR_REGEX).shouldBeTrue()
+        ValueMatchingUtil.isOperatorConditionSatisfied(STR, OperatorType.MATCHES_REGEX, "aaa").shouldBeFalse()
+
         ValueMatchingUtil.isOperatorConditionSatisfied(
             STR, OperatorType.DOES_NOT_MATCH_REGEX, STR_REGEX,
         ).shouldBeFalse()
+        ValueMatchingUtil.isOperatorConditionSatisfied(
+            "aaa", OperatorType.DOES_NOT_MATCH_REGEX, STR_REGEX,
+        ).shouldBeTrue()
     }
 
     @Test
@@ -80,13 +106,15 @@ open class ValueMatchingUtilSpec : BaseTest() {
     }
 
     @Test
-    fun `should be true when compare empty string`() {
+    fun `should compare string emptiness`() {
         ValueMatchingUtil.isOperatorConditionSatisfied("", OperatorType.IS_BLANK, "").shouldBeTrue()
+        ValueMatchingUtil.isOperatorConditionSatisfied(STR, OperatorType.IS_BLANK, "").shouldBeFalse()
     }
 
     @Test
-    fun `should be true when compare not empty string`() {
+    fun `should compare string non-emptiness`() {
         ValueMatchingUtil.isOperatorConditionSatisfied("xx", OperatorType.IS_NOT_BLANK, "xx").shouldBeTrue()
+        ValueMatchingUtil.isOperatorConditionSatisfied("", OperatorType.IS_NOT_BLANK, "").shouldBeFalse()
     }
 
     @Test

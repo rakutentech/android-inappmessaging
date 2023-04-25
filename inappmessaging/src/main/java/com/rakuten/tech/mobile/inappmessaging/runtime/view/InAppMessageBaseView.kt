@@ -42,9 +42,11 @@ internal open class InAppMessageBaseView(context: Context, attrs: AttributeSet?)
         id = R.id.in_app_message_base_view
     }
 
-    protected var bgColor = 0
+    var bgColor = 0
+        private set
+    var listener: InAppMessageViewListener? = null
+        private set
     private var imageUrl: String? = null
-    protected var listener: InAppMessageViewListener? = null
     private var headerColor = 0
     private var messageBodyColor = 0
     private var header: String? = null
@@ -112,14 +114,11 @@ internal open class InAppMessageBaseView(context: Context, attrs: AttributeSet?)
     private fun bindButtons() {
         // Set onClick listener to close button.
         val closeButton = findViewById<ImageButton>(R.id.message_close_button)
-        closeButton?.let { button ->
-            if (isDismissable) {
-                button.setOnClickListener(this.listener)
-            } else {
-                button.visibility = View.GONE
-            }
+        if (isDismissable) {
+            closeButton.setOnClickListener(this.listener)
+        } else {
+            closeButton.visibility = View.GONE
         }
-
         setupButton()
     }
 
@@ -127,9 +126,7 @@ internal open class InAppMessageBaseView(context: Context, attrs: AttributeSet?)
         when (this.buttons.size) {
             1 -> {
                 // Set bigger layout_margin if there's only one button.
-                findViewById<MaterialButton>(R.id.message_single_button)?.let {
-                    setButtonInfo(it, this.buttons[0])
-                }
+                setButtonInfo(findViewById(R.id.message_single_button), this.buttons[0])
             }
             2 -> {
                 // Set bigger layout_margin if there's only one button.
@@ -152,8 +149,8 @@ internal open class InAppMessageBaseView(context: Context, attrs: AttributeSet?)
                 checkBox.buttonTintList = ColorStateList.valueOf(Color.WHITE)
                 checkBox.setTextColor(Color.WHITE)
             }
-            checkBox?.setOnClickListener(this.listener)
-            checkBox?.visibility = View.VISIBLE
+            checkBox.setOnClickListener(this.listener)
+            checkBox.visibility = View.VISIBLE
         }
     }
 
@@ -165,7 +162,7 @@ internal open class InAppMessageBaseView(context: Context, attrs: AttributeSet?)
         if (!this.imageUrl.isNullOrEmpty()) {
             // load the image then display the view
             this.visibility = GONE
-            findViewById<ImageView>(R.id.message_image_view)?.let { imgView ->
+            findViewById<ImageView>(R.id.message_image_view).let { imgView ->
                 imgView.setOnTouchListener(this.listener)
                 try {
                     val callback = object : Callback {
@@ -206,7 +203,7 @@ internal open class InAppMessageBaseView(context: Context, attrs: AttributeSet?)
 
         getFont(BUTTON_FONT)?.let { buttonView.typeface = it }
         buttonView.visibility = VISIBLE
-        findViewById<LinearLayout>(R.id.message_buttons)?.visibility = VISIBLE
+        findViewById<LinearLayout>(R.id.message_buttons).visibility = VISIBLE
     }
 
     private fun setBgColor(button: MessageButton, buttonView: MaterialButton): Int {
@@ -247,15 +244,15 @@ internal open class InAppMessageBaseView(context: Context, attrs: AttributeSet?)
 
     private fun bindBody() {
         if (!messageBody.isNullOrEmpty()) {
-            findViewById<TextView>(R.id.message_body)?.let { textView ->
-                textView.text = messageBody
-                textView.setTextColor(messageBodyColor)
-                textView.setOnTouchListener(listener)
-                textView.visibility = VISIBLE
-                textView.hyphenationFrequency = getHyphenationFreq() // Word break
+            findViewById<TextView>(R.id.message_body).apply {
+                text = messageBody
+                setTextColor(messageBodyColor)
+                setOnTouchListener(listener)
+                visibility = VISIBLE
+                hyphenationFrequency = getHyphenationFreq() // Word break
                 val font = getFont(BODY_FONT)
                 if (font != null) {
-                    textView.typeface = font
+                    typeface = font
                 }
             }
         }
@@ -352,7 +349,7 @@ internal open class InAppMessageBaseView(context: Context, attrs: AttributeSet?)
 
     @SuppressLint("InlinedApi")
     private fun getHyphenationFreq(): Int {
-        return if (BuildVersionChecker.instance().isAndroidTAndAbove()) {
+        return if (BuildVersionChecker.isAndroidTAndAbove()) {
             Layout.HYPHENATION_FREQUENCY_FULL_FAST
         } else {
             Layout.HYPHENATION_FREQUENCY_FULL

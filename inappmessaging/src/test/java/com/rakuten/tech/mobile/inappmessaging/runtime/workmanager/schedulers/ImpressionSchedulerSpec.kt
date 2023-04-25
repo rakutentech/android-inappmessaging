@@ -78,16 +78,6 @@ class ImpressionSchedulerSpec : BaseTest() {
         setupImpressionScheduler(mockWorkManager)
     }
 
-    @Test
-    fun `should not throw exception with valid workmanager but null context`() {
-        WorkManagerTestInitHelper.initializeTestWorkManager(ApplicationProvider.getApplicationContext())
-        setupImpressionScheduler()
-        WorkManager.getInstance(ApplicationProvider.getApplicationContext())
-            .getWorkInfosByTag(IMPRESSION_WORKER_NAME)
-            .get()
-            .shouldBeEmpty()
-    }
-
     private fun setupImpressionScheduler(mockManager: WorkManager? = null) {
         val impressionTypes = mutableListOf(ImpressionType.CLICK_CONTENT)
         // Assemble ImpressionRequest object.

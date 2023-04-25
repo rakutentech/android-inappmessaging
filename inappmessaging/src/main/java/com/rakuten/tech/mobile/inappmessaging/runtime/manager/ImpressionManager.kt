@@ -8,10 +8,10 @@ import com.rakuten.tech.mobile.inappmessaging.runtime.data.repositories.HostAppI
 import com.rakuten.tech.mobile.inappmessaging.runtime.data.requests.Impression
 import com.rakuten.tech.mobile.inappmessaging.runtime.data.requests.ImpressionRequest
 import com.rakuten.tech.mobile.inappmessaging.runtime.utils.InAppLogger
-import com.rakuten.tech.mobile.inappmessaging.runtime.utils.InAppMessagingConstants.Companion.RAT_EVENT_CAMP_ID
-import com.rakuten.tech.mobile.inappmessaging.runtime.utils.InAppMessagingConstants.Companion.RAT_EVENT_IMP
-import com.rakuten.tech.mobile.inappmessaging.runtime.utils.InAppMessagingConstants.Companion.RAT_EVENT_KEY_IMPRESSION
-import com.rakuten.tech.mobile.inappmessaging.runtime.utils.InAppMessagingConstants.Companion.RAT_EVENT_SUBS_ID
+import com.rakuten.tech.mobile.inappmessaging.runtime.utils.InAppMessagingConstants.RAT_EVENT_CAMP_ID
+import com.rakuten.tech.mobile.inappmessaging.runtime.utils.InAppMessagingConstants.RAT_EVENT_IMP
+import com.rakuten.tech.mobile.inappmessaging.runtime.utils.InAppMessagingConstants.RAT_EVENT_KEY_IMPRESSION
+import com.rakuten.tech.mobile.inappmessaging.runtime.utils.InAppMessagingConstants.RAT_EVENT_SUBS_ID
 import com.rakuten.tech.mobile.inappmessaging.runtime.utils.RuntimeUtil
 import com.rakuten.tech.mobile.inappmessaging.runtime.workmanager.schedulers.ImpressionScheduler
 import java.util.Date

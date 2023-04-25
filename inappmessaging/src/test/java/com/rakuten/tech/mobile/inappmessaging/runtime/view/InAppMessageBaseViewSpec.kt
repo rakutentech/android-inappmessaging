@@ -22,12 +22,12 @@ import org.junit.runner.RunWith
 import org.mockito.verification.VerificationMode
 import org.robolectric.RobolectricTestRunner
 import org.robolectric.annotation.Config
-
 import android.widget.CheckBox
 import android.content.Context
 import android.content.res.Resources
 import android.graphics.Typeface
 import android.text.Layout
+import androidx.core.widget.NestedScrollView
 import com.nhaarman.mockitokotlin2.any
 import com.nhaarman.mockitokotlin2.eq
 import com.nhaarman.mockitokotlin2.times
@@ -39,7 +39,7 @@ import org.mockito.Mockito.`when`
 
 @RunWith(RobolectricTestRunner::class)
 @Ignore("base class")
-open class BaseViewSpec : BaseTest() {
+open class InAppMessageBaseViewSpec : BaseTest() {
     private val hostAppActivity = Mockito.mock(Activity::class.java)
     internal val mockMessage = Mockito.mock(Message::class.java)
     internal val mockPayload = Mockito.mock(MessagePayload::class.java)
@@ -81,7 +81,88 @@ open class BaseViewSpec : BaseTest() {
     }
 }
 
-class BaseViewCheckBoxSpec : BaseViewSpec() {
+class InAppMessageBaseViewBodySpec : InAppMessageBaseViewSpec() {
+    @Before
+    override fun setup() {
+        super.setup()
+        `when`(mockPayload.headerColor).thenReturn(WHITE_HEX)
+        `when`(mockPayload.messageBodyColor).thenReturn(WHITE_HEX)
+        `when`(mockPayload.backgroundColor).thenReturn(WHITE_HEX)
+    }
+
+    @Test
+    fun `should not bind view body when message body is null`() {
+        `when`(mockPayload.messageBody).thenReturn(null)
+
+        view?.populateViewData(mockMessage)
+
+        view?.findViewById<TextView>(R.id.message_body)?.visibility shouldNotBeEqualTo View.VISIBLE
+    }
+
+    @Test
+    fun `should not bind view body when message body is empty`() {
+        `when`(mockPayload.messageBody).thenReturn("")
+
+        view?.populateViewData(mockMessage)
+
+        view?.findViewById<TextView>(R.id.message_body)?.visibility shouldNotBeEqualTo View.VISIBLE
+    }
+}
+
+class InAppMessageBaseViewHeaderSpec : InAppMessageBaseViewSpec() {
+    @Before
+    override fun setup() {
+        super.setup()
+        `when`(mockPayload.headerColor).thenReturn(WHITE_HEX)
+        `when`(mockPayload.messageBodyColor).thenReturn(WHITE_HEX)
+        `when`(mockPayload.backgroundColor).thenReturn(WHITE_HEX)
+    }
+
+    @Test
+    fun `should not bind view header when message header and body are null`() {
+        `when`(mockPayload.header).thenReturn(null)
+        `when`(mockPayload.messageBody).thenReturn(null)
+
+        view?.populateViewData(mockMessage)
+
+        view?.findViewById<NestedScrollView>(R.id.message_scrollview)?.visibility shouldNotBeEqualTo View.VISIBLE
+        view?.findViewById<TextView>(R.id.header_text)?.visibility shouldNotBeEqualTo View.VISIBLE
+    }
+
+    @Test
+    fun `should not bind view header when message header and body are empty`() {
+        `when`(mockPayload.header).thenReturn("")
+        `when`(mockPayload.messageBody).thenReturn("")
+
+        view?.populateViewData(mockMessage)
+
+        view?.findViewById<NestedScrollView>(R.id.message_scrollview)?.visibility shouldNotBeEqualTo View.VISIBLE
+        view?.findViewById<TextView>(R.id.header_text)?.visibility shouldNotBeEqualTo View.VISIBLE
+    }
+
+    @Test
+    fun `should show scrollview when header is valid`() {
+        `when`(mockPayload.header).thenReturn("abc")
+        `when`(mockPayload.messageBody).thenReturn("")
+
+        view?.populateViewData(mockMessage)
+
+        view?.findViewById<NestedScrollView>(R.id.message_scrollview)?.visibility shouldBeEqualTo View.VISIBLE
+        view?.findViewById<TextView>(R.id.header_text)?.visibility shouldBeEqualTo View.VISIBLE
+    }
+
+    @Test
+    fun `should show scrollview when body is valid`() {
+        `when`(mockPayload.header).thenReturn("")
+        `when`(mockPayload.messageBody).thenReturn("abc")
+
+        view?.populateViewData(mockMessage)
+
+        view?.findViewById<NestedScrollView>(R.id.message_scrollview)?.visibility shouldBeEqualTo View.VISIBLE
+    }
+}
+
+class InAppMessageBaseViewCheckBoxSpec : InAppMessageBaseViewSpec() {
     @Test
     fun `should set check box to white color`() {
         verifyCheckBox(BLACK_HEX, Color.WHITE)
@@ -112,7 +193,7 @@ class BaseViewCheckBoxSpec : BaseViewSpec() {
     }
 }
 
-class BaseViewImageSpec : BaseViewSpec() {
+class InAppMessageBaseViewImageSpec : InAppMessageBaseViewSpec() {
     @Test
     fun `should display image`() {
         verifyImageFetch(true)
@@ -158,7 +239,7 @@ class BaseViewImageSpec : BaseViewSpec() {
     }
 }
 
-class BaseViewBorderSpec : BaseViewSpec() {
+class InAppMessageBaseViewBorderSpec : InAppMessageBaseViewSpec() {
     @Test
     fun `should set button border for identical bg colors`() {
         val bgColor = "#AA00BB"
@@ -216,7 +297,7 @@ class BaseViewBorderSpec : BaseViewSpec() {
     }
 }
 
-class BaseViewColorSpec : BaseViewSpec() {
+class InAppMessageBaseViewColorSpec : InAppMessageBaseViewSpec() {
     @Test
     @Config(
         sdk = [
@@ -306,7 +387,7 @@ class BaseViewColorSpec : BaseViewSpec() {
     }
 }
 
-class BaseViewTextSpec : BaseViewSpec() {
+class InAppMessageBaseViewTextSpec : InAppMessageBaseViewSpec() {
     @Test
     fun `should set correct font typeface`() {
         val mockTypeface = setMock()

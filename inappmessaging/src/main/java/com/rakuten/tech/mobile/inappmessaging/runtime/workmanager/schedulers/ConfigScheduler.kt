@@ -4,6 +4,7 @@ import androidx.work.ExistingWorkPolicy
 import androidx.work.OneTimeWorkRequest
 import androidx.work.WorkManager
 import com.rakuten.tech.mobile.inappmessaging.runtime.InAppMessaging
+import com.rakuten.tech.mobile.inappmessaging.runtime.data.repositories.HostAppInfoRepository
 import com.rakuten.tech.mobile.inappmessaging.runtime.exception.InAppMessagingException
 import com.rakuten.tech.mobile.inappmessaging.runtime.utils.RetryDelayUtil
 import com.rakuten.tech.mobile.inappmessaging.runtime.utils.WorkManagerUtil
@@ -28,7 +29,7 @@ internal interface ConfigScheduler {
     private class ConfigSchedulerImpl : ConfigScheduler {
         override fun startConfig(delay: Long, workManager: WorkManager?) {
             try {
-                val context = InAppMessaging.instance().getHostAppContext()
+                val context = HostAppInfoRepository.instance().getContext()
                 context?.let { ctx ->
                     val manager = workManager ?: WorkManager.getInstance(ctx)
                     manager.beginUniqueWork(
