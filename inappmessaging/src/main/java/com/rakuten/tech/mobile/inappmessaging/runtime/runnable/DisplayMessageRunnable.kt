@@ -94,7 +94,13 @@ internal class DisplayMessageRunnable(
         val toolTipView = hostActivity.layoutInflater.inflate(R.layout.in_app_message_tooltip, null)
             as InAppMessagingTooltipView
         toolTipView.populateViewData(message)
-        message.getTooltipConfig()?.let { displayTooltip(it, toolTipView) }
+        message.getTooltipConfig()?.let {
+            displayTooltip(it, toolTipView)
+            ImpressionManager.sendImpressionEvent(
+                message.campaignId,
+                listOf(Impression(ImpressionType.IMPRESSION, Date().time)),
+                impressionTypeOnly = true,
+            )}
     }
 
     private fun displayTooltip(tooltip: Tooltip, toolTipView: InAppMessagingTooltipView) {
