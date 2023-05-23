@@ -94,34 +94,47 @@ internal class DisplayMessageRunnable(
         val toolTipView = hostActivity.layoutInflater.inflate(R.layout.in_app_message_tooltip, null)
             as InAppMessagingTooltipView
         toolTipView.populateViewData(message)
-        message.getTooltipConfig()?.let { displayTooltip(it, toolTipView) }
+        message.getTooltipConfig()?.let { config ->
+            if (displayTooltip(config, toolTipView)) {
+                ImpressionManager.sendImpressionEvent(
+                    message.campaignId,
+                    listOf(Impression(ImpressionType.IMPRESSION, Date().time)),
+                    impressionTypeOnly = true,
+                )
+            }
+        }
     }
 
-    private fun displayTooltip(tooltip: Tooltip, toolTipView: InAppMessagingTooltipView) {
+    private fun displayTooltip(tooltip: Tooltip, toolTipView: InAppMessagingTooltipView): Boolean {
+        var isTooltipAdded = false
         ResourceUtils.findViewByName<View>(hostActivity, tooltip.id)?.let { target ->
             val scroll = ViewUtil.getScrollView(target)
-            if (scroll != null) {
+            isTooltipAdded = if (scroll != null) {
                 displayInScrollView(scroll, toolTipView)
             } else {
                 val params = ViewGroup.LayoutParams(
                     ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT,
                 )
                 hostActivity.addContentView(toolTipView, params)
+                true
             }
             if (tooltip.autoDisappear != null && tooltip.autoDisappear > 0) {
                 displayManager.removeMessage(hostActivity, delay = tooltip.autoDisappear, id = message.campaignId)
             }
         }
+        return isTooltipAdded
     }
 
     /** Adds the tooltip to the anchor view's parent scroll view. */
-    private fun displayInScrollView(scroll: ViewGroup, toolTipView: InAppMessagingTooltipView) {
-        (scroll.getChildAt(0) as? ViewGroup)?.addView(
+    private fun displayInScrollView(scroll: ViewGroup, toolTipView: InAppMessagingTooltipView): Boolean {
+        val anchor = scroll.getChildAt(0) as? ViewGroup
+        anchor?.addView(
             toolTipView,
             ViewGroup.LayoutParams(
                 ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT,
             ),
         )
+        return anchor != null
     }
 
     private fun shouldNotDisplay(messageType: InAppMessageType?): Boolean {
