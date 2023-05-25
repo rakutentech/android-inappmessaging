@@ -15,6 +15,9 @@ import java.util.concurrent.TimeUnit
 /**
  * Utility class used for scheduling WorkManager's workers to communicate with IAM /ping endpoint.
  */
+@SuppressWarnings(
+    "kotlin:S6517",
+)
 internal interface MessageMixerPingScheduler {
 
     /**

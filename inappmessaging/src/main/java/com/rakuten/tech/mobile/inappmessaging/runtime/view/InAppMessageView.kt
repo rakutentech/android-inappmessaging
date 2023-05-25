@@ -5,7 +5,7 @@ import com.rakuten.tech.mobile.inappmessaging.runtime.data.responses.ping.Messag
 /**
  * Interface for the InApp custom views to implement.
  */
-internal interface InAppMessageView {
+internal fun interface InAppMessageView {
     /**
      * This method sets campaign message data int the custom view classes.
      * Message must not be null.
