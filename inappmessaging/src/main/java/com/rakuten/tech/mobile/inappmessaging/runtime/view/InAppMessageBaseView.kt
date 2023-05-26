@@ -113,11 +113,12 @@ internal open class InAppMessageBaseView(context: Context, attrs: AttributeSet?)
      */
     private fun bindButtons() {
         // Set onClick listener to close button.
-        val closeButton = findViewById<ImageButton>(R.id.message_close_button)
-        if (isDismissable) {
-            closeButton.setOnClickListener(this.listener)
-        } else {
-            closeButton.visibility = View.GONE
+        findViewById<ImageButton>(R.id.message_close_button)?.let { closeButton ->
+            if (isDismissable) {
+                closeButton.setOnClickListener(this.listener)
+            } else {
+                closeButton.visibility = View.GONE
+            }
         }
         setupButton()
     }
@@ -126,7 +127,9 @@ internal open class InAppMessageBaseView(context: Context, attrs: AttributeSet?)
         when (this.buttons.size) {
             1 -> {
                 // Set bigger layout_margin if there's only one button.
-                setButtonInfo(findViewById(R.id.message_single_button), this.buttons[0])
+                findViewById<MaterialButton>(R.id.message_single_button)?.let {
+                    setButtonInfo(it, this.buttons[0])
+                }
             }
             2 -> {
                 // Set bigger layout_margin if there's only one button.
@@ -143,14 +146,15 @@ internal open class InAppMessageBaseView(context: Context, attrs: AttributeSet?)
     private fun bindCheckBox() {
         // Display opt-out checkbox.
         if (this.displayOptOut) {
-            val checkBox = findViewById<CheckBox>(R.id.opt_out_checkbox)
-            val brightness = getBrightness(bgColor)
-            if (brightness < BRIGHTNESS_LEVEL) {
-                checkBox.buttonTintList = ColorStateList.valueOf(Color.WHITE)
-                checkBox.setTextColor(Color.WHITE)
+            findViewById<CheckBox>(R.id.opt_out_checkbox)?.let { checkBox ->
+                val brightness = getBrightness(bgColor)
+                if (brightness < BRIGHTNESS_LEVEL) {
+                    checkBox.buttonTintList = ColorStateList.valueOf(Color.WHITE)
+                    checkBox.setTextColor(Color.WHITE)
+                }
+                checkBox.setOnClickListener(this.listener)
+                checkBox.visibility = View.VISIBLE
             }
-            checkBox.setOnClickListener(this.listener)
-            checkBox.visibility = View.VISIBLE
         }
     }
 
@@ -162,7 +166,7 @@ internal open class InAppMessageBaseView(context: Context, attrs: AttributeSet?)
         if (!this.imageUrl.isNullOrEmpty()) {
             // load the image then display the view
             this.visibility = GONE
-            findViewById<ImageView>(R.id.message_image_view).let { imgView ->
+            findViewById<ImageView>(R.id.message_image_view)?.let { imgView ->
                 imgView.setOnTouchListener(this.listener)
                 try {
                     val callback = object : Callback {
@@ -203,7 +207,7 @@ internal open class InAppMessageBaseView(context: Context, attrs: AttributeSet?)
 
         getFont(BUTTON_FONT)?.let { buttonView.typeface = it }
         buttonView.visibility = VISIBLE
-        findViewById<LinearLayout>(R.id.message_buttons).visibility = VISIBLE
+        findViewById<LinearLayout>(R.id.message_buttons)?.visibility = VISIBLE
     }
 
     private fun setBgColor(button: MessageButton, buttonView: MaterialButton): Int {
@@ -244,7 +248,7 @@ internal open class InAppMessageBaseView(context: Context, attrs: AttributeSet?)
 
     private fun bindBody() {
         if (!messageBody.isNullOrEmpty()) {
-            findViewById<TextView>(R.id.message_body).apply {
+            findViewById<TextView>(R.id.message_body)?.apply {
                 text = messageBody
                 setTextColor(messageBodyColor)
                 setOnTouchListener(listener)
