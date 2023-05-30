@@ -494,6 +494,7 @@ Documents targeting Product Managers:
   - TriggerAttributesValidator (SDKCF-6399)
   - BuildVersionChecker (SDKCF-6513)
 * SDKCF-6547: Fixed impression is not incremented when tooltip campaign is displayed.
+* SDKCF-6518: Fixed and suppressed some SonarCloud code smells.
 
 ### 7.4.0 (2023-04-24)
 * SDKCF-6321: Updated detekt version to `1.22.0`.

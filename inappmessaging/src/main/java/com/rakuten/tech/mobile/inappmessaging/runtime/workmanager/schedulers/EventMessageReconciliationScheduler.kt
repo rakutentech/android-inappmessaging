@@ -12,6 +12,9 @@ import java.util.concurrent.TimeUnit
 /**
  * Scheduler for MessageEventReconciliationWorker. Providing static helper functions.
  */
+@SuppressWarnings(
+    "kotlin:S6517",
+)
 internal interface EventMessageReconciliationScheduler {
     /**
      * A chain work requests, first reconcile messages and events. After work has been successfully

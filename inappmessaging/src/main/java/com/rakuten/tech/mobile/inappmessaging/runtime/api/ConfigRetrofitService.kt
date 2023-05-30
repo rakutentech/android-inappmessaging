@@ -11,7 +11,7 @@ import retrofit2.http.Url
  * Retrofit API interface in order for Retrofit to make request to Config Service.
  * Contains endpoint communicating with Config Service.
  */
-internal interface ConfigRetrofitService {
+internal fun interface ConfigRetrofitService {
 
     /**
      * This method retrieves config.
