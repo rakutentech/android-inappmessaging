@@ -3,6 +3,8 @@ apply from: "$CONFIG.configDir/android/application.gradle"
 apply plugin: "kotlin-android"
 apply plugin: 'kotlin-kapt'
 
+def compose_version = '1.2.0-rc02'
+
 android {
     compileSdkVersion 33
 
