@@ -41,18 +41,10 @@
   <!-- Detekt -->
   <suppress until="2023-12-31Z">
     <notes><![CDATA[
-   file name: snakeyaml-1.30.jar
+   file name: snakeyaml-1.33.jar
    ]]></notes>
     <packageUrl regex="true">^pkg:maven/org\.yaml/snakeyaml@.*$</packageUrl>
-    <cpe>cpe:/a:snakeyaml_project:snakeyaml</cpe>
-    <cpe>cpe:/a:yaml_project:yaml</cpe>
-    <vulnerabilityName>CVE-2022-25857</vulnerabilityName>
-    <vulnerabilityName>CVE-2022-38749</vulnerabilityName>
-    <vulnerabilityName>CVE-2022-38751</vulnerabilityName>
-    <vulnerabilityName>CVE-2022-38752</vulnerabilityName>
-    <vulnerabilityName>CVE-2022-38750</vulnerabilityName>
-    <vulnerabilityName>CVE-2022-41854</vulnerabilityName>
-    <vulnerabilityName>CVE-2022-1471</vulnerabilityName>
+    <cve>CVE-2022-1471</cve>
   </suppress>
 
   <!-- SDK Utils -->

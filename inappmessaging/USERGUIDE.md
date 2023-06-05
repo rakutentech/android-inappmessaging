@@ -493,7 +493,7 @@ Documents targeting Product Managers:
   - MessageReadinessManager (SDKCF-6458)
   - TriggerAttributesValidator (SDKCF-6399)
   - BuildVersionChecker (SDKCF-6513)
-* SDKCF-6596: Updated minor versions of the following dependencies and removed dependency check suppressions:
+* SDKCF-6596: Updated minor version and dependency check suppression of the following dependencies:
   - Kotlin to `1.6.21`
   - Dokka to `1.8.10`
   - Robolectric to `4.10.3`
