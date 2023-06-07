@@ -78,7 +78,7 @@ dependencies {
   testImplementation 'androidx.work:work-testing:2.7.1'
   testImplementation 'junit:junit:4.13.2'
   testImplementation 'org.mockito:mockito-core:4.5.1'
-  testImplementation 'org.robolectric:robolectric:4.9.2'
+  testImplementation 'org.robolectric:robolectric:4.10.3'
   testImplementation "com.facebook.soloader:soloader:0.9.0"
   testImplementation "com.squareup.okhttp3:mockwebserver:3.14.7"
 

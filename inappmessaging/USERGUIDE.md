@@ -493,6 +493,11 @@ Documents targeting Product Managers:
   - MessageReadinessManager (SDKCF-6458)
   - TriggerAttributesValidator (SDKCF-6399)
   - BuildVersionChecker (SDKCF-6513)
+* SDKCF-6596: Updated minor version and dependency check suppression of the following dependencies:
+  - Kotlin to `1.6.21`
+  - Dokka to `1.8.10`
+  - Robolectric to `4.10.3`
+  - Dependency Check to `8.2.1`
 * SDKCF-6547: Fixed impression is not incremented when tooltip campaign is displayed.
 * SDKCF-6518: Fixed and suppressed some SonarCloud code smells.
 
