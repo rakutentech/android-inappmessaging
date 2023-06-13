@@ -204,6 +204,10 @@ workflows:
         inputs:
         - timeout: 1800
         - content: "./gradlew dependencyCheckAggregate"
+    - deploy-to-bitrise-io:
+        title: Deploy Dependency Check Report
+        inputs:
+          - deploy_path: "$SDK_PATH/build/reports/dependency-check-report.html"
   _common-end:
     after_run:
     - _run-sonarqube-scanner
