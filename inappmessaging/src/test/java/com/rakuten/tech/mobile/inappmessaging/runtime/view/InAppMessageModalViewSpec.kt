@@ -14,9 +14,30 @@ import org.robolectric.RobolectricTestRunner
 
 @RunWith(RobolectricTestRunner::class)
 class InAppMessageModalViewSpec {
+    @Test
+    fun `should set background color`() {
+        val view = spy(InAppMessageModalView(ApplicationProvider.getApplicationContext(), null))
+        val mockModal = mock(LinearLayout::class.java)
+
+        doReturn(mockModal).`when`(view).findModalView()
+        doReturn(null).`when`(view).findViewById<Button>(anyInt())
+        doReturn(null).`when`(view).findViewById<CheckBox>(anyInt())
+
+        view.populateViewData(
+            TestDataHelper.createDummyMessage(
+                messagePayload = TestDataHelper.createDummyPayload(
+                    header = "",
+                    messageBody = "",
+                    resource = Resource(imageUrl = "", cropType = 0),
+                ),
+            ),
+        )
+
+        verify(mockModal).setBackgroundColor(anyInt())
+    }
 
     @Test
-    fun c() {
+    fun `should not set background color when modal view is null`() {
         val view = spy(InAppMessageModalView(ApplicationProvider.getApplicationContext(), null))
 
         doReturn(null).`when`(view).findViewById<LinearLayout>(anyInt())
@@ -24,26 +45,5 @@ class InAppMessageModalViewSpec {
         view.populateViewData(TestDataHelper.createDummyMessage())
 
         verify(view, never()).setBackgroundColor(anyInt())
-    }
-
-    @Test
-    fun d() {
-        val view = spy(InAppMessageModalView(ApplicationProvider.getApplicationContext(), null))
-        val mockModal = mock(LinearLayout::class.java)
-
-//        doReturn(mockModal).`when`(view).modal()
-        doReturn(mockModal).`when`(view).findViewById<LinearLayout>(anyInt())
-        doReturn(null).`when`(view).findViewById<Button>(anyInt())
-        doReturn(null).`when`(view).findViewById<CheckBox>(anyInt())
-
-        view.populateViewData(TestDataHelper.createDummyMessage(
-            messagePayload = TestDataHelper.createDummyPayload(
-                header = "",
-                messageBody = "",
-                resource = Resource(imageUrl = "", cropType = 0)
-            )
-        ))
-
-        verify(mockModal).setBackgroundColor(anyInt())
     }
 }
