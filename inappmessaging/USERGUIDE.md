@@ -488,6 +488,7 @@ Documents targeting Product Managers:
   - InAppMessagingConstants (SDKCF-6497)
   - InAppMessageSlideUpView (SDKCF-6478)
   - InAppMessagingTooltipView (SDKCF-6438)
+  - InAppMessageModalView (SDKCF-6611)
   - InAppMessageBaseView (SDKCF-6486)
   - MessageEventReconciliationUtil (SDKCF-6398)
   - MessageReadinessManager (SDKCF-6458)
