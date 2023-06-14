@@ -493,6 +493,7 @@ Documents targeting Product Managers:
   - MessageReadinessManager (SDKCF-6458)
   - TriggerAttributesValidator (SDKCF-6399)
   - BuildVersionChecker (SDKCF-6513)
+  - ImpressionWorker (SDKCF-6613)
 * SDKCF-6596: Updated minor version and dependency check suppression of the following dependencies:
   - Kotlin to `1.6.21`
   - Dokka to `1.8.10`

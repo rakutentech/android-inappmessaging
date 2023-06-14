@@ -98,11 +98,14 @@ class ImpressionWorkerSpec {
     @Test
     fun `should return retry when request fails with exception`() {
         val worker = spy(setupWorker())
-        `when`(worker.createReportImpressionCall(
-            impressionEndpoint = mockWebServer.url("impression").toString(),
-            impressionRequest = Gson().fromJson(
-                worker.inputData.getString(ImpressionWorker.IMPRESSION_REQUEST_KEY), ImpressionRequest::class.java)
-        )).thenThrow(IllegalArgumentException())
+        `when`(
+            worker.createReportImpressionCall(
+                impressionEndpoint = mockWebServer.url("impression").toString(),
+                impressionRequest = Gson().fromJson(
+                    worker.inputData.getString(ImpressionWorker.IMPRESSION_REQUEST_KEY), ImpressionRequest::class.java,
+                ),
+            ),
+        ).thenThrow(IllegalArgumentException())
 
         worker.doWork() shouldBeEqualTo ListenableWorker.Result.retry()
     }
@@ -124,12 +127,12 @@ class ImpressionWorkerSpec {
                 "sdkVersion":"1.6.0-SNAPSHOT",
                 "userIdentifiers":[]
             }
-            """
+        """.trimIndent(),
     ): ImpressionWorker {
         val worker = TestWorkerBuilder<ImpressionWorker>(
             ApplicationProvider.getApplicationContext(),
             Executors.newSingleThreadExecutor(),
-            inputData = workDataOf(ImpressionWorker.IMPRESSION_REQUEST_KEY to jsonString)
+            inputData = workDataOf(ImpressionWorker.IMPRESSION_REQUEST_KEY to jsonString),
         ).build()
 
         val mockConfigRepo = mock(ConfigResponseRepository::class.java)

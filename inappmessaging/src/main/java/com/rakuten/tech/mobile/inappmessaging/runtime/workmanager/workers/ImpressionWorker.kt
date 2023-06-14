@@ -29,8 +29,9 @@ internal class ImpressionWorker(
 ) :
     Worker(context, workerParams) {
 
-    constructor(context: Context, workerParams: WorkerParameters): this(
-        context, workerParams, ConfigResponseRepository.instance())
+    constructor(context: Context, workerParams: WorkerParameters) : this(
+        context, workerParams, ConfigResponseRepository.instance(),
+    )
 
     /**
      * This method makes a thread blocking network call to post impression.
