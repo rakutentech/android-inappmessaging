@@ -1,7 +1,6 @@
 package com.rakuten.tech.mobile.inappmessaging.runtime.workmanager.workers
 
 import android.content.Context
-import androidx.annotation.VisibleForTesting
 import androidx.work.Worker
 import androidx.work.WorkerParameters
 import com.google.gson.Gson
@@ -26,10 +25,12 @@ import java.util.concurrent.atomic.AtomicInteger
 internal class ImpressionWorker(
     context: Context,
     workerParams: WorkerParameters,
+    var configRepo: ConfigResponseRepository,
 ) :
     Worker(context, workerParams) {
 
-    @VisibleForTesting internal var configRepo = ConfigResponseRepository.instance()
+    constructor(context: Context, workerParams: WorkerParameters): this(
+        context, workerParams, ConfigResponseRepository.instance())
 
     /**
      * This method makes a thread blocking network call to post impression.
@@ -68,7 +69,7 @@ internal class ImpressionWorker(
         }
     }
 
-    fun onResponse(response: Response<ResponseBody>): Result {
+    private fun onResponse(response: Response<ResponseBody>): Result {
         InAppLogger(TAG).debug("Impression Response:%d", response.code())
 
         return when {
@@ -106,6 +107,6 @@ internal class ImpressionWorker(
     companion object {
         const val IMPRESSION_REQUEST_KEY = "impression_request_key"
         private const val TAG = "IAM_ImpressionWorker"
-        internal val serverErrorCounter = AtomicInteger(0)
+        private val serverErrorCounter = AtomicInteger(0)
     }
 }
