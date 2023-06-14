@@ -23,9 +23,9 @@ internal class InAppMessageModalView(
         super.populateViewData(message)
 
         setCloseButton()
-        findModalView()?.setBackgroundColor(bgColor)
+        findModalLayout()?.setBackgroundColor(bgColor)
     }
 
     @VisibleForTesting
-    internal fun findModalView() = findViewById<LinearLayout>(R.id.modal)
+    fun findModalLayout(): LinearLayout? = findViewById(R.id.modal)
 }

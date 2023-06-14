@@ -19,7 +19,7 @@ class InAppMessageModalViewSpec {
         val view = spy(InAppMessageModalView(ApplicationProvider.getApplicationContext(), null))
         val mockModal = mock(LinearLayout::class.java)
 
-        doReturn(mockModal).`when`(view).findModalView()
+        doReturn(mockModal).`when`(view).findModalLayout()
         doReturn(null).`when`(view).findViewById<Button>(anyInt())
         doReturn(null).`when`(view).findViewById<CheckBox>(anyInt())
 
@@ -37,10 +37,10 @@ class InAppMessageModalViewSpec {
     }
 
     @Test
-    fun `should not set background color when modal view is null`() {
+    fun `should not set background color when modal layout is null`() {
         val view = spy(InAppMessageModalView(ApplicationProvider.getApplicationContext(), null))
 
-        doReturn(null).`when`(view).findModalView()
+        doReturn(null).`when`(view).findModalLayout()
 
         view.populateViewData(TestDataHelper.createDummyMessage())
 
