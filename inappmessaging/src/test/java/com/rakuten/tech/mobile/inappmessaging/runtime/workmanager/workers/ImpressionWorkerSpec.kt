@@ -38,35 +38,35 @@ class ImpressionWorkerSpec {
 
     @Test
     fun `should return failure when impression endpoint is empty`() {
-        val worker = setupWorker(endpoint = "")
+        val worker = buildWorker(endpoint = "")
 
         worker.doWork() shouldBeEqualTo ListenableWorker.Result.failure()
     }
 
     @Test
     fun `should return failure when impression json is null`() {
-        val worker = setupWorker(jsonString = null)
+        val worker = buildWorker(jsonString = null)
 
         worker.doWork() shouldBeEqualTo ListenableWorker.Result.failure()
     }
 
     @Test
     fun `should return failure when impression json is empty`() {
-        val worker = setupWorker(jsonString = "")
+        val worker = buildWorker(jsonString = "")
 
         worker.doWork() shouldBeEqualTo ListenableWorker.Result.failure()
     }
 
     @Test
     fun `should return failure when both impression endpoint and json are invalid`() {
-        val worker = setupWorker(endpoint = "", jsonString = null)
+        val worker = buildWorker(endpoint = "", jsonString = null)
 
         worker.doWork() shouldBeEqualTo ListenableWorker.Result.failure()
     }
 
     @Test
     fun `should return failure when impression json format is invalid`() {
-        val worker = setupWorker(jsonString = """key: "invalid"}""")
+        val worker = buildWorker(jsonString = """key: "invalid"}""")
 
         worker.doWork() shouldBeEqualTo ListenableWorker.Result.failure()
     }
@@ -74,7 +74,7 @@ class ImpressionWorkerSpec {
     @Test
     fun `should return retry when response=HTTP_INTERNAL_ERROR`() {
         mockWebServer.enqueue(MockResponse().setResponseCode(HttpURLConnection.HTTP_INTERNAL_ERROR))
-        val worker = setupWorker()
+        val worker = buildWorker()
 
         worker.doWork() shouldBeEqualTo ListenableWorker.Result.retry()
     }
@@ -82,7 +82,7 @@ class ImpressionWorkerSpec {
     @Test
     fun `should return failure when response=HTTP_MULT_CHOICE`() {
         mockWebServer.enqueue(MockResponse().setResponseCode(HttpURLConnection.HTTP_MULT_CHOICE))
-        val worker = setupWorker()
+        val worker = buildWorker()
 
         worker.doWork() shouldBeEqualTo ListenableWorker.Result.failure()
     }
@@ -90,14 +90,14 @@ class ImpressionWorkerSpec {
     @Test
     fun `should return success when response=HTTP_OK`() {
         mockWebServer.enqueue(MockResponse().setResponseCode(HttpURLConnection.HTTP_OK))
-        val worker = setupWorker()
+        val worker = buildWorker()
 
         worker.doWork() shouldBeEqualTo ListenableWorker.Result.success()
     }
 
     @Test
     fun `should return retry when request fails with exception`() {
-        val worker = spy(setupWorker())
+        val worker = spy(buildWorker())
         `when`(
             worker.createReportImpressionCall(
                 impressionEndpoint = mockWebServer.url("impression").toString(),
@@ -110,7 +110,7 @@ class ImpressionWorkerSpec {
         worker.doWork() shouldBeEqualTo ListenableWorker.Result.retry()
     }
 
-    private fun setupWorker(
+    private fun buildWorker(
         endpoint: String = mockWebServer.url("impression").toString(),
         jsonString: String? = """
             {
