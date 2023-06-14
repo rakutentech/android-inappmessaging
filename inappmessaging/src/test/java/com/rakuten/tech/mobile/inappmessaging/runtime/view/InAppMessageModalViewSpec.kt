@@ -40,7 +40,7 @@ class InAppMessageModalViewSpec {
     fun `should not set background color when modal view is null`() {
         val view = spy(InAppMessageModalView(ApplicationProvider.getApplicationContext(), null))
 
-        doReturn(null).`when`(view).findViewById<LinearLayout>(anyInt())
+        doReturn(null).`when`(view).findModalView()
 
         view.populateViewData(TestDataHelper.createDummyMessage())
 
