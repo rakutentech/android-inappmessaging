@@ -6,6 +6,8 @@ import android.util.Log
 import androidx.test.core.app.ApplicationProvider
 import androidx.work.*
 import androidx.work.testing.SynchronousExecutor
+import androidx.work.testing.TestListenableWorkerBuilder
+import androidx.work.testing.TestWorkerBuilder
 import androidx.work.testing.WorkManagerTestInitHelper
 import com.google.gson.Gson
 import com.rakuten.tech.mobile.inappmessaging.runtime.*
@@ -21,13 +23,18 @@ import com.rakuten.tech.mobile.inappmessaging.runtime.data.responses.ConfigRespo
 import com.rakuten.tech.mobile.inappmessaging.runtime.utils.RuntimeUtil
 import com.rakuten.tech.mobile.inappmessaging.runtime.workmanager.schedulers.MessageMixerPingScheduler
 import okhttp3.ResponseBody
+import okhttp3.mockwebserver.MockResponse
+import okhttp3.mockwebserver.MockWebServer
+import org.amshove.kluent.shouldBe
 import org.amshove.kluent.shouldBeEqualTo
+import org.junit.After
 import org.junit.Before
 import org.junit.Ignore
 import org.junit.Test
 import org.junit.runner.RunWith
 import org.mockito.Mock
 import org.mockito.Mockito
+import org.mockito.Mockito.mock
 import org.mockito.Mockito.`when`
 import org.mockito.MockitoAnnotations
 import org.robolectric.RobolectricTestRunner
@@ -35,6 +42,7 @@ import retrofit2.Call
 import retrofit2.Response
 import java.net.HttpURLConnection
 import java.util.*
+import java.util.concurrent.Executors
 
 /**
  * Test class for ImpressionWorker.
@@ -234,6 +242,57 @@ class ImpressionWorkerRespSpec : ImpressionWorkerSpec() {
     fun `should response body call contains device id header`() {
         respBodyCall!!.request().header(MessageMixerRetrofitService.DEVICE_ID_HEADER) shouldBeEqualTo
             InAppMessagingTestConstants.DEVICE_ID
+    }
+}
+
+@RunWith(RobolectricTestRunner::class)
+class ImpressionWorkerSuccessSpec: ImpressionWorkerSpec() {
+    private val mockWebServer = MockWebServer()
+
+    @Before
+    override fun setup() {
+        super.setup()
+        mockWebServer.start()
+    }
+
+    @After
+    fun teardown() {
+        super.tearDown()
+        mockWebServer.shutdown()
+    }
+
+    @Test
+    fun test() {
+        val mockConfigRepo = mock(ConfigResponseRepository::class.java)
+
+        `when`(mockConfigRepo.getImpressionEndpoint()).thenReturn(mockWebServer.url("impression").toString())
+
+//        val json = """
+//            {
+//                "appVersion":"0.0.1",
+//                "campaignId":"1234567890",
+//                "impressions":[
+//                    {
+//                    "impType":"IMPRESSION",
+//                    "timestamp":1583851442449,
+//                    "type":1
+//                    },
+//                ],
+//                "isTest":false,
+//                "sdkVersion":"1.6.0-SNAPSHOT",
+//                "userIdentifiers":[]
+//            }
+//            """
+        val worker = TestWorkerBuilder<ImpressionWorker>(
+            ApplicationProvider.getApplicationContext(),
+            Executors.newSingleThreadExecutor(),
+            inputData = workDataOf("impression_request_key" to REQUEST)
+        ).build()
+        worker.configRepo = mockConfigRepo
+
+        mockWebServer.enqueue(MockResponse().setResponseCode(HttpURLConnection.HTTP_OK))
+
+        worker.doWork() shouldBeEqualTo ListenableWorker.Result.success()
     }
 }
 

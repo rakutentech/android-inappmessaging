@@ -1,6 +1,7 @@
 package com.rakuten.tech.mobile.inappmessaging.runtime.workmanager.workers
 
 import android.content.Context
+import androidx.annotation.VisibleForTesting
 import androidx.work.Worker
 import androidx.work.WorkerParameters
 import com.google.gson.Gson
@@ -28,13 +29,15 @@ internal class ImpressionWorker(
 ) :
     Worker(context, workerParams) {
 
+    @VisibleForTesting internal var configRepo = ConfigResponseRepository.instance()
+
     /**
      * This method makes a thread blocking network call to post impression.
      * If server responding a non-successful response, work will be retried again with exponential backoff.
      */
     override fun doWork(): Result {
         // Retrieve input data.
-        val impressionEndpoint = ConfigResponseRepository.instance().getImpressionEndpoint()
+        val impressionEndpoint = configRepo.getImpressionEndpoint()
         val impressionRequestJsonRequest = inputData.getString(IMPRESSION_REQUEST_KEY)
 
         // Validate input data.
