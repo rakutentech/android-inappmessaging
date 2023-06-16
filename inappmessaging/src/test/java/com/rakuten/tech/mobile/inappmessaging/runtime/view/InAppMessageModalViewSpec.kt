@@ -15,7 +15,7 @@ import org.robolectric.RobolectricTestRunner
 @RunWith(RobolectricTestRunner::class)
 class InAppMessageModalViewSpec {
     @Test
-    fun `should set background color`() {
+    fun `should call setBackgroundColor`() {
         val view = spy(InAppMessageModalView(ApplicationProvider.getApplicationContext(), null))
         val mockModal = mock(LinearLayout::class.java)
 
@@ -37,7 +37,7 @@ class InAppMessageModalViewSpec {
     }
 
     @Test
-    fun `should not set background color when modal layout is null`() {
+    fun `should not call setBackgroundColor when modal layout is null`() {
         val view = spy(InAppMessageModalView(ApplicationProvider.getApplicationContext(), null))
 
         doReturn(null).`when`(view).findModalLayout()
