@@ -37,12 +37,8 @@ workflows:
   integration-test:
     before_run:
     - _setup-env
+    - _common-start
     steps:
-    - script@1:
-        title: Dependency Check
-        run_if: '{{enveq "RUN_DEPENDENCY_CHECK" "true"}}'
-        inputs:
-        - content: ./gradlew dependencyCheckAggregate
     - script@1:
         title: Run Tests
         inputs:
