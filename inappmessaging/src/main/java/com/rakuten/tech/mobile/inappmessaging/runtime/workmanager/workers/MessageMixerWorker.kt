@@ -78,8 +78,10 @@ internal class MessageMixerWorker(
 
         // Create an pingRequest for the API.
         val pingRequest = PingRequest(
-            HostAppInfoRepository.instance().getVersion(), RuntimeUtil.getUserIdentifiers(),
-            getSupportedCampaign(),
+            appVersion = HostAppInfoRepository.instance().getVersion(),
+            userIdentifiers = RuntimeUtil.getUserIdentifiers(),
+            supportedTypes = getSupportedCampaign(),
+            deviceId = HostAppInfoRepository.instance().getDeviceId(),
         )
 
         // Create an retrofit API network call.

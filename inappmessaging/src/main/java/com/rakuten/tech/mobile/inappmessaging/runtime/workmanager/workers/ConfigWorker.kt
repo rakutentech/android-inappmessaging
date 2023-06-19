@@ -81,10 +81,14 @@ internal class ConfigWorker(
             locale = locale,
             appVersion = hostAppVersion,
             sdkVersion = sdkVersion,
+            deviceId = hostRepo.getDeviceId(),
         ).queryParams
         return RuntimeUtil.getRetrofit()
             .create(ConfigRetrofitService::class.java)
-            .getConfigService(configUrl, subscriptionId, params)
+            .getConfigService(
+                url = configUrl, subscriptionId = subscriptionId,
+                deviceId = hostRepo.getDeviceId(), parameters = params,
+            )
     }
 
     /**

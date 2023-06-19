@@ -165,6 +165,7 @@ internal class MessageReadinessManager(
             locale = hostAppInfoRepo.getDeviceLocale(),
             lastPingInMillis = campaignRepo.lastSyncMillis ?: 0,
             userIdentifier = RuntimeUtil.getUserIdentifiers(),
+            deviceId = hostAppInfoRepo.getDeviceId(),
         )
     }
 
@@ -179,6 +180,7 @@ internal class MessageReadinessManager(
             accessToken = accountRepo.getAccessToken(),
             url = displayPermissionUrl,
             request = request,
+            deviceId = hostAppInfoRepo.getDeviceId(),
         )
 
     /**

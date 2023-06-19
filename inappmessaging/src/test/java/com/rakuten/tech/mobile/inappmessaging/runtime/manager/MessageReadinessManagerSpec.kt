@@ -360,10 +360,10 @@ class MessageReadinessManagerCallSpec : MessageReadinessManagerSpec() {
     private var mockRequest = mock(DisplayPermissionRequest::class.java)
 
     @Test
-    fun `should response call contain two headers`() {
+    fun `should response call contain three headers`() {
         val responseCall: Call<DisplayPermissionResponse> =
             MessageReadinessManager.instance().getDisplayCall(DISPLAY_PERMISSION_URL, mockRequest)
-        responseCall.request().headers().size() shouldBeEqualTo 2
+        responseCall.request().headers().size() shouldBeEqualTo 3
     }
 
     @Test
@@ -490,6 +490,7 @@ class MessageReadinessTooltipSpec {
     @Test
     fun `should get display permission request for tooltip`() {
         `when`(manager.campaignRepo.lastSyncMillis).thenReturn(null)
+        `when`(manager.hostAppInfoRepo.getDeviceId()).thenReturn("duMMyDeviceId")
         val message = TooltipHelper.createMessage()
         val request = manager.getDisplayPermissionRequest(message)
 
@@ -499,10 +500,11 @@ class MessageReadinessTooltipSpec {
     @Test
     fun `should get display call for tooltip`() {
         `when`(manager.hostAppInfoRepo.getSubscriptionKey()).thenReturn("test-key")
+        `when`(manager.hostAppInfoRepo.getDeviceId()).thenReturn("duMMyDeviceId")
         `when`(manager.accountRepo.getAccessToken()).thenReturn("test-token")
         val request = manager.getDisplayPermissionRequest(testTooltip)
 
         val call = manager.getDisplayCall("test-url", request)
-        call.request().headers().size() shouldBeEqualTo 2
+        call.request().headers().size() shouldBeEqualTo 3
     }
 }

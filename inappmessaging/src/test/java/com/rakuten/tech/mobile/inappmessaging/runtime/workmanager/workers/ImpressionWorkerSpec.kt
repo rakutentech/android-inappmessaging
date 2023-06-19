@@ -161,6 +161,7 @@ class ImpressionWorkerEndpointSpec : ImpressionWorkerSpec() {
             sdkVersion = BuildConfig.VERSION_NAME,
             userIdentifiers = RuntimeUtil.getUserIdentifiers(),
             impressions = listOf(Impression(ImpressionType.ACTION_ONE, Date().time)),
+            deviceId = "duMMyDeviceId",
         )
         val workManager = WorkManager.getInstance(ApplicationProvider.getApplicationContext())
         val request = createWorkRequest(impressionRequest, ImpressionWorker.IMPRESSION_REQUEST_KEY)
@@ -181,6 +182,7 @@ class ImpressionWorkerEndpointSpec : ImpressionWorkerSpec() {
             sdkVersion = BuildConfig.VERSION_NAME,
             userIdentifiers = RuntimeUtil.getUserIdentifiers(),
             impressions = listOf(Impression(ImpressionType.ACTION_ONE, Date().time)),
+            deviceId = "duMMyDeviceId",
         )
         val workManager = WorkManager.getInstance(ApplicationProvider.getApplicationContext())
         val request = createWorkRequest(impressionRequest, ImpressionWorker.IMPRESSION_REQUEST_KEY)
@@ -285,6 +287,7 @@ class ImpressionWorkerBaseSpec : ImpressionWorkerSpec() {
             sdkVersion = BuildConfig.VERSION_NAME,
             userIdentifiers = RuntimeUtil.getUserIdentifiers(),
             impressions = listOf(Impression(ImpressionType.ACTION_ONE, Date().time)),
+            deviceId = "duMMyDeviceId",
         )
         val workManager = WorkManager.getInstance(context)
 
@@ -305,6 +308,7 @@ class ImpressionWorkerBaseSpec : ImpressionWorkerSpec() {
             sdkVersion = BuildConfig.VERSION_NAME,
             userIdentifiers = RuntimeUtil.getUserIdentifiers(),
             impressions = listOf(Impression(ImpressionType.ACTION_ONE, Date().time)),
+            deviceId = "duMMyDeviceId",
         )
         val workManager = WorkManager.getInstance(context)
 
@@ -327,6 +331,7 @@ class ImpressionWorkerBaseSpec : ImpressionWorkerSpec() {
             sdkVersion = BuildConfig.VERSION_NAME,
             userIdentifiers = RuntimeUtil.getUserIdentifiers(),
             impressions = listOf(Impression(ImpressionType.ACTION_ONE, Date().time)),
+            deviceId = "duMMyDeviceId",
         )
         val workManager = WorkManager.getInstance(context)
 

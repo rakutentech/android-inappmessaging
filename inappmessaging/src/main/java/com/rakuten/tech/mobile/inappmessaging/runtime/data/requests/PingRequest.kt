@@ -10,4 +10,5 @@ internal data class PingRequest(
     private val appVersion: String?,
     private val userIdentifiers: List<UserIdentifier>?,
     @SerializedName("supportedCampaignTypes") private val supportedTypes: List<Int>,
+    private val deviceId: String,
 )

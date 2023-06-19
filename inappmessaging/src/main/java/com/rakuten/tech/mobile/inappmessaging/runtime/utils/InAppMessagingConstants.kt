@@ -29,4 +29,6 @@ internal object InAppMessagingConstants {
     const val RAT_EVENT_SUBS_ID = "subscription_id"
     const val RAT_EVENT_IMP = "impressions"
     const val RAT_EVENT_KEY_PERMISSION = "push_permission"
+    const val RAT_EVENT_KEY_DEVICE_ID = "device_id"
+    const val RAT_EVENT_KEY_CP = "cp"
 }

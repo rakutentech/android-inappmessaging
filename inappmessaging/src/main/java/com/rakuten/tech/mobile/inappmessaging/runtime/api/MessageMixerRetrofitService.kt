@@ -37,6 +37,7 @@ internal interface MessageMixerRetrofitService {
     fun getDisplayPermissionService(
         @Header(SUBSCRIPTION_ID_HEADER) subscriptionId: String,
         @Header(ACCESS_TOKEN_HEADER) accessToken: String,
+        @Header(DEVICE_ID_HEADER) deviceId: String,
         @Url url: String,
         @Body request: DisplayPermissionRequest,
     ): Call<DisplayPermissionResponse>

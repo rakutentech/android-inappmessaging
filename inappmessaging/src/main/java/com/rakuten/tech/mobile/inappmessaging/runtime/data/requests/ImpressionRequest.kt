@@ -13,6 +13,7 @@ internal data class ImpressionRequest(
     private val sdkVersion: String?,
     private val userIdentifiers: List<UserIdentifier>,
     val impressions: List<Impression>,
+    private val deviceId: String,
 )
 
 internal data class Impression(

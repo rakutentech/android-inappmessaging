@@ -500,6 +500,7 @@ Documents targeting Product Managers:
   - Dependency Check to `8.2.1`
 * SDKCF-6547: Fixed impression is not incremented when tooltip campaign is displayed.
 * SDKCF-6518: Fixed and suppressed some SonarCloud code smells.
+* SDKCF-6575: Added send device-id to all API calls and RAT events.
 
 ### 7.4.0 (2023-04-24)
 * SDKCF-6321: Updated detekt version to `1.22.0`.

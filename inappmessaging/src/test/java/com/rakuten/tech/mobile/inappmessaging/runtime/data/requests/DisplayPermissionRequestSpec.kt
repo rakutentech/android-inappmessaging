@@ -18,17 +18,22 @@ class DisplayPermissionRequestSpec {
             locale = "test-locale",
             lastPingInMillis = 0L,
             userIdentifier = listOf(UserIdentifier(id = "test-id", type = 0)),
+            deviceId = "duMMyDeviceId",
         )
         val json = """
             >{"campaignId":"test-campaignId","appVersion":"test-appVersion","sdkVersion":"test-sdkVersion",
-            >"locale":"test-locale","lastPingInMillis":0,"userIdentifier":[{"id":"test-id","type":0}],"platform":2}
+            >"locale":"test-locale","lastPingInMillis":0,"userIdentifier":[{"id":"test-id","type":0}],
+            >"deviceId":"duMMyDeviceId","platform":2}
         """.trimMargin(">").replace("\n", "")
         Gson().toJson(testDataClass).shouldBeEqualTo(json)
     }
 
     @Test
     fun `should deserialize DisplayPermissionRequest from json field names set`() {
-        val json = """{"lastPingInMillis":0,"userIdentifier":[{"id":"test-id","type":0}],"platform":2}"""
+        val json = """
+            |{"lastPingInMillis":0,"userIdentifier":[{"id":"test-id","type":0}],"platform":2,
+            |"deviceId":"duMMyDeviceId"}
+        """.trimMargin()
         val testDataClass = Gson().fromJson(json, DisplayPermissionRequest::class.java)
         testDataClass.shouldBeEquivalentTo(
             DisplayPermissionRequest(
@@ -38,6 +43,7 @@ class DisplayPermissionRequestSpec {
                 locale = null,
                 lastPingInMillis = 0,
                 userIdentifier = listOf(UserIdentifier(id = "test-id", type = 0)),
+                deviceId = "duMMyDeviceId",
             ),
         )
     }

@@ -18,18 +18,19 @@ class ImpressionRequestSpec {
             sdkVersion = "test-sdkVersion",
             userIdentifiers = listOf(),
             impressions = listOf(Impression(ImpressionType.EXIT, 0)),
+            deviceId = "duMMyDeviceId",
         )
         val json = """
             >{"campaignId":"test-campaignId","isTest":false,"appVersion":"test-appVersion",
             >"sdkVersion":"test-sdkVersion","userIdentifiers":[],
-            >"impressions":[{"impType":"EXIT","timestamp":0,"type":4}]}
+            >"impressions":[{"impType":"EXIT","timestamp":0,"type":4}],"deviceId":"duMMyDeviceId"}
         """.trimMargin(">").replace("\n", "")
         Gson().toJson(testDataClass).shouldBeEqualTo(json)
     }
 
     @Test
     fun `should deserialize ImpressionRequest from json field names set`() {
-        val json = """{"isTest":true,"userIdentifiers":[],"impressions":[]}"""
+        val json = """{"isTest":true,"userIdentifiers":[],"impressions":[],"deviceId":"duMMyDeviceId"}"""
         val testDataClass = Gson().fromJson(json, ImpressionRequest::class.java)
         testDataClass.shouldBeEquivalentTo(
             ImpressionRequest(
@@ -39,6 +40,7 @@ class ImpressionRequestSpec {
                 sdkVersion = null,
                 userIdentifiers = listOf(),
                 impressions = listOf(),
+                deviceId = "duMMyDeviceId",
             ),
         )
     }
