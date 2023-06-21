@@ -13,11 +13,8 @@ class PingRequestSpec {
             appVersion = "appVersion",
             userIdentifiers = listOf(),
             supportedTypes = listOf(CampaignType.REGULAR.typeId),
-            deviceId = "duMMyDeviceId",
         )
-        val json = """
-            {"appVersion":"appVersion","userIdentifiers":[],"supportedCampaignTypes":[1],"deviceId":"duMMyDeviceId"}
-        """.trimIndent()
+        val json = """{"appVersion":"appVersion","userIdentifiers":[],"supportedCampaignTypes":[1]}"""
         Gson().toJson(testDataClass).shouldBeEqualTo(json)
     }
 }

@@ -5,6 +5,8 @@ import com.rakuten.tech.mobile.inappmessaging.runtime.data.requests.ImpressionRe
 import com.rakuten.tech.mobile.inappmessaging.runtime.data.requests.PingRequest
 import com.rakuten.tech.mobile.inappmessaging.runtime.data.responses.DisplayPermissionResponse
 import com.rakuten.tech.mobile.inappmessaging.runtime.data.responses.ping.MessageMixerResponse
+import com.rakuten.tech.mobile.inappmessaging.runtime.utils.InAppMessagingConstants.DEVICE_ID_HEADER
+import com.rakuten.tech.mobile.inappmessaging.runtime.utils.InAppMessagingConstants.SUBSCRIPTION_ID_HEADER
 import okhttp3.ResponseBody
 import retrofit2.Call
 import retrofit2.http.POST
@@ -55,8 +57,6 @@ internal interface MessageMixerRetrofitService {
     ): Call<ResponseBody>
 
     companion object {
-        const val DEVICE_ID_HEADER = "device_id"
         const val ACCESS_TOKEN_HEADER = "Authorization"
-        const val SUBSCRIPTION_ID_HEADER = "Subscription-Id"
     }
 }

@@ -19,6 +19,7 @@ import com.rakuten.tech.mobile.inappmessaging.runtime.data.responses.DisplayPerm
 import com.rakuten.tech.mobile.inappmessaging.runtime.data.responses.ping.Message
 import com.rakuten.tech.mobile.inappmessaging.runtime.testhelpers.TestDataHelper
 import com.rakuten.tech.mobile.inappmessaging.runtime.testhelpers.TooltipHelper
+import com.rakuten.tech.mobile.inappmessaging.runtime.utils.InAppMessagingConstants.SUBSCRIPTION_ID_HEADER
 import com.rakuten.tech.mobile.inappmessaging.runtime.utils.ViewUtil
 import com.rakuten.tech.mobile.inappmessaging.runtime.workmanager.schedulers.MessageMixerPingScheduler
 import okhttp3.mockwebserver.MockResponse
@@ -378,7 +379,7 @@ class MessageReadinessManagerCallSpec : MessageReadinessManagerSpec() {
     fun `should add sub id header`() {
         val responseCall: Call<DisplayPermissionResponse> =
             MessageReadinessManager.instance().getDisplayCall(DISPLAY_PERMISSION_URL, mockRequest)
-        responseCall.request().header(MessageMixerRetrofitService.SUBSCRIPTION_ID_HEADER) shouldBeEqualTo
+        responseCall.request().header(SUBSCRIPTION_ID_HEADER) shouldBeEqualTo
             InAppMessagingTestConstants.SUB_KEY
     }
 }
@@ -490,7 +491,6 @@ class MessageReadinessTooltipSpec {
     @Test
     fun `should get display permission request for tooltip`() {
         `when`(manager.campaignRepo.lastSyncMillis).thenReturn(null)
-        `when`(manager.hostAppInfoRepo.getDeviceId()).thenReturn("duMMyDeviceId")
         val message = TooltipHelper.createMessage()
         val request = manager.getDisplayPermissionRequest(message)
 

@@ -165,7 +165,6 @@ internal class MessageReadinessManager(
             locale = hostAppInfoRepo.getDeviceLocale(),
             lastPingInMillis = campaignRepo.lastSyncMillis ?: 0,
             userIdentifier = RuntimeUtil.getUserIdentifiers(),
-            deviceId = hostAppInfoRepo.getDeviceId(),
         )
     }
 

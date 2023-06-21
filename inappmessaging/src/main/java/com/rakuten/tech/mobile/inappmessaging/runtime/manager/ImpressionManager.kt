@@ -8,6 +8,7 @@ import com.rakuten.tech.mobile.inappmessaging.runtime.data.repositories.HostAppI
 import com.rakuten.tech.mobile.inappmessaging.runtime.data.requests.Impression
 import com.rakuten.tech.mobile.inappmessaging.runtime.data.requests.ImpressionRequest
 import com.rakuten.tech.mobile.inappmessaging.runtime.utils.InAppLogger
+import com.rakuten.tech.mobile.inappmessaging.runtime.utils.InAppMessagingConstants
 import com.rakuten.tech.mobile.inappmessaging.runtime.utils.InAppMessagingConstants.RAT_EVENT_CAMP_ID
 import com.rakuten.tech.mobile.inappmessaging.runtime.utils.InAppMessagingConstants.RAT_EVENT_IMP
 import com.rakuten.tech.mobile.inappmessaging.runtime.utils.InAppMessagingConstants.RAT_EVENT_KEY_IMPRESSION
@@ -56,7 +57,6 @@ internal object ImpressionManager {
             sdkVersion = BuildConfig.VERSION_NAME,
             userIdentifiers = RuntimeUtil.getUserIdentifiers(),
             impressions = impListRequest,
-            deviceId = HostAppInfoRepository.instance().getDeviceId(),
         )
 
         // Schedule work to report impressions back to IAM backend.
@@ -79,6 +79,7 @@ internal object ImpressionManager {
         params[RAT_EVENT_CAMP_ID] = campaignId
         params[RAT_EVENT_SUBS_ID] = HostAppInfoRepository.instance().getSubscriptionKey()
         params[RAT_EVENT_IMP] = createRatImpressionList(impressionList)
+        params[InAppMessagingConstants.RAT_EVENT_KEY_DEVICE_ID] = HostAppInfoRepository.instance().getDeviceId()
 
         sendEvent(RAT_EVENT_KEY_IMPRESSION, params)
     }

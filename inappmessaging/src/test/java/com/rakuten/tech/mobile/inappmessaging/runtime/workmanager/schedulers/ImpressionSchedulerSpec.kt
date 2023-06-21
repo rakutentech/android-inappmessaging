@@ -88,7 +88,6 @@ class ImpressionSchedulerSpec : BaseTest() {
             HostAppInfoRepository.instance().getVersion(),
             RuntimeUtil.getUserIdentifiers(),
             ImpressionManager.createImpressionList(impressionTypes),
-            "duMMyDeviceId",
         )
         ImpressionScheduler().startImpressionWorker(impressionRequest, mockManager)
     }

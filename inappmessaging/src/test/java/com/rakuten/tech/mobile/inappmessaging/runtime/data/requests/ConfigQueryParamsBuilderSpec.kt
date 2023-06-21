@@ -13,7 +13,6 @@ class ConfigQueryParamsBuilderSpec {
             locale = "jp",
             appVersion = "0.0.1",
             sdkVersion = "1.6.0-SNAPSHOT",
-            deviceId = "duMMyDeviceId",
         )
         testDataClass.apply {
             queryParams["platform"] shouldBeEqualTo InAppMessagingConstants.ANDROID_PLATFORM_ENUM
@@ -26,7 +25,7 @@ class ConfigQueryParamsBuilderSpec {
 
     @Test
     fun `should map platform in query params`() {
-        val testDataClass = ConfigQueryParamsBuilder(deviceId = "duMMyDeviceId")
+        val testDataClass = ConfigQueryParamsBuilder()
         testDataClass.queryParams["platform"] shouldBeEqualTo InAppMessagingConstants.ANDROID_PLATFORM_ENUM
     }
 }
