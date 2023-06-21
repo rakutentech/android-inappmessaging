@@ -37,6 +37,20 @@
     <packageUrl regex="true">^pkg:maven/com\.fasterxml\.woodstox/woodstox\-core@.*$</packageUrl>
     <vulnerabilityName>CVE-2022-40152</vulnerabilityName>
   </suppress>
+  <suppress until="2023-12-31Z">
+    <notes><![CDATA[
+   file name: woodstox-core-6.2.4.jar (shaded: com.sun.xml.bind.jaxb:isorelax:20090621)
+   ]]></notes>
+    <packageUrl regex="true">^pkg:maven/com\.sun\.xml\.bind\.jaxb/isorelax@.*$</packageUrl>
+    <cve>CVE-2023-34411</cve>
+  </suppress>
+  <suppress until="2023-12-31Z">
+    <notes><![CDATA[
+   file name: jackson-databind-2.12.7.1.jar
+   ]]></notes>
+    <packageUrl regex="true">^pkg:maven/com\.fasterxml\.jackson\.core/jackson\-databind@.*$</packageUrl>
+    <vulnerabilityName>CVE-2023-35116</vulnerabilityName>
+  </suppress>
 
   <!-- Detekt -->
   <suppress until="2023-12-31Z">

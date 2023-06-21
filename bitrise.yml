@@ -37,12 +37,8 @@ workflows:
   integration-test:
     before_run:
     - _setup-env
+    - _common-start
     steps:
-    - script@1:
-        title: Dependency Check
-        run_if: '{{enveq "RUN_DEPENDENCY_CHECK" "true"}}'
-        inputs:
-        - content: ./gradlew dependencyCheckAggregate
     - script@1:
         title: Run Tests
         inputs:
@@ -204,6 +200,10 @@ workflows:
         inputs:
         - timeout: 1800
         - content: "./gradlew dependencyCheckAggregate"
+    - deploy-to-bitrise-io:
+        title: Deploy Dependency Check Report
+        inputs:
+          - deploy_path: "$SDK_PATH/build/reports/dependency-check-report.html"
   _common-end:
     after_run:
     - _run-sonarqube-scanner
