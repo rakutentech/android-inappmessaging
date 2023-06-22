@@ -484,6 +484,7 @@ Documents targeting Product Managers:
 ## <a name="changelog"></a> Changelog
 
 ### 7.5.0 (In-Progress)
+* SDKCF-6575: Added sending of device Id in all IAM requests.
 * Improved the following classes to increase code coverage:
   - InAppMessagingConstants (SDKCF-6497)
   - InAppMessageSlideUpView (SDKCF-6478)
