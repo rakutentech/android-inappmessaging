@@ -179,6 +179,7 @@ internal class MessageReadinessManager(
             accessToken = accountRepo.getAccessToken(),
             url = displayPermissionUrl,
             request = request,
+            deviceId = hostAppInfoRepo.getDeviceId(),
         )
 
     /**

@@ -18,6 +18,8 @@ import com.rakuten.tech.mobile.inappmessaging.runtime.data.repositories.HostAppI
 import com.rakuten.tech.mobile.inappmessaging.runtime.data.requests.Impression
 import com.rakuten.tech.mobile.inappmessaging.runtime.data.requests.ImpressionRequest
 import com.rakuten.tech.mobile.inappmessaging.runtime.data.responses.ConfigResponse
+import com.rakuten.tech.mobile.inappmessaging.runtime.utils.InAppMessagingConstants.DEVICE_ID_HEADER
+import com.rakuten.tech.mobile.inappmessaging.runtime.utils.InAppMessagingConstants.SUBSCRIPTION_ID_HEADER
 import com.rakuten.tech.mobile.inappmessaging.runtime.utils.RuntimeUtil
 import com.rakuten.tech.mobile.inappmessaging.runtime.workmanager.schedulers.MessageMixerPingScheduler
 import okhttp3.ResponseBody
@@ -226,13 +228,13 @@ class ImpressionWorkerRespSpec : ImpressionWorkerSpec() {
 
     @Test
     fun `should response body call contains sub id header`() {
-        respBodyCall!!.request().header(MessageMixerRetrofitService.SUBSCRIPTION_ID_HEADER) shouldBeEqualTo
+        respBodyCall!!.request().header(SUBSCRIPTION_ID_HEADER) shouldBeEqualTo
             InAppMessagingTestConstants.SUB_KEY
     }
 
     @Test
     fun `should response body call contains device id header`() {
-        respBodyCall!!.request().header(MessageMixerRetrofitService.DEVICE_ID_HEADER) shouldBeEqualTo
+        respBodyCall!!.request().header(DEVICE_ID_HEADER) shouldBeEqualTo
             InAppMessagingTestConstants.DEVICE_ID
     }
 }

@@ -19,6 +19,7 @@ import com.rakuten.tech.mobile.inappmessaging.runtime.data.responses.DisplayPerm
 import com.rakuten.tech.mobile.inappmessaging.runtime.data.responses.ping.Message
 import com.rakuten.tech.mobile.inappmessaging.runtime.testhelpers.TestDataHelper
 import com.rakuten.tech.mobile.inappmessaging.runtime.testhelpers.TooltipHelper
+import com.rakuten.tech.mobile.inappmessaging.runtime.utils.InAppMessagingConstants.SUBSCRIPTION_ID_HEADER
 import com.rakuten.tech.mobile.inappmessaging.runtime.utils.ViewUtil
 import com.rakuten.tech.mobile.inappmessaging.runtime.workmanager.schedulers.MessageMixerPingScheduler
 import okhttp3.mockwebserver.MockResponse
@@ -360,10 +361,10 @@ class MessageReadinessManagerCallSpec : MessageReadinessManagerSpec() {
     private var mockRequest = mock(DisplayPermissionRequest::class.java)
 
     @Test
-    fun `should response call contain two headers`() {
+    fun `should response call contain three headers`() {
         val responseCall: Call<DisplayPermissionResponse> =
             MessageReadinessManager.instance().getDisplayCall(DISPLAY_PERMISSION_URL, mockRequest)
-        responseCall.request().headers().size() shouldBeEqualTo 2
+        responseCall.request().headers().size() shouldBeEqualTo 3
     }
 
     @Test
@@ -378,7 +379,7 @@ class MessageReadinessManagerCallSpec : MessageReadinessManagerSpec() {
     fun `should add sub id header`() {
         val responseCall: Call<DisplayPermissionResponse> =
             MessageReadinessManager.instance().getDisplayCall(DISPLAY_PERMISSION_URL, mockRequest)
-        responseCall.request().header(MessageMixerRetrofitService.SUBSCRIPTION_ID_HEADER) shouldBeEqualTo
+        responseCall.request().header(SUBSCRIPTION_ID_HEADER) shouldBeEqualTo
             InAppMessagingTestConstants.SUB_KEY
     }
 }
@@ -499,10 +500,11 @@ class MessageReadinessTooltipSpec {
     @Test
     fun `should get display call for tooltip`() {
         `when`(manager.hostAppInfoRepo.getSubscriptionKey()).thenReturn("test-key")
+        `when`(manager.hostAppInfoRepo.getDeviceId()).thenReturn("duMMyDeviceId")
         `when`(manager.accountRepo.getAccessToken()).thenReturn("test-token")
         val request = manager.getDisplayPermissionRequest(testTooltip)
 
         val call = manager.getDisplayCall("test-url", request)
-        call.request().headers().size() shouldBeEqualTo 2
+        call.request().headers().size() shouldBeEqualTo 3
     }
 }
