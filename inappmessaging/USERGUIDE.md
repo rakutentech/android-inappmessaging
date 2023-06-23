@@ -484,6 +484,7 @@ Documents targeting Product Managers:
 ## <a name="changelog"></a> Changelog
 
 ### 7.5.0 (In-Progress)
+* SDKCF-6575: Added sending of device Id in all IAM requests.
 * Improved the following classes to increase code coverage:
   - InAppMessagingConstants (SDKCF-6497)
   - InAppMessageSlideUpView (SDKCF-6478)
@@ -494,6 +495,7 @@ Documents targeting Product Managers:
   - MessageReadinessManager (SDKCF-6458)
   - TriggerAttributesValidator (SDKCF-6399)
   - BuildVersionChecker (SDKCF-6513)
+  - ImpressionWorker (SDKCF-6613)
 * SDKCF-6596: Updated minor version and dependency check suppression of the following dependencies:
   - Kotlin to `1.6.21`
   - Dokka to `1.8.10`
@@ -501,7 +503,6 @@ Documents targeting Product Managers:
   - Dependency Check to `8.2.1`
 * SDKCF-6547: Fixed impression is not incremented when tooltip campaign is displayed.
 * SDKCF-6518: Fixed and suppressed some SonarCloud code smells.
-* SDKCF-6575: Added sending of device Id in all IAM requests.
 
 ### 7.4.0 (2023-04-24)
 * SDKCF-6321: Updated detekt version to `1.22.0`.
