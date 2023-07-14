@@ -25,8 +25,13 @@ import java.util.concurrent.atomic.AtomicInteger
 internal class ImpressionWorker(
     context: Context,
     workerParams: WorkerParameters,
+    var configRepo: ConfigResponseRepository,
 ) :
     Worker(context, workerParams) {
+
+    constructor(context: Context, workerParams: WorkerParameters) : this(
+        context, workerParams, ConfigResponseRepository.instance(),
+    )
 
     /**
      * This method makes a thread blocking network call to post impression.
@@ -34,7 +39,7 @@ internal class ImpressionWorker(
      */
     override fun doWork(): Result {
         // Retrieve input data.
-        val impressionEndpoint = ConfigResponseRepository.instance().getImpressionEndpoint()
+        val impressionEndpoint = configRepo.getImpressionEndpoint()
         val impressionRequestJsonRequest = inputData.getString(IMPRESSION_REQUEST_KEY)
 
         // Validate input data.
@@ -65,7 +70,7 @@ internal class ImpressionWorker(
         }
     }
 
-    fun onResponse(response: Response<ResponseBody>): Result {
+    private fun onResponse(response: Response<ResponseBody>): Result {
         InAppLogger(TAG).debug("Impression Response:%d", response.code())
 
         return when {
@@ -103,6 +108,6 @@ internal class ImpressionWorker(
     companion object {
         const val IMPRESSION_REQUEST_KEY = "impression_request_key"
         private const val TAG = "IAM_ImpressionWorker"
-        internal val serverErrorCounter = AtomicInteger(0)
+        private val serverErrorCounter = AtomicInteger(0)
     }
 }
