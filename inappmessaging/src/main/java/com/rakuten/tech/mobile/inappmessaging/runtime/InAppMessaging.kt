@@ -7,6 +7,7 @@ import androidx.annotation.RestrictTo
 import com.rakuten.tech.mobile.inappmessaging.runtime.data.models.appevents.Event
 import com.rakuten.tech.mobile.inappmessaging.runtime.data.repositories.AccountRepository
 import com.rakuten.tech.mobile.inappmessaging.runtime.exception.InAppMessagingException
+import com.rakuten.tech.mobile.inappmessaging.runtime.utils.InAppLogger
 import com.rakuten.tech.mobile.inappmessaging.runtime.utils.Initializer
 import com.rakuten.tech.mobile.inappmessaging.runtime.workmanager.schedulers.ConfigScheduler
 
@@ -133,9 +134,10 @@ abstract class InAppMessaging internal constructor() {
             enableTooltipFeature: Boolean? = false,
         ): Boolean {
 
-            // TODO: publish rmc to test it
-            if (shouldIgnoreConfigure(context, subscriptionKey))
+            if (shouldIgnoreConfigure(context, subscriptionKey)) {
+                InAppLogger("InAppMessaging").debug("Ignoring configure()")
                 return false
+            }
 
             return try {
                 initialize(
