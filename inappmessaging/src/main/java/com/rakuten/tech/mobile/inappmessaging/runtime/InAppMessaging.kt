@@ -160,8 +160,7 @@ abstract class InAppMessaging internal constructor() {
          * @return true when app has integrated RMC SDK but manually called configure API, otherwise false.
          */
         private fun shouldIgnoreConfigure(context: Context, subscriptionKey: String? = null): Boolean {
-            // Check if an RMC metadata exists, if yes then app is using RMC SDK
-            if (!InApp.AppManifestConfig(context).rmcApiKey().isNullOrEmpty()) {
+            if (isUsingRmcSdk(context)) {
                 if (subscriptionKey != null) {
                     // Check if a configure parameter (subscriptionKey) has an RMC prefix, if yes then the API call
                     // came from RMC SDK, otherwise app manually made the call
@@ -170,6 +169,11 @@ abstract class InAppMessaging internal constructor() {
             }
             return false
         }
+
+        /**
+         * Checks if an RMC metadata exists to judge whether the app is using RMC SDK.
+         */
+        internal fun isUsingRmcSdk(context: Context) = !InApp.AppManifestConfig(context).rmcApiKey().isNullOrEmpty()
 
         @SuppressWarnings("LongParameterList")
         @Throws(InAppMessagingException::class)
