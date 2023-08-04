@@ -102,6 +102,11 @@ abstract class InAppMessaging internal constructor() {
         private var instance: InAppMessaging = NotConfiguredInAppMessaging()
 
         /**
+         * RMC SDK prefix to identify whether to proceed with configure or not.
+         */
+        private const val RMC_PREFIX = "rmc_"
+
+        /**
          * Instance of [InAppMessaging].
          *
          * @return [InAppMessaging] instance
@@ -127,10 +132,15 @@ abstract class InAppMessaging internal constructor() {
             configUrl: String? = null,
             enableTooltipFeature: Boolean? = false,
         ): Boolean {
+
+            // TODO: publish rmc to test it
+            if (shouldIgnoreConfigure(context, subscriptionKey))
+                return false
+
             return try {
                 initialize(
                     context = context, isCacheHandling = BuildConfig.IS_CACHE_HANDLING,
-                    subscriptionKey = subscriptionKey, configUrl = configUrl,
+                    subscriptionKey = subscriptionKey?.replace(RMC_PREFIX, ""), configUrl = configUrl,
                     enableTooltipFeature = enableTooltipFeature,
                 )
                 true
@@ -142,6 +152,23 @@ abstract class InAppMessaging internal constructor() {
                 }
                 false
             }
+        }
+
+        /**
+         * Checks whether to ignore the configure API call or not.
+         *
+         * @return true when app has integrated RMC SDK but manually called configure API, otherwise false.
+         */
+        private fun shouldIgnoreConfigure(context: Context, subscriptionKey: String? = null): Boolean {
+            // Check if an RMC metadata exists, if yes then app is using RMC SDK
+            if (!InApp.AppManifestConfig(context).rmcApiKey().isNullOrEmpty()) {
+                if (subscriptionKey != null) {
+                    // Check if a configure parameter (subscriptionKey) has an RMC prefix, if yes then the API call
+                    // came from RMC SDK, otherwise app manually made the call
+                    return !subscriptionKey.startsWith(RMC_PREFIX)
+                }
+            }
+            return false
         }
 
         @SuppressWarnings("LongParameterList")
