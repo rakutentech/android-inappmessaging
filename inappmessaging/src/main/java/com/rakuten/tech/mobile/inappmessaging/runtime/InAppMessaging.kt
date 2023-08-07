@@ -103,7 +103,7 @@ abstract class InAppMessaging internal constructor() {
         private var instance: InAppMessaging = NotConfiguredInAppMessaging()
 
         /**
-         * RMC SDK prefix to identify whether to proceed with configure or not.
+         * Prefix to isolate whether configure request came from RMC SDK.
          */
         private const val RMC_PREFIX = "rmc_"
 
@@ -173,7 +173,7 @@ abstract class InAppMessaging internal constructor() {
         }
 
         /**
-         * Checks if an RMC metadata exists to judge whether the app is using RMC SDK.
+         * Checks if an RMC metadata exists/set to judge whether the app is using RMC SDK.
          */
         internal fun isUsingRmcSdk(context: Context) = !InApp.AppManifestConfig(context).rmcApiKey().isNullOrEmpty()
 
