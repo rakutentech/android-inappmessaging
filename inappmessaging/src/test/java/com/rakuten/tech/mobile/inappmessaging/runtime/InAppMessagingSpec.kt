@@ -2,9 +2,12 @@ package com.rakuten.tech.mobile.inappmessaging.runtime
 
 import android.Manifest
 import android.app.Activity
+import android.content.ContentResolver
 import android.content.Context
+import android.content.pm.ApplicationInfo
 import android.content.pm.PackageManager
 import android.os.Build
+import android.os.Bundle
 import android.provider.Settings
 import android.view.ViewGroup
 import androidx.test.core.app.ApplicationProvider
@@ -24,10 +27,15 @@ import kotlinx.coroutines.test.*
 import org.amshove.kluent.*
 import org.junit.*
 import org.junit.runner.RunWith
+import org.mockito.ArgumentMatchers
+import org.mockito.ArgumentMatchers.anyInt
+import org.mockito.ArgumentMatchers.anyString
 import org.mockito.Mockito
 import org.mockito.Mockito.`when`
+import org.mockito.Mockito.mock
 import org.robolectric.RobolectricTestRunner
 import org.robolectric.annotation.Config
+import java.util.*
 
 /**
  * Test class for InAppMessaging.
@@ -37,16 +45,16 @@ import org.robolectric.annotation.Config
 @SuppressWarnings("LargeClass")
 @Ignore("base class")
 open class InAppMessagingSpec : BaseTest() {
-    internal val activity = Mockito.mock(Activity::class.java)
-    internal val configResponseData = Mockito.mock(ConfigResponseData::class.java)
-    internal val displayManager = Mockito.mock(DisplayManager::class.java)
-    internal val eventsManager = Mockito.mock(EventsManager::class.java)
-    internal val viewGroup = Mockito.mock(ViewGroup::class.java)
-    internal val parentViewGroup = Mockito.mock(ViewGroup::class.java)
-    internal val mockContext = Mockito.mock(Context::class.java)
+    internal val activity = mock(Activity::class.java)
+    internal val configResponseData = mock(ConfigResponseData::class.java)
+    internal val displayManager = mock(DisplayManager::class.java)
+    internal val eventsManager = mock(EventsManager::class.java)
+    internal val viewGroup = mock(ViewGroup::class.java)
+    internal val parentViewGroup = mock(ViewGroup::class.java)
+    internal val mockContext = mock(Context::class.java)
 
     private val function: (ex: Exception) -> Unit = {}
-    internal val mockCallback = Mockito.mock(function.javaClass)
+    internal val mockCallback = mock(function.javaClass)
     internal val captor = argumentCaptor<InAppMessagingException>()
 
     @Before
@@ -330,12 +338,12 @@ class InAppMessagingConfigureSpec : InAppMessagingSpec() {
 }
 
 class InAppMessagingLogEventSpec : InAppMessagingSpec() {
-    private val mockConfigRepo = Mockito.mock(ConfigResponseRepository::class.java)
-    private val mockEventUtil = Mockito.mock(EventMatchingUtil::class.java)
-    private val mockAcctRepo = Mockito.mock(AccountRepository::class.java)
-    private val mockCampaignRepo = Mockito.mock(CampaignRepository::class.java)
-    private val mockSessionManager = Mockito.mock(SessionManager::class.java)
-    private val mockEventsManager = Mockito.mock(EventsManager::class.java)
+    private val mockConfigRepo = mock(ConfigResponseRepository::class.java)
+    private val mockEventUtil = mock(EventMatchingUtil::class.java)
+    private val mockAcctRepo = mock(AccountRepository::class.java)
+    private val mockCampaignRepo = mock(CampaignRepository::class.java)
+    private val mockSessionManager = mock(SessionManager::class.java)
+    private val mockEventsManager = mock(EventsManager::class.java)
 
     private val instance = initializeMockInstance(
         rollout = 100,
@@ -416,9 +424,9 @@ class InAppMessagingLogEventSpec : InAppMessagingSpec() {
 
 class InAppMessagingExceptionSpec : InAppMessagingSpec() {
 
-    private val mockActivity = Mockito.mock(Activity::class.java)
-    private val dispMgr = Mockito.mock(DisplayManager::class.java)
-    private val mockAcctRepo = Mockito.mock(AccountRepository::class.java)
+    private val mockActivity = mock(Activity::class.java)
+    private val dispMgr = mock(DisplayManager::class.java)
+    private val mockAcctRepo = mock(AccountRepository::class.java)
     private val instance = initializeMockInstance(100, dispMgr, accountRepo = mockAcctRepo)
 
     @Before
@@ -583,7 +591,7 @@ class InAppMessagingRemoveSpec : InAppMessagingSpec() {
             position = "top-center",
         )
         setupDisplayedView(message, true)
-        val mockMgr = Mockito.mock(MessageReadinessManager::class.java)
+        val mockMgr = mock(MessageReadinessManager::class.java)
         val instance = initializeMockInstance(100, readinessManager = mockMgr)
 
         instance.registerMessageDisplayActivity(activity)
@@ -601,7 +609,7 @@ class InAppMessagingRemoveSpec : InAppMessagingSpec() {
             position = "top-center",
         )
         setupDisplayedView(message, true)
-        val mockMgr = Mockito.mock(MessageReadinessManager::class.java)
+        val mockMgr = mock(MessageReadinessManager::class.java)
         val instance = initializeMockInstance(100, readinessManager = mockMgr)
 
         instance.registerMessageDisplayActivity(activity)
@@ -616,7 +624,7 @@ class InAppMessagingRemoveSpec : InAppMessagingSpec() {
     fun `should call display manager when removing campaign but not clear queue`() {
         val message = TestDataHelper.createDummyMessage(campaignId = "1")
         setupDisplayedView(message)
-        val mockMgr = Mockito.mock(MessageReadinessManager::class.java)
+        val mockMgr = mock(MessageReadinessManager::class.java)
         val instance = initializeMockInstance(100, readinessManager = mockMgr)
 
         `when`(displayManager.removeMessage(anyOrNull(), any(), any(), anyOrNull())).thenReturn("1")
@@ -632,7 +640,7 @@ class InAppMessagingRemoveSpec : InAppMessagingSpec() {
 
     @Test
     fun `should not call display manager when removing campaign but not clear queue`() {
-        val mockMgr = Mockito.mock(MessageReadinessManager::class.java)
+        val mockMgr = mock(MessageReadinessManager::class.java)
         val instance = initializeMockInstance(100, readinessManager = mockMgr)
 
         `when`(displayManager.removeMessage(anyOrNull(), any(), any(), anyOrNull())).thenReturn(null)
@@ -665,7 +673,7 @@ class InAppMessagingRemoveSpec : InAppMessagingSpec() {
 
 @Config(sdk = [Build.VERSION_CODES.TIRAMISU])
 class InAppMessagingPrimerTrackerSpec : InAppMessagingSpec() {
-    private val mockMgr = Mockito.mock(PushPrimerTrackerManager::class.java)
+    private val mockMgr = mock(PushPrimerTrackerManager::class.java)
 
     @Test
     fun `should call primer manager with granted result`() {
@@ -735,5 +743,143 @@ class InAppMessagingPrimerTrackerSpec : InAppMessagingSpec() {
         )
 
         verify(mockMgr, never()).sendPrimerEvent(any(), any())
+    }
+}
+
+@RunWith(RobolectricTestRunner::class)
+class InAppMessagingRmcSpec {
+
+    private lateinit var mockContext: Context
+    private lateinit var mockPm: PackageManager
+    private lateinit var mockAppInfo: ApplicationInfo
+
+    @Before
+    fun setup() {
+        mockContext = mock(Context::class.java)
+        mockPm = mock(PackageManager::class.java)
+        `when`(mockContext.packageName).thenReturn("test-pm")
+        `when`(mockContext.packageManager).thenReturn(mockPm)
+    }
+
+    @Test
+    fun `isUsingRmcSdk should return true when rmcApiKey exists and valid`() {
+        buildContextWithMetaData(value = "test-api-key")
+
+        InAppMessaging.isUsingRmcSdk(mockContext) shouldBeEqualTo true
+    }
+
+    @Test
+    fun `isUsingRmcSdk should return false when rmcApiKey do not exist`() {
+        buildContextWithMetaData(key = "random.key", null)
+
+        InAppMessaging.isUsingRmcSdk(mockContext) shouldBeEqualTo false
+    }
+
+    @Test
+    fun `isUsingRmcSdk should return false when rmcApiKey exists but null`() {
+        buildContextWithMetaData(value = null)
+
+        InAppMessaging.isUsingRmcSdk(mockContext) shouldBeEqualTo false
+    }
+
+    @Test
+    fun `isUsingRmcSdk should return false when rmcApiKey exists but empty`() {
+        buildContextWithMetaData(value = "")
+
+        InAppMessaging.isUsingRmcSdk(mockContext) shouldBeEqualTo false
+    }
+
+    @Test
+    fun `should ignore configure if using RMC SDK and manually called configure with runtime params`() {
+        buildContextWithMetaData(value = "test-api-key")
+
+        val iamSpy = spy(InAppMessaging)
+        iamSpy.configure(
+            mockContext,
+            "test-subs-key",
+            "test-config-url"
+        )
+
+        verify(iamSpy, never()).initialize(
+            any(),
+            any(),
+            any(),
+            any(),
+            any(),
+            any()
+        )
+    }
+
+    @Test
+    fun `should ignore configure if using RMC SDK and manually called configure with default params`() {
+        buildContextWithMetaData(value = "test-api-key")
+
+        val iamSpy = spy(InAppMessaging)
+        iamSpy.configure(mockContext)
+
+        verify(iamSpy, never()).initialize(
+            any(),
+            any(),
+            any(),
+            any(),
+            any(),
+            any()
+        )
+    }
+
+    @Test
+    fun `should process configure if using RMC SDK and RMC called configure`() {
+        buildContextWithMetaData(value = "test-api-key")
+
+        val iamSpy = spy(InAppMessaging)
+        // Simulate call from RMC by adding prefix
+        iamSpy.configure(
+            mockContext,
+            "${InAppMessaging.RMC_PREFIX}test-subs-key",
+            "test-config-url"
+        )
+
+        verify(iamSpy).initialize(
+            any(),
+            any(),
+            any(),
+            any(),
+            any(),
+            any()
+        )
+    }
+
+    @Test
+    fun `should process configure if not using RMC SDK`() {
+        val iamSpy = spy(InAppMessaging)
+        iamSpy.configure(
+            ApplicationProvider.getApplicationContext(),
+            "test-subs-key",
+            "test-config-url"
+        )
+
+        verify(iamSpy).initialize(
+            any(),
+            any(),
+            any(),
+            any(),
+            any(),
+            any()
+        )
+    }
+
+    private fun buildContextWithMetaData(key: String = "com.rakuten.tech.mobile.rmc.apiKey", value: String?) {
+        mockAppInfo = ApplicationInfo().apply {
+            metaData = Bundle().apply {
+                putString(key, value)
+            }
+        }
+
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+            `when`(mockPm.getApplicationInfo(anyString(),
+                ArgumentMatchers.any(PackageManager.ApplicationInfoFlags::class.java))).thenReturn(mockAppInfo)
+        } else {
+            `when`(mockPm.getApplicationInfo(anyString(), anyInt())).thenReturn(mockAppInfo)
+        }
     }
 }

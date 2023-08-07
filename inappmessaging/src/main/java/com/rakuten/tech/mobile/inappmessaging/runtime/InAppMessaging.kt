@@ -105,7 +105,7 @@ abstract class InAppMessaging internal constructor() {
         /**
          * Prefix to isolate whether configure request came from RMC SDK.
          */
-        private const val RMC_PREFIX = "rmc_"
+        internal const val RMC_PREFIX = "rmc_"
 
         /**
          * Instance of [InAppMessaging].
@@ -134,14 +134,14 @@ abstract class InAppMessaging internal constructor() {
             enableTooltipFeature: Boolean? = false,
         ): Boolean {
 
-            // First check whether to ignore processing this call. Calls made from apps that have the RMC SDK integrated
-            // will be ignored, and are forced to use the RMC configure API.
-            if (shouldIgnoreConfigure(context, subscriptionKey)) {
-                InAppLogger("InAppMessaging").debug("Ignoring configure()")
-                return false
-            }
-
             return try {
+                // First check whether to ignore processing this call. Calls made from apps that have the RMC SDK
+                // integrated will be ignored, and are forced to use the RMC configure API.
+                if (shouldIgnoreConfigure(context, subscriptionKey)) {
+                    InAppLogger(InApp.TAG).debug("Ignoring configure()")
+                    return false
+                }
+
                 initialize(
                     context = context, isCacheHandling = BuildConfig.IS_CACHE_HANDLING,
                     subscriptionKey = subscriptionKey?.replace(RMC_PREFIX, ""), configUrl = configUrl,
@@ -160,11 +160,12 @@ abstract class InAppMessaging internal constructor() {
 
         /**
          * Checks whether to ignore the configure API call or not.
-         * This assumes that the configure API call from RMC SDK appends the [RMC_PREFIX] in the subscriptionKey value.
+         * This assumes that when configure API is called from RMC SDK, it appended the [RMC_PREFIX] at the beginning
+         * of the subscriptionKey value.
          *
          * @return true when app has integrated RMC SDK but manually called configure API, otherwise false.
          */
-        private fun shouldIgnoreConfigure(context: Context, subscriptionKey: String? = null): Boolean {
+        private fun shouldIgnoreConfigure(context: Context, subscriptionKey: String?): Boolean {
             if (isUsingRmcSdk(context)) {
                 if (subscriptionKey != null) {
                     // Check if a configure parameter (subscriptionKey) has an RMC prefix, if yes then the API call
