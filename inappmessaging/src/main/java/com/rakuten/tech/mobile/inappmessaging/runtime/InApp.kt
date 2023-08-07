@@ -245,7 +245,7 @@ internal class InApp(
         fun isDebugging(): Boolean = metadata.getBoolean("com.rakuten.tech.mobile.inappmessaging.debugging")
 
         /**
-         * An RMC SDK metadata.
+         * RMC SDK apiKey metadata.
          */
         fun rmcApiKey(): String? = metadata.getString("com.rakuten.tech.mobile.rmc.apiKey")
     }

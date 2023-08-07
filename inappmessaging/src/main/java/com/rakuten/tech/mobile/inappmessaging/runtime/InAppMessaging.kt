@@ -134,6 +134,8 @@ abstract class InAppMessaging internal constructor() {
             enableTooltipFeature: Boolean? = false,
         ): Boolean {
 
+            // First check whether to ignore processing this call. Calls made from apps that have the RMC SDK integrated
+            // will be ignored, and are forced to use the RMC configure API.
             if (shouldIgnoreConfigure(context, subscriptionKey)) {
                 InAppLogger("InAppMessaging").debug("Ignoring configure()")
                 return false
@@ -158,6 +160,7 @@ abstract class InAppMessaging internal constructor() {
 
         /**
          * Checks whether to ignore the configure API call or not.
+         * This assumes that the configure API call from RMC SDK appends the [RMC_PREFIX] in the subscriptionKey value.
          *
          * @return true when app has integrated RMC SDK but manually called configure API, otherwise false.
          */
@@ -173,7 +176,7 @@ abstract class InAppMessaging internal constructor() {
         }
 
         /**
-         * Checks if an RMC metadata exists/set to judge whether the app is using RMC SDK.
+         * Checks if the RMC metadata apiKey exists/set to judge whether the app is using RMC SDK.
          */
         internal fun isUsingRmcSdk(context: Context) = !InApp.AppManifestConfig(context).rmcApiKey().isNullOrEmpty()
 
