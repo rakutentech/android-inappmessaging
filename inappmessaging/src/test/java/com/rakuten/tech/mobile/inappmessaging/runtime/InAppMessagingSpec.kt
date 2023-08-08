@@ -2,12 +2,9 @@ package com.rakuten.tech.mobile.inappmessaging.runtime
 
 import android.Manifest
 import android.app.Activity
-import android.content.ContentResolver
 import android.content.Context
-import android.content.pm.ApplicationInfo
 import android.content.pm.PackageManager
 import android.os.Build
-import android.os.Bundle
 import android.provider.Settings
 import android.view.ViewGroup
 import androidx.test.core.app.ApplicationProvider
@@ -27,9 +24,6 @@ import kotlinx.coroutines.test.*
 import org.amshove.kluent.*
 import org.junit.*
 import org.junit.runner.RunWith
-import org.mockito.ArgumentMatchers
-import org.mockito.ArgumentMatchers.anyInt
-import org.mockito.ArgumentMatchers.anyString
 import org.mockito.Mockito
 import org.mockito.Mockito.`when`
 import org.mockito.Mockito.mock
@@ -749,116 +743,66 @@ class InAppMessagingPrimerTrackerSpec : InAppMessagingSpec() {
 @RunWith(RobolectricTestRunner::class)
 class InAppMessagingRmcSpec {
 
-    private lateinit var mockContext: Context
-    private lateinit var mockPm: PackageManager
-    private lateinit var mockAppInfo: ApplicationInfo
+    private lateinit var context: Context
+    private lateinit var iamSpy: InAppMessaging.Companion
 
     @Before
     fun setup() {
-        mockContext = mock(Context::class.java)
-        mockPm = mock(PackageManager::class.java)
-        `when`(mockContext.packageName).thenReturn("test-pm")
-        `when`(mockContext.packageManager).thenReturn(mockPm)
-    }
-
-    @Test
-    fun `isUsingRmcSdk should return true when rmcApiKey exists and valid`() {
-        buildContextWithMetaData(value = "test-api-key")
-
-        InAppMessaging.isUsingRmcSdk(mockContext) shouldBeEqualTo true
-    }
-
-    @Test
-    fun `isUsingRmcSdk should return false when rmcApiKey do not exist`() {
-        buildContextWithMetaData(key = "random.key", null)
-
-        InAppMessaging.isUsingRmcSdk(mockContext) shouldBeEqualTo false
-    }
-
-    @Test
-    fun `isUsingRmcSdk should return false when rmcApiKey exists but null`() {
-        buildContextWithMetaData(value = null)
-
-        InAppMessaging.isUsingRmcSdk(mockContext) shouldBeEqualTo false
-    }
-
-    @Test
-    fun `isUsingRmcSdk should return false when rmcApiKey exists but empty`() {
-        buildContextWithMetaData(value = "")
-
-        InAppMessaging.isUsingRmcSdk(mockContext) shouldBeEqualTo false
+        context = ApplicationProvider.getApplicationContext()
+        iamSpy = spy(InAppMessaging)
     }
 
     @Test
     fun `should ignore configure if using RMC SDK and manually called configure with runtime params`() {
-        buildContextWithMetaData(value = "test-api-key")
+        `when`(iamSpy.isUsingRmcSdk()).thenReturn(true)
 
-        val iamSpy = spy(InAppMessaging)
         iamSpy.configure(
-            mockContext,
+            context,
             "test-subs-key",
             "test-config-url"
         )
 
-        verify(iamSpy, never()).initialize(
-            any(),
-            any(),
-            any(),
-            any(),
-            any(),
-            any()
-        )
+        verifyInitializedCalled(0)
     }
 
     @Test
     fun `should ignore configure if using RMC SDK and manually called configure with default params`() {
-        buildContextWithMetaData(value = "test-api-key")
+        `when`(iamSpy.isUsingRmcSdk()).thenReturn(true)
 
-        val iamSpy = spy(InAppMessaging)
-        iamSpy.configure(mockContext)
+        iamSpy.configure(context)
 
-        verify(iamSpy, never()).initialize(
-            any(),
-            any(),
-            any(),
-            any(),
-            any(),
-            any()
-        )
+        verifyInitializedCalled(0)
     }
 
     @Test
     fun `should process configure if using RMC SDK and RMC called configure`() {
-        buildContextWithMetaData(value = "test-api-key")
+        `when`(iamSpy.isUsingRmcSdk()).thenReturn(true)
 
-        val iamSpy = spy(InAppMessaging)
         // Simulate call from RMC by adding prefix
         iamSpy.configure(
-            mockContext,
+            context,
             "${InAppMessaging.RMC_PREFIX}test-subs-key",
             "test-config-url"
         )
 
-        verify(iamSpy).initialize(
-            any(),
-            any(),
-            any(),
-            any(),
-            any(),
-            any()
-        )
+        verifyInitializedCalled(1)
     }
 
     @Test
     fun `should process configure if not using RMC SDK`() {
-        val iamSpy = spy(InAppMessaging)
+        `when`(iamSpy.isUsingRmcSdk()).thenReturn(false)
+
         iamSpy.configure(
             ApplicationProvider.getApplicationContext(),
             "test-subs-key",
             "test-config-url"
         )
 
-        verify(iamSpy).initialize(
+        verifyInitializedCalled(1)
+    }
+
+    private fun verifyInitializedCalled(numInvocations: Int) {
+        verify(iamSpy, times(numInvocations)).initialize(
             any(),
             any(),
             any(),
@@ -866,20 +810,5 @@ class InAppMessagingRmcSpec {
             any(),
             any()
         )
-    }
-
-    private fun buildContextWithMetaData(key: String = "com.rakuten.tech.mobile.rmc.apiKey", value: String?) {
-        mockAppInfo = ApplicationInfo().apply {
-            metaData = Bundle().apply {
-                putString(key, value)
-            }
-        }
-
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
-            `when`(mockPm.getApplicationInfo(anyString(),
-                ArgumentMatchers.any(PackageManager.ApplicationInfoFlags::class.java))).thenReturn(mockAppInfo)
-        } else {
-            `when`(mockPm.getApplicationInfo(anyString(), anyInt())).thenReturn(mockAppInfo)
-        }
     }
 }

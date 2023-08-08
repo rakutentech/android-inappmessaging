@@ -7,6 +7,7 @@ import androidx.annotation.RestrictTo
 import com.rakuten.tech.mobile.inappmessaging.runtime.data.models.appevents.Event
 import com.rakuten.tech.mobile.inappmessaging.runtime.data.repositories.AccountRepository
 import com.rakuten.tech.mobile.inappmessaging.runtime.exception.InAppMessagingException
+import com.rakuten.tech.mobile.inappmessaging.runtime.utils.CommonUtil
 import com.rakuten.tech.mobile.inappmessaging.runtime.utils.InAppLogger
 import com.rakuten.tech.mobile.inappmessaging.runtime.utils.Initializer
 import com.rakuten.tech.mobile.inappmessaging.runtime.workmanager.schedulers.ConfigScheduler
@@ -137,8 +138,8 @@ abstract class InAppMessaging internal constructor() {
             return try {
                 // First check whether to ignore processing this call. Calls made from apps that have the RMC SDK
                 // integrated will be ignored, and are forced to use the RMC configure API.
-                if (shouldIgnoreConfigure(context, subscriptionKey)) {
-                    InAppLogger(InApp.TAG).debug("Ignoring configure()")
+                if (shouldIgnoreConfigure(subscriptionKey)) {
+                    InAppLogger(InApp.TAG).debug("Ignoring configuration")
                     return false
                 }
 
@@ -159,27 +160,9 @@ abstract class InAppMessaging internal constructor() {
         }
 
         /**
-         * Checks whether to ignore the configure API call or not.
-         * This assumes that when configure API is called from RMC SDK, it appended the [RMC_PREFIX] at the beginning
-         * of the subscriptionKey value.
-         *
-         * @return true when app has integrated RMC SDK but manually called configure API, otherwise false.
+         * Checks if app is using RMC SDK by checking the existence of public class.
          */
-        private fun shouldIgnoreConfigure(context: Context, subscriptionKey: String?): Boolean {
-            if (isUsingRmcSdk(context)) {
-                if (subscriptionKey != null) {
-                    // Check if a configure parameter (subscriptionKey) has an RMC prefix, if yes then the API call
-                    // came from RMC SDK, otherwise app manually made the call
-                    return !subscriptionKey.startsWith(RMC_PREFIX)
-                }
-            }
-            return false
-        }
-
-        /**
-         * Checks if the RMC metadata apiKey exists/set to judge whether the app is using RMC SDK.
-         */
-        internal fun isUsingRmcSdk(context: Context) = !InApp.AppManifestConfig(context).rmcApiKey().isNullOrEmpty()
+        internal fun isUsingRmcSdk() = CommonUtil.hasClass("com.rakuten.tech.mobile.rmc.Rmc")
 
         @SuppressWarnings("LongParameterList")
         @Throws(InAppMessagingException::class)
@@ -219,6 +202,22 @@ abstract class InAppMessaging internal constructor() {
         }
 
         internal fun getPreferencesFile() = "internal_shared_prefs_" + AccountRepository.instance().userInfoHash
+
+        /**
+         * Checks whether to ignore the configure API call or not.
+         * This assumes that when configure API is called from RMC SDK, it appended the [RMC_PREFIX] at the beginning
+         * of the subscriptionKey value.
+         *
+         * @return true when app has integrated RMC SDK but manually called configure API, otherwise false.
+         */
+        private fun shouldIgnoreConfigure(subscriptionKey: String?): Boolean {
+            // Check if subscriptionKey has an RMC prefix, if yes then the API call came from RMC SDK,
+            // otherwise app manually made the call
+            if (isUsingRmcSdk() && subscriptionKey != null)
+                return !subscriptionKey.startsWith(RMC_PREFIX)
+
+            return false
+        }
     }
 
     @SuppressWarnings("TooManyFunctions")

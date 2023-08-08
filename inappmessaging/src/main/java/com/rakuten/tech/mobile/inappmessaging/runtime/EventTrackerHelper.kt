@@ -1,12 +1,9 @@
 package com.rakuten.tech.mobile.inappmessaging.runtime
 
 import android.text.TextUtils
-import androidx.annotation.VisibleForTesting
-import com.rakuten.tech.mobile.inappmessaging.runtime.utils.InAppLogger
+import com.rakuten.tech.mobile.inappmessaging.runtime.utils.CommonUtil
 
 internal object EventTrackerHelper {
-
-    private const val TAG = "EventTrackerHelper"
 
     /**
      * This method sends event data to Analytics module for processing.
@@ -26,23 +23,12 @@ internal object EventTrackerHelper {
                 else -> HashMap(data)
             }
 
-            if (hasClass("com.rakuten.tech.mobile.analytics.Event")) {
+            if (CommonUtil.hasClass("com.rakuten.tech.mobile.analytics.Event")) {
                 com.rakuten.tech.mobile.analytics.Event(eventName, serializableData).track()
                 return true
             }
         }
 
         return false
-    }
-
-    @VisibleForTesting
-    internal fun hasClass(className: String): Boolean {
-        return try {
-            Class.forName(className)
-            true
-        } catch (e: ClassNotFoundException) {
-            InAppLogger(TAG).info(e.message)
-            false
-        }
     }
 }
