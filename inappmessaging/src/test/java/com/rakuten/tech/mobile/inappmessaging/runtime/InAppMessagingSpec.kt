@@ -28,7 +28,6 @@ import org.mockito.Mockito
 import org.mockito.Mockito.`when`
 import org.robolectric.RobolectricTestRunner
 import org.robolectric.annotation.Config
-import java.util.*
 
 /**
  * Test class for InAppMessaging.
@@ -752,7 +751,7 @@ class InAppMessagingRmcSpec {
     }
 
     @Test
-    fun `should ignore configure if using RMC SDK and manually called configure with runtime params`() {
+    fun `should ignore configure if call (with runtime params) is made from app using RMC SDK`() {
         `when`(iamSpy.isUsingRmcSdk()).thenReturn(true)
 
         iamSpy.configure(
@@ -765,7 +764,7 @@ class InAppMessagingRmcSpec {
     }
 
     @Test
-    fun `should ignore configure if using RMC SDK and manually called configure with default params`() {
+    fun `should ignore configure if call (with default params) is made from app using RMC SDK`() {
         `when`(iamSpy.isUsingRmcSdk()).thenReturn(true)
 
         iamSpy.configure(context)
@@ -774,7 +773,7 @@ class InAppMessagingRmcSpec {
     }
 
     @Test
-    fun `should process configure if using RMC SDK and RMC called configure`() {
+    fun `should process configure if call is made from RMC SDK`() {
         `when`(iamSpy.isUsingRmcSdk()).thenReturn(true)
 
         // Simulate call from RMC by adding prefix
@@ -788,11 +787,11 @@ class InAppMessagingRmcSpec {
     }
 
     @Test
-    fun `should process configure if not using RMC SDK`() {
+    fun `should process configure if call is made from app not using RMC SDK`() {
         `when`(iamSpy.isUsingRmcSdk()).thenReturn(false)
 
         iamSpy.configure(
-            ApplicationProvider.getApplicationContext(),
+            context,
             "test-subs-key",
             "test-config-url",
         )
@@ -800,8 +799,8 @@ class InAppMessagingRmcSpec {
         verifyInitializedCalled(1)
     }
 
-    private fun verifyInitializedCalled(numInvocations: Int) {
-        verify(iamSpy, times(numInvocations)).initialize(
+    private fun verifyInitializedCalled(invocations: Int) {
+        verify(iamSpy, times(invocations)).initialize(
             any(),
             any(),
             any(),

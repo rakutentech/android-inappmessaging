@@ -162,7 +162,7 @@ abstract class InAppMessaging internal constructor() {
         }
 
         /**
-         * Checks if app is using RMC SDK by checking the existence of public class.
+         * Checks if app is using RMC SDK by checking the existence of its main entrypoint (public class).
          */
         internal fun isUsingRmcSdk() = CommonUtil.hasClass("com.rakuten.tech.mobile.rmc.Rmc")
 
@@ -213,12 +213,9 @@ abstract class InAppMessaging internal constructor() {
          * @return true when app has integrated RMC SDK but manually called configure API, otherwise false.
          */
         private fun shouldIgnoreConfigure(subscriptionKey: String?): Boolean {
-            // Check if subscriptionKey has an RMC prefix, if yes then the API call came from RMC SDK,
-            // otherwise app manually made the call
             if (isUsingRmcSdk() && subscriptionKey != null) {
                 return !subscriptionKey.startsWith(RMC_PREFIX)
             }
-
             return false
         }
     }
