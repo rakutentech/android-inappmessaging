@@ -126,7 +126,10 @@ abstract class InAppMessaging internal constructor() {
          *
          * @return `true` if configuration is successful, and `false` otherwise.
          */
-        @SuppressWarnings("TooGenericExceptionCaught")
+        @SuppressWarnings(
+            "LongMethod",
+            "TooGenericExceptionCaught",
+        )
         @JvmOverloads
         fun configure(
             context: Context,
@@ -134,7 +137,6 @@ abstract class InAppMessaging internal constructor() {
             configUrl: String? = null,
             enableTooltipFeature: Boolean? = false,
         ): Boolean {
-
             return try {
                 // First check whether to ignore processing this call. Calls made from apps that have the RMC SDK
                 // integrated will be ignored, and are forced to use the RMC configure API.
@@ -213,8 +215,9 @@ abstract class InAppMessaging internal constructor() {
         private fun shouldIgnoreConfigure(subscriptionKey: String?): Boolean {
             // Check if subscriptionKey has an RMC prefix, if yes then the API call came from RMC SDK,
             // otherwise app manually made the call
-            if (isUsingRmcSdk() && subscriptionKey != null)
+            if (isUsingRmcSdk() && subscriptionKey != null) {
                 return !subscriptionKey.startsWith(RMC_PREFIX)
+            }
 
             return false
         }

@@ -26,7 +26,6 @@ import org.junit.*
 import org.junit.runner.RunWith
 import org.mockito.Mockito
 import org.mockito.Mockito.`when`
-import org.mockito.Mockito.mock
 import org.robolectric.RobolectricTestRunner
 import org.robolectric.annotation.Config
 import java.util.*
@@ -39,16 +38,16 @@ import java.util.*
 @SuppressWarnings("LargeClass")
 @Ignore("base class")
 open class InAppMessagingSpec : BaseTest() {
-    internal val activity = mock(Activity::class.java)
-    internal val configResponseData = mock(ConfigResponseData::class.java)
-    internal val displayManager = mock(DisplayManager::class.java)
-    internal val eventsManager = mock(EventsManager::class.java)
-    internal val viewGroup = mock(ViewGroup::class.java)
-    internal val parentViewGroup = mock(ViewGroup::class.java)
-    internal val mockContext = mock(Context::class.java)
+    internal val activity = Mockito.mock(Activity::class.java)
+    internal val configResponseData = Mockito.mock(ConfigResponseData::class.java)
+    internal val displayManager = Mockito.mock(DisplayManager::class.java)
+    internal val eventsManager = Mockito.mock(EventsManager::class.java)
+    internal val viewGroup = Mockito.mock(ViewGroup::class.java)
+    internal val parentViewGroup = Mockito.mock(ViewGroup::class.java)
+    internal val mockContext = Mockito.mock(Context::class.java)
 
     private val function: (ex: Exception) -> Unit = {}
-    internal val mockCallback = mock(function.javaClass)
+    internal val mockCallback = Mockito.mock(function.javaClass)
     internal val captor = argumentCaptor<InAppMessagingException>()
 
     @Before
@@ -332,12 +331,12 @@ class InAppMessagingConfigureSpec : InAppMessagingSpec() {
 }
 
 class InAppMessagingLogEventSpec : InAppMessagingSpec() {
-    private val mockConfigRepo = mock(ConfigResponseRepository::class.java)
-    private val mockEventUtil = mock(EventMatchingUtil::class.java)
-    private val mockAcctRepo = mock(AccountRepository::class.java)
-    private val mockCampaignRepo = mock(CampaignRepository::class.java)
-    private val mockSessionManager = mock(SessionManager::class.java)
-    private val mockEventsManager = mock(EventsManager::class.java)
+    private val mockConfigRepo = Mockito.mock(ConfigResponseRepository::class.java)
+    private val mockEventUtil = Mockito.mock(EventMatchingUtil::class.java)
+    private val mockAcctRepo = Mockito.mock(AccountRepository::class.java)
+    private val mockCampaignRepo = Mockito.mock(CampaignRepository::class.java)
+    private val mockSessionManager = Mockito.mock(SessionManager::class.java)
+    private val mockEventsManager = Mockito.mock(EventsManager::class.java)
 
     private val instance = initializeMockInstance(
         rollout = 100,
@@ -418,9 +417,9 @@ class InAppMessagingLogEventSpec : InAppMessagingSpec() {
 
 class InAppMessagingExceptionSpec : InAppMessagingSpec() {
 
-    private val mockActivity = mock(Activity::class.java)
-    private val dispMgr = mock(DisplayManager::class.java)
-    private val mockAcctRepo = mock(AccountRepository::class.java)
+    private val mockActivity = Mockito.mock(Activity::class.java)
+    private val dispMgr = Mockito.mock(DisplayManager::class.java)
+    private val mockAcctRepo = Mockito.mock(AccountRepository::class.java)
     private val instance = initializeMockInstance(100, dispMgr, accountRepo = mockAcctRepo)
 
     @Before
@@ -585,7 +584,7 @@ class InAppMessagingRemoveSpec : InAppMessagingSpec() {
             position = "top-center",
         )
         setupDisplayedView(message, true)
-        val mockMgr = mock(MessageReadinessManager::class.java)
+        val mockMgr = Mockito.mock(MessageReadinessManager::class.java)
         val instance = initializeMockInstance(100, readinessManager = mockMgr)
 
         instance.registerMessageDisplayActivity(activity)
@@ -603,7 +602,7 @@ class InAppMessagingRemoveSpec : InAppMessagingSpec() {
             position = "top-center",
         )
         setupDisplayedView(message, true)
-        val mockMgr = mock(MessageReadinessManager::class.java)
+        val mockMgr = Mockito.mock(MessageReadinessManager::class.java)
         val instance = initializeMockInstance(100, readinessManager = mockMgr)
 
         instance.registerMessageDisplayActivity(activity)
@@ -618,7 +617,7 @@ class InAppMessagingRemoveSpec : InAppMessagingSpec() {
     fun `should call display manager when removing campaign but not clear queue`() {
         val message = TestDataHelper.createDummyMessage(campaignId = "1")
         setupDisplayedView(message)
-        val mockMgr = mock(MessageReadinessManager::class.java)
+        val mockMgr = Mockito.mock(MessageReadinessManager::class.java)
         val instance = initializeMockInstance(100, readinessManager = mockMgr)
 
         `when`(displayManager.removeMessage(anyOrNull(), any(), any(), anyOrNull())).thenReturn("1")
@@ -634,7 +633,7 @@ class InAppMessagingRemoveSpec : InAppMessagingSpec() {
 
     @Test
     fun `should not call display manager when removing campaign but not clear queue`() {
-        val mockMgr = mock(MessageReadinessManager::class.java)
+        val mockMgr = Mockito.mock(MessageReadinessManager::class.java)
         val instance = initializeMockInstance(100, readinessManager = mockMgr)
 
         `when`(displayManager.removeMessage(anyOrNull(), any(), any(), anyOrNull())).thenReturn(null)
@@ -667,7 +666,7 @@ class InAppMessagingRemoveSpec : InAppMessagingSpec() {
 
 @Config(sdk = [Build.VERSION_CODES.TIRAMISU])
 class InAppMessagingPrimerTrackerSpec : InAppMessagingSpec() {
-    private val mockMgr = mock(PushPrimerTrackerManager::class.java)
+    private val mockMgr = Mockito.mock(PushPrimerTrackerManager::class.java)
 
     @Test
     fun `should call primer manager with granted result`() {
@@ -759,7 +758,7 @@ class InAppMessagingRmcSpec {
         iamSpy.configure(
             context,
             "test-subs-key",
-            "test-config-url"
+            "test-config-url",
         )
 
         verifyInitializedCalled(0)
@@ -782,7 +781,7 @@ class InAppMessagingRmcSpec {
         iamSpy.configure(
             context,
             "${InAppMessaging.RMC_PREFIX}test-subs-key",
-            "test-config-url"
+            "test-config-url",
         )
 
         verifyInitializedCalled(1)
@@ -795,7 +794,7 @@ class InAppMessagingRmcSpec {
         iamSpy.configure(
             ApplicationProvider.getApplicationContext(),
             "test-subs-key",
-            "test-config-url"
+            "test-config-url",
         )
 
         verifyInitializedCalled(1)
@@ -808,7 +807,7 @@ class InAppMessagingRmcSpec {
             any(),
             any(),
             any(),
-            any()
+            any(),
         )
     }
 }

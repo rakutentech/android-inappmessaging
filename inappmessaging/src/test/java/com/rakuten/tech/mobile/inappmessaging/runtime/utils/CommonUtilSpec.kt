@@ -1,6 +1,5 @@
 package com.rakuten.tech.mobile.inappmessaging.runtime.utils
 
-import com.rakuten.tech.mobile.inappmessaging.runtime.EventTrackerHelper
 import org.amshove.kluent.shouldBeEqualTo
 import org.junit.Test
 import org.junit.runner.RunWith
