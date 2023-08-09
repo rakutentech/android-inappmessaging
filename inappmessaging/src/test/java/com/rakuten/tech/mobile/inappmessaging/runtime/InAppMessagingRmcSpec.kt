@@ -6,26 +6,17 @@ import com.nhaarman.mockitokotlin2.spy
 import com.nhaarman.mockitokotlin2.times
 import com.nhaarman.mockitokotlin2.verify
 import org.junit.After
-import org.junit.Before
 import org.junit.Test
 import org.junit.runner.RunWith
-import org.mockito.MockedStatic
 import org.mockito.Mockito.*
 import org.robolectric.RobolectricTestRunner
 
 @RunWith(RobolectricTestRunner::class)
 class InAppMessagingRmcSpec {
 
-    private lateinit var context: Context
-    private lateinit var iamSpy: InAppMessaging.Companion
-    private lateinit var mockRmcHelper: MockedStatic<RmcHelper>
-
-    @Before
-    fun setup() {
-        context = ApplicationProvider.getApplicationContext()
-        iamSpy = spy(InAppMessaging)
-        mockRmcHelper = mockStatic(RmcHelper::class.java)
-    }
+    private val context: Context = ApplicationProvider.getApplicationContext()
+    private val mockRmcHelper = mockStatic(RmcHelper::class.java)
+    private val iamSpy = spy(InAppMessaging)
 
     @After
     fun tearDown() {
@@ -60,7 +51,7 @@ class InAppMessagingRmcSpec {
 
         iamSpy.configure(
             context,
-            "$TEST_SUBS_KEY${RmcHelper.RMC_SUFFIX}",    // simulate call from RMC by adding suffix
+            "$TEST_SUBS_KEY${RmcHelper.RMC_SUFFIX}", // simulate call from RMC by adding suffix
             TEST_CONFIG_URL,
         )
 
@@ -84,9 +75,9 @@ class InAppMessagingRmcSpec {
         verify(iamSpy, times(invocations)).initialize(
             context,
             true,
-            TEST_SUBS_KEY,  // verify any suffix is removed
+            TEST_SUBS_KEY, // verify any suffix is removed
             TEST_CONFIG_URL,
-            false
+            false,
         )
     }
 
