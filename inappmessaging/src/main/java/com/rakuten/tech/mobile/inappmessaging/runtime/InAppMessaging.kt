@@ -7,7 +7,6 @@ import androidx.annotation.RestrictTo
 import com.rakuten.tech.mobile.inappmessaging.runtime.data.models.appevents.Event
 import com.rakuten.tech.mobile.inappmessaging.runtime.data.repositories.AccountRepository
 import com.rakuten.tech.mobile.inappmessaging.runtime.exception.InAppMessagingException
-import com.rakuten.tech.mobile.inappmessaging.runtime.utils.CommonUtil
 import com.rakuten.tech.mobile.inappmessaging.runtime.utils.InAppLogger
 import com.rakuten.tech.mobile.inappmessaging.runtime.utils.Initializer
 import com.rakuten.tech.mobile.inappmessaging.runtime.workmanager.schedulers.ConfigScheduler
@@ -104,11 +103,6 @@ abstract class InAppMessaging internal constructor() {
         private var instance: InAppMessaging = NotConfiguredInAppMessaging()
 
         /**
-         * Prefix to isolate whether configure request came from RMC SDK.
-         */
-        internal const val RMC_PREFIX = "rmc_"
-
-        /**
          * Instance of [InAppMessaging].
          *
          * @return [InAppMessaging] instance
@@ -147,7 +141,7 @@ abstract class InAppMessaging internal constructor() {
 
                 initialize(
                     context = context, isCacheHandling = BuildConfig.IS_CACHE_HANDLING,
-                    subscriptionKey = subscriptionKey?.replace(RMC_PREFIX, ""), configUrl = configUrl,
+                    subscriptionKey = subscriptionKey?.replace(RmcHelper.RMC_PREFIX, ""), configUrl = configUrl,
                     enableTooltipFeature = enableTooltipFeature,
                 )
                 true
@@ -160,11 +154,6 @@ abstract class InAppMessaging internal constructor() {
                 false
             }
         }
-
-        /**
-         * Checks if app is using RMC SDK by checking the existence of its main entrypoint (public class).
-         */
-        internal fun isUsingRmcSdk() = CommonUtil.hasClass("com.rakuten.tech.mobile.rmc.Rmc")
 
         @SuppressWarnings("LongParameterList")
         @Throws(InAppMessagingException::class)
@@ -206,15 +195,15 @@ abstract class InAppMessaging internal constructor() {
         internal fun getPreferencesFile() = "internal_shared_prefs_" + AccountRepository.instance().userInfoHash
 
         /**
-         * Checks whether to ignore the configure API call or not.
-         * This assumes that when configure API is called from RMC SDK, it appended the [RMC_PREFIX] at the beginning
-         * of the subscriptionKey value.
+         * Checks whether to ignore the configure API call or not. This assumes that when configure API is called from
+         * RMC SDK, it appended the [RmcHelper.RMC_PREFIX] at the beginning of the subscriptionKey value, thus allowing
+         * the call.
          *
          * @return true when app has integrated RMC SDK but manually called configure API, otherwise false.
          */
         private fun shouldIgnoreConfigure(subscriptionKey: String?): Boolean {
-            if (isUsingRmcSdk() && subscriptionKey != null) {
-                return !subscriptionKey.startsWith(RMC_PREFIX)
+            if (RmcHelper.isUsingRmc() && subscriptionKey != null) {
+                return !subscriptionKey.startsWith(RmcHelper.RMC_PREFIX)
             }
             return false
         }

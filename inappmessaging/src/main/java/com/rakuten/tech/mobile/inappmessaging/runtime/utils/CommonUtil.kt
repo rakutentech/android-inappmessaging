@@ -7,6 +7,7 @@ internal object CommonUtil {
 
     private const val TAG = "CommonUtil"
 
+    @JvmStatic
     fun hasClass(className: String): Boolean {
         return try {
             Class.forName(className)
