@@ -8,9 +8,9 @@ import com.rakuten.tech.mobile.inappmessaging.runtime.utils.CommonUtil
 internal object RmcHelper {
 
     /**
-     * Prefix to isolate whether IAM API call came from RMC SDK.
+     * Suffix to isolate whether IAM API call came from RMC SDK.
      */
-    const val RMC_PREFIX = "rmc_"
+    const val RMC_SUFFIX = "-rmc"
 
     /**
      * Checks if app is using RMC SDK by checking the existence of its main entry point public class.

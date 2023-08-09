@@ -141,7 +141,7 @@ abstract class InAppMessaging internal constructor() {
 
                 initialize(
                     context = context, isCacheHandling = BuildConfig.IS_CACHE_HANDLING,
-                    subscriptionKey = subscriptionKey?.replace(RmcHelper.RMC_PREFIX, ""), configUrl = configUrl,
+                    subscriptionKey = subscriptionKey?.removeSuffix(RmcHelper.RMC_SUFFIX), configUrl = configUrl,
                     enableTooltipFeature = enableTooltipFeature,
                 )
                 true
@@ -196,14 +196,13 @@ abstract class InAppMessaging internal constructor() {
 
         /**
          * Checks whether to ignore the configure API call or not. This assumes that when configure API is called from
-         * RMC SDK, it appended the [RmcHelper.RMC_PREFIX] at the beginning of the subscriptionKey value, thus allowing
-         * the call.
+         * RMC SDK, it appended the [RmcHelper.RMC_SUFFIX] in the subscriptionKey value, thus allowing the call.
          *
          * @return true when app has integrated RMC SDK but manually called configure API, otherwise false.
          */
         private fun shouldIgnoreConfigure(subscriptionKey: String?): Boolean {
             if (RmcHelper.isUsingRmc() && subscriptionKey != null) {
-                return !subscriptionKey.startsWith(RmcHelper.RMC_PREFIX)
+                return !subscriptionKey.endsWith(RmcHelper.RMC_SUFFIX)
             }
             return false
         }

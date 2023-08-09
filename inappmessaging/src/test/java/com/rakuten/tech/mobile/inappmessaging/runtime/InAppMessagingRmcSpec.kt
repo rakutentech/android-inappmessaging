@@ -2,7 +2,6 @@ package com.rakuten.tech.mobile.inappmessaging.runtime
 
 import android.content.Context
 import androidx.test.core.app.ApplicationProvider
-import com.nhaarman.mockitokotlin2.any
 import com.nhaarman.mockitokotlin2.spy
 import com.nhaarman.mockitokotlin2.times
 import com.nhaarman.mockitokotlin2.verify
@@ -39,8 +38,8 @@ class InAppMessagingRmcSpec {
 
         iamSpy.configure(
             context,
-            "test-subs-key",
-            "test-config-url",
+            TEST_SUBS_KEY,
+            TEST_CONFIG_URL,
         )
 
         verifyInitializedCalled(0)
@@ -59,11 +58,10 @@ class InAppMessagingRmcSpec {
     fun `should process configure if call is made from RMC SDK`() {
         mockRmcHelper.`when`<Any> { RmcHelper.isUsingRmc() }.thenReturn(true)
 
-        // Simulate call from RMC by adding prefix
         iamSpy.configure(
             context,
-            "${RmcHelper.RMC_PREFIX}test-subs-key",
-            "test-config-url",
+            "$TEST_SUBS_KEY${RmcHelper.RMC_SUFFIX}",    // simulate call from RMC by adding suffix
+            TEST_CONFIG_URL,
         )
 
         verifyInitializedCalled(1)
@@ -75,8 +73,8 @@ class InAppMessagingRmcSpec {
 
         iamSpy.configure(
             context,
-            "test-subs-key",
-            "test-config-url",
+            TEST_SUBS_KEY,
+            TEST_CONFIG_URL,
         )
 
         verifyInitializedCalled(1)
@@ -84,12 +82,16 @@ class InAppMessagingRmcSpec {
 
     private fun verifyInitializedCalled(invocations: Int) {
         verify(iamSpy, times(invocations)).initialize(
-            any(),
-            any(),
-            any(),
-            any(),
-            any(),
-            any(),
+            context,
+            true,
+            TEST_SUBS_KEY,  // verify any suffix is removed
+            TEST_CONFIG_URL,
+            false
         )
+    }
+
+    companion object {
+        private const val TEST_SUBS_KEY = "test-subs-key"
+        private const val TEST_CONFIG_URL = "test-config-url"
     }
 }
