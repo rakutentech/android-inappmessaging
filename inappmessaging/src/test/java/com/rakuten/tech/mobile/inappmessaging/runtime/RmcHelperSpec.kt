@@ -1,32 +1,48 @@
 package com.rakuten.tech.mobile.inappmessaging.runtime
 
-import com.nhaarman.mockitokotlin2.any
-import com.rakuten.tech.mobile.inappmessaging.runtime.utils.CommonUtil
+import android.content.Context
+import android.content.res.Resources
+import androidx.test.core.app.ApplicationProvider
 import org.amshove.kluent.shouldBeEqualTo
-import org.junit.After
+import org.junit.Before
 import org.junit.Test
-import org.mockito.Mockito.mockStatic
+import org.junit.runner.RunWith
+import org.mockito.Mockito.*
+import org.robolectric.RobolectricTestRunner
 
+@RunWith(RobolectricTestRunner::class)
 class RmcHelperSpec {
 
-    private val mockCommonUtil = mockStatic(CommonUtil::class.java)
+    private val mockContext = mock(Context::class.java)
 
-    @After
-    fun tearDown() {
-        mockCommonUtil.close()
+    @Before
+    fun setup() {
+        `when`(mockContext.resources).thenReturn(mock(Resources::class.java))
     }
 
     @Test
     fun `isRmcIntegrated should return true`() {
-        mockCommonUtil.`when`<Any> { CommonUtil.hasClass(any()) }.thenReturn(true)
+        `when`(mockContext.getString(anyInt())).thenReturn("1.0.0")
 
-        RmcHelper.isRmcIntegrated() shouldBeEqualTo true
+        RmcHelper.isRmcIntegrated(mockContext) shouldBeEqualTo true
     }
 
     @Test
     fun `isRmcIntegrated should return false`() {
-        mockCommonUtil.`when`<Any> { CommonUtil.hasClass(any()) }.thenReturn(false)
+        `when`(mockContext.getString(anyInt())).thenReturn(null)
 
-        RmcHelper.isRmcIntegrated() shouldBeEqualTo false
+        RmcHelper.isRmcIntegrated(mockContext) shouldBeEqualTo false
+    }
+
+    @Test
+    fun `getRmcVersion should return version from resource`() {
+        `when`(mockContext.getString(anyInt())).thenReturn("1.0.0")
+
+        RmcHelper.getRmcVersion(mockContext) shouldBeEqualTo "1.0.0"
+    }
+
+    @Test
+    fun `getRmcVersion should return null if resource does not exist`() {
+        RmcHelper.getRmcVersion(ApplicationProvider.getApplicationContext()) shouldBeEqualTo null
     }
 }

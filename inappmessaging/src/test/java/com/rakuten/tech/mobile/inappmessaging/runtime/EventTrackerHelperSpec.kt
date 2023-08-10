@@ -36,3 +36,28 @@ class EventTrackerHelperSpec(
         }
     }
 }
+
+@RunWith(ParameterizedRobolectricTestRunner::class)
+class HasClassSpec(
+    private val className: String,
+    private val expected: Boolean,
+) {
+    private val hasClass = EventTrackerHelper::hasClass
+
+    @Test
+    fun `should return if class exists`() {
+        hasClass(className) shouldBeEqualTo expected
+    }
+
+    companion object {
+        @JvmStatic
+        @ParameterizedRobolectricTestRunner.Parameters
+        fun data(): List<Array<out Any?>> {
+            return listOf(
+                arrayOf("com.rakuten.tech.mobile.analytics.Event", true),
+                arrayOf("", false),
+                arrayOf("com.rakuten.tech.mobile.NonExistingClass", false),
+            )
+        }
+    }
+}

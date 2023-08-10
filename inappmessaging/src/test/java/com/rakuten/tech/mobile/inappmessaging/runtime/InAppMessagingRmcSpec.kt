@@ -25,7 +25,7 @@ class InAppMessagingRmcSpec {
 
     @Test
     fun `should ignore configure if call (with runtime params) is made from app using RMC SDK`() {
-        mockRmcHelper.`when`<Any> { RmcHelper.isRmcIntegrated() }.thenReturn(true)
+        mockRmcHelper.`when`<Any> { RmcHelper.isRmcIntegrated(context) }.thenReturn(true)
 
         iamSpy.configure(
             context,
@@ -38,7 +38,7 @@ class InAppMessagingRmcSpec {
 
     @Test
     fun `should ignore configure if call (with default params) is made from app using RMC SDK`() {
-        mockRmcHelper.`when`<Any> { RmcHelper.isRmcIntegrated() }.thenReturn(true)
+        mockRmcHelper.`when`<Any> { RmcHelper.isRmcIntegrated(context) }.thenReturn(true)
 
         iamSpy.configure(context)
 
@@ -47,7 +47,7 @@ class InAppMessagingRmcSpec {
 
     @Test
     fun `should process configure if call is made from RMC SDK`() {
-        mockRmcHelper.`when`<Any> { RmcHelper.isRmcIntegrated() }.thenReturn(true)
+        mockRmcHelper.`when`<Any> { RmcHelper.isRmcIntegrated(context) }.thenReturn(true)
 
         iamSpy.configure(
             context,
@@ -60,7 +60,7 @@ class InAppMessagingRmcSpec {
 
     @Test
     fun `should process configure if call is made from app not using RMC SDK`() {
-        mockRmcHelper.`when`<Any> { RmcHelper.isRmcIntegrated() }.thenReturn(false)
+        mockRmcHelper.`when`<Any> { RmcHelper.isRmcIntegrated(context) }.thenReturn(false)
 
         iamSpy.configure(
             context,

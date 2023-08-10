@@ -134,7 +134,7 @@ abstract class InAppMessaging internal constructor() {
             return try {
                 // First check whether to ignore processing this call. Calls made from apps that have the RMC SDK
                 // integrated will be ignored, and are forced to use the RMC configure API.
-                if (shouldIgnoreConfigure(subscriptionKey)) {
+                if (shouldIgnoreConfigure(context, subscriptionKey)) {
                     InAppLogger(InApp.TAG).debug("Ignoring configuration")
                     return false
                 }
@@ -142,7 +142,7 @@ abstract class InAppMessaging internal constructor() {
                 initialize(
                     context = context,
                     isCacheHandling = BuildConfig.IS_CACHE_HANDLING,
-                    subscriptionKey = if (RmcHelper.isRmcIntegrated()) {
+                    subscriptionKey = if (RmcHelper.isRmcIntegrated(context)) {
                         subscriptionKey?.removeSuffix(RmcHelper.RMC_SUFFIX)
                     } else {
                         subscriptionKey
@@ -206,8 +206,8 @@ abstract class InAppMessaging internal constructor() {
          *
          * @return true when app has integrated RMC SDK but manually called configure API, otherwise false.
          */
-        private fun shouldIgnoreConfigure(subscriptionKey: String?): Boolean {
-            if (RmcHelper.isRmcIntegrated() && subscriptionKey != null) {
+        private fun shouldIgnoreConfigure(context: Context, subscriptionKey: String?): Boolean {
+            if (RmcHelper.isRmcIntegrated(context) && subscriptionKey != null) {
                 return !subscriptionKey.endsWith(RmcHelper.RMC_SUFFIX)
             }
             return false
