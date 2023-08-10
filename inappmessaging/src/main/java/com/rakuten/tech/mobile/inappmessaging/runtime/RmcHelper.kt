@@ -16,5 +16,5 @@ internal object RmcHelper {
      * Checks if app is using RMC SDK by checking the existence of its main entry point public class.
      */
     @JvmStatic
-    fun isUsingRmc() = CommonUtil.hasClass("com.rakuten.tech.mobile.rmc.Rmc")
+    fun isRmcIntegrated() = CommonUtil.hasClass("com.rakuten.tech.mobile.rmc.Rmc")
 }

@@ -20,13 +20,13 @@ class RmcHelperSpec {
     fun `isUsingRmc should return true`() {
         mockCommonUtil.`when`<Any> { CommonUtil.hasClass(any()) }.thenReturn(true)
 
-        RmcHelper.isUsingRmc() shouldBeEqualTo true
+        RmcHelper.isRmcIntegrated() shouldBeEqualTo true
     }
 
     @Test
     fun `isUsingRmc should return false`() {
         mockCommonUtil.`when`<Any> { CommonUtil.hasClass(any()) }.thenReturn(false)
 
-        RmcHelper.isUsingRmc() shouldBeEqualTo false
+        RmcHelper.isRmcIntegrated() shouldBeEqualTo false
     }
 }

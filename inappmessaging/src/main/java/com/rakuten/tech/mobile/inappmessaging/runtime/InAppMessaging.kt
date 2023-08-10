@@ -140,8 +140,14 @@ abstract class InAppMessaging internal constructor() {
                 }
 
                 initialize(
-                    context = context, isCacheHandling = BuildConfig.IS_CACHE_HANDLING,
-                    subscriptionKey = subscriptionKey?.removeSuffix(RmcHelper.RMC_SUFFIX), configUrl = configUrl,
+                    context = context,
+                    isCacheHandling = BuildConfig.IS_CACHE_HANDLING,
+                    subscriptionKey = if (RmcHelper.isRmcIntegrated()) {
+                        subscriptionKey?.removeSuffix(RmcHelper.RMC_SUFFIX)
+                    } else {
+                        subscriptionKey
+                    },
+                    configUrl = configUrl,
                     enableTooltipFeature = enableTooltipFeature,
                 )
                 true
@@ -201,7 +207,7 @@ abstract class InAppMessaging internal constructor() {
          * @return true when app has integrated RMC SDK but manually called configure API, otherwise false.
          */
         private fun shouldIgnoreConfigure(subscriptionKey: String?): Boolean {
-            if (RmcHelper.isUsingRmc() && subscriptionKey != null) {
+            if (RmcHelper.isRmcIntegrated() && subscriptionKey != null) {
                 return !subscriptionKey.endsWith(RmcHelper.RMC_SUFFIX)
             }
             return false
