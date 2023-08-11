@@ -131,8 +131,9 @@ abstract class InAppMessaging internal constructor() {
             enableTooltipFeature: Boolean? = false,
         ): Boolean {
             return try {
-                if (!shouldProcess(context, subscriptionKey))
+                if (!shouldProcess(context, subscriptionKey)) {
                     return false
+                }
 
                 initialize(
                     context = context,
@@ -196,16 +197,19 @@ abstract class InAppMessaging internal constructor() {
         internal fun getPreferencesFile() = "internal_shared_prefs_" + AccountRepository.instance().userInfoHash
 
         /**
-         * Checks whether to ignore the configure API call or not. This assumes that when configure API is called from
-         * RMC SDK, it appended the [RmcHelper.RMC_SUFFIX] in the subscriptionKey value, thus allowing the call.
+         * Checks whether to process configure API call or not.
          *
-         * @return true when app has integrated RMC SDK but manually called configure API, otherwise false.
+         * This assumes that when configure API is called from RMC SDK, it appended the [RmcHelper.RMC_SUFFIX] in the
+         * subscriptionKey value.
+         *
+         * @return false when RMC SDK is integrated but the API call is not from RMC SDK.
          */
         private fun shouldProcess(context: Context, subscriptionKey: String?): Boolean {
-            if (!RmcHelper.isRmcIntegrated(context))
+            if (!RmcHelper.isRmcIntegrated(context)) {
                 return true
+            }
 
-            return subscriptionKey == null || subscriptionKey.endsWith(RmcHelper.RMC_SUFFIX)
+            return subscriptionKey != null && subscriptionKey.endsWith(RmcHelper.RMC_SUFFIX)
         }
     }
 
