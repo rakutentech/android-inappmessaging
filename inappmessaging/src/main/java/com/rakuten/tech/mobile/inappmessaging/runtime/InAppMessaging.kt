@@ -7,7 +7,6 @@ import androidx.annotation.RestrictTo
 import com.rakuten.tech.mobile.inappmessaging.runtime.data.models.appevents.Event
 import com.rakuten.tech.mobile.inappmessaging.runtime.data.repositories.AccountRepository
 import com.rakuten.tech.mobile.inappmessaging.runtime.exception.InAppMessagingException
-import com.rakuten.tech.mobile.inappmessaging.runtime.utils.InAppLogger
 import com.rakuten.tech.mobile.inappmessaging.runtime.utils.Initializer
 import com.rakuten.tech.mobile.inappmessaging.runtime.workmanager.schedulers.ConfigScheduler
 
@@ -132,12 +131,8 @@ abstract class InAppMessaging internal constructor() {
             enableTooltipFeature: Boolean? = false,
         ): Boolean {
             return try {
-                // First check whether to ignore processing this call. Calls made from apps that have the RMC SDK
-                // integrated will be ignored, and are forced to use the RMC configure API.
-                if (shouldIgnoreConfigure(context, subscriptionKey)) {
-                    InAppLogger(InApp.TAG).debug("Ignoring configuration")
+                if (!shouldProcess(context, subscriptionKey))
                     return false
-                }
 
                 initialize(
                     context = context,
@@ -206,11 +201,11 @@ abstract class InAppMessaging internal constructor() {
          *
          * @return true when app has integrated RMC SDK but manually called configure API, otherwise false.
          */
-        private fun shouldIgnoreConfigure(context: Context, subscriptionKey: String?): Boolean {
-            if (RmcHelper.isRmcIntegrated(context) && subscriptionKey != null) {
-                return !subscriptionKey.endsWith(RmcHelper.RMC_SUFFIX)
-            }
-            return false
+        private fun shouldProcess(context: Context, subscriptionKey: String?): Boolean {
+            if (!RmcHelper.isRmcIntegrated(context))
+                return true
+
+            return subscriptionKey == null || subscriptionKey.endsWith(RmcHelper.RMC_SUFFIX)
         }
     }
 

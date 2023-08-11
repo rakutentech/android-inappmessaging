@@ -246,6 +246,6 @@ internal class InApp(
     }
 
     companion object {
-        const val TAG = "IAM_InAppMessaging"
+        private const val TAG = "IAM_InAppMessaging"
     }
 }
