@@ -10,7 +10,7 @@ import org.robolectric.ParameterizedRobolectricTestRunner
  */
 
 @RunWith(ParameterizedRobolectricTestRunner::class)
-class SendEventSpec(
+class EventTrackerHelperSpec(
     private val eventName: String,
     private val data: Map<String, *>?,
     private val expected: Boolean,
