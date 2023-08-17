@@ -18,6 +18,7 @@ class DisplayPermissionRequestSpec {
             locale = "test-locale",
             lastPingInMillis = 0L,
             userIdentifier = listOf(UserIdentifier(id = "test-id", type = 0)),
+            rmcSdkVersion = null,
         )
         val json = """
             >{"campaignId":"test-campaignId","appVersion":"test-appVersion","sdkVersion":"test-sdkVersion",
@@ -38,6 +39,7 @@ class DisplayPermissionRequestSpec {
                 locale = null,
                 lastPingInMillis = 0,
                 userIdentifier = listOf(UserIdentifier(id = "test-id", type = 0)),
+                rmcSdkVersion = null,
             ),
         )
     }

@@ -13,6 +13,7 @@ internal data class DisplayPermissionRequest(
     val locale: String?,
     val lastPingInMillis: Long,
     val userIdentifier: List<UserIdentifier>,
+    val rmcSdkVersion: String?,
 ) {
     private val platform: Int = InAppMessagingConstants.ANDROID_PLATFORM_ENUM
 }

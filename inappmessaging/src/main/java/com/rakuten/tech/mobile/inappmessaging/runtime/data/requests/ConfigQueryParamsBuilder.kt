@@ -10,15 +10,21 @@ internal data class ConfigQueryParamsBuilder(
     private val locale: String? = null,
     private val appVersion: String? = null,
     private val sdkVersion: String? = null,
+    private val rmcSdkVersion: String? = null,
 ) {
 
     private val platform = InAppMessagingConstants.ANDROID_PLATFORM_ENUM
 
-    val queryParams = mutableMapOf<String, Any?>(
+    private val _queryParams = mutableMapOf<String, Any?>(
         "platform" to platform,
         "appId" to appId,
         "sdkVersion" to sdkVersion,
         "appVersion" to appVersion,
         "locale" to locale.orEmpty(),
     )
+    val queryParams = if (rmcSdkVersion == null) {
+        _queryParams
+    } else {
+        _queryParams.apply { put("rmcSdkVersion", rmcSdkVersion) }
+    }
 }

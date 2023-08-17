@@ -18,6 +18,7 @@ class ImpressionRequestSpec {
             sdkVersion = "test-sdkVersion",
             userIdentifiers = listOf(),
             impressions = listOf(Impression(ImpressionType.EXIT, 0)),
+            rmcSdkVersion = null,
         )
         val json = """
             >{"campaignId":"test-campaignId","isTest":false,"appVersion":"test-appVersion",
@@ -39,6 +40,7 @@ class ImpressionRequestSpec {
                 sdkVersion = null,
                 userIdentifiers = listOf(),
                 impressions = listOf(),
+                rmcSdkVersion = null,
             ),
         )
     }

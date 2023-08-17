@@ -56,6 +56,7 @@ internal object ImpressionManager {
             sdkVersion = BuildConfig.VERSION_NAME,
             userIdentifiers = RuntimeUtil.getUserIdentifiers(),
             impressions = impListRequest,
+            rmcSdkVersion = HostAppInfoRepository.instance().getRmcSdkVersion(),
         )
 
         // Schedule work to report impressions back to IAM backend.

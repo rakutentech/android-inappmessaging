@@ -10,6 +10,7 @@ import androidx.work.testing.WorkManagerTestInitHelper
 import com.rakuten.tech.mobile.inappmessaging.runtime.InApp.AppManifestConfig
 import com.rakuten.tech.mobile.inappmessaging.runtime.BaseTest
 import com.rakuten.tech.mobile.inappmessaging.runtime.InAppMessaging
+import com.rakuten.tech.mobile.inappmessaging.runtime.RmcHelper
 import com.rakuten.tech.mobile.inappmessaging.runtime.TestUserInfoProvider
 import com.rakuten.tech.mobile.inappmessaging.runtime.data.repositories.HostAppInfoRepository
 import com.rakuten.tech.mobile.inappmessaging.runtime.exception.InAppMessagingException
@@ -96,6 +97,17 @@ class InitializerSpec : BaseTest() {
         Initializer.initializeSdk(appCtx, "test", "")
 
         HostAppInfoRepository.instance().getDeviceId() shouldBeEqualTo "test_uuid"
+    }
+
+    @Test
+    fun `should set rmcSdkVersion`() {
+        Mockito.mockStatic(RmcHelper::class.java).use { mockHelper ->
+            mockHelper.`when`<Any> { RmcHelper.getRmcVersion(context) }.thenReturn("1.0.0")
+
+            Initializer.initializeSdk(context, "test", "")
+
+            HostAppInfoRepository.instance().getRmcSdkVersion() shouldBeEqualTo "1.0.0"
+        }
     }
 
     private fun verifyHostAppInfo() {
