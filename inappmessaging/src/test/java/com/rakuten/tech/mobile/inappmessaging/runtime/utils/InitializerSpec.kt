@@ -7,8 +7,12 @@ import androidx.test.core.app.ApplicationProvider
 import androidx.work.Data
 import androidx.work.WorkerParameters
 import androidx.work.testing.WorkManagerTestInitHelper
-import com.rakuten.tech.mobile.inappmessaging.runtime.*
 import com.rakuten.tech.mobile.inappmessaging.runtime.InApp.AppManifestConfig
+import com.rakuten.tech.mobile.inappmessaging.runtime.BaseTest
+import com.rakuten.tech.mobile.inappmessaging.runtime.InAppMessaging
+import com.rakuten.tech.mobile.inappmessaging.runtime.TestUserInfoProvider
+import com.rakuten.tech.mobile.inappmessaging.runtime.InAppMessagingTestConstants
+import com.rakuten.tech.mobile.inappmessaging.runtime.RmcHelper
 import com.rakuten.tech.mobile.inappmessaging.runtime.data.repositories.HostAppInfoRepository
 import com.rakuten.tech.mobile.inappmessaging.runtime.exception.InAppMessagingException
 import com.rakuten.tech.mobile.sdkutils.PreferencesUtil

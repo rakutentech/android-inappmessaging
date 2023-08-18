@@ -36,7 +36,6 @@ class ImpressionRequestSpec {
             >{"campaignId":"test-campaignId","isTest":false,"appVersion":"test-appVersion",
             >"sdkVersion":"test-sdkVersion","userIdentifiers":[],
             >"impressions":[{"impType":"EXIT","timestamp":0,"type":4}]}
-            >
         """.trimMargin(">").replace("\n", "")
 
         Gson().toJson(testDataClass) shouldBeEqualTo json
