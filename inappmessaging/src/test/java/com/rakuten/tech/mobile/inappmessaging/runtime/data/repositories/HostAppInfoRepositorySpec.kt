@@ -31,7 +31,7 @@ class HostAppInfoRepositorySpec : BaseTest() {
         InAppMessagingTestConstants.APP_VERSION, InAppMessagingTestConstants.SUB_KEY,
         InAppMessagingTestConstants.LOCALE, isTooltipFeatureEnabled = true,
         context = ApplicationProvider.getApplicationContext(),
-        rmcSdkVersion = InAppMessagingTestConstants.RMC_VERSION
+        rmcSdkVersion = InAppMessagingTestConstants.RMC_VERSION,
     )
 
     @Before

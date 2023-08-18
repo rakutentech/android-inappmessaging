@@ -22,7 +22,7 @@ class RmcHelperSpec {
 
     @Test
     fun `isRmcIntegrated should return true`() {
-        `when`(mockContext.getString(anyInt())).thenReturn("1.0.0")
+        `when`(mockContext.getString(anyInt())).thenReturn(InAppMessagingTestConstants.RMC_VERSION)
 
         RmcHelper.isRmcIntegrated(mockContext) shouldBeEqualTo true
     }
@@ -36,9 +36,9 @@ class RmcHelperSpec {
 
     @Test
     fun `getRmcVersion should return version from resource`() {
-        `when`(mockContext.getString(anyInt())).thenReturn("1.0.0")
+        `when`(mockContext.getString(anyInt())).thenReturn(InAppMessagingTestConstants.RMC_VERSION)
 
-        RmcHelper.getRmcVersion(mockContext) shouldBeEqualTo "1.0.0"
+        RmcHelper.getRmcVersion(mockContext) shouldBeEqualTo InAppMessagingTestConstants.RMC_VERSION
     }
 
     @Test

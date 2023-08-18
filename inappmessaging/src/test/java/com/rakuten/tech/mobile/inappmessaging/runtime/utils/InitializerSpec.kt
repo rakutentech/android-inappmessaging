@@ -7,11 +7,8 @@ import androidx.test.core.app.ApplicationProvider
 import androidx.work.Data
 import androidx.work.WorkerParameters
 import androidx.work.testing.WorkManagerTestInitHelper
+import com.rakuten.tech.mobile.inappmessaging.runtime.*
 import com.rakuten.tech.mobile.inappmessaging.runtime.InApp.AppManifestConfig
-import com.rakuten.tech.mobile.inappmessaging.runtime.BaseTest
-import com.rakuten.tech.mobile.inappmessaging.runtime.InAppMessaging
-import com.rakuten.tech.mobile.inappmessaging.runtime.RmcHelper
-import com.rakuten.tech.mobile.inappmessaging.runtime.TestUserInfoProvider
 import com.rakuten.tech.mobile.inappmessaging.runtime.data.repositories.HostAppInfoRepository
 import com.rakuten.tech.mobile.inappmessaging.runtime.exception.InAppMessagingException
 import com.rakuten.tech.mobile.sdkutils.PreferencesUtil
@@ -102,11 +99,12 @@ class InitializerSpec : BaseTest() {
     @Test
     fun `should set rmcSdkVersion`() {
         Mockito.mockStatic(RmcHelper::class.java).use { mockHelper ->
-            mockHelper.`when`<Any> { RmcHelper.getRmcVersion(context) }.thenReturn("1.0.0")
+            mockHelper.`when`<Any> { RmcHelper.getRmcVersion(context) }
+                .thenReturn(InAppMessagingTestConstants.RMC_VERSION)
 
             Initializer.initializeSdk(context, "test", "")
 
-            HostAppInfoRepository.instance().getRmcSdkVersion() shouldBeEqualTo "1.0.0"
+            HostAppInfoRepository.instance().getRmcSdkVersion() shouldBeEqualTo InAppMessagingTestConstants.RMC_VERSION
         }
     }
 

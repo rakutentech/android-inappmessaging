@@ -101,7 +101,7 @@ internal object Initializer {
             packageName = getHostAppPackageName(context), deviceId = getDeviceId(context, sharedUtil),
             version = getHostAppVersion(context), subscriptionKey = subscriptionKey, locale = getLocale(context),
             configUrl = configUrl, isTooltipFeatureEnabled = enableTooltipFeature, context = context,
-            rmcSdkVersion = getRmcSdkVersion(context)
+            rmcSdkVersion = getRmcSdkVersion(context),
         )
 
         // Store hostAppInfo in repository.

@@ -2,7 +2,6 @@ package com.rakuten.tech.mobile.inappmessaging.runtime.data.requests
 
 import com.rakuten.tech.mobile.inappmessaging.runtime.utils.InAppMessagingConstants
 import org.amshove.kluent.shouldBeEqualTo
-import org.amshove.kluent.shouldBeNull
 import org.amshove.kluent.shouldNotHaveKey
 import org.junit.Test
 
@@ -15,7 +14,7 @@ class ConfigQueryParamsBuilderSpec {
             locale = "jp",
             appVersion = "0.0.1",
             sdkVersion = "1.6.0-SNAPSHOT",
-            rmcSdkVersion = "1.0.0"
+            rmcSdkVersion = "1.0.0",
         )
         testDataClass.apply {
             queryParams["platform"] shouldBeEqualTo InAppMessagingConstants.ANDROID_PLATFORM_ENUM

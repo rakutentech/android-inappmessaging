@@ -6,7 +6,6 @@ import androidx.work.Worker
 import androidx.work.WorkerParameters
 import com.rakuten.tech.mobile.inappmessaging.runtime.BuildConfig
 import com.rakuten.tech.mobile.inappmessaging.runtime.InAppMessaging
-import com.rakuten.tech.mobile.inappmessaging.runtime.RmcHelper
 import com.rakuten.tech.mobile.inappmessaging.runtime.api.ConfigRetrofitService
 import com.rakuten.tech.mobile.inappmessaging.runtime.data.repositories.ConfigResponseRepository
 import com.rakuten.tech.mobile.inappmessaging.runtime.data.repositories.HostAppInfoRepository
@@ -79,7 +78,7 @@ internal class ConfigWorker(
             locale = hostRepo.getDeviceLocale(),
             appVersion = hostAppVersion,
             sdkVersion = BuildConfig.VERSION_NAME,
-            rmcSdkVersion = hostRepo.getRmcSdkVersion()
+            rmcSdkVersion = hostRepo.getRmcSdkVersion(),
         ).queryParams
         return RuntimeUtil.getRetrofit()
             .create(ConfigRetrofitService::class.java)
