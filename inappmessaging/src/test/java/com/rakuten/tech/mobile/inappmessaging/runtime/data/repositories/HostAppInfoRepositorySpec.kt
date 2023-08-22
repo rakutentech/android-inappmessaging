@@ -31,6 +31,7 @@ class HostAppInfoRepositorySpec : BaseTest() {
         InAppMessagingTestConstants.APP_VERSION, InAppMessagingTestConstants.SUB_KEY,
         InAppMessagingTestConstants.LOCALE, isTooltipFeatureEnabled = true,
         context = ApplicationProvider.getApplicationContext(),
+        rmcSdkVersion = InAppMessagingTestConstants.RMC_VERSION,
     )
 
     @Before
@@ -57,6 +58,7 @@ class HostAppInfoRepositorySpec : BaseTest() {
             .getSubscriptionKey() shouldBeEqualTo InAppMessagingTestConstants.SUB_KEY
         HostAppInfoRepository.instance().getDeviceId() shouldBeEqualTo InAppMessagingTestConstants.DEVICE_ID
         HostAppInfoRepository.instance().getContext() shouldBeEqualTo ApplicationProvider.getApplicationContext()
+        HostAppInfoRepository.instance().getRmcSdkVersion() shouldBeEqualTo InAppMessagingTestConstants.RMC_VERSION
     }
 
     @Test
@@ -172,6 +174,7 @@ class HostAppInfoRepositorySpec : BaseTest() {
         instance.getSubscriptionKey().shouldBeEmpty()
         instance.getDeviceId().shouldBeEmpty()
         instance.getConfigUrl().shouldBeEmpty()
+        instance.getRmcSdkVersion().shouldBeNull()
     }
 
     @Test

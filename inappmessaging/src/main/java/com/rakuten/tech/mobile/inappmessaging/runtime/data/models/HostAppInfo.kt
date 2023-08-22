@@ -15,4 +15,5 @@ internal data class HostAppInfo(
     internal val configUrl: String? = null,
     internal val isTooltipFeatureEnabled: Boolean? = null,
     internal val context: Context? = null,
+    internal val rmcSdkVersion: String? = null,
 )

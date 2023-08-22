@@ -9,22 +9,36 @@ import org.junit.Test
 @OptIn(ExperimentalStdlibApi::class)
 class ImpressionRequestSpec {
 
+    private val impressionRequest = ImpressionRequest(
+        campaignId = "test-campaignId",
+        isTest = false,
+        appVersion = "test-appVersion",
+        sdkVersion = "test-sdkVersion",
+        userIdentifiers = listOf(),
+        impressions = listOf(Impression(ImpressionType.EXIT, 0)),
+        rmcSdkVersion = "1.0.0",
+    )
+
     @Test
     fun `should serialize ImpressionRequest with correct json field names`() {
-        val testDataClass = ImpressionRequest(
-            campaignId = "test-campaignId",
-            isTest = false,
-            appVersion = "test-appVersion",
-            sdkVersion = "test-sdkVersion",
-            userIdentifiers = listOf(),
-            impressions = listOf(Impression(ImpressionType.EXIT, 0)),
-        )
+        val json = """
+            >{"campaignId":"test-campaignId","isTest":false,"appVersion":"test-appVersion",
+            >"sdkVersion":"test-sdkVersion","userIdentifiers":[],
+            >"impressions":[{"impType":"EXIT","timestamp":0,"type":4}],"rmcSdkVersion":"1.0.0"}
+        """.trimMargin(">").replace("\n", "")
+        Gson().toJson(impressionRequest) shouldBeEqualTo json
+    }
+
+    @Test
+    fun `should not serialize ImpressionRequest with null values`() {
+        val testDataClass = impressionRequest.copy(rmcSdkVersion = null)
         val json = """
             >{"campaignId":"test-campaignId","isTest":false,"appVersion":"test-appVersion",
             >"sdkVersion":"test-sdkVersion","userIdentifiers":[],
             >"impressions":[{"impType":"EXIT","timestamp":0,"type":4}]}
         """.trimMargin(">").replace("\n", "")
-        Gson().toJson(testDataClass).shouldBeEqualTo(json)
+
+        Gson().toJson(testDataClass) shouldBeEqualTo json
     }
 
     @Test
@@ -39,6 +53,7 @@ class ImpressionRequestSpec {
                 sdkVersion = null,
                 userIdentifiers = listOf(),
                 impressions = listOf(),
+                rmcSdkVersion = null,
             ),
         )
     }

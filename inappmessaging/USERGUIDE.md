@@ -485,7 +485,6 @@ Documents targeting Product Managers:
 
 ### 7.5.0 (In-Progress)
 * SDKCF-6575: Added sending of device Id in all IAM requests.
-* SDKCF-6711: Added support for RMC SDK configuration.
 * Improved the following classes to increase code coverage:
   - InAppMessagingConstants (SDKCF-6497)
   - InAppMessageSlideUpView (SDKCF-6478)
@@ -504,6 +503,9 @@ Documents targeting Product Managers:
   - Dependency Check to `8.2.1`
 * SDKCF-6547: Fixed impression is not incremented when tooltip campaign is displayed.
 * SDKCF-6518: Fixed and suppressed some SonarCloud code smells.
+* Updates for RMC SDK:
+  - Prevent calling `configure()` when RMC SDK is integrated (SDKCF-6711)
+  - Added sending of `rmcSdkVersion` in IAM requests (SDKCF-6708)
 
 ### 7.4.0 (2023-04-24)
 * SDKCF-6321: Updated detekt version to `1.22.0`.

@@ -36,6 +36,11 @@ internal interface HostAppInfoRepository {
     fun getVersion(): String
 
     /**
+     * This method returns host app's RMC SDK version or null if not integrated.
+     */
+    fun getRmcSdkVersion(): String?
+
+    /**
      * This method returns host app's package name or empty string if not set.
      */
     fun getPackageName(): String
@@ -124,6 +129,8 @@ internal interface HostAppInfoRepository {
         }
 
         override fun getVersion(): String = hostAppInfo?.version.orEmpty()
+
+        override fun getRmcSdkVersion(): String? = hostAppInfo?.rmcSdkVersion
 
         override fun getPackageName(): String = hostAppInfo?.packageName.orEmpty()
 

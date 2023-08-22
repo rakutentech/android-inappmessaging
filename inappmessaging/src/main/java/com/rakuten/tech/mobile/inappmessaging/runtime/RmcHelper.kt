@@ -27,6 +27,7 @@ internal object RmcHelper {
      * @return the RMC SDK version if integrated by app, otherwise null.
      */
     @SuppressWarnings("TooGenericExceptionCaught")
+    @JvmStatic
     fun getRmcVersion(context: Context): String? {
         return try {
             context.getString(

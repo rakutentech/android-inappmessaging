@@ -73,19 +73,17 @@ internal class ConfigWorker(
     }
 
     private fun setupCall(hostAppId: String, hostAppVersion: String, subscriptionId: String): Call<ConfigResponse> {
-        val locale = hostRepo.getDeviceLocale()
-        val configUrl = hostRepo.getConfigUrl()
-        val sdkVersion = BuildConfig.VERSION_NAME
         val params = ConfigQueryParamsBuilder(
             appId = hostAppId,
-            locale = locale,
+            locale = hostRepo.getDeviceLocale(),
             appVersion = hostAppVersion,
-            sdkVersion = sdkVersion,
+            sdkVersion = BuildConfig.VERSION_NAME,
+            rmcSdkVersion = hostRepo.getRmcSdkVersion(),
         ).queryParams
         return RuntimeUtil.getRetrofit()
             .create(ConfigRetrofitService::class.java)
             .getConfigService(
-                url = configUrl, subscriptionId = subscriptionId,
+                url = hostRepo.getConfigUrl(), subscriptionId = subscriptionId,
                 deviceId = hostRepo.getDeviceId(), parameters = params,
             )
     }
