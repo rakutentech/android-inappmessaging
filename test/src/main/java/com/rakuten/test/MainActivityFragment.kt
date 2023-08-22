@@ -3,6 +3,7 @@ package com.rakuten.test
 import android.app.AlertDialog
 import android.content.Intent
 import android.os.Bundle
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -55,6 +56,9 @@ class MainActivityFragment : Fragment(), View.OnClickListener {
     }
 
     override fun onClick(v: View) {
+
+        Log.d("MainActivityFragment", "onClick")
+
         when (v.id) {
             R.id.launch_second_activity -> startActivity(Intent(this.activity, SecondActivity::class.java))
             R.id.launch_successful -> InAppMessaging.instance().logEvent(AppStartEvent())
