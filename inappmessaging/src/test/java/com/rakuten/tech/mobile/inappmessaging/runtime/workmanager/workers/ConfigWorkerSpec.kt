@@ -10,6 +10,7 @@ import androidx.work.testing.WorkManagerTestInitHelper
 import com.nhaarman.mockitokotlin2.anyOrNull
 import com.nhaarman.mockitokotlin2.eq
 import com.rakuten.tech.mobile.inappmessaging.runtime.BaseTest
+import com.rakuten.tech.mobile.inappmessaging.runtime.BuildConfig
 import com.rakuten.tech.mobile.inappmessaging.runtime.InApp
 import com.rakuten.tech.mobile.inappmessaging.runtime.InAppMessaging
 import com.rakuten.tech.mobile.inappmessaging.runtime.InAppMessagingTestConstants
@@ -57,6 +58,11 @@ open class ConfigWorkerSpec : BaseTest() {
         ConfigScheduler.currDelay = RetryDelayUtil.INITIAL_BACKOFF_DELAY
         ConfigResponseRepository.resetInstance()
         ConfigWorker.serverErrorCounter.set(0)
+
+        `when`(mockHostRepo.getConfigUrl()).thenReturn(InAppMessagingTestConstants.CONFIG_URL)
+        `when`(mockHostRepo.getPackageName()).thenReturn(InAppMessagingTestConstants.APP_ID)
+        `when`(mockHostRepo.getVersion()).thenReturn(BuildConfig.VERSION_NAME)
+        `when`(mockHostRepo.getSubscriptionKey()).thenReturn(InAppMessagingTestConstants.SUB_KEY)
     }
 
     internal fun initializeInstance() {
@@ -110,12 +116,7 @@ class ConfigWorkerSuccessSpec : ConfigWorkerSpec() {
         `when`(mockHostRepo.getConfigUrl()).thenReturn(bundle.getString(CONFIG_KEY, ""))
         `when`(mockHostRepo.getSubscriptionKey()).thenReturn(bundle.getString(SUB_KEY, ""))
         val worker = ConfigWorker(this.ctx, workParam, mockHostRepo, mockConfigRepo, mockMsgSched)
-        val expected = if (bundle.getString(CONFIG_KEY, "").isNullOrEmpty()) {
-            ListenableWorker.Result.retry()
-        } else {
-            ListenableWorker.Result.success()
-        }
-        worker.doWork() shouldBeEqualTo expected
+        worker.doWork() shouldBeEqualTo ListenableWorker.Result.success()
     }
 
 //    @Test
@@ -206,6 +207,16 @@ class ConfigWorkerSuccessSpec : ConfigWorkerSpec() {
     }
 }
 
+class ConfigWorkerRetrySpec : ConfigWorkerSpec() {
+    @Test
+    fun `should return retry when exception is encountered`() {
+        `when`(mockHostRepo.getDeviceId()).thenThrow(IllegalStateException())
+
+        val worker = ConfigWorker(this.ctx, workParam, mockHostRepo, mockConfigRepo, mockMsgSched)
+        worker.doWork() shouldBeEqualTo ListenableWorker.Result.retry()
+    }
+}
+
 class ConfigWorkerFailSpec : ConfigWorkerSpec() {
     @Test
     fun `should fail if server fail more than 3 times`() {
@@ -244,7 +255,17 @@ class ConfigWorkerFailSpec : ConfigWorkerSpec() {
     }
 
     @Test
-    fun `should fail if hostapp id is empty`() {
+    fun `should fail if config URL is empty`() {
+        `when`(mockHostRepo.getConfigUrl()).thenReturn("")
+        val worker = ConfigWorker(
+            ctx, workParam, mockHostRepo, ConfigResponseRepository.instance(),
+            MessageMixerPingScheduler.instance(),
+        )
+        worker.doWork() shouldBeEqualTo ListenableWorker.Result.failure()
+    }
+
+    @Test
+    fun `should fail if host app id is empty`() {
         `when`(mockHostRepo.getPackageName()).thenReturn("")
         val worker = ConfigWorker(
             ctx, workParam, mockHostRepo, ConfigResponseRepository.instance(),
@@ -254,8 +275,7 @@ class ConfigWorkerFailSpec : ConfigWorkerSpec() {
     }
 
     @Test
-    fun `should fail if hostapp version is empty`() {
-        `when`(mockHostRepo.getPackageName()).thenReturn("valid.package.name")
+    fun `should fail if host app version is empty`() {
         `when`(mockHostRepo.getVersion()).thenReturn("")
         val worker = ConfigWorker(
             ctx, workParam, mockHostRepo, ConfigResponseRepository.instance(),
@@ -266,8 +286,6 @@ class ConfigWorkerFailSpec : ConfigWorkerSpec() {
 
     @Test
     fun `should fail if subscription key is empty`() {
-        `when`(mockHostRepo.getPackageName()).thenReturn("valid.package.name")
-        `when`(mockHostRepo.getVersion()).thenReturn("valid.version")
         `when`(mockHostRepo.getSubscriptionKey()).thenReturn("")
         val worker = ConfigWorker(
             ctx, workParam, mockHostRepo, ConfigResponseRepository.instance(),
