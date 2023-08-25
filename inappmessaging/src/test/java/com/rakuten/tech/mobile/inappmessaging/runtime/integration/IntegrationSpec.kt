@@ -51,8 +51,8 @@ class IntegrationSpec {
             context, workerParameters, HostAppInfoRepository.instance(),
             ConfigResponseRepository.instance(), mockMessageScheduler,
         )
-        val expected = if (HostAppInfoRepository.instance().getConfigUrl().isNullOrEmpty()) {
-            ListenableWorker.Result.retry()
+        val expected = if (HostAppInfoRepository.instance().getConfigUrl().isEmpty()) {
+            ListenableWorker.Result.failure()
         } else {
             ListenableWorker.Result.success()
         }
@@ -81,7 +81,7 @@ class IntegrationSpec {
             CampaignRepository.instance().lastSyncMillis?.shouldBeGreaterThan(0)
             CampaignRepository.instance().messages.shouldBeEmpty()
         } else {
-            result shouldBeEqualTo ListenableWorker.Result.retry()
+            result shouldBeEqualTo ListenableWorker.Result.failure()
         }
     }
 }

@@ -116,7 +116,12 @@ class ConfigWorkerSuccessSpec : ConfigWorkerSpec() {
         `when`(mockHostRepo.getConfigUrl()).thenReturn(bundle.getString(CONFIG_KEY, ""))
         `when`(mockHostRepo.getSubscriptionKey()).thenReturn(bundle.getString(SUB_KEY, ""))
         val worker = ConfigWorker(this.ctx, workParam, mockHostRepo, mockConfigRepo, mockMsgSched)
-        worker.doWork() shouldBeEqualTo ListenableWorker.Result.success()
+        val expected = if (bundle.getString(CONFIG_KEY, "").isNullOrEmpty()) {
+            ListenableWorker.Result.failure()
+        } else {
+            ListenableWorker.Result.success()
+        }
+        worker.doWork() shouldBeEqualTo expected
     }
 
 //    @Test
