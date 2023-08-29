@@ -54,17 +54,14 @@ internal class ConfigWorker(
     @SuppressWarnings("TooGenericExceptionCaught")
     override fun doWork(): Result {
         InAppLogger(TAG).debug(hostRepo.getConfigUrl())
-        val hostAppId = hostRepo.getPackageName()
-        val hostAppVersion = hostRepo.getVersion()
-        val subscriptionId = hostRepo.getSubscriptionKey()
-        // Terminate request if any of the following values are empty: appId, appVersion or subscription key.
-        if (hostAppId.isEmpty() || hostAppVersion.isEmpty() || subscriptionId.isEmpty()) {
+        // Terminate request if any of the following values are empty
+        if (!isConfigValid()) {
             return Result.failure()
         }
 
         return try {
             // Executing the API network call.
-            onResponse(setupCall(hostAppId, hostAppVersion, subscriptionId).execute())
+            onResponse(setupCall().execute())
         } catch (e: Exception) {
             InAppLogger(TAG).error(e.message)
             // RETRY by default has exponential backoff baked in.
@@ -72,18 +69,23 @@ internal class ConfigWorker(
         }
     }
 
-    private fun setupCall(hostAppId: String, hostAppVersion: String, subscriptionId: String): Call<ConfigResponse> {
+    private fun isConfigValid() = hostRepo.getConfigUrl().isNotEmpty() &&
+        hostRepo.getPackageName().isNotEmpty() &&
+        hostRepo.getVersion().isNotEmpty() &&
+        hostRepo.getSubscriptionKey().isNotEmpty()
+
+    private fun setupCall(): Call<ConfigResponse> {
         val params = ConfigQueryParamsBuilder(
-            appId = hostAppId,
+            appId = hostRepo.getPackageName(),
             locale = hostRepo.getDeviceLocale(),
-            appVersion = hostAppVersion,
+            appVersion = hostRepo.getVersion(),
             sdkVersion = BuildConfig.VERSION_NAME,
             rmcSdkVersion = hostRepo.getRmcSdkVersion(),
         ).queryParams
         return RuntimeUtil.getRetrofit()
             .create(ConfigRetrofitService::class.java)
             .getConfigService(
-                url = hostRepo.getConfigUrl(), subscriptionId = subscriptionId,
+                url = hostRepo.getConfigUrl(), subscriptionId = hostRepo.getSubscriptionKey(),
                 deviceId = hostRepo.getDeviceId(), parameters = params,
             )
     }
