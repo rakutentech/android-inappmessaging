@@ -13,7 +13,7 @@ android {
         versionCode 1
         versionName "0.0"
         minSdkVersion CONFIG.versions.android.sdk.min
-        targetSdkVersion 33
+        targetSdkVersion CONFIG.versions.android.sdk.target
 
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
         vectorDrawables {

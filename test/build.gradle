@@ -14,7 +14,7 @@ android {
         // Defines the minimum API level required to run the app.
         minSdkVersion CONFIG.versions.android.sdk.min
         // Specifies the API level used to test the app.
-        targetSdkVersion 33
+        targetSdkVersion CONFIG.versions.android.sdk.target
 
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
 

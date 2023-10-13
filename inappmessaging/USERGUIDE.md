@@ -46,18 +46,18 @@ dependencies {
 ```
 Please refer to [Changelog](#changelog) section for the latest version.
 
-### #3 Target and compile SDK version to 33 or above.
-Note: It is required to target and compile to SDK version 33 or above.
+### #3 Target and compile SDK version to 34 or above.
+Note: It is required to target and compile to SDK version 34 or above.
 
 ```groovy
 android {
-    compileSdkVersion 33
+    compileSdkVersion 34
 
     defaultConfig {
     // Defines the minimum API level required to run the app.
     minSdkVersion 23
     // Specifies the API level used to test the app.
-    targetSdkVersion 33
+    targetSdkVersion 34
     }
 }
 ```
@@ -482,6 +482,9 @@ Documents targeting Product Managers:
 + In-App Messaging Dashboard Sign Up(page is coming soon.)
 
 ## <a name="changelog"></a> Changelog
+
+### 7.6.0 (In-Progress)
+* SDKCF-6327: Updated compile and target SDK to API 34 (Android 14).
 
 ### 7.5.0 (In-Progress)
 * SDKCF-6575: Added sending of device Id in all IAM requests.
