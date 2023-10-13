@@ -39,16 +39,15 @@
 
     <activity
       android:name=".SecondActivity"
-      android:exported="false"
+      android:exported="true"
       tools:ignore="AppLinkUrlError">
       <intent-filter android:label="second_activity">
         <category android:name="android.intent.category.BROWSABLE"/>
         <category android:name="android.intent.category.DEFAULT" />
         <action android:name="android.intent.action.VIEW"/>
         <data
-          android:host="www.rakuten.com"
-          android:pathPrefix="/inapp"
-          android:scheme="https"/>
+            android:scheme="sampleapp"
+            android:host="second.activity" />
       </intent-filter>
     </activity>
   </application>
