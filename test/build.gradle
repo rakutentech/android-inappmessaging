@@ -9,7 +9,7 @@ android {
 
     defaultConfig {
         applicationId "rakuten.com.tech.mobile.test"
-        versionCode 5
+        versionCode 2
         versionName "0.0"
         // Defines the minimum API level required to run the app.
         minSdkVersion CONFIG.versions.android.sdk.min
