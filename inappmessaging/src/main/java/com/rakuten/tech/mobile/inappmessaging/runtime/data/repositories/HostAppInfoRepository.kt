@@ -93,6 +93,7 @@ internal interface HostAppInfoRepository {
      */
     fun getRegisteredActivity(): Activity?
 
+    @SuppressWarnings("kotlin:S6515")
     companion object {
         private const val TAG = "IAM_HostAppRepository"
         private var instance: HostAppInfoRepository = HostAppInfoRepositoryImpl()

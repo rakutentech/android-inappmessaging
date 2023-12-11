@@ -21,6 +21,7 @@ internal interface ConfigScheduler {
 
     fun startConfig(delay: Long = 0, workManager: WorkManager? = null)
 
+    @SuppressWarnings("kotlin:S6515")
     companion object {
         private const val CONFIG_WORKER_NAME = "iam_config_worker"
         private var instance: ConfigScheduler = ConfigSchedulerImpl()
