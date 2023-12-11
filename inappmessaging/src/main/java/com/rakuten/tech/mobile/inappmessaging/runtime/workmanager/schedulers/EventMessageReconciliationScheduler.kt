@@ -22,6 +22,7 @@ internal interface EventMessageReconciliationScheduler {
      */
     fun startReconciliationWorker(workManager: WorkManager? = null, delay: Long = 0)
 
+    @SuppressWarnings("kotlin:S6515")
     companion object {
         private const val MESSAGES_EVENTS_WORKER_NAME = "iam_messages_events_worker"
         private var instance: EventMessageReconciliationScheduler = EventMessageReconciliationSchedulerImpl()

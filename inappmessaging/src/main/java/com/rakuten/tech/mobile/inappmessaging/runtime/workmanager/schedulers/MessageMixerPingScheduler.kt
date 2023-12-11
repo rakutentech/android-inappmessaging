@@ -27,6 +27,7 @@ internal interface MessageMixerPingScheduler {
      */
     fun pingMessageMixerService(initialDelay: Long, workManager: WorkManager? = null)
 
+    @SuppressWarnings("kotlin:S6515")
     companion object {
         private const val MESSAGE_MIXER_PING_WORKER = "iam_message_mixer_worker"
         private var instance: MessageMixerPingScheduler = MessageMixerPingSchedulerImpl()

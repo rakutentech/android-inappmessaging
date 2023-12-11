@@ -38,6 +38,7 @@ internal abstract class CampaignRepository {
      */
     abstract fun clearMessages()
 
+    @SuppressWarnings("kotlin:S6515")
     companion object {
         private var instance: CampaignRepository = CampaignRepositoryImpl()
 
