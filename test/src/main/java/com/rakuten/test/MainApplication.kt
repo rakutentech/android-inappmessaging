@@ -5,7 +5,7 @@ import com.rakuten.tech.mobile.inappmessaging.runtime.InAppMessaging
 
 class MainApplication : Application() {
 
-    val provider = AppUserInfoProvider()
+    val provider = AppUserInfoProvider(this)
     lateinit var settings: IAMSettings
 
     override fun onCreate() {

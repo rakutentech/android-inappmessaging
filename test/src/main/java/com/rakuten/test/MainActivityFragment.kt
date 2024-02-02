@@ -16,20 +16,9 @@ import com.rakuten.tech.mobile.inappmessaging.runtime.data.models.appevents.AppS
 import com.rakuten.tech.mobile.inappmessaging.runtime.data.models.appevents.CustomEvent
 import com.rakuten.tech.mobile.inappmessaging.runtime.data.models.appevents.LoginSuccessfulEvent
 import com.rakuten.tech.mobile.inappmessaging.runtime.data.models.appevents.PurchaseSuccessfulEvent
-import com.rakuten.tech.mobile.sdkutils.PreferencesUtil
 
 class MainActivityFragment : Fragment(), View.OnClickListener {
-
-    private var tokenOrIdTrackingType = 0 // Use Tracking ID over access token by default
     private var ignoredContexts = ""
-
-    override fun onCreate(savedInstanceState: Bundle?) {
-        context?.let {
-            updateUser(PreferencesUtil.getString(it, SHARED_FILE, USER_ID, "user1") ?: "user1",
-            PreferencesUtil.getString(it, SHARED_FILE, TOKEN_OR_ID_TRACKING, "trackingId1") ?: "trackingId1")
-        }
-        super.onCreate(savedInstanceState)
-    }
 
     override fun onCreateView(
             inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
@@ -129,27 +118,28 @@ class MainActivityFragment : Fragment(), View.OnClickListener {
 
     private fun showUserInfo() {
         val contentView = LayoutInflater.from(activity).inflate(R.layout.dialog_users, null)
-        val application = activity?.application as MainApplication
+        val appProvider = (activity?.application as MainApplication).provider
 
         val userId = contentView.findViewById<EditText>(R.id.edit_userid)
-        userId.setText(application.provider.userId)
-        val tokenOrIdTracking = contentView.findViewById<EditText>(R.id.edit_tokenOrTrackingId)
-        tokenOrIdTracking.setText(application.provider.idTracking)
+        userId.setText(appProvider.provideUserId())
         val tokenOrIdTrackingRadio = contentView.findViewById<RadioGroup>(R.id.dialog_radio_group)
-        tokenOrIdTrackingRadio.check(tokenOrIdTrackingRadio.getChildAt(tokenOrIdTrackingType).id)
+        val isIdTracking = appProvider.isIdTracking()
+        tokenOrIdTrackingRadio.check(tokenOrIdTrackingRadio.getChildAt(if (isIdTracking) 0 else 1).id)
+        val tokenOrIdTracking = contentView.findViewById<EditText>(R.id.edit_tokenOrTrackingId)
+        tokenOrIdTracking.setText(
+            if (isIdTracking) appProvider.provideIdTrackingIdentifier()else appProvider.provideAccessToken())
 
         val dialog =  AlertDialog.Builder(activity)
                 .setView(contentView)
                 .setTitle(R.string.dialog_title_user)
                 .setPositiveButton(android.R.string.ok) { dialog, _ ->
-                    if (application.provider.userId != userId.text.toString()) {
+                    if (appProvider.provideUserId() != userId.text.toString()) {
                         InAppMessaging.instance().closeMessage()
                     }
-
-                    updateUser(userId.text.toString(), tokenOrIdTracking.text.toString())
-                    tokenOrIdTrackingType = tokenOrIdTrackingRadio.indexOfChild(
-                        tokenOrIdTrackingRadio.findViewById(tokenOrIdTrackingRadio.checkedRadioButtonId))
-
+                    val tokenOrIdTrackingType = tokenOrIdTrackingRadio
+                        .indexOfChild(tokenOrIdTrackingRadio.findViewById(tokenOrIdTrackingRadio.checkedRadioButtonId))
+                    appProvider.saveUser(userId.text.toString(), tokenOrIdTracking.text.toString(),
+                        tokenOrIdTrackingType == 0)
                     dialog.dismiss()
                 }
                 .setNegativeButton(android.R.string.cancel) {dialog, _ ->
@@ -190,35 +180,5 @@ class MainActivityFragment : Fragment(), View.OnClickListener {
             .create()
 
         dialog.show()
-    }
-
-    override fun onDestroy() {
-        activity?.let {
-            val application = it.application as MainApplication
-            PreferencesUtil.putString(it, SHARED_FILE, USER_ID, application.provider.userId)
-            PreferencesUtil.putString(it, SHARED_FILE, TOKEN_OR_ID_TRACKING,
-                if (tokenOrIdTrackingType == 0) application.provider.idTracking else application.provider.accessToken)
-        }
-        super.onDestroy()
-    }
-
-    private fun updateUser(userId: String, tokenOrIdTracking: String) {
-        val application = activity?.application as MainApplication
-        application.provider.userId = userId
-
-        // Only one of access token or ID tracking is expected to be set at the same time
-        if (tokenOrIdTrackingType == 0) {
-            application.provider.accessToken = ""
-            application.provider.idTracking = tokenOrIdTracking
-        } else {
-            application.provider.idTracking = ""
-            application.provider.accessToken = tokenOrIdTracking
-        }
-    }
-
-    companion object {
-        private const val USER_ID: String = "user-id"
-        private const val SHARED_FILE: String = "user-shared-file"
-        private const val TOKEN_OR_ID_TRACKING: String = "token-or-id-tracking"
     }
 }
