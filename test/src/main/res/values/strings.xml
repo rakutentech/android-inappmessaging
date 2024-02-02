@@ -8,7 +8,7 @@
   <string name="purchase_successful">Purchase Successful</string>
   <string name="purchase_successful_twice">Purchase Successful 2x</string>
   <string name="login_purchase_successful">Login and Purchase Successful</string>
-  <string name="custom_event_newuser">Custom Event: newUser</string>
+  <string name="custom_event">Custom Event</string>
   <string name="change_user">Change User</string>
   <string name="label_userid">User ID</string>
   <string name="label_tokenOrTrackingID">Tracking ID/\nAccess Token</string>
