@@ -127,19 +127,17 @@ class MainActivityFragment : Fragment(), View.OnClickListener {
         tokenOrIdTrackingRadio.check(tokenOrIdTrackingRadio.getChildAt(if (isIdTracking) 0 else 1).id)
         val tokenOrIdTracking = contentView.findViewById<EditText>(R.id.edit_tokenOrTrackingId)
         tokenOrIdTracking.setText(
-            if (isIdTracking) appProvider.provideIdTrackingIdentifier()else appProvider.provideAccessToken())
+            if (isIdTracking) appProvider.provideIdTrackingIdentifier() else appProvider.provideAccessToken())
 
         val dialog =  AlertDialog.Builder(activity)
                 .setView(contentView)
                 .setTitle(R.string.dialog_title_user)
                 .setPositiveButton(android.R.string.ok) { dialog, _ ->
-                    if (appProvider.provideUserId() != userId.text.toString()) {
-                        InAppMessaging.instance().closeMessage()
-                    }
                     val tokenOrIdTrackingType = tokenOrIdTrackingRadio
                         .indexOfChild(tokenOrIdTrackingRadio.findViewById(tokenOrIdTrackingRadio.checkedRadioButtonId))
                     appProvider.saveUser(userId.text.toString(), tokenOrIdTracking.text.toString(),
                         tokenOrIdTrackingType == 0)
+                    InAppMessaging.instance().logEvent(LoginSuccessfulEvent())
                     dialog.dismiss()
                 }
                 .setNegativeButton(android.R.string.cancel) {dialog, _ ->

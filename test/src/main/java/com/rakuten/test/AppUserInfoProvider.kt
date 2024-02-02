@@ -1,9 +1,7 @@
 package com.rakuten.test
 
 import android.content.Context
-import com.rakuten.tech.mobile.inappmessaging.runtime.InAppMessaging
 import com.rakuten.tech.mobile.inappmessaging.runtime.UserInfoProvider
-import com.rakuten.tech.mobile.inappmessaging.runtime.data.models.appevents.LoginSuccessfulEvent
 import com.rakuten.tech.mobile.sdkutils.PreferencesUtil
 
 class AppUserInfoProvider(private val context: Context) : UserInfoProvider {
@@ -35,7 +33,6 @@ class AppUserInfoProvider(private val context: Context) : UserInfoProvider {
         PreferencesUtil.putString(context, SHARED_FILE, USER_ID, userId)
         PreferencesUtil.putString(context, SHARED_FILE, TOKEN_OR_ID_TRACKING, tokenOrIdTracking)
         PreferencesUtil.putBoolean(context, SHARED_FILE, IS_ID_TRACKING, isIdTracking)
-        InAppMessaging.instance().logEvent(LoginSuccessfulEvent())
     }
 
     companion object {
