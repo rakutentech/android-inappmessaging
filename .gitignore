@@ -90,3 +90,9 @@ fabric.properties
 *.iml
 modules.xml
 *.ipr
+
+# Gems
+.bundle/
+vendor/
+# Use latest gem versions
+Gemfile.lock

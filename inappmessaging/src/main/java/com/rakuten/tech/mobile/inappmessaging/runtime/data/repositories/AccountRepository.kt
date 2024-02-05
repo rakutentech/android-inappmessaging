@@ -52,6 +52,7 @@ internal abstract class AccountRepository {
         preferences: PreferencesUtil = PreferencesUtil,
     )
 
+    @SuppressWarnings("kotlin:S6515")
     companion object {
         private const val TOKEN_PREFIX = "OAuth2 "
         internal const val ID_TRACKING_ERR_MSG = "Both an access token and a user tracking id have been set. " +

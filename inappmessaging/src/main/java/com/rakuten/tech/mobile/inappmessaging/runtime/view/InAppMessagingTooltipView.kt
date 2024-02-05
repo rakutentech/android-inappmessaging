@@ -116,6 +116,7 @@ internal class InAppMessagingTooltipView(
 
     /** This method binds image to view. */
     @Suppress("ClickableViewAccessibility", "TooGenericExceptionCaught", "LongMethod")
+    @SuppressWarnings("kotlin:S6516")
     private fun bindImage() { // Display image.
         this.hide(asGone = true)
         if (this.imageUrl.isNullOrEmpty()) {

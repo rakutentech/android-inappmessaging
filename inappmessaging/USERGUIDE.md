@@ -487,7 +487,7 @@ Documents targeting Product Managers:
 * SDKCF-6327: Updated compile and target SDK to API 34 (Android 14).
   - As part of security updates, the use of implicit intents is restricted. If you plan to redirect users to internal app activity through a campaign's button action, make sure to mark the activity as `android:exported="true"`.
 
-### 7.5.0 (In-Progress)
+### 7.5.0 (2023-12-12)
 * SDKCF-6575: Added sending of device Id in all IAM requests.
 * Improved the following classes to increase code coverage:
   - InAppMessagingConstants (SDKCF-6497)
