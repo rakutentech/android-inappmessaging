@@ -26,31 +26,16 @@
     </activity>
 
     <meta-data
-    android:name="com.rakuten.tech.mobile.inappmessaging.subscriptionkey"
-    android:value="${in_app_messaging_sub_id}"/>
+        android:name="com.rakuten.tech.mobile.inappmessaging.subscriptionkey"
+        android:value="${in_app_messaging_sub_id}"/>
 
     <meta-data
-      android:name="com.rakuten.tech.mobile.inappmessaging.debugging"
-      android:value="true"/>
+        android:name="com.rakuten.tech.mobile.inappmessaging.debugging"
+        android:value="true"/>
 
     <meta-data
-      android:name="com.rakuten.tech.mobile.inappmessaging.configurl"
-      android:value="${config_url}"/>
-
-    <activity
-      android:name=".SecondActivity"
-      android:exported="false"
-      tools:ignore="AppLinkUrlError">
-      <intent-filter android:label="second_activity">
-        <category android:name="android.intent.category.BROWSABLE"/>
-        <category android:name="android.intent.category.DEFAULT" />
-        <action android:name="android.intent.action.VIEW"/>
-        <data
-          android:host="www.rakuten.com"
-          android:pathPrefix="/inapp"
-          android:scheme="https"/>
-      </intent-filter>
-    </activity>
+        android:name="com.rakuten.tech.mobile.inappmessaging.configurl"
+        android:value="${config_url}"/>
   </application>
 
 </manifest>

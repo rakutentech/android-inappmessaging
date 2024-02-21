@@ -6,7 +6,7 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:orientation="vertical"
-    tools:context="com.rakuten.test.SecondActivity">
+    tools:context="com.rakuten.test.SecondActivityFragment">
 
   <LinearLayout
       android:id="@+id/text_layout"
