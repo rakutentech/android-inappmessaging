@@ -1,5 +1,6 @@
 package com.rakuten.test
 
+import android.annotation.SuppressLint
 import android.os.Bundle
 import android.widget.TextView
 import androidx.appcompat.app.AppCompatActivity
@@ -7,17 +8,16 @@ import androidx.fragment.app.Fragment
 import com.google.android.material.bottomnavigation.BottomNavigationView
 import com.rakuten.tech.mobile.inappmessaging.runtime.InAppMessaging
 import com.rakuten.tech.mobile.inappmessaging.runtime.data.models.appevents.AppStartEvent
+import com.rakuten.tech.mobile.inappmessaging.runtime.data.models.appevents.CustomEvent
 
 class MainActivity : AppCompatActivity() {
-
-    lateinit var bottomNav : BottomNavigationView
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
 
         loadFragment(MainActivityFragment())
-        setupAboutView()
+        setupVersionsDisplay()
         setupBottomNav()
     }
 
@@ -43,15 +43,15 @@ class MainActivity : AppCompatActivity() {
     }
 
     private fun setupBottomNav() {
-        bottomNav = findViewById(R.id.bottom_nav)
+        val bottomNav = findViewById<BottomNavigationView>(R.id.bottom_nav)
         bottomNav.setOnNavigationItemSelectedListener {
             when (it.itemId) {
                 R.id.screen1 -> {
-                    loadFragment(MainActivityFragment())
+                    screen1Clicked()
                     true
                 }
                 R.id.screen2 -> {
-                    loadFragment(SecondActivityFragment())
+                    screen2Clicked()
                     true
                 }
                 else -> false
@@ -59,8 +59,41 @@ class MainActivity : AppCompatActivity() {
         }
     }
 
-    private fun setupAboutView() {
-        findViewById<TextView>(R.id.about).text =
+    @SuppressLint("SetTextI18n")
+    private fun setupVersionsDisplay() {
+        val aboutText = findViewById<TextView>(R.id.about)
+        aboutText.text =
             "App (${BuildConfig.VERSION_NAME}.${BuildConfig.VERSION_CODE}), SDK (${com.rakuten.tech.mobile.inappmessaging.runtime.BuildConfig.VERSION_NAME})"
+    }
+
+    private fun screen1Clicked() {
+        loadFragment(MainActivityFragment())
+
+        listOf(
+            "screen2",
+            "sec_act_custom_event_click"
+        ).forEach { viewId -> InAppMessaging.instance().closeTooltip(viewId) }
+        InAppMessaging.instance().logEvent(CustomEvent("screen1"))
+    }
+
+    private fun screen2Clicked() {
+        loadFragment(SecondActivityFragment())
+
+        listOf(
+            "screen1",
+            "set_contexts",
+            "close_message",
+            "close_tooltip",
+            "change_user",
+            "launch_successful",
+            "login_successful",
+            "purchase_successful",
+            "purchase_successful_twice",
+            "login_successful_twice",
+            "login_purchase_successful",
+            "custom_event",
+            "reconfigure"
+        ).forEach { viewId -> InAppMessaging.instance().closeTooltip(viewId) }
+        InAppMessaging.instance().logEvent(CustomEvent("screen2"))
     }
 }

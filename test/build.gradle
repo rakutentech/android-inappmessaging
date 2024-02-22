@@ -40,10 +40,9 @@ android {
             shrinkResources true
             minifyEnabled true
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
-            versionNameSuffix "-${new Date().format("yyyy-MM-dd")}"
+            versionNameSuffix "-RELEASE-${new Date().format("yyyy-MM-dd")}"
 
             buildConfigField("String", "VERSION_NAME", "\"${defaultConfig.versionName}${versionNameSuffix}\"")
-            buildConfigField("String", "VERSION_CODE", "\"${defaultConfig.versionCode}\"")
         }
     }
 
