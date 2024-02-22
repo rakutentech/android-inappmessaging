@@ -35,14 +35,18 @@ android {
     }
 
     buildTypes {
+        debug {
+            versionNameSuffix "-DEBUG-${new Date().format("yyyy-MM-dd")}"
+
+            buildConfigField("String", "VERSION_NAME", "\"${defaultConfig.versionName}${versionNameSuffix}\"")
+        }
+
         release {
             debuggable true
             shrinkResources true
             minifyEnabled true
-            proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
-            versionNameSuffix "-RELEASE-${new Date().format("yyyy-MM-dd")}"
-
-            buildConfigField("String", "VERSION_NAME", "\"${defaultConfig.versionName}${versionNameSuffix}\"")
+            proguardFiles getDefaultProguardFile('proguard-android.txt'),
+                    'proguard-rules.pro'
         }
     }
 

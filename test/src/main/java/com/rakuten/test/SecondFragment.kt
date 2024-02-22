@@ -23,7 +23,6 @@ class SecondFragment : Fragment(), View.OnClickListener {
         super.onViewCreated(view, savedInstanceState)
 
         view.findViewById<Button>(R.id.sec_act_custom_event_click).setOnClickListener(this)
-        view.findViewById<Button>(R.id.sec_act_custom_event_click).setOnClickListener(this)
     }
 
     override fun onClick(v: View) {

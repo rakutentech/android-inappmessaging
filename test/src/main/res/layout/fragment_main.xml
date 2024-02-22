@@ -1,83 +1,82 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout
-  xmlns:android="http://schemas.android.com/apk/res/android"
-  xmlns:tools="http://schemas.android.com/tools"
-  android:layout_width="match_parent"
-  android:layout_height="match_parent"
-  tools:context="com.rakuten.test.MainFragment"
-  android:gravity="center"
-  android:orientation="vertical">
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:gravity="center"
+    android:orientation="vertical"
+    tools:context="com.rakuten.test.MainFragment">
 
-  <Button
-      android:id="@+id/set_contexts"
-      android:layout_width="wrap_content"
-      android:layout_height="wrap_content"
-      android:text="@string/set_contexts"/>
+    <Button
+        android:id="@+id/set_contexts"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="@string/set_contexts" />
 
-  <Button
-      android:id="@+id/close_message"
-      android:layout_width="wrap_content"
-      android:layout_height="wrap_content"
-      android:text="@string/close_message"/>
+    <Button
+        android:id="@+id/close_message"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="@string/close_message" />
 
-  <Button
-      android:id="@+id/close_tooltip"
-      android:layout_width="wrap_content"
-      android:layout_height="wrap_content"
-      android:text="@string/close_tooltip"/>
+    <Button
+        android:id="@+id/close_tooltip"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="@string/close_tooltip" />
 
-  <Button
-      android:id="@+id/change_user"
-      android:layout_width="wrap_content"
-      android:layout_height="wrap_content"
-      android:text="@string/change_user"/>
+    <Button
+        android:id="@+id/change_user"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="@string/change_user" />
 
-  <Button
-      android:id="@+id/launch_successful"
-      android:layout_width="wrap_content"
-      android:layout_height="wrap_content"
-      android:text="@string/launch_successful"/>
+    <Button
+        android:id="@+id/launch_successful"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="@string/launch_successful" />
 
-  <Button
-      android:id="@+id/login_successful"
-      android:layout_width="wrap_content"
-      android:layout_height="wrap_content"
-      android:text="@string/login_successful"/>
+    <Button
+        android:id="@+id/login_successful"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="@string/login_successful" />
 
-  <Button
-      android:id="@+id/purchase_successful"
-      android:layout_width="wrap_content"
-      android:layout_height="wrap_content"
-      android:text="@string/purchase_successful"/>
+    <Button
+        android:id="@+id/purchase_successful"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="@string/purchase_successful" />
 
-  <Button
-      android:id="@+id/purchase_successful_twice"
-      android:layout_width="wrap_content"
-      android:layout_height="wrap_content"
-      android:text="@string/purchase_successful_twice"/>
+    <Button
+        android:id="@+id/purchase_successful_twice"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="@string/purchase_successful_twice" />
 
-  <Button
-      android:id="@+id/login_successful_twice"
-      android:layout_width="wrap_content"
-      android:layout_height="wrap_content"
-      android:text="@string/login_successful_twice"/>
+    <Button
+        android:id="@+id/login_successful_twice"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="@string/login_successful_twice" />
 
-  <Button
-      android:id="@+id/login_purchase_successful"
-      android:layout_width="wrap_content"
-      android:layout_height="wrap_content"
-      android:text="@string/login_purchase_successful"/>
+    <Button
+        android:id="@+id/login_purchase_successful"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="@string/login_purchase_successful" />
 
-  <Button
-      android:id="@+id/custom_event"
-      android:layout_width="wrap_content"
-      android:layout_height="wrap_content"
-      android:text="@string/custom_event"/>
+    <Button
+        android:id="@+id/custom_event"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="@string/custom_event" />
 
-  <Button
-      android:id="@+id/reconfigure"
-      android:layout_width="wrap_content"
-      android:layout_height="wrap_content"
-      android:text="@string/label_reconfigure"/>
+    <Button
+        android:id="@+id/reconfigure"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="@string/label_reconfigure" />
 
 </LinearLayout>
