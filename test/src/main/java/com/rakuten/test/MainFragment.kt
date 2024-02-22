@@ -16,7 +16,7 @@ import com.rakuten.tech.mobile.inappmessaging.runtime.data.models.appevents.Cust
 import com.rakuten.tech.mobile.inappmessaging.runtime.data.models.appevents.LoginSuccessfulEvent
 import com.rakuten.tech.mobile.inappmessaging.runtime.data.models.appevents.PurchaseSuccessfulEvent
 
-class MainActivityFragment : Fragment(), View.OnClickListener {
+class MainFragment : Fragment(), View.OnClickListener {
     private var ignoredContexts = ""
 
     override fun onCreateView(

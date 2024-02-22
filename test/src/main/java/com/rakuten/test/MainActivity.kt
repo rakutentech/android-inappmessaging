@@ -16,7 +16,7 @@ class MainActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
 
-        loadFragment(MainActivityFragment())
+        loadFragment(MainFragment())
         setupVersionsDisplay()
         setupBottomNav()
     }
@@ -46,16 +46,10 @@ class MainActivity : AppCompatActivity() {
         val bottomNav = findViewById<BottomNavigationView>(R.id.bottom_nav)
         bottomNav.setOnNavigationItemSelectedListener {
             when (it.itemId) {
-                R.id.screen1 -> {
-                    screen1Clicked()
-                    true
-                }
-                R.id.screen2 -> {
-                    screen2Clicked()
-                    true
-                }
-                else -> false
+                R.id.screen1 -> screen1TabClicked()
+                R.id.screen2 -> screen2TabClicked()
             }
+            true
         }
     }
 
@@ -66,8 +60,8 @@ class MainActivity : AppCompatActivity() {
             "App (${BuildConfig.VERSION_NAME}.${BuildConfig.VERSION_CODE}), SDK (${com.rakuten.tech.mobile.inappmessaging.runtime.BuildConfig.VERSION_NAME})"
     }
 
-    private fun screen1Clicked() {
-        loadFragment(MainActivityFragment())
+    private fun screen1TabClicked() {
+        loadFragment(MainFragment())
 
         listOf(
             "screen2",
@@ -76,9 +70,10 @@ class MainActivity : AppCompatActivity() {
         InAppMessaging.instance().logEvent(CustomEvent("screen1"))
     }
 
-    private fun screen2Clicked() {
-        loadFragment(SecondActivityFragment())
+    private fun screen2TabClicked() {
+        loadFragment(SecondFragment())
 
+        // As of current version, the only way to programmatically close tooltip is by supplying viewId.
         listOf(
             "screen1",
             "set_contexts",

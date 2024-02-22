@@ -1,19 +1,15 @@
 package com.rakuten.test
 
 import android.os.Bundle
-import android.util.Log
 import android.view.LayoutInflater
-import android.view.MotionEvent
 import android.view.View
 import android.view.ViewGroup
 import android.widget.Button
-import android.widget.ScrollView
 import androidx.fragment.app.Fragment
 import com.rakuten.tech.mobile.inappmessaging.runtime.InAppMessaging
 import com.rakuten.tech.mobile.inappmessaging.runtime.data.models.appevents.CustomEvent
-import com.rakuten.tech.mobile.inappmessaging.runtime.view.CustomOnTouchListener
 
-class SecondActivityFragment : Fragment(), View.OnClickListener {
+class SecondFragment : Fragment(), View.OnClickListener {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
     }
@@ -26,6 +22,7 @@ class SecondActivityFragment : Fragment(), View.OnClickListener {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
+        view.findViewById<Button>(R.id.sec_act_custom_event_click).setOnClickListener(this)
         view.findViewById<Button>(R.id.sec_act_custom_event_click).setOnClickListener(this)
     }
 
