@@ -3,9 +3,9 @@
     <item
         android:id="@+id/screen1"
         android:title="screen1"
-        android:icon="@drawable/baseline_star_24"/>
+        android:icon="@drawable/baseline_home_24"/>
     <item
         android:id="@+id/screen2"
         android:title="screen2"
-        android:icon="@drawable/baseline_star_24"/>
+        android:icon="@drawable/baseline_expand_24"/>
 </menu>

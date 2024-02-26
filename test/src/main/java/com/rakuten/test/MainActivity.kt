@@ -46,8 +46,16 @@ class MainActivity : AppCompatActivity() {
         val bottomNav = findViewById<BottomNavigationView>(R.id.bottom_nav)
         bottomNav.setOnNavigationItemSelectedListener {
             when (it.itemId) {
-                R.id.screen1 -> screen1TabClicked()
-                R.id.screen2 -> screen2TabClicked()
+                R.id.screen1 -> {
+                    loadFragment(MainFragment())
+                    closeScreenTooltipsIfAny(R.id.screen2)
+                    InAppMessaging.instance().logEvent(CustomEvent("screen1"))
+                }
+                R.id.screen2 -> {
+                    loadFragment(SecondFragment())
+                    closeScreenTooltipsIfAny(R.id.screen1)
+                    InAppMessaging.instance().logEvent(CustomEvent("screen2"))
+                }
             }
             true
         }
@@ -60,35 +68,36 @@ class MainActivity : AppCompatActivity() {
             "App (${BuildConfig.VERSION_NAME}.${BuildConfig.VERSION_CODE}), SDK (${com.rakuten.tech.mobile.inappmessaging.runtime.BuildConfig.VERSION_NAME})"
     }
 
-    private fun screen1TabClicked() {
-        loadFragment(MainFragment())
+    private fun closeScreenTooltipsIfAny(screenId: Int) {
+        // The list of viewIds to close.
+        // As of current version, the only way to programmatically close tooltip is by supplying these Ids.
+        var viewIds = listOf<String>()
 
-        listOf(
-            "screen2",
-            "sec_act_custom_event_click"
-        ).forEach { viewId -> InAppMessaging.instance().closeTooltip(viewId) }
-        InAppMessaging.instance().logEvent(CustomEvent("screen1"))
-    }
-
-    private fun screen2TabClicked() {
-        loadFragment(SecondFragment())
-
-        // As of current version, the only way to programmatically close tooltip is by supplying viewId.
-        listOf(
-            "screen1",
-            "set_contexts",
-            "close_message",
-            "close_tooltip",
-            "change_user",
-            "launch_successful",
-            "login_successful",
-            "purchase_successful",
-            "purchase_successful_twice",
-            "login_successful_twice",
-            "login_purchase_successful",
-            "custom_event",
-            "reconfigure"
-        ).forEach { viewId -> InAppMessaging.instance().closeTooltip(viewId) }
-        InAppMessaging.instance().logEvent(CustomEvent("screen2"))
+        when(screenId) {
+            R.id.screen1 -> {
+                viewIds = listOf(
+                    "screen1",
+                    "set_contexts",
+                    "close_message",
+                    "close_tooltip",
+                    "change_user",
+                    "launch_successful",
+                    "login_successful",
+                    "purchase_successful",
+                    "purchase_successful_twice",
+                    "login_successful_twice",
+                    "login_purchase_successful",
+                    "custom_event",
+                    "reconfigure"
+                )
+            }
+            R.id.screen2 -> {
+                viewIds = listOf(
+                    "screen2",
+                    "sec_act_custom_event_click"
+                )
+            }
+        }
+        viewIds.forEach { viewId -> InAppMessaging.instance().closeTooltip(viewId) }
     }
 }
