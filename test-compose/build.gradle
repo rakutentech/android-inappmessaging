@@ -6,14 +6,14 @@ apply plugin: 'kotlin-kapt'
 def compose_version = '1.2.0-rc02'
 
 android {
-    compileSdkVersion 33
+    compileSdkVersion CONFIG.versions.android.sdk.compile
 
     defaultConfig {
         applicationId "com.rakuten.tech.mobile.test_compose"
         versionCode 1
         versionName "0.0"
         minSdkVersion CONFIG.versions.android.sdk.min
-        targetSdkVersion 33
+        targetSdkVersion CONFIG.versions.android.sdk.target
 
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
         vectorDrawables {
