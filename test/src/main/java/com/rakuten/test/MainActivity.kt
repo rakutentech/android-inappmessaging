@@ -17,7 +17,7 @@ class MainActivity : AppCompatActivity() {
         setContentView(R.layout.activity_main)
 
         loadFragment(MainFragment())
-        setupVersionsDisplay()
+        setupVersionDisplay()
         setupBottomNav()
     }
 
@@ -62,15 +62,14 @@ class MainActivity : AppCompatActivity() {
     }
 
     @SuppressLint("SetTextI18n")
-    private fun setupVersionsDisplay() {
+    private fun setupVersionDisplay() {
         val aboutText = findViewById<TextView>(R.id.about)
-        aboutText.text =
-            "App (${BuildConfig.VERSION_NAME}.${BuildConfig.VERSION_CODE}), SDK (${com.rakuten.tech.mobile.inappmessaging.runtime.BuildConfig.VERSION_NAME})"
+        aboutText.text = "App Version: ${BuildConfig.VERSION_NAME}.${BuildConfig.VERSION_CODE}"
     }
 
     private fun closeScreenTooltipsIfAny(screenId: Int) {
-        // The list of viewIds to close.
-        // As of current version, the only way to programmatically close tooltip is by supplying these Ids.
+        // The list of viewIds to close. Closing currently displayed tooltip without supplying viewId is not supported
+        // in the current version.
         var viewIds = listOf<String>()
 
         when(screenId) {
