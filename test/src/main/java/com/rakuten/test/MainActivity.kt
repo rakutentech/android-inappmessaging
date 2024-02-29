@@ -75,7 +75,6 @@ class MainActivity : AppCompatActivity() {
         when(screenId) {
             R.id.screen1 -> {
                 viewIds = listOf(
-                    "screen1",
                     "set_contexts",
                     "close_message",
                     "close_tooltip",
@@ -92,7 +91,6 @@ class MainActivity : AppCompatActivity() {
             }
             R.id.screen2 -> {
                 viewIds = listOf(
-                    "screen2",
                     "sec_act_custom_event_click"
                 )
             }
