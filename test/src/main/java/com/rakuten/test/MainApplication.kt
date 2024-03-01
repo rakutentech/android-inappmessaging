@@ -11,7 +11,12 @@ class MainApplication : Application() {
     override fun onCreate() {
         super.onCreate()
         settings = IAMSettings(this)
-        InAppMessaging.configure(this, enableTooltipFeature = settings.isTooltipFeatureEnabled)
+        InAppMessaging.configure(
+            context = this,
+            subscriptionKey = settings.getSubscriptionKey(),
+            configUrl = settings.getConfigUrl(),
+            enableTooltipFeature = settings.isTooltipEnabled()
+        )
         InAppMessaging.instance().registerPreference(provider)
     }
 }
