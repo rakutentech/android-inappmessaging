@@ -150,22 +150,24 @@ class MainFragment : Fragment(), View.OnClickListener {
         val settings = (activity?.application as MainApplication).settings
 
         val configUrl = contentView.findViewById<EditText>(R.id.edit_config_url)
-        configUrl.setText(settings.configUrl)
+        configUrl.setText(settings.getConfigUrl())
         val subsKey = contentView.findViewById<EditText>(R.id.edit_subs_key)
-        subsKey.setText(settings.subscriptionKey)
+        subsKey.setText(settings.getSubscriptionKey())
         val enableTooltip = contentView.findViewById<SwitchCompat>(R.id.tooltip_feat_switch)
-        enableTooltip.isChecked = settings.isTooltipFeatureEnabled
+        enableTooltip.isChecked = settings.isTooltipEnabled()
 
         val dialog =  AlertDialog.Builder(activity)
             .setView(contentView)
             .setTitle(R.string.label_reconfigure)
             .setPositiveButton(android.R.string.ok) { dialog, _ ->
                 context?.let {
-                    settings.subscriptionKey = subsKey.text.toString()
-                    settings.configUrl = configUrl.text.toString()
-                    settings.isTooltipFeatureEnabled = enableTooltip.isChecked
-                    InAppMessaging.configure(it, settings.subscriptionKey, settings.configUrl,
-                        enableTooltipFeature = settings.isTooltipFeatureEnabled)
+                    settings.saveConfig(
+                        configUrl = configUrl.text.toString(),
+                        subscriptionKey = subsKey.text.toString(),
+                        isTooltipEnabled = enableTooltip.isChecked
+                    )
+                    InAppMessaging.configure(it, settings.getSubscriptionKey(), settings.getConfigUrl(),
+                        enableTooltipFeature = settings.isTooltipEnabled())
                 }
                 dialog.dismiss()
             }
