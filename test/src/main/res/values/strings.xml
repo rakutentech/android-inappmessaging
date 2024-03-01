@@ -1,6 +1,6 @@
 <resources>
   <string name="app_name">IAM Test</string>
-  <string name="empty_second_activity">Empty second activity</string>
+  <string name="scroll_placeholder_text">This is a ScrollView</string>
   <string name="launch_second_activity">Launch Second Activity</string>
   <string name="launch_successful">Launch Successful</string>
   <string name="login_successful">Login Successful</string>

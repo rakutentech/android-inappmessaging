@@ -1,7 +1,6 @@
 package com.rakuten.test
 
 import android.app.AlertDialog
-import android.content.Intent
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
@@ -17,7 +16,7 @@ import com.rakuten.tech.mobile.inappmessaging.runtime.data.models.appevents.Cust
 import com.rakuten.tech.mobile.inappmessaging.runtime.data.models.appevents.LoginSuccessfulEvent
 import com.rakuten.tech.mobile.inappmessaging.runtime.data.models.appevents.PurchaseSuccessfulEvent
 
-class MainActivityFragment : Fragment(), View.OnClickListener {
+class MainFragment : Fragment(), View.OnClickListener {
     private var ignoredContexts = ""
 
     override fun onCreateView(
@@ -28,7 +27,6 @@ class MainActivityFragment : Fragment(), View.OnClickListener {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        view.findViewById<Button>(R.id.launch_second_activity).setOnClickListener(this)
         view.findViewById<Button>(R.id.launch_successful).setOnClickListener(this)
         view.findViewById<Button>(R.id.login_successful).setOnClickListener(this)
         view.findViewById<Button>(R.id.purchase_successful).setOnClickListener(this)
@@ -45,7 +43,6 @@ class MainActivityFragment : Fragment(), View.OnClickListener {
 
     override fun onClick(v: View) {
         when (v.id) {
-            R.id.launch_second_activity -> startActivity(Intent(this.activity, SecondActivity::class.java))
             R.id.launch_successful -> InAppMessaging.instance().logEvent(AppStartEvent())
             R.id.login_successful -> InAppMessaging.instance().logEvent(LoginSuccessfulEvent())
             R.id.purchase_successful -> InAppMessaging.instance().logEvent(PurchaseSuccessfulEvent().currencyCode("JPY"))
