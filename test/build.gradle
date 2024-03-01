@@ -54,7 +54,8 @@ android {
 }
 
 dependencies {
-    implementation project(':inappmessaging')
+    //implementation project(':inappmessaging')
+    implementation "io.github.rakutentech.inappmessaging:inappmessaging:7.5.0"
     implementation "io.github.rakutentech.sdkutils:sdk-utils:1.1.0"
 
     implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk7:$CONFIG.versions.kotlin"
