@@ -7,6 +7,7 @@ import androidx.work.ListenableWorker
 import androidx.work.WorkerParameters
 import com.rakuten.tech.mobile.inappmessaging.runtime.InApp.AppManifestConfig
 import com.rakuten.tech.mobile.inappmessaging.runtime.InAppMessaging
+import com.rakuten.tech.mobile.inappmessaging.runtime.InAppMessagingTestConstants
 import com.rakuten.tech.mobile.inappmessaging.runtime.UserInfoProvider
 import com.rakuten.tech.mobile.inappmessaging.runtime.data.models.HostAppInfo
 import com.rakuten.tech.mobile.inappmessaging.runtime.data.repositories.ConfigResponseRepository
@@ -94,7 +95,7 @@ class IntegrationSpec {
         HostAppInfoRepository.instance().apply {
             addHostInfo(
                 HostAppInfo(
-                    packageName = "rakuten.com.tech.mobile.test",
+                    packageName = InAppMessagingTestConstants.APP_ID,
                     deviceId = this.getDeviceId(),
                     version = this.getVersion(),
                     subscriptionKey = this.getSubscriptionKey(),

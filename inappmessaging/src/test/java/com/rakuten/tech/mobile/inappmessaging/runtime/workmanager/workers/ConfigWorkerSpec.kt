@@ -67,7 +67,7 @@ open class ConfigWorkerSpec : BaseTest() {
 
     internal fun initializeInstance() {
         val testAppInfo = HostAppInfo(
-            "rakuten.com.tech.mobile.test",
+            InAppMessagingTestConstants.APP_ID,
             InAppMessagingTestConstants.DEVICE_ID, InAppMessagingTestConstants.APP_VERSION,
             "test-key", InAppMessagingTestConstants.LOCALE,
         )
@@ -110,7 +110,6 @@ class ConfigWorkerSuccessSpec : ConfigWorkerSpec() {
         val ctx = ApplicationProvider.getApplicationContext<Context>()
         val app = ctx.packageManager.getApplicationInfo(ctx.packageName, PackageManager.GET_META_DATA)
         val bundle = app.metaData
-        `when`(mockHostRepo.getPackageName()).thenReturn(ctx.packageName)
         val version = ctx.packageManager.getPackageInfo(ctx.packageName, 0).versionName
         `when`(mockHostRepo.getVersion()).thenReturn(version)
         `when`(mockHostRepo.getConfigUrl()).thenReturn(bundle.getString(CONFIG_KEY, ""))
