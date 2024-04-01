@@ -8,6 +8,7 @@ import androidx.work.WorkerParameters
 import com.rakuten.tech.mobile.inappmessaging.runtime.InApp.AppManifestConfig
 import com.rakuten.tech.mobile.inappmessaging.runtime.InAppMessaging
 import com.rakuten.tech.mobile.inappmessaging.runtime.UserInfoProvider
+import com.rakuten.tech.mobile.inappmessaging.runtime.data.models.HostAppInfo
 import com.rakuten.tech.mobile.inappmessaging.runtime.data.repositories.ConfigResponseRepository
 import com.rakuten.tech.mobile.inappmessaging.runtime.data.repositories.HostAppInfoRepository
 import com.rakuten.tech.mobile.inappmessaging.runtime.data.repositories.CampaignRepository
@@ -22,6 +23,7 @@ import org.junit.Test
 import org.junit.runner.RunWith
 import org.mockito.Mockito
 import org.robolectric.RobolectricTestRunner
+import java.util.Locale
 
 @RunWith(RobolectricTestRunner::class)
 class IntegrationSpec {
@@ -32,7 +34,6 @@ class IntegrationSpec {
 
     @Before
     fun setup() {
-        val manifest = AppManifestConfig(context)
         Settings.Secure.putString(context.contentResolver, Settings.Secure.ANDROID_ID, "testid")
         ConfigResponseRepository.resetInstance()
         InAppMessaging.instance().registerPreference(object : UserInfoProvider {
@@ -41,8 +42,7 @@ class IntegrationSpec {
             override fun provideIdTrackingIdentifier() = ""
         },
         )
-        // to initialize host app info
-        Initializer.initializeSdk(context, manifest.subscriptionKey(), manifest.configUrl())
+        initializeHostAppInfo(AppManifestConfig(context))
     }
 
     @Test
@@ -82,6 +82,29 @@ class IntegrationSpec {
             CampaignRepository.instance().messages.shouldBeEmpty()
         } else {
             result shouldBeEqualTo ListenableWorker.Result.failure()
+        }
+    }
+
+    private fun initializeHostAppInfo(manifest: AppManifestConfig) {
+        Initializer.initializeSdk(context, manifest.subscriptionKey(), manifest.configUrl())
+
+        // Re-initializes host app info with updated packageName to match with sample app
+        // Backend will now throw error if packageName/appId and subscriptionKey does not match
+        // Changing the package name via mock AndroidManifest or @Config(package="") does not work in Robolectric
+        HostAppInfoRepository.instance().apply {
+            addHostInfo(
+                HostAppInfo(
+                    packageName = "rakuten.com.tech.mobile.test",
+                    deviceId = this.getDeviceId(),
+                    version = this.getVersion(),
+                    subscriptionKey = this.getSubscriptionKey(),
+                    locale = Locale.getDefault(),
+                    configUrl = this.getConfigUrl(),
+                    isTooltipFeatureEnabled = this.isTooltipFeatureEnabled(),
+                    context = this.getContext(),
+                    rmcSdkVersion = this.getRmcSdkVersion(),
+                ),
+            )
         }
     }
 }
