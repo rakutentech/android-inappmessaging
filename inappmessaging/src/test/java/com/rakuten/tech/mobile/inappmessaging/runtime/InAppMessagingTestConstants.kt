@@ -3,7 +3,7 @@ package com.rakuten.tech.mobile.inappmessaging.runtime
 import java.util.Locale
 
 object InAppMessagingTestConstants {
-    const val APP_ID = "com.rakuten.test"
+    const val APP_ID = "rakuten.com.tech.mobile.test"
     val LOCALE = Locale.getDefault()
     const val APP_VERSION = "0.0.1"
     const val CONFIG_URL = "https://config"
