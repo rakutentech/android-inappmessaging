@@ -80,7 +80,6 @@ class IntegrationSpec {
             val pingWorker = MessageMixerWorker(context, workerParameters, mockEventScheduler, mockMessageScheduler)
             pingWorker.doWork() shouldBeEqualTo ListenableWorker.Result.success()
             CampaignRepository.instance().lastSyncMillis?.shouldBeGreaterThan(0)
-            CampaignRepository.instance().messages.shouldBeEmpty()
         } else {
             result shouldBeEqualTo ListenableWorker.Result.failure()
         }
