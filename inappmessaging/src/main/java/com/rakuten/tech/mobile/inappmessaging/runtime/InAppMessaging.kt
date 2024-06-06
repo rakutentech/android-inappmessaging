@@ -7,6 +7,7 @@ import androidx.annotation.RestrictTo
 import com.rakuten.tech.mobile.inappmessaging.runtime.data.models.appevents.Event
 import com.rakuten.tech.mobile.inappmessaging.runtime.data.repositories.AccountRepository
 import com.rakuten.tech.mobile.inappmessaging.runtime.exception.InAppMessagingException
+import com.rakuten.tech.mobile.inappmessaging.runtime.utils.InAppLogger
 import com.rakuten.tech.mobile.inappmessaging.runtime.utils.Initializer
 import com.rakuten.tech.mobile.inappmessaging.runtime.workmanager.schedulers.ConfigScheduler
 
@@ -88,6 +89,8 @@ abstract class InAppMessaging internal constructor() {
 
     companion object {
 
+        private const val TAG = "IAM_InAppMessaging"
+
         /**
          * This is the request code that will be used when requesting push permission.
          */
@@ -130,8 +133,10 @@ abstract class InAppMessaging internal constructor() {
             configUrl: String? = null,
             enableTooltipFeature: Boolean? = false,
         ): Boolean {
+            InAppLogger(TAG).info("configure")
             return try {
                 if (!shouldProcess(context, subscriptionKey)) {
+                    InAppLogger(TAG).debug("Not processed since RMC is integrated")
                     return false
                 }
 

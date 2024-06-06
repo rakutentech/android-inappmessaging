@@ -4,6 +4,7 @@ import com.rakuten.tech.mobile.inappmessaging.runtime.InAppMessaging
 import com.rakuten.tech.mobile.inappmessaging.runtime.data.repositories.AccountRepository
 import com.rakuten.tech.mobile.inappmessaging.runtime.data.repositories.CampaignRepository
 import com.rakuten.tech.mobile.inappmessaging.runtime.utils.EventMatchingUtil
+import com.rakuten.tech.mobile.inappmessaging.runtime.utils.InAppLogger
 import com.rakuten.tech.mobile.inappmessaging.runtime.utils.RetryDelayUtil
 import com.rakuten.tech.mobile.inappmessaging.runtime.workmanager.schedulers.MessageMixerPingScheduler
 
@@ -17,6 +18,8 @@ internal object SessionManager {
      * user.
      */
     fun onSessionUpdate() {
+        InAppLogger("IAM_SessionManager").debug("onSessionUpdate")
+
         if (!InAppMessaging.instance().isLocalCachingEnabled()) {
             // Clear locally stored campaigns from ping response
             CampaignRepository.instance().clearMessages()

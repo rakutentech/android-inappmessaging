@@ -53,7 +53,7 @@ internal class ConfigWorker(
      */
     @SuppressWarnings("TooGenericExceptionCaught")
     override fun doWork(): Result {
-        InAppLogger(TAG).debug(hostRepo.getConfigUrl())
+        InAppLogger(TAG).debug("Config API - START")
         // Terminate request if any of the following values are empty
         if (!isConfigValid()) {
             return Result.failure()
@@ -135,10 +135,8 @@ internal class ConfigWorker(
         // Schedule a ping request to message mixer. Initial delay is 0
         // reset current delay to initial
         ConfigScheduler.currDelay = RetryDelayUtil.INITIAL_BACKOFF_DELAY
-        InAppLogger(TAG).debug(
-            "Config Response: %d (%b)",
-            response.body()?.data?.rollOutPercentage, configRepo.isConfigEnabled(),
-        )
+        InAppLogger(TAG).debug("Config API END - rollout: ${response.body()?.data?.rollOutPercentage}, " +
+                "enabled: ${configRepo.isConfigEnabled()}")
         if (configRepo.isConfigEnabled()) {
             MessageMixerPingScheduler.currDelay = RetryDelayUtil.INITIAL_BACKOFF_DELAY
             messagePingScheduler.pingMessageMixerService(0)

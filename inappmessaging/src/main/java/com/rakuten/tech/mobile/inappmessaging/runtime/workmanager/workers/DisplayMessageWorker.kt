@@ -36,9 +36,9 @@ internal class DisplayMessageWorker(
      * This method starts displaying message runnable.
      */
     override suspend fun doWork(): Result {
-        InAppLogger(TAG).debug("onHandleWork() started on thread: %s", Thread.currentThread().name)
+        InAppLogger(TAG).debug("Display worker START, thread: ${Thread.currentThread().name}")
         prepareNextMessage()
-        InAppLogger(TAG).debug("onHandleWork() ended")
+        InAppLogger(TAG).debug("Display worker END")
         return Result.success()
     }
 
@@ -87,7 +87,7 @@ internal class DisplayMessageWorker(
     private fun displayMessage(message: Message, hostActivity: Activity, newWorker: Boolean = false) {
         if (!verifyContexts(message)) {
             // Message display aborted by the host app
-            InAppLogger(TAG).debug("message display cancelled by the host app")
+            InAppLogger(TAG).debug("Message display cancelled by the host app")
             // Remove message in queue
             messageReadinessManager.removeMessageFromQueue(message.campaignId)
             // Prepare next message

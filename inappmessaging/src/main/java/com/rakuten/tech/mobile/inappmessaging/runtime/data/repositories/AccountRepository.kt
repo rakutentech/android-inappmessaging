@@ -87,6 +87,7 @@ internal abstract class AccountRepository {
         override fun updateUserInfo(algo: String?): Boolean {
             val currentHash = userInfoHash
             userInfoHash = hash(getUserId() + getIdTrackingIdentifier(), algo)
+            InAppLogger(TAG).debug("old hash: $currentHash, new hash: $userInfoHash")
             return currentHash != userInfoHash
         }
 
@@ -137,7 +138,7 @@ internal abstract class AccountRepository {
         }
 
         companion object {
-            private const val TAG = "AccountRepository"
+            private const val TAG = "IAM_AccountRepository"
             private const val RADIX = 16
             private const val PAD_LENGTH = 32
         }
