@@ -74,7 +74,7 @@ internal class MessageMixerWorker(
 
     private fun setupCall(): Call<MessageMixerResponse> {
         val identifiers = RuntimeUtil.getUserIdentifiers()
-        InAppLogger(TAG).debug("Ping API START - identifiers: $identifiers")
+        InAppLogger(TAG).debug("Ping API START")
 
         // Create a retrofit API.
         val serviceApi = RuntimeUtil.getRetrofit().create(MessageMixerRetrofitService::class.java)
