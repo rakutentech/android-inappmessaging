@@ -113,11 +113,9 @@ internal class MessageReadinessManager(
                 continue
             }
 
-            InAppLogger(TAG).debug("checking permission for message: %s", message.campaignId)
-
             // First, check if this message should be displayed.
             if (!shouldDisplayMessage(message)) {
-                InAppLogger(TAG).debug("skipping message: %s", message.campaignId)
+                InAppLogger(TAG).debug("Skipping message: ${message.campaignId}")
                 // Skip to next message.
                 continue
             }
@@ -133,11 +131,13 @@ internal class MessageReadinessManager(
         return result
     }
 
+    @SuppressWarnings("LongMethod")
     private fun shouldPing(message: Message, result: MutableList<Message>) = if (message.isTest) {
-        InAppLogger(TAG).debug("skipping test message: %s", message.campaignId)
+        InAppLogger(TAG).debug("Skipping test message: ${message.campaignId}")
         result.add(message)
         false
     } else {
+        InAppLogger(TAG).debug("Check API START - campaignId: ${message.campaignId}")
         // Check message display permission with server.
         val displayPermissionResponse = getMessagePermission(message)
         // If server wants SDK to ping for updated messages, do a new ping request and break this loop.
@@ -196,8 +196,10 @@ internal class MessageReadinessManager(
         return if (message.type == InAppMessageType.TOOLTIP.typeId) {
             val shouldDisplayTooltip = hasPassedBasicCheck &&
                 isTooltipTargetViewVisible(message) // if view where to attach tooltip is indeed visible
+            InAppLogger(TAG).debug("shouldDisplayTooltip: $shouldDisplayTooltip")
             shouldDisplayTooltip
         } else {
+            InAppLogger(TAG).debug("hasPassedBasicCheck: $hasPassedBasicCheck")
             hasPassedBasicCheck
         }
     }
@@ -254,13 +256,9 @@ internal class MessageReadinessManager(
         response: Response<DisplayPermissionResponse>,
         callClone: Call<DisplayPermissionResponse>,
     ): DisplayPermissionResponse? {
+        InAppLogger(DISP_TAG).debug("Check API END - code: ${response.code()}, body: ${response.body()}")
         return when {
-            response.isSuccessful -> {
-                InAppLogger(DISP_TAG).debug(
-                    "display: %b performPing: %b", response.body()?.display, response.body()?.shouldPing,
-                )
-                response.body()
-            }
+            response.isSuccessful -> response.body()
             response.code() >= HttpURLConnection.HTTP_INTERNAL_ERROR -> checkAndRetry(callClone) {
                 WorkerUtils.logRequestError(DISP_TAG, response.code(), response.errorBody()?.string())
             }

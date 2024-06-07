@@ -67,12 +67,14 @@ internal class MessageMixerWorker(
             // Execute a thread blocking API network call, and handle response.
             onResponse(call.execute())
         } catch (e: Exception) {
-            InAppLogger(TAG).error(e.message)
+            InAppLogger(TAG).error("Ping API END - error: ${e.message}")
             Result.retry()
         }
     }
 
     private fun setupCall(): Call<MessageMixerResponse> {
+        InAppLogger(TAG).debug("Ping API START")
+
         // Create a retrofit API.
         val serviceApi = RuntimeUtil.getRetrofit().create(MessageMixerRetrofitService::class.java)
 
@@ -102,6 +104,7 @@ internal class MessageMixerWorker(
      */
     @VisibleForTesting
     fun onResponse(response: Response<MessageMixerResponse>): Result {
+        InAppLogger(TAG).debug("Ping API END - isSuccessful: ${response.isSuccessful}")
         if (response.isSuccessful) {
             serverErrorCounter.set(0) // reset server error counter
             response.body()?.let { handleResponse(it) }

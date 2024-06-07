@@ -57,6 +57,7 @@ internal abstract class CampaignRepository {
         }
 
         override fun syncWith(messageList: List<Message>, timestampMillis: Long, ignoreTooltips: Boolean) {
+            InAppLogger(TAG).debug("START -  message size: ${messageList.size}")
             lastSyncMillis = timestampMillis
             loadCachedData() // ensure we're using latest cache data for syncing below
             val oldList = LinkedHashMap(messages) // copy
@@ -67,6 +68,7 @@ internal abstract class CampaignRepository {
                 messages[updatedCampaign.campaignId] = updatedCampaign
             }
             saveDataToCache()
+            InAppLogger(TAG).debug("END")
         }
 
         private fun List<Message>.filterMessages(ignoreTooltips: Boolean): List<Message> {
@@ -97,6 +99,7 @@ internal abstract class CampaignRepository {
         }
 
         override fun optOutCampaign(campaign: Message): Message? {
+            InAppLogger(TAG).debug("Campaign: ${campaign.campaignId}")
             val localCampaign = messages[campaign.campaignId]
             if (localCampaign == null) {
                 InAppLogger(TAG).debug(
@@ -113,6 +116,7 @@ internal abstract class CampaignRepository {
         }
 
         override fun decrementImpressions(id: String): Message? {
+            InAppLogger(TAG).debug("Campaign: $id")
             val campaign = messages[id] ?: return null
             return updateImpressions(
                 campaign,
@@ -132,6 +136,7 @@ internal abstract class CampaignRepository {
         @SuppressWarnings("TooGenericExceptionCaught")
         private fun loadCachedData() {
             if (InAppMessaging.instance().isLocalCachingEnabled()) {
+                InAppLogger(TAG).debug("START")
                 messages.clear()
                 try {
                     val jsonObject = JSONObject(retrieveData())
@@ -143,28 +148,35 @@ internal abstract class CampaignRepository {
                 } catch (ex: Exception) {
                     InAppLogger(TAG).debug(ex.cause, "Invalid JSON format for $IAM_USER_CACHE data")
                 }
+                InAppLogger(TAG).debug("END")
             }
         }
 
         private fun retrieveData(): String {
             return HostAppInfoRepository.instance().getContext()?.let { ctx ->
-                PreferencesUtil.getString(
+                val preferenceFile = InAppMessaging.getPreferencesFile()
+                val preferenceData = PreferencesUtil.getString(
                     context = ctx,
-                    name = InAppMessaging.getPreferencesFile(),
+                    name = preferenceFile,
                     key = IAM_USER_CACHE,
                     defValue = "",
                 )
+                InAppLogger(TAG).debug("Cache Read - file: $preferenceFile, data: $preferenceData")
+                preferenceData
             }.orEmpty()
         }
 
         private fun saveDataToCache() {
             if (InAppMessaging.instance().isLocalCachingEnabled()) {
-                HostAppInfoRepository.instance().getContext()?.let {
+                HostAppInfoRepository.instance().getContext()?.let { ctx ->
+                    val preferenceFile = InAppMessaging.getPreferencesFile()
+                    val preferenceData = Gson().toJson(messages)
+                    InAppLogger(TAG).debug("Cache Write - file: $preferenceFile, data: $preferenceData")
                     PreferencesUtil.putString(
-                        context = it,
-                        name = InAppMessaging.getPreferencesFile(),
+                        context = ctx,
+                        name = preferenceFile,
                         key = IAM_USER_CACHE,
-                        value = Gson().toJson(messages),
+                        value = preferenceData,
                     )
                 } ?: InAppLogger(TAG).debug("failed saving response data")
             }
