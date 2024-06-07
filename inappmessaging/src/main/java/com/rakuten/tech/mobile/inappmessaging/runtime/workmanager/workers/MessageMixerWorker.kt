@@ -73,7 +73,6 @@ internal class MessageMixerWorker(
     }
 
     private fun setupCall(): Call<MessageMixerResponse> {
-        val identifiers = RuntimeUtil.getUserIdentifiers()
         InAppLogger(TAG).debug("Ping API START")
 
         // Create a retrofit API.
@@ -82,7 +81,7 @@ internal class MessageMixerWorker(
         // Create an pingRequest for the API.
         val pingRequest = PingRequest(
             appVersion = HostAppInfoRepository.instance().getVersion(),
-            userIdentifiers = identifiers,
+            userIdentifiers = RuntimeUtil.getUserIdentifiers(),
             supportedTypes = getSupportedCampaign(),
             rmcSdkVersion = HostAppInfoRepository.instance().getRmcSdkVersion(),
         )

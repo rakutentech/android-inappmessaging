@@ -139,8 +139,7 @@ internal abstract class CampaignRepository {
                 InAppLogger(TAG).debug("START")
                 messages.clear()
                 try {
-                    val preferenceData = retrieveData()
-                    val jsonObject = JSONObject(preferenceData)
+                    val jsonObject = JSONObject(retrieveData())
                     for (key in jsonObject.keys()) {
                         messages[key] = Gson().fromJson(
                             jsonObject.getJSONObject(key).toString(), Message::class.java,
