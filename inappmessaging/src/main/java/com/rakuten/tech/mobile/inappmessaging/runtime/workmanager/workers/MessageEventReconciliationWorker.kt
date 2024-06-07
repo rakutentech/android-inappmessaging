@@ -69,8 +69,10 @@ internal class MessageEventReconciliationWorker(
         messageEventReconciliationUtil.validate { campaign, events ->
             if (eventMatchingUtil.removeSetOfMatchedEvents(events, campaign)) {
                 messageReadinessManager.addMessageToQueue(campaign.campaignId)
-                InAppLogger(TAG).debug("Ready message - campaignId: ${campaign.campaignId}, " +
-                        "header: ${campaign.messagePayload.header}")
+                InAppLogger(TAG).debug(
+                    "Ready message - campaignId: ${campaign.campaignId}, " +
+                        "header: ${campaign.messagePayload.header}",
+                )
             }
         }
     }

@@ -131,6 +131,7 @@ internal class MessageReadinessManager(
         return result
     }
 
+    @SuppressWarnings("LongMethod")
     private fun shouldPing(message: Message, result: MutableList<Message>) = if (message.isTest) {
         InAppLogger(TAG).debug("Skipping test message: ${message.campaignId}")
         result.add(message)
@@ -257,9 +258,7 @@ internal class MessageReadinessManager(
     ): DisplayPermissionResponse? {
         InAppLogger(DISP_TAG).debug("Check API END - code: ${response.code()}, body: ${response.body()}")
         return when {
-            response.isSuccessful -> {
-                response.body()
-            }
+            response.isSuccessful -> response.body()
             response.code() >= HttpURLConnection.HTTP_INTERNAL_ERROR -> checkAndRetry(callClone) {
                 WorkerUtils.logRequestError(DISP_TAG, response.code(), response.errorBody()?.string())
             }

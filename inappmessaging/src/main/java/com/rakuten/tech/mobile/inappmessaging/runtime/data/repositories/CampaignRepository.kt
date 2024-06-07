@@ -155,7 +155,7 @@ internal abstract class CampaignRepository {
         private fun retrieveData(): String {
             return HostAppInfoRepository.instance().getContext()?.let { ctx ->
                 val preferenceFile = InAppMessaging.getPreferencesFile()
-                val preferenceData =  PreferencesUtil.getString(
+                val preferenceData = PreferencesUtil.getString(
                     context = ctx,
                     name = preferenceFile,
                     key = IAM_USER_CACHE,
@@ -168,12 +168,12 @@ internal abstract class CampaignRepository {
 
         private fun saveDataToCache() {
             if (InAppMessaging.instance().isLocalCachingEnabled()) {
-                HostAppInfoRepository.instance().getContext()?.let {
+                HostAppInfoRepository.instance().getContext()?.let { ctx ->
                     val preferenceFile = InAppMessaging.getPreferencesFile()
                     val preferenceData = Gson().toJson(messages)
                     InAppLogger(TAG).debug("Cache Write - file: $preferenceFile, data: $preferenceData")
                     PreferencesUtil.putString(
-                        context = it,
+                        context = ctx,
                         name = preferenceFile,
                         key = IAM_USER_CACHE,
                         value = preferenceData,

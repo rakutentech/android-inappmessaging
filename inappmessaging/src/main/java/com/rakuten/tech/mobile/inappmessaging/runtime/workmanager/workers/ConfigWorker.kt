@@ -135,8 +135,10 @@ internal class ConfigWorker(
         // Schedule a ping request to message mixer. Initial delay is 0
         // reset current delay to initial
         ConfigScheduler.currDelay = RetryDelayUtil.INITIAL_BACKOFF_DELAY
-        InAppLogger(TAG).debug("Config API END - rollout: ${response.body()?.data?.rollOutPercentage}, " +
-                "enabled: ${configRepo.isConfigEnabled()}")
+        InAppLogger(TAG).debug(
+            "Config API END - rollout: ${response.body()?.data?.rollOutPercentage}, " +
+                "enabled: ${configRepo.isConfigEnabled()}",
+        )
         if (configRepo.isConfigEnabled()) {
             MessageMixerPingScheduler.currDelay = RetryDelayUtil.INITIAL_BACKOFF_DELAY
             messagePingScheduler.pingMessageMixerService(0)
