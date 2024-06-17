@@ -167,7 +167,7 @@ class MainActivity : AppCompatActivity() {
     }
 }
 ```
-**<font color="red">Caution when using AppStart-only event as campaign trigger</font>**: Because this event can be logged almost instantly after app launch, there may be situation where accurate user information is not yet available and this event can be matched immediately. Therefore we recommend to ensure user information is up-to-date (see [User Targeting](#info-provider) section for details) when using App Start-only as trigger, or combine it with other event where user information is guarateed to be available.
+**<font color="red">Caution when using AppStart-only event as campaign trigger in Dashboard</font>**: Because this event is logged almost instantly after app launch, there may be situation wherein accurate user information is not yet available in the app (such as when loading user information). Therefore we recommend to ensure user information is up-to-date (see [User Targeting](#info-provider) section for details) when using AppStart-only as trigger, or combine it with other event wherein user information is guaranteed to be available.
 
 ### <a name="login-event"></a>`LoginSuccessfulEvent`
 Host app should log this every time the user logs in successfully.
@@ -255,10 +255,10 @@ Register your `UserInfoProvider` through the `registerPreference` method. Call i
 class MainApplication : Application() {
 
   override fun onCreate() {
-    ...
+
     InAppMessaging.configure(context = this)
+
     InAppMessaging.instance().registerPreference(YourUserInfoProvider()) // HERE
-    ...
   }
 }                                      
 ```
@@ -473,7 +473,7 @@ Rakuten developers experiencing any other problems should refer to the Troublesh
 ## <a name="faq"></a> Frequently Asked Questions
 ### Q: How do I send message based on app version?
 When creating campaigns, you can specify the app version - such as debug, staging, or production verison.
-`<versionName>.<versionCode>` is the format when specifying the versions; for example, 1.0.0-staging.203, 1.0.0-prod.203, or 0.x.x.103.
+`<versionName>.<versionCode>` is the format when specifying the versions; for example, 1.0.0-staging.101, 1.0.0-prod.203, or 0.x.x.4.
 
 ### Q: How many times In-App Message should be sent to device? Does it depends on Max Lifetime Impressions?
 The max impression is handled by SDK and is bound to user per device.<br/>
