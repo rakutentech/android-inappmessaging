@@ -25,7 +25,7 @@ This SDK supports Android API level 23 (Marshmallow) and above.
 You must have a subscription key for your application from IAM Dashboard.
 
 ## <a name="integration"></a> SDK Integration
-### #1 Include Maven Central repo in your project, this should be added in your project root `build.gradle` file.
+### <a name="sdk-repo"></a>#1 Include Maven Central repo in your project, this should be added in your project root `build.gradle` file.
 
 ```groovy
 allprojects {
@@ -35,7 +35,7 @@ allprojects {
 }
 ```
 
-### #2 Add InAppMessaging SDK in your project dependencies.
+### <a name="sdk-dependency"></a>#2 Add InAppMessaging SDK in your project dependencies.
 
 Note: InAppMessaging SDK only uses AndroidX libraries. Host apps should migrate to AndroidX to avoid duplicate dependencies.
 
@@ -46,7 +46,7 @@ dependencies {
 ```
 Please refer to [Changelog](#changelog) section for the latest version.
 
-### #3 Target and compile SDK version to 33 or above.
+### <a name="target-sdk"></a>#3 Target and compile SDK version to 33 or above.
 Note: It is required to target and compile to SDK version 33 or above.
 
 ```groovy
@@ -62,7 +62,7 @@ android {
 }
 ```
 
-### #4 Adding subscription ID and config URL.
+### <a name="sdk-keys"></a>#4 Adding subscription ID and config URL.
 
 It is required set your app's subscription key and config endpoint URL using one of these methods:
 
@@ -130,7 +130,7 @@ class MainApplication : Application() {
 * Missing Subscription Key or other critical information are some of the possible issues that can be encountered during configuration.
 * If `configure()` is not called, subsequent calls to other public API SDK functions have no effect.
 
-### #6 Registering and unregistering activities.
+### <a name="register-activity"></a>#6 Registering and unregistering activities.
 Only register activities that are allowed to display In-App messages. Your activities will be kept in a `WeakReference` object, so it will not cause any memory leaks. Don't forget to unregister your activities in `onPause()` method.
 
 Please see [Context](#context) feature section to have more control on displaying campaigns.
@@ -147,13 +147,13 @@ override fun onPause() {
 }
 ```
 
-### #7 Logging events
+### <a name="log-event"></a>#7 Logging events
 Logging events initiates the display of a campaign whenever a specific event or a set of events occur. Call the `logEvent` method at appropriate locations in your app.
 
 For each logged event, SDK will match it with the ongoing campaign's triggers that are configured in the Dashboard. Once all of the required events are logged by the app, the campaign will be displayed in the current registered activity. If no activity is registered, it will be displayed in the next registered activity.
 
 ### Pre-defined event classes:<br/>
-### `AppStartEvent`
+### <a name="app-start"></a>`AppStartEvent`
 Host app should log this event on app launch from terminated state. Recommended to log this event in host app's main activity's `Activity#onStart()`.
 
 App Start Event is persistent, meaning, once it's logged it will always satisfy corresponding trigger in a campaign. All subsequent logs of this event are ignored. Campaigns that require only AppStartEvent are shown once per app session.
@@ -169,14 +169,14 @@ class MainActivity : AppCompatActivity() {
 ```
 **<font color="red">Caution when using AppStart-only event as campaign trigger</font>**: Because this event can be logged almost instantly after app launch, there may be situation where accurate user information is not yet available and this event can be matched immediately. Therefore we recommend to ensure user information is up-to-date (see [User Targeting](#info-provider) section for details) when using App Start-only as trigger, or combine it with other event where user information is guarateed to be available.
 
-### `LoginSuccessfulEvent`
+### <a name="login-event"></a>`LoginSuccessfulEvent`
 Host app should log this every time the user logs in successfully.
 
 ```kotlin
 InAppMessaging.instance().logEvent(LoginSuccessfulEvent())
 ```
 
-### `PurchaseSuccessfulEvent`
+### <a name="purchase-event"></a>`PurchaseSuccessfulEvent`
 Host app should log this event after every successful purchase.
 
 ```kotlin
@@ -185,7 +185,7 @@ InAppMessaging.instance().logEvent(PurchaseSuccessfulEvent())
 
 ### Custom event class:
 
-### `CustomEvent`
+### <a name="custom-event"></a>`CustomEvent`
 Host app should log this after app-defined states are reached or conditions are met. Example use-case is an event based on tabs or certain screens in your app.
 
 Custom events can have attributes with names and values. Attributes can be `integer`, `double`, `String`, `boolean`, or `java.util.Date` type.
@@ -199,9 +199,9 @@ Custom events can have attributes with names and values. Attributes can be `inte
 InAppMessaging.instance().logEvent(CustomEvent("search").addAttribute("keyword", "book").addAttribute("number_of_keyword", 1))
 ```
 
-### #8 <a name="info-provider"></a> Creating and registering `UserInfoProvider` for User Targeting.
+### <a name="info-provider"></a>#8 Creating and registering `UserInfoProvider` for User Targeting.
 
-To target campaigns to specific users, you must provide the following user information:
+To target campaigns to specific users, you must provide the following user information (note that the required information varies based on the login SDK used):
 
 | User Info | Description | For User SDK users | For ID SDK users |
 |-|-|-|-|
@@ -237,7 +237,6 @@ class YourUserInfoProvider : UserInfoProvider {
 ```
 
 You must provide the relevant information through this class. It will be retrieved by SDK on demand, so make sure values are up-to-date.
-
 After logout is complete, please ensure that all `UserInfoProvider` methods in the preference object return `null` or empty string.
 
 **<font color="red">Notes for Rakuten Developers:</font>**
@@ -264,7 +263,7 @@ class MainApplication : Application() {
 }                                      
 ```
 
-### #9 See [advanced features](#advanced) for optional behavior
+### <a name="advanced-features"></a>#9 See [advanced features](#advanced) for optional behavior
 
 ## <a name="logic"></a> SDK Logic
 
@@ -473,7 +472,7 @@ Rakuten developers experiencing any other problems should refer to the Troublesh
 
 ## <a name="faq"></a> Frequently Asked Questions
 ### Q: How do I send message based on app version?
-When creating campaigns, you can specify the app version - such as debug, test, or production verison.
+When creating campaigns, you can specify the app version - such as debug, staging, or production verison.
 `<versionName>.<versionCode>` is the format when specifying the versions; for example, 1.0.0-staging.203, 1.0.0-prod.203, or 0.x.x.103.
 
 ### Q: How many times In-App Message should be sent to device? Does it depends on Max Lifetime Impressions?
