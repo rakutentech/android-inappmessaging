@@ -46,18 +46,18 @@ dependencies {
 ```
 Please refer to [Changelog](#changelog) section for the latest version.
 
-### #3 Target and compile SDK version to 34 or above.
-Note: It is required to target and compile to SDK version 34 or above.
+### #3 Target and compile SDK version to 33 or above.
+Note: It is required to target and compile to SDK version 33 or above.
 
 ```groovy
 android {
-    compileSdkVersion 34
+    compileSdkVersion 33
 
     defaultConfig {
     // Defines the minimum API level required to run the app.
     minSdkVersion 23
     // Specifies the API level used to test the app.
-    targetSdkVersion 34
+    targetSdkVersion 33
     }
 }
 ```
@@ -78,7 +78,7 @@ It is required set your app's subscription key and config endpoint URL using one
     android:value="change-to-config-url"/>
 ```
 * Runtime configuration
-  - Provide values for `subscriptionKey` and `configUrl` when initializing the SDK (more details in [#6 Configuring In-App Messaging SDK](#configure-sdk)):
+  - Provide values for `subscriptionKey` and `configUrl` when initializing the SDK (more details in [Configuring In-App Messaging SDK](#configure-sdk)):
 ```kotlin
 InAppMessaging.configure(context = this,
                          subscriptionKey = "change-to-your-subsrcription-key",
@@ -102,84 +102,35 @@ If you want to enable debug logging in In-App Messaging SDK (tags begins with "I
 #### **Enable and disable the SDK remotely**
 We recommend, as good engineering practice, that you integrate with a remote config service so that you can fetch a feature flag, e.g. `Enable_IAM_SDK`, and use its value to dynamically enable/disable the SDK without making an app release. There are many remote config services on the market, both free and paid.
 
-### #5 <a name="info-provider"></a> Creating UserInfoProvider.
-Create a new class in your project that implements the following class:
-```kotlin
-com.rakuten.tech.mobile.inappmessaging.runtime.UserInfoProvider
-```
+### <a name="configure-sdk"></a> #5 Configuring In-App Messaging SDK.
+The `configure` method initializes the SDK and should be called in your Application or MainActivity's `onCreate`.
 
-This class serves the purpose of providing basic user information such as user ID, Access Token, and ID Tracking Identifier at runtime. These user information are used by the SDK for campaigns targeting specific users.
+An optional lambda function callback can be set to receive exceptions that caused failed configuration or non-fatal failures in the SDK.
 
 ```kotlin
-class AppUserInfoProvider : UserInfoProvider {
+class MainApplication : Application() {
 
-    // This method is optional for Kotlin class
-    // If Access Token will not be used, no need to override this method (i.e. default value is "")
-    override fun provideAccessToken(): String? {
-        return accessToken
+  override fun onCreate() {
+    // Set optional lambda function callback.
+    // This can be used for analytics and logging of encountered configuration issues.
+    InAppMessaging.errorCallback = {
+        Log.e(TAG, it.localizedMessage, it.cause)
     }
 
-    // This method is optional for Kotlin class
-    // If User ID will not be used, no need to override this method (i.e. default value is "")
-    override fun provideUserId(): String? {
-        return userId
-    }
-
-    // This method is optional for Kotlin class
-    // If ID tracking identifier will not be used, no need to override this method (i.e. default value is "")
-    override fun provideIdTrackingIdentifier(): String? {
-        return idTrackingIdentifier
-    }
-}
+    // Configure API: configure(context: Context): Boolean
+    // In a Java app, this API is callable via `InAppMessaging.Companion.configure(context: Context)`.
+    InAppMessaging.configure(context = this, // Required
+                             subscriptionKey = "change-to-your-subsrcription-key", // Optional, overrides the subscription ID from AndroidManifest.xml
+                             configUrl = "change-to-config-url", // Optional, overrides the config URL from AndroidManifest.xml
+                             enableTooltipFeature = true // Optional, enables/disables tooltip campaigns feature (disabled by default)
+  }
+}                                      
 ```
-
-* User ID - The ID when registering a Rakuten account (e.g. email address or username).
-* Access Token - This is the token provided by the internal User SDK as the "authentication token" value.
-* ID Tracking Identifier - This is the value provided by the internal identity SDK as the "tracking identifier" value.
-
-To help IAM identify users, please keep user information in the preference object up to date.
-After logout is complete, please ensure that all `UserInfoProvider` methods in the preference object return `null` or empty string.
-
-**<font color="red">Notes for Rakuten Developers:</font>**
-* **Only provide Access token if the user is logged in.**
-* **The internal IAM backend only supports production Access token.**
-
-### <a name="configure-sdk"></a> #6 Configuring In-App Messaging SDK.
-Host app should configure the SDK, then register the provider containing the user information.
-* An optional lambda function callback can be set to receive exceptions that caused failed configuration or non-fatal failures in the SDK.
-
-In your Application class' `onCreate()` method, add:
-
-```kotlin
-// Set optional lambda function callback.
-// This can be used for analytics and logging of encountered configuration issues.
-InAppMessaging.errorCallback = {
-    Log.e(TAG, it.localizedMessage, it.cause)
-}
-
-// Configure API: configure(context: Context): Boolean
-// In a Java app, this API is callable via `InAppMessaging.Companion.configure(context: Context)`.
-val iamFlag = InAppMessaging.configure(context = this, // Required
-                                       subscriptionKey = "change-to-your-subsrcription-key", // Optional, overrides the subscription ID from AndroidManifest.xml
-                                       configUrl = "change-to-config-url", // Optional, overrides the config URL from AndroidManifest.xml
-                                       enableTooltipFeature = true // Optional, enables/disables tooltip campaigns feature (disabled by default)
-)
-// use flag to enable/disable IAM feature in your app.
-if (iamFlag) {
-    InAppMessaging.instance().registerPreference(provider)
-}
-```
-
-The preference object can be set once per app session. IAM SDK will read object's properties on demand.
-
-Preferences are not persisted so this function needs to be called on every launch.
-
 **<font color="red">Notes:</font>**
 * Missing Subscription Key or other critical information are some of the possible issues that can be encountered during configuration.
-* You can move the `configure()` call inside an `if (<enable IAM-SDK boolean value> == true)` block to control enabling/disabling the SDK.
 * If `configure()` is not called, subsequent calls to other public API SDK functions have no effect.
 
-### #7 Registering and unregistering activities.
+### #6 Registering and unregistering activities.
 Only register activities that are allowed to display In-App messages. Your activities will be kept in a `WeakReference` object, so it will not cause any memory leaks. Don't forget to unregister your activities in `onPause()` method.
 
 Please see [Context](#context) feature section to have more control on displaying campaigns.
@@ -196,12 +147,10 @@ override fun onPause() {
 }
 ```
 
-### #8 Logging events
-Host app can log events to InAppMessaging anywhere in your app.
+### #7 Logging events
+Logging events initiates the display of a campaign whenever a specific event or a set of events occur. Call the `logEvent` method at appropriate locations in your app.
 
-These events will trigger messages with the same event based trigger. Upon receiving logged event, InAppMessaging SDK will start matching it with current campaigns immediately. After a campaign message's trigger events are matched by the logged events, this message will be displayed in the current registered activity. If no activity is registered, it will be displayed in the next registered activity.
-
-### #9 See [advanced features](#advanced) for optional behavior
+For each logged event, SDK will match it with the ongoing campaign's triggers that are configured in the Dashboard. Once all of the required events are logged by the app, the campaign will be displayed in the current registered activity. If no activity is registered, it will be displayed in the next registered activity.
 
 ### Pre-defined event classes:<br/>
 ### `AppStartEvent`
@@ -218,6 +167,7 @@ class MainActivity : AppCompatActivity() {
     }
 }
 ```
+**<font color="red">Caution when using AppStart-only event as campaign trigger</font>**: Because this event can be logged almost instantly after app launch, there may be situation where accurate user information is not yet available and this event can be matched immediately. Therefore we recommend to ensure user information is up-to-date (see [User Targeting](#info-provider) section for details) when using App Start-only as trigger, or combine it with other event where user information is guarateed to be available.
 
 ### `LoginSuccessfulEvent`
 Host app should log this every time the user logs in successfully.
@@ -236,7 +186,7 @@ InAppMessaging.instance().logEvent(PurchaseSuccessfulEvent())
 ### Custom event class:
 
 ### `CustomEvent`
-Host app should log this after app-defined states are reached or conditions are met.
+Host app should log this after app-defined states are reached or conditions are met. Example use-case is an event based on tabs or certain screens in your app.
 
 Custom events can have attributes with names and values. Attributes can be `integer`, `double`, `String`, `boolean`, or `java.util.Date` type.
 
@@ -249,7 +199,72 @@ Custom events can have attributes with names and values. Attributes can be `inte
 InAppMessaging.instance().logEvent(CustomEvent("search").addAttribute("keyword", "book").addAttribute("number_of_keyword", 1))
 ```
 
-**<font color="red">Please note:</font> Logging events may trigger InAppMessaging SDK to update current session data if there were changes in the app's user information (see [UserInfoProvider](#info-provider) section for details).**
+### #8 <a name="info-provider"></a> Creating and registering `UserInfoProvider` for User Targeting.
+
+To target campaigns to specific users, you must provide the following user information:
+
+| User Info | Description | For User SDK users | For ID SDK users |
+|-|-|-|-|
+| User ID | ID when registering a Rakuten account (e.g. email address or username) | Required | Optional |
+| Access Token | Access token value provided by the internal User SDK | Required | Do not override or leave empty |
+| ID Tracking Identifier | Tracking identifier value provided by the internal ID SDK | Do not override or leave empty | Required |
+
+### 1. Create a new class in your project that implements `UserInfoProvider`:
+
+```kotlin
+import com.rakuten.tech.mobile.inappmessaging.runtime.UserInfoProvider
+
+class YourUserInfoProvider : UserInfoProvider {
+
+    // This method is optional for Kotlin class
+    // If User ID will not be used, no need to override this method (i.e. default value is "")
+    override fun provideUserId(): String? {
+        return userId
+    }
+
+    // This method is optional for Kotlin class
+    // If Access Token will not be used, no need to override this method (i.e. default value is "")
+    override fun provideAccessToken(): String? {
+        return accessToken
+    }
+
+    // This method is optional for Kotlin class
+    // If ID tracking identifier will not be used, no need to override this method (i.e. default value is "")
+    override fun provideIdTrackingIdentifier(): String? {
+        return idTrackingIdentifier
+    }
+}
+```
+
+You must provide the relevant information through this class. It will be retrieved by SDK on demand, so make sure values are up-to-date.
+
+After logout is complete, please ensure that all `UserInfoProvider` methods in the preference object return `null` or empty string.
+
+**<font color="red">Notes for Rakuten Developers:</font>**
+* Regarding access token
+  - Only provide access token if the user is logged in.
+  - The internal IAM backend only supports production access token.
+* Migrating from User SDK to ID SDK
+  - Update your `UserInfoProvider` and override the `provideIdTrackingIdentifier()` method. Do not override other methods or leave them as null or empty.
+  - **Impact**: User will be treated as a new user, therefore if there are **active** campaigns that were previously displayed/opted-out by the user, then it will be displayed again.
+
+### 2. Register your `UserInfoProvider`
+
+Register your `UserInfoProvider` through the `registerPreference` method. Call it just once, for example, in your Application's `onCreate` just after `configure`.
+
+```kotlin
+class MainApplication : Application() {
+
+  override fun onCreate() {
+    ...
+    InAppMessaging.configure(context = this)
+    InAppMessaging.instance().registerPreference(YourUserInfoProvider()) // HERE
+    ...
+  }
+}                                      
+```
+
+### #9 See [advanced features](#advanced) for optional behavior
 
 ## <a name="logic"></a> SDK Logic
 
@@ -328,7 +343,7 @@ in strings.xml:
     <string name="iam_custom_font_button">your_app_other_font</string>
 ```
 
-### <a name="push-primer"></a> #4 Push Primer
+### <a name="push-primer"></a> #4 Push Primer (Dashboard support coming soon)
 
 Starting v7.2.0, campaigns can be used [as push primer](https://developer.android.com/guide/topics/ui/notifiers/notification-permission#wait-to-show-prompt) to explain to users the context and advantages of enabling push notification in your app.
 
@@ -457,9 +472,9 @@ configurations.all {
 Rakuten developers experiencing any other problems should refer to the Troubleshooting Guide on the internal developer documentation portal.
 
 ## <a name="faq"></a> Frequently Asked Questions
-### Q: How do I send message for in staging or testing environment?
-When creating campaigns, you can set the versions which the campaign will be applied to your app.
-You can set the versions to staging versions (ex. 0.0.1, 1.0.0-staging, 0.x.x, etc.)
+### Q: How do I send message based on app version?
+When creating campaigns, you can specify the app version - such as debug, test, or production verison.
+`<versionName>.<versionCode>` is the format when specifying the versions; for example, 1.0.0-staging.203, 1.0.0-prod.203, or 0.x.x.103.
 
 ### Q: How many times In-App Message should be sent to device? Does it depends on Max Lifetime Impressions?
 The max impression is handled by SDK and is bound to user per device.<br/>
@@ -477,15 +492,12 @@ Documents targeting Engineers:
 
 + [SDK Source Code](https://github.com/rakutentech/android-inappmessaging)
 
-Documents targeting Product Managers:
-
-+ In-App Messaging Dashboard Sign Up(page is coming soon.)
-
 ## <a name="changelog"></a> Changelog
 
 ### 7.6.0 (In-Progress)
 * SDKCF-6327: Updated compile and target SDK to API 34 (Android 14).
   - As part of security updates, the use of implicit intents is restricted. If you plan to redirect users to internal app activity through a campaign's button action, make sure to mark the activity as `android:exported="true"`.
+* SDKCF-6936: Improved this userguide.
 
 ### 7.5.0 (2023-12-12)
 * SDKCF-6575: Added sending of device Id in all IAM requests.
