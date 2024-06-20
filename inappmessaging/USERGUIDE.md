@@ -64,7 +64,7 @@ android {
 
 ### <a name="sdk-keys"></a>#4 Adding subscription ID and config URL.
 
-It is required set your app's subscription key and config endpoint URL using one of these methods:
+It is required to set your app's subscription key and config endpoint URL using one of these methods:
 
 * Build-time configuration
   - Add the following in your app's AndroidManifest.xml:
@@ -148,7 +148,7 @@ override fun onPause() {
 ```
 
 ### <a name="log-event"></a>#7 Logging events
-Logging events initiates the display of a campaign whenever a specific event or a set of events occur. Call the `logEvent` method at appropriate locations in your app.
+Logging events initiates the display of a campaign whenever a specific event or a set of events occur. Call the `logEvent` method at appropriate locations in your app and based on your use-case.
 
 For each logged event, SDK will match it with the ongoing campaign's triggers that are configured in the Dashboard. Once all of the required events are logged by the app, the campaign will be displayed in the current registered activity. If no activity is registered, it will be displayed in the next registered activity.
 
@@ -167,7 +167,7 @@ class MainActivity : AppCompatActivity() {
     }
 }
 ```
-**<font color="red">Caution when using AppStart-only event as campaign trigger in Dashboard</font>**: Because this event is logged almost instantly after app launch, there may be situation wherein accurate user information is not yet available in the app (such as when loading user information). Therefore we recommend to ensure user information is up-to-date (see [User Targeting](#info-provider) section for details) when using AppStart-only as trigger, or combine it with other event wherein user information is guaranteed to be available.
+**<font color="red">Caution when using AppStart-only event as campaign trigger in Dashboard</font>**: Because this event is logged almost instantly after app launch, there may be situation wherein user information is not yet available due to some delay, and may cause unexpected behavior. Therefore we recommend to ensure user information is up-to-date (see [User Targeting](#info-provider) section for details) when using AppStart-only as trigger, or combine it with other event wherein user information is guaranteed to be available.
 
 ### <a name="login-event"></a>`LoginSuccessfulEvent`
 Host app should log this every time the user logs in successfully.
@@ -249,7 +249,7 @@ After logout is complete, please ensure that all `UserInfoProvider` methods in t
 
 ### 2. Register your `UserInfoProvider`
 
-Register your `UserInfoProvider` through the `registerPreference` method. Call it just once, for example, in your Application's `onCreate` just after `configure`.
+Register your `UserInfoProvider` through the `registerPreference` method. Call it just once, for example, in your Application's `onCreate` after `configure`.
 
 ```kotlin
 class MainApplication : Application() {
@@ -472,7 +472,7 @@ Rakuten developers experiencing any other problems should refer to the Troublesh
 
 ## <a name="faq"></a> Frequently Asked Questions
 ### Q: How do I send message based on app version?
-When creating campaigns, you can specify the app version - such as debug, staging, or production verison.
+When creating campaigns, you can specify the app version - such as debug, staging, or production version.
 `<versionName>.<versionCode>` is the format when specifying the versions; for example, 1.0.0-staging.101, 1.0.0-prod.203, or 0.x.x.4.
 
 ### Q: How many times In-App Message should be sent to device? Does it depends on Max Lifetime Impressions?
