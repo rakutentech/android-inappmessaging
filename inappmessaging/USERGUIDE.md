@@ -28,33 +28,20 @@ You must have a subscription key for your application from IAM Dashboard.
 
 ### <a name="final-code"></a>Final Code Preview (Sample)
 
-By the end of this integration guide, the final code should basically look something like this:
+By the end of this guide, the final code should basically look something like this:
 
 <details>
 <summary style="cursor: pointer;";>(click to expand)</summary>
-
-AndroidManifest.xml
-```xml
-<meta-data
-    android:name="com.rakuten.tech.mobile.inappmessaging.subscriptionkey"
-    android:value="change-to-your-subsrcription-key"/>
-
-<meta-data
-    android:name="com.rakuten.tech.mobile.inappmessaging.configurl"
-    android:value="change-to-config-url"/>
-
-<meta-data
-    android:name="com.rakuten.tech.mobile.inappmessaging.debugging"
-    android:value="true|false"/>
-```
 
 MainApplication.kt
 ```kotlin
 class MainApplication: Application() {
 
+    val yourUserProvider = YourUserInfoProvider()
+
     override fun onCreate() {
         InAppMessaging.configure(this)
-        InAppMessaging.instance().registerPreference(YourUserInfoProvider())
+        InAppMessaging.instance().registerPreference(yourUserProvider)
     }
 }
 ```
@@ -82,27 +69,24 @@ class MainActivity: AppCompatActivity(), View.OnClickListener {
 
     override fun onStart() {
         super.onStart()
+
         InAppMessaging.instance().logEvent(AppStartEvent())
     }
 
     override fun onResume() {
         super.onResume()
+
         InAppMessaging.instance().registerMessageDisplayActivity(this)
     }
 
     override fun onPause() {
         super.onPause()
-        InAppMessaging.instance().unregisterMessageDisplayActivity()
-    }
 
-    fun onUserLogin() {
-      // When user logins successfully
-      InAppMessaging.instance().logEvent(LoginSuccessfulEvent())
+        InAppMessaging.instance().unregisterMessageDisplayActivity()
     }
 
     override fun onClick(v: View) {
       // Log the events based on your use-cases
-
       when (v.id) {
         R.id.purchase_button_tapped -> InAppMessaging.instance().logEvent(PurchaseSuccessfulEvent())
 
@@ -110,6 +94,17 @@ class MainActivity: AppCompatActivity(), View.OnClickListener {
 
         R.id.cart_tab_tapped -> InAppMessaging.instance().logEvent(CustomEvent("tab_visit").addAttribute("tab_name", "cart"))
       }
+    }
+
+    fun onUserLogin() {
+        yourUserProvider.userId = "<userId>"
+        yourUserProvider.accessToken = "<accessToken>" // or idTracking
+        InAppMessaging.instance().logEvent(LoginSuccessfulEvent())
+    }
+    
+    fun onUserLogout() {
+        yourUserProvider.userId = ""
+        yourUserProvider.accessToken = "" // or idTracking
     }
 }
 ```
@@ -218,8 +213,8 @@ class MainApplication : Application() {
 ```
 **<font color="red">Notes:</font>**
 * Missing Subscription Key or other critical information are some of the possible issues that can be encountered during configuration.
-* If `configure()` is not called, subsequent calls to other public API SDK functions have no effect.
 * To enable [tooltips](#tooltip-campaigns) (beta feature) you must set `enableTooltipFeature` flag to true.
+* If `configure()` is not called, subsequent calls to other public API SDK functions have no effect.
 
 ### <a name="register-activity"></a>#6 Registering and unregistering activities.
 Only register activities that are allowed to display In-App messages. Your activities will be kept in a `WeakReference` object, so it will not cause any memory leaks. Don't forget to unregister your activities in `onPause()` method.
@@ -504,8 +499,9 @@ override fun onRequestPermissionsResult(requestCode: Int, permissions: Array<Str
 
 ### <a name="tooltip-campaigns"></a> #6 Tooltip Campaigns
 
-Tooltip feature is currently in beta testing; its features and behaviour might change in the future.
-Please refer to the internal guide for more information.
+Tooltip campaigns are attached to particular anchor views within the application. To enable this feature, refer to the Configuration section.
+
+**<font color="red">Note:</font>** This feature is in beta testing, therefore its features and behaviour might change in the future. Please refer to the internal guide for more information.
 
 ## <a name="troubleshooting"></a> Troubleshooting
 ### Proguard ParseException
