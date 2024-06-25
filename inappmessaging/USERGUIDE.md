@@ -289,10 +289,10 @@ InAppMessaging.instance().logEvent(CustomEvent("search").addAttribute("keyword",
 
 To target campaigns to specific users, you must provide the following user information (note that the required information varies based on the login SDK used):
 
-| User Info | Description | For User SDK users | For ID SDK users |
+| User Info | Description | For Mobile Login SDK users | For ID SDK users |
 |-|-|-|-|
 | User ID | ID when registering a Rakuten account (e.g. email address or username) | Required | Optional |
-| Access Token | Access token value provided by the internal User SDK | Required | Do not override or leave empty |
+| Access Token | Access token value provided by the internal Mobile Login SDK | Required | Do not override or leave empty |
 | ID Tracking Identifier | Tracking identifier value provided by the internal ID SDK | Do not override or leave empty | Required |
 
 ### 1. Create a new class in your project that implements `UserInfoProvider`:
@@ -329,7 +329,7 @@ After logout is complete, please ensure that all `UserInfoProvider` methods in t
 * Regarding access token
   - Only provide access token if the user is logged in.
   - The internal IAM backend only supports production access token.
-* Migrating from User SDK to ID SDK
+* Migrating from Mobile Login SDK to ID SDK
   - Update your `UserInfoProvider` and override the `provideIdTrackingIdentifier()` method. Do not override other methods or leave them as null or empty.
   - **Impact**: User will be treated as a new user, therefore if there are **active** campaigns that were previously displayed/opted-out by the user, then it will be displayed again.
 
