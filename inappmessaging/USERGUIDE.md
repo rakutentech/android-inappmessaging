@@ -12,6 +12,7 @@ In-App Messaging (IAM) module allows app developers to easily configure and disp
 * [SDK Integration](#integration)
 * [SDK Logic](#logic)
 * [Advanced Features](#advanced)
+* [Final Code (Sample)](#final-code)
 * [Troubleshooting](#troubleshooting)
 * [FAQ](#faq)
 * [Documentation and Useful Links](#see-also)
@@ -421,6 +422,79 @@ To enable tooltips you must set `enableTooltipFeature` flag to true when calling
 InAppMessaging.instance().configure(context = this,
                                     enableTooltipFeature = true)
 ```
+
+## <a name="final-code"></a>Final Code (Sample)
+
+The final code should basically look something like this:
+
+<details>
+<summary style="cursor: pointer;";>(click to expand)</summary>
+
+MainApplication.kt
+```kotlin
+class MainApplication: Application() {
+    override fun onCreate() {
+        InAppMessaging.configure(this)
+        InAppMessaging.instance().registerPreference(YourUserInfoProvider())
+    }
+}
+```
+
+YourUserInfoProvider.kt
+```kotlin
+class YourUserInfoProvider: UserInfoProvider() {
+
+    // Update during login or logout
+    var userId = ""
+    var accessToken = ""
+    var idTracking = ""
+
+    override fun provideUserId() = userId
+
+    override fun provideAccessToken() = accessToken
+
+    override fun provideIdTrackingIdentifier() = idTracking
+}
+```
+
+MainActivity.kt
+```kotlin
+class MainActivity: AppCompatActivity(), View.OnClickListener {
+
+    override fun onStart() {
+        super.onStart()
+        InAppMessaging.instance().logEvent(AppStartEvent())
+    }
+
+    override fun onResume() {
+        super.onResume()
+        InAppMessaging.instance().registerMessageDisplayActivity(this)
+    }
+
+    override fun onPause() {
+        super.onPause()
+        InAppMessaging.instance().unregisterMessageDisplayActivity()
+    }
+
+    fun onUserLogin() {
+      // When user logins successfully
+      InAppMessaging.instance().logEvent(LoginSuccessfulEvent())
+    }
+
+    override fun onClick(v: View) {
+      // Log the events based on your use-cases
+
+      when (v.id) {
+        R.id.purchase_button_tapped -> InAppMessaging.instance().logEvent(PurchaseSuccessfulEvent())
+
+        R.id.home_tab_tapped -> InAppMessaging.instance().logEvent(CustomEvent("tab_visit").addAttribute("tab_name", "home"))
+
+        R.id.cart_tab_tapped -> InAppMessaging.instance().logEvent(CustomEvent("tab_visit").addAttribute("tab_name", "cart"))
+      }
+    }
+}
+```
+</details>
 
 ## <a name="troubleshooting"></a> Troubleshooting
 ### Proguard ParseException
