@@ -12,7 +12,6 @@ In-App Messaging (IAM) module allows app developers to easily configure and disp
 * [SDK Integration](#integration)
 * [SDK Logic](#logic)
 * [Advanced Features](#advanced)
-* [Final Code (Sample)](#final-code)
 * [Troubleshooting](#troubleshooting)
 * [FAQ](#faq)
 * [Documentation and Useful Links](#see-also)
@@ -26,6 +25,96 @@ This SDK supports Android API level 23 (Marshmallow) and above.
 You must have a subscription key for your application from IAM Dashboard.
 
 ## <a name="integration"></a> SDK Integration
+
+### <a name="final-code"></a>Final Code Preview (Sample)
+
+By the end of this integration guide, the final code should basically look something like this:
+
+<details>
+<summary style="cursor: pointer;";>(click to expand)</summary>
+
+AndroidManifest.xml
+```xml
+<meta-data
+    android:name="com.rakuten.tech.mobile.inappmessaging.subscriptionkey"
+    android:value="change-to-your-subsrcription-key"/>
+
+<meta-data
+    android:name="com.rakuten.tech.mobile.inappmessaging.configurl"
+    android:value="change-to-config-url"/>
+
+<meta-data
+    android:name="com.rakuten.tech.mobile.inappmessaging.debugging"
+    android:value="true|false"/>
+```
+
+MainApplication.kt
+```kotlin
+class MainApplication: Application() {
+
+    override fun onCreate() {
+        InAppMessaging.configure(this)
+        InAppMessaging.instance().registerPreference(YourUserInfoProvider())
+    }
+}
+```
+
+YourUserInfoProvider.kt
+```kotlin
+class YourUserInfoProvider: UserInfoProvider() {
+
+    // Update during login or logout
+    var userId = ""
+    var accessToken = ""
+    var idTracking = ""
+
+    override fun provideUserId() = userId
+
+    override fun provideAccessToken() = accessToken
+
+    override fun provideIdTrackingIdentifier() = idTracking
+}
+```
+
+MainActivity.kt
+```kotlin
+class MainActivity: AppCompatActivity(), View.OnClickListener {
+
+    override fun onStart() {
+        super.onStart()
+        InAppMessaging.instance().logEvent(AppStartEvent())
+    }
+
+    override fun onResume() {
+        super.onResume()
+        InAppMessaging.instance().registerMessageDisplayActivity(this)
+    }
+
+    override fun onPause() {
+        super.onPause()
+        InAppMessaging.instance().unregisterMessageDisplayActivity()
+    }
+
+    fun onUserLogin() {
+      // When user logins successfully
+      InAppMessaging.instance().logEvent(LoginSuccessfulEvent())
+    }
+
+    override fun onClick(v: View) {
+      // Log the events based on your use-cases
+
+      when (v.id) {
+        R.id.purchase_button_tapped -> InAppMessaging.instance().logEvent(PurchaseSuccessfulEvent())
+
+        R.id.home_tab_tapped -> InAppMessaging.instance().logEvent(CustomEvent("tab_visit").addAttribute("tab_name", "home"))
+
+        R.id.cart_tab_tapped -> InAppMessaging.instance().logEvent(CustomEvent("tab_visit").addAttribute("tab_name", "cart"))
+      }
+    }
+}
+```
+</details>
+
 ### <a name="sdk-repo"></a>#1 Include Maven Central repo in your project, this should be added in your project root `build.gradle` file.
 
 ```groovy
@@ -130,6 +219,7 @@ class MainApplication : Application() {
 **<font color="red">Notes:</font>**
 * Missing Subscription Key or other critical information are some of the possible issues that can be encountered during configuration.
 * If `configure()` is not called, subsequent calls to other public API SDK functions have no effect.
+* To enable [tooltips](#tooltip-campaigns) (beta feature) you must set `enableTooltipFeature` flag to true.
 
 ### <a name="register-activity"></a>#6 Registering and unregistering activities.
 Only register activities that are allowed to display In-App messages. Your activities will be kept in a `WeakReference` object, so it will not cause any memory leaks. Don't forget to unregister your activities in `onPause()` method.
@@ -416,85 +506,6 @@ override fun onRequestPermissionsResult(requestCode: Int, permissions: Array<Str
 
 Tooltip feature is currently in beta testing; its features and behaviour might change in the future.
 Please refer to the internal guide for more information.
-
-To enable tooltips you must set `enableTooltipFeature` flag to true when calling `configure()`.
-```kotlin
-InAppMessaging.instance().configure(context = this,
-                                    enableTooltipFeature = true)
-```
-
-## <a name="final-code"></a>Final Code (Sample)
-
-The final code should basically look something like this:
-
-<details>
-<summary style="cursor: pointer;";>(click to expand)</summary>
-
-MainApplication.kt
-```kotlin
-class MainApplication: Application() {
-    override fun onCreate() {
-        InAppMessaging.configure(this)
-        InAppMessaging.instance().registerPreference(YourUserInfoProvider())
-    }
-}
-```
-
-YourUserInfoProvider.kt
-```kotlin
-class YourUserInfoProvider: UserInfoProvider() {
-
-    // Update during login or logout
-    var userId = ""
-    var accessToken = ""
-    var idTracking = ""
-
-    override fun provideUserId() = userId
-
-    override fun provideAccessToken() = accessToken
-
-    override fun provideIdTrackingIdentifier() = idTracking
-}
-```
-
-MainActivity.kt
-```kotlin
-class MainActivity: AppCompatActivity(), View.OnClickListener {
-
-    override fun onStart() {
-        super.onStart()
-        InAppMessaging.instance().logEvent(AppStartEvent())
-    }
-
-    override fun onResume() {
-        super.onResume()
-        InAppMessaging.instance().registerMessageDisplayActivity(this)
-    }
-
-    override fun onPause() {
-        super.onPause()
-        InAppMessaging.instance().unregisterMessageDisplayActivity()
-    }
-
-    fun onUserLogin() {
-      // When user logins successfully
-      InAppMessaging.instance().logEvent(LoginSuccessfulEvent())
-    }
-
-    override fun onClick(v: View) {
-      // Log the events based on your use-cases
-
-      when (v.id) {
-        R.id.purchase_button_tapped -> InAppMessaging.instance().logEvent(PurchaseSuccessfulEvent())
-
-        R.id.home_tab_tapped -> InAppMessaging.instance().logEvent(CustomEvent("tab_visit").addAttribute("tab_name", "home"))
-
-        R.id.cart_tab_tapped -> InAppMessaging.instance().logEvent(CustomEvent("tab_visit").addAttribute("tab_name", "cart"))
-      }
-    }
-}
-```
-</details>
 
 ## <a name="troubleshooting"></a> Troubleshooting
 ### Proguard ParseException
