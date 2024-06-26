@@ -28,7 +28,7 @@ You must have a subscription key for your application from IAM Dashboard.
 
 ### <a name="final-code"></a>Final Code Preview (Sample)
 
-By the end of this guide, the final code should basically look something like this:
+By the end of this guide, the final code will basically look something like this:
 
 <details>
 <summary style="cursor: pointer;";>(click to expand)</summary>
@@ -68,20 +68,14 @@ MainActivity.kt
 class MainActivity: AppCompatActivity(), View.OnClickListener {
 
     override fun onStart() {
-        super.onStart()
-
         InAppMessaging.instance().logEvent(AppStartEvent())
     }
 
     override fun onResume() {
-        super.onResume()
-
         InAppMessaging.instance().registerMessageDisplayActivity(this)
     }
 
     override fun onPause() {
-        super.onPause()
-
         InAppMessaging.instance().unregisterMessageDisplayActivity()
     }
 
@@ -577,7 +571,7 @@ Documents targeting Engineers:
 ### 7.6.0 (In-Progress)
 * SDKCF-6327: Updated compile and target SDK to API 34 (Android 14).
   - As part of security updates, the use of implicit intents is restricted. If you plan to redirect users to internal app activity through a campaign's button action, make sure to mark the activity as `android:exported="true"`.
-* SDKCF-6936: Improved this userguide.
+* SDKCF-6936: Improved the userguide.
 
 ### 7.5.0 (2023-12-12)
 * SDKCF-6575: Added sending of device Id in all IAM requests.
