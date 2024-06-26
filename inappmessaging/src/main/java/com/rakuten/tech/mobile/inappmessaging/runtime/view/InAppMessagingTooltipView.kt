@@ -26,12 +26,12 @@ import com.google.android.material.shape.ShapeAppearanceModel
 import com.rakuten.tech.mobile.inappmessaging.runtime.R
 import com.rakuten.tech.mobile.inappmessaging.runtime.data.enums.PositionType
 import com.rakuten.tech.mobile.inappmessaging.runtime.data.repositories.HostAppInfoRepository
-import com.rakuten.tech.mobile.inappmessaging.runtime.data.responses.ping.Message
 import com.rakuten.tech.mobile.inappmessaging.runtime.extensions.hide
 import com.rakuten.tech.mobile.inappmessaging.runtime.utils.InAppLogger
 import com.rakuten.tech.mobile.inappmessaging.runtime.utils.ResourceUtils
 import com.rakuten.tech.mobile.inappmessaging.runtime.utils.ViewUtil
 import com.rakuten.tech.mobile.inappmessaging.runtime.extensions.show
+import com.rakuten.tech.mobile.inappmessaging.runtime.data.ui.UiMessage
 import com.squareup.picasso.Callback
 import com.squareup.picasso.Picasso
 
@@ -49,7 +49,8 @@ internal class InAppMessagingTooltipView(
     private var bgColor = "#FFFFFF" // default white
     internal var type: PositionType = PositionType.BOTTOM_CENTER
     private var viewId: String? = null
-    private var listener: InAppMessageViewListener? = null
+    var listener: InAppMessageViewListener? = null
+        private set
     internal var isTest = false
     internal var mainHandler = Handler(Looper.getMainLooper())
     private val anchorViewLayoutListener = ViewTreeObserver.OnGlobalLayoutListener {
@@ -59,19 +60,19 @@ internal class InAppMessagingTooltipView(
     @VisibleForTesting
     internal var picasso: Picasso? = null
 
-    override fun populateViewData(message: Message) {
+    override fun populateViewData(uiMessage: UiMessage) {
         // set tag
-        tag = message.campaignId
-        this.imageUrl = message.messagePayload.resource.imageUrl
-        this.bgColor = message.messagePayload.backgroundColor
-        message.getTooltipConfig()?.let { tooltip ->
+        tag = uiMessage.id
+        this.imageUrl = uiMessage.imageUrl
+        this.bgColor = uiMessage.backgroundColor
+        uiMessage.tooltipData?.let { tooltip ->
             val position = PositionType.getById(tooltip.position)
             if (position != null) {
                 type = position
             }
             viewId = tooltip.id
         }
-        listener = InAppMessageViewListener(message)
+        listener = InAppMessageViewListener(uiMessage)
         bindImage()
     }
 

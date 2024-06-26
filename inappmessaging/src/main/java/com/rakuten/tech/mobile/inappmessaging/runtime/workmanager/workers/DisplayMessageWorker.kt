@@ -9,6 +9,7 @@ import androidx.work.OneTimeWorkRequest
 import androidx.work.WorkerParameters
 import androidx.work.WorkManager
 import com.rakuten.tech.mobile.inappmessaging.runtime.InAppMessaging
+import com.rakuten.tech.mobile.inappmessaging.runtime.data.customjson.MessageMapper
 import com.rakuten.tech.mobile.inappmessaging.runtime.data.repositories.HostAppInfoRepository
 import com.rakuten.tech.mobile.inappmessaging.runtime.data.responses.ping.Message
 import com.rakuten.tech.mobile.inappmessaging.runtime.utils.ImageUtil
@@ -96,7 +97,7 @@ internal class DisplayMessageWorker(
         }
 
         // Display message on main thread
-        handler.post(DisplayMessageRunnable(message, hostActivity))
+        handler.post(DisplayMessageRunnable(uiMessage = MessageMapper.mapFrom(message), hostActivity))
     }
 
     /**
