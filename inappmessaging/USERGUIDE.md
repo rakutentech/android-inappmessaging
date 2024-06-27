@@ -10,8 +10,9 @@ In-App Messaging (IAM) module allows app developers to easily configure and disp
 ### This page covers:
 * [Requirements](#requirements)
 * [SDK Integration](#integration)
-* [SDK Logic](#logic)
 * [Advanced Features](#advanced)
+* [Final Code (Sample)](#final-code)
+* [SDK Logic](#logic)
 * [Troubleshooting](#troubleshooting)
 * [FAQ](#faq)
 * [Documentation and Useful Links](#see-also)
@@ -25,84 +26,6 @@ This SDK supports Android API level 23 (Marshmallow) and above.
 You must have a subscription key for your application from IAM Dashboard.
 
 ## <a name="integration"></a> SDK Integration
-
-### <a name="final-code"></a>Final Code Preview (Sample)
-
-By the end of this guide, the final code will basically look something like this:
-
-<details>
-<summary style="cursor: pointer;";>(click to expand)</summary>
-
-MainApplication.kt
-```kotlin
-class MainApplication: Application() {
-
-    val yourUserProvider = YourUserInfoProvider()
-
-    override fun onCreate() {
-        InAppMessaging.configure(this)
-        InAppMessaging.instance().registerPreference(yourUserProvider)
-    }
-}
-```
-
-YourUserInfoProvider.kt
-```kotlin
-class YourUserInfoProvider: UserInfoProvider() {
-
-    // Update during login or logout
-    var userId = ""
-    var accessToken = ""
-    var idTracking = ""
-
-    override fun provideUserId() = userId
-
-    override fun provideAccessToken() = accessToken
-
-    override fun provideIdTrackingIdentifier() = idTracking
-}
-```
-
-MainActivity.kt
-```kotlin
-class MainActivity: AppCompatActivity(), View.OnClickListener {
-
-    override fun onStart() {
-        InAppMessaging.instance().logEvent(AppStartEvent())
-    }
-
-    override fun onResume() {
-        InAppMessaging.instance().registerMessageDisplayActivity(this)
-    }
-
-    override fun onPause() {
-        InAppMessaging.instance().unregisterMessageDisplayActivity()
-    }
-
-    override fun onClick(v: View) {
-      // Log the events based on your use-cases
-      when (v.id) {
-        R.id.purchase_button_tapped -> InAppMessaging.instance().logEvent(PurchaseSuccessfulEvent())
-
-        R.id.home_tab_tapped -> InAppMessaging.instance().logEvent(CustomEvent("tab_visit").addAttribute("tab_name", "home"))
-
-        R.id.cart_tab_tapped -> InAppMessaging.instance().logEvent(CustomEvent("tab_visit").addAttribute("tab_name", "cart"))
-      }
-    }
-
-    fun onUserLogin() {
-        yourUserProvider.userId = "<userId>"
-        yourUserProvider.accessToken = "<accessToken>" // or idTracking
-        InAppMessaging.instance().logEvent(LoginSuccessfulEvent())
-    }
-    
-    fun onUserLogout() {
-        yourUserProvider.userId = ""
-        yourUserProvider.accessToken = "" // or idTracking
-    }
-}
-```
-</details>
 
 ### <a name="sdk-repo"></a>#1 Include Maven Central repo in your project, this should be added in your project root `build.gradle` file.
 
@@ -345,17 +268,6 @@ class MainApplication : Application() {
 
 ### <a name="advanced-features"></a>#9 See [advanced features](#advanced) for optional behavior
 
-## <a name="logic"></a> SDK Logic
-
-### Client-side opt-out handling
-
-If user (with valid identifiers in [`UserInfoProvider`](#info-provider) class) opts out from a campaign, that information is saved in user cache locally on the device and the campaign won't be shown again for that user on the same device. The opt-out status is not shared between devices. The same applies for anonymous user.
-* Each user has a separate cache container that is persisted in `SharedPreferences`. Each combination of userId and idTrackingIdentifier is treated as a different user including a special - anonymous user - that represents non logged-in user (userId and idTrackingIdentifier are null or empty).
-
-### <a name="max-impression"></a> Client-side max impressions handling
-
-Campaign impressions (displays) are counted locally for each user. Meaning that a campaign with maxImpression value of 3 will be displayed to each user (different identifiers in [`UserInfoProvider`](#info-provider) class) max 3 times. Campaign's max impression number can be modified in the dashboard/backend. Then the SDK, after next ping call, will compare new value with old max impression number and add the difference to the current impression counter. The max impression data is not shared between devices. The same applies for anonymous user.
-
 ## <a name="advanced"></a> Advanced Features
 
 ### <a name="context"></a> #1 Campaign's context
@@ -496,6 +408,95 @@ override fun onRequestPermissionsResult(requestCode: Int, permissions: Array<Str
 Tooltip campaigns are attached to particular anchor views within the application. To enable this feature, refer to the Configuration section.
 
 **<font color="red">Note:</font>** This feature is in beta testing, therefore its features and behaviour might change in the future. Please refer to the internal guide for more information.
+
+## <a name="final-code"></a>Final Code (Sample)
+
+With basic features, your code should look something like this:
+
+<details>
+<summary style="cursor: pointer;";>(click to expand)</summary>
+
+MainApplication.kt
+```kotlin
+class MainApplication: Application() {
+
+    val yourUserProvider = YourUserInfoProvider()
+
+    override fun onCreate() {
+        InAppMessaging.configure(this)
+        InAppMessaging.instance().registerPreference(yourUserProvider)
+    }
+}
+```
+
+YourUserInfoProvider.kt
+```kotlin
+class YourUserInfoProvider: UserInfoProvider() {
+
+    // Update during login or logout
+    var userId = ""
+    var accessToken = ""
+    var idTracking = ""
+
+    override fun provideUserId() = userId
+
+    override fun provideAccessToken() = accessToken
+
+    override fun provideIdTrackingIdentifier() = idTracking
+}
+```
+
+MainActivity.kt
+```kotlin
+class MainActivity: AppCompatActivity(), View.OnClickListener {
+
+    override fun onStart() {
+        InAppMessaging.instance().logEvent(AppStartEvent())
+    }
+
+    override fun onResume() {
+        InAppMessaging.instance().registerMessageDisplayActivity(this)
+    }
+
+    override fun onPause() {
+        InAppMessaging.instance().unregisterMessageDisplayActivity()
+    }
+
+    override fun onClick(v: View) {
+      // Log the events based on your use-cases
+      when (v.id) {
+        R.id.purchase_button_tapped -> InAppMessaging.instance().logEvent(PurchaseSuccessfulEvent())
+
+        R.id.home_tab_tapped -> InAppMessaging.instance().logEvent(CustomEvent("tab_visit").addAttribute("tab_name", "home"))
+
+        R.id.cart_tab_tapped -> InAppMessaging.instance().logEvent(CustomEvent("tab_visit").addAttribute("tab_name", "cart"))
+      }
+    }
+
+    fun onUserLogin() {
+        yourUserProvider.userId = "<userId>"
+        yourUserProvider.accessToken = "<accessToken>" // or idTracking
+        InAppMessaging.instance().logEvent(LoginSuccessfulEvent())
+    }
+    
+    fun onUserLogout() {
+        yourUserProvider.userId = ""
+        yourUserProvider.accessToken = "" // or idTracking
+    }
+}
+```
+</details>
+
+## <a name="logic"></a> SDK Logic
+
+### Client-side opt-out handling
+
+If user (with valid identifiers in [`UserInfoProvider`](#info-provider) class) opts out from a campaign, that information is saved in user cache locally on the device and the campaign won't be shown again for that user on the same device. The opt-out status is not shared between devices. The same applies for anonymous user.
+* Each user has a separate cache container that is persisted in `SharedPreferences`. Each combination of userId and idTrackingIdentifier is treated as a different user including a special - anonymous user - that represents non logged-in user (userId and idTrackingIdentifier are null or empty).
+
+### <a name="max-impression"></a> Client-side max impressions handling
+
+Campaign impressions (displays) are counted locally for each user. Meaning that a campaign with maxImpression value of 3 will be displayed to each user (different identifiers in [`UserInfoProvider`](#info-provider) class) max 3 times. Campaign's max impression number can be modified in the dashboard/backend. Then the SDK, after next ping call, will compare new value with old max impression number and add the difference to the current impression counter. The max impression data is not shared between devices. The same applies for anonymous user.
 
 ## <a name="troubleshooting"></a> Troubleshooting
 ### Proguard ParseException
