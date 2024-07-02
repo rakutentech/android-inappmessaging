@@ -21,7 +21,7 @@ internal abstract class CampaignRepository {
     /**
      * Updates the [Message.isOptedOut] as true for the provided campaign.
      */
-    abstract fun optOutCampaign(campaign: Message): Message?
+    abstract fun optOutCampaign(id: String): Message?
 
     /**
      * Decrements the number of [Message.impressionsLeft] for provided campaign Id in the repository.
@@ -98,18 +98,18 @@ internal abstract class CampaignRepository {
             saveDataToCache()
         }
 
-        override fun optOutCampaign(campaign: Message): Message? {
-            InAppLogger(TAG).debug("Campaign: ${campaign.campaignId}")
-            val localCampaign = messages[campaign.campaignId]
+        override fun optOutCampaign(id: String): Message? {
+            InAppLogger(TAG).debug("Campaign: $id}")
+            val localCampaign = messages[id]
             if (localCampaign == null) {
                 InAppLogger(TAG).debug(
-                    "Campaign (${campaign.campaignId}) could not be updated -" +
+                    "Campaign ($id) could not be updated -" +
                         "not found in the repository",
                 )
                 return null
             }
             val updatedCampaign = localCampaign.apply { isOptedOut = true }
-            if (!campaign.isTest) {
+            if (!updatedCampaign.isTest) {
                 saveDataToCache()
             }
             return updatedCampaign

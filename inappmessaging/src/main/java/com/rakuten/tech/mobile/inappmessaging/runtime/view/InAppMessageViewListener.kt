@@ -10,9 +10,9 @@ import androidx.annotation.UiThread
 import androidx.annotation.VisibleForTesting
 import com.rakuten.tech.mobile.inappmessaging.runtime.R
 import com.rakuten.tech.mobile.inappmessaging.runtime.coroutine.MessageActionsCoroutine
+import com.rakuten.tech.mobile.inappmessaging.runtime.data.ui.UiMessage
 import com.rakuten.tech.mobile.inappmessaging.runtime.data.enums.InAppMessageType
 import com.rakuten.tech.mobile.inappmessaging.runtime.data.repositories.HostAppInfoRepository
-import com.rakuten.tech.mobile.inappmessaging.runtime.data.responses.ping.Message
 import com.rakuten.tech.mobile.inappmessaging.runtime.manager.DisplayManager
 import com.rakuten.tech.mobile.inappmessaging.runtime.utils.BuildVersionChecker
 import com.rakuten.tech.mobile.inappmessaging.runtime.workmanager.schedulers.EventMessageReconciliationScheduler
@@ -26,14 +26,14 @@ import kotlinx.coroutines.withContext
  * Touch and clicker listener class for InAppMessageView.
  */
 internal class InAppMessageViewListener(
-    val message: Message,
+    private val uiMessage: UiMessage,
     private val messageCoroutine: MessageActionsCoroutine = MessageActionsCoroutine(),
     private val displayManager: DisplayManager = DisplayManager.instance(),
     private val buildChecker: BuildVersionChecker = BuildVersionChecker,
     private val eventScheduler: EventMessageReconciliationScheduler = EventMessageReconciliationScheduler.instance(),
     private val hostAppInfoRepo: HostAppInfoRepository = HostAppInfoRepository.instance(),
 ) :
-    View.OnTouchListener, View.OnClickListener, View.OnKeyListener {
+    View.OnTouchListener, View.OnClickListener, View.OnKeyListener, OnAutoDisappear {
 
     // set to public to be mocked in testing.
     @VisibleForTesting
@@ -65,7 +65,7 @@ internal class InAppMessageViewListener(
         if (R.id.opt_out_checkbox == view.id) {
             // If user only checked the opt-out box, just assign the isOptOutChecked variable.
             this.isOptOutChecked = (view as CheckBox).isChecked
-        } else if (R.id.message_close_button == view.id && !message.isCampaignDismissable) {
+        } else if (R.id.message_close_button == view.id && !uiMessage.shouldShowUpperCloseButton) {
             // Disable closing the message if not dismissable.
             return
         } else {
@@ -77,7 +77,7 @@ internal class InAppMessageViewListener(
     override fun onKey(v: View?, keyCode: Int, event: KeyEvent?): Boolean {
         return if (event != null && event.action == KeyEvent.ACTION_UP && keyCode == KeyEvent.KEYCODE_BACK) {
             // Disable closing the message if not dismissable.
-            if (!message.isCampaignDismissable) {
+            if (!uiMessage.shouldShowUpperCloseButton) {
                 false
             } else {
                 // Handling back button click in coroutine.
@@ -89,6 +89,20 @@ internal class InAppMessageViewListener(
         }
     }
 
+    override fun onAutoDisappear() {
+        if (uiMessage.type != InAppMessageType.TOOLTIP.typeId) {
+            return
+        }
+
+        if (this.uiMessage.tooltipData?.autoDisappear == null) {
+            return
+        }
+
+        // Tooltip is detached from window through autoDisappear
+        // To handle repo update and impression request, simulate a close action
+        messageCoroutine.executeTask(this.uiMessage, R.id.message_close_button, false)
+    }
+
     internal fun handleClick(
         id: Int,
         mainDispatcher: CoroutineDispatcher = Dispatchers.Main,
@@ -97,7 +111,7 @@ internal class InAppMessageViewListener(
         CoroutineScope(mainDispatcher).launch {
             displayManager.removeMessage(
                 hostAppInfoRepo.getRegisteredActivity(),
-                id = if (message.type == InAppMessageType.TOOLTIP.typeId) message.campaignId else null,
+                id = if (uiMessage.type == InAppMessageType.TOOLTIP.typeId) uiMessage.id else null,
             )
             withContext(dispatcher) {
                 handleMessage(id)
@@ -106,10 +120,10 @@ internal class InAppMessageViewListener(
     }
 
     internal fun handleMessage(id: Int) {
-        val result = messageCoroutine.executeTask(message, id, isOptOutChecked)
+        val result = messageCoroutine.executeTask(uiMessage, id, isOptOutChecked)
         if (result) {
             eventScheduler.startReconciliationWorker(
-                delay = (message.messagePayload.messageSettings.displaySettings.delay).toLong(),
+                delay = (uiMessage.displaySettings.delay).toLong(),
             )
         }
     }
@@ -122,4 +136,12 @@ internal class InAppMessageViewListener(
             magnifier.show(event.rawX - viewPosition[0], event.rawY - viewPosition[1])
         }
     }
+}
+
+internal interface OnAutoDisappear {
+
+    /**
+     * Callback when In-App message is removed from window through auto-disappear (without user interaction).
+     */
+    fun onAutoDisappear()
 }

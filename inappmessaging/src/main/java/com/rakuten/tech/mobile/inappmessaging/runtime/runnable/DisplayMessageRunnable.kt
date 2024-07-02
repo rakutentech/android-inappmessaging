@@ -6,10 +6,10 @@ import android.view.ViewGroup
 import android.widget.FrameLayout
 import androidx.annotation.UiThread
 import com.rakuten.tech.mobile.inappmessaging.runtime.R
+import com.rakuten.tech.mobile.inappmessaging.runtime.data.ui.UiMessage
 import com.rakuten.tech.mobile.inappmessaging.runtime.data.enums.ImpressionType
 import com.rakuten.tech.mobile.inappmessaging.runtime.data.enums.InAppMessageType
 import com.rakuten.tech.mobile.inappmessaging.runtime.data.models.Tooltip
-import com.rakuten.tech.mobile.inappmessaging.runtime.data.responses.ping.Message
 import com.rakuten.tech.mobile.inappmessaging.runtime.data.requests.Impression
 import com.rakuten.tech.mobile.inappmessaging.runtime.manager.DisplayManager
 import com.rakuten.tech.mobile.inappmessaging.runtime.manager.ImpressionManager
@@ -28,7 +28,7 @@ import java.util.Date
  */
 @UiThread
 internal class DisplayMessageRunnable(
-    private val message: Message,
+    private val uiMessage: UiMessage,
     private val hostActivity: Activity,
     private val displayManager: DisplayManager = DisplayManager.instance(),
 ) : Runnable {
@@ -40,7 +40,7 @@ internal class DisplayMessageRunnable(
      */
     @UiThread
     override fun run() {
-        val messageType = InAppMessageType.getById(message.type)
+        val messageType = InAppMessageType.getById(uiMessage.type)
         if (shouldNotDisplay(messageType)) return
 
         if (messageType != null) {
@@ -57,10 +57,10 @@ internal class DisplayMessageRunnable(
     private fun handleSlide() {
         val slideUpView = hostActivity.layoutInflater.inflate(R.layout.in_app_message_slide_up, null)
             as InAppMessageSlideUpView
-        slideUpView.populateViewData(message)
+        slideUpView.populateViewData(uiMessage)
         hostActivity.addContentView(slideUpView, hostActivity.window.attributes)
         ImpressionManager.sendImpressionEvent(
-            message.campaignId,
+            uiMessage.id,
             listOf(Impression(ImpressionType.IMPRESSION, Date().time)),
             impressionTypeOnly = true,
         )
@@ -69,10 +69,10 @@ internal class DisplayMessageRunnable(
     private fun handleFull() {
         val fullScreenView = hostActivity.layoutInflater.inflate(R.layout.in_app_message_full_screen, null)
             as InAppMessageFullScreenView
-        fullScreenView.populateViewData(message)
+        fullScreenView.populateViewData(uiMessage)
         hostActivity.addContentView(fullScreenView, hostActivity.window.attributes)
         ImpressionManager.sendImpressionEvent(
-            message.campaignId,
+            uiMessage.id,
             listOf(Impression(ImpressionType.IMPRESSION, Date().time)),
             impressionTypeOnly = true,
         )
@@ -81,10 +81,10 @@ internal class DisplayMessageRunnable(
     private fun handleModal() {
         val modalView = hostActivity.layoutInflater.inflate(R.layout.in_app_message_modal, null)
             as InAppMessageModalView
-        modalView.populateViewData(message)
+        modalView.populateViewData(uiMessage)
         hostActivity.addContentView(modalView, hostActivity.window.attributes)
         ImpressionManager.sendImpressionEvent(
-            message.campaignId,
+            uiMessage.id,
             listOf(Impression(ImpressionType.IMPRESSION, Date().time)),
             impressionTypeOnly = true,
         )
@@ -93,11 +93,11 @@ internal class DisplayMessageRunnable(
     private fun handleTooltip() {
         val toolTipView = hostActivity.layoutInflater.inflate(R.layout.in_app_message_tooltip, null)
             as InAppMessagingTooltipView
-        toolTipView.populateViewData(message)
-        message.getTooltipConfig()?.let { config ->
+        toolTipView.populateViewData(uiMessage)
+        uiMessage.tooltipData?.let { config ->
             if (displayTooltip(config, toolTipView)) {
                 ImpressionManager.sendImpressionEvent(
-                    message.campaignId,
+                    uiMessage.id,
                     listOf(Impression(ImpressionType.IMPRESSION, Date().time)),
                     impressionTypeOnly = true,
                 )
@@ -119,7 +119,7 @@ internal class DisplayMessageRunnable(
                 true
             }
             if (tooltip.autoDisappear != null && tooltip.autoDisappear > 0) {
-                displayManager.removeMessage(hostActivity, delay = tooltip.autoDisappear, id = message.campaignId)
+                displayManager.removeMessage(hostActivity, delay = tooltip.autoDisappear, id = uiMessage.id)
             }
         }
         return isTooltipAdded
@@ -155,7 +155,7 @@ internal class DisplayMessageRunnable(
         hostActivity.findViewById<View?>(R.id.in_app_message_tooltip_view)?.parent?.let { viewParent ->
             for (i in 0 until (viewParent as ViewGroup).childCount) {
                 val child = viewParent.getChildAt(i)
-                if (child?.id == R.id.in_app_message_tooltip_view && child.tag == message.campaignId) {
+                if (child?.id == R.id.in_app_message_tooltip_view && child.tag == uiMessage.id) {
                     // tool campaign is already displayed, no need to display again
                     return true
                 }

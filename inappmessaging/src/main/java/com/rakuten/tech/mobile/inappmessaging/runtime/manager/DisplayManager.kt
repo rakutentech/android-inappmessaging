@@ -9,11 +9,11 @@ import android.view.ViewGroup
 import android.widget.FrameLayout
 import androidx.annotation.VisibleForTesting
 import com.rakuten.tech.mobile.inappmessaging.runtime.R
-import com.rakuten.tech.mobile.inappmessaging.runtime.coroutine.MessageActionsCoroutine
 import com.rakuten.tech.mobile.inappmessaging.runtime.data.repositories.CampaignRepository
 import com.rakuten.tech.mobile.inappmessaging.runtime.data.repositories.HostAppInfoRepository
 import com.rakuten.tech.mobile.inappmessaging.runtime.utils.InAppLogger
 import com.rakuten.tech.mobile.inappmessaging.runtime.utils.ResourceUtils
+import com.rakuten.tech.mobile.inappmessaging.runtime.view.InAppMessagingTooltipView
 import com.rakuten.tech.mobile.inappmessaging.runtime.workmanager.workers.DisplayMessageWorker
 
 /**
@@ -40,7 +40,6 @@ internal interface DisplayManager {
         @VisibleForTesting
         internal var instance: DisplayManager = DisplayManagerImpl(
             Handler(Looper.getMainLooper()),
-            MessageActionsCoroutine(),
         )
 
         fun instance() = instance
@@ -52,7 +51,6 @@ internal interface DisplayManager {
     )
     class DisplayManagerImpl(
         private val handler: Handler,
-        private val messageActionsCoroutine: MessageActionsCoroutine,
     ) : DisplayManager {
 
         override fun displayMessage() {
@@ -128,10 +126,7 @@ internal interface DisplayManager {
                         // when the delay completes
                         if (isViewPresent(view, id)) {
                             removeCampaign(view, id, activity)
-                            // to handle repo update and impression request, simulate a close action
-                            messageActionsCoroutine.executeTask(
-                                CampaignRepository.instance().messages[id], R.id.message_close_button, false,
-                            )
+                            (view as? InAppMessagingTooltipView)?.listener?.onAutoDisappear()
                         }
                     }, delay * MS_MULTIPLIER,
                 )

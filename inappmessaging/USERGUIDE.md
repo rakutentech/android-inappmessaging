@@ -486,6 +486,7 @@ Documents targeting Product Managers:
 ### 7.6.0 (In-Progress)
 * SDKCF-6327: Updated compile and target SDK to API 34 (Android 14).
   - As part of security updates, the use of implicit intents is restricted. If you plan to redirect users to internal app activity through a campaign's button action, make sure to mark the activity as `android:exported="true"`.
+* SDKCF-6930: Supported Push Primer feature through CustomJson.
 
 ### 7.5.0 (2023-12-12)
 * SDKCF-6575: Added sending of device Id in all IAM requests.
