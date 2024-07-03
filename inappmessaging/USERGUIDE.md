@@ -4,7 +4,7 @@ layout: userguide
 
 # In-App Messaging
 
-In-App Messaging (IAM) module allows app developers to easily configure and display notifications within their app.
+In-App Messaging (IAM) module allows app developers to easily configure and display messages or campaigns within their app.
 
 ![In-App Messaging Sample](images/what-is-inapp.png)
 
@@ -23,9 +23,9 @@ In-App Messaging (IAM) module allows app developers to easily configure and disp
 
 -----
 
-  * `minSdkVersion` >= `23`
-  * `targetSdkVersion` and `compileSdkVersion` >= `33`
-  * `Subscription Key` from the Dashboard
+* `minSdkVersion` >= `23`
+* `targetSdkVersion` and `compileSdkVersion` >= `33`
+* `Subscription Key` from the Dashboard
 
 # Configuration
 
@@ -86,7 +86,7 @@ class MainApplication : Application() {
         // This can be used for analytics and logging of encountered configuration issues.
         InAppMessaging.errorCallback = { Log.e(TAG, it.localizedMessage, it.cause) }
 
-        // In a Java app, call with `InAppMessaging.Companion.configure(context: Context)`.
+        // If using Java, call with `InAppMessaging.Companion.configure(context: Context)`.
         InAppMessaging.configure(
             context = this,
             subscriptionKey = "your_subscription_key", // Optional
@@ -217,7 +217,7 @@ For each logged event, the SDK will match it with the ongoing message's triggers
 #### AppStartEvent
 Log this event on app launch from terminated state. Recommended to log this event in app's main activity's `Activity#onStart()`.
 
-App Start Event is persistent, meaning, once it's logged it will always satisfy corresponding trigger in a campaign. All subsequent logs of this event are ignored. Campaigns that require only AppStartEvent are shown once per app session.
+App Start Event is persistent, meaning, once it's logged it will always satisfy corresponding trigger in a message. All subsequent logs of this event are ignored. Messages that require only AppStartEvent are shown once per app session.
 
 ```kotlin
 class MainActivity: AppCompatActivity() {
@@ -228,7 +228,8 @@ class MainActivity: AppCompatActivity() {
     }
 }
 ```
-**<font color="red">Caution when using AppStart-only event as trigger in Dashboard</font>**: Because this event is logged almost instantly after app launch, there may be situation wherein user information is not yet available due to some delay, and may cause unexpected behavior. Therefore we recommend to ensure user information is up-to-date (see [User Targeting](#register-preference) section for details) when using AppStart-only as trigger, or combine it with other event wherein user information is guaranteed to be available.
+> <font color="red">Note:</font>
+> Because this event is logged almost instantly after app launch, there may be situation wherein user information is not yet available due to some delay, and may cause unexpected behavior. Therefore we recommend to ensure user information is up-to-date (see [User Targeting](#register-preference) section for details) when using AppStart-only as trigger, or combine it with other event wherein user information is guaranteed to be available.
 
 #### LoginSuccessfulEvent
 Log this every time the user logs in successfully.
@@ -300,7 +301,7 @@ After logout is complete, please ensure that all `UserInfoProvider` methods in t
 > - Regarding access token:
 >   - Only provide access token if the user is logged in
 >   - The internal Backend only supports production access token
-> - Migrating from legacy Mobole Login SDK to ID SDK
+> - Migrating from legacy Mobile Login SDK to ID SDK
 >   - Update your `UserInfoProvider` and override the `provideIdTrackingIdentifier()` method. Do not override other methods or leave them as null or empty
 >   - **Impact**: User will be treated as a new user, therefore if there are **active** messages that were previously displayed/opted-out by the user, then it will be displayed again
 
@@ -341,20 +342,15 @@ InAppMessaging.instance().onVerifyContext = { contexts: List<String>, campaignTi
 ```
 
 ### <a name="close-campaign"></a>2. closeCampaign()
+
 There may be cases where apps need to manually close the messages without user interaction.
 
-An example is when a different user logs-in and the currently displayed message does not target the new user.
-
-It is possible that the new user did not close the message (tapping the 'X' button) when logging in. The app can force-close the message by calling the `closeMessage()` API.
-
-```kotlin
-InAppMessaging.instance().closeMessage()
-```
+An example is when a different user logs-in and the currently displayed message does not target the new user. It is possible that the new user did not close the message (tapping the 'X' button) when logging in. The app can force-close the message by calling this method.
 
 An optional parameter, `clearQueuedCampaigns`, can be set to `true` (`false` by default) which will additionally remove all messages that were queued to be displayed.
 
 ```kotlin
-InAppMessaging.instance().closeMessage(true)
+InAppMessaging.instance().closeMessage(clearQueuedCampaigns = true|false)
 ```
 
 > Note: Calling this method will not increment the campaign's impression (i.e not counted as displayed)
@@ -402,12 +398,12 @@ Tooltips are messages attached to particular anchor views within the app. To ena
 
 ### Client-side opt-out handling
 
-If user (with valid identifiers in [`UserInfoProvider`](#info-provider) class) opts out from a message, that information is saved in user cache locally on the device and the message won't be shown again for that user on the same device. The opt-out status is not shared between devices. The same applies for anonymous user.
+If user (with valid identifiers in `UserInfoProvider`) opts out from a message, that information is saved in user cache locally on the device and the message won't be shown again for that user on the same device. The opt-out status is not shared between devices. The same applies for anonymous user.
 * Each user has a separate cache container that is persisted in `SharedPreferences`. Each combination of userId and idTrackingIdentifier is treated as a different user including a special - anonymous user - that represents non logged-in user (userId and idTrackingIdentifier are null or empty).
 
 ### <a name="max-impression"></a> Client-side max impressions handling
 
-Message impressions (displays) are counted locally for each user. Meaning that a message with maxImpression value of 3 will be displayed to each user (different identifiers in [`UserInfoProvider`](#info-provider) class) max 3 times. Max impression number can be modified in the Dashboard. Then the SDK, after next ping call, will compare new value with old max impression number and add the difference to the current impression counter. The max impression data is not shared between devices. The same applies for anonymous user.
+Message impressions (displays) are counted locally for each user. Meaning that a message with maxImpression value of 3 will be displayed to each user (different identifiers in `UserInfoProvider` class) max 3 times. Max impression number can be modified in the Dashboard. Then the SDK, after next ping call, will compare new value with old max impression number and add the difference to the current impression counter. The max impression data is not shared between devices. The same applies for anonymous user.
 
 </details>
 
@@ -475,7 +471,7 @@ Rakuten developers experiencing any other problems should refer to the Troublesh
 <summary style="cursor: pointer;";>(click to expand)</summary>
 
 ### Q: How do I send message based on app version?
-When creating campaigns, you can specify the app version - such as debug, staging, or production version.
+When creating messages, you can specify the app version - such as debug, staging, or production version.
 `<versionName>.<versionCode>` is the format when specifying the versions; for example, 1.0.0-staging.101, 1.0.0-prod.203, or 0.x.x.4.
 
 ### Q: How many times the message is sent to the device? Does it depends on Max Lifetime Impressions?
