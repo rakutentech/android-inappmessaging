@@ -15,7 +15,7 @@ internal fun UiMessage.applyCustomPushPrimer(pushPrimer: PushPrimer?): UiMessage
 
     val customButtons = mutableListOf<MessageButton>()
     for ((index, rawButton) in buttons.withIndex()) {
-        val shouldUpdateActionToPPrimer = pushPrimer.buttons.contains("${index + 1}")
+        val shouldUpdateActionToPPrimer = pushPrimer.buttons.contains(index + 1)
         val customButton = if (!shouldUpdateActionToPPrimer) {
             rawButton
         } else {

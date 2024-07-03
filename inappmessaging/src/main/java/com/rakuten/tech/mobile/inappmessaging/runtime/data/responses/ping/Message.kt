@@ -1,6 +1,7 @@
 package com.rakuten.tech.mobile.inappmessaging.runtime.data.responses.ping
 
 import com.google.gson.Gson
+import com.google.gson.JsonObject
 import com.google.gson.JsonParseException
 import com.google.gson.annotations.SerializedName
 import com.rakuten.tech.mobile.inappmessaging.runtime.data.customjson.CustomJson
@@ -26,9 +27,10 @@ internal data class Message(
     val isTest: Boolean,
     val triggers: List<Trigger>?,
     val messagePayload: MessagePayload,
-    val customJson: CustomJson? = null,
+    val customJson: JsonObject? = null, // dynamic
 ) {
     private var tooltip: Tooltip? = null
+    private var customJsonConfig: CustomJson? = null
 
     var impressionsLeft: Int? = null
         get() = if (field == null) maxImpressions else field
@@ -65,10 +67,22 @@ internal data class Message(
                     tooltip = null
                 }
             } catch (je: JsonParseException) {
-                InAppLogger(TAG).debug("Invalid format for tooltip config.", je)
+                InAppLogger(TAG).warn("Invalid format for tooltip config.", je)
             }
         }
         return tooltip
+    }
+
+    fun getCustomJsonConfig(): CustomJson? {
+        if (customJson == null || customJsonConfig != null)
+            return customJsonConfig
+
+        try {
+            customJsonConfig = Gson().fromJson(customJson, CustomJson::class.java)
+        } catch (je : JsonParseException) {
+            InAppLogger(TAG).warn("Invalid format for CustomJson", je)
+        }
+        return customJsonConfig
     }
 
     companion object {
