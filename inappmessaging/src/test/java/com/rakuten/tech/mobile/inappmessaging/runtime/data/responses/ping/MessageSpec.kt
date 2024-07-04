@@ -297,18 +297,18 @@ class MessageSpec {
     @Test
     fun `should map CustomJson data for valid customJson response`() {
         val campaign = TestDataHelper.createDummyMessage(
-            customJson = JsonParser.parseString("""{"pushPrimer": { "buttons": [1] }}""").asJsonObject,
+            customJson = JsonParser.parseString("""{"pushPrimer": { "button": 1 }}""").asJsonObject,
         )
-        campaign.getCustomJsonData() shouldBeEqualTo CustomJson(pushPrimer = PushPrimer(buttons = listOf(1)))
+        campaign.getCustomJsonData() shouldBeEqualTo CustomJson(pushPrimer = PushPrimer(button = 1))
     }
 
     @Test
     fun `should map CustomJson data even if there is an unknown feature key`() {
         val campaign = TestDataHelper.createDummyMessage(
             customJson = JsonParser.parseString(
-                """{ "pushPrimer": { "buttons": [1] }, "unknownKey": "unknownValue" }""",
+                """{ "pushPrimer": { "button": 1 }, "unknownKey": "unknownValue" }""",
             ).asJsonObject,
         )
-        campaign.getCustomJsonData() shouldBeEqualTo CustomJson(pushPrimer = PushPrimer(buttons = listOf(1)))
+        campaign.getCustomJsonData() shouldBeEqualTo CustomJson(pushPrimer = PushPrimer(button = 1))
     }
 }

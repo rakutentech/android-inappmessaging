@@ -9,13 +9,13 @@ import com.rakuten.tech.mobile.inappmessaging.runtime.data.ui.UiMessage
  */
 @SuppressWarnings("LongMethod")
 internal fun UiMessage.applyCustomPushPrimer(pushPrimer: PushPrimer?): UiMessage {
-    if (pushPrimer == null || pushPrimer.buttons.isNullOrEmpty()) {
+    if (pushPrimer?.button == null) {
         return this
     }
 
     val customButtons = mutableListOf<MessageButton>()
     for ((index, rawButton) in buttons.withIndex()) {
-        val shouldUpdateActionToPPrimer = pushPrimer.buttons.contains(index + 1)
+        val shouldUpdateActionToPPrimer = pushPrimer.button == index + 1
         val customButton = if (!shouldUpdateActionToPPrimer) {
             rawButton
         } else {

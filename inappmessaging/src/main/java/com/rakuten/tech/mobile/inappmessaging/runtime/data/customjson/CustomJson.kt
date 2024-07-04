@@ -6,8 +6,7 @@ internal data class CustomJson(
 
 internal data class PushPrimer(
     /**
-     * Buttons that will trigger push notification permission request.
-     * i.e. [1, 2]
+     * Button index that will trigger push notification permission request.
      */
-    val buttons: List<Int>? = null,
+    val button: Int? = null,
 )

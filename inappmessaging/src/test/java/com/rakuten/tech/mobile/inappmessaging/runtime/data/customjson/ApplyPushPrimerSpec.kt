@@ -21,13 +21,7 @@ class ApplyPushPrimerSpec {
         var uiMessage = message.applyCustomPushPrimer(PushPrimer())
         uiMessage shouldBeEqualTo message
 
-        uiMessage = message.applyCustomPushPrimer(PushPrimer(buttons = null))
-        uiMessage shouldBeEqualTo message
-    }
-
-    @Test
-    fun `should do nothing if pushPrimer required buttons attribute is empty`() {
-        val uiMessage = message.applyCustomPushPrimer(PushPrimer(buttons = listOf()))
+        uiMessage = message.applyCustomPushPrimer(PushPrimer(button = null))
         uiMessage shouldBeEqualTo message
     }
 
@@ -42,7 +36,7 @@ class ApplyPushPrimerSpec {
             ),
         )
 
-        val uiMessage = message.applyCustomPushPrimer(PushPrimer(buttons = listOf(1)))
+        val uiMessage = message.applyCustomPushPrimer(PushPrimer(button = 1))
 
         uiMessage.buttons.size shouldBeEqualTo 1
         uiMessage.buttons[0].buttonBehavior.action shouldBeEqualTo ButtonActionType.PUSH_PRIMER.typeId
@@ -59,7 +53,7 @@ class ApplyPushPrimerSpec {
             ),
         )
 
-        val uiMessage = message.applyCustomPushPrimer(PushPrimer(buttons = listOf(99)))
+        val uiMessage = message.applyCustomPushPrimer(PushPrimer(button = 99))
 
         uiMessage.buttons.size shouldBeEqualTo 1
         uiMessage.buttons[0].buttonBehavior.action shouldBeEqualTo ButtonActionType.DEEPLINK.typeId

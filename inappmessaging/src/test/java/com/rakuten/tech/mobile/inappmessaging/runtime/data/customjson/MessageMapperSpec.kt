@@ -38,7 +38,7 @@ class MessageMapperSpec {
         val uiMessage = MessageMapper.mapFrom(
             TestDataHelper.createDummyMessage(
                 messagePayload = payload,
-                customJson = JsonParser.parseString("""{"pushPrimer": { "buttons": [1] }}""").asJsonObject,
+                customJson = JsonParser.parseString("""{"pushPrimer": { "button": 1 }}""").asJsonObject,
             ),
         )
 
