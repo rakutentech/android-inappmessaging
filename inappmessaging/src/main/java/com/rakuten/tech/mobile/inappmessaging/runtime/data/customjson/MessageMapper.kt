@@ -6,9 +6,12 @@ import com.rakuten.tech.mobile.inappmessaging.runtime.data.ui.UiMessage
 /**
  * Maps [Message] DTO to [UiMessage] model.
  */
+@SuppressWarnings(
+    "LongMethod",
+    "kotlin:S6516",
+)
 internal object MessageMapper : Mapper<Message, UiMessage> {
 
-    @SuppressWarnings("LongMethod")
     override fun mapFrom(from: Message): UiMessage {
         val uiModel = UiMessage(
             id = from.campaignId,
