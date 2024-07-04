@@ -30,7 +30,6 @@ internal data class Message(
     val customJson: JsonObject? = null, // dynamic
 ) {
     private var tooltip: Tooltip? = null
-    private var customJsonConfig: CustomJson? = null
 
     var impressionsLeft: Int? = null
         get() = if (field == null) maxImpressions else field
@@ -73,16 +72,17 @@ internal data class Message(
         return tooltip
     }
 
-    fun getCustomJsonConfig(): CustomJson? {
-        if (customJson == null || customJsonConfig != null)
-            return customJsonConfig
-
-        try {
-            customJsonConfig = Gson().fromJson(customJson, CustomJson::class.java)
-        } catch (je : JsonParseException) {
-            InAppLogger(TAG).warn("Invalid format for CustomJson", je)
+    fun getCustomJsonData(): CustomJson? {
+        return if (customJson == null || customJson.entrySet().isEmpty()) {
+            null
+        } else {
+            try {
+                Gson().fromJson(customJson, CustomJson::class.java)
+            } catch (je: JsonParseException) {
+                InAppLogger(TAG).warn("Invalid format/representation for CustomJson", je)
+                null
+            }
         }
-        return customJsonConfig
     }
 
     companion object {

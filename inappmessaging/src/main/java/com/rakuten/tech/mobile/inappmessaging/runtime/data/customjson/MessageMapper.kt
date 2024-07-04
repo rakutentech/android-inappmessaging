@@ -28,12 +28,12 @@ internal object MessageMapper : Mapper<Message, UiMessage> {
         )
 
         // Apply CustomJson rules if exists
-        val customJson = from.getCustomJsonConfig()
-        return if (customJson == null) {
+        val customJsonData = from.getCustomJsonData()
+        return if (customJsonData == null) {
             uiModel
         } else {
             uiModel
-                .applyCustomPushPrimer(customJson.pushPrimer) // PushPrimer
+                .applyCustomPushPrimer(customJsonData.pushPrimer) // PushPrimer
         }
     }
 }

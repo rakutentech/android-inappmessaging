@@ -1,5 +1,8 @@
 package com.rakuten.tech.mobile.inappmessaging.runtime.data.responses.ping
 
+import com.google.gson.JsonParser
+import com.rakuten.tech.mobile.inappmessaging.runtime.data.customjson.CustomJson
+import com.rakuten.tech.mobile.inappmessaging.runtime.data.customjson.PushPrimer
 import com.rakuten.tech.mobile.inappmessaging.runtime.data.enums.InAppMessageType
 import com.rakuten.tech.mobile.inappmessaging.runtime.data.models.Tooltip
 import com.rakuten.tech.mobile.inappmessaging.runtime.testhelpers.TestDataHelper
@@ -10,7 +13,6 @@ import java.util.Date
 @SuppressWarnings(
     "LargeClass",
 )
-@OptIn(ExperimentalStdlibApi::class)
 class MessageSpec {
 
     @Test
@@ -189,9 +191,8 @@ class MessageSpec {
                 messageBody = """{"UIElement":"myId","position":"top-left","auto-disappear":5,"redirectURL":"myUrl"}""",
             ),
         )
-        campaign.getTooltipConfig()?.shouldBeEquivalentTo(
-            Tooltip(id = "myId", position = "top-left", autoDisappear = 5, url = "myUrl"),
-        )
+        campaign.getTooltipConfig() shouldBeEqualTo
+            Tooltip(id = "myId", position = "top-left", autoDisappear = 5, url = "myUrl")
         campaign.type.shouldBeEqualTo(InAppMessageType.TOOLTIP.typeId)
     }
 
@@ -271,5 +272,43 @@ class MessageSpec {
         settings.textAlign shouldBe 0
         settings.delay shouldBe 0
         settings.isHtml shouldBe false
+    }
+
+    @Test
+    fun `should return null CustomJson data if customJson from response is null`() {
+        val campaign = TestDataHelper.createDummyMessage(customJson = null)
+        campaign.getCustomJsonData() shouldBeEqualTo null
+    }
+
+    @Test
+    fun `should return null CustomJson data if customJson from response is empty object`() {
+        val campaign = TestDataHelper.createDummyMessage(customJson = JsonParser.parseString("{}").asJsonObject)
+        campaign.getCustomJsonData() shouldBeEqualTo null
+    }
+
+    @Test
+    fun `should return null CustomJson data if customJson from response has an unrecognized format`() {
+        val campaign = TestDataHelper.createDummyMessage(
+            customJson = JsonParser.parseString("""{"pushPrimer": true}""").asJsonObject,
+        )
+        campaign.getCustomJsonData() shouldBeEqualTo null
+    }
+
+    @Test
+    fun `should map CustomJson data for valid customJson response`() {
+        val campaign = TestDataHelper.createDummyMessage(
+            customJson = JsonParser.parseString("""{"pushPrimer": { "buttons": [1] }}""").asJsonObject,
+        )
+        campaign.getCustomJsonData() shouldBeEqualTo CustomJson(pushPrimer = PushPrimer(buttons = listOf(1)))
+    }
+
+    @Test
+    fun `should map CustomJson data even if there is an unknown feature key`() {
+        val campaign = TestDataHelper.createDummyMessage(
+            customJson = JsonParser.parseString(
+                """{ "pushPrimer": { "buttons": [1] }, "unknownKey": "unknownValue" }""",
+            ).asJsonObject,
+        )
+        campaign.getCustomJsonData() shouldBeEqualTo CustomJson(pushPrimer = PushPrimer(buttons = listOf(1)))
     }
 }

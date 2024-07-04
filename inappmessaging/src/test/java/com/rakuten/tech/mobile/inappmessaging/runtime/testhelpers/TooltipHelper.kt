@@ -7,6 +7,7 @@ import android.widget.ImageView
 import androidx.test.core.app.ApplicationProvider
 import com.nhaarman.mockitokotlin2.any
 import com.rakuten.tech.mobile.inappmessaging.runtime.R
+import com.rakuten.tech.mobile.inappmessaging.runtime.data.customjson.MessageMapper
 import com.rakuten.tech.mobile.inappmessaging.runtime.data.enums.InAppMessageType
 import com.rakuten.tech.mobile.inappmessaging.runtime.data.responses.ping.Message
 import com.rakuten.tech.mobile.inappmessaging.runtime.data.responses.ping.Resource
@@ -52,7 +53,7 @@ internal object TooltipHelper {
             true
         }
 
-        tv.populateViewData(createMessage(position))
+        tv.populateViewData(MessageMapper.mapFrom(createMessage(position)))
         // Simulate image loaded
         tv.findViewById<ImageView>(R.id.message_tooltip_image_view)?.viewTreeObserver?.dispatchOnGlobalLayout()
         // Handler delay

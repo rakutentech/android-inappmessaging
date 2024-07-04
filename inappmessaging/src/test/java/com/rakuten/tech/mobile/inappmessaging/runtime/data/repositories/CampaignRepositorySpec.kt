@@ -82,7 +82,7 @@ class CampaignRepositorySpec {
         CampaignRepository.instance().syncWith(listOf(campaign), 0)
         CampaignRepository.instance().messages.values.first().isOptedOut?.shouldBeFalse()
 
-        CampaignRepository.instance().optOutCampaign(campaign)
+        CampaignRepository.instance().optOutCampaign(campaign.campaignId)
         CampaignRepository.instance().messages.values.first().isOptedOut?.shouldBeTrue()
     }
 
@@ -91,7 +91,7 @@ class CampaignRepositorySpec {
         val campaign = TestDataHelper.createDummyMessage(isTest = true)
         CampaignRepository.instance().syncWith(listOf(campaign), 0)
 
-        CampaignRepository.instance().optOutCampaign(campaign)
+        CampaignRepository.instance().optOutCampaign(campaign.campaignId)
     }
 
     @Test
@@ -100,7 +100,7 @@ class CampaignRepositorySpec {
         val campaign1 = TestDataHelper.createDummyMessage(campaignId = "1")
         CampaignRepository.instance().syncWith(listOf(campaign), 0)
 
-        CampaignRepository.instance().optOutCampaign(campaign1).shouldBeNull()
+        CampaignRepository.instance().optOutCampaign(campaign1.campaignId).shouldBeNull()
     }
 
     @Test
@@ -109,7 +109,7 @@ class CampaignRepositorySpec {
         CampaignRepository.instance().syncWith(listOf(campaign), 0)
         CampaignRepository.instance().messages.values.first().isOptedOut?.shouldBeFalse()
 
-        CampaignRepository.instance().optOutCampaign(campaign)
+        CampaignRepository.instance().optOutCampaign(campaign.campaignId)
         CampaignRepository.instance().syncWith(listOf(campaign), 0)
         CampaignRepository.instance().messages.values.first().isOptedOut?.shouldBeTrue()
     }
