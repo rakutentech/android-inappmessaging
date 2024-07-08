@@ -10,11 +10,11 @@ import com.nhaarman.mockitokotlin2.*
 import com.rakuten.tech.mobile.inappmessaging.runtime.BaseTest
 import com.rakuten.tech.mobile.inappmessaging.runtime.R
 import com.rakuten.tech.mobile.inappmessaging.runtime.coroutine.MessageActionsCoroutine
+import com.rakuten.tech.mobile.inappmessaging.runtime.data.customjson.MessageMapper
+import com.rakuten.tech.mobile.inappmessaging.runtime.data.enums.InAppMessageType
+import com.rakuten.tech.mobile.inappmessaging.runtime.data.models.Tooltip
 import com.rakuten.tech.mobile.inappmessaging.runtime.data.repositories.HostAppInfoRepository
-import com.rakuten.tech.mobile.inappmessaging.runtime.data.responses.ping.DisplaySettings
-import com.rakuten.tech.mobile.inappmessaging.runtime.data.responses.ping.Message
-import com.rakuten.tech.mobile.inappmessaging.runtime.data.responses.ping.MessagePayload
-import com.rakuten.tech.mobile.inappmessaging.runtime.data.responses.ping.MessageSettings
+import com.rakuten.tech.mobile.inappmessaging.runtime.data.ui.UiMessage
 import com.rakuten.tech.mobile.inappmessaging.runtime.manager.DisplayManager
 import com.rakuten.tech.mobile.inappmessaging.runtime.testhelpers.TestDataHelper
 import com.rakuten.tech.mobile.inappmessaging.runtime.utils.BuildVersionChecker
@@ -57,7 +57,13 @@ class InAppMessageViewListenerOnClickSpec : InAppMessageViewListenerSpec() {
 
     @Test
     fun `should call is checked once`() {
-        val listener = InAppMessageViewListener(TestDataHelper.createDummyMessage(campaignId = "1", isTest = true))
+        val listener = InAppMessageViewListener(
+            MessageMapper.mapFrom(
+                TestDataHelper.createDummyMessage(
+                    campaignId = "1", isTest = true,
+                ),
+            ),
+        )
         `when`(mockCheckbox.id).thenReturn(R.id.opt_out_checkbox)
         `when`(mockCheckbox.isChecked).thenReturn(true)
         listener.onClick(mockCheckbox)
@@ -67,7 +73,7 @@ class InAppMessageViewListenerOnClickSpec : InAppMessageViewListenerSpec() {
 
     @Test
     fun `should not throw exception with non-checkbox click`() {
-        val message = TestDataHelper.createDummyMessage(campaignId = "1", isTest = true)
+        val message = MessageMapper.mapFrom(TestDataHelper.createDummyMessage(campaignId = "1", isTest = true))
         val listener = createMockListener(message)
         val mockView = Mockito.mock(CheckBox::class.java)
         `when`(mockView.id).thenReturn(R.id.message_close_button)
@@ -83,10 +89,12 @@ class InAppMessageViewListenerOnClickSpec : InAppMessageViewListenerSpec() {
         `when`(mockView.id).thenReturn(R.id.message_close_button)
 
         createMockListener(
-            TestDataHelper.createDummyMessage(
-                campaignId = "1",
-                isTest = true,
-                isCampaignDismissable = true,
+            MessageMapper.mapFrom(
+                TestDataHelper.createDummyMessage(
+                    campaignId = "1",
+                    isTest = true,
+                    isCampaignDismissable = true,
+                ),
             ),
         ).onClick(mockView)
     }
@@ -94,9 +102,11 @@ class InAppMessageViewListenerOnClickSpec : InAppMessageViewListenerSpec() {
     @Test
     fun `should handle message in coroutine`() {
         val listener = createMockListener(
-            TestDataHelper.createDummyMessage(
-                campaignId = "1",
-                isTest = true,
+            MessageMapper.mapFrom(
+                TestDataHelper.createDummyMessage(
+                    campaignId = "1",
+                    isTest = true,
+                ),
             ),
         )
 
@@ -104,8 +114,8 @@ class InAppMessageViewListenerOnClickSpec : InAppMessageViewListenerSpec() {
         verify(mockCoroutine, atLeastOnce()).executeTask(any(), any(), any())
     }
 
-    private fun createMockListener(message: Message) = InAppMessageViewListener(
-        message = message,
+    private fun createMockListener(message: UiMessage) = InAppMessageViewListener(
+        uiMessage = message,
         messageCoroutine = mockCoroutine,
         displayManager = mockDisplayManager,
         eventScheduler = mockEventScheduler,
@@ -201,7 +211,9 @@ class InAppMessageViewListenerOnTouchSpec : InAppMessageViewListenerSpec() {
     @Test
     fun `should return true on touch with action down`() {
         val listener = InAppMessageViewListener(
-            TestDataHelper.createDummyMessage(campaignId = "1", isTest = true),
+            MessageMapper.mapFrom(
+                TestDataHelper.createDummyMessage(campaignId = "1", isTest = true),
+            ),
             buildChecker = mockCheck,
         )
 
@@ -214,7 +226,9 @@ class InAppMessageViewListenerOnTouchSpec : InAppMessageViewListenerSpec() {
     @Test
     fun `should return true on touch with action move`() {
         val listener = InAppMessageViewListener(
-            TestDataHelper.createDummyMessage(campaignId = "1", isTest = true),
+            MessageMapper.mapFrom(
+                TestDataHelper.createDummyMessage(campaignId = "1", isTest = true),
+            ),
             buildChecker = mockCheck,
         )
 
@@ -227,7 +241,9 @@ class InAppMessageViewListenerOnTouchSpec : InAppMessageViewListenerSpec() {
     @Test
     fun `should return true on touch with action cancel`() {
         val listener = InAppMessageViewListener(
-            TestDataHelper.createDummyMessage(campaignId = "1", isTest = true),
+            MessageMapper.mapFrom(
+                TestDataHelper.createDummyMessage(campaignId = "1", isTest = true),
+            ),
             buildChecker = mockCheck,
         )
 
@@ -240,7 +256,9 @@ class InAppMessageViewListenerOnTouchSpec : InAppMessageViewListenerSpec() {
     @Test
     fun `should return true on touch with action up`() {
         val listener = InAppMessageViewListener(
-            TestDataHelper.createDummyMessage(campaignId = "1", isTest = true),
+            MessageMapper.mapFrom(
+                TestDataHelper.createDummyMessage(campaignId = "1", isTest = true),
+            ),
             buildChecker = mockCheck,
         )
 
@@ -253,7 +271,9 @@ class InAppMessageViewListenerOnTouchSpec : InAppMessageViewListenerSpec() {
     @Test
     fun `should return true on touch with other action`() {
         val listener = InAppMessageViewListener(
-            TestDataHelper.createDummyMessage(campaignId = "1", isTest = true),
+            MessageMapper.mapFrom(
+                TestDataHelper.createDummyMessage(campaignId = "1", isTest = true),
+            ),
             buildChecker = mockCheck,
         )
 
@@ -267,7 +287,9 @@ class InAppMessageViewListenerOnTouchSpec : InAppMessageViewListenerSpec() {
     @Test
     fun `should return true on touch with action move and null magnifier`() {
         val listener = InAppMessageViewListener(
-            TestDataHelper.createDummyMessage(campaignId = "1", isTest = true),
+            MessageMapper.mapFrom(
+                TestDataHelper.createDummyMessage(campaignId = "1", isTest = true),
+            ),
             buildChecker = mockCheck,
         )
 
@@ -280,7 +302,9 @@ class InAppMessageViewListenerOnTouchSpec : InAppMessageViewListenerSpec() {
     @Test
     fun `should return true on touch with action cancel and null magnifier`() {
         val listener = InAppMessageViewListener(
-            TestDataHelper.createDummyMessage(campaignId = "1", isTest = true),
+            MessageMapper.mapFrom(
+                TestDataHelper.createDummyMessage(campaignId = "1", isTest = true),
+            ),
             buildChecker = mockCheck,
         )
 
@@ -293,7 +317,9 @@ class InAppMessageViewListenerOnTouchSpec : InAppMessageViewListenerSpec() {
     @Test
     fun `should return true on touch with action up and null magnifier`() {
         val listener = InAppMessageViewListener(
-            TestDataHelper.createDummyMessage(campaignId = "1", isTest = true),
+            MessageMapper.mapFrom(
+                TestDataHelper.createDummyMessage(campaignId = "1", isTest = true),
+            ),
             buildChecker = mockCheck,
         )
 
@@ -306,7 +332,9 @@ class InAppMessageViewListenerOnTouchSpec : InAppMessageViewListenerSpec() {
     @Test
     fun `should return true on touch with other action and null magnifier`() {
         val listener = InAppMessageViewListener(
-            TestDataHelper.createDummyMessage(campaignId = "1", isTest = true),
+            MessageMapper.mapFrom(
+                TestDataHelper.createDummyMessage(campaignId = "1", isTest = true),
+            ),
             buildChecker = mockCheck,
         )
 
@@ -319,14 +347,20 @@ class InAppMessageViewListenerOnTouchSpec : InAppMessageViewListenerSpec() {
 
     @Test
     fun `should return false for lower android version`() {
-        val listener = InAppMessageViewListener(TestDataHelper.createDummyMessage(campaignId = "1", isTest = true))
+        val listener = InAppMessageViewListener(
+            MessageMapper.mapFrom(
+                TestDataHelper.createDummyMessage(campaignId = "1", isTest = true),
+            ),
+        )
 
         listener.onTouch(mockView, mockMotionEvent).shouldBeFalse()
     }
 
     private fun setupListener(action: Int): InAppMessageViewListener {
         val listener = InAppMessageViewListener(
-            TestDataHelper.createDummyMessage(campaignId = "1", isTest = true),
+            MessageMapper.mapFrom(
+                TestDataHelper.createDummyMessage(campaignId = "1", isTest = true),
+            ),
             buildChecker = mockCheck,
         )
 
@@ -343,7 +377,9 @@ class InAppMessageViewListenerOnKeySpec : InAppMessageViewListenerSpec() {
 
     @Test
     fun `should return true with back button click`() {
-        val message = TestDataHelper.createDummyMessage(campaignId = "1", isTest = true, isCampaignDismissable = true)
+        val message = MessageMapper.mapFrom(
+            TestDataHelper.createDummyMessage(campaignId = "1", isTest = true, isCampaignDismissable = true),
+        )
         val listener = InAppMessageViewListener(message, mockCoroutine, mockDisplayManager)
 
         `when`(keyEvent.action).thenReturn(KeyEvent.ACTION_UP)
@@ -360,7 +396,9 @@ class InAppMessageViewListenerOnKeySpec : InAppMessageViewListenerSpec() {
 
     @Test
     fun `should return false with back button click`() {
-        val message = TestDataHelper.createDummyMessage(campaignId = "1", isTest = true, isCampaignDismissable = false)
+        val message = MessageMapper.mapFrom(
+            TestDataHelper.createDummyMessage(campaignId = "1", isTest = true, isCampaignDismissable = false),
+        )
         val listener = InAppMessageViewListener(message, mockCoroutine, mockDisplayManager)
 
         `when`(keyEvent.action).thenReturn(KeyEvent.ACTION_UP)
@@ -377,7 +415,7 @@ class InAppMessageViewListenerOnKeySpec : InAppMessageViewListenerSpec() {
 
     @Test
     fun `should return false with back button action down`() {
-        val message = TestDataHelper.createDummyMessage(campaignId = "1", isTest = true)
+        val message = MessageMapper.mapFrom(TestDataHelper.createDummyMessage(campaignId = "1", isTest = true))
         val listener = InAppMessageViewListener(message, mockCoroutine, mockDisplayManager)
 
         `when`(keyEvent.action).thenReturn(KeyEvent.ACTION_DOWN)
@@ -394,7 +432,7 @@ class InAppMessageViewListenerOnKeySpec : InAppMessageViewListenerSpec() {
 
     @Test
     fun `should return false with null event`() {
-        val message = TestDataHelper.createDummyMessage(campaignId = "1", isTest = true)
+        val message = MessageMapper.mapFrom(TestDataHelper.createDummyMessage(campaignId = "1", isTest = true))
         val listener = InAppMessageViewListener(message, mockCoroutine, mockDisplayManager)
 
         listener.onKey(mockView, KeyEvent.KEYCODE_BACK, null).shouldBeFalse()
@@ -402,7 +440,7 @@ class InAppMessageViewListenerOnKeySpec : InAppMessageViewListenerSpec() {
 
     @Test
     fun `should return false with null event and not back button`() {
-        val message = TestDataHelper.createDummyMessage(campaignId = "1", isTest = true)
+        val message = MessageMapper.mapFrom(TestDataHelper.createDummyMessage(campaignId = "1", isTest = true))
         val listener = InAppMessageViewListener(message, mockCoroutine, mockDisplayManager)
 
         listener.onKey(mockView, KeyEvent.KEYCODE_BREAK, null).shouldBeFalse()
@@ -410,7 +448,7 @@ class InAppMessageViewListenerOnKeySpec : InAppMessageViewListenerSpec() {
 
     @Test
     fun `should return false with not back button`() {
-        val message = TestDataHelper.createDummyMessage(campaignId = "1", isTest = true)
+        val message = MessageMapper.mapFrom(TestDataHelper.createDummyMessage(campaignId = "1", isTest = true))
         val listener = InAppMessageViewListener(message, mockCoroutine, mockDisplayManager)
         `when`(keyEvent.action).thenReturn(KeyEvent.ACTION_UP)
 
@@ -419,18 +457,18 @@ class InAppMessageViewListenerOnKeySpec : InAppMessageViewListenerSpec() {
 
     @Test
     fun `should return false with not back button and action down`() {
-        val message = TestDataHelper.createDummyMessage(campaignId = "1", isTest = true)
+        val message = MessageMapper.mapFrom(TestDataHelper.createDummyMessage(campaignId = "1", isTest = true))
         val listener = InAppMessageViewListener(message, mockCoroutine, mockDisplayManager)
         `when`(keyEvent.action).thenReturn(KeyEvent.ACTION_DOWN)
 
         listener.onKey(mockView, KeyEvent.KEYCODE_BREAK, keyEvent).shouldBeFalse()
     }
 
-//    @Test
+    //    @Test
     fun `should return true on false coroutine`() {
-        val message = TestDataHelper.createDummyMessage(campaignId = "1", isTest = true)
+        val message = MessageMapper.mapFrom(TestDataHelper.createDummyMessage(campaignId = "1", isTest = true))
         val listener = InAppMessageViewListener(
-            message = message,
+            uiMessage = message,
             messageCoroutine = mockCoroutine,
             displayManager = mockDisplayManager,
             eventScheduler = mockEventScheduler,
@@ -449,38 +487,76 @@ class InAppMessageViewListenerOnKeySpec : InAppMessageViewListenerSpec() {
 }
 
 class InAppMessageViewListenerHandleSpec : InAppMessageViewListenerSpec() {
-    private val mockMessage = Mockito.mock(Message::class.java)
-    private val mockPayload = Mockito.mock(MessagePayload::class.java)
-    private val mockSettings = Mockito.mock(MessageSettings::class.java)
-    private val mockDispSettings = Mockito.mock(DisplaySettings::class.java)
-    private val instance = createMockListener(mockMessage)
+    private val message = MessageMapper.mapFrom(TestDataHelper.createDummyMessage())
 
     @Test
     fun `should start worker with zero delay due to null value`() {
-        `when`(mockCoroutine.executeTask(mockMessage, R.id.message_close_button, false)).thenReturn(true)
-        `when`(mockMessage.messagePayload).thenReturn(mockPayload)
-        `when`(mockPayload.messageSettings).thenReturn(mockSettings)
-        `when`(mockSettings.displaySettings).thenReturn(Mockito.mock(DisplaySettings::class.java))
-        instance.handleMessage(R.id.message_close_button)
-        Mockito.verify(mockEventScheduler).startReconciliationWorker(anyOrNull(), eq(0L))
+        `when`(mockCoroutine.executeTask(message, R.id.message_close_button, false)).thenReturn(true)
+
+        createMockListener(message).handleMessage(R.id.message_close_button)
+
+        verify(mockEventScheduler).startReconciliationWorker(anyOrNull(), eq(0L))
     }
 
     @Test
     fun `should start worker with valid delay due to null values`() {
-        `when`(mockCoroutine.executeTask(mockMessage, R.id.message_close_button, false)).thenReturn(true)
-        `when`(mockMessage.messagePayload).thenReturn(mockPayload)
-        `when`(mockPayload.messageSettings).thenReturn(mockSettings)
-        `when`(mockSettings.displaySettings).thenReturn(mockDispSettings)
-        `when`(mockDispSettings.delay).thenReturn(3000)
-        instance.handleMessage(R.id.message_close_button)
-        Mockito.verify(mockEventScheduler).startReconciliationWorker(anyOrNull(), eq(3000L))
+        val message = message.copy(
+            displaySettings = message.displaySettings.copy(delay = 3000),
+        )
+        `when`(mockCoroutine.executeTask(message, R.id.message_close_button, false)).thenReturn(true)
+        createMockListener(message).handleMessage(R.id.message_close_button)
+
+        verify(mockEventScheduler).startReconciliationWorker(anyOrNull(), eq(3000L))
     }
 
-    private fun createMockListener(message: Message) = InAppMessageViewListener(
-        message = message,
+    private fun createMockListener(message: UiMessage) = InAppMessageViewListener(
+        uiMessage = message,
         messageCoroutine = mockCoroutine,
         displayManager = mockDisplayManager,
         eventScheduler = mockEventScheduler,
         hostAppInfoRepo = mockHostAppInfoRepo,
     )
+}
+
+class InAppMessageViewListenerOnAutoDisappearSpec : InAppMessageViewListenerSpec() {
+
+    @Test
+    fun `should do nothing for non-tooltip campaigns`() {
+        val message = MessageMapper.mapFrom(TestDataHelper.createDummyMessage(type = InAppMessageType.MODAL.typeId))
+        val listener = InAppMessageViewListener(message, mockCoroutine, mockDisplayManager)
+
+        listener.onAutoDisappear()
+
+        verify(mockCoroutine, never()).executeTask(any(), any(), any())
+    }
+
+    @Test
+    fun `should do nothing if no autoDisappear data`() {
+        val message = MessageMapper.mapFrom(TestDataHelper.createDummyMessage(type = InAppMessageType.TOOLTIP.typeId))
+        val listener = InAppMessageViewListener(
+            message.copy(
+                tooltipData = Tooltip(autoDisappear = null),
+            ),
+            mockCoroutine, mockDisplayManager,
+        )
+
+        listener.onAutoDisappear()
+
+        verify(mockCoroutine, never()).executeTask(any(), any(), any())
+    }
+
+    @Test
+    fun `should close and send impression on autoDisappear`() {
+        val message = MessageMapper.mapFrom(TestDataHelper.createDummyMessage(type = InAppMessageType.TOOLTIP.typeId))
+        val listener = InAppMessageViewListener(
+            message.copy(
+                tooltipData = Tooltip(autoDisappear = 2),
+            ),
+            mockCoroutine, mockDisplayManager,
+        )
+
+        listener.onAutoDisappear()
+
+        verify(mockCoroutine).executeTask(any(), any(), any())
+    }
 }

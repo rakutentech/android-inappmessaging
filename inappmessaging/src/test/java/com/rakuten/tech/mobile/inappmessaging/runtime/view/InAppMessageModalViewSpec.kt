@@ -1,3 +1,4 @@
+
 package com.rakuten.tech.mobile.inappmessaging.runtime.view
 
 import android.widget.Button
@@ -5,6 +6,7 @@ import android.widget.CheckBox
 import android.widget.LinearLayout
 import androidx.test.core.app.ApplicationProvider
 import com.nhaarman.mockitokotlin2.verify
+import com.rakuten.tech.mobile.inappmessaging.runtime.data.customjson.MessageMapper
 import com.rakuten.tech.mobile.inappmessaging.runtime.data.responses.ping.Resource
 import com.rakuten.tech.mobile.inappmessaging.runtime.testhelpers.TestDataHelper
 import org.junit.Test
@@ -24,11 +26,13 @@ class InAppMessageModalViewSpec {
         doReturn(null).`when`(view).findViewById<CheckBox>(anyInt())
 
         view.populateViewData(
-            TestDataHelper.createDummyMessage(
-                messagePayload = TestDataHelper.createDummyPayload(
-                    header = "",
-                    messageBody = "",
-                    resource = Resource(imageUrl = "", cropType = 0),
+            MessageMapper.mapFrom(
+                TestDataHelper.createDummyMessage(
+                    messagePayload = TestDataHelper.createDummyPayload(
+                        header = "",
+                        messageBody = "",
+                        resource = Resource(imageUrl = "", cropType = 0),
+                    ),
                 ),
             ),
         )
@@ -42,7 +46,11 @@ class InAppMessageModalViewSpec {
 
         doReturn(null).`when`(view).findModalLayout()
 
-        view.populateViewData(TestDataHelper.createDummyMessage())
+        view.populateViewData(
+            MessageMapper.mapFrom(
+                TestDataHelper.createDummyMessage(),
+            ),
+        )
 
         verify(view, never()).setBackgroundColor(anyInt())
     }

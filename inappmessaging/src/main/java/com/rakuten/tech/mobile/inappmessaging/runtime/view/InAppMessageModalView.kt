@@ -5,7 +5,7 @@ import android.util.AttributeSet
 import android.widget.LinearLayout
 import androidx.annotation.VisibleForTesting
 import com.rakuten.tech.mobile.inappmessaging.runtime.R
-import com.rakuten.tech.mobile.inappmessaging.runtime.data.responses.ping.Message
+import com.rakuten.tech.mobile.inappmessaging.runtime.data.ui.UiMessage
 
 /**
  * This is a custom view that extends from InAppMessageBaseView.
@@ -19,8 +19,8 @@ internal class InAppMessageModalView(
     /**
      * Sets campaign message data onto the view.
      */
-    override fun populateViewData(message: Message) {
-        super.populateViewData(message)
+    override fun populateViewData(uiMessage: UiMessage) {
+        super.populateViewData(uiMessage)
 
         setCloseButton()
         findModalLayout()?.setBackgroundColor(bgColor)

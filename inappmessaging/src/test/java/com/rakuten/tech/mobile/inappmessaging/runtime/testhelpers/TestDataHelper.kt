@@ -1,6 +1,7 @@
 package com.rakuten.tech.mobile.inappmessaging.runtime.testhelpers
 
 import com.google.gson.Gson
+import com.google.gson.JsonObject
 import com.rakuten.tech.mobile.inappmessaging.runtime.data.responses.ping.*
 import java.io.File
 
@@ -29,6 +30,7 @@ internal object TestDataHelper {
         isTest: Boolean? = null,
         triggers: List<Trigger>? = null,
         messagePayload: MessagePayload? = null,
+        customJson: JsonObject? = null,
     ): Message {
         return message0.copy(
             campaignId = campaignId ?: message0.campaignId,
@@ -40,6 +42,7 @@ internal object TestDataHelper {
             isTest = isTest ?: message0.isTest,
             triggers = triggers ?: message0.triggers,
             messagePayload = messagePayload ?: message0.messagePayload,
+            customJson = customJson,
         )
     }
 

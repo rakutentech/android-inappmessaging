@@ -17,9 +17,10 @@ import com.nhaarman.mockitokotlin2.*
 import com.rakuten.tech.mobile.inappmessaging.runtime.BaseTest
 import com.rakuten.tech.mobile.inappmessaging.runtime.InAppMessaging
 import com.rakuten.tech.mobile.inappmessaging.runtime.R
+import com.rakuten.tech.mobile.inappmessaging.runtime.data.customjson.MessageMapper
 import com.rakuten.tech.mobile.inappmessaging.runtime.data.enums.InAppMessageType
 import com.rakuten.tech.mobile.inappmessaging.runtime.data.models.Tooltip
-import com.rakuten.tech.mobile.inappmessaging.runtime.data.responses.ping.Message
+import com.rakuten.tech.mobile.inappmessaging.runtime.data.ui.UiMessage
 import com.rakuten.tech.mobile.inappmessaging.runtime.manager.DisplayManager
 import com.rakuten.tech.mobile.inappmessaging.runtime.testhelpers.TestDataHelper
 import com.rakuten.tech.mobile.inappmessaging.runtime.view.InAppMessageModalView
@@ -37,86 +38,100 @@ import org.robolectric.RobolectricTestRunner
 @RunWith(RobolectricTestRunner::class)
 @SuppressWarnings("LargeClass")
 class DisplayMessageRunnableSpec : BaseTest() {
-    private val message = mock(Message::class.java)
+    private val message = MessageMapper.mapFrom(TestDataHelper.createDummyMessage())
     private var hostAppActivity = mock(Activity::class.java)
     private var mockDisplay = mock(DisplayManager::class.java)
     private val view = mock(View::class.java)
     private val window = mock(Window::class.java)
-    private val payload = TestDataHelper.message0Payload
 
     @Before
     override fun setup() {
         super.setup()
         `when`(view!!.id).thenReturn(12343254)
         `when`(hostAppActivity.window).thenReturn(window)
-        `when`(message.campaignId).thenReturn("1234")
     }
 
     @Test
     fun `should not throw exception fo invalid message type`() {
-        `when`(message.type).thenReturn(0)
-        DisplayMessageRunnable(message, hostAppActivity).run()
+        DisplayMessageRunnable(
+            message.copy(type = 0),
+            hostAppActivity,
+        ).run()
     }
 
     @Test
     fun `should not throw exception fo invalid does not exist`() {
-        `when`(message.type).thenReturn(100)
-        DisplayMessageRunnable(message, hostAppActivity).run()
+        DisplayMessageRunnable(
+            message.copy(type = 100),
+            hostAppActivity,
+        ).run()
     }
 
     @Test(expected = NullPointerException::class)
     fun `should throw null pointer exception when modal`() {
-        `when`(message.type).thenReturn(InAppMessageType.MODAL.typeId)
-        DisplayMessageRunnable(message, hostAppActivity).run()
+        DisplayMessageRunnable(
+            message.copy(type = InAppMessageType.MODAL.typeId),
+            hostAppActivity,
+        ).run()
     }
 
     @Test(expected = NullPointerException::class)
     fun `should throw null pointer exception when fullscreen`() {
-        `when`(message.type).thenReturn(InAppMessageType.FULL.typeId)
-        DisplayMessageRunnable(message, hostAppActivity).run()
+        DisplayMessageRunnable(
+            message.copy(type = InAppMessageType.FULL.typeId),
+            hostAppActivity,
+        ).run()
     }
 
     @Test(expected = NullPointerException::class)
     fun `should throw null pointer exception when tooltip`() {
-        `when`(message.type).thenReturn(InAppMessageType.TOOLTIP.typeId)
-        DisplayMessageRunnable(message, hostAppActivity).run()
+        DisplayMessageRunnable(
+            message.copy(type = InAppMessageType.TOOLTIP.typeId),
+            hostAppActivity,
+        ).run()
     }
 
     @Test
     fun `should throw exception with mock activity for full`() {
         setupActivity()
-        `when`(message.type).thenReturn(InAppMessageType.FULL.typeId)
-        verifyShouldDisplayTooltip()
+        verifyShouldDisplayTooltip(
+            message.copy(type = InAppMessageType.FULL.typeId),
+        )
     }
 
     @Test
     fun `should not throw exception with mock activity for modal`() {
         setupActivity()
-        `when`(message.type).thenReturn(InAppMessageType.MODAL.typeId)
-        verifyShouldDisplayTooltip()
+        verifyShouldDisplayTooltip(
+            message.copy(type = InAppMessageType.MODAL.typeId),
+        )
     }
 
     @Test
     fun `should not throw exception with mock activity for slide`() {
         setupActivity()
-        `when`(message.type).thenReturn(InAppMessageType.SLIDE.typeId)
-        verifyShouldDisplayTooltip()
+        verifyShouldDisplayTooltip(
+            message.copy(type = InAppMessageType.SLIDE.typeId),
+        )
     }
 
     @Test
     fun `should not throw exception with mock activity for tooltip`() {
         setupActivity()
-        `when`(message.type).thenReturn(InAppMessageType.TOOLTIP.typeId)
-        verifyShouldDisplayTooltip()
+        verifyShouldDisplayTooltip(
+            message.copy(type = InAppMessageType.TOOLTIP.typeId),
+        )
     }
 
     @Test
     fun `should not display campaign due to already displayed normal campaign`() {
         setupActivity()
-        `when`(message.type).thenReturn(InAppMessageType.MODAL.typeId)
         `when`(hostAppActivity.findViewById<View>(R.id.in_app_message_base_view))
             .thenReturn(mock(View::class.java))
-        DisplayMessageRunnable(message, hostAppActivity).run()
+        DisplayMessageRunnable(
+            message.copy(type = InAppMessageType.MODAL.typeId),
+            hostAppActivity,
+        ).run()
         verify(hostAppActivity, never()).layoutInflater
     }
 
@@ -124,7 +139,9 @@ class DisplayMessageRunnableSpec : BaseTest() {
     fun `should display for tooltip with no child`() {
         setupActivity()
         setupTooltip(0)
-        verifyShouldDisplayTooltip()
+        verifyShouldDisplayTooltip(
+            message.copy(type = InAppMessageType.TOOLTIP.typeId),
+        )
     }
 
     @Test
@@ -132,28 +149,36 @@ class DisplayMessageRunnableSpec : BaseTest() {
         setupActivity()
         setupTooltip()
         `when`(hostAppActivity.findViewById<View>(R.id.in_app_message_tooltip_view)).thenReturn(null)
-        verifyShouldDisplayTooltip()
+        verifyShouldDisplayTooltip(
+            message.copy(type = InAppMessageType.TOOLTIP.typeId),
+        )
     }
 
     @Test
     fun `should display for tooltip with null parent`() {
         setupActivity()
         setupTooltip(isNullParent = true)
-        verifyShouldDisplayTooltip()
+        verifyShouldDisplayTooltip(
+            message.copy(type = InAppMessageType.TOOLTIP.typeId),
+        )
     }
 
     @Test
     fun `should display for tooltip with null child`() {
         setupActivity()
         setupTooltip(isNullChild = true)
-        verifyShouldDisplayTooltip()
+        verifyShouldDisplayTooltip(
+            message.copy(type = InAppMessageType.TOOLTIP.typeId),
+        )
     }
 
     @Test
     fun `should display for tooltip with diff child`() {
         setupActivity()
         setupTooltip(tag = "not-test")
-        verifyShouldDisplayTooltip()
+        verifyShouldDisplayTooltip(
+            message.copy(type = InAppMessageType.TOOLTIP.typeId),
+        )
     }
 
     @Test
@@ -162,14 +187,23 @@ class DisplayMessageRunnableSpec : BaseTest() {
         setupTooltip()
         `when`(hostAppActivity.findViewById<View>(R.id.in_app_message_base_view))
             .thenReturn(mock(InAppMessageModalView::class.java))
-        verifyNotShowTooltip()
+        DisplayMessageRunnable(
+            message.copy(type = InAppMessageType.TOOLTIP.typeId),
+            hostAppActivity,
+        ).run()
+        verify(hostAppActivity, never()).layoutInflater
     }
 
     @Test
     fun `should not display campaign due to already displayed tooltip campaign`() {
         setupActivity()
-        setupTooltip()
-        verifyNotShowTooltip()
+        val message = message.copy(type = InAppMessageType.TOOLTIP.typeId)
+        setupTooltip(tag = message.id)
+        DisplayMessageRunnable(
+            message,
+            hostAppActivity,
+        ).run()
+        verify(hostAppActivity, never()).layoutInflater
     }
 
     @Test
@@ -178,7 +212,12 @@ class DisplayMessageRunnableSpec : BaseTest() {
         setupTooltip()
         setupTooltipDetails()
         `when`(hostAppActivity.findViewById<View>(1)).thenReturn(null)
-        verifyShouldDisplayTooltip()
+        verifyShouldDisplayTooltip(
+            message.copy(
+                type = InAppMessageType.TOOLTIP.typeId,
+                tooltipData = Tooltip("target", "top-center", "testurl", 5),
+            ),
+        )
         verify(hostAppActivity, never()).addContentView(any(), any())
     }
 
@@ -187,7 +226,12 @@ class DisplayMessageRunnableSpec : BaseTest() {
         setupActivity()
         setupTooltip()
         setupTooltipDetails()
-        verifyShouldDisplayTooltip()
+        verifyShouldDisplayTooltip(
+            message.copy(
+                type = InAppMessageType.TOOLTIP.typeId,
+                tooltipData = Tooltip("target", "top-center", "testurl", 5),
+            ),
+        )
         verify(hostAppActivity).addContentView(any(), any())
         verify(mockDisplay).removeMessage(any(), any(), any(), any())
     }
@@ -196,8 +240,13 @@ class DisplayMessageRunnableSpec : BaseTest() {
     fun `should not call display manager for null auto-disappear`() {
         setupActivity()
         setupTooltip()
-        setupTooltipDetails(autoDisappear = null)
-        verifyShouldDisplayTooltip()
+        setupTooltipDetails()
+        verifyShouldDisplayTooltip(
+            message.copy(
+                type = InAppMessageType.TOOLTIP.typeId,
+                tooltipData = Tooltip("target", "top-center", "testurl", null),
+            ),
+        )
         verify(hostAppActivity).addContentView(any(), any())
         verify(mockDisplay, never()).removeMessage(any(), any(), any(), any())
     }
@@ -206,8 +255,13 @@ class DisplayMessageRunnableSpec : BaseTest() {
     fun `should not call display manager for 0 auto-disappear`() {
         setupActivity()
         setupTooltip()
-        setupTooltipDetails(autoDisappear = 0)
-        verifyShouldDisplayTooltip()
+        setupTooltipDetails()
+        verifyShouldDisplayTooltip(
+            message.copy(
+                type = InAppMessageType.TOOLTIP.typeId,
+                tooltipData = Tooltip("target", "top-center", "testurl", 0),
+            ),
+        )
         verify(hostAppActivity).addContentView(any(), any())
         verify(mockDisplay, never()).removeMessage(any(), any(), any(), any())
     }
@@ -219,19 +273,23 @@ class DisplayMessageRunnableSpec : BaseTest() {
         val scroll = setupTooltipDetails(true)
         val scrollChild = mock(ViewGroup::class.java)
         `when`(scroll?.getChildAt(0)).thenReturn(scrollChild)
-        val runner = DisplayMessageRunnable(message, hostAppActivity, mockDisplay)
+        val runner = DisplayMessageRunnable(
+            message.copy(
+                type = InAppMessageType.TOOLTIP.typeId,
+                tooltipData = Tooltip("target", "top-center", "testurl", 0),
+            ),
+            hostAppActivity, mockDisplay,
+        )
         runner.run()
 
         verify(scrollChild)?.addView(any(), any<ViewGroup.LayoutParams>())
     }
 
     @SuppressWarnings("LongMethod")
-    private fun setupTooltipDetails(isScroll: Boolean = false, autoDisappear: Int? = 5): ScrollView? {
-        val tooltip = Tooltip("target", "top-center", "testurl", autoDisappear)
+    private fun setupTooltipDetails(isScroll: Boolean = false): ScrollView? {
         val mockView = mock(View::class.java)
         val mockResource = mock(Resources::class.java)
         `when`(hostAppActivity.findViewById<View>(R.id.in_app_message_tooltip_view)).thenReturn(null)
-        `when`(message.getTooltipConfig()).thenReturn(tooltip)
         `when`(hostAppActivity.packageName).thenReturn("test")
         `when`(hostAppActivity.resources).thenReturn(mockResource)
         val metrics = DisplayMetrics()
@@ -257,7 +315,6 @@ class DisplayMessageRunnableSpec : BaseTest() {
     ) {
         `when`(hostAppActivity.findViewById<View>(R.id.in_app_message_base_view))
             .thenReturn(mock(InAppMessageSlideUpView::class.java))
-        `when`(message.type).thenReturn(InAppMessageType.TOOLTIP.typeId)
         val tooltip = mock(View::class.java)
         val parent = mock(ViewGroup::class.java)
         `when`(hostAppActivity.findViewById<View>(R.id.in_app_message_tooltip_view))
@@ -275,13 +332,6 @@ class DisplayMessageRunnableSpec : BaseTest() {
         }
         `when`(tooltip.id).thenReturn(R.id.in_app_message_tooltip_view)
         `when`(tooltip.tag).thenReturn(tag ?: "test")
-        `when`(message.campaignId).thenReturn("test")
-    }
-
-    private fun verifyNotShowTooltip() {
-        `when`(message.type).thenReturn(InAppMessageType.TOOLTIP.typeId)
-        DisplayMessageRunnable(message, hostAppActivity).run()
-        verify(hostAppActivity, never()).layoutInflater
     }
 
     private fun setupActivity() {
@@ -292,14 +342,13 @@ class DisplayMessageRunnableSpec : BaseTest() {
             "test_device_id",
         )
         InAppMessaging.initialize(ApplicationProvider.getApplicationContext())
-        `when`(message.messagePayload).thenReturn(payload)
         `when`(
             hostAppActivity
                 .layoutInflater,
         ).thenReturn(LayoutInflater.from(ApplicationProvider.getApplicationContext()))
     }
 
-    private fun verifyShouldDisplayTooltip(mockLayout: FrameLayout? = null) {
+    private fun verifyShouldDisplayTooltip(message: UiMessage, mockLayout: FrameLayout? = null) {
         val runner = DisplayMessageRunnable(message, hostAppActivity, mockDisplay)
         runner.testLayout = mockLayout
         runner.run()

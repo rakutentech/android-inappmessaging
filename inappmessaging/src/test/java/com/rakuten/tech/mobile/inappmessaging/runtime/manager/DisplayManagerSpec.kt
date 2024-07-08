@@ -14,7 +14,6 @@ import com.nhaarman.mockitokotlin2.*
 import com.rakuten.tech.mobile.inappmessaging.runtime.BaseTest
 import com.rakuten.tech.mobile.inappmessaging.runtime.InAppMessaging
 import com.rakuten.tech.mobile.inappmessaging.runtime.R
-import com.rakuten.tech.mobile.inappmessaging.runtime.coroutine.MessageActionsCoroutine
 import com.rakuten.tech.mobile.inappmessaging.runtime.data.models.Tooltip
 import com.rakuten.tech.mobile.inappmessaging.runtime.data.repositories.CampaignRepository
 import com.rakuten.tech.mobile.inappmessaging.runtime.data.responses.ping.Message
@@ -40,13 +39,12 @@ class DisplayManagerSpec : BaseTest() {
     private val viewGroup = Mockito.mock(ViewGroup::class.java)
     private val parentViewGroup = Mockito.mock(FrameLayout::class.java)
     private val handler = Mockito.mock(Handler::class.java)
-    private val messageCoroutine = Mockito.mock(MessageActionsCoroutine::class.java)
 
     @Before
     override fun setup() {
         InAppMessaging.initialize(ApplicationProvider.getApplicationContext(), enableTooltipFeature = true)
         InAppMessaging.instance().registerMessageDisplayActivity(activity)
-        DisplayManager.instance = DisplayManager.DisplayManagerImpl(handler, messageCoroutine)
+        DisplayManager.instance = DisplayManager.DisplayManagerImpl(handler)
     }
 
     @Test
@@ -96,7 +94,7 @@ class DisplayManagerSpec : BaseTest() {
         setupTooltipView()
         `when`(parentViewGroup.childCount).thenReturn(0)
         DisplayManager.instance().removeMessage(activity, id = ID, delay = 1)
-        Mockito.verify(messageCoroutine, never()).executeTask(anyOrNull(), any(), any())
+        Mockito.verify(parentViewGroup, never()).removeView(any())
     }
 
     @Test

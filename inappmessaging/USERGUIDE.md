@@ -499,6 +499,7 @@ All the events "launch the app event, login event, purchase successful event, cu
 #### 7.6.0 (In-Progress)
 * SDKCF-6327: Updated compile and target SDK to API 34 (Android 14).
 * RMCCX-6695: Improved the userguide.
+* RMCCX-6698: Supported Push Primer feature through CustomJson.
 
 #### 7.5.0 (2023-12-12)
 * SDKCF-6575: Added sending of device Id in all IAM requests.

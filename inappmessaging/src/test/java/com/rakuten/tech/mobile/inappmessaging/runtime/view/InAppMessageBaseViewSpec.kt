@@ -31,43 +31,30 @@ import androidx.core.widget.NestedScrollView
 import com.nhaarman.mockitokotlin2.any
 import com.nhaarman.mockitokotlin2.eq
 import com.nhaarman.mockitokotlin2.times
+import com.nhaarman.mockitokotlin2.verify
+import com.rakuten.tech.mobile.inappmessaging.runtime.data.customjson.MessageMapper
+import com.rakuten.tech.mobile.inappmessaging.runtime.testhelpers.TestDataHelper
 import com.rakuten.tech.mobile.inappmessaging.runtime.utils.ResourceUtils
 import org.amshove.kluent.*
 import org.junit.Ignore
-import org.mockito.Mockito
+import org.mockito.Mockito.mock
 import org.mockito.Mockito.`when`
 
 @RunWith(RobolectricTestRunner::class)
 @Ignore("base class")
 open class InAppMessageBaseViewSpec : BaseTest() {
-    private val hostAppActivity = Mockito.mock(Activity::class.java)
-    internal val mockMessage = Mockito.mock(Message::class.java)
-    internal val mockPayload = Mockito.mock(MessagePayload::class.java)
-    private val mockSettings = Mockito.mock(MessageSettings::class.java)
-    internal val mockCtrlSettings = Mockito.mock(ControlSettings::class.java)
-    internal val mockDisplaySettings = Mockito.mock(DisplaySettings::class.java)
-    internal val mockResource = Mockito.mock(Resource::class.java)
-    internal val mockBtn = Mockito.mock(MessageButton::class.java)
+    private val hostAppActivity = mock(Activity::class.java)
     internal var view: InAppMessageBaseView? = null
     internal var expectedHyphenation = Layout.HYPHENATION_FREQUENCY_NONE
+    internal val message = MessageMapper.mapFrom(TestDataHelper.createDummyMessage())
 
     @Before
-    @SuppressWarnings("LongMethod")
     override fun setup() {
         super.setup()
         `when`(hostAppActivity.layoutInflater)
             .thenReturn(LayoutInflater.from(ApplicationProvider.getApplicationContext()))
-        `when`(mockMessage.messagePayload).thenReturn(mockPayload)
-        `when`(mockMessage.isCampaignDismissable).thenReturn(true)
-        `when`(mockPayload.header).thenReturn("test")
-        `when`(mockPayload.messageBody).thenReturn("test")
-        `when`(mockPayload.messageSettings).thenReturn(mockSettings)
-        `when`(mockSettings.controlSettings).thenReturn(mockCtrlSettings)
-        `when`(mockSettings.displaySettings).thenReturn(mockDisplaySettings)
-        `when`(mockPayload.resource).thenReturn(mockResource)
         view = hostAppActivity.layoutInflater.inflate(R.layout.in_app_message_full_screen, null)
             as InAppMessageBaseView
-
         expectedHyphenation = if (Build.VERSION.SDK_INT == Build.VERSION_CODES.TIRAMISU) {
             Layout.HYPHENATION_FREQUENCY_FULL_FAST
         } else {
@@ -82,48 +69,32 @@ open class InAppMessageBaseViewSpec : BaseTest() {
 }
 
 class InAppMessageBaseViewBodySpec : InAppMessageBaseViewSpec() {
-    @Before
-    override fun setup() {
-        super.setup()
-        `when`(mockPayload.headerColor).thenReturn(WHITE_HEX)
-        `when`(mockPayload.messageBodyColor).thenReturn(WHITE_HEX)
-        `when`(mockPayload.backgroundColor).thenReturn(WHITE_HEX)
-    }
 
     @Test
     fun `should not bind view body when message body is null`() {
-        `when`(mockPayload.messageBody).thenReturn(null)
-
-        view?.populateViewData(mockMessage)
+        view?.populateViewData(message.copy(bodyText = null))
 
         view?.findViewById<TextView>(R.id.message_body)?.visibility shouldNotBeEqualTo View.VISIBLE
     }
 
     @Test
     fun `should not bind view body when message body is empty`() {
-        `when`(mockPayload.messageBody).thenReturn("")
-
-        view?.populateViewData(mockMessage)
+        view?.populateViewData(message.copy(bodyText = null))
 
         view?.findViewById<TextView>(R.id.message_body)?.visibility shouldNotBeEqualTo View.VISIBLE
     }
 }
 
 class InAppMessageBaseViewHeaderSpec : InAppMessageBaseViewSpec() {
-    @Before
-    override fun setup() {
-        super.setup()
-        `when`(mockPayload.headerColor).thenReturn(WHITE_HEX)
-        `when`(mockPayload.messageBodyColor).thenReturn(WHITE_HEX)
-        `when`(mockPayload.backgroundColor).thenReturn(WHITE_HEX)
-    }
 
     @Test
     fun `should not bind view header when message header and body are null`() {
-        `when`(mockPayload.header).thenReturn(null)
-        `when`(mockPayload.messageBody).thenReturn(null)
-
-        view?.populateViewData(mockMessage)
+        view?.populateViewData(
+            message.copy(
+                headerText = null,
+                bodyText = null,
+            ),
+        )
 
         view?.findViewById<NestedScrollView>(R.id.message_scrollview)?.visibility shouldNotBeEqualTo View.VISIBLE
         view?.findViewById<TextView>(R.id.header_text)?.visibility shouldNotBeEqualTo View.VISIBLE
@@ -131,10 +102,12 @@ class InAppMessageBaseViewHeaderSpec : InAppMessageBaseViewSpec() {
 
     @Test
     fun `should not bind view header when message header and body are empty`() {
-        `when`(mockPayload.header).thenReturn("")
-        `when`(mockPayload.messageBody).thenReturn("")
-
-        view?.populateViewData(mockMessage)
+        view?.populateViewData(
+            message.copy(
+                headerText = "",
+                bodyText = "",
+            ),
+        )
 
         view?.findViewById<NestedScrollView>(R.id.message_scrollview)?.visibility shouldNotBeEqualTo View.VISIBLE
         view?.findViewById<TextView>(R.id.header_text)?.visibility shouldNotBeEqualTo View.VISIBLE
@@ -142,10 +115,12 @@ class InAppMessageBaseViewHeaderSpec : InAppMessageBaseViewSpec() {
 
     @Test
     fun `should show scrollview when header is valid`() {
-        `when`(mockPayload.header).thenReturn("abc")
-        `when`(mockPayload.messageBody).thenReturn("")
-
-        view?.populateViewData(mockMessage)
+        view?.populateViewData(
+            message.copy(
+                headerText = "abc",
+                bodyText = "",
+            ),
+        )
 
         view?.findViewById<NestedScrollView>(R.id.message_scrollview)?.visibility shouldBeEqualTo View.VISIBLE
         view?.findViewById<TextView>(R.id.header_text)?.visibility shouldBeEqualTo View.VISIBLE
@@ -153,10 +128,12 @@ class InAppMessageBaseViewHeaderSpec : InAppMessageBaseViewSpec() {
 
     @Test
     fun `should show scrollview when body is valid`() {
-        `when`(mockPayload.header).thenReturn("")
-        `when`(mockPayload.messageBody).thenReturn("abc")
-
-        view?.populateViewData(mockMessage)
+        view?.populateViewData(
+            message.copy(
+                headerText = "",
+                bodyText = "abc",
+            ),
+        )
 
         view?.findViewById<NestedScrollView>(R.id.message_scrollview)?.visibility shouldBeEqualTo View.VISIBLE
     }
@@ -174,20 +151,26 @@ class InAppMessageBaseViewCheckBoxSpec : InAppMessageBaseViewSpec() {
     }
 
     private fun verifyCheckBox(color: String, expectedColor: Int) {
-        `when`(mockPayload.headerColor).thenReturn(color)
-        `when`(mockPayload.messageBodyColor).thenReturn(color)
-        `when`(mockPayload.backgroundColor).thenReturn(color)
-        `when`(mockDisplaySettings.isOptedOut).thenReturn(true)
+        view?.populateViewData(
+            message.copy(
+                headerColor = color,
+                bodyColor = color,
+                backgroundColor = color,
+                displaySettings = message.displaySettings.copy(isOptedOut = true),
+            ),
+        )
 
-        view?.populateViewData(mockMessage)
         view?.findViewById<CheckBox>(R.id.opt_out_checkbox)?.textColors?.defaultColor shouldBeEqualTo expectedColor
     }
 
     @Test
     fun `should set checkbox to visible`() {
-        `when`(mockPayload.headerColor).thenReturn("#")
-        `when`(mockDisplaySettings.isOptedOut).thenReturn(true)
-        view?.populateViewData(mockMessage)
+        view?.populateViewData(
+            message.copy(
+                headerColor = "#",
+                displaySettings = message.displaySettings.copy(isOptedOut = true),
+            ),
+        )
 
         view?.findViewById<CheckBox>(R.id.opt_out_checkbox)?.visibility shouldBeEqualTo View.VISIBLE
     }
@@ -216,21 +199,28 @@ class InAppMessageBaseViewImageSpec : InAppMessageBaseViewSpec() {
 
     @Test
     fun `should not throw exception when valid picasso`() {
-        `when`(mockResource.imageUrl).thenReturn("test valid URL")
-        `when`(mockPayload.headerColor).thenReturn("#")
         ImageUtilSpec.setupValidPicasso()
-        view?.populateViewData(mockMessage)
+        view?.populateViewData(
+            message.copy(
+                imageUrl = "test valid UR",
+                headerColor = "#",
+            ),
+        )
     }
 
     private fun verifyImageFetch(isValid: Boolean, isException: Boolean = false, isNull: Boolean = false) {
         ImageUtilSpec.IS_VALID = isValid
         ImageUtilSpec.IS_NULL = isNull
-        `when`(mockResource.imageUrl).thenReturn("any url")
-        `when`(mockPayload.headerColor).thenReturn("#")
-        view?.picasso = ImageUtilSpec.setupMockPicasso(isException)
-        view?.populateViewData(mockMessage)
-        val imageView = view?.findViewById<ImageView>(R.id.message_image_view)
 
+        view?.picasso = ImageUtilSpec.setupMockPicasso(isException)
+        view?.populateViewData(
+            message.copy(
+                imageUrl = "any url",
+                headerColor = "#",
+            ),
+        )
+
+        val imageView = view?.findViewById<ImageView>(R.id.message_image_view)
         if (isValid) {
             imageView?.visibility shouldBeEqualTo View.VISIBLE
         } else {
@@ -242,115 +232,128 @@ class InAppMessageBaseViewImageSpec : InAppMessageBaseViewSpec() {
 class InAppMessageBaseViewBorderSpec : InAppMessageBaseViewSpec() {
     @Test
     fun `should set button border for identical bg colors`() {
-        val bgColor = "#AA00BB"
-        `when`(mockPayload.headerColor).thenReturn(WHITE_HEX)
-        `when`(mockPayload.messageBodyColor).thenReturn(WHITE_HEX)
-        `when`(mockPayload.backgroundColor).thenReturn(bgColor)
-        view?.populateViewData(mockMessage)
+        view?.populateViewData(
+            message.copy(
+                headerColor = WHITE_HEX,
+                bodyColor = WHITE_HEX,
+                backgroundColor = "#AA00BB",
+            ),
+        )
 
-        val mockButton = Mockito.mock(MaterialButton::class.java)
-        view?.setButtonBorder(mockButton, Color.parseColor(bgColor), Color.BLACK)
-        Mockito.verify(mockButton, times(1)).setStrokeColor(ColorStateList.valueOf(Color.BLACK))
-        Mockito.verify(mockButton, times(1)).setStrokeWidth(any())
+        val mockButton = mock(MaterialButton::class.java)
+        view?.setButtonBorder(mockButton, Color.parseColor("#AA00BB"), Color.BLACK)
+        verify(mockButton, times(1)).setStrokeColor(ColorStateList.valueOf(Color.BLACK))
+        verify(mockButton, times(1)).setStrokeWidth(any())
     }
 
     @Test
     fun `should set button border for similar bg colors`() {
-        `when`(mockPayload.headerColor).thenReturn(WHITE_HEX)
-        `when`(mockPayload.messageBodyColor).thenReturn(WHITE_HEX)
-        `when`(mockPayload.backgroundColor).thenReturn("#AA00BB")
-        view?.populateViewData(mockMessage)
+        view?.populateViewData(
+            message.copy(
+                headerColor = WHITE_HEX,
+                bodyColor = WHITE_HEX,
+                backgroundColor = "#AA00BB",
+            ),
+        )
 
-        val mockButton = Mockito.mock(MaterialButton::class.java)
+        val mockButton = mock(MaterialButton::class.java)
         view?.setButtonBorder(mockButton, Color.parseColor("#AA05BB"), Color.BLACK)
-        Mockito.verify(mockButton, times(1)).setStrokeColor(ColorStateList.valueOf(Color.BLACK))
-        Mockito.verify(mockButton, times(1)).setStrokeWidth(any())
+        verify(mockButton, times(1)).setStrokeColor(ColorStateList.valueOf(Color.BLACK))
+        verify(mockButton, times(1)).setStrokeWidth(any())
     }
 
     @Test
     fun `should set grey button border for white bg colors`() {
-        `when`(mockPayload.headerColor).thenReturn(WHITE_HEX)
-        `when`(mockPayload.messageBodyColor).thenReturn(WHITE_HEX)
-        `when`(mockPayload.backgroundColor).thenReturn(WHITE_HEX)
-        view?.populateViewData(mockMessage)
+        view?.populateViewData(
+            message.copy(
+                headerColor = WHITE_HEX,
+                bodyColor = WHITE_HEX,
+                backgroundColor = WHITE_HEX,
+            ),
+        )
 
-        val mockButton = Mockito.mock(MaterialButton::class.java)
+        val mockButton = mock(MaterialButton::class.java)
         view?.setButtonBorder(mockButton, Color.parseColor(WHITE_HEX), Color.BLACK)
         val expectedColor = view?.resources?.getColorStateList(
             R.color.modal_border_color_light_grey, view!!.context.theme,
         )
-        Mockito.verify(mockButton, times(1)).setStrokeColor(expectedColor)
-        Mockito.verify(mockButton, times(1)).setStrokeWidth(any())
+        verify(mockButton, times(1)).setStrokeColor(expectedColor)
+        verify(mockButton, times(1)).setStrokeWidth(any())
     }
 
     @Test
     fun `should not set button border for different bg colors`() {
-        `when`(mockPayload.headerColor).thenReturn(WHITE_HEX)
-        `when`(mockPayload.messageBodyColor).thenReturn(WHITE_HEX)
-        `when`(mockPayload.backgroundColor).thenReturn(WHITE_HEX)
-        view?.populateViewData(mockMessage)
+        view?.populateViewData(
+            message.copy(
+                headerColor = WHITE_HEX,
+                bodyColor = WHITE_HEX,
+                backgroundColor = WHITE_HEX,
+            ),
+        )
 
-        val mockButton = Mockito.mock(MaterialButton::class.java)
+        val mockButton = mock(MaterialButton::class.java)
         view?.setButtonBorder(mockButton, Color.parseColor("#AA00BB"), Color.BLACK)
-        Mockito.verify(mockButton, never()).setStrokeColor(any())
-        Mockito.verify(mockButton, never()).setStrokeWidth(any())
+        verify(mockButton, never()).setStrokeColor(any())
+        verify(mockButton, never()).setStrokeWidth(any())
     }
 }
 
 class InAppMessageBaseViewColorSpec : InAppMessageBaseViewSpec() {
     @Test
-    @Config(
-        sdk = [
-            Build.VERSION_CODES.S,
-            Build.VERSION_CODES.TIRAMISU,
-        ],
-    )
+    @Config(sdk = [Build.VERSION_CODES.S, Build.VERSION_CODES.TIRAMISU])
     fun `should set default when invalid header color`() {
-        `when`(mockPayload.headerColor).thenReturn("invalid")
-        view?.populateViewData(mockMessage)
+        view?.populateViewData(
+            message.copy(
+                headerColor = "invalid",
+            ),
+        )
 
         verifyDefault()
     }
 
     @Test
-    @Config(
-        sdk = [
-            Build.VERSION_CODES.S,
-            Build.VERSION_CODES.TIRAMISU,
-        ],
-    )
+    @Config(sdk = [Build.VERSION_CODES.S, Build.VERSION_CODES.TIRAMISU])
     fun `should set default when invalid body color`() {
-        `when`(mockPayload.headerColor).thenReturn(WHITE_HEX)
-        `when`(mockPayload.messageBodyColor).thenReturn("incorrect")
-        view?.populateViewData(mockMessage)
+        view?.populateViewData(
+            message.copy(
+                headerColor = WHITE_HEX,
+                bodyColor = "incorrect",
+            ),
+        )
 
         verifyDefault()
     }
 
     @Test
-    @Config(
-        sdk = [
-            Build.VERSION_CODES.S,
-            Build.VERSION_CODES.TIRAMISU,
-        ],
-    )
+    @Config(sdk = [Build.VERSION_CODES.S, Build.VERSION_CODES.TIRAMISU])
     fun `should set default when invalid bg color`() {
-        `when`(mockPayload.headerColor).thenReturn(WHITE_HEX)
-        `when`(mockPayload.messageBodyColor).thenReturn(WHITE_HEX)
-        `when`(mockPayload.backgroundColor).thenReturn("failed")
-        view?.populateViewData(mockMessage)
+        view?.populateViewData(
+            message.copy(
+                headerColor = WHITE_HEX,
+                bodyColor = WHITE_HEX,
+                backgroundColor = "failed",
+            ),
+        )
 
         verifyDefault()
     }
 
     @Test
     fun `should set default when invalid button text and bg color`() {
-        `when`(mockPayload.headerColor).thenReturn("invalid")
-        `when`(mockCtrlSettings.buttons).thenReturn(listOf(mockBtn))
-        `when`(mockBtn.buttonTextColor).thenReturn("test")
-        `when`(mockBtn.buttonTextColor).thenReturn("#")
-        `when`(mockBtn.buttonBackgroundColor).thenReturn("#")
-        view?.populateViewData(mockMessage)
+        view?.populateViewData(
+            message.copy(
+                headerColor = "invalid",
+                buttons = listOf(
+                    MessageButton(
+                        buttonBackgroundColor = "#",
+                        buttonTextColor = "test",
+                        buttonBehavior = OnClickBehavior(2, null),
+                        buttonText = "test",
+                    ),
+                ),
+            ),
+        )
+
         val button = view?.findViewById<MaterialButton>(R.id.message_single_button)
         button?.textColors shouldBeEqualTo ColorStateList.valueOf(Color.parseColor("#1D1D1D"))
         button?.backgroundTintList shouldBeEqualTo ColorStateList.valueOf(Color.WHITE)
@@ -367,13 +370,18 @@ class InAppMessageBaseViewColorSpec : InAppMessageBaseViewSpec() {
     }
 
     private fun verifyCloseButton(color: String, mode: VerificationMode) {
-        `when`(mockPayload.headerColor).thenReturn(color)
-        `when`(mockPayload.messageBodyColor).thenReturn(color)
-        `when`(mockPayload.backgroundColor).thenReturn(color)
-        view?.populateViewData(mockMessage)
-        val mockButton = Mockito.mock(ImageButton::class.java)
+        view?.populateViewData(
+            message.copy(
+                headerColor = color,
+                bodyColor = color,
+                backgroundColor = color,
+                shouldShowUpperCloseButton = true,
+            ),
+        )
+
+        val mockButton = mock(ImageButton::class.java)
         view?.setCloseButton(mockButton)
-        Mockito.verify(mockButton, mode).setImageResource(R.drawable.close_button_white)
+        verify(mockButton, mode).setImageResource(R.drawable.close_button_white)
     }
 
     private fun verifyDefault() {
@@ -400,7 +408,7 @@ class InAppMessageBaseViewTextSpec : InAppMessageBaseViewSpec() {
     @Test
     @Config(sdk = [Build.VERSION_CODES.N])
     fun `should set correct font for lower API`() {
-        val mockFont = Mockito.mock(Typeface::class.java)
+        val mockFont = mock(Typeface::class.java)
         setMock(lower = true, font = mockFont)
 
         view?.findViewById<TextView>(R.id.header_text)?.typeface shouldBeEqualTo mockFont
@@ -439,12 +447,7 @@ class InAppMessageBaseViewTextSpec : InAppMessageBaseViewSpec() {
     }
 
     @Test
-    @Config(
-        sdk = [
-            Build.VERSION_CODES.S,
-            Build.VERSION_CODES.TIRAMISU,
-        ],
-    )
+    @Config(sdk = [Build.VERSION_CODES.S, Build.VERSION_CODES.TIRAMISU])
     fun `should set button hyphenation`() {
         setMock()
 
@@ -454,11 +457,9 @@ class InAppMessageBaseViewTextSpec : InAppMessageBaseViewSpec() {
 
     @SuppressWarnings("LongMethod")
     private fun setMock(inv: Boolean = false, id: Int = 1, lower: Boolean = false, font: Typeface? = null): Typeface? {
-        `when`(mockPayload.headerColor).thenReturn("#")
-        val mockContext = Mockito.mock(Context::class.java)
-        val mockResource = Mockito.mock(Resources::class.java)
-        val mockTypeface = Mockito.mock(Typeface::class.java)
-        val mockButton = Mockito.mock(MessageButton::class.java)
+        val mockContext = mock(Context::class.java)
+        val mockResource = mock(Resources::class.java)
+        val mockTypeface = mock(Typeface::class.java)
         view?.mockContext = mockContext
         `when`(mockContext.resources).thenReturn(mockResource)
         `when`(mockContext.packageName).thenReturn("test")
@@ -474,10 +475,19 @@ class InAppMessageBaseViewTextSpec : InAppMessageBaseViewSpec() {
         } else {
             `when`(mockResource.getFont(any())).thenReturn(mockTypeface)
         }
-        `when`(mockCtrlSettings.buttons).thenReturn(listOf(mockButton))
-        `when`(mockButton.buttonTextColor).thenReturn("#")
-        `when`(mockButton.buttonBackgroundColor).thenReturn("#")
-        view?.populateViewData(mockMessage)
+        view?.populateViewData(
+            message.copy(
+                headerColor = "#",
+                buttons = listOf(
+                    MessageButton(
+                        buttonBackgroundColor = "#",
+                        buttonTextColor = "#",
+                        buttonBehavior = OnClickBehavior(2, null),
+                        buttonText = "test",
+                    ),
+                ),
+            ),
+        )
         return mockTypeface
     }
 }

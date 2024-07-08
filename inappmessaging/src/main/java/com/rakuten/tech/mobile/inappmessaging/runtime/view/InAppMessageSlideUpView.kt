@@ -4,8 +4,8 @@ import android.content.Context
 import android.util.AttributeSet
 import androidx.constraintlayout.widget.ConstraintLayout
 import com.rakuten.tech.mobile.inappmessaging.runtime.R
+import com.rakuten.tech.mobile.inappmessaging.runtime.data.ui.UiMessage
 import com.rakuten.tech.mobile.inappmessaging.runtime.data.enums.SlideFromDirectionType
-import com.rakuten.tech.mobile.inappmessaging.runtime.data.responses.ping.Message
 import com.rakuten.tech.mobile.inappmessaging.runtime.utils.ViewUtil
 
 /**
@@ -20,8 +20,8 @@ internal class InAppMessageSlideUpView(
     /**
      * Populating view data according to Slide Up view.
      */
-    override fun populateViewData(message: Message) {
-        super.populateViewData(message)
+    override fun populateViewData(uiMessage: UiMessage) {
+        super.populateViewData(uiMessage)
 
         setCloseButton()
         val constraintLayout = findViewById<ConstraintLayout>(R.id.slide_up)
@@ -32,7 +32,7 @@ internal class InAppMessageSlideUpView(
         ViewUtil.getSlidingAnimation(
             context,
             SlideFromDirectionType.getById(
-                message.messagePayload.messageSettings.displaySettings.slideFrom,
+                uiMessage.displaySettings.slideFrom,
             ),
         )?.let { animation ->
             constraintLayout.startAnimation(animation)

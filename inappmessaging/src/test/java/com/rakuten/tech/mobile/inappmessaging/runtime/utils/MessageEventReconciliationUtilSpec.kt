@@ -127,7 +127,7 @@ class MessageEventReconciliationUtilSpec : BaseTest() {
         )
         CampaignRepository.instance().syncWith(listOf(campaign), 0)
         EventMatchingUtil.instance().matchAndStore(LoginSuccessfulEvent())
-        CampaignRepository.instance().optOutCampaign(campaign)
+        CampaignRepository.instance().optOutCampaign(campaign.campaignId)
         val handler = ValidatorHandler()
         messageEventReconciliationUtil.validate(handler.closure)
 

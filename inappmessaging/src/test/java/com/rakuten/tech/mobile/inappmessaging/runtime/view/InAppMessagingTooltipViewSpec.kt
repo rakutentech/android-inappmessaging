@@ -12,6 +12,7 @@ import androidx.core.widget.NestedScrollView
 import androidx.test.core.app.ApplicationProvider
 import com.nhaarman.mockitokotlin2.any
 import com.rakuten.tech.mobile.inappmessaging.runtime.InAppMessaging
+import com.rakuten.tech.mobile.inappmessaging.runtime.data.customjson.MessageMapper
 import com.rakuten.tech.mobile.inappmessaging.runtime.testhelpers.MockPicasso
 import com.rakuten.tech.mobile.inappmessaging.runtime.testhelpers.MockPicassoReturnType
 import com.rakuten.tech.mobile.inappmessaging.runtime.data.enums.PositionType
@@ -31,14 +32,14 @@ class InAppMessagingTooltipViewSpec {
 
     @Test
     fun `should not be displayed when image URL is null`() {
-        tooltipView.populateViewData(TooltipHelper.createMessage(imageUrl = null))
+        tooltipView.populateViewData(MessageMapper.mapFrom(TooltipHelper.createMessage(imageUrl = null)))
 
         tooltipView.visibility.shouldBeEqualTo(View.GONE)
     }
 
     @Test
     fun `should not be displayed when image URL is empty`() {
-        tooltipView.populateViewData(TooltipHelper.createMessage(imageUrl = ""))
+        tooltipView.populateViewData(MessageMapper.mapFrom(TooltipHelper.createMessage(imageUrl = "")))
 
         tooltipView.visibility.shouldBeEqualTo(View.GONE)
     }
@@ -46,7 +47,7 @@ class InAppMessagingTooltipViewSpec {
     @Test
     fun `should not be displayed when exception is encountered during image display`() {
         tooltipView.picasso = MockPicasso.init(MockPicassoReturnType.GENERIC_EXCEPTION)
-        tooltipView.populateViewData(TooltipHelper.createMessage())
+        tooltipView.populateViewData(MessageMapper.mapFrom(TooltipHelper.createMessage()))
 
         tooltipView.visibility.shouldBeEqualTo(View.GONE)
     }
@@ -54,7 +55,7 @@ class InAppMessagingTooltipViewSpec {
     @Test
     fun `should not be displayed when callback error is encountered during image display`() {
         tooltipView.picasso = MockPicasso.init(MockPicassoReturnType.CALLBACK_ERROR)
-        tooltipView.populateViewData(TooltipHelper.createMessage())
+        tooltipView.populateViewData(MessageMapper.mapFrom(TooltipHelper.createMessage()))
 
         tooltipView.visibility.shouldBeEqualTo(View.GONE)
     }
@@ -81,7 +82,7 @@ class InAppMessagingTooltipAnchorListenerSpec {
         `when`(mockObserver.isAlive).thenReturn(true)
 
         tooltipView = TooltipHelper.inflateTooltipView(hostAppActivity)
-        tooltipView.populateViewData(TooltipHelper.createMessage())
+        tooltipView.populateViewData(MessageMapper.mapFrom(TooltipHelper.createMessage()))
     }
 
     @Test
@@ -252,7 +253,7 @@ class InAppMessagingTooltipViewPopulateDataSpec(private val position: String, pr
 
     @Test
     fun `populateViewData should set correct tooltip position`() {
-        tooltipView.populateViewData(TooltipHelper.createMessage(position))
+        tooltipView.populateViewData(MessageMapper.mapFrom(TooltipHelper.createMessage(position)))
 
         tooltipView.type.ordinal.shouldBeEqualTo(expected)
     }
