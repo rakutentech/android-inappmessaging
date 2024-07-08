@@ -83,6 +83,7 @@ internal data class Message(
         }
         if (customJsonData == null) {
             try {
+                println("[Mau] fromGson")
                 customJsonData = Gson().fromJson(customJson, CustomJson::class.java)
             } catch (je: JsonParseException) {
                 InAppLogger(TAG).warn("Invalid format/representation for CustomJson", je)
