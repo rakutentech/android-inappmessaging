@@ -54,12 +54,8 @@ internal data class Message(
             }
         }
 
-    val primaryType: CampaignType by lazy {
-        if (getCustomJsonData()?.pushPrimer != null) {
-            CampaignType.PUSH_PRIMER
-        } else {
-            CampaignType.REGULAR
-        }
+    val isPushPrimer: Boolean by lazy {
+        getCustomJsonData()?.pushPrimer?.button != null
     }
 
     fun getTooltipConfig(): Tooltip? {

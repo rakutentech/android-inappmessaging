@@ -207,17 +207,17 @@ internal class MessageReadinessManager(
             return false
         }
 
-        if (message.primaryType == CampaignType.PUSH_PRIMER) {
+        // Check if device is unsupported or permission already granted
+        if (message.isPushPrimer) {
             if (!BuildVersionChecker.isAndroidTAndAbove()) {
-                // Unsupported device
                 return false
             }
 
             hostAppInfoRepo.getContext()?.let {
-                // Permission already granted
                 return !PermissionUtil.isPermissionGranted(it, Manifest.permission.POST_NOTIFICATIONS)
             }
         }
+
         return true
     }
 
