@@ -41,6 +41,7 @@ import kotlin.collections.ArrayList
 internal class MessageActionsCoroutine(
     private val campaignRepo: CampaignRepository = CampaignRepository.instance(),
     private val readinessManager: MessageReadinessManager = MessageReadinessManager.instance(),
+    private val hostAppRepo: HostAppInfoRepository = HostAppInfoRepository.instance()
 ) {
 
     fun executeTask(uiMessage: UiMessage?, viewResourceId: Int, optOut: Boolean): Boolean {
@@ -183,24 +184,23 @@ internal class MessageActionsCoroutine(
 
     @SuppressLint("InlinedApi")
     private fun requestPushNotificationPermission() {
-        val activity = HostAppInfoRepository.instance().getRegisteredActivity() ?: return
+        val activity = hostAppRepo.getRegisteredActivity() ?: return
 
-        PermissionUtil.checkPermission(activity, Manifest.permission.POST_NOTIFICATIONS) { result ->
-            when (result) {
-                CheckPermissionResult.CAN_ASK -> {
-                    println("[Mau] PermissionAsk")
-                    activity.promptPushNotifPermissionDialog()
-                }
-                CheckPermissionResult.PREVIOUSLY_DENIED -> {
-                    println("[Mau] PermissionPreviouslyDenied")
-                    activity.promptPushNotifPermissionDialog()
-                }
-                CheckPermissionResult.PERMANENTLY_DENIED -> {
-                    println("[Mau] PermissionDisabled")
-                    activity.openAppNotifPermissionSettings()
-                }
-                CheckPermissionResult.GRANTED -> {}
+        val permissionResult = PermissionUtil.checkPermission(activity, Manifest.permission.POST_NOTIFICATIONS)
+        when (permissionResult) {
+            CheckPermissionResult.CAN_ASK -> {
+                println("[Mau] PermissionAsk")
+                activity.promptPushNotifPermissionDialog()
             }
+            CheckPermissionResult.PREVIOUSLY_DENIED -> {
+                println("[Mau] PermissionPreviouslyDenied")
+                activity.promptPushNotifPermissionDialog()
+            }
+            CheckPermissionResult.PERMANENTLY_DENIED -> {
+                println("[Mau] PermissionDisabled")
+                activity.openAppNotifPermissionSettings()
+            }
+            CheckPermissionResult.GRANTED -> {}
         }
     }
 
