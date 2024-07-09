@@ -30,6 +30,7 @@ internal data class Message(
     val customJson: JsonObject? = null, // dynamic
 ) {
     private var tooltip: Tooltip? = null
+
     @Transient private var customJsonData: CustomJson? = null
 
     var impressionsLeft: Int? = null
