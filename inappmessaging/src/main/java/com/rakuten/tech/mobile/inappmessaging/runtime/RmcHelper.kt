@@ -1,6 +1,7 @@
 package com.rakuten.tech.mobile.inappmessaging.runtime
 
 import android.content.Context
+import com.rakuten.tech.mobile.inappmessaging.runtime.utils.ClassUtil
 import com.rakuten.tech.mobile.inappmessaging.runtime.utils.InAppLogger
 
 /**
@@ -16,10 +17,10 @@ internal object RmcHelper {
     private const val TAG = "RmcHelper"
 
     /**
-     * Checks if app is using RMC SDK by checking the existence of its version resource.
+     * Checks if app is using RMC SDK by checking the existence of its public class.
      */
     @JvmStatic
-    fun isRmcIntegrated(context: Context) = getRmcVersion(context) != null
+    fun isRmcIntegrated() = ClassUtil.hasClass("com.rakuten.tech.mobile.rmc.Rmc")
 
     /**
      * Returns the RMC SDK version through the resource identifier.
@@ -29,6 +30,10 @@ internal object RmcHelper {
     @SuppressWarnings("TooGenericExceptionCaught")
     @JvmStatic
     fun getRmcVersion(context: Context): String? {
+        if (!isRmcIntegrated()) {
+            return null
+        }
+
         return try {
             context.getString(
                 context.resources.getIdentifier(
@@ -39,7 +44,7 @@ internal object RmcHelper {
             )
         } catch (e: Exception) {
             InAppLogger(TAG).debug(e.message)
-            return null
+            null
         }
     }
 }
