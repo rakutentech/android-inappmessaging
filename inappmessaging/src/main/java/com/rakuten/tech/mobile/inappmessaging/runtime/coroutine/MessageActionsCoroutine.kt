@@ -22,7 +22,7 @@ import com.rakuten.tech.mobile.inappmessaging.runtime.data.responses.ping.OnClic
 import com.rakuten.tech.mobile.inappmessaging.runtime.data.responses.ping.Trigger
 import com.rakuten.tech.mobile.inappmessaging.runtime.data.responses.ping.TriggerAttribute
 import com.rakuten.tech.mobile.inappmessaging.runtime.extensions.openAppNotifPermissionSettings
-import com.rakuten.tech.mobile.inappmessaging.runtime.extensions.promptPushNotifPermissionDialog
+import com.rakuten.tech.mobile.inappmessaging.runtime.extensions.promptPushPermissionDialog
 import com.rakuten.tech.mobile.inappmessaging.runtime.manager.EventsManager
 import com.rakuten.tech.mobile.inappmessaging.runtime.manager.ImpressionManager
 import com.rakuten.tech.mobile.inappmessaging.runtime.manager.MessageReadinessManager
@@ -41,7 +41,7 @@ import kotlin.collections.ArrayList
 internal class MessageActionsCoroutine(
     private val campaignRepo: CampaignRepository = CampaignRepository.instance(),
     private val readinessManager: MessageReadinessManager = MessageReadinessManager.instance(),
-    private val hostAppRepo: HostAppInfoRepository = HostAppInfoRepository.instance()
+    private val hostAppRepo: HostAppInfoRepository = HostAppInfoRepository.instance(),
 ) {
 
     fun executeTask(uiMessage: UiMessage?, viewResourceId: Int, optOut: Boolean): Boolean {
@@ -177,29 +177,20 @@ internal class MessageActionsCoroutine(
                 callback.invoke()
             } else if (checker.isAndroidTAndAbove()) {
                 PushPrimerTrackerManager.campaignId = campaignId
-                requestPushNotificationPermission()
+                requestPushNotifPermission()
             }
         }
     }
 
     @SuppressLint("InlinedApi")
-    private fun requestPushNotificationPermission() {
+    private fun requestPushNotifPermission() {
         val activity = hostAppRepo.getRegisteredActivity() ?: return
 
         val permissionResult = PermissionUtil.checkPermission(activity, Manifest.permission.POST_NOTIFICATIONS)
         when (permissionResult) {
-            CheckPermissionResult.CAN_ASK -> {
-                println("[Mau] PermissionAsk")
-                activity.promptPushNotifPermissionDialog()
-            }
-            CheckPermissionResult.PREVIOUSLY_DENIED -> {
-                println("[Mau] PermissionPreviouslyDenied")
-                activity.promptPushNotifPermissionDialog()
-            }
-            CheckPermissionResult.PERMANENTLY_DENIED -> {
-                println("[Mau] PermissionDisabled")
-                activity.openAppNotifPermissionSettings()
-            }
+            CheckPermissionResult.CAN_ASK -> activity.promptPushPermissionDialog()
+            CheckPermissionResult.PREVIOUSLY_DENIED -> activity.promptPushPermissionDialog()
+            CheckPermissionResult.PERMANENTLY_DENIED -> activity.openAppNotifPermissionSettings()
             CheckPermissionResult.GRANTED -> {}
         }
     }

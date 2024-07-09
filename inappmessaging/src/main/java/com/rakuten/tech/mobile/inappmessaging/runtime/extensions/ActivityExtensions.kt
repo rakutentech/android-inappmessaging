@@ -9,14 +9,14 @@ import androidx.core.app.ActivityCompat
 import com.rakuten.tech.mobile.inappmessaging.runtime.InAppMessaging
 
 /**
- * Prompts the push notification permission dialog if applicable
+ * Prompts the push notification permission dialog if applicable.
  */
 @RequiresApi(Build.VERSION_CODES.TIRAMISU)
-internal fun Activity.promptPushNotifPermissionDialog(requestCode: Int = InAppMessaging.PUSH_PRIMER_REQ_CODE) =
+internal fun Activity.promptPushPermissionDialog(requestCode: Int = InAppMessaging.PUSH_PRIMER_REQ_CODE) =
     ActivityCompat.requestPermissions(this, arrayOf(Manifest.permission.POST_NOTIFICATIONS), requestCode)
 
 /**
- * Redirects to app push notification Settings
+ * Redirects to app push notification Settings.
  */
 internal fun Activity.openAppNotifPermissionSettings() {
     val intent = Intent()

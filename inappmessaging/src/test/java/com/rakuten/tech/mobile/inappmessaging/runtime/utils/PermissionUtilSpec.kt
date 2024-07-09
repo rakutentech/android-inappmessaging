@@ -46,35 +46,47 @@ class PermissionUtilSpec {
         `when`(mockActivity.checkSelfPermission(anyString())).thenReturn(PackageManager.PERMISSION_GRANTED)
 
         PermissionUtil.checkPermission(mockActivity, Manifest.permission.POST_NOTIFICATIONS) shouldBe
-                CheckPermissionResult.GRANTED
+            CheckPermissionResult.GRANTED
     }
 
     @Test
     fun `checkPermission should return Can Ask`() {
-        mockActivityCompat.`when`<Any> { ActivityCompat.shouldShowRequestPermissionRationale(mockActivity,
-            Manifest.permission.POST_NOTIFICATIONS) }.thenReturn(false)
+        mockActivityCompat.`when`<Any> {
+            ActivityCompat.shouldShowRequestPermissionRationale(
+                mockActivity,
+                Manifest.permission.POST_NOTIFICATIONS,
+            )
+        }.thenReturn(false)
         `when`(mockPreferences.getBoolean(anyString(), anyBoolean())).thenReturn(true) // first time asking
 
         PermissionUtil.checkPermission(mockActivity, Manifest.permission.POST_NOTIFICATIONS) shouldBe
-                CheckPermissionResult.CAN_ASK
+            CheckPermissionResult.CAN_ASK
     }
 
     @Test
     fun `checkPermission should return Previously Denied`() {
-        mockActivityCompat.`when`<Any> { ActivityCompat.shouldShowRequestPermissionRationale(mockActivity,
-            Manifest.permission.POST_NOTIFICATIONS) }.thenReturn(true)
+        mockActivityCompat.`when`<Any> {
+            ActivityCompat.shouldShowRequestPermissionRationale(
+                mockActivity,
+                Manifest.permission.POST_NOTIFICATIONS,
+            )
+        }.thenReturn(true)
 
         PermissionUtil.checkPermission(mockActivity, Manifest.permission.POST_NOTIFICATIONS) shouldBe
-                CheckPermissionResult.PREVIOUSLY_DENIED
+            CheckPermissionResult.PREVIOUSLY_DENIED
     }
 
     @Test
     fun `checkPermission should return Permanently Denied`() {
-        mockActivityCompat.`when`<Any> { ActivityCompat.shouldShowRequestPermissionRationale(mockActivity,
-            Manifest.permission.POST_NOTIFICATIONS) }.thenReturn(false)
+        mockActivityCompat.`when`<Any> {
+            ActivityCompat.shouldShowRequestPermissionRationale(
+                mockActivity,
+                Manifest.permission.POST_NOTIFICATIONS,
+            )
+        }.thenReturn(false)
         `when`(mockPreferences.getBoolean(anyString(), anyBoolean())).thenReturn(false) // not first time asking
 
         PermissionUtil.checkPermission(mockActivity, Manifest.permission.POST_NOTIFICATIONS) shouldBe
-                CheckPermissionResult.PERMANENTLY_DENIED
+            CheckPermissionResult.PERMANENTLY_DENIED
     }
 }

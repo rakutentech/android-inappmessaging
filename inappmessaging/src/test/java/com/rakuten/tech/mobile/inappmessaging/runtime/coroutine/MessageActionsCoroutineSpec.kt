@@ -21,7 +21,7 @@ import com.rakuten.tech.mobile.inappmessaging.runtime.data.repositories.Campaign
 import com.rakuten.tech.mobile.inappmessaging.runtime.data.repositories.HostAppInfoRepository
 import com.rakuten.tech.mobile.inappmessaging.runtime.data.responses.ping.*
 import com.rakuten.tech.mobile.inappmessaging.runtime.extensions.openAppNotifPermissionSettings
-import com.rakuten.tech.mobile.inappmessaging.runtime.extensions.promptPushNotifPermissionDialog
+import com.rakuten.tech.mobile.inappmessaging.runtime.extensions.promptPushPermissionDialog
 import com.rakuten.tech.mobile.inappmessaging.runtime.manager.DisplayManager
 import com.rakuten.tech.mobile.inappmessaging.runtime.manager.MessageReadinessManager
 import com.rakuten.tech.mobile.inappmessaging.runtime.testhelpers.TestDataHelper
@@ -251,8 +251,6 @@ class MessageActionsCoroutineFuncSpec : BaseTest() {
         action.handleAction(OnClickBehavior(2, "https://test"))
     }
 
-
-
     @Test
     fun `should handle empty buttons`() {
         val message = message.copy(buttons = listOf())
@@ -332,32 +330,44 @@ class MessageActionsPushPrimerSpec {
 
     @Test
     fun `PushPrimer action should prompt native permission dialog if requested the first time`() {
-        mockPermissionUtil.`when`<Any> { PermissionUtil.checkPermission(mockActivity, Manifest.permission.POST_NOTIFICATIONS) }
-            .thenReturn(CheckPermissionResult.CAN_ASK)
+        mockPermissionUtil.`when`<Any> {
+            PermissionUtil.checkPermission(
+                mockActivity,
+                Manifest.permission.POST_NOTIFICATIONS,
+            )
+        }.thenReturn(CheckPermissionResult.CAN_ASK)
 
         MessageActionsCoroutine(hostAppRepo = mockHostAppRepo)
             .handleAction(OnClickBehavior(ButtonActionType.PUSH_PRIMER.typeId))
 
         verify(mockActivity)
-            .promptPushNotifPermissionDialog()
+            .promptPushPermissionDialog()
     }
 
     @Test
     fun `PushPrimer action should prompt native permission dialog if requested the second time`() {
-        mockPermissionUtil.`when`<Any> { PermissionUtil.checkPermission(mockActivity, Manifest.permission.POST_NOTIFICATIONS) }
-            .thenReturn(CheckPermissionResult.PREVIOUSLY_DENIED)
+        mockPermissionUtil.`when`<Any> {
+            PermissionUtil.checkPermission(
+                mockActivity,
+                Manifest.permission.POST_NOTIFICATIONS,
+            )
+        }.thenReturn(CheckPermissionResult.PREVIOUSLY_DENIED)
 
         MessageActionsCoroutine(hostAppRepo = mockHostAppRepo)
             .handleAction(OnClickBehavior(ButtonActionType.PUSH_PRIMER.typeId))
 
         verify(mockActivity)
-            .promptPushNotifPermissionDialog()
+            .promptPushPermissionDialog()
     }
 
     @Test
     fun `PushPrimer action should redirect to Settings from third time onwards`() {
-        mockPermissionUtil.`when`<Any> { PermissionUtil.checkPermission(mockActivity, Manifest.permission.POST_NOTIFICATIONS) }
-            .thenReturn(CheckPermissionResult.PERMANENTLY_DENIED)
+        mockPermissionUtil.`when`<Any> {
+            PermissionUtil.checkPermission(
+                mockActivity,
+                Manifest.permission.POST_NOTIFICATIONS,
+            )
+        }.thenReturn(CheckPermissionResult.PERMANENTLY_DENIED)
 
         MessageActionsCoroutine(hostAppRepo = mockHostAppRepo)
             .handleAction(OnClickBehavior(ButtonActionType.PUSH_PRIMER.typeId))
@@ -368,14 +378,18 @@ class MessageActionsPushPrimerSpec {
 
     @Test
     fun `PushPrimer action should do nothing if permission is granted`() {
-        mockPermissionUtil.`when`<Any> { PermissionUtil.checkPermission(mockActivity, Manifest.permission.POST_NOTIFICATIONS) }
-            .thenReturn(CheckPermissionResult.GRANTED)
+        mockPermissionUtil.`when`<Any> {
+            PermissionUtil.checkPermission(
+                mockActivity,
+                Manifest.permission.POST_NOTIFICATIONS,
+            )
+        }.thenReturn(CheckPermissionResult.GRANTED)
 
         MessageActionsCoroutine(hostAppRepo = mockHostAppRepo)
             .handleAction(OnClickBehavior(ButtonActionType.PUSH_PRIMER.typeId))
 
         verify(mockActivity, never())
-            .promptPushNotifPermissionDialog()
+            .promptPushPermissionDialog()
         verify(mockActivity, never())
             .openAppNotifPermissionSettings()
     }
