@@ -2,10 +2,13 @@ package com.rakuten.tech.mobile.inappmessaging.runtime.manager
 
 import android.app.Activity
 import android.content.Context
+import android.content.pm.PackageManager
+import android.os.Build
 import android.provider.Settings
 import androidx.test.core.app.ApplicationProvider
 import androidx.work.testing.WorkManagerTestInitHelper
 import com.google.gson.Gson
+import com.google.gson.JsonParser
 import com.rakuten.tech.mobile.inappmessaging.runtime.*
 import com.rakuten.tech.mobile.inappmessaging.runtime.api.MessageMixerRetrofitService
 import com.rakuten.tech.mobile.inappmessaging.runtime.data.enums.InAppMessageType
@@ -31,6 +34,7 @@ import org.junit.Test
 import org.junit.runner.RunWith
 import org.mockito.Mockito.*
 import org.robolectric.RobolectricTestRunner
+import org.robolectric.annotation.Config
 import retrofit2.Call
 import java.util.*
 import kotlin.collections.ArrayList
@@ -506,5 +510,60 @@ class MessageReadinessTooltipSpec {
 
         val call = manager.getDisplayCall("test-url", request)
         call.request().headers().size() shouldBeEqualTo 3
+    }
+}
+
+@RunWith(RobolectricTestRunner::class)
+@Config(sdk = [Build.VERSION_CODES.TIRAMISU])
+class MessageReadinessPushPrimerSpec {
+
+    private val manager = MessageReadinessManager(
+        campaignRepo = mock(CampaignRepository::class.java),
+        configResponseRepo = mock(ConfigResponseRepository::class.java),
+        hostAppInfoRepo = mock(HostAppInfoRepository::class.java),
+        accountRepo = mock(AccountRepository::class.java),
+        pingScheduler = mock(MessageMixerPingScheduler::class.java),
+        viewUtil = mock(ViewUtil::class.java),
+    )
+
+    private val mockContext = mock(Context::class.java)
+    private val testPushPrimer = TestDataHelper.createDummyMessage(
+        isTest = true,
+        customJson = JsonParser.parseString("""{"pushPrimer": { "button": 1 }}""").asJsonObject,
+    )
+
+    @Before
+    fun setup() {
+        `when`(manager.campaignRepo.messages).thenReturn(linkedMapOf(testPushPrimer.campaignId to testPushPrimer))
+        `when`(manager.hostAppInfoRepo.getContext()).thenReturn(mockContext)
+    }
+
+    @After
+    fun tearDown() {
+        manager.clearMessages()
+    }
+
+    @Test
+    @Config(sdk = [Build.VERSION_CODES.S])
+    fun `should not return push primer campaign if device is below Android 13()`() {
+        manager.addMessageToQueue(testPushPrimer.campaignId)
+
+        manager.getNextDisplayMessage() shouldNotContain testPushPrimer
+    }
+
+    @Test
+    fun `should not return push primer campaign if permission is granted()`() {
+        `when`(mockContext.checkSelfPermission(anyString())).thenReturn(PackageManager.PERMISSION_GRANTED)
+        manager.addMessageToQueue(testPushPrimer.campaignId)
+
+        manager.getNextDisplayMessage() shouldNotContain testPushPrimer
+    }
+
+    @Test
+    fun `should return push primer campaign if device is supported and permission is not yet granted()`() {
+        `when`(mockContext.checkSelfPermission(anyString())).thenReturn(PackageManager.PERMISSION_DENIED)
+        manager.addMessageToQueue(testPushPrimer.campaignId)
+
+        manager.getNextDisplayMessage() shouldContain testPushPrimer
     }
 }

@@ -1,5 +1,6 @@
 package com.rakuten.tech.mobile.inappmessaging.runtime.manager
 
+import android.Manifest
 import androidx.annotation.VisibleForTesting
 import androidx.annotation.WorkerThread
 import com.rakuten.tech.mobile.inappmessaging.runtime.BuildConfig
@@ -14,7 +15,9 @@ import com.rakuten.tech.mobile.inappmessaging.runtime.data.requests.DisplayPermi
 import com.rakuten.tech.mobile.inappmessaging.runtime.data.responses.DisplayPermissionResponse
 import com.rakuten.tech.mobile.inappmessaging.runtime.data.responses.ping.Message
 import com.rakuten.tech.mobile.inappmessaging.runtime.exception.InAppMessagingException
+import com.rakuten.tech.mobile.inappmessaging.runtime.utils.BuildVersionChecker
 import com.rakuten.tech.mobile.inappmessaging.runtime.utils.InAppLogger
+import com.rakuten.tech.mobile.inappmessaging.runtime.utils.PermissionUtil
 import com.rakuten.tech.mobile.inappmessaging.runtime.utils.RetryDelayUtil
 import com.rakuten.tech.mobile.inappmessaging.runtime.utils.RuntimeUtil
 import com.rakuten.tech.mobile.inappmessaging.runtime.utils.WorkerUtils
@@ -184,24 +187,37 @@ internal class MessageReadinessManager(
         )
 
     /**
-     * This method checks if the message has infinite impressions, or has been displayed less
-     * than its max impressions, or has been opted out.
-     * Additional checks are performed depending on message type.
+     * This method checks whether message should be displayed based on opt-out status, impressions, and additional
+     * checks based on the campaign type.
      */
+    @SuppressWarnings("LongMethod", "ReturnCount")
     private fun shouldDisplayMessage(message: Message): Boolean {
-        val impressions = message.impressionsLeft ?: message.maxImpressions
-        val isOptOut = message.isOptedOut == true
-        val hasPassedBasicCheck = (message.areImpressionsInfinite || impressions > 0) && !isOptOut
-
-        return if (message.type == InAppMessageType.TOOLTIP.typeId) {
-            val shouldDisplayTooltip = hasPassedBasicCheck &&
-                isTooltipTargetViewVisible(message) // if view where to attach tooltip is indeed visible
-            InAppLogger(TAG).debug("shouldDisplayTooltip: $shouldDisplayTooltip")
-            shouldDisplayTooltip
-        } else {
-            InAppLogger(TAG).debug("hasPassedBasicCheck: $hasPassedBasicCheck")
-            hasPassedBasicCheck
+        if (message.isOptedOut == true) {
+            return false
         }
+
+        if (!message.areImpressionsInfinite &&
+            (message.impressionsLeft ?: message.maxImpressions) <= 0
+        ) {
+            return false
+        }
+
+        if (message.type == InAppMessageType.TOOLTIP.typeId && !isTooltipTargetViewVisible(message)) {
+            return false
+        }
+
+        // Check if device is unsupported or permission already granted
+        if (message.isPushPrimer) {
+            if (!BuildVersionChecker.isAndroidTAndAbove()) {
+                return false
+            }
+
+            hostAppInfoRepo.getContext()?.let {
+                return !PermissionUtil.isPermissionGranted(it, Manifest.permission.POST_NOTIFICATIONS)
+            }
+        }
+
+        return true
     }
 
     private fun isTooltipTargetViewVisible(message: Message): Boolean {
