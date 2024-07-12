@@ -1,5 +1,5 @@
 // Reduce code duplication.
-apply from: "$CONFIG.configDir/android/application.gradle"
+apply from: "../config/android/application.gradle"
 apply from: "../config/quality/gitleaks/build.gradle"
 apply plugin: "kotlin-android"
 apply plugin: 'kotlin-kapt'

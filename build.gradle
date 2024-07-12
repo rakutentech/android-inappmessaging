@@ -9,6 +9,7 @@ buildscript {
     CONFIG.versions.android.sdk.target = 34
     CONFIG.versions.android.sdk.compile = 34
     CONFIG.versions.kotlin = '1.6.21'
+    CONFIG.versions.java = '17'
 
     repositories {
         google()
