@@ -22,7 +22,6 @@ internal object PermissionUtil {
     fun isPermissionGranted(context: Context, permission: String) =
         context.checkSelfPermission(permission) == PackageManager.PERMISSION_GRANTED
 
-    @SuppressWarnings("ReturnCount")
     @JvmStatic
     fun checkPermission(activity: Activity, permission: String): CheckPermissionResult {
         if (isPermissionGranted(activity, permission)) {
@@ -30,8 +29,8 @@ internal object PermissionUtil {
         }
 
         // If permission denied previously
-        if (ActivityCompat.shouldShowRequestPermissionRationale(activity, permission)) {
-            return CheckPermissionResult.PREVIOUSLY_DENIED
+        return if (ActivityCompat.shouldShowRequestPermissionRationale(activity, permission)) {
+            CheckPermissionResult.PREVIOUSLY_DENIED
         } else {
             // Permission denied or first time requested
             val isFirstTime = isFirstTimeAskingPermission(activity, permission)
