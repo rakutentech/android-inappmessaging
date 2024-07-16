@@ -35,12 +35,12 @@ internal object PermissionUtil {
         } else {
             // Permission denied or first time requested
             val isFirstTime = isFirstTimeAskingPermission(activity, permission)
-            if (isFirstTime) {
+            return if (isFirstTime) {
                 firstTimeAskingPermission(activity, permission, false)
-                return CheckPermissionResult.CAN_ASK
+                CheckPermissionResult.CAN_ASK
             } else {
                 // Handle the feature without permission or ask user to manually allow permission
-                return CheckPermissionResult.PERMANENTLY_DENIED
+                CheckPermissionResult.PERMANENTLY_DENIED
             }
         }
     }

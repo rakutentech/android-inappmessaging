@@ -191,7 +191,7 @@ internal class MessageActionsCoroutine(
             CheckPermissionResult.CAN_ASK -> activity.promptPushPermissionDialog()
             CheckPermissionResult.PREVIOUSLY_DENIED -> activity.promptPushPermissionDialog()
             CheckPermissionResult.PERMANENTLY_DENIED -> activity.openAppNotifPermissionSettings()
-            CheckPermissionResult.GRANTED -> {}
+            CheckPermissionResult.GRANTED -> Unit
         }
     }
 
