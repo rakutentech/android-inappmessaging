@@ -30,17 +30,17 @@ internal object PermissionUtil {
         }
 
         // If permission denied previously
-        if (ActivityCompat.shouldShowRequestPermissionRationale(activity, permission)) {
-            return CheckPermissionResult.PREVIOUSLY_DENIED
+        return if (ActivityCompat.shouldShowRequestPermissionRationale(activity, permission)) {
+            CheckPermissionResult.PREVIOUSLY_DENIED
         } else {
             // Permission denied or first time requested
             val isFirstTime = isFirstTimeAskingPermission(activity, permission)
-            if (isFirstTime) {
+            return if (isFirstTime) {
                 firstTimeAskingPermission(activity, permission, false)
-                return CheckPermissionResult.CAN_ASK
+                CheckPermissionResult.CAN_ASK
             } else {
                 // Handle the feature without permission or ask user to manually allow permission
-                return CheckPermissionResult.PERMANENTLY_DENIED
+                CheckPermissionResult.PERMANENTLY_DENIED
             }
         }
     }
@@ -52,6 +52,7 @@ internal object PermissionUtil {
     private fun isFirstTimeAskingPermission(context: Context, permission: String): Boolean =
         getPermissionCache(context).getBoolean(permission, true)
 
+    @SuppressWarnings("kotlin:S6291")
     private fun getPermissionCache(context: Context) =
         context.getSharedPreferences("iam_permission_prefs", Context.MODE_PRIVATE)
 }

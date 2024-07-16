@@ -182,7 +182,7 @@ internal class MessageActionsCoroutine(
         }
     }
 
-    @SuppressLint("InlinedApi")
+    @SuppressLint("NewApi")
     private fun requestPushNotifPermission() {
         val activity = hostAppRepo.getRegisteredActivity() ?: return
 
@@ -191,7 +191,7 @@ internal class MessageActionsCoroutine(
             CheckPermissionResult.CAN_ASK -> activity.promptPushPermissionDialog()
             CheckPermissionResult.PREVIOUSLY_DENIED -> activity.promptPushPermissionDialog()
             CheckPermissionResult.PERMANENTLY_DENIED -> activity.openAppNotifPermissionSettings()
-            CheckPermissionResult.GRANTED -> {}
+            CheckPermissionResult.GRANTED -> Unit
         }
     }
 
