@@ -12,7 +12,7 @@ import com.rakuten.tech.mobile.inappmessaging.runtime.InAppMessaging
  * Prompts the push notification permission dialog if applicable.
  */
 @RequiresApi(Build.VERSION_CODES.TIRAMISU)
-internal fun Activity.promptPushPermissionDialog(requestCode: Int = InAppMessaging.PUSH_PRIMER_REQ_CODE) =
+internal fun Activity.promptPushPermissionDialog(requestCode: Int = InAppMessaging.PUSH_PRIMER_REQ_CODE): Unit =
     ActivityCompat.requestPermissions(this, arrayOf(Manifest.permission.POST_NOTIFICATIONS), requestCode)
 
 /**

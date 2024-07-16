@@ -23,6 +23,7 @@ workflows:
     - _common-start
     after_run:
     - _common-end
+    - _publish-apk
     steps:
     - cache-pull@2: {}
     - script@1:
@@ -118,7 +119,7 @@ workflows:
     steps:
     - set-java-version@1:
         inputs:
-        - set_java_version: '11'
+        - set_java_version: '17'
     - git-clone@6:
         inputs:
         - fetch_tags: 'yes'
@@ -255,6 +256,17 @@ workflows:
         - username: "$GITHUB_BOT_USERNAME"
         - api_token: "$GITHUB_BOT_API_TOKEN"
         - name: "$BITRISE_GIT_TAG"
+  _publish-apk:
+    steps:
+    - script@1:
+        title: Generate test-debug.apk
+        inputs:
+        - content: "./gradlew :test:assembleDebug"
+    - deploy-to-bitrise-io@2:
+        is_always_run: false
+        inputs:
+        - is_enable_public_page: 'false'
+        - deploy_path: test/build/outputs/apk/debug/test-debug.apk      
 meta:
   bitrise.io:
     stack: linux-docker-android-20.04
