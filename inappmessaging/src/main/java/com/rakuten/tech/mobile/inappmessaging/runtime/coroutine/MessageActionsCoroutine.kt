@@ -182,7 +182,7 @@ internal class MessageActionsCoroutine(
         }
     }
 
-    @SuppressLint("InlinedApi")
+    @SuppressLint("NewApi")
     private fun requestPushNotifPermission() {
         val activity = hostAppRepo.getRegisteredActivity() ?: return
 
