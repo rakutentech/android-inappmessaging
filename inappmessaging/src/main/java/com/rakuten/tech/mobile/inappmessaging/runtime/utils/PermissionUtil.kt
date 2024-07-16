@@ -22,6 +22,7 @@ internal object PermissionUtil {
     fun isPermissionGranted(context: Context, permission: String) =
         context.checkSelfPermission(permission) == PackageManager.PERMISSION_GRANTED
 
+    @SuppressWarnings("ReturnCount")
     @JvmStatic
     fun checkPermission(activity: Activity, permission: String): CheckPermissionResult {
         if (isPermissionGranted(activity, permission)) {
