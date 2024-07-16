@@ -52,6 +52,7 @@ internal object PermissionUtil {
     private fun isFirstTimeAskingPermission(context: Context, permission: String): Boolean =
         getPermissionCache(context).getBoolean(permission, true)
 
+    @SuppressWarnings("kotlin:S6291")
     private fun getPermissionCache(context: Context) =
         context.getSharedPreferences("iam_permission_prefs", Context.MODE_PRIVATE)
 }
