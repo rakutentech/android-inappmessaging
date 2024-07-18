@@ -282,6 +282,8 @@ internal open class InAppMessageBaseView(context: Context, attrs: AttributeSet?)
     }
 
     // Set close button to black background if the campaign background color is dark.
+    @VisibleForTesting
+    @SuppressWarnings("kotlin:S6619")
     internal fun setCloseButton(button: ImageButton? = null) {
         if (isDismissable) {
             val brightness = getBrightness(bgColor)
