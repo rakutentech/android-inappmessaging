@@ -6,7 +6,6 @@ import android.content.ActivityNotFoundException
 import android.content.Intent
 import android.net.Uri
 import androidx.annotation.VisibleForTesting
-import androidx.core.app.ActivityCompat
 import com.rakuten.tech.mobile.inappmessaging.runtime.InAppMessaging
 import com.rakuten.tech.mobile.inappmessaging.runtime.R
 import com.rakuten.tech.mobile.inappmessaging.runtime.data.ui.UiMessage
@@ -22,12 +21,16 @@ import com.rakuten.tech.mobile.inappmessaging.runtime.data.repositories.HostAppI
 import com.rakuten.tech.mobile.inappmessaging.runtime.data.responses.ping.OnClickBehavior
 import com.rakuten.tech.mobile.inappmessaging.runtime.data.responses.ping.Trigger
 import com.rakuten.tech.mobile.inappmessaging.runtime.data.responses.ping.TriggerAttribute
+import com.rakuten.tech.mobile.inappmessaging.runtime.extensions.openAppNotifPermissionSettings
+import com.rakuten.tech.mobile.inappmessaging.runtime.extensions.promptPushPermissionDialog
 import com.rakuten.tech.mobile.inappmessaging.runtime.manager.EventsManager
 import com.rakuten.tech.mobile.inappmessaging.runtime.manager.ImpressionManager
 import com.rakuten.tech.mobile.inappmessaging.runtime.manager.MessageReadinessManager
 import com.rakuten.tech.mobile.inappmessaging.runtime.manager.PushPrimerTrackerManager
 import com.rakuten.tech.mobile.inappmessaging.runtime.utils.BuildVersionChecker
+import com.rakuten.tech.mobile.inappmessaging.runtime.utils.CheckPermissionResult
 import com.rakuten.tech.mobile.inappmessaging.runtime.utils.InAppLogger
+import com.rakuten.tech.mobile.inappmessaging.runtime.utils.PermissionUtil
 import java.util.Date
 import kotlin.collections.ArrayList
 
@@ -38,6 +41,7 @@ import kotlin.collections.ArrayList
 internal class MessageActionsCoroutine(
     private val campaignRepo: CampaignRepository = CampaignRepository.instance(),
     private val readinessManager: MessageReadinessManager = MessageReadinessManager.instance(),
+    private val hostAppRepo: HostAppInfoRepository = HostAppInfoRepository.instance(),
 ) {
 
     fun executeTask(uiMessage: UiMessage?, viewResourceId: Int, optOut: Boolean): Boolean {
@@ -173,17 +177,21 @@ internal class MessageActionsCoroutine(
                 callback.invoke()
             } else if (checker.isAndroidTAndAbove()) {
                 PushPrimerTrackerManager.campaignId = campaignId
-                requestPushPrimer()
+                requestPushNotifPermission()
             }
         }
     }
 
-    @SuppressLint("InlinedApi")
-    private fun requestPushPrimer() {
-        HostAppInfoRepository.instance().getRegisteredActivity()?.let { act ->
-            ActivityCompat.requestPermissions(
-                act, arrayOf(Manifest.permission.POST_NOTIFICATIONS), InAppMessaging.PUSH_PRIMER_REQ_CODE,
-            )
+    @SuppressLint("NewApi")
+    private fun requestPushNotifPermission() {
+        val activity = hostAppRepo.getRegisteredActivity() ?: return
+
+        val permissionResult = PermissionUtil.checkPermission(activity, Manifest.permission.POST_NOTIFICATIONS)
+        when (permissionResult) {
+            CheckPermissionResult.CAN_ASK -> activity.promptPushPermissionDialog()
+            CheckPermissionResult.PREVIOUSLY_DENIED -> activity.promptPushPermissionDialog()
+            CheckPermissionResult.PERMANENTLY_DENIED -> activity.openAppNotifPermissionSettings()
+            CheckPermissionResult.GRANTED -> Unit
         }
     }
 

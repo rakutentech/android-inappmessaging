@@ -1,5 +1,6 @@
 package com.rakuten.tech.mobile.inappmessaging.runtime.coroutine
 
+import android.Manifest
 import android.app.Activity
 import android.content.ActivityNotFoundException
 import android.content.Context
@@ -7,7 +8,6 @@ import android.os.Build
 import android.os.Bundle
 import android.provider.Settings
 import androidx.test.core.app.ApplicationProvider
-import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.work.testing.WorkManagerTestInitHelper
 import com.nhaarman.mockitokotlin2.any
 import com.rakuten.tech.mobile.inappmessaging.runtime.BaseTest
@@ -15,16 +15,19 @@ import com.rakuten.tech.mobile.inappmessaging.runtime.InAppMessaging
 import com.rakuten.tech.mobile.inappmessaging.runtime.R
 import com.rakuten.tech.mobile.inappmessaging.runtime.TestUserInfoProvider
 import com.rakuten.tech.mobile.inappmessaging.runtime.data.customjson.MessageMapper
+import com.rakuten.tech.mobile.inappmessaging.runtime.data.enums.ButtonActionType
 import com.rakuten.tech.mobile.inappmessaging.runtime.data.enums.ImpressionType
 import com.rakuten.tech.mobile.inappmessaging.runtime.data.repositories.CampaignRepository
 import com.rakuten.tech.mobile.inappmessaging.runtime.data.repositories.HostAppInfoRepository
 import com.rakuten.tech.mobile.inappmessaging.runtime.data.responses.ping.*
+import com.rakuten.tech.mobile.inappmessaging.runtime.extensions.openAppNotifPermissionSettings
+import com.rakuten.tech.mobile.inappmessaging.runtime.extensions.promptPushPermissionDialog
 import com.rakuten.tech.mobile.inappmessaging.runtime.manager.DisplayManager
 import com.rakuten.tech.mobile.inappmessaging.runtime.manager.MessageReadinessManager
-import com.rakuten.tech.mobile.inappmessaging.runtime.manager.PushPrimerTrackerManager
 import com.rakuten.tech.mobile.inappmessaging.runtime.testhelpers.TestDataHelper
 import com.rakuten.tech.mobile.inappmessaging.runtime.testhelpers.TooltipHelper
-import com.rakuten.tech.mobile.inappmessaging.runtime.utils.BuildVersionChecker
+import com.rakuten.tech.mobile.inappmessaging.runtime.utils.CheckPermissionResult
+import com.rakuten.tech.mobile.inappmessaging.runtime.utils.PermissionUtil
 import org.amshove.kluent.*
 import org.junit.After
 import org.junit.Before
@@ -33,6 +36,9 @@ import org.junit.runner.RunWith
 import org.mockito.Mockito
 import org.mockito.Mockito.`when`
 import org.mockito.Mockito.never
+import org.mockito.Mockito.verify
+import org.mockito.Mockito.mock
+import org.mockito.Mockito.mockStatic
 import org.robolectric.ParameterizedRobolectricTestRunner
 import org.robolectric.RobolectricTestRunner
 import org.robolectric.annotation.Config
@@ -246,43 +252,6 @@ class MessageActionsCoroutineFuncSpec : BaseTest() {
     }
 
     @Test
-    fun `should invoke callback for primer`() {
-        setupActivity()
-        val function: () -> Unit = {}
-        val mockCallback = Mockito.mock(function.javaClass)
-
-        InAppMessaging.instance().onPushPrimer = mockCallback
-        action.handleAction(OnClickBehavior(4, ""), "test")
-
-        PushPrimerTrackerManager.campaignId shouldBeEqualTo "test"
-        Mockito.verify(mockCallback).invoke()
-
-        PushPrimerTrackerManager.campaignId = ""
-    }
-
-    @Test
-    fun `should not invoke callback for primer`() {
-        verifyPushPrimer(false)
-    }
-
-    @Test
-    @Config(sdk = [Build.VERSION_CODES.TIRAMISU])
-    fun `should not invoke callback for primer in tiramisu`() {
-        verifyPushPrimer(true)
-    }
-
-    @Test
-    @Config(sdk = [Build.VERSION_CODES.TIRAMISU])
-    fun `should request permission in tiramisu`() {
-        val mockAct = setupActivity(true)
-        InAppMessaging.instance().onPushPrimer = null
-        action.handleAction(OnClickBehavior(4, ""), "test")
-
-        PushPrimerTrackerManager.campaignId shouldBeEqualTo "test"
-        Mockito.verify(mockAct).requestPermissions(any(), any())
-    }
-
-    @Test
     fun `should handle empty buttons`() {
         val message = message.copy(buttons = listOf())
         action.executeTask(message, R.id.message_single_button, false).shouldBeTrue()
@@ -328,56 +297,100 @@ class MessageActionsCoroutineFuncSpec : BaseTest() {
 
         return activity
     }
-
-    private fun verifyPushPrimer(isTiramisu: Boolean) {
-        setupActivity(true)
-        val function: () -> Unit = {}
-        val mockCallback = Mockito.mock(function.javaClass)
-        InAppMessaging.instance().onPushPrimer = null
-        action.handleAction(OnClickBehavior(4, ""), "test")
-
-        PushPrimerTrackerManager.campaignId shouldBeEqualTo if (isTiramisu)"test" else ""
-        Mockito.verify(mockCallback, never()).invoke()
-    }
 }
 
-@RunWith(AndroidJUnit4::class)
-class MessageActionsCoroutineTiramisuSpec {
+@Config(sdk = [Build.VERSION_CODES.TIRAMISU])
+@RunWith(RobolectricTestRunner::class)
+class MessageActionsPushPrimerSpec {
+    private val mockActivity = mock(Activity::class.java)
+    private val mockPermissionUtil = mockStatic(PermissionUtil::class.java)
+    private val mockHostAppRepo = mock(HostAppInfoRepository::class.java)
 
-    @Test
-    fun `should request push permission`() {
-        val activity = setupActivity()
+    @Before
+    fun setup() {
+        `when`(mockHostAppRepo.getRegisteredActivity()).thenReturn(mockActivity)
         InAppMessaging.instance().onPushPrimer = null
-        val mockChecker = Mockito.mock(BuildVersionChecker::class.java)
-        `when`(mockChecker.isAndroidTAndAbove()).thenReturn(true)
-        MessageActionsCoroutine().handlePushPrimer("test", mockChecker)
+    }
 
-        Mockito.verify(activity).requestPermissions(any(), any())
-        PushPrimerTrackerManager.campaignId shouldBeEqualTo "test"
-        PushPrimerTrackerManager.campaignId = ""
+    @After
+    fun tearDown() {
+        mockPermissionUtil.close()
     }
 
     @Test
-    fun `should not request push permission for unregistered activity`() {
-        val activity = setupActivity()
-        InAppMessaging.instance().onPushPrimer = null
-        InAppMessaging.instance().unregisterMessageDisplayActivity()
-        val mockChecker = Mockito.mock(BuildVersionChecker::class.java)
-        `when`(mockChecker.isAndroidTAndAbove()).thenReturn(true)
-        MessageActionsCoroutine().handlePushPrimer("test", mockChecker)
+    fun `PushPrimer action should invoke custom app behavior`() {
+        val function: () -> Unit = {}
+        val mockCallback = mock(function.javaClass)
+        InAppMessaging.instance().onPushPrimer = mockCallback
 
-        Mockito.verify(activity, never()).requestPermissions(any(), any())
+        MessageActionsCoroutine().handleAction(OnClickBehavior(ButtonActionType.PUSH_PRIMER.typeId))
 
-        PushPrimerTrackerManager.campaignId shouldBeEqualTo "test"
-        PushPrimerTrackerManager.campaignId = ""
+        verify(mockCallback).invoke()
     }
 
-    private fun setupActivity(): Activity {
-        val activity = Mockito.mock(Activity::class.java)
-        InAppMessaging.initialize(ApplicationProvider.getApplicationContext(), true)
-        InAppMessaging.instance().registerMessageDisplayActivity(activity)
-        InAppMessaging.instance().registerPreference(TestUserInfoProvider())
+    @Test
+    fun `PushPrimer action should prompt native permission dialog if requested the first time`() {
+        mockPermissionUtil.`when`<Any> {
+            PermissionUtil.checkPermission(
+                mockActivity,
+                Manifest.permission.POST_NOTIFICATIONS,
+            )
+        }.thenReturn(CheckPermissionResult.CAN_ASK)
 
-        return activity
+        MessageActionsCoroutine(hostAppRepo = mockHostAppRepo)
+            .handleAction(OnClickBehavior(ButtonActionType.PUSH_PRIMER.typeId))
+
+        verify(mockActivity)
+            .promptPushPermissionDialog()
+    }
+
+    @Test
+    fun `PushPrimer action should prompt native permission dialog if requested the second time`() {
+        mockPermissionUtil.`when`<Any> {
+            PermissionUtil.checkPermission(
+                mockActivity,
+                Manifest.permission.POST_NOTIFICATIONS,
+            )
+        }.thenReturn(CheckPermissionResult.PREVIOUSLY_DENIED)
+
+        MessageActionsCoroutine(hostAppRepo = mockHostAppRepo)
+            .handleAction(OnClickBehavior(ButtonActionType.PUSH_PRIMER.typeId))
+
+        verify(mockActivity)
+            .promptPushPermissionDialog()
+    }
+
+    @Test
+    fun `PushPrimer action should redirect to Settings from third time onwards`() {
+        mockPermissionUtil.`when`<Any> {
+            PermissionUtil.checkPermission(
+                mockActivity,
+                Manifest.permission.POST_NOTIFICATIONS,
+            )
+        }.thenReturn(CheckPermissionResult.PERMANENTLY_DENIED)
+
+        MessageActionsCoroutine(hostAppRepo = mockHostAppRepo)
+            .handleAction(OnClickBehavior(ButtonActionType.PUSH_PRIMER.typeId))
+
+        verify(mockActivity)
+            .openAppNotifPermissionSettings()
+    }
+
+    @Test
+    fun `PushPrimer action should do nothing if permission is granted`() {
+        mockPermissionUtil.`when`<Any> {
+            PermissionUtil.checkPermission(
+                mockActivity,
+                Manifest.permission.POST_NOTIFICATIONS,
+            )
+        }.thenReturn(CheckPermissionResult.GRANTED)
+
+        MessageActionsCoroutine(hostAppRepo = mockHostAppRepo)
+            .handleAction(OnClickBehavior(ButtonActionType.PUSH_PRIMER.typeId))
+
+        verify(mockActivity, never())
+            .promptPushPermissionDialog()
+        verify(mockActivity, never())
+            .openAppNotifPermissionSettings()
     }
 }
