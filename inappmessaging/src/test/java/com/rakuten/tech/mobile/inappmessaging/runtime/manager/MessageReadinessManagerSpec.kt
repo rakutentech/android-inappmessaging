@@ -531,16 +531,19 @@ class MessageReadinessPushPrimerSpec {
         isTest = true,
         customJson = JsonParser.parseString("""{"pushPrimer": { "button": 1 }}""").asJsonObject,
     )
+    private val mockRmcHelper = mockStatic(RmcHelper::class.java)
 
     @Before
     fun setup() {
         `when`(manager.campaignRepo.messages).thenReturn(linkedMapOf(testPushPrimer.campaignId to testPushPrimer))
         `when`(manager.hostAppInfoRepo.getContext()).thenReturn(mockContext)
+        mockRmcHelper.`when`<Any> { RmcHelper.isRmcIntegrated() }.thenReturn(true)
     }
 
     @After
     fun tearDown() {
         manager.clearMessages()
+        mockRmcHelper.close()
     }
 
     @Test
