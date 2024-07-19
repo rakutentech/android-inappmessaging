@@ -9,6 +9,10 @@ jobs:
   mobsfscan:
     runs-on: ubuntu-latest
     name: mobsfscan code scanning
+    permissions:
+      contents: write
+      pull-requests: write
+      repository-projects: write
     steps:
     - name: Checkout the code
       uses: actions/checkout@v2
