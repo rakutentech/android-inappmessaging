@@ -1,13 +1,17 @@
 package com.rakuten.tech.mobile.inappmessaging.runtime.data.responses.ping
 
 import com.google.gson.JsonParser
+import com.rakuten.tech.mobile.inappmessaging.runtime.RmcHelper
 import com.rakuten.tech.mobile.inappmessaging.runtime.data.customjson.CustomJson
 import com.rakuten.tech.mobile.inappmessaging.runtime.data.customjson.PushPrimer
 import com.rakuten.tech.mobile.inappmessaging.runtime.data.enums.InAppMessageType
 import com.rakuten.tech.mobile.inappmessaging.runtime.data.models.Tooltip
 import com.rakuten.tech.mobile.inappmessaging.runtime.testhelpers.TestDataHelper
 import org.amshove.kluent.*
+import org.junit.After
+import org.junit.Before
 import org.junit.Test
+import org.mockito.Mockito.mockStatic
 import java.util.Date
 
 @SuppressWarnings(
@@ -273,6 +277,21 @@ class MessageSpec {
         settings.delay shouldBe 0
         settings.isHtml shouldBe false
     }
+}
+
+class MessageCustomJsonSpec {
+
+    private val mockRmcHelper = mockStatic(RmcHelper::class.java)
+
+    @Before
+    fun setup() {
+        mockRmcHelper.`when`<Any> { RmcHelper.isRmcIntegrated() }.thenReturn(true)
+    }
+
+    @After
+    fun tearDown() {
+        mockRmcHelper.close()
+    }
 
     @Test
     fun `should return null CustomJson data if customJson from response is null`() {
@@ -288,6 +307,16 @@ class MessageSpec {
 
     @Test
     fun `should return null CustomJson data if customJson from response has an unrecognized format`() {
+        val campaign = TestDataHelper.createDummyMessage(
+            customJson = JsonParser.parseString("""{"pushPrimer": true}""").asJsonObject,
+        )
+        campaign.getCustomJsonData() shouldBeEqualTo null
+    }
+
+    @Test
+    fun `should return null CustomJson data if RMC is not integrated`() {
+        mockRmcHelper.`when`<Any> { RmcHelper.isRmcIntegrated() }.thenReturn(false)
+
         val campaign = TestDataHelper.createDummyMessage(
             customJson = JsonParser.parseString("""{"pushPrimer": true}""").asJsonObject,
         )

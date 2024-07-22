@@ -497,11 +497,14 @@ All the events "launch the app event, login event, purchase successful event, cu
 <summary style="cursor: pointer;";>(click to expand)</summary>
 
 #### 7.6.0 (In-Progress)
-* SDKCF-6327: Updated compile and target SDK to API 34 (Android 14).
-* RMCCX-6695: Improved the userguide.
-* RMCCX-6698: Supported Push Primer feature through CustomJson.
-* RMCCX-6711: Supported redirecting to App Notification Settings on tapping PushPrimer button action.
-* RMCCX-6706: Prevented showing Push Primer campaign for unsupported devices (Android 12 and below) and when push permission is granted.
+* Improvements:
+  - SDKCF-6327: Updated compile and target SDK to API 34 (Android 14).
+  - RMCCX-6695: Improved the userguide.
+* RMC SDK updates:
+  - RMCCX-6698: Supported Push Primer feature through CustomJson.
+  - RMCCX-6711: Supported redirecting to App Notification Settings on tapping PushPrimer button action.
+  - RMCCX-6706: Prevented showing Push Primer campaign for unsupported devices (Android 12 and below) and when push permission is granted.
+  - RMCCX-6711: Limited CustomJson feature to RMC SDK.
 
 #### 7.5.0 (2023-12-12)
 * SDKCF-6575: Added sending of device Id in all IAM requests.

@@ -4,6 +4,7 @@ import com.google.gson.Gson
 import com.google.gson.JsonObject
 import com.google.gson.JsonParseException
 import com.google.gson.annotations.SerializedName
+import com.rakuten.tech.mobile.inappmessaging.runtime.RmcHelper
 import com.rakuten.tech.mobile.inappmessaging.runtime.data.customjson.CustomJson
 import com.rakuten.tech.mobile.inappmessaging.runtime.data.enums.InAppMessageType
 import com.rakuten.tech.mobile.inappmessaging.runtime.data.models.Tooltip
@@ -78,7 +79,7 @@ internal data class Message(
     }
 
     fun getCustomJsonData(): CustomJson? {
-        if (customJson == null || customJson.entrySet().isEmpty()) {
+        if (!RmcHelper.isRmcIntegrated() || customJson == null || customJson.entrySet().isEmpty()) {
             return null
         }
         if (customJsonData == null) {

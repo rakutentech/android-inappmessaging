@@ -135,7 +135,7 @@ abstract class InAppMessaging internal constructor() {
         ): Boolean {
             InAppLogger(TAG).info("configure")
             return try {
-                if (!shouldProcess(context, subscriptionKey)) {
+                if (!shouldProcess(subscriptionKey)) {
                     InAppLogger(TAG).debug("Not processed since RMC is integrated")
                     return false
                 }
@@ -143,7 +143,7 @@ abstract class InAppMessaging internal constructor() {
                 initialize(
                     context = context,
                     isCacheHandling = BuildConfig.IS_CACHE_HANDLING,
-                    subscriptionKey = if (RmcHelper.isRmcIntegrated(context)) {
+                    subscriptionKey = if (RmcHelper.isRmcIntegrated()) {
                         subscriptionKey?.removeSuffix(RmcHelper.RMC_SUFFIX)
                     } else {
                         subscriptionKey
@@ -209,8 +209,8 @@ abstract class InAppMessaging internal constructor() {
          *
          * @return false when RMC SDK is integrated but the API call is not from RMC SDK.
          */
-        private fun shouldProcess(context: Context, subscriptionKey: String?): Boolean {
-            if (!RmcHelper.isRmcIntegrated(context)) {
+        private fun shouldProcess(subscriptionKey: String?): Boolean {
+            if (!RmcHelper.isRmcIntegrated()) {
                 return true
             }
 
