@@ -26,11 +26,7 @@ internal object ImpressionManager {
      * Reporting impression list to IAM backend, and sending to analytics. This method is invoked on
      * main thread.
      */
-    fun scheduleReportImpression(
-        impressionList: List<Impression>,
-        campaignId: String,
-        isTestMessage: Boolean
-    ) {
+    fun scheduleReportImpression(impressionList: List<Impression>, campaignId: String, isTestMessage: Boolean) {
         if (impressionList.isEmpty()) return
 
         // send user action impression
@@ -67,7 +63,6 @@ internal object ImpressionManager {
             impressionMap[campaignId] = impressionList[0] // if impression type only, it is assumed that only one entry
         }
 
-        // TODO: Compare old and new event RAT contents
         val params = hashMapOf<String, Any>()
         params[AnalyticsKey.IMPRESSIONS.key] = createRatImpressionList(impressionList)
         AnalyticsManager.sendEvent(AnalyticsEvent.IMPRESSION, campaignId, params)

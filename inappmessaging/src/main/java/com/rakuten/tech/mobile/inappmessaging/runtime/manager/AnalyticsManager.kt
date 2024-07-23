@@ -7,7 +7,7 @@ import com.rakuten.tech.mobile.inappmessaging.runtime.data.repositories.HostAppI
 
 internal enum class AnalyticsEvent(val iamName: String?, val rmcName: String?) {
     IMPRESSION("_rem_iam_impressions", "_rem_rmc_iam_impressions"),
-    PUSH_PRIMER(null, "_rem_rmc_iam_pushprimer")
+    PUSH_PRIMER(null, "_rem_rmc_iam_pushprimer"),
 }
 
 internal enum class AnalyticsKey(val key: String) {
@@ -21,7 +21,7 @@ internal enum class AnalyticsKey(val key: String) {
     ACCOUNT("acc"),
     APP_ID("aid"),
     IMPRESSIONS("impressions"),
-    PUSH_PERMISSION("push_permission")
+    PUSH_PERMISSION("push_permission"),
 }
 
 internal object AnalyticsManager {
@@ -31,10 +31,8 @@ internal object AnalyticsManager {
      * This method attaches common metadata to the event such as Device Id etc., so only add custom information that is
      * specific to the event on [data].
      */
-    fun sendEvent(analyticsEvent: AnalyticsEvent,
-                  campaignId: String,
-                  data: MutableMap<String, Any>) {
-
+    @SuppressWarnings("LongMethod")
+    fun sendEvent(analyticsEvent: AnalyticsEvent, campaignId: String, data: MutableMap<String, Any>) {
         // Common metadata
         data[AnalyticsKey.CAMPAIGN_ID.key] = campaignId
         data[AnalyticsKey.SUBS_ID.key] = HostAppInfoRepository.instance().getSubscriptionKey()
@@ -44,8 +42,9 @@ internal object AnalyticsManager {
         params[AnalyticsKey.CUSTOM_PARAM.key] = data
 
         if (RmcHelper.isRmcIntegrated()) {
-            if (analyticsEvent.rmcName == null)
+            if (analyticsEvent.rmcName == null) {
                 return
+            }
 
             val paramsCopy = HashMap<String, Any>(params)
             paramsCopy[AnalyticsKey.ACCOUNT.key] = BuildConfig.IAM_RAT_ACC
@@ -54,8 +53,9 @@ internal object AnalyticsManager {
             EventTrackerHelper.sendEvent(analyticsEvent.rmcName, params)
             EventTrackerHelper.sendEvent(analyticsEvent.rmcName, paramsCopy)
         } else {
-            if (analyticsEvent.iamName == null)
+            if (analyticsEvent.iamName == null) {
                 return
+            }
 
             EventTrackerHelper.sendEvent(analyticsEvent.iamName, data)
         }
