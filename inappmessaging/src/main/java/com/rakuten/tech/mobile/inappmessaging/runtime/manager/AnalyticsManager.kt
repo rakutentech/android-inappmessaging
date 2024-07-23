@@ -32,6 +32,7 @@ internal object AnalyticsManager {
      * specific to the event on [data].
      */
     @SuppressWarnings("LongMethod")
+    @JvmStatic
     fun sendEvent(analyticsEvent: AnalyticsEvent, campaignId: String, data: MutableMap<String, Any>) {
         // Common metadata
         data[AnalyticsKey.CAMPAIGN_ID.key] = campaignId
@@ -57,7 +58,7 @@ internal object AnalyticsManager {
                 return
             }
 
-            EventTrackerHelper.sendEvent(analyticsEvent.iamName, data)
+            EventTrackerHelper.sendEvent(analyticsEvent.iamName, params)
         }
     }
 }

@@ -19,6 +19,7 @@ internal object EventTrackerHelper {
      * @return true if the analytics event has been sent, false otherwise.
      */
     @SuppressWarnings("TooGenericExceptionCaught")
+    @JvmStatic
     fun sendEvent(eventName: String, data: Map<String, *>?): Boolean {
         if (!TextUtils.isEmpty(eventName)) {
             val serializableData: HashMap<String, *> = when (data) {

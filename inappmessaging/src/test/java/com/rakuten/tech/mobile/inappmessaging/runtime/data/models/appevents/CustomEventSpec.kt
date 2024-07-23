@@ -2,6 +2,7 @@ package com.rakuten.tech.mobile.inappmessaging.runtime.data.models.appevents
 
 import com.rakuten.tech.mobile.inappmessaging.runtime.BaseTest
 import com.rakuten.tech.mobile.inappmessaging.runtime.data.enums.ValueType
+import com.rakuten.tech.mobile.inappmessaging.runtime.manager.AnalyticsKey
 import com.rakuten.tech.mobile.inappmessaging.runtime.utils.InAppMessagingConstants
 import org.amshove.kluent.shouldBeEqualTo
 import org.amshove.kluent.shouldBeFalse
@@ -124,9 +125,9 @@ class CustomEventParameterizedSpec(
         event.getAttributeMap()[key]?.value shouldBeEqualTo value
         event.getAttributeMap()[key]?.valueType shouldBeEqualTo type
         val ratMap = event.getRatEventMap()
-        ratMap shouldHaveKey InAppMessagingConstants.RAT_EVENT_KEY_EVENT_NAME
-        ratMap shouldHaveKey InAppMessagingConstants.RAT_EVENT_KEY_EVENT_TIMESTAMP
-        ratMap shouldHaveKey InAppMessagingConstants.RAT_EVENT_KEY_EVENT_CUSTOM_ATTRIBUTE
+        ratMap shouldHaveKey AnalyticsKey.EVENT_NAME.key
+        ratMap shouldHaveKey AnalyticsKey.TIMESTAMP.key
+        ratMap shouldHaveKey AnalyticsKey.CUSTOM_ATTRIBUTES.key
     }
 
     companion object {
