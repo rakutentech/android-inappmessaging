@@ -52,13 +52,13 @@ internal object AnalyticsManager {
 
             EventTrackerHelper.sendEvent(analyticsEvent.name2, params)
 
-            val (ratAcc, ratAid) = Pair(RmcHelper.rmcRatAcc, RmcHelper.rmcRatAid)
+            val (ratAcc, ratAid) = Pair(888, 2)
             if (ratAcc == null || ratAid == null)
                 return
 
             val paramsCopy = HashMap<String, Any>(params)
-            paramsCopy[AnalyticsKey.ACCOUNT_ID.key] = 888
-            paramsCopy[AnalyticsKey.APP_ID.key] = 2
+            paramsCopy[AnalyticsKey.ACCOUNT_ID.key] = ratAcc
+            paramsCopy[AnalyticsKey.APP_ID.key] = ratAid
             EventTrackerHelper.sendEvent(analyticsEvent.name2, paramsCopy)
         } else {
             if (analyticsEvent.name1 == null)
