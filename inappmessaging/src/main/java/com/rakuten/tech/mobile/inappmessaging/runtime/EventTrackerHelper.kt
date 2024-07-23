@@ -2,8 +2,11 @@ package com.rakuten.tech.mobile.inappmessaging.runtime
 
 import android.text.TextUtils
 import com.rakuten.tech.mobile.inappmessaging.runtime.utils.ClassUtil
+import com.rakuten.tech.mobile.inappmessaging.runtime.utils.InAppLogger
 
 internal object EventTrackerHelper {
+
+    private const val TAG = "EventTrackerHelper"
 
     /**
      * This method sends event data to Analytics module for processing.
@@ -23,9 +26,13 @@ internal object EventTrackerHelper {
                 else -> HashMap(data)
             }
 
-            if (ClassUtil.hasClass("com.rakuten.tech.mobile.analytics.Event")) {
-                com.rakuten.tech.mobile.analytics.Event(eventName, serializableData).track()
-                return true
+            if (ClassUtil.hasClass("com.rakuten.tech.mobile.analytics.RatTracker")) {
+                try {
+                    com.rakuten.tech.mobile.analytics.RatTracker.event(eventName, serializableData).track()
+                    return true
+                } catch (e: Exception) {
+                    InAppLogger(TAG).warn("Could not send event: $e")
+                }
             }
         }
 

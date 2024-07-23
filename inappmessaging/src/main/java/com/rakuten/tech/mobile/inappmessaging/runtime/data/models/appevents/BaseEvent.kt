@@ -4,6 +4,7 @@ import androidx.annotation.RestrictTo
 import androidx.annotation.RestrictTo.Scope.LIBRARY
 import com.rakuten.tech.mobile.inappmessaging.runtime.data.enums.EventType
 import com.rakuten.tech.mobile.inappmessaging.runtime.data.models.Attribute
+import com.rakuten.tech.mobile.inappmessaging.runtime.manager.AnalyticsKey
 import com.rakuten.tech.mobile.inappmessaging.runtime.utils.InAppMessagingConstants
 import org.jetbrains.annotations.NotNull
 import java.util.Locale
@@ -72,8 +73,8 @@ abstract class BaseEvent(
     @NotNull
     override fun getRatEventMap(): Map<String, Any> {
         val map = HashMap<String, Any>()
-        map[InAppMessagingConstants.RAT_EVENT_KEY_EVENT_NAME] = eventName
-        map[InAppMessagingConstants.RAT_EVENT_KEY_EVENT_TIMESTAMP] = timestamp
+        map[AnalyticsKey.EVENT_NAME.key] = eventName
+        map[AnalyticsKey.TIMESTAMP.key] = timestamp
         return Collections.unmodifiableMap(map)
     }
 
