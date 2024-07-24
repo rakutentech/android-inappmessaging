@@ -500,7 +500,7 @@ All the events "launch the app event, login event, purchase successful event, cu
 * Improvements:
   - SDKCF-6327: Updated compile and target SDK to API 34 (Android 14).
   - RMCCX-6695: Improved the userguide.
-* RMC SDK updates:
+* RMC SDK updates :
   - RMCCX-6698: Supported Push Primer feature through CustomJson.
   - RMCCX-6711: Supported redirecting to App Notification Settings on tapping PushPrimer button action.
   - RMCCX-6706: Prevented showing Push Primer campaign for unsupported devices (Android 12 and below) and when push permission is granted.
