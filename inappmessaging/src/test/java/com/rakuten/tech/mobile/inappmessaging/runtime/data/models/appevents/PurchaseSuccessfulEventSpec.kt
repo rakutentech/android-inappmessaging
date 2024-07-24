@@ -3,7 +3,6 @@ package com.rakuten.tech.mobile.inappmessaging.runtime.data.models.appevents
 import com.rakuten.tech.mobile.inappmessaging.runtime.BaseTest
 import com.rakuten.tech.mobile.inappmessaging.runtime.data.models.rat.RatAttribute
 import com.rakuten.tech.mobile.inappmessaging.runtime.manager.AnalyticsKey
-import com.rakuten.tech.mobile.inappmessaging.runtime.utils.InAppMessagingConstants
 import org.amshove.kluent.shouldContain
 import org.amshove.kluent.shouldHaveKey
 import org.amshove.kluent.shouldHaveSize

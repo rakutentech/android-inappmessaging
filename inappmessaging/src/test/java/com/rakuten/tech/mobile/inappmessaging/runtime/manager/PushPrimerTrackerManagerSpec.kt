@@ -1,33 +1,25 @@
 package com.rakuten.tech.mobile.inappmessaging.runtime.manager
 
 import com.nhaarman.mockitokotlin2.argumentCaptor
-import com.nhaarman.mockitokotlin2.eq
-import com.nhaarman.mockitokotlin2.verify
-import com.rakuten.tech.mobile.inappmessaging.runtime.BaseTest
-import com.rakuten.tech.mobile.inappmessaging.runtime.EventTrackerHelper
-import com.rakuten.tech.mobile.inappmessaging.runtime.data.repositories.HostAppInfoRepository
-import com.rakuten.tech.mobile.inappmessaging.runtime.utils.InAppMessagingConstants.RAT_EVENT_CAMP_ID
-import com.rakuten.tech.mobile.inappmessaging.runtime.utils.InAppMessagingConstants.RAT_EVENT_KEY_PERMISSION
-import com.rakuten.tech.mobile.inappmessaging.runtime.utils.InAppMessagingConstants.RAT_EVENT_KEY_PRIMER
-import com.rakuten.tech.mobile.inappmessaging.runtime.utils.InAppMessagingConstants.RAT_EVENT_SUBS_ID
 import org.amshove.kluent.shouldBeEmpty
 import org.amshove.kluent.shouldBeEqualTo
+import org.junit.After
 import org.junit.Before
 import org.junit.Test
-import org.junit.runner.RunWith
-import org.mockito.Mockito
-import org.robolectric.RobolectricTestRunner
+import org.mockito.Mockito.mockStatic
 
-@RunWith(RobolectricTestRunner::class)
-class PushPrimerTrackerManagerSpec : BaseTest() {
-    private val eventTracker = Mockito.mock(EventTrackerHelper::class.java)
-    private val captor = argumentCaptor<Map<String, Any>>()
+class PushPrimerTrackerManagerSpec {
+
+    private val analyticsManager = mockStatic(AnalyticsManager::class.java)
 
     @Before
-    override fun setup() {
-        super.setup()
-
+    fun setup() {
         PushPrimerTrackerManager.campaignId = "test"
+    }
+
+    @After
+    fun teardown() {
+        analyticsManager.close()
     }
 
     @Test
@@ -53,13 +45,19 @@ class PushPrimerTrackerManagerSpec : BaseTest() {
     }
 
     private fun verifyTracker(result: Int, campaignId: String = "test") {
-        PushPrimerTrackerManager.sendPrimerEvent(result, eventTracker::sendEvent)
+        PushPrimerTrackerManager.sendPrimerEvent(result)
 
-        verify(eventTracker).sendEvent(eq(RAT_EVENT_KEY_PRIMER), captor.capture())
+        val eTypeCaptor = argumentCaptor<AnalyticsEvent>()
+        val idCaptor = argumentCaptor<String>()
+        val dataCaptor = argumentCaptor<MutableMap<String, Any>>()
 
-        captor.firstValue[RAT_EVENT_CAMP_ID] shouldBeEqualTo campaignId
-        captor.firstValue[RAT_EVENT_SUBS_ID] shouldBeEqualTo HostAppInfoRepository.instance().getSubscriptionKey()
-        captor.firstValue[RAT_EVENT_KEY_PERMISSION] shouldBeEqualTo result
+        analyticsManager.verify {
+            AnalyticsManager.sendEvent(eTypeCaptor.capture(), idCaptor.capture(), dataCaptor.capture())
+        }
+
+        eTypeCaptor.firstValue shouldBeEqualTo AnalyticsEvent.PUSH_PRIMER
+        idCaptor.firstValue shouldBeEqualTo campaignId
+        dataCaptor.firstValue[AnalyticsKey.PUSH_PERMISSION.key] shouldBeEqualTo result
 
         PushPrimerTrackerManager.campaignId.shouldBeEmpty()
     }

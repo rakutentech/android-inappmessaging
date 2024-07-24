@@ -505,6 +505,8 @@ All the events "launch the app event, login event, purchase successful event, cu
   - RMCCX-6711: Supported redirecting to App Notification Settings on tapping PushPrimer button action.
   - RMCCX-6706: Prevented showing Push Primer campaign for unsupported devices (Android 12 and below) and when push permission is granted.
   - RMCCX-6711: Limited CustomJson feature to RMC SDK.
+  - RMCCX-6936: Supported sending `_rem_rmc_iam_impressions` event to app and SDK RAT accounts upon impression.
+  - RMCCX-6937: Supported sending `_rem_rmc_iam_pushprimer` event to app and SDK RAT accounts upon selection from the native push permission prompt.
 
 #### 7.5.0 (2023-12-12)
 * SDKCF-6575: Added sending of device Id in all IAM requests.

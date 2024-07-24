@@ -13,6 +13,7 @@ import org.junit.Before
 import org.junit.Test
 import org.mockito.Mockito.mockStatic
 
+@SuppressWarnings("LongMethod")
 class AnalyticsManagerSpec {
 
     private val eventTrackerHelper = mockStatic(EventTrackerHelper::class.java)
@@ -48,12 +49,14 @@ class AnalyticsManagerSpec {
         eventTrackerHelper.verify { EventTrackerHelper.sendEvent(any(), captor.capture()) }
         captor.firstValue.keys.shouldContain(AnalyticsKey.CUSTOM_PARAM.key)
         val params = (captor.firstValue[AnalyticsKey.CUSTOM_PARAM.key] as Map<String, Any>).keys
-        params.shouldContainAll(arrayOf(
-            AnalyticsKey.CAMPAIGN_ID.key,
-            AnalyticsKey.SUBS_ID.key,
-            AnalyticsKey.DEVICE_ID.key,
-            "param1"
-        ))
+        params.shouldContainAll(
+            arrayOf(
+                AnalyticsKey.CAMPAIGN_ID.key,
+                AnalyticsKey.SUBS_ID.key,
+                AnalyticsKey.DEVICE_ID.key,
+                "param1",
+            ),
+        )
     }
 
     @Test
@@ -63,18 +66,22 @@ class AnalyticsManagerSpec {
         val captor = argumentCaptor<Map<String, Any>>()
         eventTrackerHelper.verify({ EventTrackerHelper.sendEvent(any(), captor.capture()) }, times(2))
         captor.firstValue.keys.shouldContain(AnalyticsKey.CUSTOM_PARAM.key)
-        captor.secondValue.keys.shouldContainAll(arrayOf(
-            AnalyticsKey.CUSTOM_PARAM.key,
-            AnalyticsKey.ACCOUNT.key,
-            AnalyticsKey.APP_ID.key,
-        ))
+        captor.secondValue.keys.shouldContainAll(
+            arrayOf(
+                AnalyticsKey.CUSTOM_PARAM.key,
+                AnalyticsKey.ACCOUNT.key,
+                AnalyticsKey.APP_ID.key,
+            ),
+        )
 
         val params = (captor.firstValue[AnalyticsKey.CUSTOM_PARAM.key] as Map<String, Any>).keys
-        params.shouldContainAll(arrayOf(
-            AnalyticsKey.CAMPAIGN_ID.key,
-            AnalyticsKey.SUBS_ID.key,
-            AnalyticsKey.DEVICE_ID.key,
-            "param1"
-        ))
+        params.shouldContainAll(
+            arrayOf(
+                AnalyticsKey.CAMPAIGN_ID.key,
+                AnalyticsKey.SUBS_ID.key,
+                AnalyticsKey.DEVICE_ID.key,
+                "param1",
+            ),
+        )
     }
 }

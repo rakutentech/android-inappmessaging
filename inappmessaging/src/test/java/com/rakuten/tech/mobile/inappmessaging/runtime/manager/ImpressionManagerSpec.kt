@@ -10,22 +10,18 @@ import org.amshove.kluent.*
 import org.junit.After
 import org.junit.Before
 import org.junit.Test
-import org.junit.runner.RunWith
 import org.mockito.Mockito.mockStatic
-import org.robolectric.RobolectricTestRunner
 import java.util.Date
 
 /**
  * Test class for ImpressionManager.
  */
-@RunWith(RobolectricTestRunner::class)
-class ImpressionManagerSpec : BaseTest() {
+class ImpressionManagerSpec {
 
     private val analyticsManager = mockStatic(AnalyticsManager::class.java)
 
     @Before
-    override fun setup() {
-        super.setup()
+    fun setup() {
         impressionList = ImpressionManager.createImpressionList(VALID_IMPRESSION_TYPES)
     }
 
@@ -58,10 +54,16 @@ class ImpressionManagerSpec : BaseTest() {
         ImpressionManager.impressionMap["1234"] = Impression(ImpressionType.IMPRESSION, Date().time)
         ImpressionManager.scheduleReportImpression(impressionList!!, "1234", false)
 
-        val captor = argumentCaptor<MutableMap<String, Any>>()
+        val eTypeCaptor = argumentCaptor<AnalyticsEvent>()
+        val idCaptor = argumentCaptor<String>()
+        val dataCaptor = argumentCaptor<MutableMap<String, Any>>()
 
-        analyticsManager.verify { AnalyticsManager.sendEvent(any(), any(), captor.capture()) }
-        captor.firstValue.keys.shouldContain(AnalyticsKey.IMPRESSIONS.key)
+        analyticsManager.verify {
+            AnalyticsManager.sendEvent(eTypeCaptor.capture(), idCaptor.capture(), dataCaptor.capture())
+        }
+        eTypeCaptor.firstValue shouldBeEqualTo AnalyticsEvent.IMPRESSION
+        idCaptor.firstValue shouldBeEqualTo "1234"
+        dataCaptor.firstValue.keys.shouldContain(AnalyticsKey.IMPRESSIONS.key)
 
         ImpressionManager.impressionMap.clear()
     }
