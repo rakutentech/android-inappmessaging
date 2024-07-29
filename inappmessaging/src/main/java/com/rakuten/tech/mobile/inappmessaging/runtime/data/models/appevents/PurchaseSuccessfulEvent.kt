@@ -6,7 +6,7 @@ import com.rakuten.tech.mobile.inappmessaging.runtime.data.enums.EventType
 import com.rakuten.tech.mobile.inappmessaging.runtime.data.enums.ValueType
 import com.rakuten.tech.mobile.inappmessaging.runtime.data.models.Attribute
 import com.rakuten.tech.mobile.inappmessaging.runtime.data.models.rat.RatAttribute
-import com.rakuten.tech.mobile.inappmessaging.runtime.utils.InAppMessagingConstants
+import com.rakuten.tech.mobile.inappmessaging.runtime.manager.AnalyticsKey
 import org.jetbrains.annotations.NotNull
 import java.util.Collections
 import kotlin.collections.ArrayList
@@ -84,7 +84,7 @@ class PurchaseSuccessfulEvent : BaseEvent(EventType.PURCHASE_SUCCESSFUL, EventTy
 
         // Inherit basic attributes, and add custom attributes.
         val map = HashMap(super.getRatEventMap())
-        map[InAppMessagingConstants.RAT_EVENT_KEY_EVENT_CUSTOM_ATTRIBUTE] = attributeList
+        map[AnalyticsKey.CUSTOM_ATTRIBUTES.key] = attributeList
 
         return Collections.unmodifiableMap(map)
     }

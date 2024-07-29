@@ -2,7 +2,7 @@ package com.rakuten.tech.mobile.inappmessaging.runtime.data.models.appevents
 
 import com.rakuten.tech.mobile.inappmessaging.runtime.BaseTest
 import com.rakuten.tech.mobile.inappmessaging.runtime.data.models.rat.RatAttribute
-import com.rakuten.tech.mobile.inappmessaging.runtime.utils.InAppMessagingConstants
+import com.rakuten.tech.mobile.inappmessaging.runtime.manager.AnalyticsKey
 import org.amshove.kluent.shouldContain
 import org.amshove.kluent.shouldHaveKey
 import org.amshove.kluent.shouldHaveSize
@@ -34,8 +34,8 @@ class PurchaseSuccessfulEventSpec : BaseTest() {
             .purchaseAmountMicros(5000000)
         val map = event.getRatEventMap()
 
-        map shouldHaveKey InAppMessagingConstants.RAT_EVENT_KEY_EVENT_CUSTOM_ATTRIBUTE
-        val attr = map[InAppMessagingConstants.RAT_EVENT_KEY_EVENT_CUSTOM_ATTRIBUTE] as ArrayList<RatAttribute>
+        map shouldHaveKey AnalyticsKey.CUSTOM_ATTRIBUTES.key
+        val attr = map[AnalyticsKey.CUSTOM_ATTRIBUTES.key] as ArrayList<RatAttribute>
         attr shouldHaveSize 4
         attr shouldContain RatAttribute(PURCHASE_AMOUNT_MICROS_TAG, 5000000)
         attr shouldContain RatAttribute(NUMBER_OF_ITEMS_TAG, 5)

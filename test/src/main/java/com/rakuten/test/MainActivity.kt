@@ -97,4 +97,12 @@ class MainActivity : AppCompatActivity() {
         }
         viewIds.forEach { viewId -> InAppMessaging.instance().closeTooltip(viewId) }
     }
+
+    override fun onRequestPermissionsResult(requestCode: Int, permissions: Array<String>, grantResults: IntArray) {
+        when(requestCode) {
+            InAppMessaging.PUSH_PRIMER_REQ_CODE -> {
+                InAppMessaging.instance().trackPushPrimer(permissions, grantResults)
+            }
+        }
+    }
 }

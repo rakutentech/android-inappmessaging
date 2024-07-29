@@ -1,23 +1,17 @@
 package com.rakuten.tech.mobile.inappmessaging.runtime.manager
 
 import com.rakuten.tech.mobile.inappmessaging.runtime.BuildConfig
-import com.rakuten.tech.mobile.inappmessaging.runtime.EventTrackerHelper
 import com.rakuten.tech.mobile.inappmessaging.runtime.data.enums.ImpressionType
 import com.rakuten.tech.mobile.inappmessaging.runtime.data.models.rat.RatImpression
 import com.rakuten.tech.mobile.inappmessaging.runtime.data.repositories.HostAppInfoRepository
 import com.rakuten.tech.mobile.inappmessaging.runtime.data.requests.Impression
 import com.rakuten.tech.mobile.inappmessaging.runtime.data.requests.ImpressionRequest
 import com.rakuten.tech.mobile.inappmessaging.runtime.utils.InAppLogger
-import com.rakuten.tech.mobile.inappmessaging.runtime.utils.InAppMessagingConstants.RAT_EVENT_CAMP_ID
-import com.rakuten.tech.mobile.inappmessaging.runtime.utils.InAppMessagingConstants.RAT_EVENT_IMP
-import com.rakuten.tech.mobile.inappmessaging.runtime.utils.InAppMessagingConstants.RAT_EVENT_KEY_IMPRESSION
-import com.rakuten.tech.mobile.inappmessaging.runtime.utils.InAppMessagingConstants.RAT_EVENT_SUBS_ID
 import com.rakuten.tech.mobile.inappmessaging.runtime.utils.RuntimeUtil
 import com.rakuten.tech.mobile.inappmessaging.runtime.workmanager.schedulers.ImpressionScheduler
 import java.util.Date
 import java.util.concurrent.ConcurrentHashMap
 import kotlin.collections.ArrayList
-import kotlin.collections.HashMap
 import kotlin.collections.set
 
 /**
@@ -32,16 +26,11 @@ internal object ImpressionManager {
      * Reporting impression list to IAM backend, and sending to analytics. This method is invoked on
      * main thread.
      */
-    fun scheduleReportImpression(
-        impressionList: List<Impression>,
-        campaignId: String,
-        isTestMessage: Boolean,
-        sendEvent: (String, data: Map<String, *>?) -> Boolean = EventTrackerHelper::sendEvent,
-    ) {
+    fun scheduleReportImpression(impressionList: List<Impression>, campaignId: String, isTestMessage: Boolean) {
         if (impressionList.isEmpty()) return
 
         // send user action impression
-        sendImpressionEvent(campaignId, impressionList, sendEvent)
+        sendImpressionEvent(campaignId, impressionList)
 
         val impListRequest = impressionList.toMutableList()
         impressionMap[campaignId]?.let { mapData ->
@@ -66,7 +55,6 @@ internal object ImpressionManager {
     internal fun sendImpressionEvent(
         campaignId: String,
         impressionList: List<Impression>,
-        sendEvent: (String, data: Map<String, *>?) -> Boolean = EventTrackerHelper::sendEvent,
         impressionTypeOnly: Boolean = false,
     ) {
         if (impressionList.isEmpty()) return
@@ -75,12 +63,9 @@ internal object ImpressionManager {
             impressionMap[campaignId] = impressionList[0] // if impression type only, it is assumed that only one entry
         }
 
-        val params: MutableMap<String, Any?> = HashMap()
-        params[RAT_EVENT_CAMP_ID] = campaignId
-        params[RAT_EVENT_SUBS_ID] = HostAppInfoRepository.instance().getSubscriptionKey()
-        params[RAT_EVENT_IMP] = createRatImpressionList(impressionList)
-
-        sendEvent(RAT_EVENT_KEY_IMPRESSION, params)
+        val params = hashMapOf<String, Any>()
+        params[AnalyticsKey.IMPRESSIONS.key] = createRatImpressionList(impressionList)
+        AnalyticsManager.sendEvent(AnalyticsEvent.IMPRESSION, campaignId, params)
     }
 
     /**

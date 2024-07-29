@@ -19,17 +19,6 @@ internal object InAppMessagingConstants {
     // -------------------------------URL Only--------------------------------------------------------
     const val TEMPLATE_BASE_URL = "http://your.base.url/"
 
-    // ------------------------------ Analytics Event KEYS ---------------------------------------------
-    const val RAT_EVENT_KEY_IMPRESSION = "_rem_iam_impressions"
-    const val RAT_EVENT_KEY_PRIMER = "_rem_iam_pushprimer"
-    const val RAT_EVENT_KEY_EVENT_NAME = "eventName"
-    const val RAT_EVENT_KEY_EVENT_TIMESTAMP = "timestamp"
-    const val RAT_EVENT_KEY_EVENT_CUSTOM_ATTRIBUTE = "customAttributes"
-    const val RAT_EVENT_CAMP_ID = "campaign_id"
-    const val RAT_EVENT_SUBS_ID = "subscription_id"
-    const val RAT_EVENT_IMP = "impressions"
-    const val RAT_EVENT_KEY_PERMISSION = "push_permission"
-
     // ------------------------------ API HEADER KEYS ---------------------------------------------
 
     const val DEVICE_ID_HEADER = "device_id"

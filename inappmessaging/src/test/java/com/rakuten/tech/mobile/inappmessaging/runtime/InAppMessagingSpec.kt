@@ -675,7 +675,7 @@ class InAppMessagingPrimerTrackerSpec : InAppMessagingSpec() {
             arrayOf(Manifest.permission.POST_NOTIFICATIONS), intArrayOf(PackageManager.PERMISSION_GRANTED),
         )
 
-        verify(mockMgr).sendPrimerEvent(eq(1), any())
+        verify(mockMgr).sendPrimerEvent(eq(1))
     }
 
     @Test
@@ -686,7 +686,7 @@ class InAppMessagingPrimerTrackerSpec : InAppMessagingSpec() {
             arrayOf(Manifest.permission.POST_NOTIFICATIONS), intArrayOf(PackageManager.PERMISSION_DENIED),
         )
 
-        verify(mockMgr).sendPrimerEvent(eq(0), any())
+        verify(mockMgr).sendPrimerEvent(eq(0))
     }
 
     @Test
@@ -697,7 +697,7 @@ class InAppMessagingPrimerTrackerSpec : InAppMessagingSpec() {
             arrayOf(Manifest.permission.ACCESS_FINE_LOCATION), intArrayOf(PackageManager.PERMISSION_DENIED),
         )
 
-        verify(mockMgr, never()).sendPrimerEvent(any(), any())
+        verify(mockMgr, never()).sendPrimerEvent(any())
     }
 
     @Test
@@ -709,7 +709,7 @@ class InAppMessagingPrimerTrackerSpec : InAppMessagingSpec() {
             intArrayOf(PackageManager.PERMISSION_DENIED, PackageManager.PERMISSION_GRANTED),
         )
 
-        verify(mockMgr, never()).sendPrimerEvent(any(), any())
+        verify(mockMgr, never()).sendPrimerEvent(any())
     }
 
     @Test
@@ -721,7 +721,7 @@ class InAppMessagingPrimerTrackerSpec : InAppMessagingSpec() {
             intArrayOf(PackageManager.PERMISSION_DENIED),
         )
 
-        verify(mockMgr, never()).sendPrimerEvent(any(), any())
+        verify(mockMgr, never()).sendPrimerEvent(any())
     }
 
     @Test
@@ -734,6 +734,6 @@ class InAppMessagingPrimerTrackerSpec : InAppMessagingSpec() {
             intArrayOf(PackageManager.PERMISSION_DENIED, PackageManager.PERMISSION_GRANTED),
         )
 
-        verify(mockMgr, never()).sendPrimerEvent(any(), any())
+        verify(mockMgr, never()).sendPrimerEvent(any())
     }
 }

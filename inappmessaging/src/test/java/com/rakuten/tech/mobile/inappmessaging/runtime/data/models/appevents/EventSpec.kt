@@ -2,7 +2,7 @@ package com.rakuten.tech.mobile.inappmessaging.runtime.data.models.appevents
 
 import com.rakuten.tech.mobile.inappmessaging.runtime.BaseTest
 import com.rakuten.tech.mobile.inappmessaging.runtime.data.enums.EventType
-import com.rakuten.tech.mobile.inappmessaging.runtime.utils.InAppMessagingConstants
+import com.rakuten.tech.mobile.inappmessaging.runtime.manager.AnalyticsKey
 import org.amshove.kluent.*
 import org.junit.Test
 import org.junit.runner.RunWith
@@ -39,15 +39,15 @@ class EventSpec(
     @Test
     fun `RAT event map should contain correct keys`() {
         val map = event.getRatEventMap()
-        map shouldHaveKey InAppMessagingConstants.RAT_EVENT_KEY_EVENT_NAME
-        map shouldHaveKey InAppMessagingConstants.RAT_EVENT_KEY_EVENT_TIMESTAMP
+        map shouldHaveKey AnalyticsKey.EVENT_NAME.key
+        map shouldHaveKey AnalyticsKey.TIMESTAMP.key
     }
 
     @Test
     fun `RAT event map should correct values`() {
         val map = event.getRatEventMap()
-        map[InAppMessagingConstants.RAT_EVENT_KEY_EVENT_NAME] shouldBeEqualTo expectedName
-        map[InAppMessagingConstants.RAT_EVENT_KEY_EVENT_TIMESTAMP] as Long shouldBeGreaterThan 0L
+        map[AnalyticsKey.EVENT_NAME.key] shouldBeEqualTo expectedName
+        map[AnalyticsKey.TIMESTAMP.key] as Long shouldBeGreaterThan 0L
     }
 
     @Test

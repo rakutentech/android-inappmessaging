@@ -10,8 +10,11 @@ android {
     resValue 'string', 'inappmessaging__version', project.version
     versionName version
     consumerProguardFiles 'proguard-rules.pro'
+
     buildConfigField("boolean", "IS_CACHE_HANDLING", "true")
     buildConfigField("String","VERSION_NAME","\"${defaultConfig.versionName}\"")
+    buildConfigField("int", "IAM_RAT_ACC", CONFIG.property("IAM_RAT_ACC"))
+    buildConfigField("int", "IAM_RAT_AID", CONFIG.property("IAM_RAT_AID"))
 
     resValue("string", "config_url", CONFIG.property("CONFIG_URL_TEST_PROD") ?: "")
     resValue("string", "test_sub_key", CONFIG.property("IAM_TEST_SUBSCRIPTION_KEY") ?: "test_sub_key")
