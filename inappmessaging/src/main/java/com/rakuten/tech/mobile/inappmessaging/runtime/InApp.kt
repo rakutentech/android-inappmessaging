@@ -21,6 +21,7 @@ import com.rakuten.tech.mobile.inappmessaging.runtime.manager.SessionManager
 import com.rakuten.tech.mobile.inappmessaging.runtime.utils.BuildVersionChecker
 import com.rakuten.tech.mobile.inappmessaging.runtime.utils.EventMatchingUtil
 import com.rakuten.tech.mobile.inappmessaging.runtime.utils.InAppLogger
+import com.rakuten.tech.mobile.inappmessaging.runtime.utils.InAppProdLogger
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
@@ -57,13 +58,13 @@ internal class InApp(
     override var onPushPrimer: (() -> Unit)? = null
 
     override fun registerPreference(userInfoProvider: UserInfoProvider) {
-        InAppLogger(TAG).info("registerPreference - userInfoProvider: $userInfoProvider")
+        InAppProdLogger(TAG).info("registerPreference: $userInfoProvider")
         accountRepo.userInfoProvider = userInfoProvider
     }
 
     @SuppressWarnings("TooGenericExceptionCaught")
     override fun registerMessageDisplayActivity(activity: Activity) {
-        InAppLogger(TAG).info("registerMessageDisplayActivity - Activity: $activity")
+        InAppProdLogger(TAG).info("registerMessageDisplayActivity: $activity")
         try {
             hostAppInfoRepo.registerActivity(activity)
             // Making worker thread to display message.
@@ -79,7 +80,7 @@ internal class InApp(
 
     @SuppressWarnings("FunctionMaxLength", "TooGenericExceptionCaught")
     override fun unregisterMessageDisplayActivity() {
-        InAppLogger(TAG).info("unregisterMessageDisplayActivity")
+        InAppProdLogger(TAG).info("unregisterMessageDisplayActivity")
         try {
             if (configRepo.isConfigEnabled()) {
                 displayManager.removeMessage(hostAppInfoRepo.getRegisteredActivity(), removeAll = true)
@@ -102,8 +103,8 @@ internal class InApp(
             val isSameUser = !accountRepo.updateUserInfo()
             val areCampaignsSynced = campaignRepo.lastSyncMillis != null && eventMatchingUtil.eventBuffer.isEmpty()
 
-            InAppLogger(TAG).debug(
-                "name: ${event.getEventName()}, attributes: ${event.getAttributeMap()}, " +
+            InAppProdLogger(TAG).info(
+                "logEvent: ${event.getEventName()}, attributes: ${event.getAttributeMap()}, " +
                     "isConfigEnabled: $isConfigEnabled, isSameUser: $isSameUser, synced: $areCampaignsSynced",
             )
 
@@ -133,17 +134,17 @@ internal class InApp(
     }
 
     override fun closeMessage(clearQueuedCampaigns: Boolean) {
-        InAppLogger(TAG).info("closeMessage - clearQueuedCampaigns: $clearQueuedCampaigns")
+        InAppProdLogger(TAG).info("closeMessage: $clearQueuedCampaigns")
         closeCampaign(clearQueuedCampaigns = clearQueuedCampaigns)
     }
 
     override fun closeTooltip(viewId: String) {
-        InAppLogger(TAG).info("closeTooltip - viewId: $viewId")
+        InAppProdLogger(TAG).info("closeTooltip: $viewId")
         closeCampaign(viewId = viewId)
     }
 
     override fun trackPushPrimer(permissions: Array<String>, grantResults: IntArray) {
-        InAppLogger(TAG).info("trackPushPrimer - permissions: $permissions, grantResults: $grantResults")
+        InAppProdLogger(TAG).info("trackPushPrimer - perm: $permissions, res: $grantResults")
         if (!BuildVersionChecker.isAndroidTAndAbove()) {
             return
         }
