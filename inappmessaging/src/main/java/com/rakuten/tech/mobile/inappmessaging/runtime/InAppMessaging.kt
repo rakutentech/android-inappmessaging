@@ -7,6 +7,7 @@ import androidx.annotation.RestrictTo
 import com.rakuten.tech.mobile.inappmessaging.runtime.data.models.appevents.Event
 import com.rakuten.tech.mobile.inappmessaging.runtime.data.repositories.AccountRepository
 import com.rakuten.tech.mobile.inappmessaging.runtime.exception.InAppMessagingException
+import com.rakuten.tech.mobile.inappmessaging.runtime.utils.InAppLogger
 import com.rakuten.tech.mobile.inappmessaging.runtime.utils.InAppProdLogger
 import com.rakuten.tech.mobile.inappmessaging.runtime.utils.Initializer
 import com.rakuten.tech.mobile.inappmessaging.runtime.workmanager.schedulers.ConfigScheduler
@@ -136,7 +137,7 @@ abstract class InAppMessaging internal constructor() {
             InAppProdLogger(TAG).info("configure")
             return try {
                 if (!shouldProcess(subscriptionKey)) {
-                    InAppProdLogger(TAG).debug("Not processed since RMC is integrated")
+                    InAppLogger(TAG).debug("Not processed since RMC is integrated")
                     return false
                 }
 
@@ -158,6 +159,7 @@ abstract class InAppMessaging internal constructor() {
                 errorCallback?.let {
                     it(InAppMessagingException("In-App Messaging configuration failed", ex))
                 }
+                InAppProdLogger(TAG).error("configure - error: ${ex.message}")
                 false
             }
         }

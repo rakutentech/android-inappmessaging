@@ -11,6 +11,7 @@ import com.rakuten.tech.mobile.inappmessaging.runtime.data.repositories.ConfigRe
 import com.rakuten.tech.mobile.inappmessaging.runtime.data.repositories.HostAppInfoRepository
 import com.rakuten.tech.mobile.inappmessaging.runtime.data.requests.ImpressionRequest
 import com.rakuten.tech.mobile.inappmessaging.runtime.utils.InAppLogger
+import com.rakuten.tech.mobile.inappmessaging.runtime.utils.InAppProdLogger
 import com.rakuten.tech.mobile.inappmessaging.runtime.utils.RuntimeUtil
 import com.rakuten.tech.mobile.inappmessaging.runtime.utils.WorkerUtils
 import okhttp3.ResponseBody
@@ -56,7 +57,7 @@ internal class ImpressionWorker(
         val impressionRequest = try {
             Gson().fromJson(impressionRequestJsonRequest, ImpressionRequest::class.java)
         } catch (e: JsonParseException) {
-            InAppLogger(TAG).error(e.message)
+            InAppLogger(TAG).error("Impression - error: ${e.message}")
             return Result.failure()
         }
 
@@ -65,13 +66,13 @@ internal class ImpressionWorker(
             // Execute Retrofit API call and handle response.
             onResponse(createReportImpressionCall(impressionEndpoint, impressionRequest).execute())
         } catch (e: Exception) {
-            InAppLogger(TAG).debug(e.message)
+            InAppProdLogger(TAG).debug("Impression - error: ${e.message}")
             Result.retry()
         }
     }
 
     private fun onResponse(response: Response<ResponseBody>): Result {
-        InAppLogger(TAG).debug("Impression Response:%d", response.code())
+        InAppProdLogger(TAG).debug("impression API - response: ${response.code()}")
 
         return when {
             response.code() >= HttpURLConnection.HTTP_INTERNAL_ERROR ->

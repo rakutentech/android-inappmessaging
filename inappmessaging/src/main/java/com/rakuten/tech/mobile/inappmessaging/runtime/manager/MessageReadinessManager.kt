@@ -17,6 +17,7 @@ import com.rakuten.tech.mobile.inappmessaging.runtime.data.responses.ping.Messag
 import com.rakuten.tech.mobile.inappmessaging.runtime.exception.InAppMessagingException
 import com.rakuten.tech.mobile.inappmessaging.runtime.utils.BuildVersionChecker
 import com.rakuten.tech.mobile.inappmessaging.runtime.utils.InAppLogger
+import com.rakuten.tech.mobile.inappmessaging.runtime.utils.InAppProdLogger
 import com.rakuten.tech.mobile.inappmessaging.runtime.utils.PermissionUtil
 import com.rakuten.tech.mobile.inappmessaging.runtime.utils.RetryDelayUtil
 import com.rakuten.tech.mobile.inappmessaging.runtime.utils.RuntimeUtil
@@ -118,7 +119,7 @@ internal class MessageReadinessManager(
 
             // First, check if this message should be displayed.
             if (!shouldDisplayMessage(message)) {
-                InAppLogger(TAG).debug("Skipping message: ${message.campaignId}")
+                InAppProdLogger(TAG).debug("Skipping message: ${message.campaignId}")
                 // Skip to next message.
                 continue
             }
@@ -140,7 +141,6 @@ internal class MessageReadinessManager(
         result.add(message)
         false
     } else {
-        InAppLogger(TAG).debug("Check API START - campaignId: ${message.campaignId}")
         // Check message display permission with server.
         val displayPermissionResponse = getMessagePermission(message)
         // If server wants SDK to ping for updated messages, do a new ping request and break this loop.
@@ -272,7 +272,7 @@ internal class MessageReadinessManager(
         response: Response<DisplayPermissionResponse>,
         callClone: Call<DisplayPermissionResponse>,
     ): DisplayPermissionResponse? {
-        InAppLogger(DISP_TAG).debug("Check API END - code: ${response.code()}, body: ${response.body()}")
+        InAppLogger(DISP_TAG).debug("check API - code: ${response.code()}")
         return when {
             response.isSuccessful -> response.body()
             response.code() >= HttpURLConnection.HTTP_INTERNAL_ERROR -> checkAndRetry(callClone) {

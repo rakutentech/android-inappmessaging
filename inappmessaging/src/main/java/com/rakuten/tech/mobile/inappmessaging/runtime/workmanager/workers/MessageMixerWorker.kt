@@ -4,6 +4,7 @@ import android.content.Context
 import androidx.annotation.VisibleForTesting
 import androidx.work.Worker
 import androidx.work.WorkerParameters
+import com.rakuten.tech.mobile.inappmessaging.runtime.InAppMessaging
 import com.rakuten.tech.mobile.inappmessaging.runtime.api.MessageMixerRetrofitService
 import com.rakuten.tech.mobile.inappmessaging.runtime.data.enums.CampaignType
 import com.rakuten.tech.mobile.inappmessaging.runtime.data.repositories.AccountRepository
@@ -19,8 +20,10 @@ import com.rakuten.tech.mobile.inappmessaging.runtime.utils.RetryDelayUtil
 import com.rakuten.tech.mobile.inappmessaging.runtime.utils.RuntimeUtil
 import com.rakuten.tech.mobile.inappmessaging.runtime.utils.WorkerUtils
 import com.rakuten.tech.mobile.inappmessaging.runtime.utils.EventMatchingUtil
+import com.rakuten.tech.mobile.inappmessaging.runtime.utils.InAppProdLogger
 import com.rakuten.tech.mobile.inappmessaging.runtime.workmanager.schedulers.EventMessageReconciliationScheduler
 import com.rakuten.tech.mobile.inappmessaging.runtime.workmanager.schedulers.MessageMixerPingScheduler
+import com.rakuten.tech.mobile.inappmessaging.runtime.workmanager.workers.ConfigWorker.Companion
 import retrofit2.Call
 import retrofit2.Response
 import java.net.HttpURLConnection
@@ -67,14 +70,12 @@ internal class MessageMixerWorker(
             // Execute a thread blocking API network call, and handle response.
             onResponse(call.execute())
         } catch (e: Exception) {
-            InAppLogger(TAG).error("Ping API END - error: ${e.message}")
+            InAppProdLogger(TAG).error("ping - error: ${e.message}")
             Result.retry()
         }
     }
 
     private fun setupCall(): Call<MessageMixerResponse> {
-        InAppLogger(TAG).debug("Ping API START")
-
         // Create a retrofit API.
         val serviceApi = RuntimeUtil.getRetrofit().create(MessageMixerRetrofitService::class.java)
 
@@ -104,7 +105,8 @@ internal class MessageMixerWorker(
      */
     @VisibleForTesting
     fun onResponse(response: Response<MessageMixerResponse>): Result {
-        InAppLogger(TAG).debug("Ping API END - isSuccessful: ${response.isSuccessful}")
+        InAppProdLogger(TAG).debug("ping API - code: ${response.code()}")
+
         if (response.isSuccessful) {
             serverErrorCounter.set(0) // reset server error counter
             response.body()?.let { handleResponse(it) }
@@ -153,7 +155,7 @@ internal class MessageMixerWorker(
 
         // Schedule next ping.
         scheduleNextPing(messageMixerResponse.nextPingMillis)
-        InAppLogger(TAG).debug("campaign size: %d", messageMixerResponse.data.size)
+        InAppProdLogger(TAG).debug("ping API success - campaigns: ${messageMixerResponse.data.size}")
     }
 
     private fun retryPingRequest(): Result {

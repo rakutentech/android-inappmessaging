@@ -12,6 +12,7 @@ import com.rakuten.tech.mobile.inappmessaging.runtime.data.repositories.HostAppI
 import com.rakuten.tech.mobile.inappmessaging.runtime.data.requests.ConfigQueryParamsBuilder
 import com.rakuten.tech.mobile.inappmessaging.runtime.data.responses.ConfigResponse
 import com.rakuten.tech.mobile.inappmessaging.runtime.utils.InAppLogger
+import com.rakuten.tech.mobile.inappmessaging.runtime.utils.InAppProdLogger
 import com.rakuten.tech.mobile.inappmessaging.runtime.utils.RetryDelayUtil
 import com.rakuten.tech.mobile.inappmessaging.runtime.utils.RuntimeUtil
 import com.rakuten.tech.mobile.inappmessaging.runtime.utils.WorkerUtils
@@ -53,7 +54,6 @@ internal class ConfigWorker(
      */
     @SuppressWarnings("TooGenericExceptionCaught")
     override fun doWork(): Result {
-        InAppLogger(TAG).debug("Config API - START")
         // Terminate request if any of the following values are empty
         if (!isConfigValid()) {
             return Result.failure()
@@ -63,7 +63,7 @@ internal class ConfigWorker(
             // Executing the API network call.
             onResponse(setupCall().execute())
         } catch (e: Exception) {
-            InAppLogger(TAG).error(e.message)
+            InAppProdLogger(TAG).debug("config - error: ${e.message}")
             // RETRY by default has exponential backoff baked in.
             Result.retry()
         }
@@ -99,6 +99,8 @@ internal class ConfigWorker(
     @VisibleForTesting
     @Throws(IllegalArgumentException::class)
     fun onResponse(response: Response<ConfigResponse?>): Result {
+        InAppProdLogger(TAG).debug("config API - code: ${response.code()}")
+
         if (response.isSuccessful && response.body() != null) {
             handleResponse(response)
         } else {
@@ -135,8 +137,8 @@ internal class ConfigWorker(
         // Schedule a ping request to message mixer. Initial delay is 0
         // reset current delay to initial
         ConfigScheduler.currDelay = RetryDelayUtil.INITIAL_BACKOFF_DELAY
-        InAppLogger(TAG).debug(
-            "Config API END - rollout: ${response.body()?.data?.rollOutPercentage}, " +
+        InAppProdLogger(TAG).debug(
+            "config API success - rollout: ${response.body()?.data?.rollOutPercentage}, " +
                 "enabled: ${configRepo.isConfigEnabled()}",
         )
         if (configRepo.isConfigEnabled()) {

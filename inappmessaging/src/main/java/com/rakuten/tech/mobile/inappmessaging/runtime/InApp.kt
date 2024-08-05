@@ -130,6 +130,7 @@ internal class InApp(
             errorCallback?.let {
                 it(InAppMessagingException("In-App Messaging log event failed", ex))
             }
+            InAppProdLogger(TAG).error("logEvent - error: ${ex.message}")
         }
     }
 

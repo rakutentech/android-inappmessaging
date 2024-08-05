@@ -9,6 +9,8 @@ import android.content.pm.PackageManager.NameNotFoundException
 import android.os.Build
 import android.provider.Settings
 import androidx.core.content.pm.PackageInfoCompat
+import com.rakuten.tech.mobile.inappmessaging.runtime.InAppMessaging
+import com.rakuten.tech.mobile.inappmessaging.runtime.InAppMessaging.Companion
 import com.rakuten.tech.mobile.inappmessaging.runtime.RmcHelper
 import com.rakuten.tech.mobile.inappmessaging.runtime.data.models.HostAppInfo
 import com.rakuten.tech.mobile.inappmessaging.runtime.data.repositories.HostAppInfoRepository
@@ -97,12 +99,17 @@ internal object Initializer {
         enableTooltipFeature: Boolean? = false,
         sharedUtil: PreferencesUtil = PreferencesUtil,
     ) {
+        val deviceId = getDeviceId(context, sharedUtil)
+        val (appVer, rmcVer) = Pair(getHostAppVersion(context), getRmcSdkVersion(context))
+
         val hostAppInfo = HostAppInfo(
-            packageName = getHostAppPackageName(context), deviceId = getDeviceId(context, sharedUtil),
-            version = getHostAppVersion(context), subscriptionKey = subscriptionKey, locale = getLocale(context),
+            packageName = getHostAppPackageName(context), deviceId = deviceId,
+            version = appVer, subscriptionKey = subscriptionKey, locale = getLocale(context),
             configUrl = configUrl, isTooltipFeatureEnabled = enableTooltipFeature, context = context,
-            rmcSdkVersion = getRmcSdkVersion(context),
+            rmcSdkVersion = rmcVer,
         )
+
+        InAppProdLogger(TAG).debug("configure - device: $deviceId, appVer: $appVer, rmcVer: $rmcVer")
 
         // Store hostAppInfo in repository.
         HostAppInfoRepository.instance().addHostInfo(hostAppInfo)

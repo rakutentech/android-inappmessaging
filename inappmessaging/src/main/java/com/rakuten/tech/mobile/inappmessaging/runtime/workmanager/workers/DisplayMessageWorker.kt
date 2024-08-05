@@ -16,6 +16,7 @@ import com.rakuten.tech.mobile.inappmessaging.runtime.utils.ImageUtil
 import com.rakuten.tech.mobile.inappmessaging.runtime.manager.MessageReadinessManager
 import com.rakuten.tech.mobile.inappmessaging.runtime.runnable.DisplayMessageRunnable
 import com.rakuten.tech.mobile.inappmessaging.runtime.utils.InAppLogger
+import com.rakuten.tech.mobile.inappmessaging.runtime.utils.InAppProdLogger
 import com.rakuten.tech.mobile.inappmessaging.runtime.utils.WorkManagerUtil
 import com.squareup.picasso.Callback
 import com.squareup.picasso.Picasso
@@ -78,7 +79,7 @@ internal class DisplayMessageWorker(
                 }
 
                 override fun onError(e: Exception?) {
-                    InAppLogger(TAG).debug("Downloading image failed")
+                    InAppProdLogger(TAG).error("Downloading image failed - campaign: ${message.campaignId}")
                 }
             },
             context = hostActivity, picasso = picasso,
@@ -88,7 +89,7 @@ internal class DisplayMessageWorker(
     private fun displayMessage(message: Message, hostActivity: Activity, newWorker: Boolean = false) {
         if (!verifyContexts(message)) {
             // Message display aborted by the host app
-            InAppLogger(TAG).debug("Message display cancelled by the host app")
+            InAppProdLogger(TAG).debug("verifyContext - campaign cancelled: ${message.campaignId}")
             // Remove message in queue
             messageReadinessManager.removeMessageFromQueue(message.campaignId)
             // Prepare next message
