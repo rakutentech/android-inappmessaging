@@ -66,13 +66,13 @@ internal class ImpressionWorker(
             // Execute Retrofit API call and handle response.
             onResponse(createReportImpressionCall(impressionEndpoint, impressionRequest).execute())
         } catch (e: Exception) {
-            InAppProdLogger(TAG).debug("Impression - error: ${e.message}")
+            InAppProdLogger(TAG).error("Impression - error: ${e.message}")
             Result.retry()
         }
     }
 
     private fun onResponse(response: Response<ResponseBody>): Result {
-        InAppProdLogger(TAG).debug("impression API - response: ${response.code()}")
+        InAppProdLogger(TAG).info("impression API - code: ${response.code()}")
 
         return when {
             response.code() >= HttpURLConnection.HTTP_INTERNAL_ERROR ->

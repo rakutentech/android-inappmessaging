@@ -105,12 +105,11 @@ internal class MessageMixerWorker(
      */
     @VisibleForTesting
     fun onResponse(response: Response<MessageMixerResponse>): Result {
-        InAppProdLogger(TAG).debug("ping API - code: ${response.code()}")
-
         if (response.isSuccessful) {
             serverErrorCounter.set(0) // reset server error counter
             response.body()?.let { handleResponse(it) }
         } else {
+            InAppProdLogger(TAG).error("ping API error - code: ${response.code()}")
             return when {
                 response.code() == RetryDelayUtil.RETRY_ERROR_CODE -> handleRetry(response)
                 response.code() >= HttpURLConnection.HTTP_INTERNAL_ERROR -> handleInternalError(response)
@@ -136,6 +135,8 @@ internal class MessageMixerWorker(
     }
 
     private fun handleResponse(messageMixerResponse: MessageMixerResponse) {
+        InAppProdLogger(TAG).info("ping API success - campaigns: ${messageMixerResponse.data.size}")
+
         // Parse all data in response.
         val parsedMessages = parsePingRespTestMessage(messageMixerResponse)
 
@@ -155,7 +156,6 @@ internal class MessageMixerWorker(
 
         // Schedule next ping.
         scheduleNextPing(messageMixerResponse.nextPingMillis)
-        InAppProdLogger(TAG).debug("ping API success - campaigns: ${messageMixerResponse.data.size}")
     }
 
     private fun retryPingRequest(): Result {

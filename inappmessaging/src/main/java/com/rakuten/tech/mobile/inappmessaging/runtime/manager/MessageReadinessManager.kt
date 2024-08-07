@@ -119,7 +119,7 @@ internal class MessageReadinessManager(
 
             // First, check if this message should be displayed.
             if (!shouldDisplayMessage(message)) {
-                InAppProdLogger(TAG).debug("Skipping message: ${message.campaignId}")
+                InAppProdLogger(TAG).info("Skipping message: ${message.campaignId}")
                 // Skip to next message.
                 continue
             }
@@ -272,7 +272,7 @@ internal class MessageReadinessManager(
         response: Response<DisplayPermissionResponse>,
         callClone: Call<DisplayPermissionResponse>,
     ): DisplayPermissionResponse? {
-        InAppLogger(DISP_TAG).debug("check API - code: ${response.code()}")
+        InAppProdLogger(DISP_TAG).info("check API - code: ${response.code()}")
         return when {
             response.isSuccessful -> response.body()
             response.code() >= HttpURLConnection.HTTP_INTERNAL_ERROR -> checkAndRetry(callClone) {

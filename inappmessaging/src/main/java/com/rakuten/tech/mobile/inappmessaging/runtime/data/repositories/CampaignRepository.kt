@@ -5,6 +5,7 @@ import com.rakuten.tech.mobile.inappmessaging.runtime.InAppMessaging
 import com.rakuten.tech.mobile.inappmessaging.runtime.data.enums.InAppMessageType
 import com.rakuten.tech.mobile.inappmessaging.runtime.data.responses.ping.Message
 import com.rakuten.tech.mobile.inappmessaging.runtime.utils.InAppLogger
+import com.rakuten.tech.mobile.inappmessaging.runtime.utils.InAppProdLogger
 import com.rakuten.tech.mobile.sdkutils.PreferencesUtil
 import org.json.JSONObject
 import java.lang.Integer.max
@@ -57,7 +58,7 @@ internal abstract class CampaignRepository {
         }
 
         override fun syncWith(messageList: List<Message>, timestampMillis: Long, ignoreTooltips: Boolean) {
-            InAppLogger(TAG).debug("START -  message size: ${messageList.size}")
+            InAppProdLogger(TAG).info("syncWith start")
             lastSyncMillis = timestampMillis
             loadCachedData() // ensure we're using latest cache data for syncing below
             val oldList = LinkedHashMap(messages) // copy
@@ -68,7 +69,7 @@ internal abstract class CampaignRepository {
                 messages[updatedCampaign.campaignId] = updatedCampaign
             }
             saveDataToCache()
-            InAppLogger(TAG).debug("END")
+            InAppProdLogger(TAG).info("syncWith end")
         }
 
         private fun List<Message>.filterMessages(ignoreTooltips: Boolean): List<Message> {
@@ -161,7 +162,8 @@ internal abstract class CampaignRepository {
                     key = IAM_USER_CACHE,
                     defValue = "",
                 )
-                InAppLogger(TAG).debug("Cache Read - file: $preferenceFile, data: $preferenceData")
+                InAppProdLogger(TAG).info("retrieveData - file: $preferenceFile")
+                InAppLogger(TAG).debug("retrieveData - data: $preferenceData")
                 preferenceData
             }.orEmpty()
         }
@@ -171,7 +173,8 @@ internal abstract class CampaignRepository {
                 HostAppInfoRepository.instance().getContext()?.let { ctx ->
                     val preferenceFile = InAppMessaging.getPreferencesFile()
                     val preferenceData = Gson().toJson(messages)
-                    InAppLogger(TAG).debug("Cache Write - file: $preferenceFile, data: $preferenceData")
+                    InAppProdLogger(TAG).info("saveData - file: $preferenceFile")
+                    InAppLogger(TAG).debug("saveData - data: $preferenceData")
                     PreferencesUtil.putString(
                         context = ctx,
                         name = preferenceFile,

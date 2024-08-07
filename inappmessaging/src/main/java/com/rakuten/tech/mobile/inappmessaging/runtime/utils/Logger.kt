@@ -3,7 +3,7 @@ package com.rakuten.tech.mobile.inappmessaging.runtime.utils
 import com.rakuten.tech.mobile.sdkutils.logger.Logger
 
 /**
- * Will log to console if host app enables debug logging.
+ * Logging enabled if host app enables it through manifest metadata.
  */
 internal class InAppLogger(tag: String) : Logger(tag) {
     init {
@@ -16,11 +16,8 @@ internal class InAppLogger(tag: String) : Logger(tag) {
 }
 
 /**
- * Will log to console regardless of build configuration.
+ * Logging enabled regardless of build configuration. For debug builds, all log levels are logged. For release builds,
+ * only info, warn, and error levels are logged.
  * **Caution**: Log minimal information without any sensitive data.
  */
-internal class InAppProdLogger(tag: String): Logger(tag) {
-    init {
-        this.setDebug(false)
-    }
-}
+internal class InAppProdLogger(tag: String): Logger(tag)
