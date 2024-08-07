@@ -64,7 +64,7 @@ internal class InApp(
 
     @SuppressWarnings("TooGenericExceptionCaught")
     override fun registerMessageDisplayActivity(activity: Activity) {
-        InAppProdLogger(TAG).info("registerMessageDisplayActivity: $activity")
+        InAppProdLogger(TAG).info("registerActivity: $activity")
         try {
             hostAppInfoRepo.registerActivity(activity)
             // Making worker thread to display message.
@@ -72,6 +72,7 @@ internal class InApp(
                 displayManager.displayMessage()
             }
         } catch (ex: Exception) {
+            InAppProdLogger(TAG).error("registerActivity - error: ${ex.message}")
             errorCallback?.let {
                 it(InAppMessagingException("In-App Messaging register activity failed", ex))
             }
@@ -80,13 +81,14 @@ internal class InApp(
 
     @SuppressWarnings("FunctionMaxLength", "TooGenericExceptionCaught")
     override fun unregisterMessageDisplayActivity() {
-        InAppProdLogger(TAG).info("unregisterMessageDisplayActivity")
+        InAppProdLogger(TAG).info("unregisterActivity")
         try {
             if (configRepo.isConfigEnabled()) {
                 displayManager.removeMessage(hostAppInfoRepo.getRegisteredActivity(), removeAll = true)
             }
             hostAppInfoRepo.registerActivity(null)
         } catch (ex: Exception) {
+            InAppProdLogger(TAG).warn("unregisterActivity - error: ${ex.message}")
             errorCallback?.let {
                 it(InAppMessagingException("In-App Messaging unregister activity failed", ex))
             }
@@ -126,10 +128,10 @@ internal class InApp(
                 eventsManager.onEventReceived(event)
             }
         } catch (ex: Exception) {
+            InAppProdLogger(TAG).error("logEvent - error: ${ex.message}")
             errorCallback?.let {
                 it(InAppMessagingException("In-App Messaging log event failed", ex))
             }
-            InAppProdLogger(TAG).error("logEvent - error: ${ex.message}")
         }
     }
 
@@ -179,6 +181,7 @@ internal class InApp(
                         removeMessage(viewId)
                     }
                 } catch (ex: Exception) {
+                    InAppProdLogger(TAG).warn("closeCampaign - error: ${ex.message}")
                     errorCallback?.let {
                         it(InAppMessagingException("In-App Messaging close message failed", ex))
                     }
