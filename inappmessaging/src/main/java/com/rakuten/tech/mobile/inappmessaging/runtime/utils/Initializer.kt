@@ -9,8 +9,6 @@ import android.content.pm.PackageManager.NameNotFoundException
 import android.os.Build
 import android.provider.Settings
 import androidx.core.content.pm.PackageInfoCompat
-import com.rakuten.tech.mobile.inappmessaging.runtime.InAppMessaging
-import com.rakuten.tech.mobile.inappmessaging.runtime.InAppMessaging.Companion
 import com.rakuten.tech.mobile.inappmessaging.runtime.RmcHelper
 import com.rakuten.tech.mobile.inappmessaging.runtime.data.models.HostAppInfo
 import com.rakuten.tech.mobile.inappmessaging.runtime.data.repositories.HostAppInfoRepository

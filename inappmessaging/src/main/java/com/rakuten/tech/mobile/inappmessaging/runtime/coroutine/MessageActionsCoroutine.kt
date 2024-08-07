@@ -30,6 +30,7 @@ import com.rakuten.tech.mobile.inappmessaging.runtime.manager.PushPrimerTrackerM
 import com.rakuten.tech.mobile.inappmessaging.runtime.utils.BuildVersionChecker
 import com.rakuten.tech.mobile.inappmessaging.runtime.utils.CheckPermissionResult
 import com.rakuten.tech.mobile.inappmessaging.runtime.utils.InAppLogger
+import com.rakuten.tech.mobile.inappmessaging.runtime.utils.InAppProdLogger
 import com.rakuten.tech.mobile.inappmessaging.runtime.utils.PermissionUtil
 import java.util.Date
 import kotlin.collections.ArrayList
@@ -165,7 +166,7 @@ internal class MessageActionsCoroutine(
             try {
                 activityContext.startActivity(intent)
             } catch (e: ActivityNotFoundException) {
-                InAppLogger(TAG).debug(e.message)
+                InAppProdLogger(TAG).info("handleDeeplinkRedirection - error: ${e.message}")
             }
         }
     }

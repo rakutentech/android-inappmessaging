@@ -3,6 +3,7 @@ package com.rakuten.tech.mobile.inappmessaging.runtime
 import android.text.TextUtils
 import com.rakuten.tech.mobile.inappmessaging.runtime.utils.ClassUtil
 import com.rakuten.tech.mobile.inappmessaging.runtime.utils.InAppLogger
+import com.rakuten.tech.mobile.inappmessaging.runtime.utils.InAppProdLogger
 
 internal object EventTrackerHelper {
 
@@ -33,7 +34,8 @@ internal object EventTrackerHelper {
                     com.rakuten.tech.mobile.analytics.RatTracker.event(eventName, serializableData).track()
                     return true
                 } catch (e: Exception) {
-                    InAppLogger(TAG).warn("Could not send event: $e")
+                    InAppProdLogger(TAG).warn("sendEvent failed - check Analytics SDK")
+                    InAppLogger(TAG).warn("Exception: $e")
                 }
             }
         }
