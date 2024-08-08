@@ -498,7 +498,7 @@ All the events "launch the app event, login event, purchase successful event, cu
 
 #### 7.7.0 (In-Progress)
 * Improvements:
-  - RMCCX-6876: 
+  - RMCCX-6876: Improved console logging.
 
 #### 7.6.0 (In-Progress)
 * Improvements:
