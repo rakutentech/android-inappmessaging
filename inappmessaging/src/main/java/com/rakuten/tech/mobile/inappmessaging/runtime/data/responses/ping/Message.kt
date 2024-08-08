@@ -9,7 +9,6 @@ import com.rakuten.tech.mobile.inappmessaging.runtime.data.customjson.CustomJson
 import com.rakuten.tech.mobile.inappmessaging.runtime.data.enums.InAppMessageType
 import com.rakuten.tech.mobile.inappmessaging.runtime.data.models.Tooltip
 import com.rakuten.tech.mobile.inappmessaging.runtime.utils.InAppLogger
-
 import java.util.Date
 
 /**
