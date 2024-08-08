@@ -12,7 +12,7 @@ import com.rakuten.tech.mobile.inappmessaging.runtime.data.repositories.HostAppI
 import com.rakuten.tech.mobile.inappmessaging.runtime.data.requests.ConfigQueryParamsBuilder
 import com.rakuten.tech.mobile.inappmessaging.runtime.data.responses.ConfigResponse
 import com.rakuten.tech.mobile.inappmessaging.runtime.utils.InAppLogger
-import com.rakuten.tech.mobile.inappmessaging.runtime.utils.InAppProdLogger
+
 import com.rakuten.tech.mobile.inappmessaging.runtime.utils.RetryDelayUtil
 import com.rakuten.tech.mobile.inappmessaging.runtime.utils.RuntimeUtil
 import com.rakuten.tech.mobile.inappmessaging.runtime.utils.WorkerUtils
@@ -63,7 +63,7 @@ internal class ConfigWorker(
             // Executing the API network call.
             onResponse(setupCall().execute())
         } catch (e: Exception) {
-            InAppProdLogger(TAG).error("config - error: ${e.message}")
+            InAppLogger(TAG).error("config - error: ${e.message}")
             // RETRY by default has exponential backoff baked in.
             Result.retry()
         }
@@ -102,7 +102,7 @@ internal class ConfigWorker(
         if (response.isSuccessful && response.body() != null) {
             handleResponse(response)
         } else {
-            InAppProdLogger(TAG).error("config API - error: ${response.code()}")
+            InAppLogger(TAG).error("config API - error: ${response.code()}")
             return when {
                 response.code() == RetryDelayUtil.RETRY_ERROR_CODE -> handleRetry(response)
                 response.code() >= HttpURLConnection.HTTP_INTERNAL_ERROR -> handleInternalError(response)
@@ -136,7 +136,7 @@ internal class ConfigWorker(
         // Schedule a ping request to message mixer. Initial delay is 0
         // reset current delay to initial
         ConfigScheduler.currDelay = RetryDelayUtil.INITIAL_BACKOFF_DELAY
-        InAppProdLogger(TAG).info(
+        InAppLogger(TAG).info(
             "config API success - rollout: ${response.body()?.data?.rollOutPercentage}, " +
                 "enabled: ${configRepo.isConfigEnabled()}",
         )

@@ -107,7 +107,7 @@ internal object Initializer {
             rmcSdkVersion = rmcVer,
         )
 
-        InAppProdLogger(TAG).info("configure - device: $deviceId, appVer: $appVer, rmcVer: $rmcVer")
+        InAppLogger(TAG).info("configure - device: $deviceId, appVer: $appVer, rmcVer: $rmcVer")
 
         // Store hostAppInfo in repository.
         HostAppInfoRepository.instance().addHostInfo(hostAppInfo)

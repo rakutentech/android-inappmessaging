@@ -16,7 +16,7 @@ internal object WorkerUtils {
     }
 
     fun logSilentRequestError(tag: String, code: Int, message: String?) {
-        InAppLogger(tag).debug("Response Code $code: ${message ?: "no error message"}")
+        InAppLogger(tag).debug("response Code $code: ${message ?: "no error message"}")
     }
 
     fun checkRetry(counter: Int, retryFunc: () -> ListenableWorker.Result): ListenableWorker.Result {

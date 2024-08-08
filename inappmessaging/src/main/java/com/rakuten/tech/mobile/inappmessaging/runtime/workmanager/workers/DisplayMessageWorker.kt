@@ -16,7 +16,6 @@ import com.rakuten.tech.mobile.inappmessaging.runtime.utils.ImageUtil
 import com.rakuten.tech.mobile.inappmessaging.runtime.manager.MessageReadinessManager
 import com.rakuten.tech.mobile.inappmessaging.runtime.runnable.DisplayMessageRunnable
 import com.rakuten.tech.mobile.inappmessaging.runtime.utils.InAppLogger
-import com.rakuten.tech.mobile.inappmessaging.runtime.utils.InAppProdLogger
 import com.rakuten.tech.mobile.inappmessaging.runtime.utils.WorkManagerUtil
 import com.squareup.picasso.Callback
 import com.squareup.picasso.Picasso
@@ -38,9 +37,9 @@ internal class DisplayMessageWorker(
      * This method starts displaying message runnable.
      */
     override suspend fun doWork(): Result {
-        InAppLogger(TAG).debug("Display worker START, thread: ${Thread.currentThread().name}")
+        InAppLogger(TAG).debug("display worker start - thread: ${Thread.currentThread().name}")
         prepareNextMessage()
-        InAppLogger(TAG).debug("Display worker END")
+        InAppLogger(TAG).debug("display worker end")
         return Result.success()
     }
 
@@ -79,7 +78,7 @@ internal class DisplayMessageWorker(
                 }
 
                 override fun onError(e: Exception?) {
-                    InAppProdLogger(TAG).error("Downloading image failed - campaign: ${message.campaignId}")
+                    InAppLogger(TAG).error("downloading image failed for: ${message.campaignId}")
                 }
             },
             context = hostActivity, picasso = picasso,
@@ -89,7 +88,7 @@ internal class DisplayMessageWorker(
     private fun displayMessage(message: Message, hostActivity: Activity, newWorker: Boolean = false) {
         if (!verifyContexts(message)) {
             // Message display aborted by the host app
-            InAppProdLogger(TAG).info("verifyContext - campaign cancelled: ${message.campaignId}")
+            InAppLogger(TAG).info("verifyContext - campaign cancelled: ${message.campaignId}")
             // Remove message in queue
             messageReadinessManager.removeMessageFromQueue(message.campaignId)
             // Prepare next message
@@ -97,6 +96,7 @@ internal class DisplayMessageWorker(
             return
         }
 
+        InAppLogger(TAG).info("will display campaign: ${message.campaignId}")
         // Display message on main thread
         handler.post(DisplayMessageRunnable(uiMessage = MessageMapper.mapFrom(message), hostActivity))
     }

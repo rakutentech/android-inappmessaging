@@ -88,7 +88,7 @@ internal abstract class EventMatchingUtil {
             val totalMatchedEvents = campaignEvents.count() + persistentEvents.count()
 
             if (!(totalMatchedEvents > 0 && totalMatchedEvents >= eventsToRemove.size)) {
-                InAppLogger(TAG).debug("Couldn't find set of events")
+                InAppLogger(TAG).debug("couldn't find set of events")
                 return false
             }
 
@@ -121,7 +121,7 @@ internal abstract class EventMatchingUtil {
                 }
                 val index = campaignEvents.indexOf(eventToRemove)
                 if (index == -1) {
-                    InAppLogger(TAG).debug("Couldn't find requested set of events")
+                    InAppLogger(TAG).debug("couldn't find requested set of events")
                     return true
                 }
                 campaignEvents.removeAt(index)
@@ -136,7 +136,7 @@ internal abstract class EventMatchingUtil {
         override fun addToEventBuffer(event: Event) {
             synchronized(eventBuffer) {
                 eventBuffer.add(event)
-                InAppLogger(TAG).debug("Buffer: " + eventBuffer.map { it.getEventName() })
+                InAppLogger(TAG).debug("buffer: " + eventBuffer.map { it.getEventName() })
             }
         }
 
@@ -144,7 +144,7 @@ internal abstract class EventMatchingUtil {
             synchronized(eventBuffer) {
                 eventBuffer.forEach { ev -> matchAndStore(ev) }
                 eventBuffer.clear()
-                InAppLogger(TAG).debug("Buffer: []")
+                InAppLogger(TAG).debug("buffer: []")
             }
         }
 

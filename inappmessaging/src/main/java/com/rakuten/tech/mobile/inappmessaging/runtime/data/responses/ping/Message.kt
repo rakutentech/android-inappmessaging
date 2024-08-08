@@ -9,7 +9,7 @@ import com.rakuten.tech.mobile.inappmessaging.runtime.data.customjson.CustomJson
 import com.rakuten.tech.mobile.inappmessaging.runtime.data.enums.InAppMessageType
 import com.rakuten.tech.mobile.inappmessaging.runtime.data.models.Tooltip
 import com.rakuten.tech.mobile.inappmessaging.runtime.utils.InAppLogger
-import com.rakuten.tech.mobile.inappmessaging.runtime.utils.InAppProdLogger
+
 import java.util.Date
 
 /**
@@ -73,8 +73,8 @@ internal data class Message(
                     tooltip = null
                 }
             } catch (je: JsonParseException) {
-                InAppProdLogger(TAG).warn("getTooltipConfig - invalid tooltip format")
-                InAppLogger(TAG).warn("Parse exception: $je")
+                InAppLogger(TAG).warn("getTooltipConfig - invalid tooltip format")
+                InAppLogger(TAG).debug("parse exception: $je")
             }
         }
         return tooltip
@@ -88,8 +88,8 @@ internal data class Message(
             try {
                 customJsonData = Gson().fromJson(customJson, CustomJson::class.java)
             } catch (je: JsonParseException) {
-                InAppProdLogger(TAG).warn("getCustomJsonData - invalid customJson format")
-                InAppLogger(TAG).warn("Parse exception: $je")
+                InAppLogger(TAG).warn("getCustomJsonData - invalid customJson format")
+                InAppLogger(TAG).debug("parse exception: $je")
             }
         }
         return customJsonData

@@ -8,7 +8,6 @@ import com.rakuten.tech.mobile.inappmessaging.runtime.data.models.appevents.Even
 import com.rakuten.tech.mobile.inappmessaging.runtime.data.repositories.AccountRepository
 import com.rakuten.tech.mobile.inappmessaging.runtime.exception.InAppMessagingException
 import com.rakuten.tech.mobile.inappmessaging.runtime.utils.InAppLogger
-import com.rakuten.tech.mobile.inappmessaging.runtime.utils.InAppProdLogger
 import com.rakuten.tech.mobile.inappmessaging.runtime.utils.Initializer
 import com.rakuten.tech.mobile.inappmessaging.runtime.workmanager.schedulers.ConfigScheduler
 
@@ -136,7 +135,7 @@ abstract class InAppMessaging internal constructor() {
         ): Boolean {
             return try {
                 if (!shouldProcess(subscriptionKey)) {
-                    InAppProdLogger(TAG).info("configure called but using RMC, skipping")
+                    InAppLogger(TAG).info("configure called but using RMC, skipping")
                     return false
                 }
 
@@ -158,7 +157,7 @@ abstract class InAppMessaging internal constructor() {
                 errorCallback?.let {
                     it(InAppMessagingException("In-App Messaging configuration failed", ex))
                 }
-                InAppProdLogger(TAG).error("configure - error: ${ex.message}")
+                InAppLogger(TAG).error("configure - error: ${ex.message}")
                 false
             }
         }

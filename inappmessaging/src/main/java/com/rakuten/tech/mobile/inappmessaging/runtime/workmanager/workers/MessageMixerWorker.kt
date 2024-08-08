@@ -4,7 +4,6 @@ import android.content.Context
 import androidx.annotation.VisibleForTesting
 import androidx.work.Worker
 import androidx.work.WorkerParameters
-import com.rakuten.tech.mobile.inappmessaging.runtime.InAppMessaging
 import com.rakuten.tech.mobile.inappmessaging.runtime.api.MessageMixerRetrofitService
 import com.rakuten.tech.mobile.inappmessaging.runtime.data.enums.CampaignType
 import com.rakuten.tech.mobile.inappmessaging.runtime.data.repositories.AccountRepository
@@ -20,10 +19,8 @@ import com.rakuten.tech.mobile.inappmessaging.runtime.utils.RetryDelayUtil
 import com.rakuten.tech.mobile.inappmessaging.runtime.utils.RuntimeUtil
 import com.rakuten.tech.mobile.inappmessaging.runtime.utils.WorkerUtils
 import com.rakuten.tech.mobile.inappmessaging.runtime.utils.EventMatchingUtil
-import com.rakuten.tech.mobile.inappmessaging.runtime.utils.InAppProdLogger
 import com.rakuten.tech.mobile.inappmessaging.runtime.workmanager.schedulers.EventMessageReconciliationScheduler
 import com.rakuten.tech.mobile.inappmessaging.runtime.workmanager.schedulers.MessageMixerPingScheduler
-import com.rakuten.tech.mobile.inappmessaging.runtime.workmanager.workers.ConfigWorker.Companion
 import retrofit2.Call
 import retrofit2.Response
 import java.net.HttpURLConnection
@@ -70,7 +67,7 @@ internal class MessageMixerWorker(
             // Execute a thread blocking API network call, and handle response.
             onResponse(call.execute())
         } catch (e: Exception) {
-            InAppProdLogger(TAG).error("ping - error: ${e.message}")
+            InAppLogger(TAG).error("ping - error: ${e.message}")
             Result.retry()
         }
     }
@@ -109,7 +106,7 @@ internal class MessageMixerWorker(
             serverErrorCounter.set(0) // reset server error counter
             response.body()?.let { handleResponse(it) }
         } else {
-            InAppProdLogger(TAG).error("ping API error - code: ${response.code()}")
+            InAppLogger(TAG).error("ping API error - code: ${response.code()}")
             return when {
                 response.code() == RetryDelayUtil.RETRY_ERROR_CODE -> handleRetry(response)
                 response.code() >= HttpURLConnection.HTTP_INTERNAL_ERROR -> handleInternalError(response)
@@ -135,7 +132,7 @@ internal class MessageMixerWorker(
     }
 
     private fun handleResponse(messageMixerResponse: MessageMixerResponse) {
-        InAppProdLogger(TAG).info("ping API success - campaigns: ${messageMixerResponse.data.size}")
+        InAppLogger(TAG).info("ping API success - campaigns: ${messageMixerResponse.data.size}")
 
         // Parse all data in response.
         val parsedMessages = parsePingRespTestMessage(messageMixerResponse)
@@ -173,7 +170,7 @@ internal class MessageMixerWorker(
         // reset current delay to initial
         MessageMixerPingScheduler.currDelay = RetryDelayUtil.INITIAL_BACKOFF_DELAY
         messageMixerScheduler.pingMessageMixerService(nextPingMillis)
-        InAppLogger(TAG).debug("Next ping scheduled in: %d", nextPingMillis)
+        InAppLogger(TAG).debug("next ping scheduled in: $nextPingMillis")
     }
 
     /**

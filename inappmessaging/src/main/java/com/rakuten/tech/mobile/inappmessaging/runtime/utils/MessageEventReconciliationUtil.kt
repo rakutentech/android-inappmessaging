@@ -23,7 +23,7 @@ internal class MessageEventReconciliationUtil(
 
             val triggers = campaign.triggers
             if (triggers.isNullOrEmpty()) {
-                InAppLogger(TAG).debug("Campaign (${campaign.campaignId}) has no triggers.")
+                InAppLogger(TAG).debug("campaign (${campaign.campaignId}) has no triggers.")
                 continue
             }
 

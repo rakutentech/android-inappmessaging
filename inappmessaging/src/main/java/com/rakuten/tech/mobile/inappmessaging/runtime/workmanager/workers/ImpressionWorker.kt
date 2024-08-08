@@ -11,7 +11,6 @@ import com.rakuten.tech.mobile.inappmessaging.runtime.data.repositories.ConfigRe
 import com.rakuten.tech.mobile.inappmessaging.runtime.data.repositories.HostAppInfoRepository
 import com.rakuten.tech.mobile.inappmessaging.runtime.data.requests.ImpressionRequest
 import com.rakuten.tech.mobile.inappmessaging.runtime.utils.InAppLogger
-import com.rakuten.tech.mobile.inappmessaging.runtime.utils.InAppProdLogger
 import com.rakuten.tech.mobile.inappmessaging.runtime.utils.RuntimeUtil
 import com.rakuten.tech.mobile.inappmessaging.runtime.utils.WorkerUtils
 import okhttp3.ResponseBody
@@ -66,13 +65,13 @@ internal class ImpressionWorker(
             // Execute Retrofit API call and handle response.
             onResponse(createReportImpressionCall(impressionEndpoint, impressionRequest).execute())
         } catch (e: Exception) {
-            InAppProdLogger(TAG).error("Impression - error: ${e.message}")
+            InAppLogger(TAG).error("Impression - error: ${e.message}")
             Result.retry()
         }
     }
 
     private fun onResponse(response: Response<ResponseBody>): Result {
-        InAppProdLogger(TAG).info("impression API - code: ${response.code()}")
+        InAppLogger(TAG).info("impression API - code: ${response.code()}")
 
         return when {
             response.code() >= HttpURLConnection.HTTP_INTERNAL_ERROR ->
