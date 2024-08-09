@@ -57,7 +57,7 @@ internal abstract class CampaignRepository {
         }
 
         override fun syncWith(messageList: List<Message>, timestampMillis: Long, ignoreTooltips: Boolean) {
-            InAppLogger(TAG).debug("START -  message size: ${messageList.size}")
+            InAppLogger(TAG).info("syncWith start")
             lastSyncMillis = timestampMillis
             loadCachedData() // ensure we're using latest cache data for syncing below
             val oldList = LinkedHashMap(messages) // copy
@@ -68,7 +68,7 @@ internal abstract class CampaignRepository {
                 messages[updatedCampaign.campaignId] = updatedCampaign
             }
             saveDataToCache()
-            InAppLogger(TAG).debug("END")
+            InAppLogger(TAG).info("syncWith end")
         }
 
         private fun List<Message>.filterMessages(ignoreTooltips: Boolean): List<Message> {
@@ -99,13 +99,10 @@ internal abstract class CampaignRepository {
         }
 
         override fun optOutCampaign(id: String): Message? {
-            InAppLogger(TAG).debug("Campaign: $id}")
+            InAppLogger(TAG).debug("campaign: $id}")
             val localCampaign = messages[id]
             if (localCampaign == null) {
-                InAppLogger(TAG).debug(
-                    "Campaign ($id) could not be updated -" +
-                        "not found in the repository",
-                )
+                InAppLogger(TAG).debug("campaign not found in repository")
                 return null
             }
             val updatedCampaign = localCampaign.apply { isOptedOut = true }
@@ -116,7 +113,7 @@ internal abstract class CampaignRepository {
         }
 
         override fun decrementImpressions(id: String): Message? {
-            InAppLogger(TAG).debug("Campaign: $id")
+            InAppLogger(TAG).debug("campaign: $id")
             val campaign = messages[id] ?: return null
             return updateImpressions(
                 campaign,
@@ -136,7 +133,7 @@ internal abstract class CampaignRepository {
         @SuppressWarnings("TooGenericExceptionCaught")
         private fun loadCachedData() {
             if (InAppMessaging.instance().isLocalCachingEnabled()) {
-                InAppLogger(TAG).debug("START")
+                InAppLogger(TAG).debug("start")
                 messages.clear()
                 try {
                     val jsonObject = JSONObject(retrieveData())
@@ -146,9 +143,9 @@ internal abstract class CampaignRepository {
                         )
                     }
                 } catch (ex: Exception) {
-                    InAppLogger(TAG).debug(ex.cause, "Invalid JSON format for $IAM_USER_CACHE data")
+                    InAppLogger(TAG).debug(ex.cause, "invalid JSON format for $IAM_USER_CACHE data")
                 }
-                InAppLogger(TAG).debug("END")
+                InAppLogger(TAG).debug("end")
             }
         }
 
@@ -161,7 +158,8 @@ internal abstract class CampaignRepository {
                     key = IAM_USER_CACHE,
                     defValue = "",
                 )
-                InAppLogger(TAG).debug("Cache Read - file: $preferenceFile, data: $preferenceData")
+                InAppLogger(TAG).info("retrieveData - file: $preferenceFile")
+                InAppLogger(TAG).debug("retrieveData - data: $preferenceData")
                 preferenceData
             }.orEmpty()
         }
@@ -171,7 +169,8 @@ internal abstract class CampaignRepository {
                 HostAppInfoRepository.instance().getContext()?.let { ctx ->
                     val preferenceFile = InAppMessaging.getPreferencesFile()
                     val preferenceData = Gson().toJson(messages)
-                    InAppLogger(TAG).debug("Cache Write - file: $preferenceFile, data: $preferenceData")
+                    InAppLogger(TAG).info("saveData - file: $preferenceFile")
+                    InAppLogger(TAG).debug("saveData - data: $preferenceData")
                     PreferencesUtil.putString(
                         context = ctx,
                         name = preferenceFile,

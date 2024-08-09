@@ -176,7 +176,7 @@ internal open class InAppMessageBaseView(context: Context, attrs: AttributeSet?)
                         }
 
                         override fun onError(e: Exception?) {
-                            InAppLogger(TAG).debug(e?.cause, "Downloading image failed $imageUrl")
+                            InAppLogger(TAG).debug(e?.cause, "downloading image failed $imageUrl")
                         }
                     }
                     (picasso ?: Picasso.get()).load(this.imageUrl)
@@ -186,7 +186,7 @@ internal open class InAppMessageBaseView(context: Context, attrs: AttributeSet?)
                         .centerInside()
                         .into(imgView, callback)
                 } catch (ex: Exception) {
-                    InAppLogger(TAG).debug(ex, "Downloading image failed $imageUrl")
+                    InAppLogger(TAG).debug(ex, "downloading image failed $imageUrl")
                 }
             }
         }
@@ -215,7 +215,7 @@ internal open class InAppMessageBaseView(context: Context, attrs: AttributeSet?)
             Color.parseColor(button.buttonBackgroundColor)
         } catch (e: IllegalArgumentException) {
             // values are from backend
-            InAppLogger(TAG).error(e.message)
+            InAppLogger(TAG).error("setBgColor - error: ${e.message}")
             // set to default color
             Color.WHITE
         }
@@ -229,7 +229,7 @@ internal open class InAppMessageBaseView(context: Context, attrs: AttributeSet?)
             Color.parseColor(button.buttonTextColor)
         } catch (e: IllegalArgumentException) {
             // values are from backend
-            InAppLogger(TAG).error(e.message)
+            InAppLogger(TAG).error("setTextColor - error: ${e.message}")
             // set to default color
             Color.parseColor("#1D1D1D")
         }
@@ -346,7 +346,7 @@ internal open class InAppMessageBaseView(context: Context, attrs: AttributeSet?)
                     ResourceUtils.getResourceIdentifier(ctx, ctx.getString(strId), "font"),
                 )
             } catch (rex: Resources.NotFoundException) {
-                InAppLogger(TAG).debug(rex.cause, "Font file is not found. Will revert to default font.")
+                InAppLogger(TAG).debug(rex.cause, "font file is not found. Will revert to default font.")
             }
         }
 

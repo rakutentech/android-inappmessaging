@@ -97,12 +97,17 @@ internal object Initializer {
         enableTooltipFeature: Boolean? = false,
         sharedUtil: PreferencesUtil = PreferencesUtil,
     ) {
+        val deviceId = getDeviceId(context, sharedUtil)
+        val (appVer, rmcVer) = Pair(getHostAppVersion(context), getRmcSdkVersion(context))
+
         val hostAppInfo = HostAppInfo(
-            packageName = getHostAppPackageName(context), deviceId = getDeviceId(context, sharedUtil),
-            version = getHostAppVersion(context), subscriptionKey = subscriptionKey, locale = getLocale(context),
+            packageName = getHostAppPackageName(context), deviceId = deviceId,
+            version = appVer, subscriptionKey = subscriptionKey, locale = getLocale(context),
             configUrl = configUrl, isTooltipFeatureEnabled = enableTooltipFeature, context = context,
-            rmcSdkVersion = getRmcSdkVersion(context),
+            rmcSdkVersion = rmcVer,
         )
+
+        InAppLogger(TAG).info("configure - device: $deviceId, appVer: $appVer, rmcVer: $rmcVer")
 
         // Store hostAppInfo in repository.
         HostAppInfoRepository.instance().addHostInfo(hostAppInfo)

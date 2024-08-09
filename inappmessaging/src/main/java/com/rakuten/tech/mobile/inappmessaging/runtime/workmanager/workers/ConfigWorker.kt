@@ -53,7 +53,6 @@ internal class ConfigWorker(
      */
     @SuppressWarnings("TooGenericExceptionCaught")
     override fun doWork(): Result {
-        InAppLogger(TAG).debug("Config API - START")
         // Terminate request if any of the following values are empty
         if (!isConfigValid()) {
             return Result.failure()
@@ -63,7 +62,7 @@ internal class ConfigWorker(
             // Executing the API network call.
             onResponse(setupCall().execute())
         } catch (e: Exception) {
-            InAppLogger(TAG).error(e.message)
+            InAppLogger(TAG).error("config - error: ${e.message}")
             // RETRY by default has exponential backoff baked in.
             Result.retry()
         }
@@ -102,6 +101,7 @@ internal class ConfigWorker(
         if (response.isSuccessful && response.body() != null) {
             handleResponse(response)
         } else {
+            InAppLogger(TAG).error("config API - error: ${response.code()}")
             return when {
                 response.code() == RetryDelayUtil.RETRY_ERROR_CODE -> handleRetry(response)
                 response.code() >= HttpURLConnection.HTTP_INTERNAL_ERROR -> handleInternalError(response)
@@ -135,8 +135,8 @@ internal class ConfigWorker(
         // Schedule a ping request to message mixer. Initial delay is 0
         // reset current delay to initial
         ConfigScheduler.currDelay = RetryDelayUtil.INITIAL_BACKOFF_DELAY
-        InAppLogger(TAG).debug(
-            "Config API END - rollout: ${response.body()?.data?.rollOutPercentage}, " +
+        InAppLogger(TAG).info(
+            "config API success - rollout: ${response.body()?.data?.rollOutPercentage}, " +
                 "enabled: ${configRepo.isConfigEnabled()}",
         )
         if (configRepo.isConfigEnabled()) {

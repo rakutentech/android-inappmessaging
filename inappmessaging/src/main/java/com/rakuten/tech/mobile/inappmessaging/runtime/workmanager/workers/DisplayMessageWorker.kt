@@ -37,9 +37,9 @@ internal class DisplayMessageWorker(
      * This method starts displaying message runnable.
      */
     override suspend fun doWork(): Result {
-        InAppLogger(TAG).debug("Display worker START, thread: ${Thread.currentThread().name}")
+        InAppLogger(TAG).debug("display worker start - thread: ${Thread.currentThread().name}")
         prepareNextMessage()
-        InAppLogger(TAG).debug("Display worker END")
+        InAppLogger(TAG).debug("display worker end")
         return Result.success()
     }
 
@@ -78,7 +78,7 @@ internal class DisplayMessageWorker(
                 }
 
                 override fun onError(e: Exception?) {
-                    InAppLogger(TAG).debug("Downloading image failed")
+                    InAppLogger(TAG).error("downloading image failed for: ${message.campaignId}")
                 }
             },
             context = hostActivity, picasso = picasso,
@@ -88,7 +88,7 @@ internal class DisplayMessageWorker(
     private fun displayMessage(message: Message, hostActivity: Activity, newWorker: Boolean = false) {
         if (!verifyContexts(message)) {
             // Message display aborted by the host app
-            InAppLogger(TAG).debug("Message display cancelled by the host app")
+            InAppLogger(TAG).info("verifyContext - campaign cancelled: ${message.campaignId}")
             // Remove message in queue
             messageReadinessManager.removeMessageFromQueue(message.campaignId)
             // Prepare next message
@@ -96,6 +96,7 @@ internal class DisplayMessageWorker(
             return
         }
 
+        InAppLogger(TAG).info("will display campaign: ${message.campaignId}")
         // Display message on main thread
         handler.post(DisplayMessageRunnable(uiMessage = MessageMapper.mapFrom(message), hostActivity))
     }

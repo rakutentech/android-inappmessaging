@@ -67,14 +67,12 @@ internal class MessageMixerWorker(
             // Execute a thread blocking API network call, and handle response.
             onResponse(call.execute())
         } catch (e: Exception) {
-            InAppLogger(TAG).error("Ping API END - error: ${e.message}")
+            InAppLogger(TAG).error("ping - error: ${e.message}")
             Result.retry()
         }
     }
 
     private fun setupCall(): Call<MessageMixerResponse> {
-        InAppLogger(TAG).debug("Ping API START")
-
         // Create a retrofit API.
         val serviceApi = RuntimeUtil.getRetrofit().create(MessageMixerRetrofitService::class.java)
 
@@ -104,11 +102,11 @@ internal class MessageMixerWorker(
      */
     @VisibleForTesting
     fun onResponse(response: Response<MessageMixerResponse>): Result {
-        InAppLogger(TAG).debug("Ping API END - isSuccessful: ${response.isSuccessful}")
         if (response.isSuccessful) {
             serverErrorCounter.set(0) // reset server error counter
             response.body()?.let { handleResponse(it) }
         } else {
+            InAppLogger(TAG).error("ping API error - code: ${response.code()}")
             return when {
                 response.code() == RetryDelayUtil.RETRY_ERROR_CODE -> handleRetry(response)
                 response.code() >= HttpURLConnection.HTTP_INTERNAL_ERROR -> handleInternalError(response)
@@ -134,6 +132,8 @@ internal class MessageMixerWorker(
     }
 
     private fun handleResponse(messageMixerResponse: MessageMixerResponse) {
+        InAppLogger(TAG).info("ping API success - campaigns: ${messageMixerResponse.data.size}")
+
         // Parse all data in response.
         val parsedMessages = parsePingRespTestMessage(messageMixerResponse)
 
@@ -153,7 +153,6 @@ internal class MessageMixerWorker(
 
         // Schedule next ping.
         scheduleNextPing(messageMixerResponse.nextPingMillis)
-        InAppLogger(TAG).debug("campaign size: %d", messageMixerResponse.data.size)
     }
 
     private fun retryPingRequest(): Result {
@@ -171,7 +170,7 @@ internal class MessageMixerWorker(
         // reset current delay to initial
         MessageMixerPingScheduler.currDelay = RetryDelayUtil.INITIAL_BACKOFF_DELAY
         messageMixerScheduler.pingMessageMixerService(nextPingMillis)
-        InAppLogger(TAG).debug("Next ping scheduled in: %d", nextPingMillis)
+        InAppLogger(TAG).debug("next ping scheduled in: $nextPingMillis")
     }
 
     /**

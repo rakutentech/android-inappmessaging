@@ -112,13 +112,13 @@ internal class MessageReadinessManager(
         for (messageId in queuedMessagesCopy) {
             val message = campaignRepo.messages[messageId]
             if (message == null) {
-                InAppLogger(TAG).debug("Queued campaign $messageId does not exist in the repository anymore")
+                InAppLogger(TAG).debug("queued campaign $messageId does not exist in the repository anymore")
                 continue
             }
 
             // First, check if this message should be displayed.
             if (!shouldDisplayMessage(message)) {
-                InAppLogger(TAG).debug("Skipping message: ${message.campaignId}")
+                InAppLogger(TAG).info("campaign won't be displayed: ${message.campaignId}")
                 // Skip to next message.
                 continue
             }
@@ -136,11 +136,10 @@ internal class MessageReadinessManager(
 
     @SuppressWarnings("LongMethod")
     private fun shouldPing(message: Message, result: MutableList<Message>) = if (message.isTest) {
-        InAppLogger(TAG).debug("Skipping test message: ${message.campaignId}")
+        InAppLogger(TAG).debug("skipping test message: ${message.campaignId}")
         result.add(message)
         false
     } else {
-        InAppLogger(TAG).debug("Check API START - campaignId: ${message.campaignId}")
         // Check message display permission with server.
         val displayPermissionResponse = getMessagePermission(message)
         // If server wants SDK to ping for updated messages, do a new ping request and break this loop.
@@ -260,7 +259,7 @@ internal class MessageReadinessManager(
             handleResponse(response, call.clone())
         } catch (e: Exception) {
             checkAndRetry(call.clone()) {
-                InAppLogger(DISP_TAG).error(e.message)
+                InAppLogger(DISP_TAG).error("executeDisplayRequest - error: ${e.message}")
                 InAppMessaging.errorCallback?.let {
                     it(InAppMessagingException("In-App Messaging display permission request failed", e))
                 }
@@ -272,7 +271,7 @@ internal class MessageReadinessManager(
         response: Response<DisplayPermissionResponse>,
         callClone: Call<DisplayPermissionResponse>,
     ): DisplayPermissionResponse? {
-        InAppLogger(DISP_TAG).debug("Check API END - code: ${response.code()}, body: ${response.body()}")
+        InAppLogger(DISP_TAG).info("check API - code: ${response.code()}")
         return when {
             response.isSuccessful -> response.body()
             response.code() >= HttpURLConnection.HTTP_INTERNAL_ERROR -> checkAndRetry(callClone) {

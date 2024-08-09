@@ -33,7 +33,8 @@ internal object EventTrackerHelper {
                     com.rakuten.tech.mobile.analytics.RatTracker.event(eventName, serializableData).track()
                     return true
                 } catch (e: Exception) {
-                    InAppLogger(TAG).warn("Could not send event: $e")
+                    InAppLogger(TAG).warn("sendEvent - analytics.track() failed")
+                    InAppLogger(TAG).debug("exception: $e")
                 }
             }
         }

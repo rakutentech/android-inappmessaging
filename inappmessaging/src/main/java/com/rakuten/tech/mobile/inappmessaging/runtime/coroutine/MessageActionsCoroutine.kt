@@ -165,7 +165,7 @@ internal class MessageActionsCoroutine(
             try {
                 activityContext.startActivity(intent)
             } catch (e: ActivityNotFoundException) {
-                InAppLogger(TAG).debug(e.message)
+                InAppLogger(TAG).info("handleDeeplinkRedirection - error: ${e.message}")
             }
         }
     }
