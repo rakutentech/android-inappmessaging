@@ -45,7 +45,7 @@ internal class MessageEventReconciliationWorker(
      * Then add ready to display messages to repository.
      */
     override fun doWork(): Result {
-        InAppLogger(TAG).debug("Reconcile messages and local events")
+        InAppLogger(TAG).debug("reconcile messages and local events")
         var startTime: Long = 0
         if (BuildConfig.DEBUG) {
             startTime = getCurrentTimeMillis()
@@ -61,7 +61,7 @@ internal class MessageEventReconciliationWorker(
         if (BuildConfig.DEBUG) {
             endTime = getCurrentTimeMillis()
         }
-        InAppLogger(TAG).debug("Time took to reconcile: %d milliseconds", endTime - startTime)
+        InAppLogger(TAG).debug("time took to reconcile: %d milliseconds", endTime - startTime)
         return Result.success()
     }
 
@@ -70,7 +70,7 @@ internal class MessageEventReconciliationWorker(
             if (eventMatchingUtil.removeSetOfMatchedEvents(events, campaign)) {
                 messageReadinessManager.addMessageToQueue(campaign.campaignId)
                 InAppLogger(TAG).debug(
-                    "Ready message - campaignId: ${campaign.campaignId}, " +
+                    "ready message - campaignId: ${campaign.campaignId}, " +
                         "header: ${campaign.messagePayload.header}",
                 )
             }
