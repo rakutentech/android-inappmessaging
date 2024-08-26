@@ -58,6 +58,15 @@ internal class MessageActionsCoroutine(
         } else if (buttonType == ImpressionType.CLICK_CONTENT) {
             handleAction(OnClickBehavior(2, uiMessage.tooltipData?.url))
         }
+
+        // Add event in the button if exist.
+//        addEmbeddedEvent(buttonType, uiMessage)
+//        val onClickBehavior = if (uiMessage.type == InAppMessageType.TOOLTIP.typeId) {
+//            OnClickBehavior(ButtonActionType.DEEPLINK.typeId, uiMessage.tooltipData?.url)
+//        } else {
+//            getOnClickBehavior(buttonType, uiMessage)
+//        }
+//        handleAction(onClickBehavior, uiMessage.id)
         // Update campaign status in repository
         updateCampaignInRepository(uiMessage, optOut)
         // Schedule to report impression.
@@ -100,7 +109,7 @@ internal class MessageActionsCoroutine(
             R.id.message_close_button, BACK_BUTTON -> ImpressionType.EXIT
             R.id.message_single_button, R.id.message_button_left -> ImpressionType.ACTION_ONE
             R.id.message_button_right -> ImpressionType.ACTION_TWO
-            R.id.slide_up, R.id.message_tooltip_image_view, R.id.message_tip -> ImpressionType.CLICK_CONTENT
+            R.id.slide_up, R.id.message_tooltip_image_view, R.id.message_tip, R.id.message_image_view -> ImpressionType.CLICK_CONTENT
             else -> ImpressionType.INVALID
         }
     }

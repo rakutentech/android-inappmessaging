@@ -167,7 +167,10 @@ internal open class InAppMessageBaseView(context: Context, attrs: AttributeSet?)
             // load the image then display the view
             this.visibility = GONE
             findViewById<ImageView>(R.id.message_image_view)?.let { imgView ->
-                imgView.setOnTouchListener(this.listener)
+                // ToDo: Is there a feature for zooming? Check using actual device.
+//                imgView.setOnTouchListener(this.listener)
+                // ToDo: Call only if redirectUrl is specified from CustomJson or content exists
+                imgView.setOnClickListener(this.listener)
                 try {
                     val callback = object : Callback {
                         override fun onSuccess() {
