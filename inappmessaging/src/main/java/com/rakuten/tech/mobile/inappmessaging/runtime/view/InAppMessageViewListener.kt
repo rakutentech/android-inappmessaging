@@ -52,7 +52,6 @@ internal class InAppMessageViewListener(
                 MotionEvent.ACTION_CANCEL, MotionEvent.ACTION_UP -> this.magnifier?.dismiss()
                 else -> this.magnifier?.dismiss()
             }
-            return view.performClick()
         }
         return false
     }

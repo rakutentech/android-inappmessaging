@@ -34,11 +34,10 @@ internal object MessageMapper : Mapper<Message, UiMessage> {
         val customJsonData = from.getCustomJsonData()
         return if (customJsonData == null) {
             uiModel
-                .applyClickableImage() // ToDo: Remove - Only for testing
         } else {
             uiModel
-                .applyCustomPushPrimer(customJsonData.pushPrimer) // PushPrimer
-                .applyClickableImage()
+                .applyCustomPushPrimer(customJsonData.pushPrimer)
+                .applyCustomClickableImages(customJsonData.clickableImage)
         }
     }
 }
