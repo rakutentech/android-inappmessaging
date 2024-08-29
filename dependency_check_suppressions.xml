@@ -88,6 +88,13 @@
     <packageUrl regex="true">^pkg:maven/com\.squareup\.okio/okio@.*$</packageUrl>
     <vulnerabilityName>CVE-2023-3635</vulnerabilityName>
   </suppress>
+  <suppress until="2024-12-31Z">
+    <notes><![CDATA[
+   file name: okhttp-3.14.9.jar
+   ]]></notes>
+    <packageUrl regex="true">^pkg:maven/com\.squareup\.okhttp3/okhttp@.*$</packageUrl>
+    <vulnerabilityName>CVE-2023-0833</vulnerabilityName>
+  </suppress>
 
   <!-- WorkManager -->
   <suppress until="2024-12-31Z">
