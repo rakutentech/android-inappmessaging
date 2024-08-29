@@ -58,7 +58,6 @@ internal class MessageActionsCoroutine(
         } else if (buttonType == ImpressionType.CLICK_CONTENT) {
             handleAction(OnClickBehavior(2, uiMessage.tooltipData?.url))
         }
-
         // Update campaign status in repository
         updateCampaignInRepository(uiMessage, optOut)
         // Schedule to report impression.

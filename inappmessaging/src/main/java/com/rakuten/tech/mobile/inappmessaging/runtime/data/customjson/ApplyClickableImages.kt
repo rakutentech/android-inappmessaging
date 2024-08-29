@@ -17,7 +17,6 @@ internal fun UiMessage.applyCustomClickableImages(clickableImages: List<Clickabl
     }
 
     val newOnclick = OnClickBehavior(action = ButtonActionType.REDIRECT.typeId, uri = image.redirectURL)
-//    val newOnclick = OnClickBehavior(action = ButtonActionType.REDIRECT.typeId, uri = "https://www.youtube.com")
     return this.copy(
         content = if (this.content == null) {
             Content(onClick = newOnclick)
