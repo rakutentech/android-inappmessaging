@@ -59,14 +59,6 @@ internal class MessageActionsCoroutine(
             handleAction(OnClickBehavior(2, uiMessage.tooltipData?.url))
         }
 
-        // Add event in the button if exist.
-//        addEmbeddedEvent(buttonType, uiMessage)
-//        val onClickBehavior = if (uiMessage.type == InAppMessageType.TOOLTIP.typeId) {
-//            OnClickBehavior(ButtonActionType.DEEPLINK.typeId, uiMessage.tooltipData?.url)
-//        } else {
-//            getOnClickBehavior(buttonType, uiMessage)
-//        }
-//        handleAction(onClickBehavior, uiMessage.id)
         // Update campaign status in repository
         updateCampaignInRepository(uiMessage, optOut)
         // Schedule to report impression.
