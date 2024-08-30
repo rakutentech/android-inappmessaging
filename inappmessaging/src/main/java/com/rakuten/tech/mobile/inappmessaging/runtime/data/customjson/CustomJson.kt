@@ -2,7 +2,7 @@ package com.rakuten.tech.mobile.inappmessaging.runtime.data.customjson
 
 internal data class CustomJson(
     val pushPrimer: PushPrimer? = null,
-    val clickableImage: List<ClickableImage>? = null
+    val clickableImage: ClickableImage? = null
 )
 
 internal data class PushPrimer(
@@ -14,12 +14,7 @@ internal data class PushPrimer(
 
 internal data class ClickableImage(
     /**
-     * Image index
+     * Redirect URL or deeplink
      */
-    val image: Int? = null,
-
-    /**
-     * External URL or deeplink
-     */
-    val redirectURL: String? = null
+    val url: String? = null
 )
