@@ -171,7 +171,7 @@ internal open class InAppMessageBaseView(context: Context, attrs: AttributeSet?)
             this.visibility = GONE
             findViewById<ImageView>(R.id.message_image_view)?.let { imgView ->
                 imgView.setOnTouchListener(this.listener)
-                if (this.imageClickBehavior?.uri != null) {
+                if (!this.imageClickBehavior?.uri.isNullOrEmpty()) {
                     imgView.setOnClickListener(this.listener)
                 }
                 try {
