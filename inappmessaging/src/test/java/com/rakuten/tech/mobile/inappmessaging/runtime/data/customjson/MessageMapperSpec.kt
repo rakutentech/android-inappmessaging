@@ -60,4 +60,9 @@ class MessageMapperSpec {
         uiMessage.buttons.size shouldBeEqualTo 1
         uiMessage.buttons[0].buttonBehavior.action shouldBeEqualTo ButtonActionType.PUSH_PRIMER.typeId
     }
+
+    @Test
+    fun `should apply custom ClickableImage setting`() {
+
+    }
 }

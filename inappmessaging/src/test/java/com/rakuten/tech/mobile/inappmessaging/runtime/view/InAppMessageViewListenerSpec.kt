@@ -138,78 +138,78 @@ class InAppMessageViewListenerOnTouchSpec : InAppMessageViewListenerSpec() {
     }
 
     @Test
-    fun `should return true on touch with action down and onClick listener`() {
+    fun `should return false on touch with action down and onClick listener`() {
         val listener = setupListener(MotionEvent.ACTION_DOWN)
 
-        listener.onTouch(mockView, mockMotionEvent).shouldBeTrue()
+        listener.onTouch(mockView, mockMotionEvent).shouldBeFalse()
     }
 
     @Test
-    fun `should return true on touch with action move and onClick listener`() {
+    fun `should return false on touch with action move and onClick listener`() {
         val listener = setupListener(MotionEvent.ACTION_MOVE)
 
         listener.magnifier = Mockito.mock(Magnifier::class.java)
-        listener.onTouch(mockView, mockMotionEvent).shouldBeTrue()
+        listener.onTouch(mockView, mockMotionEvent).shouldBeFalse()
     }
 
     @Test
-    fun `should return true on touch with action cancel and onClick listener`() {
+    fun `should return false on touch with action cancel and onClick listener`() {
         val listener = setupListener(MotionEvent.ACTION_CANCEL)
 
         listener.magnifier = Mockito.mock(Magnifier::class.java)
-        listener.onTouch(mockView, mockMotionEvent).shouldBeTrue()
+        listener.onTouch(mockView, mockMotionEvent).shouldBeFalse()
     }
 
     @Test
-    fun `should return true on touch with action up and onClick listener`() {
+    fun `should return false on touch with action up and onClick listener`() {
         val listener = setupListener(MotionEvent.ACTION_UP)
 
         listener.magnifier = Mockito.mock(Magnifier::class.java)
-        listener.onTouch(mockView, mockMotionEvent).shouldBeTrue()
+        listener.onTouch(mockView, mockMotionEvent).shouldBeFalse()
     }
 
     @Test
-    fun `should return true on touch with other action and onClick listener`() {
+    fun `should return false on touch with other action and onClick listener`() {
         val listener = setupListener(MotionEvent.ACTION_OUTSIDE)
 
         listener.magnifier = Mockito.mock(Magnifier::class.java)
-        listener.onTouch(mockView, mockMotionEvent).shouldBeTrue()
+        listener.onTouch(mockView, mockMotionEvent).shouldBeFalse()
     }
 
     @Test
-    fun `should return true on touch with action move, null magnifier, and onClick listener`() {
+    fun `should return false on touch with action move, null magnifier, and onClick listener`() {
         val listener = setupListener(MotionEvent.ACTION_MOVE)
 
-        listener.onTouch(mockView, mockMotionEvent).shouldBeTrue()
+        listener.onTouch(mockView, mockMotionEvent).shouldBeFalse()
         listener.magnifier.shouldBeNull()
     }
 
     @Test
-    fun `should return true on touch with action cancel, null magnifier, and onClick listener`() {
+    fun `should return false on touch with action cancel, null magnifier, and onClick listener`() {
         val listener = setupListener(MotionEvent.ACTION_CANCEL)
 
-        listener.onTouch(mockView, mockMotionEvent).shouldBeTrue()
+        listener.onTouch(mockView, mockMotionEvent).shouldBeFalse()
         listener.magnifier.shouldBeNull()
     }
 
     @Test
-    fun `should return true on touch with action up, null magnifier, and onClick listener`() {
+    fun `should return false on touch with action up, null magnifier, and onClick listener`() {
         val listener = setupListener(MotionEvent.ACTION_UP)
 
-        listener.onTouch(mockView, mockMotionEvent).shouldBeTrue()
+        listener.onTouch(mockView, mockMotionEvent).shouldBeFalse()
         listener.magnifier.shouldBeNull()
     }
 
     @Test
-    fun `should return true on touch with other action, null magnifier, and onClick listener`() {
+    fun `should return false on touch with other action, null magnifier, and onClick listener`() {
         val listener = setupListener(MotionEvent.ACTION_OUTSIDE)
 
-        listener.onTouch(mockView, mockMotionEvent).shouldBeTrue()
+        listener.onTouch(mockView, mockMotionEvent).shouldBeFalse()
         listener.magnifier.shouldBeNull()
     }
 
     @Test
-    fun `should return true on touch with action down`() {
+    fun `should return false on touch with action down`() {
         val listener = InAppMessageViewListener(
             MessageMapper.mapFrom(
                 TestDataHelper.createDummyMessage(campaignId = "1", isTest = true),
