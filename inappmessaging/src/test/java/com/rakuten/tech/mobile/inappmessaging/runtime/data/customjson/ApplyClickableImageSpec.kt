@@ -11,7 +11,7 @@ class ApplyClickableImageSpec {
     private val message = MessageMapper.mapFrom(TestDataHelper.createDummyMessage()).copy(
         content = null,
         imageUrl = "http://test.com",
-        type = InAppMessageType.MODAL.typeId
+        type = InAppMessageType.MODAL.typeId,
     )
 
     @Test
@@ -68,7 +68,8 @@ class ApplyClickableImageSpec {
     fun `should update content url to clickableImage url for non-null content data`() {
         val uiMessage = message.copy(
             type = InAppMessageType.MODAL.typeId,
-            content = Content(onClick = OnClickBehavior(3)))
+            content = Content(onClick = OnClickBehavior(3)),
+        )
             .applyCustomClickableImage(ClickableImage("http://test.com"), false)
 
         uiMessage.content?.onClick?.uri shouldBeEqualTo "http://test.com"

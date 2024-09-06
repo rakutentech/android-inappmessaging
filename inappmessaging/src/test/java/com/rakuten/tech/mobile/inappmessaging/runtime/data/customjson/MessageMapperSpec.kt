@@ -63,6 +63,5 @@ class MessageMapperSpec {
 
     @Test
     fun `should apply custom ClickableImage setting`() {
-
     }
 }
