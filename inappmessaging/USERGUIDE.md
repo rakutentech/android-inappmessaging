@@ -496,7 +496,7 @@ All the events "launch the app event, login event, purchase successful event, cu
 <details>
 <summary style="cursor: pointer;";>(click to expand)</summary>
 
-#### 7.6.0 (In-Progress)
+#### 7.6.0 (2024-09-12)
 * Improvements:
   - SDKCF-6327: Updated compile and target SDK to API 34 (Android 14).
   - RMCCX-6695: Improved the userguide.
