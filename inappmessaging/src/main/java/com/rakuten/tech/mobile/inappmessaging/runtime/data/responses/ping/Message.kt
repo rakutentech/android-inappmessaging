@@ -72,7 +72,8 @@ internal data class Message(
                     tooltip = null
                 }
             } catch (je: JsonParseException) {
-                InAppLogger(TAG).warn("Invalid format for tooltip config.", je)
+                InAppLogger(TAG).warn("getTooltipConfig - invalid tooltip format")
+                InAppLogger(TAG).debug("parse exception: $je")
             }
         }
         return tooltip
@@ -86,7 +87,8 @@ internal data class Message(
             try {
                 customJsonData = Gson().fromJson(customJson, CustomJson::class.java)
             } catch (je: JsonParseException) {
-                InAppLogger(TAG).warn("Invalid format/representation for CustomJson", je)
+                InAppLogger(TAG).warn("getCustomJsonData - invalid customJson format")
+                InAppLogger(TAG).debug("parse exception: $je")
             }
         }
         return customJsonData

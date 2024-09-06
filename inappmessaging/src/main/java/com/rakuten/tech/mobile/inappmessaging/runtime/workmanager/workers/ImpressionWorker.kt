@@ -56,7 +56,7 @@ internal class ImpressionWorker(
         val impressionRequest = try {
             Gson().fromJson(impressionRequestJsonRequest, ImpressionRequest::class.java)
         } catch (e: JsonParseException) {
-            InAppLogger(TAG).error(e.message)
+            InAppLogger(TAG).error("impression - error: ${e.message}")
             return Result.failure()
         }
 
@@ -65,13 +65,13 @@ internal class ImpressionWorker(
             // Execute Retrofit API call and handle response.
             onResponse(createReportImpressionCall(impressionEndpoint, impressionRequest).execute())
         } catch (e: Exception) {
-            InAppLogger(TAG).debug(e.message)
+            InAppLogger(TAG).error("impression - error: ${e.message}")
             Result.retry()
         }
     }
 
     private fun onResponse(response: Response<ResponseBody>): Result {
-        InAppLogger(TAG).debug("Impression Response:%d", response.code())
+        InAppLogger(TAG).info("impression API - code: ${response.code()}")
 
         return when {
             response.code() >= HttpURLConnection.HTTP_INTERNAL_ERROR ->
