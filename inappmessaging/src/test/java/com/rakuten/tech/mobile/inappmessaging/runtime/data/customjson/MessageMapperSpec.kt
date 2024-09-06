@@ -5,8 +5,11 @@ import com.rakuten.tech.mobile.inappmessaging.runtime.RmcHelper
 import com.rakuten.tech.mobile.inappmessaging.runtime.data.enums.ButtonActionType
 import com.rakuten.tech.mobile.inappmessaging.runtime.data.responses.ping.MessageButton
 import com.rakuten.tech.mobile.inappmessaging.runtime.data.responses.ping.OnClickBehavior
+import com.rakuten.tech.mobile.inappmessaging.runtime.data.responses.ping.Resource
 import com.rakuten.tech.mobile.inappmessaging.runtime.testhelpers.TestDataHelper
 import org.amshove.kluent.shouldBeEqualTo
+import org.amshove.kluent.shouldNotBe
+import org.amshove.kluent.shouldNotBeEqualTo
 import org.junit.After
 import org.junit.Before
 import org.junit.Test
@@ -63,5 +66,21 @@ class MessageMapperSpec {
 
     @Test
     fun `should apply custom ClickableImage setting`() {
+        val settings = TestDataHelper.message0Payload.messageSettings
+        val payload = TestDataHelper.message0Payload.copy(
+            resource = Resource(imageUrl = "http://test/image.png", cropType = 0),
+            messageSettings = settings.copy(controlSettings = settings.controlSettings.copy(content = null)))
+
+        val uiMessage = MessageMapper.mapFrom(
+            TestDataHelper.createDummyMessage(
+                messagePayload = payload,
+                customJson = JsonParser.parseString("""{"clickableImage": { "url": "http://test.com" }}""").asJsonObject,
+            ),
+        )
+
+        uiMessage.content shouldNotBeEqualTo null
+        uiMessage.content?.onClick shouldNotBeEqualTo null
+        uiMessage.content?.onClick?.action shouldBeEqualTo ButtonActionType.REDIRECT.typeId
+        uiMessage.content?.onClick?.uri shouldBeEqualTo "http://test.com"
     }
 }

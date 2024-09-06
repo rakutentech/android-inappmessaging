@@ -21,7 +21,7 @@ class ApplyClickableImageSpec {
     }
 
     @Test
-    fun `should do nothing if url attribute is does not exist or empty`() {
+    fun `should do nothing if url attribute does not exist or empty`() {
         var uiMessage = message.applyCustomClickableImage(ClickableImage(), false)
         uiMessage shouldBeEqualTo message
 
