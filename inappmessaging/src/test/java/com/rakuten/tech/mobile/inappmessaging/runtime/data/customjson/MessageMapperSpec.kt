@@ -8,7 +8,6 @@ import com.rakuten.tech.mobile.inappmessaging.runtime.data.responses.ping.OnClic
 import com.rakuten.tech.mobile.inappmessaging.runtime.data.responses.ping.Resource
 import com.rakuten.tech.mobile.inappmessaging.runtime.testhelpers.TestDataHelper
 import org.amshove.kluent.shouldBeEqualTo
-import org.amshove.kluent.shouldNotBe
 import org.amshove.kluent.shouldNotBeEqualTo
 import org.junit.After
 import org.junit.Before
@@ -69,12 +68,14 @@ class MessageMapperSpec {
         val settings = TestDataHelper.message0Payload.messageSettings
         val payload = TestDataHelper.message0Payload.copy(
             resource = Resource(imageUrl = "http://test/image.png", cropType = 0),
-            messageSettings = settings.copy(controlSettings = settings.controlSettings.copy(content = null)))
+            messageSettings = settings.copy(controlSettings = settings.controlSettings.copy(content = null)),
+        )
 
         val uiMessage = MessageMapper.mapFrom(
             TestDataHelper.createDummyMessage(
                 messagePayload = payload,
-                customJson = JsonParser.parseString("""{"clickableImage": { "url": "http://test.com" }}""").asJsonObject,
+                customJson = JsonParser.parseString("""{"clickableImage": { "url": "http://test.com" }}""")
+                    .asJsonObject,
             ),
         )
 
