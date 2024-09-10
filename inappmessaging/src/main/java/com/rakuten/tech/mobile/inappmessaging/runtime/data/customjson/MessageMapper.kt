@@ -36,7 +36,8 @@ internal object MessageMapper : Mapper<Message, UiMessage> {
             uiModel
         } else {
             uiModel
-                .applyCustomPushPrimer(customJsonData.pushPrimer) // PushPrimer
+                .applyCustomPushPrimer(customJsonData.pushPrimer)
+                .applyCustomClickableImage(customJsonData.clickableImage, from.isPushPrimer)
         }
     }
 }

@@ -21,6 +21,7 @@ import com.google.android.material.button.MaterialButton
 import com.rakuten.tech.mobile.inappmessaging.runtime.R
 import com.rakuten.tech.mobile.inappmessaging.runtime.data.ui.UiMessage
 import com.rakuten.tech.mobile.inappmessaging.runtime.data.responses.ping.MessageButton
+import com.rakuten.tech.mobile.inappmessaging.runtime.data.responses.ping.OnClickBehavior
 import com.rakuten.tech.mobile.inappmessaging.runtime.utils.BuildVersionChecker
 import com.rakuten.tech.mobile.inappmessaging.runtime.utils.InAppLogger
 import com.rakuten.tech.mobile.inappmessaging.runtime.utils.ResourceUtils
@@ -47,6 +48,7 @@ internal open class InAppMessageBaseView(context: Context, attrs: AttributeSet?)
     var listener: InAppMessageViewListener? = null
         private set
     private var imageUrl: String? = null
+    private var imageClickBehavior: OnClickBehavior? = null
     private var headerColor = 0
     private var messageBodyColor = 0
     private var header: String? = null
@@ -70,6 +72,7 @@ internal open class InAppMessageBaseView(context: Context, attrs: AttributeSet?)
         this.messageBody = uiMessage.bodyText
         this.buttons = uiMessage.buttons
         this.imageUrl = uiMessage.imageUrl
+        this.imageClickBehavior = uiMessage.content?.onClick
         this.listener = InAppMessageViewListener(uiMessage)
         this.displayOptOut = uiMessage.displaySettings.isOptedOut
         this.isDismissable = uiMessage.shouldShowUpperCloseButton
@@ -168,6 +171,9 @@ internal open class InAppMessageBaseView(context: Context, attrs: AttributeSet?)
             this.visibility = GONE
             findViewById<ImageView>(R.id.message_image_view)?.let { imgView ->
                 imgView.setOnTouchListener(this.listener)
+                if (!this.imageClickBehavior?.uri.isNullOrEmpty()) {
+                    imgView.setOnClickListener(this.listener)
+                }
                 try {
                     val callback = object : Callback {
                         override fun onSuccess() {

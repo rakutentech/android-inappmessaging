@@ -169,6 +169,11 @@ class MessageActionsCoroutineFuncSpec : BaseTest() {
     }
 
     @Test
+    fun `should return click content for image resource`() {
+        action.getOnClickBehaviorType(R.id.message_image_view) shouldBeEqualTo ImpressionType.CLICK_CONTENT
+    }
+
+    @Test
     fun `should return null for action one with empty buttons`() {
         val message = message.copy(buttons = listOf())
         action.getOnClickBehavior(ImpressionType.ACTION_ONE, message).shouldBeNull()
