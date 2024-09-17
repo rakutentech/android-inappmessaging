@@ -1,0 +1,14 @@
+//[inappmessaging](../../../../index.md)/[com.rakuten.tech.mobile.inappmessaging.runtime.data.enums](../../index.md)/[ValueType](../index.md)/[STRING](index.md)
+
+# STRING
+
+[androidJvm]\
+[STRING](index.md)
+
+## Properties
+
+| Name | Summary |
+|---|---|
+| [name](../-t-i-m-e_-i-n_-m-i-l-l-i/index.md#-372974862%2FProperties%2F-93201661) | [androidJvm]<br>val [name](../-t-i-m-e_-i-n_-m-i-l-l-i/index.md#-372974862%2FProperties%2F-93201661): [String](https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-string/index.html) |
+| [ordinal](../-t-i-m-e_-i-n_-m-i-l-l-i/index.md#-739389684%2FProperties%2F-93201661) | [androidJvm]<br>val [ordinal](../-t-i-m-e_-i-n_-m-i-l-l-i/index.md#-739389684%2FProperties%2F-93201661): [Int](https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-int/index.html) |
+| [typeId](../type-id.md) | [androidJvm]<br>val [typeId](../type-id.md): [Int](https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-int/index.html)<br>Value type id. |
