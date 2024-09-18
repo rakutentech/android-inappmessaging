@@ -502,7 +502,7 @@ All the events "launch the app event, login event, purchase successful event, cu
 * RMC SDK updates:
   - RMCCX-7186: Supported Clickable Image through CustomJson.
 
-#### 7.6.0 (In-Progress)
+#### 7.6.0 (2024-09-17)
 * Improvements:
   - SDKCF-6327: Updated compile and target SDK to API 34 (Android 14).
   - RMCCX-6695: Improved the userguide.
