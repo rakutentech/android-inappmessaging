@@ -38,6 +38,7 @@ internal object MessageMapper : Mapper<Message, UiMessage> {
             uiModel
                 .applyCustomPushPrimer(customJsonData.pushPrimer)
                 .applyCustomClickableImage(customJsonData.clickableImage, from.isPushPrimer)
+                .applyBackground(customJsonData.background)
         }
     }
 }
