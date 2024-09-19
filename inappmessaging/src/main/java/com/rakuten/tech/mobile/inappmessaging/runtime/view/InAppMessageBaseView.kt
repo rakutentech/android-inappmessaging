@@ -22,6 +22,7 @@ import com.rakuten.tech.mobile.inappmessaging.runtime.R
 import com.rakuten.tech.mobile.inappmessaging.runtime.data.ui.UiMessage
 import com.rakuten.tech.mobile.inappmessaging.runtime.data.responses.ping.MessageButton
 import com.rakuten.tech.mobile.inappmessaging.runtime.data.responses.ping.OnClickBehavior
+import com.rakuten.tech.mobile.inappmessaging.runtime.extensions.isValidUrl
 import com.rakuten.tech.mobile.inappmessaging.runtime.utils.BuildVersionChecker
 import com.rakuten.tech.mobile.inappmessaging.runtime.utils.InAppLogger
 import com.rakuten.tech.mobile.inappmessaging.runtime.utils.ResourceUtils
@@ -170,9 +171,9 @@ internal open class InAppMessageBaseView(context: Context, attrs: AttributeSet?)
             // load the image then display the view
             this.visibility = GONE
             findViewById<ImageView>(R.id.message_image_view)?.let { imgView ->
-                if (!this.imageClickBehavior?.uri.isNullOrEmpty()) {
+                if (!this.imageClickBehavior?.uri.isValidUrl()) {
                     imgView.setOnClickListener(this.listener)
-                }
+                } // For invalid URL, image content will be non-clickable
                 try {
                     val callback = object : Callback {
                         override fun onSuccess() {

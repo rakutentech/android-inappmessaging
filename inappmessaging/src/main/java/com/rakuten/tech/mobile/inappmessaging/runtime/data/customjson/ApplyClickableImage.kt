@@ -24,7 +24,7 @@ internal fun UiMessage.applyCustomClickableImage(clickableImage: ClickableImage?
         return this
     }
 
-    val newOnclick = OnClickBehavior(action = ButtonActionType.REDIRECT.typeId, uri = clickableImage.url)
+    val newOnclick = OnClickBehavior(action = ButtonActionType.REDIRECT.typeId, uri = clickableImage.url.trim())
     return this.copy(
         content = if (this.content == null) {
             Content(onClick = newOnclick)
