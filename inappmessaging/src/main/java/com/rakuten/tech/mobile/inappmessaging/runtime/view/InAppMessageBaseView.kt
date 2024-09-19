@@ -172,7 +172,7 @@ internal open class InAppMessageBaseView(context: Context, attrs: AttributeSet?)
             findViewById<ImageView>(R.id.message_image_view)?.let { imgView ->
                 if (!this.imageClickBehavior?.uri.isNullOrEmpty()) {
                     imgView.setOnClickListener(this.listener)
-                } // For invalid URL, image content will be non-clickable
+                }
                 try {
                     val callback = object : Callback {
                         override fun onSuccess() {
