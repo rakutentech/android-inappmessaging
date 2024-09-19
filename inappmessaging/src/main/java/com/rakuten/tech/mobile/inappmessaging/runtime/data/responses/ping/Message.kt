@@ -57,7 +57,8 @@ internal data class Message(
         }
 
     val isPushPrimer: Boolean
-        get() = getCustomJsonData()?.pushPrimer?.button != null
+//        get() = getCustomJsonData()?.pushPrimer?.button != null
+        get() = false
 
     fun getTooltipConfig(): Tooltip? {
         val result = messagePayload.title.startsWith(TOOLTIP_TAG, true)
@@ -80,9 +81,9 @@ internal data class Message(
     }
 
     fun getCustomJsonData(): CustomJson? {
-        if (!RmcHelper.isRmcIntegrated() || customJson == null || customJson.entrySet().isEmpty()) {
-            return null
-        }
+//        if (!RmcHelper.isRmcIntegrated() || customJson == null || customJson.entrySet().isEmpty()) {
+//            return null
+//        }
         if (customJsonData == null) {
             try {
                 customJsonData = Gson().fromJson(customJson, CustomJson::class.java)
