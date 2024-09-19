@@ -171,7 +171,7 @@ internal open class InAppMessageBaseView(context: Context, attrs: AttributeSet?)
             // load the image then display the view
             this.visibility = GONE
             findViewById<ImageView>(R.id.message_image_view)?.let { imgView ->
-                if (!this.imageClickBehavior?.uri.isValidUrl()) {
+                if (this.imageClickBehavior?.uri.isValidUrl()) {
                     imgView.setOnClickListener(this.listener)
                 } // For invalid URL, image content will be non-clickable
                 try {
