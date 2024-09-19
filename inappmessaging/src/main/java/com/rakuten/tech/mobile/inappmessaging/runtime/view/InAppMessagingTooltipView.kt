@@ -134,7 +134,7 @@ internal class InAppMessagingTooltipView(
                     }
 
                     override fun onError(e: Exception?) {
-                        InAppLogger(TAG).debug(e?.cause, "Downloading image failed $imageUrl")
+                        InAppLogger(TAG).debug(e?.cause, "downloading image failed: $imageUrl")
                     }
                 }
 
@@ -160,7 +160,7 @@ internal class InAppMessagingTooltipView(
                     .centerInside()
                     .into(view, callback)
             } catch (ex: Exception) {
-                InAppLogger(TAG).debug(ex, "Downloading image failed $imageUrl")
+                InAppLogger(TAG).debug(ex, "downloading image failed: $imageUrl")
             }
         }
     }

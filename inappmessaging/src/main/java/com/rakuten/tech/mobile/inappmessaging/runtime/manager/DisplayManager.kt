@@ -165,7 +165,7 @@ internal interface DisplayManager {
                 parent.removeView(inAppMessageBaseView)
             }
 
-            InAppLogger(TAG).debug("View removed")
+            InAppLogger(TAG).debug("view removed")
         }
 
         private fun removeTooltip(parent: ViewGroup, id: String?, activity: Activity) {

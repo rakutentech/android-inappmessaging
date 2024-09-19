@@ -496,6 +496,12 @@ All the events "launch the app event, login event, purchase successful event, cu
 <details>
 <summary style="cursor: pointer;";>(click to expand)</summary>
 
+#### 7.7.0 (In-Progress)
+* Improvements:
+  - RMCCX-6876: Improved console logging.
+* RMC SDK updates:
+  - RMCCX-7186: Supported Clickable Image through CustomJson.
+
 #### 7.6.0 (2024-09-17)
 * Improvements:
   - SDKCF-6327: Updated compile and target SDK to API 34 (Android 14).
