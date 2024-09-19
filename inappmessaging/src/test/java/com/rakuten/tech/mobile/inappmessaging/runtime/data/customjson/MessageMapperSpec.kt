@@ -84,4 +84,15 @@ class MessageMapperSpec {
         uiMessage.content?.onClick?.action shouldBeEqualTo ButtonActionType.REDIRECT.typeId
         uiMessage.content?.onClick?.uri shouldBeEqualTo "http://test.com"
     }
+
+    @Test
+    fun `should apply custom Background setting`() {
+        val uiMessage = MessageMapper.mapFrom(
+            TestDataHelper.createDummyMessage(
+                customJson = JsonParser.parseString("""{"background": { "opacity": 0.6 }}""").asJsonObject,
+            ),
+        )
+
+        uiMessage.backdropOpacity shouldBeEqualTo 0.6f
+    }
 }
