@@ -21,29 +21,32 @@ class ApplyClickableImageSpec {
     }
 
     @Test
-    fun `should do nothing if url attribute does not exist or empty`() {
+    fun `should do nothing if url attribute is invalid`() {
         var uiMessage = message.applyCustomClickableImage(ClickableImage(), false)
         uiMessage shouldBeEqualTo message
 
         uiMessage = message.applyCustomClickableImage(ClickableImage(""), false)
+        uiMessage shouldBeEqualTo message
+
+        uiMessage = message.applyCustomClickableImage(ClickableImage("ogle.124dsefsd"), false)
         uiMessage shouldBeEqualTo message
     }
 
     @Test
     fun `should do nothing if imageUrl does not exist or empty`() {
         var uiMessage = message.copy(imageUrl = null)
-            .applyCustomClickableImage(ClickableImage("http://test.com"), false)
+            .applyCustomClickableImage(ClickableImage("https://test.com"), false)
         uiMessage.content?.onClick?.uri shouldBeEqualTo null
 
         uiMessage = message.copy(imageUrl = "")
-            .applyCustomClickableImage(ClickableImage("http://test.com"), false)
+            .applyCustomClickableImage(ClickableImage("https://test.com"), false)
         uiMessage.content?.onClick?.uri shouldBeEqualTo null
     }
 
     @Test
     fun `should do nothing if campaign layout isn't clickable`() {
         val uiMessage = message.copy(type = InAppMessageType.SLIDE.typeId)
-            .applyCustomClickableImage(ClickableImage("http://test.com"), false)
+            .applyCustomClickableImage(ClickableImage("https://test.com"), false)
 
         uiMessage.content?.onClick?.uri shouldBeEqualTo null
     }
@@ -51,7 +54,7 @@ class ApplyClickableImageSpec {
     @Test
     fun `should do nothing if campaign is a PushPrimer`() {
         val uiMessage = message.copy(type = InAppMessageType.MODAL.typeId)
-            .applyCustomClickableImage(ClickableImage("http://test.com"), true)
+            .applyCustomClickableImage(ClickableImage("https://test.com"), true)
 
         uiMessage.content?.onClick?.uri shouldBeEqualTo null
     }
@@ -59,9 +62,9 @@ class ApplyClickableImageSpec {
     @Test
     fun `should update content url to clickableImage url for null content data`() {
         val uiMessage = message.copy(type = InAppMessageType.MODAL.typeId)
-            .applyCustomClickableImage(ClickableImage("http://test.com"), false)
+            .applyCustomClickableImage(ClickableImage("https://test.com"), false)
 
-        uiMessage.content?.onClick?.uri shouldBeEqualTo "http://test.com"
+        uiMessage.content?.onClick?.uri shouldBeEqualTo "https://test.com"
     }
 
     @Test
@@ -70,8 +73,8 @@ class ApplyClickableImageSpec {
             type = InAppMessageType.MODAL.typeId,
             content = Content(onClick = OnClickBehavior(3)),
         )
-            .applyCustomClickableImage(ClickableImage("http://test.com"), false)
+            .applyCustomClickableImage(ClickableImage("myapp://open?param=value"), false)
 
-        uiMessage.content?.onClick?.uri shouldBeEqualTo "http://test.com"
+        uiMessage.content?.onClick?.uri shouldBeEqualTo "myapp://open?param=value"
     }
 }

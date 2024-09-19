@@ -14,9 +14,18 @@ internal fun UiMessage.applyCustomClickableImage(clickableImage: ClickableImage?
         )
     }
 
+    fun String?.isValidUrlOrDeeplink(): Boolean {
+        if (this.isNullOrEmpty()) {
+            return false
+        }
+
+        val allowedPattern = Regex("https://.*|.*://.*")
+        return this.matches(allowedPattern)
+    }
+
     @SuppressWarnings("ComplexCondition")
     if (clickableImage == null ||
-        clickableImage.url.isNullOrEmpty() ||
+        !clickableImage.url.isValidUrlOrDeeplink() ||
         imageUrl.isNullOrEmpty() ||
         !type.campaignTypeCanBeClickable() ||
         isPushPrimer
