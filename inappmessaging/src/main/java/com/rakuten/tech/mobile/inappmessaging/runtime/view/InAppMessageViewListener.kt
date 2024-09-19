@@ -43,7 +43,7 @@ internal class InAppMessageViewListener(
     /**
      * Callback When touch event occurred. Which will trigger to magnify message view content.
      */
-    @SuppressLint("NewApi")
+    @SuppressLint("NewApi", "ClickableViewAccessibility")
     override fun onTouch(view: View, event: MotionEvent): Boolean {
         if (buildChecker.isAndroidQAndAbove()) {
             when (event.actionMasked) {
@@ -52,7 +52,7 @@ internal class InAppMessageViewListener(
                 MotionEvent.ACTION_CANCEL, MotionEvent.ACTION_UP -> this.magnifier?.dismiss()
                 else -> this.magnifier?.dismiss()
             }
-            return view.performClick()
+            // No need to performClick as it will be handled by system through setOnClickListener if it is clickable
         }
         return false
     }
