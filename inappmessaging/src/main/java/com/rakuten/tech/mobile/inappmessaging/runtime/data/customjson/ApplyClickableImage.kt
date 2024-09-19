@@ -15,12 +15,15 @@ internal fun UiMessage.applyCustomClickableImage(clickableImage: ClickableImage?
     }
 
     fun String?.isValidUrlOrDeeplink(): Boolean {
-        if (this.isNullOrEmpty()) {
+        if (this.isNullOrBlank() || this != this.trim()) {
             return false
         }
 
-        val allowedPattern = Regex("https://.*|.*://.*")
-        return this.matches(allowedPattern)
+        return if (this.startsWith("http")) {
+            Regex("https://.*").matches(this)
+        } else {
+            Regex(".*://.*").matches(this)
+        }
     }
 
     @SuppressWarnings("ComplexCondition")

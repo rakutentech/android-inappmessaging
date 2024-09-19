@@ -30,6 +30,15 @@ class ApplyClickableImageSpec {
 
         uiMessage = message.applyCustomClickableImage(ClickableImage("ogle.124dsefsd"), false)
         uiMessage shouldBeEqualTo message
+
+        uiMessage = message.applyCustomClickableImage(ClickableImage("http://test.com"), false)
+        uiMessage shouldBeEqualTo message
+
+        uiMessage = message.applyCustomClickableImage(ClickableImage("   myapp://open"), false)
+        uiMessage shouldBeEqualTo message
+
+        uiMessage = message.applyCustomClickableImage(ClickableImage("https://test.com   "), false)
+        uiMessage shouldBeEqualTo message
     }
 
     @Test
