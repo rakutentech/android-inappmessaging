@@ -92,7 +92,6 @@ class InAppMessageModalViewSpec {
         verify(view).setBackgroundColor(ColorUtils.setAlphaComponent(Color.BLACK, MAX_COLOR_ALPHA))
     }
 
-
     @Test
     fun `should call setBackgroundColor when opacity is valid`() {
         view.populateViewData(MessageMapper.mapFrom(TestDataHelper.createDummyMessage()).copy(backdropOpacity = 0.3f))

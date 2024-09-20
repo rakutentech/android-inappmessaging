@@ -30,7 +30,7 @@ internal object MessageMapper : Mapper<Message, UiMessage> {
             displaySettings = from.messagePayload.messageSettings.displaySettings,
             content = from.messagePayload.messageSettings.controlSettings.content,
             tooltipData = from.getTooltipConfig(),
-            backdropOpacity = customJsonData?.background?.opacity
+            backdropOpacity = customJsonData?.background?.opacity,
         )
 
         return if (customJsonData == null) {

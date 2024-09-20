@@ -35,7 +35,8 @@ internal class InAppMessageModalView(
     private fun setBackdropColor(opacity: Float?) {
         // The default color(R.color.in_app_message_frame_light) will be set through XML.
         if (opacity == null ||
-            opacity !in 0f..1f) {
+            opacity !in 0f..1f
+        ) {
             return
         }
 
