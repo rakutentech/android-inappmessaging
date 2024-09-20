@@ -21,7 +21,7 @@ class ApplyBackgroundSpec {
         val uiMessage = message.applyBackground(Background(-0.5f))
         uiMessage shouldBeEqualTo message
 
-        uiMessage.applyBackground(Background(-3f))
+        uiMessage.applyBackground(Background(3f))
         uiMessage shouldBeEqualTo message
     }
 
