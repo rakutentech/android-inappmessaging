@@ -27,5 +27,5 @@ internal data class Background(
     /**
      * Opacity from 0 (completely transparent) to 1 (completely opaque).
      */
-    val opacity: Float? = null
+    val opacity: Float? = null,
 )

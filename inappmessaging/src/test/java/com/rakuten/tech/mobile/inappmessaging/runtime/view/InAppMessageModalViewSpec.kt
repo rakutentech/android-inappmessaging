@@ -60,11 +60,8 @@ class InAppMessageModalViewSpec {
     }
 
     @Test
-    fun `should not call setBackgroundColor when opacity is invalid`() {
-        view.populateViewData(MessageMapper.mapFrom(TestDataHelper.createDummyMessage()).copy(backdropOpacity = -1f))
-        verify(view, never()).setBackgroundColor(anyInt())
-
-        view.populateViewData(MessageMapper.mapFrom(TestDataHelper.createDummyMessage()).copy(backdropOpacity = 1.5f))
+    fun `should not call setBackgroundColor when opacity is null`() {
+        view.populateViewData(MessageMapper.mapFrom(TestDataHelper.createDummyMessage()).copy(backdropOpacity = null))
         verify(view, never()).setBackgroundColor(anyInt())
     }
 

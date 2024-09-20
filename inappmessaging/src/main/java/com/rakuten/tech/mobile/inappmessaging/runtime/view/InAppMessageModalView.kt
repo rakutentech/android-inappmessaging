@@ -33,13 +33,16 @@ internal class InAppMessageModalView(
     fun findModalLayout(): LinearLayout? = findViewById(R.id.modal)
 
     private fun setBackdropColor(opacity: Float?) {
-        if (opacity == null ||
-            opacity < 0 || opacity > 1) {
-            // The default color(R.color.in_app_message_frame_light) will be set through XML.
+        // The default color(R.color.in_app_message_frame_light) will be set through XML.
+        if (opacity == null) {
             return
         }
 
-        val blackWithAlpha = ColorUtils.setAlphaComponent(Color.BLACK, (0.6 * 255).toInt())
+        val blackWithAlpha = ColorUtils.setAlphaComponent(Color.BLACK, (opacity * MAX_ALPHA).toInt())
         this.setBackgroundColor(blackWithAlpha)
+    }
+
+    companion object {
+        private const val MAX_ALPHA = 255
     }
 }
