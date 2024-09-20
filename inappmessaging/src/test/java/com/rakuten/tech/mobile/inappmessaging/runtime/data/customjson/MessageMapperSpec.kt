@@ -74,7 +74,7 @@ class MessageMapperSpec {
         val uiMessage = MessageMapper.mapFrom(
             TestDataHelper.createDummyMessage(
                 messagePayload = payload,
-                customJson = JsonParser.parseString("""{"clickableImage": { "url": "http://test.com" }}""")
+                customJson = JsonParser.parseString("""{"clickableImage": { "url": "https://test.com" }}""")
                     .asJsonObject,
             ),
         )
@@ -82,7 +82,7 @@ class MessageMapperSpec {
         uiMessage.content shouldNotBeEqualTo null
         uiMessage.content?.onClick shouldNotBeEqualTo null
         uiMessage.content?.onClick?.action shouldBeEqualTo ButtonActionType.REDIRECT.typeId
-        uiMessage.content?.onClick?.uri shouldBeEqualTo "http://test.com"
+        uiMessage.content?.onClick?.uri shouldBeEqualTo "https://test.com"
     }
 
     @Test
