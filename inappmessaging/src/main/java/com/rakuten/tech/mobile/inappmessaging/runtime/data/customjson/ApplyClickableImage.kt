@@ -14,9 +14,21 @@ internal fun UiMessage.applyCustomClickableImage(clickableImage: ClickableImage?
         )
     }
 
+    fun String?.isValidUrlOrDeeplink(): Boolean {
+        if (this.isNullOrBlank() || this != this.trim()) {
+            return false
+        }
+
+        return if (this.startsWith("http")) {
+            Regex("https://.*").matches(this)
+        } else {
+            Regex(".*://.*").matches(this)
+        }
+    }
+
     @SuppressWarnings("ComplexCondition")
     if (clickableImage == null ||
-        clickableImage.url.isNullOrEmpty() ||
+        !clickableImage.url.isValidUrlOrDeeplink() ||
         imageUrl.isNullOrEmpty() ||
         !type.campaignTypeCanBeClickable() ||
         isPushPrimer
