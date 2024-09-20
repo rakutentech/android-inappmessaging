@@ -7,6 +7,7 @@ import com.rakuten.tech.mobile.inappmessaging.runtime.utils.InAppLogger
 import java.lang.reflect.Type
 
 internal class CustomJsonDeserializer : JsonDeserializer<CustomJson> {
+
     override fun deserialize(json: JsonElement?, typeOfT: Type?, context: JsonDeserializationContext?): CustomJson {
         val jsonObject = json?.asJsonObject
 

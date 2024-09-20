@@ -81,15 +81,20 @@ internal data class Message(
         return tooltip
     }
 
+    @SuppressWarnings("TooGenericExceptionCaught")
     fun getCustomJsonData(): CustomJson? {
         if (!RmcHelper.isRmcIntegrated() || customJson == null || customJson.entrySet().isEmpty()) {
             return null
         }
         if (customJsonData == null) {
-            val gson = GsonBuilder()
-                .registerTypeAdapter(CustomJson::class.java, CustomJsonDeserializer())
-                .create()
-            customJsonData = gson.fromJson(customJson, CustomJson::class.java)
+            try {
+                val gson = GsonBuilder()
+                    .registerTypeAdapter(CustomJson::class.java, CustomJsonDeserializer())
+                    .create()
+                customJsonData = gson.fromJson(customJson, CustomJson::class.java)
+            } catch (_: Exception) {
+                InAppLogger(TAG).debug("getCustomJsonData - invalid customJson format")
+            }
         }
         return customJsonData
     }
