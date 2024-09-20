@@ -34,15 +34,16 @@ internal class InAppMessageModalView(
 
     private fun setBackdropColor(opacity: Float?) {
         // The default color(R.color.in_app_message_frame_light) will be set through XML.
-        if (opacity == null) {
+        if (opacity == null ||
+            opacity !in 0f..1f) {
             return
         }
 
-        val blackWithAlpha = ColorUtils.setAlphaComponent(Color.BLACK, (opacity * MAX_ALPHA).toInt())
+        val blackWithAlpha = ColorUtils.setAlphaComponent(Color.BLACK, (opacity * MAX_COLOR_ALPHA).toInt())
         this.setBackgroundColor(blackWithAlpha)
     }
 
     companion object {
-        private const val MAX_ALPHA = 255
+        const val MAX_COLOR_ALPHA = 255
     }
 }

@@ -23,7 +23,7 @@ internal class CustomJsonDeserializer : JsonDeserializer<CustomJson> {
             this.deserialize<T>(jsonElement, T::class.java)
         } catch (_: Exception) {
             InAppLogger("IAM_CustomJsonDeserializer")
-                .warn("Invalid format for ${T::class.java.name.split(".").last()}")
+                .warn("Invalid format for ${T::class.java.name.split(".").lastOrNull()}")
             null
         }
     }

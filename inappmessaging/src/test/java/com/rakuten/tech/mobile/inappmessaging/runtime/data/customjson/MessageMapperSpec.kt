@@ -86,7 +86,40 @@ class MessageMapperSpec {
     }
 
     @Test
-    fun `should apply custom Background setting`() {
+    fun `should set opacity to null if opacity attribute does not exist`() {
+        val uiMessage = MessageMapper.mapFrom(
+            TestDataHelper.createDummyMessage(
+                customJson = JsonParser.parseString("""{"background": {}}""").asJsonObject,
+            ),
+        )
+
+        uiMessage.backdropOpacity shouldBeEqualTo null
+    }
+
+    @Test
+    fun `should set opacity to null if opacity attribute is set to null`() {
+        val uiMessage = MessageMapper.mapFrom(
+            TestDataHelper.createDummyMessage(
+                customJson = JsonParser.parseString("""{"background": {"opacity": null}}""").asJsonObject,
+            ),
+        )
+
+        uiMessage.backdropOpacity shouldBeEqualTo null
+    }
+
+    @Test
+    fun `should set opacity to null if opacity attribute is set to non-number`() {
+        val uiMessage = MessageMapper.mapFrom(
+            TestDataHelper.createDummyMessage(
+                customJson = JsonParser.parseString("""{"background": {"opacity": "abcd"}}""").asJsonObject,
+            ),
+        )
+
+        uiMessage.backdropOpacity shouldBeEqualTo null
+    }
+
+    @Test
+    fun `should correctly map valid opacity attribute`() {
         val uiMessage = MessageMapper.mapFrom(
             TestDataHelper.createDummyMessage(
                 customJson = JsonParser.parseString("""{"background": { "opacity": 0.6 }}""").asJsonObject,

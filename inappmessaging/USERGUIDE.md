@@ -501,6 +501,7 @@ All the events "launch the app event, login event, purchase successful event, cu
   - RMCCX-6876: Improved console logging.
 * RMC SDK updates:
   - RMCCX-7186: Supported Clickable Image through CustomJson.
+  - RMCCX-7327: Supported customizable modal campaign background opacity through CustomJson.
 
 #### 7.6.0 (2024-09-17)
 * Improvements:
