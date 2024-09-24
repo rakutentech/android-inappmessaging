@@ -84,4 +84,48 @@ class MessageMapperSpec {
         uiMessage.content?.onClick?.action shouldBeEqualTo ButtonActionType.REDIRECT.typeId
         uiMessage.content?.onClick?.uri shouldBeEqualTo "https://test.com"
     }
+
+    @Test
+    fun `should set opacity to null if opacity attribute does not exist`() {
+        val uiMessage = MessageMapper.mapFrom(
+            TestDataHelper.createDummyMessage(
+                customJson = JsonParser.parseString("""{"background": {}}""").asJsonObject,
+            ),
+        )
+
+        uiMessage.backdropOpacity shouldBeEqualTo null
+    }
+
+    @Test
+    fun `should set opacity to null if opacity attribute is set to null`() {
+        val uiMessage = MessageMapper.mapFrom(
+            TestDataHelper.createDummyMessage(
+                customJson = JsonParser.parseString("""{"background": {"opacity": null}}""").asJsonObject,
+            ),
+        )
+
+        uiMessage.backdropOpacity shouldBeEqualTo null
+    }
+
+    @Test
+    fun `should set opacity to null if opacity attribute is set to non-number`() {
+        val uiMessage = MessageMapper.mapFrom(
+            TestDataHelper.createDummyMessage(
+                customJson = JsonParser.parseString("""{"background": {"opacity": "abcd"}}""").asJsonObject,
+            ),
+        )
+
+        uiMessage.backdropOpacity shouldBeEqualTo null
+    }
+
+    @Test
+    fun `should correctly map valid opacity attribute`() {
+        val uiMessage = MessageMapper.mapFrom(
+            TestDataHelper.createDummyMessage(
+                customJson = JsonParser.parseString("""{"background": { "opacity": 0.6 }}""").asJsonObject,
+            ),
+        )
+
+        uiMessage.backdropOpacity shouldBeEqualTo 0.6f
+    }
 }

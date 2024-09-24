@@ -1,11 +1,13 @@
 package com.rakuten.tech.mobile.inappmessaging.runtime.data.responses.ping
 
 import com.google.gson.Gson
+import com.google.gson.GsonBuilder
 import com.google.gson.JsonObject
 import com.google.gson.JsonParseException
 import com.google.gson.annotations.SerializedName
 import com.rakuten.tech.mobile.inappmessaging.runtime.RmcHelper
 import com.rakuten.tech.mobile.inappmessaging.runtime.data.customjson.CustomJson
+import com.rakuten.tech.mobile.inappmessaging.runtime.data.customjson.CustomJsonDeserializer
 import com.rakuten.tech.mobile.inappmessaging.runtime.data.enums.InAppMessageType
 import com.rakuten.tech.mobile.inappmessaging.runtime.data.models.Tooltip
 import com.rakuten.tech.mobile.inappmessaging.runtime.utils.InAppLogger
@@ -79,16 +81,19 @@ internal data class Message(
         return tooltip
     }
 
+    @SuppressWarnings("TooGenericExceptionCaught")
     fun getCustomJsonData(): CustomJson? {
         if (!RmcHelper.isRmcIntegrated() || customJson == null || customJson.entrySet().isEmpty()) {
             return null
         }
         if (customJsonData == null) {
             try {
-                customJsonData = Gson().fromJson(customJson, CustomJson::class.java)
-            } catch (je: JsonParseException) {
-                InAppLogger(TAG).warn("getCustomJsonData - invalid customJson format")
-                InAppLogger(TAG).debug("parse exception: $je")
+                val gson = GsonBuilder()
+                    .registerTypeAdapter(CustomJson::class.java, CustomJsonDeserializer())
+                    .create()
+                customJsonData = gson.fromJson(customJson, CustomJson::class.java)
+            } catch (_: Exception) {
+                InAppLogger(TAG).debug("getCustomJsonData - invalid customJson format")
             }
         }
         return customJsonData
