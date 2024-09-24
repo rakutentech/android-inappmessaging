@@ -108,4 +108,20 @@
     <vulnerabilityName>CVE-2022-3171</vulnerabilityName>
     <vulnerabilityName>CVE-2022-3510</vulnerabilityName>
   </suppress>
+  <suppress until="2024-12-31Z">
+    <notes><![CDATA[
+   file name: work-runtime-2.7.1.aar: inspector.jar (shaded: com.google.protobuf:protobuf-javalite:3.10.0)
+   ]]></notes>
+    <packageUrl regex="true">^pkg:maven/com\.google\.protobuf/protobuf\-javalite@.*$</packageUrl>
+    <vulnerabilityName>CVE-2024-7254</vulnerabilityName>
+  </suppress>
+
+  <!-- Compose (Sample app) -->
+  <suppress until="2024-12-31Z">
+    <notes><![CDATA[
+   file name: ui-1.2.0-rc02.aar: inspector.jar (shaded: com.google.protobuf:protobuf-javalite:3.19.4)
+   ]]></notes>
+    <packageUrl regex="true">^pkg:maven/com\.google\.protobuf/protobuf\-javalite@.*$</packageUrl>
+    <vulnerabilityName>CVE-2024-7254</vulnerabilityName>
+  </suppress>
 </suppressions>
