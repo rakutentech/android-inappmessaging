@@ -5,7 +5,9 @@ apply plugin: "kotlin-android"
 apply plugin: 'kotlin-kapt'
 
 android {
-    compileSdkVersion CONFIG.versions.android.sdk.compile
+    namespace 'com.rakuten.test'
+
+    compileSdkVersion 35
 
     defaultConfig {
         applicationId "rakuten.com.tech.mobile.test"
@@ -14,7 +16,7 @@ android {
         // Defines the minimum API level required to run the app.
         minSdkVersion CONFIG.versions.android.sdk.min
         // Specifies the API level used to test the app.
-        targetSdkVersion CONFIG.versions.android.sdk.target
+        targetSdkVersion 35
 
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
 
