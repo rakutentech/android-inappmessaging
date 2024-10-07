@@ -5,6 +5,8 @@ apply plugin: "kotlin-android"
 apply plugin: 'kotlin-kapt'
 
 android {
+    namespace 'com.rakuten.test'
+
     compileSdkVersion CONFIG.versions.android.sdk.compile
 
     defaultConfig {

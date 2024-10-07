@@ -19,3 +19,8 @@
 # If you keep the line number information, uncomment this to
 # hide the original source file name.
 #-renamesourcefileattribute SourceFile
+
+# Analytics - Compile-only
+-dontwarn com.rakuten.tech.mobile.analytics.Event
+-dontwarn com.rakuten.tech.mobile.analytics.RatTracker$Companion
+-dontwarn com.rakuten.tech.mobile.analytics.RatTracker
