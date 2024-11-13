@@ -23,4 +23,5 @@ internal data class UiMessage(
     val displaySettings: DisplaySettings,
     val content: Content?,
     val tooltipData: Tooltip?,
+    val backdropOpacity: Float? = null,
 )

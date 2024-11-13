@@ -2,6 +2,7 @@ package com.rakuten.tech.mobile.inappmessaging.runtime.data.responses.ping
 
 import com.google.gson.JsonParser
 import com.rakuten.tech.mobile.inappmessaging.runtime.RmcHelper
+import com.rakuten.tech.mobile.inappmessaging.runtime.data.customjson.Background
 import com.rakuten.tech.mobile.inappmessaging.runtime.data.customjson.CustomJson
 import com.rakuten.tech.mobile.inappmessaging.runtime.data.customjson.PushPrimer
 import com.rakuten.tech.mobile.inappmessaging.runtime.data.enums.InAppMessageType
@@ -310,7 +311,7 @@ class MessageCustomJsonSpec {
         val campaign = TestDataHelper.createDummyMessage(
             customJson = JsonParser.parseString("""{"pushPrimer": true}""").asJsonObject,
         )
-        campaign.getCustomJsonData() shouldBeEqualTo null
+        campaign.getCustomJsonData()?.pushPrimer shouldBeEqualTo null
     }
 
     @Test
@@ -339,5 +340,15 @@ class MessageCustomJsonSpec {
             ).asJsonObject,
         )
         campaign.getCustomJsonData() shouldBeEqualTo CustomJson(pushPrimer = PushPrimer(button = 1))
+    }
+
+    @Test
+    fun `should map CustomJson data even if there is a feature key with invalid attribute`() {
+        val campaign = TestDataHelper.createDummyMessage(
+            customJson = JsonParser.parseString(
+                """{ "pushPrimer": { "button": "abcdef" }, "background": { "opacity": 0.6 } }""",
+            ).asJsonObject,
+        )
+        campaign.getCustomJsonData() shouldBeEqualTo CustomJson(background = Background(opacity = 0.6f))
     }
 }

@@ -31,7 +31,7 @@ class ApplyClickableImageSpec {
         uiMessage = message.applyCustomClickableImage(ClickableImage("ogle.124dsefsd"), false)
         uiMessage shouldBeEqualTo message
 
-        uiMessage = message.applyCustomClickableImage(ClickableImage("http://test.com"), false)
+        uiMessage = message.applyCustomClickableImage(ClickableImage("intent:/invalid/deeplink"), false)
         uiMessage shouldBeEqualTo message
 
         uiMessage = message.applyCustomClickableImage(ClickableImage("   myapp://open"), false)

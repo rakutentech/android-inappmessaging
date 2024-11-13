@@ -13,6 +13,8 @@ import com.rakuten.tech.mobile.inappmessaging.runtime.data.ui.UiMessage
 internal object MessageMapper : Mapper<Message, UiMessage> {
 
     override fun mapFrom(from: Message): UiMessage {
+        val customJsonData = from.getCustomJsonData()
+
         val uiModel = UiMessage(
             id = from.campaignId,
             type = from.type,
@@ -28,13 +30,13 @@ internal object MessageMapper : Mapper<Message, UiMessage> {
             displaySettings = from.messagePayload.messageSettings.displaySettings,
             content = from.messagePayload.messageSettings.controlSettings.content,
             tooltipData = from.getTooltipConfig(),
+            backdropOpacity = customJsonData?.background?.opacity,
         )
 
-        // Apply CustomJson rules if exists
-        val customJsonData = from.getCustomJsonData()
         return if (customJsonData == null) {
             uiModel
         } else {
+            // Update any data that exists from main payload to CustomJson data if applicable
             uiModel
                 .applyCustomPushPrimer(customJsonData.pushPrimer)
                 .applyCustomClickableImage(customJsonData.clickableImage, from.isPushPrimer)

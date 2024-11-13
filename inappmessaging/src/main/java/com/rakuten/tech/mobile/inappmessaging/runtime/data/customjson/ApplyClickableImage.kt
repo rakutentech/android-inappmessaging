@@ -19,11 +19,8 @@ internal fun UiMessage.applyCustomClickableImage(clickableImage: ClickableImage?
             return false
         }
 
-        return if (this.startsWith("http")) {
-            Regex("https://.*").matches(this)
-        } else {
-            Regex(".*://.*").matches(this)
-        }
+        val allowedPattern = Regex("https://.*|.*://.*")
+        return this.matches(allowedPattern)
     }
 
     @SuppressWarnings("ComplexCondition")
