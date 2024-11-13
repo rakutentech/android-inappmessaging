@@ -6,6 +6,8 @@ apply plugin: 'kotlin-kapt'
 def compose_version = '1.2.0-rc02'
 
 android {
+    namespace 'com.rakuten.tech.mobile.test_compose'
+
     compileSdkVersion CONFIG.versions.android.sdk.compile
 
     defaultConfig {

@@ -496,7 +496,7 @@ All the events "launch the app event, login event, purchase successful event, cu
 <details>
 <summary style="cursor: pointer;";>(click to expand)</summary>
 
-#### 7.7.0 (In-Progress)
+#### 7.7.0 (2024-10-22)
 * Improvements:
   - RMCCX-6876: Improved console logging.
 * RMC SDK updates:
