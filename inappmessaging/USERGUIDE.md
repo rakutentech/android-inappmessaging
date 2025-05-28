@@ -405,6 +405,17 @@ If user (with valid identifiers in `UserInfoProvider`) opts out from a message, 
 
 Message impressions (displays) are counted locally for each user. Meaning that a message with maxImpression value of 3 will be displayed to each user (different identifiers in `UserInfoProvider` class) max 3 times. Max impression number can be modified in the Dashboard. Then the SDK, after next ping call, will compare new value with old max impression number and add the difference to the current impression counter. The max impression data is not shared between devices. The same applies for anonymous user.
 
+### Deeplink handling
+
+When a campaign button action is set to `Deeplink`, the SDK uses an `implicit` intent to launch the specified link. This allows the deeplink to open content either within your app or in a different app.
+
+* **Linking to Content Within Your App**: To link to content inside your app, set up your deeplinks as usual, ensuring your manifest contains the correct intent filter with the appropriate action value. For more details, see [Create Deep Links to App Content](https://developer.android.com/training/app-links/deep-linking).
+* **Android 14 Requirement**: If your app targets Android 14, you must explicitly declare the target activity component as exported in your manifest. Android 14 restricts implicit intents to only exported components. For more details, see [Restrictions to implicit and pending intents](https://developer.android.com/about/versions/14/behavior-changes-14#safer-intents).
+* **Security Warning**: Using implicit intents and exporting activities can create security risks. Carefully choose which activities you enable for deeplinking and [implement thorough data validation](https://developer.android.com/privacy-and-security/risks/unsafe-use-of-deeplinks#unsafe-use-of-deep-links-implement-robust-data-validation) to protect your app.
+* **Deeplink Testing**: Rigorously test your deeplinks to confirm they open the correct activity. For more details, see [Test your deep links](https://developer.android.com/training/app-links/deep-linking#testing-filters).
+
+> <font color="red">Note:</font> If the SDK cannot resolve the deeplink to a valid activity, the campaign will simply close. Therefore, ensure thorough testing of your deeplink URI.
+
 </details>
 
 ## Troubleshooting
@@ -495,6 +506,10 @@ All the events "launch the app event, login event, purchase successful event, cu
 
 <details>
 <summary style="cursor: pointer;";>(click to expand)</summary>
+
+#### 7.8.0 (In-Progress)
+* Improvements:
+  - RMCCX-9127: Update userguide to add SDK logic for [Deeplink handling](#deeplink-handling).
 
 #### 7.7.0 (2024-10-22)
 * Improvements:
