@@ -3,7 +3,7 @@ def property = { key ->
 }
 def user = property("MAVEN_CENTRAL_USER")
 def pwd = property("MAVEN_CENTRAL_PASSWORD")
-def sonatypeStagingProfileId = "io.github.rakutentech" //property("SONATYPE_STAGING_PROFILE_ID")
+def sonatypeStagingProfileId = "io.github.rakutentech"
 
 nexusPublishing {
     repositories {
@@ -17,6 +17,3 @@ nexusPublishing {
         }
     }
 }
-
-closeStagingRepositories.dependsOn 'publishToSonatype'
-publish.dependsOn 'closeStagingRepositories'

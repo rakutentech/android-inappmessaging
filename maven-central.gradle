@@ -14,7 +14,6 @@ def isSnapshot = property("MAVEN_CENTRAL_IS_SNAPSHOT")
 publishing {
     repositories {
         maven {
-//      it.name "MavenCentral${isSnapshot ? "Snapshot" : "Staging"}"
             credentials {
                 it.username user
                 it.password password
