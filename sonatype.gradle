@@ -1,0 +1,22 @@
+def property = { key ->
+    return (project.hasProperty(key) ? project."$key" : System.getenv(key) )
+}
+def user = property("MAVEN_CENTRAL_USER")
+def pwd = property("MAVEN_CENTRAL_PASSWORD")
+def sonatypeStagingProfileId = "io.github.rakutentech" //property("SONATYPE_STAGING_PROFILE_ID")
+
+nexusPublishing {
+    repositories {
+        sonatype {
+            stagingProfileId = sonatypeStagingProfileId
+            username = user
+            password = pwd
+            nexusUrl = uri('https://ossrh-staging-api.central.sonatype.com/service/local/')
+            snapshotRepositoryUrl = uri('https://central.sonatype.com/repository/maven-snapshots/')
+            version = scmVersion.version
+        }
+    }
+}
+
+closeStagingRepositories.dependsOn 'publishToSonatype'
+publish.dependsOn 'closeStagingRepositories'

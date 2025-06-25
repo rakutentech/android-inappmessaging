@@ -118,7 +118,7 @@ if (isSnapshot) {
   project.ext.REPOSITORY_NAME=CONFIG.property("REPOSITORY_NAME_SNAPSHOT")
   apply from: '../config/publish/repository.gradle'
 } else {
-  apply from: '../config/publish/maven-central.gradle'
+  apply from: '../maven-central.gradle'
 }
 
 apply from: '../config/documentation/dokka/android.gradle'
