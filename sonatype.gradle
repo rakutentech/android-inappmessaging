@@ -3,12 +3,11 @@ def property = { key ->
 }
 def user = property("MAVEN_CENTRAL_USER")
 def pwd = property("MAVEN_CENTRAL_PASSWORD")
-def sonatypeStagingProfileId = "io.github.rakutentech"
 
 nexusPublishing {
     repositories {
         sonatype {
-            stagingProfileId = sonatypeStagingProfileId
+            stagingProfileId = "io.github.rakutentech"
             username = user
             password = pwd
             nexusUrl = uri('https://ossrh-staging-api.central.sonatype.com/service/local/')

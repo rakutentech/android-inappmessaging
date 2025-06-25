@@ -74,4 +74,19 @@ tasks.withType(JavaCompile) {
 
 apply from: "$project.rootDir/dependency-check.gradle"
 apply from: "$project.rootDir/sonar.gradle"
-apply from: "${project.rootDir}/sonatype.gradle"
+
+def property = { key ->
+    return (project.hasProperty(key) ? project."$key" : System.getenv(key) )
+}
+nexusPublishing {
+    repositories {
+        sonatype {
+            stagingProfileId = "io.github.rakutentech"
+            username = property("MAVEN_CENTRAL_USER")
+            password = property("MAVEN_CENTRAL_PASSWORD")
+            nexusUrl = uri('https://ossrh-staging-api.central.sonatype.com/service/local/')
+            snapshotRepositoryUrl = uri('https://central.sonatype.com/repository/maven-snapshots/')
+            version = scmVersion.version
+        }
+    }
+}

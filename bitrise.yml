@@ -113,8 +113,9 @@ workflows:
             fi
     - script@1:
         title: Publish Artifacts
+        description: This step prepares the release to Maven Central. Head to the Central Sonatype UI to promote the release from Staging to Release.
         inputs:
-        - content: ./gradlew publish
+        - content: ./gradlew publish publishToSonatype closeStagingRepositories
   _setup-env:
     steps:
     - set-java-version@1:
