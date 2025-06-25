@@ -1,3 +1,4 @@
 [submodule "config"]
 	path = config
 	url = https://github.com/rakutentech/android-buildconfig.git
+    branch = chore/ossrh-sunset
