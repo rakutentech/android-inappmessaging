@@ -74,27 +74,4 @@ tasks.withType(JavaCompile) {
 
 apply from: "$project.rootDir/dependency-check.gradle"
 apply from: "$project.rootDir/sonar.gradle"
-
-/**
- * Due to OSSRH sunsetting, we use Central Portal's OSSRH Staging API service for backward-compatibility of
- * publishing using Maven Publish. However, it does not automatically publish to the Staging repository.
- * Therefore, we use the Nexus Publish Plugin in addition to Maven Publish to complete this workflow.
- *
- * https://central.sonatype.org/news/20250326_ossrh_sunset/
- * https://central.sonatype.org/publish/publish-portal-ossrh-staging-api/
- */
-def property = { key ->
-    return (project.hasProperty(key) ? project."$key" : System.getenv(key) )
-}
-nexusPublishing {
-    repositories {
-        sonatype {
-            stagingProfileId = "io.github.rakutentech"
-            username = property("MAVEN_CENTRAL_USER")
-            password = property("MAVEN_CENTRAL_PASSWORD")
-            nexusUrl = uri('https://ossrh-staging-api.central.sonatype.com/service/local/')
-            snapshotRepositoryUrl = uri('https://central.sonatype.com/repository/maven-snapshots/')
-            version = scmVersion.version
-        }
-    }
-}
+apply from: "$project.rootDir/sonatype.gradle"
