@@ -43,6 +43,7 @@ internal interface ConfigScheduler {
                         .enqueue()
                 }
             } catch (ie: IllegalStateException) {
+                // CONFIGURE_SCHEDULER_ERROR
                 // this should not occur since work manager is initialized during SDK initialization
                 InAppMessaging.errorCallback?.let {
                     it(InAppMessagingException("In-App Messaging config request failed", ie))

@@ -152,6 +152,7 @@ abstract class InAppMessaging internal constructor() {
                 )
                 true
             } catch (ex: Exception) {
+                // ToDo: CONFIGURE_FAILED
                 // reset instance when configuration failed
                 setNotConfiguredInstance()
                 errorCallback?.let {

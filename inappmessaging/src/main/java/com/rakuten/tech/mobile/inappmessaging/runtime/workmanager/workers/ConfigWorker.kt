@@ -55,6 +55,7 @@ internal class ConfigWorker(
     override fun doWork(): Result {
         // Terminate request if any of the following values are empty
         if (!isConfigValid()) {
+            // ToDo: CONFIGURE_INVALID_VALUES
             return Result.failure()
         }
 
@@ -101,6 +102,7 @@ internal class ConfigWorker(
         if (response.isSuccessful && response.body() != null) {
             handleResponse(response)
         } else {
+            // ToDo: Configure -> 400, 404, 300-500
             InAppLogger(TAG).error("config API - error: ${response.code()}")
             return when {
                 response.code() == RetryDelayUtil.RETRY_ERROR_CODE -> handleRetry(response)

@@ -144,6 +144,7 @@ internal object Initializer {
             Picasso.setSingletonInstance(picasso)
         } catch (ignored: IllegalStateException) {
             // Picasso instance was already initialized
+            // ToDo: CONFIGURE_INITIALIZE_PICASSO_FAILED
         }
     }
 }
