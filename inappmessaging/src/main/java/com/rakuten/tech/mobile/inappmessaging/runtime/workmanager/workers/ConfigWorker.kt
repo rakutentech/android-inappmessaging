@@ -63,6 +63,7 @@ internal class ConfigWorker(
             // Executing the API network call.
             onResponse(setupCall().execute())
         } catch (e: Exception) {
+            // CONFIGURE_FAILED
             InAppLogger(TAG).error("config - error: ${e.message}")
             // RETRY by default has exponential backoff baked in.
             Result.retry()

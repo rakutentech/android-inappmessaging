@@ -29,6 +29,7 @@ internal class ImpressionScheduler {
                 manager.enqueue(createWorkRequest(impressionRequest))
             }
         } catch (ie: IllegalStateException) {
+            // ToDo: IMPRESSION_REQUEST_FAILED
             // this should not occur since work manager is initialized during SDK initialization
             InAppMessaging.errorCallback?.let {
                 it(InAppMessagingException("In-App Messaging impression request failed", ie))

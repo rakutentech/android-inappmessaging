@@ -78,6 +78,7 @@ internal class DisplayMessageWorker(
                 }
 
                 override fun onError(e: Exception?) {
+                    // ToDo: IMAGE_DOWNLOAD_FAILED
                     InAppLogger(TAG).error("downloading image failed for: ${message.campaignId}")
                 }
             },
@@ -88,6 +89,7 @@ internal class DisplayMessageWorker(
     private fun displayMessage(message: Message, hostActivity: Activity, newWorker: Boolean = false) {
         if (!verifyContexts(message)) {
             // Message display aborted by the host app
+            // ToDo: DISPLAY_CANCELLED_BY_APP
             InAppLogger(TAG).info("verifyContext - campaign cancelled: ${message.campaignId}")
             // Remove message in queue
             messageReadinessManager.removeMessageFromQueue(message.campaignId)

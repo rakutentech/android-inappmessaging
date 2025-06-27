@@ -143,6 +143,7 @@ internal abstract class CampaignRepository {
                         )
                     }
                 } catch (ex: Exception) {
+                    // ToDo: USER_CACHE_DECODING_FAILED
                     InAppLogger(TAG).debug(ex.cause, "invalid JSON format for $IAM_USER_CACHE data")
                 }
                 InAppLogger(TAG).debug("end")
@@ -169,6 +170,7 @@ internal abstract class CampaignRepository {
                 HostAppInfoRepository.instance().getContext()?.let { ctx ->
                     val preferenceFile = InAppMessaging.getPreferencesFile()
                     val preferenceData = Gson().toJson(messages)
+                    // ToDo: USERDATA_CACHE_ENCODING_FAILED- wrap in try catch
                     InAppLogger(TAG).info("saveData - file: $preferenceFile")
                     InAppLogger(TAG).debug("saveData - data: $preferenceData")
                     PreferencesUtil.putString(

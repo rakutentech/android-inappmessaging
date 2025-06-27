@@ -71,6 +71,7 @@ internal class InApp(
                 displayManager.displayMessage()
             }
         } catch (ex: Exception) {
+            // ToDo: REGISTER_ACTIVITY_FAILED
             InAppLogger(TAG).error("registerActivity - error: ${ex.message}")
             errorCallback?.let {
                 it(InAppMessagingException("In-App Messaging register activity failed", ex))
@@ -87,6 +88,7 @@ internal class InApp(
             }
             hostAppInfoRepo.registerActivity(null)
         } catch (ex: Exception) {
+            // ToDo: UNREGISTER_ACTIVITY_FAILED
             InAppLogger(TAG).warn("unregisterActivity - error: ${ex.message}")
             errorCallback?.let {
                 it(InAppMessagingException("In-App Messaging unregister activity failed", ex))

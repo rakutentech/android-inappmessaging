@@ -77,6 +77,7 @@ internal interface MessageMixerPingScheduler {
                     )
                 }
             } catch (ie: IllegalStateException) {
+                // PING_FAILED
                 // this should not occur since work manager is initialized during SDK initialization
                 InAppMessaging.errorCallback?.let {
                     it(InAppMessagingException("In-App Messaging ping request failed", ie))

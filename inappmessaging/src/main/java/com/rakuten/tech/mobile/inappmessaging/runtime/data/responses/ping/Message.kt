@@ -74,6 +74,7 @@ internal data class Message(
                     tooltip = null
                 }
             } catch (je: JsonParseException) {
+                // ToDo: CAMPAIGN_INVALID_TOOLTIP
                 InAppLogger(TAG).warn("getTooltipConfig - invalid tooltip format")
                 InAppLogger(TAG).debug("parse exception: $je")
             }

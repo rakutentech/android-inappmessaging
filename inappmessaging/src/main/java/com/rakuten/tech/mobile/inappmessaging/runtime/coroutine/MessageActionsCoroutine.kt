@@ -166,6 +166,7 @@ internal class MessageActionsCoroutine(
             try {
                 activityContext.startActivity(intent)
             } catch (e: ActivityNotFoundException) {
+                // ToDO: CAMPAIGN_REDIRECT_ACTION_FAILED
                 InAppLogger(TAG).info("handleDeeplinkRedirection - error: ${e.message}")
             }
         }

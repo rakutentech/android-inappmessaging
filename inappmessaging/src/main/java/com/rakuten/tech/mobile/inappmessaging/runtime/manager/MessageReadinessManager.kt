@@ -242,7 +242,7 @@ internal class MessageReadinessManager(
     private fun getMessagePermission(message: Message): DisplayPermissionResponse? {
         // Prepare request data.
         val displayPermissionUrl: String = configResponseRepo.getDisplayPermissionEndpoint()
-        if (displayPermissionUrl.isEmpty()) return null
+        if (displayPermissionUrl.isEmpty()) return null // ToDo: DISPLAY_PERMISSION_MISSING_METADATA
 
         // Prepare network request.
         val request = getDisplayPermissionRequest(message)
@@ -259,6 +259,7 @@ internal class MessageReadinessManager(
             handleResponse(response, call.clone())
         } catch (e: Exception) {
             checkAndRetry(call.clone()) {
+                // ToDo: #22
                 InAppLogger(DISP_TAG).error("executeDisplayRequest - error: ${e.message}")
                 InAppMessaging.errorCallback?.let {
                     it(InAppMessagingException("In-App Messaging display permission request failed", e))

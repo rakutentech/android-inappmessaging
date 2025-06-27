@@ -50,6 +50,7 @@ internal interface EventMessageReconciliationScheduler {
                     ).enqueue()
                 }
             } catch (ie: IllegalStateException) {
+                // ToDo: LOG_EVENT_FAILED
                 // this should not occur since work manager is initialized during SDK initialization
                 InAppMessaging.errorCallback?.let {
                     it(InAppMessagingException("In-App Messaging message reconciliation failed", ie))

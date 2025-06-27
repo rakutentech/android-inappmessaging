@@ -86,6 +86,7 @@ internal open class InAppMessageBaseView(context: Context, attrs: AttributeSet?)
             this.messageBodyColor = Color.parseColor(messageUiModel.bodyColor)
             this.bgColor = Color.parseColor(messageUiModel.backgroundColor)
         } catch (e: IllegalArgumentException) {
+            // ToDo: CAMPAIGN_INVALID_COLOR
             // values are from backend
             InAppLogger(TAG).error(e.message)
             // change to default
@@ -181,6 +182,7 @@ internal open class InAppMessageBaseView(context: Context, attrs: AttributeSet?)
                         }
 
                         override fun onError(e: Exception?) {
+                            // ToDo: IMAGE_DOWNLOAD_FAILED
                             InAppLogger(TAG).debug(e?.cause, "downloading image failed $imageUrl")
                         }
                     }
@@ -191,6 +193,7 @@ internal open class InAppMessageBaseView(context: Context, attrs: AttributeSet?)
                         .centerInside()
                         .into(imgView, callback)
                 } catch (ex: Exception) {
+                    // ToDo: IMAGE_DOWNLOAD_FAILED
                     InAppLogger(TAG).debug(ex, "downloading image failed $imageUrl")
                 }
             }
@@ -219,6 +222,7 @@ internal open class InAppMessageBaseView(context: Context, attrs: AttributeSet?)
         val bgColor = try {
             Color.parseColor(button.buttonBackgroundColor)
         } catch (e: IllegalArgumentException) {
+            // ToDo: CAMPAIGN_INVALID_COLOR
             // values are from backend
             InAppLogger(TAG).error("setBgColor - error: ${e.message}")
             // set to default color
@@ -234,6 +238,7 @@ internal open class InAppMessageBaseView(context: Context, attrs: AttributeSet?)
             Color.parseColor(button.buttonTextColor)
         } catch (e: IllegalArgumentException) {
             // values are from backend
+            // ToDo: CAMPAIGN_INVALID_COLOR
             InAppLogger(TAG).error("setTextColor - error: ${e.message}")
             // set to default color
             Color.parseColor("#1D1D1D")

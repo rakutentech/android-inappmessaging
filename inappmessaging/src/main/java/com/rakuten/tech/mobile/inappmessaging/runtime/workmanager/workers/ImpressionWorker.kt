@@ -44,6 +44,7 @@ internal class ImpressionWorker(
 
         // Validate input data.
         if (impressionEndpoint.isEmpty() || impressionRequestJsonRequest.isNullOrEmpty()) {
+            // ToDo: IMPRESSION_MISSING_METADATA
             return Result.failure()
         }
 
@@ -57,6 +58,7 @@ internal class ImpressionWorker(
             Gson().fromJson(impressionRequestJsonRequest, ImpressionRequest::class.java)
         } catch (e: JsonParseException) {
             InAppLogger(TAG).error("impression - error: ${e.message}")
+            // ToDo: IMPRESSION_JSON_ENCODING_FAILED
             return Result.failure()
         }
 
@@ -65,6 +67,7 @@ internal class ImpressionWorker(
             // Execute Retrofit API call and handle response.
             onResponse(createReportImpressionCall(impressionEndpoint, impressionRequest).execute())
         } catch (e: Exception) {
+            // ToDo: #29
             InAppLogger(TAG).error("impression - error: ${e.message}")
             Result.retry()
         }
