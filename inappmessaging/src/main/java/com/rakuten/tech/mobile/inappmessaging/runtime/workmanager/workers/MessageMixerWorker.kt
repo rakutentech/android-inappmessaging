@@ -4,6 +4,8 @@ import android.content.Context
 import androidx.annotation.VisibleForTesting
 import androidx.work.Worker
 import androidx.work.WorkerParameters
+import com.rakuten.tech.mobile.inappmessaging.runtime.InAppError
+import com.rakuten.tech.mobile.inappmessaging.runtime.InAppErrorLogger
 import com.rakuten.tech.mobile.inappmessaging.runtime.api.MessageMixerRetrofitService
 import com.rakuten.tech.mobile.inappmessaging.runtime.data.enums.CampaignType
 import com.rakuten.tech.mobile.inappmessaging.runtime.data.repositories.AccountRepository
@@ -13,6 +15,8 @@ import com.rakuten.tech.mobile.inappmessaging.runtime.data.repositories.Campaign
 import com.rakuten.tech.mobile.inappmessaging.runtime.data.requests.PingRequest
 import com.rakuten.tech.mobile.inappmessaging.runtime.data.responses.ping.Message
 import com.rakuten.tech.mobile.inappmessaging.runtime.data.responses.ping.MessageMixerResponse
+import com.rakuten.tech.mobile.inappmessaging.runtime.eventlogger.BackendApi
+import com.rakuten.tech.mobile.inappmessaging.runtime.eventlogger.Event
 import com.rakuten.tech.mobile.inappmessaging.runtime.utils.BuildVersionChecker
 import com.rakuten.tech.mobile.inappmessaging.runtime.utils.InAppLogger
 import com.rakuten.tech.mobile.inappmessaging.runtime.utils.RetryDelayUtil
@@ -67,8 +71,13 @@ internal class MessageMixerWorker(
             // Execute a thread blocking API network call, and handle response.
             onResponse(call.execute())
         } catch (e: Exception) {
-            // ToDo: PING_FAILED
-            InAppLogger(TAG).error("ping - error: ${e.message}")
+            InAppErrorLogger.logError(
+                TAG,
+                InAppError(
+                    "messageMixer doWork failed",
+                    ex = e, ev = Event.OperationFailed(BackendApi.PING.name),
+                ),
+            )
             Result.retry()
         }
     }
@@ -107,7 +116,13 @@ internal class MessageMixerWorker(
             serverErrorCounter.set(0) // reset server error counter
             response.body()?.let { handleResponse(it) }
         } else {
-            InAppLogger(TAG).error("ping API error - code: ${response.code()}")
+            InAppErrorLogger.logError(
+                TAG,
+                InAppError(
+                    "${BackendApi.PING.alias} API failed - ${response.message()}",
+                    ev = Event.ApiRequestFailed(BackendApi.PING, response.code().toString()),
+                ),
+            )
             return when {
                 response.code() == RetryDelayUtil.RETRY_ERROR_CODE -> handleRetry(response)
                 response.code() >= HttpURLConnection.HTTP_INTERNAL_ERROR -> handleInternalError(response)

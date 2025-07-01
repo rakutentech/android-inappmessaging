@@ -12,6 +12,8 @@ import com.rakuten.tech.mobile.inappmessaging.runtime.data.repositories.AccountR
 import com.rakuten.tech.mobile.inappmessaging.runtime.data.repositories.CampaignRepository
 import com.rakuten.tech.mobile.inappmessaging.runtime.data.repositories.ConfigResponseRepository
 import com.rakuten.tech.mobile.inappmessaging.runtime.data.repositories.HostAppInfoRepository
+import com.rakuten.tech.mobile.inappmessaging.runtime.eventlogger.SdkApi
+import com.rakuten.tech.mobile.inappmessaging.runtime.eventlogger.Event as ELEvent
 import com.rakuten.tech.mobile.inappmessaging.runtime.exception.InAppMessagingException
 import com.rakuten.tech.mobile.inappmessaging.runtime.manager.DisplayManager
 import com.rakuten.tech.mobile.inappmessaging.runtime.manager.EventsManager
@@ -71,10 +73,15 @@ internal class InApp(
                 displayManager.displayMessage()
             }
         } catch (ex: Exception) {
-            // ToDo: REGISTER_ACTIVITY_FAILED
-            InAppLogger(TAG).error("registerActivity - error: ${ex.message}")
-            errorCallback?.let {
-                it(InAppMessagingException("In-App Messaging register activity failed", ex))
+            "In-App Messaging register activity failed".let {
+                InAppErrorLogger.logError(
+                    TAG,
+                    InAppError(
+                        it,
+                        InAppMessagingException(it, ex),
+                        ELEvent.OperationFailed(SdkApi.REGISTER_ACTIVITY.name),
+                    ),
+                )
             }
         }
     }
@@ -88,10 +95,15 @@ internal class InApp(
             }
             hostAppInfoRepo.registerActivity(null)
         } catch (ex: Exception) {
-            // ToDo: UNREGISTER_ACTIVITY_FAILED
-            InAppLogger(TAG).warn("unregisterActivity - error: ${ex.message}")
-            errorCallback?.let {
-                it(InAppMessagingException("In-App Messaging unregister activity failed", ex))
+            "In-App Messaging unregister activity failed".let {
+                InAppErrorLogger.logError(
+                    TAG,
+                    InAppError(
+                        it,
+                        InAppMessagingException(it, ex),
+                        ELEvent.OperationFailed(SdkApi.UNREGISTER_ACTIVITY.name),
+                    ),
+                )
             }
         }
     }
