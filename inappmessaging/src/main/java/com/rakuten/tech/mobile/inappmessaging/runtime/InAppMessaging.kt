@@ -105,11 +105,12 @@ abstract class InAppMessaging internal constructor() {
          */
         var errorCallback: ((ex: Exception) -> Unit)? = null
 
-        data class EventLoggerConfig(
-            val apiUrl: String,
-            val apiKey: String,
+        private data class EventLoggerConfig(
+            val apiUrl: String? = null,
+            val apiKey: String? = null,
             val enableEventLogger: Boolean = false,
         )
+        private var eventLoggerConfig = EventLoggerConfig()
 
         private var instance: InAppMessaging = NotConfiguredInAppMessaging()
 
@@ -141,14 +142,13 @@ abstract class InAppMessaging internal constructor() {
             subscriptionKey: String? = null,
             configUrl: String? = null,
             enableTooltipFeature: Boolean? = false,
-            eventLoggerConfig: EventLoggerConfig? = null,
         ): Boolean {
             return try {
                 InAppEventLogger.configure(
                     context = context,
-                    enable = eventLoggerConfig?.enableEventLogger,
-                    apiUrl = eventLoggerConfig?.apiUrl,
-                    apiKey = eventLoggerConfig?.apiKey,
+                    enable = eventLoggerConfig.enableEventLogger,
+                    apiUrl = eventLoggerConfig.apiUrl,
+                    apiKey = eventLoggerConfig.apiKey,
                 )
 
                 if (!shouldProcess(subscriptionKey)) {
@@ -183,6 +183,10 @@ abstract class InAppMessaging internal constructor() {
                 }
                 false
             }
+        }
+
+        fun setEventLoggerConfig(apiUrl: String, apiKey: String, enableEventLogger: Boolean = true) {
+            this.eventLoggerConfig = EventLoggerConfig(apiUrl, apiKey, enableEventLogger)
         }
 
         @SuppressWarnings("LongParameterList")
