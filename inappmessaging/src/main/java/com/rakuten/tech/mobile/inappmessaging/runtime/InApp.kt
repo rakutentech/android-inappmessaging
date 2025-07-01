@@ -131,6 +131,7 @@ internal class InApp(
                 eventsManager.onEventReceived(event)
             }
         } catch (ex: Exception) {
+            // ToDo: LOG_EVENT_FAILED
             InAppLogger(TAG).error("logEvent - error: ${ex.message}")
             errorCallback?.let {
                 it(InAppMessagingException("In-App Messaging log event failed", ex))
@@ -184,6 +185,7 @@ internal class InApp(
                         removeMessage(viewId)
                     }
                 } catch (ex: Exception) {
+                    // ToDo: CAMPAIGN_CLOSE_FAILED
                     InAppLogger(TAG).warn("closeCampaign - error: ${ex.message}")
                     errorCallback?.let {
                         it(InAppMessagingException("In-App Messaging close message failed", ex))
@@ -253,6 +255,15 @@ internal class InApp(
          * Flag to enable/disable debug logging.
          **/
         fun isDebugging(): Boolean = metadata.getBoolean("com.rakuten.tech.mobile.inappmessaging.debugging")
+
+        fun enableEventLogger(): Boolean =
+            metadata.getBoolean("com.rakuten.tech.mobile.inappmessaging.enableeventlogger", true)
+
+        fun eventLoggerApiUrl(): String? =
+            metadata.getString("com.rakuten.tech.mobile.inappmessaging.eventloggerapiurl")
+
+        fun eventLoggerApiKey(): String? =
+            metadata.getString("com.rakuten.tech.mobile.inappmessaging.eventloggerapikey")
     }
 
     companion object {

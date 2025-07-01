@@ -67,7 +67,7 @@ internal class MessageMixerWorker(
             // Execute a thread blocking API network call, and handle response.
             onResponse(call.execute())
         } catch (e: Exception) {
-            // PING_FAILED
+            // ToDo: PING_FAILED
             InAppLogger(TAG).error("ping - error: ${e.message}")
             Result.retry()
         }

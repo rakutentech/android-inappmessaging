@@ -5,12 +5,17 @@ import androidx.annotation.VisibleForTesting
 import androidx.work.Worker
 import androidx.work.WorkerParameters
 import com.rakuten.tech.mobile.inappmessaging.runtime.BuildConfig
+import com.rakuten.tech.mobile.inappmessaging.runtime.InAppError
+import com.rakuten.tech.mobile.inappmessaging.runtime.InAppErrorLogger
 import com.rakuten.tech.mobile.inappmessaging.runtime.InAppMessaging
 import com.rakuten.tech.mobile.inappmessaging.runtime.api.ConfigRetrofitService
 import com.rakuten.tech.mobile.inappmessaging.runtime.data.repositories.ConfigResponseRepository
 import com.rakuten.tech.mobile.inappmessaging.runtime.data.repositories.HostAppInfoRepository
 import com.rakuten.tech.mobile.inappmessaging.runtime.data.requests.ConfigQueryParamsBuilder
 import com.rakuten.tech.mobile.inappmessaging.runtime.data.responses.ConfigResponse
+import com.rakuten.tech.mobile.inappmessaging.runtime.eventlogger.BackendApi
+import com.rakuten.tech.mobile.inappmessaging.runtime.eventlogger.Event
+import com.rakuten.tech.mobile.inappmessaging.runtime.eventlogger.SdkApi
 import com.rakuten.tech.mobile.inappmessaging.runtime.utils.InAppLogger
 import com.rakuten.tech.mobile.inappmessaging.runtime.utils.RetryDelayUtil
 import com.rakuten.tech.mobile.inappmessaging.runtime.utils.RuntimeUtil
@@ -55,7 +60,13 @@ internal class ConfigWorker(
     override fun doWork(): Result {
         // Terminate request if any of the following values are empty
         if (!isConfigValid()) {
-            // ToDo: CONFIGURE_INVALID_VALUES
+            InAppErrorLogger.logError(
+                TAG,
+                InAppError(
+                    "Config URL, Subscription Key, Package name, or Version may be empty",
+                    ev = Event.ConfigInvalidVConfiguration,
+                ),
+            )
             return Result.failure()
         }
 
@@ -63,8 +74,13 @@ internal class ConfigWorker(
             // Executing the API network call.
             onResponse(setupCall().execute())
         } catch (e: Exception) {
-            // CONFIGURE_FAILED
-            InAppLogger(TAG).error("config - error: ${e.message}")
+            InAppErrorLogger.logError(
+                TAG,
+                InAppError(
+                    "configWorker doWork failed",
+                    ex = e, ev = Event.OperationFailed(SdkApi.CONFIG.name),
+                ),
+            )
             // RETRY by default has exponential backoff baked in.
             Result.retry()
         }
@@ -103,8 +119,13 @@ internal class ConfigWorker(
         if (response.isSuccessful && response.body() != null) {
             handleResponse(response)
         } else {
-            // ToDo: Configure -> 400, 404, 300-500
-            InAppLogger(TAG).error("config API - error: ${response.code()}")
+            InAppErrorLogger.logError(
+                TAG,
+                InAppError(
+                    "${BackendApi.CONFIG.alias} API failed - ${response.message()}",
+                    ev = Event.ApiRequestFailed(BackendApi.CONFIG, response.code().toString()),
+                ),
+            )
             return when {
                 response.code() == RetryDelayUtil.RETRY_ERROR_CODE -> handleRetry(response)
                 response.code() >= HttpURLConnection.HTTP_INTERNAL_ERROR -> handleInternalError(response)

@@ -6,6 +6,9 @@ import androidx.annotation.NonNull
 import androidx.annotation.RestrictTo
 import com.rakuten.tech.mobile.inappmessaging.runtime.data.models.appevents.Event
 import com.rakuten.tech.mobile.inappmessaging.runtime.data.repositories.AccountRepository
+import com.rakuten.tech.mobile.inappmessaging.runtime.eventlogger.InAppEventLogger
+import com.rakuten.tech.mobile.inappmessaging.runtime.eventlogger.Event as ELEvent
+import com.rakuten.tech.mobile.inappmessaging.runtime.eventlogger.SdkApi
 import com.rakuten.tech.mobile.inappmessaging.runtime.exception.InAppMessagingException
 import com.rakuten.tech.mobile.inappmessaging.runtime.utils.InAppLogger
 import com.rakuten.tech.mobile.inappmessaging.runtime.utils.Initializer
@@ -102,6 +105,12 @@ abstract class InAppMessaging internal constructor() {
          */
         var errorCallback: ((ex: Exception) -> Unit)? = null
 
+        data class EventLoggerConfig(
+            val apiUrl: String,
+            val apiKey: String,
+            val enableEventLogger: Boolean = false,
+        )
+
         private var instance: InAppMessaging = NotConfiguredInAppMessaging()
 
         /**
@@ -132,8 +141,16 @@ abstract class InAppMessaging internal constructor() {
             subscriptionKey: String? = null,
             configUrl: String? = null,
             enableTooltipFeature: Boolean? = false,
+            eventLoggerConfig: EventLoggerConfig? = null,
         ): Boolean {
             return try {
+                InAppEventLogger.configure(
+                    context = context,
+                    enable = eventLoggerConfig?.enableEventLogger,
+                    apiUrl = eventLoggerConfig?.apiUrl,
+                    apiKey = eventLoggerConfig?.apiKey,
+                )
+
                 if (!shouldProcess(subscriptionKey)) {
                     InAppLogger(TAG).info("configure called but using RMC, skipping")
                     return false
@@ -152,13 +169,18 @@ abstract class InAppMessaging internal constructor() {
                 )
                 true
             } catch (ex: Exception) {
-                // ToDo: CONFIGURE_FAILED
                 // reset instance when configuration failed
                 setNotConfiguredInstance()
-                errorCallback?.let {
-                    it(InAppMessagingException("In-App Messaging configuration failed", ex))
+                "In-App Messaging configuration failed".let {
+                    InAppErrorLogger.logError(
+                        TAG,
+                        InAppError(
+                            it,
+                            InAppMessagingException(it, ex),
+                            ELEvent.OperationFailed(SdkApi.CONFIG.name),
+                        ),
+                    )
                 }
-                InAppLogger(TAG).error("configure - error: ${ex.message}")
                 false
             }
         }

@@ -9,9 +9,13 @@ import android.content.pm.PackageManager.NameNotFoundException
 import android.os.Build
 import android.provider.Settings
 import androidx.core.content.pm.PackageInfoCompat
+import com.rakuten.tech.mobile.inappmessaging.runtime.InAppError
+import com.rakuten.tech.mobile.inappmessaging.runtime.InAppErrorLogger
 import com.rakuten.tech.mobile.inappmessaging.runtime.RmcHelper
 import com.rakuten.tech.mobile.inappmessaging.runtime.data.models.HostAppInfo
 import com.rakuten.tech.mobile.inappmessaging.runtime.data.repositories.HostAppInfoRepository
+import com.rakuten.tech.mobile.inappmessaging.runtime.eventlogger.Event
+import com.rakuten.tech.mobile.inappmessaging.runtime.eventlogger.SdkApi
 import com.rakuten.tech.mobile.inappmessaging.runtime.exception.InAppMessagingException
 import com.rakuten.tech.mobile.inappmessaging.runtime.utils.CacheUtil.getMemoryCacheSize
 import com.rakuten.tech.mobile.sdkutils.PreferencesUtil
@@ -144,7 +148,13 @@ internal object Initializer {
             Picasso.setSingletonInstance(picasso)
         } catch (ignored: IllegalStateException) {
             // Picasso instance was already initialized
-            // ToDo: CONFIGURE_FAILED
+            InAppErrorLogger.logError(
+                TAG,
+                InAppError(
+                    "initializePicassoInstance failed",
+                    ex = ignored, ev = Event.OperationFailed(SdkApi.CONFIG.name),
+                ),
+            )
         }
     }
 }

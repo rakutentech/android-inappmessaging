@@ -3,8 +3,11 @@ package com.rakuten.tech.mobile.inappmessaging.runtime.workmanager.schedulers
 import androidx.work.ExistingWorkPolicy
 import androidx.work.OneTimeWorkRequest
 import androidx.work.WorkManager
-import com.rakuten.tech.mobile.inappmessaging.runtime.InAppMessaging
+import com.rakuten.tech.mobile.inappmessaging.runtime.InAppError
+import com.rakuten.tech.mobile.inappmessaging.runtime.InAppErrorLogger
 import com.rakuten.tech.mobile.inappmessaging.runtime.data.repositories.HostAppInfoRepository
+import com.rakuten.tech.mobile.inappmessaging.runtime.eventlogger.Event
+import com.rakuten.tech.mobile.inappmessaging.runtime.eventlogger.SdkApi
 import com.rakuten.tech.mobile.inappmessaging.runtime.exception.InAppMessagingException
 import com.rakuten.tech.mobile.inappmessaging.runtime.utils.RetryDelayUtil
 import com.rakuten.tech.mobile.inappmessaging.runtime.utils.WorkManagerUtil
@@ -43,10 +46,16 @@ internal interface ConfigScheduler {
                         .enqueue()
                 }
             } catch (ie: IllegalStateException) {
-                // CONFIGURE_FAILED
                 // this should not occur since work manager is initialized during SDK initialization
-                InAppMessaging.errorCallback?.let {
-                    it(InAppMessagingException("In-App Messaging config request failed", ie))
+                "In-App Messaging config request failed".let {
+                    InAppErrorLogger.logError(
+                        "ConfigScheduler",
+                        InAppError(
+                            it,
+                            InAppMessagingException(it, ie),
+                            Event.OperationFailed(SdkApi.CONFIG.name),
+                        ),
+                    )
                 }
             }
         }
