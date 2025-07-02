@@ -1,9 +1,12 @@
 package com.rakuten.tech.mobile.inappmessaging.runtime.data.repositories
 
 import com.google.gson.Gson
+import com.rakuten.tech.mobile.inappmessaging.runtime.InAppError
+import com.rakuten.tech.mobile.inappmessaging.runtime.InAppErrorLogger
 import com.rakuten.tech.mobile.inappmessaging.runtime.InAppMessaging
 import com.rakuten.tech.mobile.inappmessaging.runtime.data.enums.InAppMessageType
 import com.rakuten.tech.mobile.inappmessaging.runtime.data.responses.ping.Message
+import com.rakuten.tech.mobile.inappmessaging.runtime.eventlogger.Event
 import com.rakuten.tech.mobile.inappmessaging.runtime.utils.InAppLogger
 import com.rakuten.tech.mobile.sdkutils.PreferencesUtil
 import org.json.JSONObject
@@ -135,16 +138,25 @@ internal abstract class CampaignRepository {
             if (InAppMessaging.instance().isLocalCachingEnabled()) {
                 InAppLogger(TAG).debug("start")
                 messages.clear()
-                try {
-                    val jsonObject = JSONObject(retrieveData())
-                    for (key in jsonObject.keys()) {
-                        messages[key] = Gson().fromJson(
-                            jsonObject.getJSONObject(key).toString(), Message::class.java,
+
+                val cachedData = retrieveData()
+                if (cachedData.isNotEmpty()) {
+                    try {
+                        val jsonObject = JSONObject(cachedData)
+                        for (key in jsonObject.keys())
+                            messages[key] = Gson().fromJson(
+                                jsonObject.getJSONObject(key).toString(),
+                                Message::class.java,
+                            )
+                    } catch (ex: Exception) {
+                        InAppErrorLogger.logError(
+                            TAG,
+                            InAppError(
+                                "invalid JSON format for $IAM_USER_CACHE data",
+                                ex, ev = Event.UserDataCacheDecodingFailed,
+                            ),
                         )
                     }
-                } catch (ex: Exception) {
-                    // ToDo: USER_CACHE_DECODING_FAILED
-                    InAppLogger(TAG).debug(ex.cause, "invalid JSON format for $IAM_USER_CACHE data")
                 }
                 InAppLogger(TAG).debug("end")
             }
@@ -170,7 +182,6 @@ internal abstract class CampaignRepository {
                 HostAppInfoRepository.instance().getContext()?.let { ctx ->
                     val preferenceFile = InAppMessaging.getPreferencesFile()
                     val preferenceData = Gson().toJson(messages)
-                    // ToDo: USERDATA_CACHE_ENCODING_FAILED- wrap in try catch
                     InAppLogger(TAG).info("saveData - file: $preferenceFile")
                     InAppLogger(TAG).debug("saveData - data: $preferenceData")
                     PreferencesUtil.putString(

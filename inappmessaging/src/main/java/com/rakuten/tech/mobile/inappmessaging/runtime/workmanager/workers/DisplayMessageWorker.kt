@@ -8,10 +8,13 @@ import androidx.work.CoroutineWorker
 import androidx.work.OneTimeWorkRequest
 import androidx.work.WorkerParameters
 import androidx.work.WorkManager
+import com.rakuten.tech.mobile.inappmessaging.runtime.InAppError
+import com.rakuten.tech.mobile.inappmessaging.runtime.InAppErrorLogger
 import com.rakuten.tech.mobile.inappmessaging.runtime.InAppMessaging
 import com.rakuten.tech.mobile.inappmessaging.runtime.data.customjson.MessageMapper
 import com.rakuten.tech.mobile.inappmessaging.runtime.data.repositories.HostAppInfoRepository
 import com.rakuten.tech.mobile.inappmessaging.runtime.data.responses.ping.Message
+import com.rakuten.tech.mobile.inappmessaging.runtime.eventlogger.Event
 import com.rakuten.tech.mobile.inappmessaging.runtime.utils.ImageUtil
 import com.rakuten.tech.mobile.inappmessaging.runtime.manager.MessageReadinessManager
 import com.rakuten.tech.mobile.inappmessaging.runtime.runnable.DisplayMessageRunnable
@@ -78,8 +81,7 @@ internal class DisplayMessageWorker(
                 }
 
                 override fun onError(e: Exception?) {
-                    // ToDo: IMAGE_DOWNLOAD_FAILED
-                    InAppLogger(TAG).error("downloading image failed for: ${message.campaignId}")
+                    InAppErrorLogger.logError(TAG, InAppError(ex = e, ev = Event.ImageLoadFailed(imageUrl)))
                 }
             },
             context = hostActivity, picasso = picasso,
@@ -89,7 +91,6 @@ internal class DisplayMessageWorker(
     private fun displayMessage(message: Message, hostActivity: Activity, newWorker: Boolean = false) {
         if (!verifyContexts(message)) {
             // Message display aborted by the host app
-            // ToDo: DISPLAY_CANCELLED_BY_APP
             InAppLogger(TAG).info("verifyContext - campaign cancelled: ${message.campaignId}")
             // Remove message in queue
             messageReadinessManager.removeMessageFromQueue(message.campaignId)

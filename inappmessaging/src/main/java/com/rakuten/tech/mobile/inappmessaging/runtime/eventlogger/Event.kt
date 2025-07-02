@@ -1,7 +1,7 @@
 package com.rakuten.tech.mobile.inappmessaging.runtime.eventlogger
 
 /**
- * https:<company-confluence-link>/display/MAGS/IAM+Event+Logger%3A+SDK+Events
+ * https:<company-confluence-link>/display/MAGS/IAM+Event+Logger%3A+SDK+Events.
  */
 internal sealed class Event(
     val type: EventType,
@@ -36,42 +36,6 @@ internal sealed class Event(
         "CONFIG_INVALID_CONFIGURATION",
     )
 
-    // 8
-    object ConfigJsonDecodingError : Event(
-        EventType.WARNING,
-        "CONFIG_JSON_DECODING_ERROR",
-    )
-
-    // 20
-    object DisplayPermMissingMdata : Event(
-        EventType.WARNING,
-        "DISPLAY_PERMISSION_MISSING_METADATA",
-    )
-
-    // 27
-    object ImpressionMissingMdata : Event(
-        EventType.WARNING,
-        "IMPRESSION_MISSING_METADATA",
-    )
-
-    // 28
-    object ImpressionJsonEncodingFailed : Event(
-        EventType.WARNING,
-        "IMPRESSION_JSON_ENCODING_FAILED",
-    )
-
-    // 30
-    object ImpressionRatTrackerFailed : Event(
-        EventType.WARNING,
-        "IMPRESSION_RAT_TRACKER_FAILED",
-    )
-
-    // 32
-    object UserDataCacheEncodingFailed : Event(
-        EventType.WARNING,
-        "USERDATA_CACHE_ENCODING_FAILED",
-    )
-
     // 33
     object UserDataCacheDecodingFailed : Event(
         EventType.WARNING,
@@ -79,9 +43,13 @@ internal sealed class Event(
     )
 
     // 34
-    object ImageDownloadFailed : Event(
+    data class ImageLoadFailed(
+        val url: String?,
+    ) : Event(
         EventType.WARNING,
-        "IMAGE_DOWNLOAD_FAILED",
+        "IMAGE_LOAD_FAILED",
+        "Image load failed",
+        info = mutableMapOf("url" to url.orEmpty()),
     )
 
     // 35
@@ -97,14 +65,22 @@ internal sealed class Event(
     )
 
     // 37
-    object CampaignInvalidColor : Event(
+    data class CampaignInvalidColor(
+        val method: String?,
+    ) : Event(
         EventType.WARNING,
         "CAMPAIGN_INVALID_COLOR",
+        "Invalid color",
+        info = mutableMapOf("method" to method.orEmpty()),
     )
 
     // 38
-    object CampaignRedirectActionFailed : Event(
+    data class CampaignRedirectActionFailed(
+        val url: String?,
+    ) : Event(
         EventType.WARNING,
         "CAMPAIGN_REDIRECT_ACTION_FAILED",
+        "Redirect failed",
+        info = mutableMapOf("url" to url.orEmpty()),
     )
 }

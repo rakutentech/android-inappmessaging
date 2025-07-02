@@ -77,8 +77,8 @@ internal class ConfigWorker(
             InAppErrorLogger.logError(
                 TAG,
                 InAppError(
-                    "configWorker doWork failed",
-                    ex = e, ev = Event.OperationFailed(SdkApi.CONFIG.name),
+                    "configWorker doWork failed", ex = e,
+                    ev = Event.OperationFailed(SdkApi.CONFIG.name),
                 ),
             )
             // RETRY by default has exponential backoff baked in.

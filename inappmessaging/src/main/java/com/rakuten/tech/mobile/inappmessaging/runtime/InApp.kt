@@ -77,8 +77,7 @@ internal class InApp(
                 InAppErrorLogger.logError(
                     TAG,
                     InAppError(
-                        it,
-                        InAppMessagingException(it, ex),
+                        it, InAppMessagingException(it, ex),
                         ELEvent.OperationFailed(SdkApi.REGISTER_ACTIVITY.name),
                     ),
                 )
@@ -99,8 +98,7 @@ internal class InApp(
                 InAppErrorLogger.logError(
                     TAG,
                     InAppError(
-                        it,
-                        InAppMessagingException(it, ex),
+                        it, InAppMessagingException(it, ex),
                         ELEvent.OperationFailed(SdkApi.UNREGISTER_ACTIVITY.name),
                     ),
                 )
@@ -143,10 +141,14 @@ internal class InApp(
                 eventsManager.onEventReceived(event)
             }
         } catch (ex: Exception) {
-            // ToDo: LOG_EVENT_FAILED
-            InAppLogger(TAG).error("logEvent - error: ${ex.message}")
-            errorCallback?.let {
-                it(InAppMessagingException("In-App Messaging log event failed", ex))
+            "In-App Messaging log event failed".let {
+                InAppErrorLogger.logError(
+                    TAG,
+                    InAppError(
+                        it, InAppMessagingException(it),
+                        ELEvent.OperationFailed(SdkApi.LOG_EVENT.name),
+                    ),
+                )
             }
         }
     }
@@ -197,10 +199,14 @@ internal class InApp(
                         removeMessage(viewId)
                     }
                 } catch (ex: Exception) {
-                    // ToDo: CAMPAIGN_CLOSE_FAILED
-                    InAppLogger(TAG).warn("closeCampaign - error: ${ex.message}")
-                    errorCallback?.let {
-                        it(InAppMessagingException("In-App Messaging close message failed", ex))
+                    "In-App Messaging close message failed".let {
+                        InAppErrorLogger.logError(
+                            TAG,
+                            InAppError(
+                                it, InAppMessagingException(it),
+                                ELEvent.OperationFailed(SdkApi.CLOSE_MESSAGE.name),
+                            ),
+                        )
                     }
                 }
             }

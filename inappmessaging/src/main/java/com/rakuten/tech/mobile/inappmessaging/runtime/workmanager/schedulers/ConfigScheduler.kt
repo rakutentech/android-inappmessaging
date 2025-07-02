@@ -51,8 +51,7 @@ internal interface ConfigScheduler {
                     InAppErrorLogger.logError(
                         "ConfigScheduler",
                         InAppError(
-                            it,
-                            InAppMessagingException(it, ie),
+                            it, InAppMessagingException(it, ie),
                             Event.OperationFailed(SdkApi.CONFIG.name),
                         ),
                     )

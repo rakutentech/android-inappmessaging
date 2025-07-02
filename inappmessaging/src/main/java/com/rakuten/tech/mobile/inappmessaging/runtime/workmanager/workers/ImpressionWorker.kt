@@ -5,11 +5,15 @@ import androidx.work.Worker
 import androidx.work.WorkerParameters
 import com.google.gson.Gson
 import com.google.gson.JsonParseException
+import com.rakuten.tech.mobile.inappmessaging.runtime.InAppError
+import com.rakuten.tech.mobile.inappmessaging.runtime.InAppErrorLogger
 import com.rakuten.tech.mobile.inappmessaging.runtime.api.MessageMixerRetrofitService
 import com.rakuten.tech.mobile.inappmessaging.runtime.data.repositories.AccountRepository
 import com.rakuten.tech.mobile.inappmessaging.runtime.data.repositories.ConfigResponseRepository
 import com.rakuten.tech.mobile.inappmessaging.runtime.data.repositories.HostAppInfoRepository
 import com.rakuten.tech.mobile.inappmessaging.runtime.data.requests.ImpressionRequest
+import com.rakuten.tech.mobile.inappmessaging.runtime.eventlogger.BackendApi
+import com.rakuten.tech.mobile.inappmessaging.runtime.eventlogger.Event
 import com.rakuten.tech.mobile.inappmessaging.runtime.utils.InAppLogger
 import com.rakuten.tech.mobile.inappmessaging.runtime.utils.RuntimeUtil
 import com.rakuten.tech.mobile.inappmessaging.runtime.utils.WorkerUtils
@@ -44,7 +48,13 @@ internal class ImpressionWorker(
 
         // Validate input data.
         if (impressionEndpoint.isEmpty() || impressionRequestJsonRequest.isNullOrEmpty()) {
-            // ToDo: IMPRESSION_MISSING_METADATA
+            InAppErrorLogger.logError(
+                TAG,
+                InAppError(
+                    "impressionUrl or impressionRequest may be empty",
+                    ev = Event.OperationFailed(BackendApi.IMPRESSION.alias),
+                ),
+            )
             return Result.failure()
         }
 
@@ -57,8 +67,13 @@ internal class ImpressionWorker(
         val impressionRequest = try {
             Gson().fromJson(impressionRequestJsonRequest, ImpressionRequest::class.java)
         } catch (e: JsonParseException) {
-            InAppLogger(TAG).error("impression - error: ${e.message}")
-            // ToDo: IMPRESSION_JSON_ENCODING_FAILED
+            InAppErrorLogger.logError(
+                TAG,
+                InAppError(
+                    "impressionRequest parsing error", e,
+                    ev = Event.OperationFailed(BackendApi.IMPRESSION.alias),
+                ),
+            )
             return Result.failure()
         }
 
@@ -67,8 +82,7 @@ internal class ImpressionWorker(
             // Execute Retrofit API call and handle response.
             onResponse(createReportImpressionCall(impressionEndpoint, impressionRequest).execute())
         } catch (e: Exception) {
-            // ToDo: #29
-            InAppLogger(TAG).error("impression - error: ${e.message}")
+            InAppErrorLogger.logError(TAG, InAppError(ex = e, ev = Event.OperationFailed(BackendApi.IMPRESSION.alias)))
             Result.retry()
         }
     }
@@ -76,6 +90,15 @@ internal class ImpressionWorker(
     private fun onResponse(response: Response<ResponseBody>): Result {
         InAppLogger(TAG).info("impression API - code: ${response.code()}")
 
+        if (!response.isSuccessful) {
+            InAppErrorLogger.logError(
+                TAG,
+                InAppError(
+                    "${BackendApi.IMPRESSION.alias} API failed - ${response.message()}",
+                    ev = Event.ApiRequestFailed(BackendApi.IMPRESSION, response.code().toString()),
+                ),
+            )
+        }
         return when {
             response.code() >= HttpURLConnection.HTTP_INTERNAL_ERROR ->
                 WorkerUtils.checkRetry(serverErrorCounter.getAndIncrement()) { Result.retry() }

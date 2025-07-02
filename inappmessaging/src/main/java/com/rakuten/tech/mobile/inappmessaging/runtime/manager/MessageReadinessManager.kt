@@ -293,23 +293,19 @@ internal class MessageReadinessManager(
         if (response.isSuccessful) {
             return response.body()
         } else {
-            val errorBody = response.errorBody()?.string()
             InAppErrorLogger.logError(
                 DISP_TAG,
                 InAppError(
-                    errorBody,
-                    ev = Event.ApiRequestFailed(
-                        BackendApi.DISPLAY_PERMISSION,
-                        response.code().toString(),
-                    ),
+                    response.errorBody()?.string(),
+                    ev = Event.ApiRequestFailed(BackendApi.DISPLAY_PERMISSION, response.code().toString()),
                 ),
             )
             return when {
                 response.code() >= HttpURLConnection.HTTP_INTERNAL_ERROR -> checkAndRetry(callClone) {
-                    WorkerUtils.logRequestError(DISP_TAG, response.code(), errorBody)
+                    WorkerUtils.logRequestError(DISP_TAG, response.code(), response.errorBody()?.string())
                 }
                 else -> {
-                    WorkerUtils.logRequestError(DISP_TAG, response.code(), errorBody)
+                    WorkerUtils.logRequestError(DISP_TAG, response.code(), response.errorBody()?.string())
                     null
                 }
             }

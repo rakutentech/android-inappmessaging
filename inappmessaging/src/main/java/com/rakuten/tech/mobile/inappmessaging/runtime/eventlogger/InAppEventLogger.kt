@@ -7,7 +7,7 @@ import com.rakuten.tech.mobile.sdkutils.eventlogger.EventLogger
 
 internal interface EventLogger {
 
-    fun configure(context: Context, enable: Boolean? = null, apiUrl: String? = null, apiKey: String? = null)
+    fun configure(context: Context, config: EventLoggerConfig?)
 
     fun logEvent(event: Event)
 }
@@ -16,17 +16,17 @@ internal object InAppEventLogger : com.rakuten.tech.mobile.inappmessaging.runtim
 
     private var isEnabled: Boolean = true
 
-    override fun configure(context: Context, enable: Boolean?, apiUrl: String?, apiKey: String?) {
+    override fun configure(context: Context, config: EventLoggerConfig?) {
         val appManifestConfig = InApp.AppManifestConfig(context)
 
-        isEnabled = enable ?: appManifestConfig.enableEventLogger()
+        isEnabled = config?.enableEventLogger ?: appManifestConfig.enableEventLogger()
 
         if (!isEnabled) {
             return
         }
 
-        val realApiUrl = apiUrl ?: appManifestConfig.eventLoggerApiUrl().orEmpty()
-        val realApiKey = apiKey ?: appManifestConfig.eventLoggerApiKey().orEmpty()
+        val realApiUrl = config?.apiUrl ?: appManifestConfig.eventLoggerApiUrl().orEmpty()
+        val realApiKey = config?.apiKey ?: appManifestConfig.eventLoggerApiKey().orEmpty()
 
         if (realApiUrl.isEmpty() || realApiKey.isEmpty()) {
             isEnabled = false
