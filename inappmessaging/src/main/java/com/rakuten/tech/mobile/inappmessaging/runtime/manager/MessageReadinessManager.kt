@@ -290,25 +290,26 @@ internal class MessageReadinessManager(
         callClone: Call<DisplayPermissionResponse>,
     ): DisplayPermissionResponse? {
         InAppLogger(DISP_TAG).info("check API - code: ${response.code()}")
+
         if (response.isSuccessful) {
             return response.body()
-        } else {
-            InAppErrorLogger.logError(
-                DISP_TAG,
-                InAppError(
-                    response.errorBody()?.string(),
-                    ev = Event.ApiRequestFailed(BackendApi.DISPLAY_PERMISSION, response.code().toString()),
-                ),
-            )
-            return when {
-                response.code() >= HttpURLConnection.HTTP_INTERNAL_ERROR -> checkAndRetry(callClone) {
-                    WorkerUtils.logRequestError(DISP_TAG, response.code(), response.errorBody()?.string())
-                }
-                else -> {
-                    WorkerUtils.logRequestError(DISP_TAG, response.code(), response.errorBody()?.string())
-                    null
-                }
+        }
+
+        InAppErrorLogger.logError(
+            DISP_TAG,
+            InAppError(
+                "${BackendApi.DISPLAY_PERMISSION.alias} API failed - ${response.errorBody()?.string()}",
+                ev = Event.ApiRequestFailed(BackendApi.DISPLAY_PERMISSION, response.code().toString()),
+            ),
+        )
+
+        return if (response.code() >= HttpURLConnection.HTTP_INTERNAL_ERROR) {
+            checkAndRetry(callClone) {
+                WorkerUtils.logRequestError(DISP_TAG, response.code(), response.errorBody()?.string())
             }
+        } else {
+            WorkerUtils.logRequestError(DISP_TAG, response.code(), response.errorBody()?.string())
+            null
         }
     }
 

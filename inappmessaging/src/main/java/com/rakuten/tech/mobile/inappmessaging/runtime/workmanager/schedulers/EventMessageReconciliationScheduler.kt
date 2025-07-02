@@ -59,7 +59,7 @@ internal interface EventMessageReconciliationScheduler {
                         "EventMessageReconciliation",
                         InAppError(
                             it,
-                            InAppMessagingException(it), Event.OperationFailed(SdkApi.LOG_EVENT.name),
+                            InAppMessagingException(it, ie), Event.OperationFailed(SdkApi.LOG_EVENT.name),
                         ),
                     )
                 }

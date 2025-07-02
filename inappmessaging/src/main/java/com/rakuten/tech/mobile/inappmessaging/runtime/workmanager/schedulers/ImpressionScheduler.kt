@@ -37,7 +37,7 @@ internal class ImpressionScheduler {
                 InAppErrorLogger.logError(
                     "ImpressionScheduler",
                     InAppError(
-                        ex = InAppMessagingException(it),
+                        ex = InAppMessagingException(it, ie),
                         ev = Event.OperationFailed(BackendApi.IMPRESSION.alias),
                     ),
                 )

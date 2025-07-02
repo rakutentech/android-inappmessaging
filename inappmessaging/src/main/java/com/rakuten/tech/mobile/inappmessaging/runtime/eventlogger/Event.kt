@@ -36,6 +36,12 @@ internal sealed class Event(
         "CONFIG_INVALID_CONFIGURATION",
     )
 
+    // 32
+    object ImpressionRatTrackerFailed : Event(
+        EventType.WARNING,
+        "IMPRESSION_RAT_TRACKER_FAILED",
+    )
+
     // 33
     object UserDataCacheDecodingFailed : Event(
         EventType.WARNING,

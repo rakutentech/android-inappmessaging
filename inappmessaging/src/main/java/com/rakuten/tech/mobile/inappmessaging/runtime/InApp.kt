@@ -145,7 +145,7 @@ internal class InApp(
                 InAppErrorLogger.logError(
                     TAG,
                     InAppError(
-                        it, InAppMessagingException(it),
+                        it, InAppMessagingException(it, ex),
                         ELEvent.OperationFailed(SdkApi.LOG_EVENT.name),
                     ),
                 )
@@ -203,7 +203,7 @@ internal class InApp(
                         InAppErrorLogger.logError(
                             TAG,
                             InAppError(
-                                it, InAppMessagingException(it),
+                                it, InAppMessagingException(it, ex),
                                 ELEvent.OperationFailed(SdkApi.CLOSE_MESSAGE.name),
                             ),
                         )

@@ -135,31 +135,32 @@ internal abstract class CampaignRepository {
 
         @SuppressWarnings("TooGenericExceptionCaught")
         private fun loadCachedData() {
-            if (InAppMessaging.instance().isLocalCachingEnabled()) {
-                InAppLogger(TAG).debug("start")
-                messages.clear()
+            if (!InAppMessaging.instance().isLocalCachingEnabled()) {
+                return
+            }
 
-                val cachedData = retrieveData()
-                if (cachedData.isNotEmpty()) {
-                    try {
-                        val jsonObject = JSONObject(cachedData)
-                        for (key in jsonObject.keys())
-                            messages[key] = Gson().fromJson(
-                                jsonObject.getJSONObject(key).toString(),
-                                Message::class.java,
-                            )
-                    } catch (ex: Exception) {
-                        InAppErrorLogger.logError(
-                            TAG,
-                            InAppError(
-                                "invalid JSON format for $IAM_USER_CACHE data",
-                                ex, ev = Event.UserDataCacheDecodingFailed,
-                            ),
+            InAppLogger(TAG).debug("start")
+            messages.clear()
+            val cachedData = retrieveData()
+            if (cachedData.isNotEmpty()) {
+                try {
+                    val jsonObject = JSONObject(cachedData)
+                    for (key in jsonObject.keys()) {
+                        messages[key] = Gson().fromJson(
+                            jsonObject.getJSONObject(key).toString(), Message::class.java,
                         )
                     }
+                } catch (ex: Exception) {
+                    InAppErrorLogger.logError(
+                        TAG,
+                        InAppError(
+                            "invalid JSON format for $IAM_USER_CACHE data",
+                            ex, ev = Event.UserDataCacheDecodingFailed,
+                        ),
+                    )
                 }
-                InAppLogger(TAG).debug("end")
             }
+            InAppLogger(TAG).debug("end")
         }
 
         private fun retrieveData(): String {
