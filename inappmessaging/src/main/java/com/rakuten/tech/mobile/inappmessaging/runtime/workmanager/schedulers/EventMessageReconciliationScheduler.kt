@@ -35,6 +35,7 @@ internal interface EventMessageReconciliationScheduler {
 
     private class EventMessageReconciliationSchedulerImpl : EventMessageReconciliationScheduler {
 
+        @SuppressWarnings("LongMethod")
         override fun startReconciliationWorker(workManager: WorkManager?, delay: Long) {
             // Starts MessageEventReconciliationWorker as a unique worker.
             // This worker must be a unique worker, but it can be replaced with a new one. Because we don't
@@ -45,11 +46,11 @@ internal interface EventMessageReconciliationScheduler {
                 .build()
 
             try {
-                val context = HostAppInfoRepository.instance().getContext()
-                context?.let { ctx ->
+                HostAppInfoRepository.instance().getContext()?.let { ctx ->
                     val manager = workManager ?: WorkManager.getInstance(ctx)
                     manager.beginUniqueWork(
-                        MESSAGES_EVENTS_WORKER_NAME, ExistingWorkPolicy.REPLACE, reconciliationWorkRequest,
+                        MESSAGES_EVENTS_WORKER_NAME, ExistingWorkPolicy.REPLACE,
+                        reconciliationWorkRequest,
                     ).enqueue()
                 }
             } catch (ie: IllegalStateException) {
@@ -57,10 +58,7 @@ internal interface EventMessageReconciliationScheduler {
                 "In-App Messaging message reconciliation failed".let {
                     InAppErrorLogger.logError(
                         "EventMessageReconciliation",
-                        InAppError(
-                            it,
-                            InAppMessagingException(it, ie), Event.OperationFailed(SdkApi.LOG_EVENT.name),
-                        ),
+                        InAppError(it, InAppMessagingException(it, ie), Event.OperationFailed(SdkApi.LOG_EVENT.name)),
                     )
                 }
             }

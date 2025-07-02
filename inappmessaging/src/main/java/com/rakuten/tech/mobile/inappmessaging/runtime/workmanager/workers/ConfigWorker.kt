@@ -62,10 +62,7 @@ internal class ConfigWorker(
         if (!isConfigValid()) {
             InAppErrorLogger.logError(
                 TAG,
-                InAppError(
-                    "Config URL, Subscription Key, Package name, or Version may be empty",
-                    ev = Event.ConfigInvalidVConfiguration,
-                ),
+                InAppError("Config URL or other config may be empty", ev = Event.ConfigInvalidVConfiguration),
             )
             return Result.failure()
         }
@@ -76,10 +73,7 @@ internal class ConfigWorker(
         } catch (e: Exception) {
             InAppErrorLogger.logError(
                 TAG,
-                InAppError(
-                    "configWorker doWork failed", ex = e,
-                    ev = Event.OperationFailed(SdkApi.CONFIG.name),
-                ),
+                InAppError("configWorker doWork failed", ex = e, ev = Event.OperationFailed(SdkApi.CONFIG.name)),
             )
             // RETRY by default has exponential backoff baked in.
             Result.retry()
@@ -115,6 +109,7 @@ internal class ConfigWorker(
      */
     @VisibleForTesting
     @Throws(IllegalArgumentException::class)
+    @SuppressWarnings("LongMethod")
     fun onResponse(response: Response<ConfigResponse?>): Result {
         if (response.isSuccessful && response.body() != null) {
             handleResponse(response)

@@ -72,10 +72,8 @@ internal interface MessageMixerPingScheduler {
 
         private fun enqueueRequest(workManager: WorkManager?, periodicMessageMixerFetch: OneTimeWorkRequest) {
             try {
-                val context = HostAppInfoRepository.instance().getContext()
-                context?.let { ctx ->
-                    val manager = workManager ?: WorkManager.getInstance(ctx)
-                    manager.enqueueUniqueWork(
+                HostAppInfoRepository.instance().getContext()?.let { ctx ->
+                    (workManager ?: WorkManager.getInstance(ctx)).enqueueUniqueWork(
                         MESSAGE_MIXER_PING_WORKER, ExistingWorkPolicy.REPLACE, periodicMessageMixerFetch,
                     )
                 }

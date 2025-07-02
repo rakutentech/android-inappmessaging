@@ -132,6 +132,7 @@ internal object Initializer {
         return id
     }
 
+    @SuppressWarnings("LongMethod")
     private fun initializePicassoInstance(context: Context) {
         try {
             val cacheDirectory = File(context.cacheDir, "http_cache")

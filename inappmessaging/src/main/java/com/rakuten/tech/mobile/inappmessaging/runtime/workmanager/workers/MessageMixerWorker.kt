@@ -111,6 +111,7 @@ internal class MessageMixerWorker(
      * else -> returns failure
      */
     @VisibleForTesting
+    @SuppressWarnings("LongMethod")
     fun onResponse(response: Response<MessageMixerResponse>): Result {
         if (response.isSuccessful) {
             serverErrorCounter.set(0) // reset server error counter

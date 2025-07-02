@@ -133,7 +133,10 @@ internal abstract class CampaignRepository {
             )
         }
 
-        @SuppressWarnings("TooGenericExceptionCaught")
+        @SuppressWarnings(
+            "TooGenericExceptionCaught",
+            "LongMethod",
+        )
         private fun loadCachedData() {
             if (!InAppMessaging.instance().isLocalCachingEnabled()) {
                 return

@@ -61,7 +61,10 @@ internal class ImpressionWorker(
         return executeRequest(impressionRequestJsonRequest, impressionEndpoint)
     }
 
-    @SuppressWarnings("TooGenericExceptionCaught")
+    @SuppressWarnings(
+        "TooGenericExceptionCaught",
+        "LongMethod",
+    )
     private fun executeRequest(impressionRequestJsonRequest: String?, impressionEndpoint: String): Result {
         // Convert impressionRequestJsonString to ImpressionRequest object.
         val impressionRequest = try {
@@ -87,6 +90,7 @@ internal class ImpressionWorker(
         }
     }
 
+    @SuppressWarnings("LongMethod")
     private fun onResponse(response: Response<ResponseBody>): Result {
         InAppLogger(TAG).info("impression API - code: ${response.code()}")
 

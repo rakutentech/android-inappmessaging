@@ -186,6 +186,7 @@ internal class InApp(
     @SuppressWarnings(
         "TooGenericExceptionCaught",
         "CanBeNonNullable",
+        "LongMethod",
     )
     private fun closeCampaign(clearQueuedCampaigns: Boolean? = null, viewId: String? = null) {
         if (configRepo.isConfigEnabled()) {

@@ -285,6 +285,7 @@ internal class MessageReadinessManager(
         }
     }
 
+    @SuppressWarnings("LongMethod")
     private fun handleResponse(
         response: Response<DisplayPermissionResponse>,
         callClone: Call<DisplayPermissionResponse>,

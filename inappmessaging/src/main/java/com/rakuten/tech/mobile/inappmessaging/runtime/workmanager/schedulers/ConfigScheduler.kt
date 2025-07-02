@@ -36,13 +36,9 @@ internal interface ConfigScheduler {
     private class ConfigSchedulerImpl : ConfigScheduler {
         override fun startConfig(delay: Long, workManager: WorkManager?) {
             try {
-                val context = HostAppInfoRepository.instance().getContext()
-                context?.let { ctx ->
+                HostAppInfoRepository.instance().getContext()?.let { ctx ->
                     val manager = workManager ?: WorkManager.getInstance(ctx)
-                    manager.beginUniqueWork(
-                        CONFIG_WORKER_NAME, ExistingWorkPolicy.REPLACE,
-                        getConfigWorkRequest(delay),
-                    )
+                    manager.beginUniqueWork(CONFIG_WORKER_NAME, ExistingWorkPolicy.REPLACE, getConfigWorkRequest(delay))
                         .enqueue()
                 }
             } catch (ie: IllegalStateException) {
