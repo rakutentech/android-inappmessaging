@@ -105,7 +105,7 @@ internal class ImpressionWorker(
         }
         return when {
             response.code() >= HttpURLConnection.HTTP_INTERNAL_ERROR ->
-                WorkerUtils.checkRetry(serverErrorCounter.getAndIncrement()) { Result.retry() }
+                WorkerUtils.checkRetry(serverErrorCounter.getAndIncrement(), BackendApi.IMPRESSION, response) { Result.retry() }
             response.code() >= HttpURLConnection.HTTP_MULT_CHOICE -> {
                 serverErrorCounter.set(0) // reset server error counter
                 Result.failure()

@@ -10,7 +10,6 @@ internal sealed class Event(
     open val info: MutableMap<String, String> = mutableMapOf(),
 ) {
     // May be used for API request errors.
-    // 3, 5, 6, 7, 9, 13, 14, 15, 22, 29
     data class ApiRequestFailed(
         val api: BackendApi,
         override val code: String,
@@ -21,7 +20,6 @@ internal sealed class Event(
     )
 
     // May be used for generic errors in the SDK (such as a caught exception).
-    // 10, 17, 18, 19, 31, 39, 40
     data class OperationFailed(
         val tag: String,
         val severity: EventType = EventType.WARNING,
@@ -30,25 +28,29 @@ internal sealed class Event(
         "${tag}_FAILED",
     )
 
-    // 4
     object ConfigInvalidVConfiguration : Event(
         EventType.CRITICAL,
         "CONFIG_INVALID_CONFIGURATION",
     )
 
-    // 32
+    data class DecodeJsonFailed(
+        val tag: String,
+        val severity: EventType = EventType.WARNING,
+    ) : Event(
+        severity,
+        "${tag}_JSON_DECODING_ERROR",
+    )
+
     object ImpressionRatTrackerFailed : Event(
         EventType.WARNING,
         "IMPRESSION_RAT_TRACKER_FAILED",
     )
 
-    // 33
     object UserDataCacheDecodingFailed : Event(
         EventType.WARNING,
         "USER_CACHE_DECODING_FAILED",
     )
 
-    // 34
     data class ImageLoadFailed(
         val url: String?,
     ) : Event(
@@ -58,19 +60,11 @@ internal sealed class Event(
         info = mutableMapOf("url" to url.orEmpty()),
     )
 
-    // 35
     object InvalidTooltip : Event(
         EventType.WARNING,
         "CAMPAIGN_INVALID_TOOLTIP",
     )
 
-    // 26
-    object CampaignDisplayCancelled : Event(
-        EventType.WARNING,
-        "CAMPAIGN_DISPLAY_CANCELLED_BY_APP",
-    )
-
-    // 37
     data class CampaignInvalidColor(
         val method: String?,
     ) : Event(
@@ -80,7 +74,6 @@ internal sealed class Event(
         info = mutableMapOf("method" to method.orEmpty()),
     )
 
-    // 38
     data class CampaignRedirectActionFailed(
         val url: String?,
     ) : Event(

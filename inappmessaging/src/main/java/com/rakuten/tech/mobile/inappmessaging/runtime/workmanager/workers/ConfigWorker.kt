@@ -4,6 +4,7 @@ import android.content.Context
 import androidx.annotation.VisibleForTesting
 import androidx.work.Worker
 import androidx.work.WorkerParameters
+import com.google.gson.stream.MalformedJsonException
 import com.rakuten.tech.mobile.inappmessaging.runtime.BuildConfig
 import com.rakuten.tech.mobile.inappmessaging.runtime.InAppError
 import com.rakuten.tech.mobile.inappmessaging.runtime.InAppErrorLogger
@@ -16,6 +17,7 @@ import com.rakuten.tech.mobile.inappmessaging.runtime.data.responses.ConfigRespo
 import com.rakuten.tech.mobile.inappmessaging.runtime.eventlogger.BackendApi
 import com.rakuten.tech.mobile.inappmessaging.runtime.eventlogger.Event
 import com.rakuten.tech.mobile.inappmessaging.runtime.eventlogger.SdkApi
+import com.rakuten.tech.mobile.inappmessaging.runtime.exception.InAppMessagingException
 import com.rakuten.tech.mobile.inappmessaging.runtime.utils.InAppLogger
 import com.rakuten.tech.mobile.inappmessaging.runtime.utils.RetryDelayUtil
 import com.rakuten.tech.mobile.inappmessaging.runtime.utils.RuntimeUtil
@@ -70,11 +72,10 @@ internal class ConfigWorker(
         return try {
             // Executing the API network call.
             onResponse(setupCall().execute())
+        } catch (je: MalformedJsonException) {
+            InAppErrorLogger.logError(TAG, InAppError(ex = je, ev = Event.DecodeJsonFailed(SdkApi.CONFIG.name)))
+            Result.retry()
         } catch (e: Exception) {
-            InAppErrorLogger.logError(
-                TAG,
-                InAppError("configWorker doWork failed", ex = e, ev = Event.OperationFailed(SdkApi.CONFIG.name)),
-            )
             // RETRY by default has exponential backoff baked in.
             Result.retry()
         }
@@ -114,13 +115,6 @@ internal class ConfigWorker(
         if (response.isSuccessful && response.body() != null) {
             handleResponse(response)
         } else {
-            InAppErrorLogger.logError(
-                TAG,
-                InAppError(
-                    "${BackendApi.CONFIG.alias} API failed - ${response.message()}",
-                    ev = Event.ApiRequestFailed(BackendApi.CONFIG, response.code().toString()),
-                ),
-            )
             return when {
                 response.code() == RetryDelayUtil.RETRY_ERROR_CODE -> handleRetry(response)
                 response.code() >= HttpURLConnection.HTTP_INTERNAL_ERROR -> handleInternalError(response)
@@ -128,7 +122,15 @@ internal class ConfigWorker(
                     serverErrorCounter.set(0) // reset server error counter
                     // clear temp data (ignore all temp data stored during config request)
                     InAppMessaging.setNotConfiguredInstance()
-                    WorkerUtils.logRequestError(TAG, response.code(), response.errorBody()?.string())
+                    "${BackendApi.CONFIG.alias} API failed - ${response.errorBody()?.string()}".let {
+                        InAppErrorLogger.logError(
+                            TAG,
+                            InAppError(
+                                message = it, ex = InAppMessagingException(it),
+                                ev = Event.ApiRequestFailed(BackendApi.CONFIG, "${response.code()}"),
+                            ),
+                        )
+                    }
                     Result.failure()
                 }
             }
@@ -138,7 +140,9 @@ internal class ConfigWorker(
 
     private fun handleInternalError(response: Response<ConfigResponse?>): Result {
         WorkerUtils.logRequestError(TAG, response.code(), response.errorBody()?.string())
-        return WorkerUtils.checkRetry(serverErrorCounter.getAndIncrement()) { retryConfigRequest() }
+        return WorkerUtils.checkRetry(serverErrorCounter.getAndIncrement(), BackendApi.CONFIG, response) {
+            retryConfigRequest()
+        }
     }
 
     private fun handleRetry(response: Response<ConfigResponse?>): Result {

@@ -139,7 +139,7 @@ internal class MessageMixerWorker(
 
     private fun handleInternalError(response: Response<MessageMixerResponse>): Result {
         WorkerUtils.logRequestError(TAG, response.code(), response.errorBody()?.string())
-        return WorkerUtils.checkRetry(serverErrorCounter.getAndIncrement()) { retryPingRequest() }
+        return WorkerUtils.checkRetry(serverErrorCounter.getAndIncrement(), BackendApi.PING, response) { retryPingRequest() }
     }
 
     private fun handleRetry(response: Response<MessageMixerResponse>): Result {
