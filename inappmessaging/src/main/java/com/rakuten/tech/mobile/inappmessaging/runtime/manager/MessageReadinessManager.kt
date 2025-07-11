@@ -17,14 +17,12 @@ import com.rakuten.tech.mobile.inappmessaging.runtime.data.responses.DisplayPerm
 import com.rakuten.tech.mobile.inappmessaging.runtime.data.responses.ping.Message
 import com.rakuten.tech.mobile.inappmessaging.runtime.eventlogger.BackendApi
 import com.rakuten.tech.mobile.inappmessaging.runtime.eventlogger.Event
-import com.rakuten.tech.mobile.inappmessaging.runtime.eventlogger.EventType
 import com.rakuten.tech.mobile.inappmessaging.runtime.exception.InAppMessagingException
 import com.rakuten.tech.mobile.inappmessaging.runtime.utils.BuildVersionChecker
 import com.rakuten.tech.mobile.inappmessaging.runtime.utils.InAppLogger
 import com.rakuten.tech.mobile.inappmessaging.runtime.utils.PermissionUtil
 import com.rakuten.tech.mobile.inappmessaging.runtime.utils.RetryDelayUtil
 import com.rakuten.tech.mobile.inappmessaging.runtime.utils.RuntimeUtil
-import com.rakuten.tech.mobile.inappmessaging.runtime.utils.WorkerUtils
 import com.rakuten.tech.mobile.inappmessaging.runtime.utils.ViewUtil
 import com.rakuten.tech.mobile.inappmessaging.runtime.workmanager.schedulers.MessageMixerPingScheduler
 import retrofit2.Call

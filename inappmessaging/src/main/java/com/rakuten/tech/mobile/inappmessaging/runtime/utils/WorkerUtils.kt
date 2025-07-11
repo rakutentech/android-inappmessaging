@@ -24,8 +24,12 @@ internal object WorkerUtils {
         InAppLogger(tag).debug("response Code $code: ${message ?: "no error message"}")
     }
 
-    fun checkRetry(counter: Int, api: BackendApi, response: Response<*>, retryFunc: () -> ListenableWorker.Result):
-            ListenableWorker.Result {
+    fun checkRetry(
+        counter: Int,
+        api: BackendApi,
+        response: Response<*>,
+        retryFunc: () -> ListenableWorker.Result,
+    ): ListenableWorker.Result {
         if (counter < MAX_RETRY) {
             return retryFunc.invoke()
         } else {

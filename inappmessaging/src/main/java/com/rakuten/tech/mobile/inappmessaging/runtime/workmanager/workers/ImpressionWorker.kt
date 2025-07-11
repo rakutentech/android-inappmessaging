@@ -14,7 +14,6 @@ import com.rakuten.tech.mobile.inappmessaging.runtime.data.repositories.HostAppI
 import com.rakuten.tech.mobile.inappmessaging.runtime.data.requests.ImpressionRequest
 import com.rakuten.tech.mobile.inappmessaging.runtime.eventlogger.BackendApi
 import com.rakuten.tech.mobile.inappmessaging.runtime.eventlogger.Event
-import com.rakuten.tech.mobile.inappmessaging.runtime.exception.InAppMessagingException
 import com.rakuten.tech.mobile.inappmessaging.runtime.utils.InAppLogger
 import com.rakuten.tech.mobile.inappmessaging.runtime.utils.RuntimeUtil
 import com.rakuten.tech.mobile.inappmessaging.runtime.utils.WorkerUtils
@@ -86,6 +85,7 @@ internal class ImpressionWorker(
             // Execute Retrofit API call and handle response.
             onResponse(createReportImpressionCall(impressionEndpoint, impressionRequest).execute())
         } catch (e: Exception) {
+            InAppLogger(TAG).error("impression - error: ${e.message}")
             Result.retry()
         }
     }
@@ -96,14 +96,17 @@ internal class ImpressionWorker(
 
         return when {
             response.code() >= HttpURLConnection.HTTP_INTERNAL_ERROR ->
-                WorkerUtils.checkRetry(serverErrorCounter.getAndIncrement(), BackendApi.IMPRESSION, response) { Result.retry() }
+                WorkerUtils.checkRetry(serverErrorCounter.getAndIncrement(), BackendApi.IMPRESSION, response) {
+                    Result.retry()
+                }
             response.code() >= HttpURLConnection.HTTP_MULT_CHOICE -> {
                 serverErrorCounter.set(0) // reset server error counter
                 InAppErrorLogger.logError(
                     TAG,
                     InAppError(
                         "${BackendApi.IMPRESSION.alias} API failed - ${response.errorBody()?.string()}",
-                        ev = Event.ApiRequestFailed(BackendApi.IMPRESSION, "${response.code()}")),
+                        ev = Event.ApiRequestFailed(BackendApi.IMPRESSION, "${response.code()}"),
+                    ),
                 )
                 Result.failure()
             }

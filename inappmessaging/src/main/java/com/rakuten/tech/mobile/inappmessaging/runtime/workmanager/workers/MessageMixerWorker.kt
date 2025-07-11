@@ -18,7 +18,6 @@ import com.rakuten.tech.mobile.inappmessaging.runtime.data.responses.ping.Messag
 import com.rakuten.tech.mobile.inappmessaging.runtime.data.responses.ping.MessageMixerResponse
 import com.rakuten.tech.mobile.inappmessaging.runtime.eventlogger.BackendApi
 import com.rakuten.tech.mobile.inappmessaging.runtime.eventlogger.Event
-import com.rakuten.tech.mobile.inappmessaging.runtime.eventlogger.SdkApi
 import com.rakuten.tech.mobile.inappmessaging.runtime.utils.BuildVersionChecker
 import com.rakuten.tech.mobile.inappmessaging.runtime.utils.InAppLogger
 import com.rakuten.tech.mobile.inappmessaging.runtime.utils.RetryDelayUtil
@@ -27,7 +26,6 @@ import com.rakuten.tech.mobile.inappmessaging.runtime.utils.WorkerUtils
 import com.rakuten.tech.mobile.inappmessaging.runtime.utils.EventMatchingUtil
 import com.rakuten.tech.mobile.inappmessaging.runtime.workmanager.schedulers.EventMessageReconciliationScheduler
 import com.rakuten.tech.mobile.inappmessaging.runtime.workmanager.schedulers.MessageMixerPingScheduler
-import com.rakuten.tech.mobile.inappmessaging.runtime.workmanager.workers.ConfigWorker.Companion
 import retrofit2.Call
 import retrofit2.Response
 import java.net.HttpURLConnection
@@ -63,12 +61,15 @@ internal class MessageMixerWorker(
      * Main method to do the work. Make Message Mixer network call is the main work.
      * Retries sending the request with default backoff when network error is encountered.
      */
-    @SuppressWarnings("TooGenericExceptionCaught")
+    @SuppressWarnings("TooGenericExceptionCaught", "LongMethod")
     override fun doWork(): Result {
         if (ConfigResponseRepository.instance().getPingEndpoint().isBlank()) {
             InAppErrorLogger.logError(
                 TAG,
-                InAppError("Invalid ping URL", ev = Event.InvalidConfiguration(BackendApi.PING.name)),
+                InAppError(
+                    "Invalid ping URL",
+                    ev = Event.InvalidConfiguration(BackendApi.PING.name),
+                ),
             )
             return Result.failure()
         }
@@ -85,6 +86,7 @@ internal class MessageMixerWorker(
             InAppErrorLogger.logError(TAG, InAppError(ex = je, ev = Event.DecodeJsonFailed(BackendApi.PING.name)))
             Result.retry()
         } catch (e: Exception) {
+            InAppLogger(TAG).error("ping - error: ${e.message}")
             Result.retry()
         }
     }

@@ -19,7 +19,7 @@ internal object InAppEventLogger : com.rakuten.tech.mobile.inappmessaging.runtim
     override fun configure(context: Context, config: EventLoggerConfig?) {
         val appManifestConfig = InApp.AppManifestConfig(context)
 
-        isEnabled = config?.enableEventLogger ?: appManifestConfig.enableEventLogger()
+        isEnabled = config?.isEnabled ?: appManifestConfig.enableEventLogger()
 
         if (!isEnabled) {
             return

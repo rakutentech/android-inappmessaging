@@ -16,7 +16,6 @@ import com.rakuten.tech.mobile.inappmessaging.runtime.data.requests.ConfigQueryP
 import com.rakuten.tech.mobile.inappmessaging.runtime.data.responses.ConfigResponse
 import com.rakuten.tech.mobile.inappmessaging.runtime.eventlogger.BackendApi
 import com.rakuten.tech.mobile.inappmessaging.runtime.eventlogger.Event
-import com.rakuten.tech.mobile.inappmessaging.runtime.eventlogger.SdkApi
 import com.rakuten.tech.mobile.inappmessaging.runtime.exception.InAppMessagingException
 import com.rakuten.tech.mobile.inappmessaging.runtime.utils.InAppLogger
 import com.rakuten.tech.mobile.inappmessaging.runtime.utils.RetryDelayUtil
@@ -58,13 +57,16 @@ internal class ConfigWorker(
      * Main method to do the work. Make Config Service network call is the main work.
      * Retries sending the request with default backoff when network error is encountered.
      */
-    @SuppressWarnings("TooGenericExceptionCaught")
+    @SuppressWarnings("TooGenericExceptionCaught", "LongMethod")
     override fun doWork(): Result {
         // Terminate request if any of the following values are empty
         if (!isConfigValid()) {
             InAppErrorLogger.logError(
                 TAG,
-                InAppError("Config URL or other config may be empty", ev = Event.InvalidConfiguration(BackendApi.CONFIG.name)),
+                InAppError(
+                    "Config URL or other config may be empty",
+                    ev = Event.InvalidConfiguration(BackendApi.CONFIG.name),
+                ),
             )
             return Result.failure()
         }
@@ -76,6 +78,7 @@ internal class ConfigWorker(
             InAppErrorLogger.logError(TAG, InAppError(ex = je, ev = Event.DecodeJsonFailed(BackendApi.CONFIG.name)))
             Result.retry()
         } catch (e: Exception) {
+            InAppLogger(TAG).error("config - error: ${e.message}")
             // RETRY by default has exponential backoff baked in.
             Result.retry()
         }
