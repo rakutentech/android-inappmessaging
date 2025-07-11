@@ -64,7 +64,7 @@ internal class ConfigWorker(
         if (!isConfigValid()) {
             InAppErrorLogger.logError(
                 TAG,
-                InAppError("Config URL or other config may be empty", ev = Event.ConfigInvalidVConfiguration),
+                InAppError("Config URL or other config may be empty", ev = Event.InvalidConfiguration(BackendApi.CONFIG.name)),
             )
             return Result.failure()
         }
@@ -73,7 +73,7 @@ internal class ConfigWorker(
             // Executing the API network call.
             onResponse(setupCall().execute())
         } catch (je: MalformedJsonException) {
-            InAppErrorLogger.logError(TAG, InAppError(ex = je, ev = Event.DecodeJsonFailed(SdkApi.CONFIG.name)))
+            InAppErrorLogger.logError(TAG, InAppError(ex = je, ev = Event.DecodeJsonFailed(BackendApi.CONFIG.name)))
             Result.retry()
         } catch (e: Exception) {
             // RETRY by default has exponential backoff baked in.

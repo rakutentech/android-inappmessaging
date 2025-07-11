@@ -28,9 +28,11 @@ internal sealed class Event(
         "${tag}_FAILED",
     )
 
-    object ConfigInvalidVConfiguration : Event(
+    data class InvalidConfiguration(
+        val tag: String,
+    ) : Event(
         EventType.CRITICAL,
-        "CONFIG_INVALID_CONFIGURATION",
+        "${tag}_INVALID_CONFIGURATION",
     )
 
     data class DecodeJsonFailed(

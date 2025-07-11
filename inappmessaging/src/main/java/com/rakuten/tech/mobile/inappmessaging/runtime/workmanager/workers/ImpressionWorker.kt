@@ -14,6 +14,7 @@ import com.rakuten.tech.mobile.inappmessaging.runtime.data.repositories.HostAppI
 import com.rakuten.tech.mobile.inappmessaging.runtime.data.requests.ImpressionRequest
 import com.rakuten.tech.mobile.inappmessaging.runtime.eventlogger.BackendApi
 import com.rakuten.tech.mobile.inappmessaging.runtime.eventlogger.Event
+import com.rakuten.tech.mobile.inappmessaging.runtime.exception.InAppMessagingException
 import com.rakuten.tech.mobile.inappmessaging.runtime.utils.InAppLogger
 import com.rakuten.tech.mobile.inappmessaging.runtime.utils.RuntimeUtil
 import com.rakuten.tech.mobile.inappmessaging.runtime.utils.WorkerUtils
@@ -52,7 +53,7 @@ internal class ImpressionWorker(
                 TAG,
                 InAppError(
                     "impressionUrl or impressionRequest may be empty",
-                    ev = Event.OperationFailed(BackendApi.IMPRESSION.alias),
+                    ev = Event.InvalidConfiguration(BackendApi.IMPRESSION.name),
                 ),
             )
             return Result.failure()
@@ -85,7 +86,6 @@ internal class ImpressionWorker(
             // Execute Retrofit API call and handle response.
             onResponse(createReportImpressionCall(impressionEndpoint, impressionRequest).execute())
         } catch (e: Exception) {
-            InAppErrorLogger.logError(TAG, InAppError(ex = e, ev = Event.OperationFailed(BackendApi.IMPRESSION.alias)))
             Result.retry()
         }
     }
@@ -94,20 +94,17 @@ internal class ImpressionWorker(
     private fun onResponse(response: Response<ResponseBody>): Result {
         InAppLogger(TAG).info("impression API - code: ${response.code()}")
 
-        if (!response.isSuccessful) {
-            InAppErrorLogger.logError(
-                TAG,
-                InAppError(
-                    "${BackendApi.IMPRESSION.alias} API failed - ${response.message()}",
-                    ev = Event.ApiRequestFailed(BackendApi.IMPRESSION, response.code().toString()),
-                ),
-            )
-        }
         return when {
             response.code() >= HttpURLConnection.HTTP_INTERNAL_ERROR ->
                 WorkerUtils.checkRetry(serverErrorCounter.getAndIncrement(), BackendApi.IMPRESSION, response) { Result.retry() }
             response.code() >= HttpURLConnection.HTTP_MULT_CHOICE -> {
                 serverErrorCounter.set(0) // reset server error counter
+                InAppErrorLogger.logError(
+                    TAG,
+                    InAppError(
+                        "${BackendApi.IMPRESSION.alias} API failed - ${response.errorBody()?.string()}",
+                        ev = Event.ApiRequestFailed(BackendApi.IMPRESSION, "${response.code()}")),
+                )
                 Result.failure()
             }
             else -> {

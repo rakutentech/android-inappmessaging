@@ -17,6 +17,7 @@ import com.rakuten.tech.mobile.inappmessaging.runtime.data.responses.DisplayPerm
 import com.rakuten.tech.mobile.inappmessaging.runtime.data.responses.ping.Message
 import com.rakuten.tech.mobile.inappmessaging.runtime.eventlogger.BackendApi
 import com.rakuten.tech.mobile.inappmessaging.runtime.eventlogger.Event
+import com.rakuten.tech.mobile.inappmessaging.runtime.eventlogger.EventType
 import com.rakuten.tech.mobile.inappmessaging.runtime.exception.InAppMessagingException
 import com.rakuten.tech.mobile.inappmessaging.runtime.utils.BuildVersionChecker
 import com.rakuten.tech.mobile.inappmessaging.runtime.utils.InAppLogger
@@ -249,8 +250,8 @@ internal class MessageReadinessManager(
             InAppErrorLogger.logError(
                 DISP_TAG,
                 InAppError(
-                    "Empty displayPermissionUrl",
-                    ev = Event.OperationFailed(BackendApi.DISPLAY_PERMISSION.name),
+                    "Invalid displayPermission URL",
+                    ev = Event.InvalidConfiguration(BackendApi.DISPLAY_PERMISSION.name),
                 ),
             )
             return null
@@ -296,20 +297,12 @@ internal class MessageReadinessManager(
             return response.body()
         }
 
-        InAppErrorLogger.logError(
-            DISP_TAG,
-            InAppError(
-                "${BackendApi.DISPLAY_PERMISSION.alias} API failed - ${response.errorBody()?.string()}",
-                ev = Event.ApiRequestFailed(BackendApi.DISPLAY_PERMISSION, response.code().toString()),
-            ),
-        )
-
         return if (response.code() >= HttpURLConnection.HTTP_INTERNAL_ERROR) {
             checkAndRetry(callClone) {
-                WorkerUtils.logRequestError(DISP_TAG, response.code(), response.errorBody()?.string())
+                logFailedResponse(response)
             }
         } else {
-            WorkerUtils.logRequestError(DISP_TAG, response.code(), response.errorBody()?.string())
+            logFailedResponse(response)
             null
         }
     }
@@ -324,6 +317,16 @@ internal class MessageReadinessManager(
             errorHandling.invoke()
             null
         }
+    }
+
+    private fun logFailedResponse(response: Response<DisplayPermissionResponse>) {
+        InAppErrorLogger.logError(
+            DISP_TAG,
+            InAppError(
+                "${BackendApi.DISPLAY_PERMISSION.alias} API failed - ${response.errorBody()?.string()}",
+                ev = Event.ApiRequestFailed(BackendApi.DISPLAY_PERMISSION, response.code().toString()),
+            ),
+        )
     }
 
     companion object {

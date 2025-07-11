@@ -10,7 +10,7 @@ import com.rakuten.tech.mobile.inappmessaging.runtime.exception.InAppMessagingEx
 import retrofit2.Response
 
 internal object WorkerUtils {
-    private const val MAX_RETRY = 3
+    private const val MAX_RETRY = 1
 
     fun logRequestError(tag: String, code: Int, message: String?) {
         val errMsg = "Response Code $code: ${message ?: "no error message"}"
@@ -29,7 +29,7 @@ internal object WorkerUtils {
         if (counter < MAX_RETRY) {
             return retryFunc.invoke()
         } else {
-            "${api.alias} API failed - ${response.body()}".let {
+            "${api.alias} API failed - ${response.errorBody()?.string()}".let {
                 InAppErrorLogger.logError(
                     "WorkerUtils",
                     InAppError(
