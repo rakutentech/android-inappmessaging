@@ -10,7 +10,7 @@ import com.rakuten.tech.mobile.inappmessaging.runtime.exception.InAppMessagingEx
 import retrofit2.Response
 
 internal object WorkerUtils {
-    private const val MAX_RETRY = 1
+    private const val MAX_RETRY = 3
 
     fun logRequestError(tag: String, code: Int, message: String?) {
         val errMsg = "Response Code $code: ${message ?: "no error message"}"

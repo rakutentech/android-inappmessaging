@@ -284,24 +284,21 @@ internal class MessageReadinessManager(
         }
     }
 
-    @SuppressWarnings("LongMethod")
     private fun handleResponse(
         response: Response<DisplayPermissionResponse>,
         callClone: Call<DisplayPermissionResponse>,
     ): DisplayPermissionResponse? {
         InAppLogger(DISP_TAG).info("check API - code: ${response.code()}")
 
-        if (response.isSuccessful) {
-            return response.body()
-        }
-
-        return if (response.code() >= HttpURLConnection.HTTP_INTERNAL_ERROR) {
-            checkAndRetry(callClone) {
+        return when {
+            response.isSuccessful -> response.body()
+            response.code() >= HttpURLConnection.HTTP_INTERNAL_ERROR -> checkAndRetry(callClone) {
                 logFailedResponse(response)
             }
-        } else {
-            logFailedResponse(response)
-            null
+            else -> {
+                logFailedResponse(response)
+                null
+            }
         }
     }
 
