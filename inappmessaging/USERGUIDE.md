@@ -542,7 +542,7 @@ All the events "launch the app event, login event, purchase successful event, cu
 #### 7.8.0 (In-Progress)
 * Improvements:
   - RMCCX-9127: Update userguide to add SDK logic for [Deeplink handling](#deeplink-handling).
-  - RMCCX-9004: Integrate `Event Logger` utility module and send events. For more details, see [Configure Event Logger](#error-logging) section.
+  - RMCCX-9004: Integrate `Event Logger` module and send events. For more details, see [Configure Event Logger](#error-logging) section.
 
 #### 7.7.0 (2024-10-22)
 * Improvements:
