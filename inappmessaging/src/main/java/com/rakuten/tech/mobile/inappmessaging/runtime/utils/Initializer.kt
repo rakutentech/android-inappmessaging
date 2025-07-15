@@ -151,10 +151,7 @@ internal object Initializer {
             // Picasso instance was already initialized
             InAppErrorLogger.logError(
                 TAG,
-                InAppError(
-                    "initializePicassoInstance failed",
-                    ex = ignored, ev = Event.OperationFailed(SdkApi.CONFIG.name),
-                ),
+                InAppError("initializePicassoInstance failed", ev = Event.OperationFailed(SdkApi.CONFIG.name)),
             )
         }
     }

@@ -18,6 +18,8 @@ import com.rakuten.tech.mobile.inappmessaging.runtime.data.models.HostAppInfo
 import com.rakuten.tech.mobile.inappmessaging.runtime.data.repositories.AccountRepository
 import com.rakuten.tech.mobile.inappmessaging.runtime.data.repositories.ConfigResponseRepository
 import com.rakuten.tech.mobile.inappmessaging.runtime.data.repositories.HostAppInfoRepository
+import com.rakuten.tech.mobile.inappmessaging.runtime.data.responses.ConfigResponseData
+import com.rakuten.tech.mobile.inappmessaging.runtime.data.responses.ConfigResponseEndpoints
 import com.rakuten.tech.mobile.inappmessaging.runtime.data.responses.ping.MessageMixerResponse
 import com.rakuten.tech.mobile.inappmessaging.runtime.testhelpers.TestDataHelper
 import com.rakuten.tech.mobile.inappmessaging.runtime.utils.BuildVersionChecker
@@ -96,7 +98,7 @@ open class MessageMixerWorkerSpec : BaseTest() {
     @Test
     fun `should return success in api call`() {
         setupHostApp()
-        retrieveValidConfig()
+        setupValidConfig()
         MessageMixerWorker(ctx!!, workParam!!).doWork() shouldBeEqualTo ListenableWorker.Result.retry()
     }
 
@@ -108,7 +110,7 @@ open class MessageMixerWorkerSpec : BaseTest() {
             override fun provideUserId() = "user1"
             override fun provideIdTrackingIdentifier() = "tracking1"
         }
-        retrieveValidConfig()
+        setupValidConfig()
         val worker = MessageMixerWorker(ctx!!, workParam!!)
         worker.doWork() shouldBeEqualTo ListenableWorker.Result.retry()
         val buffer = Buffer()
@@ -138,13 +140,13 @@ open class MessageMixerWorkerSpec : BaseTest() {
         return worker.getSupportedCampaign(mockChecker)
     }
 
-    private fun retrieveValidConfig() {
-        val mockMessageScheduler = Mockito.mock(MessageMixerPingScheduler::class.java)
-        val worker = ConfigWorker(
-            ctx, workParam, HostAppInfoRepository.instance(),
-            ConfigResponseRepository.instance(), mockMessageScheduler,
+    private fun setupValidConfig() {
+        ConfigResponseRepository.instance().addConfigResponse(
+            ConfigResponseData(
+                endpoints = ConfigResponseEndpoints("https://test"),
+                100,
+            ),
         )
-        worker.doWork()
     }
 
     private fun setupHostApp() {
