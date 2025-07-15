@@ -198,11 +198,15 @@ workflows:
     - cache-pull@2: {}
     - script@1:
         title: Run Dependency Check
+        run_if: |-
+          {{enveq "SONAR_DEPENDENCYCHECK_SKIP" "false"}}
         inputs:
         - timeout: 1800
         - content: "./gradlew dependencyCheckAggregate"
     - deploy-to-bitrise-io:
         title: Deploy Dependency Check Report
+        run_if: |-
+          {{enveq "SONAR_DEPENDENCYCHECK_SKIP" "false"}}
         inputs:
           - deploy_path: "$SDK_PATH/build/reports/dependency-check-report.html"
   _common-end:
