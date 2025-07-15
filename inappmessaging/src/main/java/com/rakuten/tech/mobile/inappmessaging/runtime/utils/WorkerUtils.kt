@@ -30,8 +30,8 @@ internal object WorkerUtils {
         response: Response<*>,
         retryFunc: () -> ListenableWorker.Result,
     ): ListenableWorker.Result {
-        if (counter < MAX_RETRY) {
-            return retryFunc.invoke()
+        return if (counter < MAX_RETRY) {
+            retryFunc.invoke()
         } else {
             "${api.alias} API failed - ${response.errorBody()?.string()}".let {
                 InAppErrorLogger.logError(
@@ -42,7 +42,7 @@ internal object WorkerUtils {
                     ),
                 )
             }
-            return ListenableWorker.Result.failure()
+            ListenableWorker.Result.failure()
         }
     }
 }
