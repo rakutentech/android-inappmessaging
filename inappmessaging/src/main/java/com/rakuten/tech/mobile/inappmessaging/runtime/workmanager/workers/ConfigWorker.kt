@@ -4,7 +4,6 @@ import android.content.Context
 import androidx.annotation.VisibleForTesting
 import androidx.work.Worker
 import androidx.work.WorkerParameters
-import com.google.gson.stream.MalformedJsonException
 import com.rakuten.tech.mobile.inappmessaging.runtime.BuildConfig
 import com.rakuten.tech.mobile.inappmessaging.runtime.InAppError
 import com.rakuten.tech.mobile.inappmessaging.runtime.InAppErrorLogger
@@ -74,9 +73,6 @@ internal class ConfigWorker(
         return try {
             // Executing the API network call.
             onResponse(setupCall().execute())
-        } catch (je: MalformedJsonException) {
-            InAppErrorLogger.logError(TAG, InAppError(ex = je, ev = Event.DecodeJsonFailed(BackendApi.CONFIG.name)))
-            Result.retry()
         } catch (e: Exception) {
             InAppLogger(TAG).error("config - error: ${e.message}")
             // RETRY by default has exponential backoff baked in.

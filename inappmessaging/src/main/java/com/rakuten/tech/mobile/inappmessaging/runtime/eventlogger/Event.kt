@@ -35,14 +35,6 @@ internal sealed class Event(
         "${tag}_INVALID_CONFIGURATION",
     )
 
-    data class DecodeJsonFailed(
-        val tag: String,
-        val severity: EventType = EventType.WARNING,
-    ) : Event(
-        severity,
-        "${tag}_JSON_DECODING_ERROR",
-    )
-
     object ImpressionRatTrackerFailed : Event(
         EventType.WARNING,
         "IMPRESSION_RAT_TRACKER_FAILED",
@@ -65,15 +57,6 @@ internal sealed class Event(
     object InvalidTooltip : Event(
         EventType.WARNING,
         "CAMPAIGN_INVALID_TOOLTIP",
-    )
-
-    data class CampaignInvalidColor(
-        val method: String?,
-    ) : Event(
-        EventType.WARNING,
-        "CAMPAIGN_INVALID_COLOR",
-        "Invalid color",
-        info = mutableMapOf("method" to method.orEmpty()),
     )
 
     data class CampaignRedirectActionFailed(
