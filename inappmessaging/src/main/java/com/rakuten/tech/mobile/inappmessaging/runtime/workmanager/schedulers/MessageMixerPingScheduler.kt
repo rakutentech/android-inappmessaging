@@ -3,9 +3,12 @@ package com.rakuten.tech.mobile.inappmessaging.runtime.workmanager.schedulers
 import androidx.work.ExistingWorkPolicy
 import androidx.work.OneTimeWorkRequest
 import androidx.work.WorkManager
-import com.rakuten.tech.mobile.inappmessaging.runtime.InAppMessaging
+import com.rakuten.tech.mobile.inappmessaging.runtime.InAppError
+import com.rakuten.tech.mobile.inappmessaging.runtime.InAppErrorLogger
 import com.rakuten.tech.mobile.inappmessaging.runtime.data.repositories.ConfigResponseRepository
 import com.rakuten.tech.mobile.inappmessaging.runtime.data.repositories.HostAppInfoRepository
+import com.rakuten.tech.mobile.inappmessaging.runtime.eventlogger.BackendApi
+import com.rakuten.tech.mobile.inappmessaging.runtime.eventlogger.Event
 import com.rakuten.tech.mobile.inappmessaging.runtime.exception.InAppMessagingException
 import com.rakuten.tech.mobile.inappmessaging.runtime.utils.RetryDelayUtil
 import com.rakuten.tech.mobile.inappmessaging.runtime.utils.WorkManagerUtil
@@ -69,17 +72,20 @@ internal interface MessageMixerPingScheduler {
 
         private fun enqueueRequest(workManager: WorkManager?, periodicMessageMixerFetch: OneTimeWorkRequest) {
             try {
-                val context = HostAppInfoRepository.instance().getContext()
-                context?.let { ctx ->
-                    val manager = workManager ?: WorkManager.getInstance(ctx)
-                    manager.enqueueUniqueWork(
+                HostAppInfoRepository.instance().getContext()?.let { ctx ->
+                    (workManager ?: WorkManager.getInstance(ctx)).enqueueUniqueWork(
                         MESSAGE_MIXER_PING_WORKER, ExistingWorkPolicy.REPLACE, periodicMessageMixerFetch,
                     )
                 }
             } catch (ie: IllegalStateException) {
-                // this should not occur since work manager is initialized during SDK initialization
-                InAppMessaging.errorCallback?.let {
-                    it(InAppMessagingException("In-App Messaging ping request failed", ie))
+                "In-App Messaging ping request failed".let {
+                    InAppErrorLogger.logError(
+                        "MessageMixerPingScheduler",
+                        InAppError(
+                            it,
+                            ex = InAppMessagingException(it, ie), ev = Event.OperationFailed(BackendApi.PING.name),
+                        ),
+                    )
                 }
             }
         }

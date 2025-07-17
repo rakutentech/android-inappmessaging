@@ -11,6 +11,10 @@ class MainApplication : Application() {
     override fun onCreate() {
         super.onCreate()
         settings = IAMSettings(this)
+        InAppMessaging.setEventLoggerConfig(
+            apiUrl = BuildConfig.RELOGGER_API_URL,
+            apiKey = BuildConfig.RELOGGER_API_KEY
+        )
         InAppMessaging.configure(
             context = this,
             subscriptionKey = settings.getSubscriptionKey(),

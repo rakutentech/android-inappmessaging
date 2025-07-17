@@ -18,10 +18,13 @@ import android.widget.ImageView
 import androidx.annotation.VisibleForTesting
 import androidx.core.widget.NestedScrollView
 import com.google.android.material.button.MaterialButton
+import com.rakuten.tech.mobile.inappmessaging.runtime.InAppError
+import com.rakuten.tech.mobile.inappmessaging.runtime.InAppErrorLogger
 import com.rakuten.tech.mobile.inappmessaging.runtime.R
 import com.rakuten.tech.mobile.inappmessaging.runtime.data.ui.UiMessage
 import com.rakuten.tech.mobile.inappmessaging.runtime.data.responses.ping.MessageButton
 import com.rakuten.tech.mobile.inappmessaging.runtime.data.responses.ping.OnClickBehavior
+import com.rakuten.tech.mobile.inappmessaging.runtime.eventlogger.Event
 import com.rakuten.tech.mobile.inappmessaging.runtime.utils.BuildVersionChecker
 import com.rakuten.tech.mobile.inappmessaging.runtime.utils.InAppLogger
 import com.rakuten.tech.mobile.inappmessaging.runtime.utils.ResourceUtils
@@ -181,7 +184,7 @@ internal open class InAppMessageBaseView(context: Context, attrs: AttributeSet?)
                         }
 
                         override fun onError(e: Exception?) {
-                            InAppLogger(TAG).debug(e?.cause, "downloading image failed $imageUrl")
+                            InAppErrorLogger.logError(TAG, InAppError(ex = e, ev = Event.ImageLoadFailed(imageUrl)))
                         }
                     }
                     (picasso ?: Picasso.get()).load(this.imageUrl)
@@ -191,7 +194,7 @@ internal open class InAppMessageBaseView(context: Context, attrs: AttributeSet?)
                         .centerInside()
                         .into(imgView, callback)
                 } catch (ex: Exception) {
-                    InAppLogger(TAG).debug(ex, "downloading image failed $imageUrl")
+                    InAppErrorLogger.logError(TAG, InAppError(ex = ex, ev = Event.ImageLoadFailed(imageUrl)))
                 }
             }
         }

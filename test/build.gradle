@@ -29,9 +29,13 @@ android {
 
         manifestPlaceholders.in_app_messaging_sub_id = property("IAM_SUBSCRIPTION_KEY") ?: ""
         manifestPlaceholders.config_url = property("CONFIG_URL") ?: ""
+//        manifestPlaceholders.event_logger_api_url = property("RELOGGER_API_URL") ?: ""
+//        manifestPlaceholders.event_logger_api_key = property("RELOGGER_API_KEY") ?: ""
 
         buildConfigField("String", "VERSION_NAME", "\"${defaultConfig.versionName}\"")
         buildConfigField("String", "VERSION_CODE", "\"${defaultConfig.versionCode}\"")
+        buildConfigField("String", "RELOGGER_API_URL", "\"${property("RELOGGER_API_URL")}\"")
+        buildConfigField("String", "RELOGGER_API_KEY", "\"${property("RELOGGER_API_KEY")}\"")
     }
 
     buildTypes {

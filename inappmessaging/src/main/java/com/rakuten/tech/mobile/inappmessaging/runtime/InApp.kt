@@ -12,6 +12,8 @@ import com.rakuten.tech.mobile.inappmessaging.runtime.data.repositories.AccountR
 import com.rakuten.tech.mobile.inappmessaging.runtime.data.repositories.CampaignRepository
 import com.rakuten.tech.mobile.inappmessaging.runtime.data.repositories.ConfigResponseRepository
 import com.rakuten.tech.mobile.inappmessaging.runtime.data.repositories.HostAppInfoRepository
+import com.rakuten.tech.mobile.inappmessaging.runtime.eventlogger.SdkApi
+import com.rakuten.tech.mobile.inappmessaging.runtime.eventlogger.Event as ELEvent
 import com.rakuten.tech.mobile.inappmessaging.runtime.exception.InAppMessagingException
 import com.rakuten.tech.mobile.inappmessaging.runtime.manager.DisplayManager
 import com.rakuten.tech.mobile.inappmessaging.runtime.manager.EventsManager
@@ -71,9 +73,14 @@ internal class InApp(
                 displayManager.displayMessage()
             }
         } catch (ex: Exception) {
-            InAppLogger(TAG).error("registerActivity - error: ${ex.message}")
-            errorCallback?.let {
-                it(InAppMessagingException("In-App Messaging register activity failed", ex))
+            "In-App Messaging register activity failed".let {
+                InAppErrorLogger.logError(
+                    TAG,
+                    InAppError(
+                        it, InAppMessagingException(it, ex),
+                        ELEvent.OperationFailed(SdkApi.REGISTER_ACTIVITY.name),
+                    ),
+                )
             }
         }
     }
@@ -87,9 +94,14 @@ internal class InApp(
             }
             hostAppInfoRepo.registerActivity(null)
         } catch (ex: Exception) {
-            InAppLogger(TAG).warn("unregisterActivity - error: ${ex.message}")
-            errorCallback?.let {
-                it(InAppMessagingException("In-App Messaging unregister activity failed", ex))
+            "In-App Messaging unregister activity failed".let {
+                InAppErrorLogger.logError(
+                    TAG,
+                    InAppError(
+                        it, InAppMessagingException(it, ex),
+                        ELEvent.OperationFailed(SdkApi.UNREGISTER_ACTIVITY.name),
+                    ),
+                )
             }
         }
     }
@@ -129,9 +141,14 @@ internal class InApp(
                 eventsManager.onEventReceived(event)
             }
         } catch (ex: Exception) {
-            InAppLogger(TAG).error("logEvent - error: ${ex.message}")
-            errorCallback?.let {
-                it(InAppMessagingException("In-App Messaging log event failed", ex))
+            "In-App Messaging log event failed".let {
+                InAppErrorLogger.logError(
+                    TAG,
+                    InAppError(
+                        it, InAppMessagingException(it, ex),
+                        ELEvent.OperationFailed(SdkApi.LOG_EVENT.name),
+                    ),
+                )
             }
         }
     }
@@ -169,6 +186,7 @@ internal class InApp(
     @SuppressWarnings(
         "TooGenericExceptionCaught",
         "CanBeNonNullable",
+        "LongMethod",
     )
     private fun closeCampaign(clearQueuedCampaigns: Boolean? = null, viewId: String? = null) {
         if (configRepo.isConfigEnabled()) {
@@ -182,9 +200,14 @@ internal class InApp(
                         removeMessage(viewId)
                     }
                 } catch (ex: Exception) {
-                    InAppLogger(TAG).warn("closeCampaign - error: ${ex.message}")
-                    errorCallback?.let {
-                        it(InAppMessagingException("In-App Messaging close message failed", ex))
+                    "In-App Messaging close message failed".let {
+                        InAppErrorLogger.logError(
+                            TAG,
+                            InAppError(
+                                it, InAppMessagingException(it, ex),
+                                ELEvent.OperationFailed(SdkApi.CLOSE_MESSAGE.name),
+                            ),
+                        )
                     }
                 }
             }
@@ -251,6 +274,15 @@ internal class InApp(
          * Flag to enable/disable debug logging.
          **/
         fun isDebugging(): Boolean = metadata.getBoolean("com.rakuten.tech.mobile.inappmessaging.debugging")
+
+        fun enableEventLogger(): Boolean =
+            metadata.getBoolean("com.rakuten.tech.mobile.inappmessaging.enableeventlogger", true)
+
+        fun eventLoggerApiUrl(): String? =
+            metadata.getString("com.rakuten.tech.mobile.inappmessaging.eventloggerapiurl")
+
+        fun eventLoggerApiKey(): String? =
+            metadata.getString("com.rakuten.tech.mobile.inappmessaging.eventloggerapikey")
     }
 
     companion object {

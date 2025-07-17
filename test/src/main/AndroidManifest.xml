@@ -45,6 +45,19 @@
         <meta-data
             android:name="com.rakuten.tech.mobile.inappmessaging.configurl"
             android:value="${config_url}" />
+
+<!--        <meta-data-->
+<!--            android:name="com.rakuten.tech.mobile.inappmessaging.eventloggerapiurl"-->
+<!--            android:value="${event_logger_api_url}" />-->
+
+<!--        <meta-data-->
+<!--            android:name="com.rakuten.tech.mobile.inappmessaging.eventloggerapikey"-->
+<!--            android:value="${event_logger_api_key}"/>-->
+
+<!--        <meta-data-->
+<!--            android:name="com.rakuten.tech.mobile.inappmessaging.enableeventlogger"-->
+<!--            android:value="true" />-->
+
     </application>
 
 </manifest>
