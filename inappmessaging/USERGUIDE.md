@@ -74,7 +74,39 @@ If you want to enable SDK debug logging (tags begins with "IAM_"), add this meta
     android:value="true"/>
 ```
 
-### <a name="configure"></a>5. Call configure()
+### <a name="error-logging"></a>5. Configure Event Logger (Optional)
+Event Logger is a troubleshooting utility which helps to track or send important SDK events to a remote API server.
+
+To enable this feature, set the Event Logger API URL and Key. To obtain these credentials, please reach out to the In-App Messaging Team.
+
+* Option 1 (Build-time): Add this metadata in `AndroidManifest.xml`:
+```xml
+<meta-data
+  android:name="com.rakuten.tech.mobile.inappmessaging.eventloggerapiurl"
+  android:value="${event-logger-api-url}" />
+
+<meta-data
+  android:name="com.rakuten.tech.mobile.inappmessaging.eventloggerapikey"
+  android:value="${event-logger-api-key}"/>
+```
+* Option 2 (Runtime): Call `setEventLoggerConfig` API in your Application's `onCreate`:
+```kotlin
+class MainApplication : Application() {
+
+    override fun onCreate() {
+      InAppMessaging.setEventLoggerConfig(apiUrl = "<event-logger-api-key>", apiKey = "<event-logger-api-key>")
+    }   
+}
+```
+
+To disable this feature, do not provide the Event Logger API URL and Key; or to explicitly disable it, add this metadata in `AndroidManifest.xml`:
+```xml
+<meta-data
+  android:name="com.rakuten.tech.mobile.inappmessaging.enableeventlogger"
+  android:value="false" />
+```
+
+### <a name="configure"></a>6. Call configure()
 This method initializes the SDK and should be called in your Application's `onCreate`.
 
 An optional lambda function callback can be set to receive exceptions that caused failed configuration or non-fatal failures in the SDK.
@@ -510,6 +542,7 @@ All the events "launch the app event, login event, purchase successful event, cu
 #### 7.8.0 (In-Progress)
 * Improvements:
   - RMCCX-9127: Update userguide to add SDK logic for [Deeplink handling](#deeplink-handling).
+  - RMCCX-9004: Integrate `Event Logger` module and send events. For more details, see [Configure Event Logger](#error-logging) section.
 
 #### 7.7.0 (2024-10-22)
 * Improvements:

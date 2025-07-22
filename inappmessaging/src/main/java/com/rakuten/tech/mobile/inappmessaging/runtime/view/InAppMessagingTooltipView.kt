@@ -23,15 +23,17 @@ import com.google.android.material.imageview.ShapeableImageView
 import com.google.android.material.shape.CornerFamily
 import com.google.android.material.shape.MaterialShapeDrawable
 import com.google.android.material.shape.ShapeAppearanceModel
+import com.rakuten.tech.mobile.inappmessaging.runtime.InAppError
+import com.rakuten.tech.mobile.inappmessaging.runtime.InAppErrorLogger
 import com.rakuten.tech.mobile.inappmessaging.runtime.R
 import com.rakuten.tech.mobile.inappmessaging.runtime.data.enums.PositionType
 import com.rakuten.tech.mobile.inappmessaging.runtime.data.repositories.HostAppInfoRepository
 import com.rakuten.tech.mobile.inappmessaging.runtime.extensions.hide
-import com.rakuten.tech.mobile.inappmessaging.runtime.utils.InAppLogger
 import com.rakuten.tech.mobile.inappmessaging.runtime.utils.ResourceUtils
 import com.rakuten.tech.mobile.inappmessaging.runtime.utils.ViewUtil
 import com.rakuten.tech.mobile.inappmessaging.runtime.extensions.show
 import com.rakuten.tech.mobile.inappmessaging.runtime.data.ui.UiMessage
+import com.rakuten.tech.mobile.inappmessaging.runtime.eventlogger.Event
 import com.squareup.picasso.Callback
 import com.squareup.picasso.Picasso
 
@@ -134,7 +136,7 @@ internal class InAppMessagingTooltipView(
                     }
 
                     override fun onError(e: Exception?) {
-                        InAppLogger(TAG).debug(e?.cause, "downloading image failed: $imageUrl")
+                        InAppErrorLogger.logError(TAG, InAppError(ex = e, ev = Event.ImageLoadFailed(imageUrl)))
                     }
                 }
 
@@ -160,7 +162,7 @@ internal class InAppMessagingTooltipView(
                     .centerInside()
                     .into(view, callback)
             } catch (ex: Exception) {
-                InAppLogger(TAG).debug(ex, "downloading image failed: $imageUrl")
+                InAppErrorLogger.logError(TAG, InAppError(ex = ex, ev = Event.ImageLoadFailed(imageUrl)))
             }
         }
     }

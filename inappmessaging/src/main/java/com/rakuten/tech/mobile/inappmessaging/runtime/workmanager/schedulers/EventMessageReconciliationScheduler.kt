@@ -3,8 +3,11 @@ package com.rakuten.tech.mobile.inappmessaging.runtime.workmanager.schedulers
 import androidx.work.ExistingWorkPolicy
 import androidx.work.OneTimeWorkRequest
 import androidx.work.WorkManager
-import com.rakuten.tech.mobile.inappmessaging.runtime.InAppMessaging
+import com.rakuten.tech.mobile.inappmessaging.runtime.InAppError
+import com.rakuten.tech.mobile.inappmessaging.runtime.InAppErrorLogger
 import com.rakuten.tech.mobile.inappmessaging.runtime.data.repositories.HostAppInfoRepository
+import com.rakuten.tech.mobile.inappmessaging.runtime.eventlogger.Event
+import com.rakuten.tech.mobile.inappmessaging.runtime.eventlogger.SdkApi
 import com.rakuten.tech.mobile.inappmessaging.runtime.exception.InAppMessagingException
 import com.rakuten.tech.mobile.inappmessaging.runtime.workmanager.workers.MessageEventReconciliationWorker
 import java.util.concurrent.TimeUnit
@@ -32,6 +35,7 @@ internal interface EventMessageReconciliationScheduler {
 
     private class EventMessageReconciliationSchedulerImpl : EventMessageReconciliationScheduler {
 
+        @SuppressWarnings("LongMethod")
         override fun startReconciliationWorker(workManager: WorkManager?, delay: Long) {
             // Starts MessageEventReconciliationWorker as a unique worker.
             // This worker must be a unique worker, but it can be replaced with a new one. Because we don't
@@ -42,8 +46,7 @@ internal interface EventMessageReconciliationScheduler {
                 .build()
 
             try {
-                val context = HostAppInfoRepository.instance().getContext()
-                context?.let { ctx ->
+                HostAppInfoRepository.instance().getContext()?.let { ctx ->
                     val manager = workManager ?: WorkManager.getInstance(ctx)
                     manager.beginUniqueWork(
                         MESSAGES_EVENTS_WORKER_NAME, ExistingWorkPolicy.REPLACE, reconciliationWorkRequest,
@@ -51,8 +54,11 @@ internal interface EventMessageReconciliationScheduler {
                 }
             } catch (ie: IllegalStateException) {
                 // this should not occur since work manager is initialized during SDK initialization
-                InAppMessaging.errorCallback?.let {
-                    it(InAppMessagingException("In-App Messaging message reconciliation failed", ie))
+                "In-App Messaging message reconciliation failed".let {
+                    InAppErrorLogger.logError(
+                        "EventMessageReconciliation",
+                        InAppError(it, InAppMessagingException(it, ie), Event.OperationFailed(SdkApi.LOG_EVENT.name)),
+                    )
                 }
             }
         }

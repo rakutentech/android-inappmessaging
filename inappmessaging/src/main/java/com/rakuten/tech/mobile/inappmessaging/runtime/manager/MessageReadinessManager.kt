@@ -4,7 +4,8 @@ import android.Manifest
 import androidx.annotation.VisibleForTesting
 import androidx.annotation.WorkerThread
 import com.rakuten.tech.mobile.inappmessaging.runtime.BuildConfig
-import com.rakuten.tech.mobile.inappmessaging.runtime.InAppMessaging
+import com.rakuten.tech.mobile.inappmessaging.runtime.InAppError
+import com.rakuten.tech.mobile.inappmessaging.runtime.InAppErrorLogger
 import com.rakuten.tech.mobile.inappmessaging.runtime.api.MessageMixerRetrofitService
 import com.rakuten.tech.mobile.inappmessaging.runtime.data.enums.InAppMessageType
 import com.rakuten.tech.mobile.inappmessaging.runtime.data.repositories.AccountRepository
@@ -14,13 +15,14 @@ import com.rakuten.tech.mobile.inappmessaging.runtime.data.repositories.Campaign
 import com.rakuten.tech.mobile.inappmessaging.runtime.data.requests.DisplayPermissionRequest
 import com.rakuten.tech.mobile.inappmessaging.runtime.data.responses.DisplayPermissionResponse
 import com.rakuten.tech.mobile.inappmessaging.runtime.data.responses.ping.Message
+import com.rakuten.tech.mobile.inappmessaging.runtime.eventlogger.BackendApi
+import com.rakuten.tech.mobile.inappmessaging.runtime.eventlogger.Event
 import com.rakuten.tech.mobile.inappmessaging.runtime.exception.InAppMessagingException
 import com.rakuten.tech.mobile.inappmessaging.runtime.utils.BuildVersionChecker
 import com.rakuten.tech.mobile.inappmessaging.runtime.utils.InAppLogger
 import com.rakuten.tech.mobile.inappmessaging.runtime.utils.PermissionUtil
 import com.rakuten.tech.mobile.inappmessaging.runtime.utils.RetryDelayUtil
 import com.rakuten.tech.mobile.inappmessaging.runtime.utils.RuntimeUtil
-import com.rakuten.tech.mobile.inappmessaging.runtime.utils.WorkerUtils
 import com.rakuten.tech.mobile.inappmessaging.runtime.utils.ViewUtil
 import com.rakuten.tech.mobile.inappmessaging.runtime.workmanager.schedulers.MessageMixerPingScheduler
 import retrofit2.Call
@@ -242,7 +244,16 @@ internal class MessageReadinessManager(
     private fun getMessagePermission(message: Message): DisplayPermissionResponse? {
         // Prepare request data.
         val displayPermissionUrl: String = configResponseRepo.getDisplayPermissionEndpoint()
-        if (displayPermissionUrl.isEmpty()) return null
+        if (displayPermissionUrl.isEmpty()) {
+            InAppErrorLogger.logError(
+                DISP_TAG,
+                InAppError(
+                    "Invalid displayPermission URL",
+                    ev = Event.InvalidConfiguration(BackendApi.DISPLAY_PERMISSION.name),
+                ),
+            )
+            return null
+        }
 
         // Prepare network request.
         val request = getDisplayPermissionRequest(message)
@@ -259,9 +270,15 @@ internal class MessageReadinessManager(
             handleResponse(response, call.clone())
         } catch (e: Exception) {
             checkAndRetry(call.clone()) {
-                InAppLogger(DISP_TAG).error("executeDisplayRequest - error: ${e.message}")
-                InAppMessaging.errorCallback?.let {
-                    it(InAppMessagingException("In-App Messaging display permission request failed", e))
+                "In-App Messaging display permission request failed".let {
+                    InAppErrorLogger.logError(
+                        DISP_TAG,
+                        InAppError(
+                            it,
+                            InAppMessagingException(it, e),
+                            ev = Event.OperationFailed(BackendApi.DISPLAY_PERMISSION.name),
+                        ),
+                    )
                 }
             }
         }
@@ -272,13 +289,14 @@ internal class MessageReadinessManager(
         callClone: Call<DisplayPermissionResponse>,
     ): DisplayPermissionResponse? {
         InAppLogger(DISP_TAG).info("check API - code: ${response.code()}")
+
         return when {
             response.isSuccessful -> response.body()
             response.code() >= HttpURLConnection.HTTP_INTERNAL_ERROR -> checkAndRetry(callClone) {
-                WorkerUtils.logRequestError(DISP_TAG, response.code(), response.errorBody()?.string())
+                logFailedResponse(response)
             }
             else -> {
-                WorkerUtils.logRequestError(DISP_TAG, response.code(), response.errorBody()?.string())
+                logFailedResponse(response)
                 null
             }
         }
@@ -294,6 +312,16 @@ internal class MessageReadinessManager(
             errorHandling.invoke()
             null
         }
+    }
+
+    private fun logFailedResponse(response: Response<DisplayPermissionResponse>) {
+        InAppErrorLogger.logError(
+            DISP_TAG,
+            InAppError(
+                "${BackendApi.DISPLAY_PERMISSION.alias} API failed - ${response.errorBody()?.string()}",
+                ev = Event.ApiRequestFailed(BackendApi.DISPLAY_PERMISSION, response.code().toString()),
+            ),
+        )
     }
 
     companion object {

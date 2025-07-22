@@ -5,11 +5,14 @@ import com.google.gson.GsonBuilder
 import com.google.gson.JsonObject
 import com.google.gson.JsonParseException
 import com.google.gson.annotations.SerializedName
+import com.rakuten.tech.mobile.inappmessaging.runtime.InAppError
+import com.rakuten.tech.mobile.inappmessaging.runtime.InAppErrorLogger
 import com.rakuten.tech.mobile.inappmessaging.runtime.RmcHelper
 import com.rakuten.tech.mobile.inappmessaging.runtime.data.customjson.CustomJson
 import com.rakuten.tech.mobile.inappmessaging.runtime.data.customjson.CustomJsonDeserializer
 import com.rakuten.tech.mobile.inappmessaging.runtime.data.enums.InAppMessageType
 import com.rakuten.tech.mobile.inappmessaging.runtime.data.models.Tooltip
+import com.rakuten.tech.mobile.inappmessaging.runtime.eventlogger.Event
 import com.rakuten.tech.mobile.inappmessaging.runtime.utils.InAppLogger
 import java.util.Date
 
@@ -74,8 +77,7 @@ internal data class Message(
                     tooltip = null
                 }
             } catch (je: JsonParseException) {
-                InAppLogger(TAG).warn("getTooltipConfig - invalid tooltip format")
-                InAppLogger(TAG).debug("parse exception: $je")
+                InAppErrorLogger.logError(TAG, InAppError("Invalid tooltip format", je, Event.InvalidTooltip))
             }
         }
         return tooltip

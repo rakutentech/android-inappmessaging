@@ -1,9 +1,12 @@
 package com.rakuten.tech.mobile.inappmessaging.runtime.data.repositories
 
 import com.google.gson.Gson
+import com.rakuten.tech.mobile.inappmessaging.runtime.InAppError
+import com.rakuten.tech.mobile.inappmessaging.runtime.InAppErrorLogger
 import com.rakuten.tech.mobile.inappmessaging.runtime.InAppMessaging
 import com.rakuten.tech.mobile.inappmessaging.runtime.data.enums.InAppMessageType
 import com.rakuten.tech.mobile.inappmessaging.runtime.data.responses.ping.Message
+import com.rakuten.tech.mobile.inappmessaging.runtime.eventlogger.Event
 import com.rakuten.tech.mobile.inappmessaging.runtime.utils.InAppLogger
 import com.rakuten.tech.mobile.sdkutils.PreferencesUtil
 import org.json.JSONObject
@@ -130,23 +133,37 @@ internal abstract class CampaignRepository {
             )
         }
 
-        @SuppressWarnings("TooGenericExceptionCaught")
+        @SuppressWarnings(
+            "TooGenericExceptionCaught",
+            "LongMethod",
+        )
         private fun loadCachedData() {
-            if (InAppMessaging.instance().isLocalCachingEnabled()) {
-                InAppLogger(TAG).debug("start")
-                messages.clear()
+            if (!InAppMessaging.instance().isLocalCachingEnabled()) {
+                return
+            }
+
+            InAppLogger(TAG).debug("start")
+            messages.clear()
+            val cachedData = retrieveData()
+            if (cachedData.isNotEmpty()) {
                 try {
-                    val jsonObject = JSONObject(retrieveData())
+                    val jsonObject = JSONObject(cachedData)
                     for (key in jsonObject.keys()) {
                         messages[key] = Gson().fromJson(
                             jsonObject.getJSONObject(key).toString(), Message::class.java,
                         )
                     }
                 } catch (ex: Exception) {
-                    InAppLogger(TAG).debug(ex.cause, "invalid JSON format for $IAM_USER_CACHE data")
+                    InAppErrorLogger.logError(
+                        TAG,
+                        InAppError(
+                            "invalid JSON format for $IAM_USER_CACHE data",
+                            ex, ev = Event.UserDataCacheDecodingFailed,
+                        ),
+                    )
                 }
-                InAppLogger(TAG).debug("end")
             }
+            InAppLogger(TAG).debug("end")
         }
 
         private fun retrieveData(): String {

@@ -1,8 +1,8 @@
 package com.rakuten.tech.mobile.inappmessaging.runtime
 
 import android.text.TextUtils
+import com.rakuten.tech.mobile.inappmessaging.runtime.eventlogger.Event
 import com.rakuten.tech.mobile.inappmessaging.runtime.utils.ClassUtil
-import com.rakuten.tech.mobile.inappmessaging.runtime.utils.InAppLogger
 
 internal object EventTrackerHelper {
 
@@ -33,8 +33,7 @@ internal object EventTrackerHelper {
                     com.rakuten.tech.mobile.analytics.RatTracker.event(eventName, serializableData).track()
                     return true
                 } catch (e: Exception) {
-                    InAppLogger(TAG).warn("sendEvent - analytics.track() failed")
-                    InAppLogger(TAG).debug("exception: $e")
+                    InAppErrorLogger.logError(TAG, InAppError(ex = e, ev = Event.ImpressionRatTrackerFailed))
                 }
             }
         }
