@@ -4,6 +4,7 @@ import android.content.Context
 import androidx.annotation.VisibleForTesting
 import androidx.work.Worker
 import androidx.work.WorkerParameters
+import com.google.gson.stream.MalformedJsonException
 import com.rakuten.tech.mobile.inappmessaging.runtime.InAppError
 import com.rakuten.tech.mobile.inappmessaging.runtime.InAppErrorLogger
 import com.rakuten.tech.mobile.inappmessaging.runtime.api.MessageMixerRetrofitService
@@ -60,15 +61,17 @@ internal class MessageMixerWorker(
      * Main method to do the work. Make Message Mixer network call is the main work.
      * Retries sending the request with default backoff when network error is encountered.
      */
-    @SuppressWarnings("TooGenericExceptionCaught", "LongMethod")
+    @SuppressWarnings("TooGenericExceptionCaught", "LongMethod", "ReturnCount")
     override fun doWork(): Result {
-        if (ConfigResponseRepository.instance().getPingEndpoint().isBlank()) {
+        val configRepo = ConfigResponseRepository.instance()
+        if (!configRepo.isConfigEnabled()) {
+            return Result.failure()
+        }
+
+        if (configRepo.getPingEndpoint().isBlank()) {
             InAppErrorLogger.logError(
                 TAG,
-                InAppError(
-                    "Invalid ping URL",
-                    ev = Event.InvalidConfiguration(BackendApi.PING.name),
-                ),
+                InAppError("Invalid ping URL", ev = Event.InvalidConfiguration(BackendApi.PING.name)),
             )
             return Result.failure()
         }
@@ -81,6 +84,9 @@ internal class MessageMixerWorker(
         return try {
             // Execute a thread blocking API network call, and handle response.
             onResponse(call.execute())
+        } catch (mje: MalformedJsonException) {
+            InAppErrorLogger.logError(TAG, InAppError(ex = mje, ev = Event.JsonDecodingFailed(BackendApi.PING.name)))
+            Result.failure()
         } catch (e: Exception) {
             InAppLogger(TAG).error("ping - error: ${e.message}")
             Result.retry()

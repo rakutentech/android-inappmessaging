@@ -28,7 +28,7 @@ internal object InAppErrorLogger {
 
     fun logError(tag: String, error: InAppError) {
         val errorMessage = error.message ?: "Unexpected error"
-        val exceptionCause = error.ex?.cause?.let { ", Cause: $it" }.orEmpty()
+        val exceptionCause = (error.ex?.cause ?: error.ex?.message)?.let { ", Cause: $it" }.orEmpty()
         val fullMessage = "$errorMessage$exceptionCause"
 
         if (InAppLogger.isDebug) {

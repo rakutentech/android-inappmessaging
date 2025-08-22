@@ -7,6 +7,8 @@ import androidx.work.workDataOf
 import com.google.gson.Gson
 import com.rakuten.tech.mobile.inappmessaging.runtime.data.repositories.ConfigResponseRepository
 import com.rakuten.tech.mobile.inappmessaging.runtime.data.requests.ImpressionRequest
+import com.rakuten.tech.mobile.inappmessaging.runtime.data.responses.ConfigResponseData
+import com.rakuten.tech.mobile.inappmessaging.runtime.data.responses.ConfigResponseEndpoints
 import okhttp3.mockwebserver.MockResponse
 import okhttp3.mockwebserver.MockWebServer
 import org.amshove.kluent.shouldBeEqualTo
@@ -135,9 +137,11 @@ class ImpressionWorkerSpec {
             inputData = workDataOf(ImpressionWorker.IMPRESSION_REQUEST_KEY to jsonString),
         ).build()
 
-        val mockConfigRepo = mock(ConfigResponseRepository::class.java)
-        `when`(mockConfigRepo.getImpressionEndpoint()).thenReturn(endpoint)
-        worker.configRepo = mockConfigRepo
+        ConfigResponseRepository.instance().addConfigResponse(
+            ConfigResponseData(
+                ConfigResponseEndpoints(impression = endpoint), 100,
+            ),
+        )
 
         return worker
     }

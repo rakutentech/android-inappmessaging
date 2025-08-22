@@ -28,6 +28,14 @@ internal sealed class Event(
         "${tag}_FAILED",
     )
 
+    data class JsonDecodingFailed(
+        val tag: String,
+        val severity: EventType = EventType.CRITICAL,
+    ) : Event(
+        severity,
+        "${tag}_JSON_DECODING_ERROR",
+    )
+
     data class InvalidConfiguration(
         val tag: String,
     ) : Event(

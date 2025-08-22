@@ -41,7 +41,12 @@ internal class ImpressionWorker(
      * This method makes a thread blocking network call to post impression.
      * If server responding a non-successful response, work will be retried again with exponential backoff.
      */
+    @SuppressWarnings("ReturnCount")
     override fun doWork(): Result {
+        if (!configRepo.isConfigEnabled()) {
+            return Result.failure()
+        }
+
         // Retrieve input data.
         val impressionEndpoint = configRepo.getImpressionEndpoint()
         val impressionRequestJsonRequest = inputData.getString(IMPRESSION_REQUEST_KEY)

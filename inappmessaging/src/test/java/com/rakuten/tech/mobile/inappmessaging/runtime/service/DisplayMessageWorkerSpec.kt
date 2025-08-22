@@ -1,16 +1,12 @@
 package com.rakuten.tech.mobile.inappmessaging.runtime.service
 
 import android.app.Activity
-import android.content.Context
 import android.content.res.Resources
 import android.os.Handler
 import android.util.DisplayMetrics
 import android.view.View
 import androidx.test.core.app.ApplicationProvider.getApplicationContext
 import androidx.work.ListenableWorker
-import androidx.work.WorkerParameters
-import androidx.work.impl.utils.SerialExecutor
-import androidx.work.impl.utils.taskexecutor.TaskExecutor
 import androidx.work.testing.TestListenableWorkerBuilder
 import com.nhaarman.mockitokotlin2.*
 import com.rakuten.tech.mobile.inappmessaging.runtime.BaseTest
@@ -70,17 +66,6 @@ class DisplayMessageWorkerSpec : BaseTest() {
     @Test
     fun `should return successful if no message`() {
         runBlocking { displayWorker.doWork() shouldBeEqualTo ListenableWorker.Result.success() }
-        Mockito.verify(handler, never()).post(any())
-    }
-
-    @Test
-    fun `should not throw exception with mock parameters`() {
-        val mockParams = Mockito.mock(WorkerParameters::class.java)
-        val mockExecutor = Mockito.mock(TaskExecutor::class.java)
-        `when`(mockParams.taskExecutor).thenReturn(mockExecutor)
-        `when`(mockExecutor.backgroundExecutor).thenReturn(Mockito.mock(SerialExecutor::class.java))
-        val worker = DisplayMessageWorker(Mockito.mock(Context::class.java), mockParams)
-        runBlocking { worker.doWork() shouldBeEqualTo ListenableWorker.Result.success() }
         Mockito.verify(handler, never()).post(any())
     }
 

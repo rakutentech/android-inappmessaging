@@ -44,9 +44,6 @@ import kotlin.collections.ArrayList
  */
 @RunWith(RobolectricTestRunner::class)
 open class MessageReadinessManagerSpec : BaseTest() {
-    private var configResponseData = mock(ConfigResponseData::class.java)
-    private var configResponseEndpoints = mock(ConfigResponseEndpoints::class.java)
-
     @Before
     override fun setup() {
         super.setup()
@@ -60,9 +57,12 @@ open class MessageReadinessManagerSpec : BaseTest() {
                 InAppMessagingTestConstants.LOCALE,
             ),
         )
-        ConfigResponseRepository.instance().addConfigResponse(configResponseData)
-        `when`(configResponseData.endpoints).thenReturn(configResponseEndpoints)
-        `when`(configResponseEndpoints.displayPermission).thenReturn(DISPLAY_PERMISSION_URL)
+
+        ConfigResponseRepository.instance().addConfigResponse(
+            ConfigResponseData(
+                ConfigResponseEndpoints(displayPermission = DISPLAY_PERMISSION_URL), 100,
+            ),
+        )
         MessageReadinessManager.instance().clearMessages()
     }
 
@@ -240,10 +240,9 @@ open class MessageReadinessManagerSpec : BaseTest() {
     }
 }
 
+@SuppressWarnings("LongMethod")
 class MessageReadinessManagerRequestSpec : BaseTest() {
     private val server = MockWebServer()
-    private var data = mock(ConfigResponseData::class.java)
-    private var endpoint = mock(ConfigResponseEndpoints::class.java)
 
     @Before
     override fun setup() {
@@ -258,12 +257,12 @@ class MessageReadinessManagerRequestSpec : BaseTest() {
                 InAppMessagingTestConstants.LOCALE,
             ),
         )
-        ConfigResponseRepository.instance().addConfigResponse(data)
+        ConfigResponseRepository.instance().addConfigResponse(
+            ConfigResponseData(
+                ConfigResponseEndpoints(displayPermission = server.url("client").toString()), 100,
+            ),
+        )
         setMessagesList(arrayListOf(TestDataHelper.createDummyMessage(campaignId = CAMPAIGN_ID)))
-
-        server.start()
-        `when`(data.endpoints).thenReturn(endpoint)
-        `when`(endpoint.displayPermission).thenReturn(server.url("client").toString())
         InAppMessaging.errorCallback = null
     }
 

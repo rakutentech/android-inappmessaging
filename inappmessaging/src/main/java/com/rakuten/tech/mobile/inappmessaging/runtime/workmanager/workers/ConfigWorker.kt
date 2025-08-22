@@ -4,6 +4,7 @@ import android.content.Context
 import androidx.annotation.VisibleForTesting
 import androidx.work.Worker
 import androidx.work.WorkerParameters
+import com.google.gson.stream.MalformedJsonException
 import com.rakuten.tech.mobile.inappmessaging.runtime.BuildConfig
 import com.rakuten.tech.mobile.inappmessaging.runtime.InAppError
 import com.rakuten.tech.mobile.inappmessaging.runtime.InAppErrorLogger
@@ -60,19 +61,19 @@ internal class ConfigWorker(
     override fun doWork(): Result {
         // Terminate request if any of the following values are empty
         if (!isConfigValid()) {
-            InAppErrorLogger.logError(
-                TAG,
-                InAppError(
-                    "Config URL or other config may be empty",
-                    ev = Event.InvalidConfiguration(BackendApi.CONFIG.name),
-                ),
-            )
             return Result.failure()
         }
 
         return try {
             // Executing the API network call.
             onResponse(setupCall().execute())
+        } catch (iae: java.lang.IllegalArgumentException) {
+            // "data" is not found from response
+            InAppErrorLogger.logError(TAG, InAppError(ex = iae, ev = Event.JsonDecodingFailed(BackendApi.CONFIG.name)))
+            Result.failure()
+        } catch (mje: MalformedJsonException) {
+            InAppErrorLogger.logError(TAG, InAppError(ex = mje, ev = Event.JsonDecodingFailed(BackendApi.CONFIG.name)))
+            Result.failure()
         } catch (e: Exception) {
             InAppLogger(TAG).error("config - error: ${e.message}")
             // RETRY by default has exponential backoff baked in.
