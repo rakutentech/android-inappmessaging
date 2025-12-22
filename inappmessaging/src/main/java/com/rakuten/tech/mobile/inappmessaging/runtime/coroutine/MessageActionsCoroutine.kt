@@ -6,8 +6,6 @@ import android.content.ActivityNotFoundException
 import android.content.Intent
 import android.net.Uri
 import androidx.annotation.VisibleForTesting
-import com.rakuten.tech.mobile.inappmessaging.runtime.InAppError
-import com.rakuten.tech.mobile.inappmessaging.runtime.InAppErrorLogger
 import com.rakuten.tech.mobile.inappmessaging.runtime.InAppMessaging
 import com.rakuten.tech.mobile.inappmessaging.runtime.R
 import com.rakuten.tech.mobile.inappmessaging.runtime.data.ui.UiMessage
@@ -31,8 +29,8 @@ import com.rakuten.tech.mobile.inappmessaging.runtime.manager.MessageReadinessMa
 import com.rakuten.tech.mobile.inappmessaging.runtime.manager.PushPrimerTrackerManager
 import com.rakuten.tech.mobile.inappmessaging.runtime.utils.BuildVersionChecker
 import com.rakuten.tech.mobile.inappmessaging.runtime.utils.CheckPermissionResult
+import com.rakuten.tech.mobile.inappmessaging.runtime.utils.InAppLogger
 import com.rakuten.tech.mobile.inappmessaging.runtime.utils.PermissionUtil
-import com.rakuten.tech.mobile.inappmessaging.runtime.eventlogger.Event as ELEvent
 import java.util.Date
 import kotlin.collections.ArrayList
 
@@ -168,7 +166,7 @@ internal class MessageActionsCoroutine(
             try {
                 activityContext.startActivity(intent)
             } catch (e: ActivityNotFoundException) {
-                InAppErrorLogger.logError(TAG, InAppError(ex = e, ev = ELEvent.CampaignRedirectActionFailed(uri)))
+                InAppLogger(TAG).info("handleDeeplinkRedirection - error: ${e.message}")
             }
         }
     }

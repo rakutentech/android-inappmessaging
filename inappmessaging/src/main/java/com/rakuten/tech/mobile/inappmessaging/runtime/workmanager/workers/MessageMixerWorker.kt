@@ -5,8 +5,6 @@ import androidx.annotation.VisibleForTesting
 import androidx.work.Worker
 import androidx.work.WorkerParameters
 import com.google.gson.stream.MalformedJsonException
-import com.rakuten.tech.mobile.inappmessaging.runtime.InAppError
-import com.rakuten.tech.mobile.inappmessaging.runtime.InAppErrorLogger
 import com.rakuten.tech.mobile.inappmessaging.runtime.api.MessageMixerRetrofitService
 import com.rakuten.tech.mobile.inappmessaging.runtime.data.enums.CampaignType
 import com.rakuten.tech.mobile.inappmessaging.runtime.data.repositories.AccountRepository
@@ -16,8 +14,6 @@ import com.rakuten.tech.mobile.inappmessaging.runtime.data.repositories.Campaign
 import com.rakuten.tech.mobile.inappmessaging.runtime.data.requests.PingRequest
 import com.rakuten.tech.mobile.inappmessaging.runtime.data.responses.ping.Message
 import com.rakuten.tech.mobile.inappmessaging.runtime.data.responses.ping.MessageMixerResponse
-import com.rakuten.tech.mobile.inappmessaging.runtime.eventlogger.BackendApi
-import com.rakuten.tech.mobile.inappmessaging.runtime.eventlogger.Event
 import com.rakuten.tech.mobile.inappmessaging.runtime.utils.BuildVersionChecker
 import com.rakuten.tech.mobile.inappmessaging.runtime.utils.InAppLogger
 import com.rakuten.tech.mobile.inappmessaging.runtime.utils.RetryDelayUtil
@@ -69,10 +65,6 @@ internal class MessageMixerWorker(
         }
 
         if (configRepo.getPingEndpoint().isBlank()) {
-            InAppErrorLogger.logError(
-                TAG,
-                InAppError("Invalid ping URL", ev = Event.InvalidConfiguration(BackendApi.PING.name)),
-            )
             return Result.failure()
         }
 
@@ -84,8 +76,7 @@ internal class MessageMixerWorker(
         return try {
             // Execute a thread blocking API network call, and handle response.
             onResponse(call.execute())
-        } catch (mje: MalformedJsonException) {
-            InAppErrorLogger.logError(TAG, InAppError(ex = mje, ev = Event.JsonDecodingFailed(BackendApi.PING.name)))
+        } catch (_: MalformedJsonException) {
             Result.failure()
         } catch (e: Exception) {
             InAppLogger(TAG).error("ping - error: ${e.message}")
@@ -122,24 +113,18 @@ internal class MessageMixerWorker(
      * else -> returns failure
      */
     @VisibleForTesting
-    @SuppressWarnings("LongMethod")
     fun onResponse(response: Response<MessageMixerResponse>): Result {
         if (response.isSuccessful) {
             serverErrorCounter.set(0) // reset server error counter
             response.body()?.let { handleResponse(it) }
         } else {
+            InAppLogger(TAG).error("ping API error - code: ${response.code()}")
             return when {
                 response.code() == RetryDelayUtil.RETRY_ERROR_CODE -> handleRetry(response)
                 response.code() >= HttpURLConnection.HTTP_INTERNAL_ERROR -> handleInternalError(response)
                 else -> {
                     serverErrorCounter.set(0) // reset server error counter
-                    InAppErrorLogger.logError(
-                        TAG,
-                        InAppError(
-                            "${BackendApi.PING.alias} API failed - ${response.errorBody()?.string()}",
-                            ev = Event.ApiRequestFailed(BackendApi.PING, response.code().toString()),
-                        ),
-                    )
+                    WorkerUtils.logRequestError(TAG, response.code(), response.errorBody()?.string())
                     Result.failure()
                 }
             }
@@ -149,9 +134,7 @@ internal class MessageMixerWorker(
 
     private fun handleInternalError(response: Response<MessageMixerResponse>): Result {
         WorkerUtils.logRequestError(TAG, response.code(), response.errorBody()?.string())
-        return WorkerUtils.checkRetry(serverErrorCounter.getAndIncrement(), BackendApi.PING, response) {
-            retryPingRequest()
-        }
+        return WorkerUtils.checkRetry(serverErrorCounter.getAndIncrement()) { retryPingRequest() }
     }
 
     private fun handleRetry(response: Response<MessageMixerResponse>): Result {

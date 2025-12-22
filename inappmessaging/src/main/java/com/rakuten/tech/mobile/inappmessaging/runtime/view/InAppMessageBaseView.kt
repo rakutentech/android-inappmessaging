@@ -18,14 +18,10 @@ import android.widget.ImageView
 import androidx.annotation.VisibleForTesting
 import androidx.core.widget.NestedScrollView
 import com.google.android.material.button.MaterialButton
-import com.rakuten.tech.mobile.inappmessaging.runtime.InAppError
-import com.rakuten.tech.mobile.inappmessaging.runtime.InAppErrorLogger
 import com.rakuten.tech.mobile.inappmessaging.runtime.R
 import com.rakuten.tech.mobile.inappmessaging.runtime.data.ui.UiMessage
 import com.rakuten.tech.mobile.inappmessaging.runtime.data.responses.ping.MessageButton
 import com.rakuten.tech.mobile.inappmessaging.runtime.data.responses.ping.OnClickBehavior
-import com.rakuten.tech.mobile.inappmessaging.runtime.eventlogger.BackendApi
-import com.rakuten.tech.mobile.inappmessaging.runtime.eventlogger.Event
 import com.rakuten.tech.mobile.inappmessaging.runtime.utils.BuildVersionChecker
 import com.rakuten.tech.mobile.inappmessaging.runtime.utils.InAppLogger
 import com.rakuten.tech.mobile.inappmessaging.runtime.utils.ResourceUtils
@@ -39,7 +35,7 @@ import kotlin.math.round
 /**
  * Base class of all custom views.
  */
-@SuppressWarnings("LargeClass", "TooManyFunctions", "TooGenericExceptionCaught")
+@SuppressWarnings("LargeClass", "TooManyFunctions")
 internal open class InAppMessageBaseView(context: Context, attrs: AttributeSet?) :
     FrameLayout(context, attrs), InAppMessageView {
 
@@ -89,12 +85,9 @@ internal open class InAppMessageBaseView(context: Context, attrs: AttributeSet?)
             this.headerColor = Color.parseColor(messageUiModel.headerColor)
             this.messageBodyColor = Color.parseColor(messageUiModel.bodyColor)
             this.bgColor = Color.parseColor(messageUiModel.backgroundColor)
-        } catch (_: Exception) {
+        } catch (e: IllegalArgumentException) {
             // values are from backend
-            InAppErrorLogger.logError(
-                TAG,
-                InAppError("setColor error", ev = Event.JsonDecodingFailed(BackendApi.PING.name)),
-            )
+            InAppLogger(TAG).error(e.message)
             // change to default
             this.headerColor = Color.BLACK
             this.messageBodyColor = Color.BLACK
@@ -188,7 +181,7 @@ internal open class InAppMessageBaseView(context: Context, attrs: AttributeSet?)
                         }
 
                         override fun onError(e: Exception?) {
-                            InAppErrorLogger.logError(TAG, InAppError(ex = e, ev = Event.ImageLoadFailed(imageUrl)))
+                            InAppLogger(TAG).debug(e?.cause, "downloading image failed $imageUrl")
                         }
                     }
                     (picasso ?: Picasso.get()).load(this.imageUrl)
@@ -198,7 +191,7 @@ internal open class InAppMessageBaseView(context: Context, attrs: AttributeSet?)
                         .centerInside()
                         .into(imgView, callback)
                 } catch (ex: Exception) {
-                    InAppErrorLogger.logError(TAG, InAppError(ex = ex, ev = Event.ImageLoadFailed(imageUrl)))
+                    InAppLogger(TAG).debug(ex, "downloading image failed $imageUrl")
                 }
             }
         }
@@ -225,12 +218,9 @@ internal open class InAppMessageBaseView(context: Context, attrs: AttributeSet?)
     private fun setBgColor(button: MessageButton, buttonView: MaterialButton): Int {
         val bgColor = try {
             Color.parseColor(button.buttonBackgroundColor)
-        } catch (_: Exception) {
+        } catch (e: IllegalArgumentException) {
             // values are from backend
-            InAppErrorLogger.logError(
-                TAG,
-                InAppError("setBgColor error", ev = Event.JsonDecodingFailed(BackendApi.PING.name)),
-            )
+            InAppLogger(TAG).error("setBgColor - error: ${e.message}")
             // set to default color
             Color.WHITE
         }
@@ -242,12 +232,9 @@ internal open class InAppMessageBaseView(context: Context, attrs: AttributeSet?)
     private fun setTextColor(button: MessageButton, buttonView: MaterialButton): Int {
         val textColor = try {
             Color.parseColor(button.buttonTextColor)
-        } catch (_: Exception) {
+        } catch (e: IllegalArgumentException) {
             // values are from backend
-            InAppErrorLogger.logError(
-                TAG,
-                InAppError("setTextColor error", ev = Event.JsonDecodingFailed(BackendApi.PING.name)),
-            )
+            InAppLogger(TAG).error("setTextColor - error: ${e.message}")
             // set to default color
             Color.parseColor("#1D1D1D")
         }

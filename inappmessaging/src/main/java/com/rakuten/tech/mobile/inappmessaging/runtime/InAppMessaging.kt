@@ -6,10 +6,6 @@ import androidx.annotation.NonNull
 import androidx.annotation.RestrictTo
 import com.rakuten.tech.mobile.inappmessaging.runtime.data.models.appevents.Event
 import com.rakuten.tech.mobile.inappmessaging.runtime.data.repositories.AccountRepository
-import com.rakuten.tech.mobile.inappmessaging.runtime.eventlogger.EventLoggerConfig
-import com.rakuten.tech.mobile.inappmessaging.runtime.eventlogger.InAppEventLogger
-import com.rakuten.tech.mobile.inappmessaging.runtime.eventlogger.Event as ELEvent
-import com.rakuten.tech.mobile.inappmessaging.runtime.eventlogger.SdkApi
 import com.rakuten.tech.mobile.inappmessaging.runtime.exception.InAppMessagingException
 import com.rakuten.tech.mobile.inappmessaging.runtime.utils.InAppLogger
 import com.rakuten.tech.mobile.inappmessaging.runtime.utils.Initializer
@@ -106,8 +102,6 @@ abstract class InAppMessaging internal constructor() {
          */
         var errorCallback: ((ex: Exception) -> Unit)? = null
 
-        private var eventLoggerConfig: EventLoggerConfig? = null
-
         private var instance: InAppMessaging = NotConfiguredInAppMessaging()
 
         /**
@@ -140,8 +134,6 @@ abstract class InAppMessaging internal constructor() {
             enableTooltipFeature: Boolean? = false,
         ): Boolean {
             return try {
-                InAppEventLogger.configure(context, eventLoggerConfig)
-
                 if (!shouldProcess(subscriptionKey)) {
                     InAppLogger(TAG).info("configure called but using RMC, skipping")
                     return false
@@ -162,31 +154,12 @@ abstract class InAppMessaging internal constructor() {
             } catch (ex: Exception) {
                 // reset instance when configuration failed
                 setNotConfiguredInstance()
-                "In-App Messaging configuration failed".let {
-                    InAppErrorLogger.logError(
-                        TAG,
-                        InAppError(
-                            it, InAppMessagingException(it, ex),
-                            ELEvent.OperationFailed(SdkApi.CONFIG.name),
-                        ),
-                    )
+                errorCallback?.let {
+                    it(InAppMessagingException("In-App Messaging configuration failed", ex))
                 }
+                InAppLogger(TAG).error("configure - error: ${ex.message}")
                 false
             }
-        }
-
-        /**
-         * Configures the Event Logger platform for sending SDK critical or warning events.
-         *
-         * @param apiUrl An optional EventLogger API URL. Default is the value set in the app's AndroidManifest.
-         * @param apiKey An optional EventLogger API Key. Default is the value set in the app's AndroidManifest.
-         * @param enableEventLogger An optional flag to en/dis-able capturing events. Enabled by default.
-         *
-         * This method is intended for internal use only, and clients should not call this method directly.
-         */
-        @JvmOverloads
-        fun setEventLoggerConfig(apiUrl: String, apiKey: String, enableEventLogger: Boolean = true) {
-            this.eventLoggerConfig = EventLoggerConfig(apiUrl, apiKey, enableEventLogger)
         }
 
         @SuppressWarnings("LongParameterList")

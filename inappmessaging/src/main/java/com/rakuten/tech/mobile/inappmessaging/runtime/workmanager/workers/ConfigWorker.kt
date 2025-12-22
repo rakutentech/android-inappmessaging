@@ -6,17 +6,12 @@ import androidx.work.Worker
 import androidx.work.WorkerParameters
 import com.google.gson.stream.MalformedJsonException
 import com.rakuten.tech.mobile.inappmessaging.runtime.BuildConfig
-import com.rakuten.tech.mobile.inappmessaging.runtime.InAppError
-import com.rakuten.tech.mobile.inappmessaging.runtime.InAppErrorLogger
 import com.rakuten.tech.mobile.inappmessaging.runtime.InAppMessaging
 import com.rakuten.tech.mobile.inappmessaging.runtime.api.ConfigRetrofitService
 import com.rakuten.tech.mobile.inappmessaging.runtime.data.repositories.ConfigResponseRepository
 import com.rakuten.tech.mobile.inappmessaging.runtime.data.repositories.HostAppInfoRepository
 import com.rakuten.tech.mobile.inappmessaging.runtime.data.requests.ConfigQueryParamsBuilder
 import com.rakuten.tech.mobile.inappmessaging.runtime.data.responses.ConfigResponse
-import com.rakuten.tech.mobile.inappmessaging.runtime.eventlogger.BackendApi
-import com.rakuten.tech.mobile.inappmessaging.runtime.eventlogger.Event
-import com.rakuten.tech.mobile.inappmessaging.runtime.exception.InAppMessagingException
 import com.rakuten.tech.mobile.inappmessaging.runtime.utils.InAppLogger
 import com.rakuten.tech.mobile.inappmessaging.runtime.utils.RetryDelayUtil
 import com.rakuten.tech.mobile.inappmessaging.runtime.utils.RuntimeUtil
@@ -57,7 +52,7 @@ internal class ConfigWorker(
      * Main method to do the work. Make Config Service network call is the main work.
      * Retries sending the request with default backoff when network error is encountered.
      */
-    @SuppressWarnings("TooGenericExceptionCaught", "LongMethod")
+    @SuppressWarnings("TooGenericExceptionCaught")
     override fun doWork(): Result {
         // Terminate request if any of the following values are empty
         if (!isConfigValid()) {
@@ -67,12 +62,10 @@ internal class ConfigWorker(
         return try {
             // Executing the API network call.
             onResponse(setupCall().execute())
-        } catch (iae: java.lang.IllegalArgumentException) {
+        } catch (_: java.lang.IllegalArgumentException) {
             // "data" is not found from response
-            InAppErrorLogger.logError(TAG, InAppError(ex = iae, ev = Event.JsonDecodingFailed(BackendApi.CONFIG.name)))
             Result.failure()
-        } catch (mje: MalformedJsonException) {
-            InAppErrorLogger.logError(TAG, InAppError(ex = mje, ev = Event.JsonDecodingFailed(BackendApi.CONFIG.name)))
+        } catch (_: MalformedJsonException) {
             Result.failure()
         } catch (e: Exception) {
             InAppLogger(TAG).error("config - error: ${e.message}")
@@ -110,11 +103,11 @@ internal class ConfigWorker(
      */
     @VisibleForTesting
     @Throws(IllegalArgumentException::class)
-    @SuppressWarnings("LongMethod")
     fun onResponse(response: Response<ConfigResponse?>): Result {
         if (response.isSuccessful && response.body() != null) {
             handleResponse(response)
         } else {
+            InAppLogger(TAG).error("config API - error: ${response.code()}")
             return when {
                 response.code() == RetryDelayUtil.RETRY_ERROR_CODE -> handleRetry(response)
                 response.code() >= HttpURLConnection.HTTP_INTERNAL_ERROR -> handleInternalError(response)
@@ -122,15 +115,7 @@ internal class ConfigWorker(
                     serverErrorCounter.set(0) // reset server error counter
                     // clear temp data (ignore all temp data stored during config request)
                     InAppMessaging.setNotConfiguredInstance()
-                    "${BackendApi.CONFIG.alias} API failed - ${response.errorBody()?.string()}".let {
-                        InAppErrorLogger.logError(
-                            TAG,
-                            InAppError(
-                                message = it, ex = InAppMessagingException(it),
-                                ev = Event.ApiRequestFailed(BackendApi.CONFIG, "${response.code()}"),
-                            ),
-                        )
-                    }
+                    WorkerUtils.logRequestError(TAG, response.code(), response.errorBody()?.string())
                     Result.failure()
                 }
             }
@@ -140,9 +125,7 @@ internal class ConfigWorker(
 
     private fun handleInternalError(response: Response<ConfigResponse?>): Result {
         WorkerUtils.logRequestError(TAG, response.code(), response.errorBody()?.string())
-        return WorkerUtils.checkRetry(serverErrorCounter.getAndIncrement(), BackendApi.CONFIG, response) {
-            retryConfigRequest()
-        }
+        return WorkerUtils.checkRetry(serverErrorCounter.getAndIncrement()) { retryConfigRequest() }
     }
 
     private fun handleRetry(response: Response<ConfigResponse?>): Result {
