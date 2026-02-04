@@ -5,15 +5,11 @@ import androidx.work.Worker
 import androidx.work.WorkerParameters
 import com.google.gson.Gson
 import com.google.gson.JsonParseException
-import com.rakuten.tech.mobile.inappmessaging.runtime.InAppError
-import com.rakuten.tech.mobile.inappmessaging.runtime.InAppErrorLogger
 import com.rakuten.tech.mobile.inappmessaging.runtime.api.MessageMixerRetrofitService
 import com.rakuten.tech.mobile.inappmessaging.runtime.data.repositories.AccountRepository
 import com.rakuten.tech.mobile.inappmessaging.runtime.data.repositories.ConfigResponseRepository
 import com.rakuten.tech.mobile.inappmessaging.runtime.data.repositories.HostAppInfoRepository
 import com.rakuten.tech.mobile.inappmessaging.runtime.data.requests.ImpressionRequest
-import com.rakuten.tech.mobile.inappmessaging.runtime.eventlogger.BackendApi
-import com.rakuten.tech.mobile.inappmessaging.runtime.eventlogger.Event
 import com.rakuten.tech.mobile.inappmessaging.runtime.utils.InAppLogger
 import com.rakuten.tech.mobile.inappmessaging.runtime.utils.RuntimeUtil
 import com.rakuten.tech.mobile.inappmessaging.runtime.utils.WorkerUtils
@@ -53,35 +49,19 @@ internal class ImpressionWorker(
 
         // Validate input data.
         if (impressionEndpoint.isEmpty() || impressionRequestJsonRequest.isNullOrEmpty()) {
-            InAppErrorLogger.logError(
-                TAG,
-                InAppError(
-                    "impressionUrl or impressionRequest may be empty",
-                    ev = Event.InvalidConfiguration(BackendApi.IMPRESSION.name),
-                ),
-            )
             return Result.failure()
         }
 
         return executeRequest(impressionRequestJsonRequest, impressionEndpoint)
     }
 
-    @SuppressWarnings(
-        "TooGenericExceptionCaught",
-        "LongMethod",
-    )
+    @SuppressWarnings("TooGenericExceptionCaught")
     private fun executeRequest(impressionRequestJsonRequest: String?, impressionEndpoint: String): Result {
         // Convert impressionRequestJsonString to ImpressionRequest object.
         val impressionRequest = try {
             Gson().fromJson(impressionRequestJsonRequest, ImpressionRequest::class.java)
         } catch (e: JsonParseException) {
-            InAppErrorLogger.logError(
-                TAG,
-                InAppError(
-                    "impressionRequest parsing error", e,
-                    ev = Event.OperationFailed(BackendApi.IMPRESSION.alias),
-                ),
-            )
+            InAppLogger(TAG).error("impression - error: ${e.message}")
             return Result.failure()
         }
 
@@ -95,24 +75,14 @@ internal class ImpressionWorker(
         }
     }
 
-    @SuppressWarnings("LongMethod")
     private fun onResponse(response: Response<ResponseBody>): Result {
         InAppLogger(TAG).info("impression API - code: ${response.code()}")
 
         return when {
             response.code() >= HttpURLConnection.HTTP_INTERNAL_ERROR ->
-                WorkerUtils.checkRetry(serverErrorCounter.getAndIncrement(), BackendApi.IMPRESSION, response) {
-                    Result.retry()
-                }
+                WorkerUtils.checkRetry(serverErrorCounter.getAndIncrement()) { Result.retry() }
             response.code() >= HttpURLConnection.HTTP_MULT_CHOICE -> {
                 serverErrorCounter.set(0) // reset server error counter
-                InAppErrorLogger.logError(
-                    TAG,
-                    InAppError(
-                        "${BackendApi.IMPRESSION.alias} API failed - ${response.errorBody()?.string()}",
-                        ev = Event.ApiRequestFailed(BackendApi.IMPRESSION, "${response.code()}"),
-                    ),
-                )
                 Result.failure()
             }
             else -> {

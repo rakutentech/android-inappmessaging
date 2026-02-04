@@ -4,12 +4,9 @@ import androidx.work.Data
 import androidx.work.OneTimeWorkRequest
 import androidx.work.WorkManager
 import com.google.gson.Gson
-import com.rakuten.tech.mobile.inappmessaging.runtime.InAppError
-import com.rakuten.tech.mobile.inappmessaging.runtime.InAppErrorLogger
+import com.rakuten.tech.mobile.inappmessaging.runtime.InAppMessaging
 import com.rakuten.tech.mobile.inappmessaging.runtime.data.repositories.HostAppInfoRepository
 import com.rakuten.tech.mobile.inappmessaging.runtime.data.requests.ImpressionRequest
-import com.rakuten.tech.mobile.inappmessaging.runtime.eventlogger.BackendApi
-import com.rakuten.tech.mobile.inappmessaging.runtime.eventlogger.Event
 import com.rakuten.tech.mobile.inappmessaging.runtime.exception.InAppMessagingException
 import com.rakuten.tech.mobile.inappmessaging.runtime.utils.WorkManagerUtil
 import com.rakuten.tech.mobile.inappmessaging.runtime.workmanager.workers.ImpressionWorker
@@ -33,14 +30,8 @@ internal class ImpressionScheduler {
             }
         } catch (ie: IllegalStateException) {
             // this should not occur since work manager is initialized during SDK initialization
-            "In-App Messaging impression request failed".let {
-                InAppErrorLogger.logError(
-                    "ImpressionScheduler",
-                    InAppError(
-                        ex = InAppMessagingException(it, ie),
-                        ev = Event.OperationFailed(BackendApi.IMPRESSION.alias),
-                    ),
-                )
+            InAppMessaging.errorCallback?.let {
+                it(InAppMessagingException("In-App Messaging impression request failed", ie))
             }
         }
     }
