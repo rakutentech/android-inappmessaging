@@ -29,6 +29,7 @@ buildscript {
 plugins {
     id 'io.gitlab.arturbosch.detekt' version "${detekt_version}"
     id 'org.sonarqube' version '3.3'
+    id 'io.github.gradle-nexus.publish-plugin' version '2.0.0'
 }
 
 allprojects { proj ->
@@ -73,3 +74,4 @@ tasks.withType(JavaCompile) {
 
 apply from: "$project.rootDir/dependency-check.gradle"
 apply from: "$project.rootDir/sonar.gradle"
+apply from: "$project.rootDir/sonatype.gradle"
