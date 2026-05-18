@@ -210,8 +210,6 @@ workflows:
         inputs:
           - deploy_path: "$SDK_PATH/build/reports/dependency-check-report.html"
   _common-end:
-    after_run:
-    - _run-sonarqube-scanner
     steps:
     - script@1:
         title: Danger
