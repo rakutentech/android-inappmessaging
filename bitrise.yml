@@ -181,6 +181,7 @@ workflows:
             fi
     - script@1:
         run_if: false
+        description: Run Sonarqube Scanner
         title: Run SonarQube Scanner
         inputs:
         - content: ./gradlew sonarqube
