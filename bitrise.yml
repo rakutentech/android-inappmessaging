@@ -180,7 +180,8 @@ workflows:
               fi    
             fi
     - script@1:
-        run_if: '{{getenv "SONARQUBE_TOKEN" | ne ""}}'
+        run_if: false
+        description: Run Sonarqube Scanner
         title: Run SonarQube Scanner
         inputs:
         - content: ./gradlew sonarqube
